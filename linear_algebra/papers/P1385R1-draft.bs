@@ -3,7 +3,7 @@ Title: A proposal to add linear algebra support to the C++ standard library
 Status: D
 Group: WG21
 TR: http://wg21.link/P1385
-ED: https://github.com/BobSteagall/wg21/linear_algebra/papers/P1385R1-draft.bs
+ED: https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/P1385R1-draft.bs
 Markup Shorthands: markdown yes
 Revision: 1-Draft
 Editor: Guy Davidson, guy@hatcat.com
