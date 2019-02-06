@@ -6,20 +6,20 @@ include(CTest)
 ##- This is the set of all headers comprising the Hades public API.
 ##
 set(Includes
-    api_bob/linear_algebra.hpp
-    api_bob/matrix_element_promotions.hpp
-    api_bob/matrix_element_traits.hpp
-    api_bob/matrix_engines.hpp
-    api_bob/matrix_engine_traits.hpp
-    api_bob/matrix.hpp
-    api_bob/matrix_operation_traits.hpp
-    api_bob/matrix_operators.hpp
+    linear_algebra.hpp
+    matrix_element_promotions.hpp
+    matrix_element_traits.hpp
+    matrix_engines.hpp
+    matrix_engine_traits.hpp
+    matrix.hpp
+    matrix_operation_traits.hpp
+    matrix_operators.hpp
 )
 
 ##- This is the set of all private source and header files used to build Hades.
 ##
 set(Sources
-    api_bob/alt_test.cpp
+    alt_test.cpp
 )
 
 include_directories(api_bob)
