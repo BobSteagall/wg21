@@ -1,0 +1,189 @@
+C++ Linear Algebra Library phone meeting
+
+Attendees
+=========
+
+Lawrence Crowl
+Guy Davidson
+Carter Edwards
+Mehdi Goli
+Mark Hoemmen
+David Hollman
+Nasos Iliopoulos
+Bryce Lelbach
+Duane Merrill
+Bob Steagall
+Michael Wong
+
+Discussion
+==========
+
+MW: SG14 had discussion on this at CppCon.  No paper ready at that time.  Bob and Guy, have things changed?  See San Diego Wiki under SG14.
+
+BL: I wanted to get together authors for mdspan proposal plus others to talk about this.  SG14 wanted to go this way.  What are requirements and goals?  Guy, since you and Bob have thought about this in graphics context, could you share what you have in mind?
+
+GD: I could show slides I showed at SG14. [looks them up]
+
+BL: [summarizes mdspan]
+
+MW: Does mdspan give me a mathematical matrix?
+
+CE: Yes, that was the original motivation, to match or exceed Fortran capabilities.
+
+MW: This is what I need to build a machine learning library, eigen library, and linear algebra library.
+
+BL: It supports different layouts.
+
+MW: Does that mean we no longer need an array TS, the one that was killed?
+
+BL: I think that is an accurate statement.
+
+MW: Does it implement it efficiently?
+
+CE: Yes.
+
+BL: It comes from Kokkos.
+
+MW: I know the answers to these questions but I want to advertise them to the rest of this group.
+
+??: Current prototype, transparent to the compiler, can see through 5- or 6-D references, beyond that is sketchy.
+
+MW: Tricycle has implemented that.
+
+??: I corresponded with Ronan on that.
+
+---
+
+GD: [shows slides] "Towards Standardization of Linear Algebra," Guy Davidson and Bob Steagall.
+
+This effort arose out of the graphics proposal.  Bob and I realized that we needed not just a matrix, but a row vector and column vector type.
+
+"Customisable": User chooses storage and implementation.
+
+"Promotable": std::complex<double> and std::complex<float>, should promote like integer types.
+
+MH: Mixed precision?
+
+BS: yes. abstract and concrete. concrete:
+  - element layout. (tri, diag, banded, sparse)
+  - storage management, orthogonal to element layout
+  - resize-ability?
+
+2 promotion problems:
+  1. Element type promotion: scalar of double, times matrix of complex<float>, would like complex<double> matrix. For MRI, receive data as complex 32-bit integers, Fourier space, and you need to transform to say complex<double>.
+  2. Engine (representational type / storage) promotion: fixed-size vs. dynamically-sized engine.
+
+Idea is to expose customization points via type traits.
+We confine ourselves to matrices and vectors, not tensors.
+
+LC?: Think about whether what you're doing extends to higher dimensions.  Would rather not repeat what we did with valarray, and force people to switch to a different datatype to get to higher-order algorithms.
+
+MH: Many linear algebra algorithms do not extend naturally to higher than rank-2 tensors.
+
+DH: mdspan will handle the datatype stuff, for non-sparse matrices at least.  That extends naturally to higher dimensions.  I wanted to agree with MH.
+
+??: We do need 2, 3, 4-rank, but have to keep in mind, when we solve a specific problem, we know the dimension ahead of time.  Don't need dynamic dims.
+
+MW: Datatype, is that same as storage type?  Storage has been pointers, but want to template, so we can use things like buffer data types -- storage class.  We can discuss this later on.
+
+DH: mdspan currently provides that.
+
+BL: our 1-D algorithms, std library, those algorithms we have an abstraction, iterators, a view into the data, agnostic of storage or allocation.  Just provide an iterator.  In same way, mdspan provides sort of the same thing for linear algebra or multi-d algorithms.
+
+MH: Probably not the right abstraction for high-rank sparse tensors, but OK.
+
+NI?: Have you defined operator+ anywhere?  I see operator+=.
+
+GD: Yes, but not as a member function.
+
+GD: [continues to explain operations]
+
+GD: "REP": the actual implementation happens there.  Default naive implementations; can substitute superior versions from the specific domain.  For example, I come from game development, with 3x3 and 4x4 matrices, so I would declare e.g., float_22.
+
+DM: In deep learning: we want to accumulate in a different, higher-precision type (say 32-bit) but write out result in 16 bits.
+
+MW: Important when transferring to different inference engines.
+
+DM: Operator itself has some type-specific stuff.  I have to go, but I want to make this an API request.
+
+BS: We see this as customizable and thus that we can fulfill DM's requirements.
+
+BL: Need to be cautious with operator overloading language.  We went down this path with valarray.  Valarray is almost never used because, after we standardized it, people came up with things like eigen, based on expression templates.  We have to compete with that.  We want implementations to be able to use expression template optimizations.
+
+?? (NI?): We've been working with cuBLAS (?) since 2009/10, and have experience with expression templates.  Linear algebra library needs expression templates.  You gain a lot of performance for cache locality optimizations.
+
+BS: We totally agree and want our API not to preclude optimizations.
+
+DH: I've had several discussions like this w/ Eric Niebler on lazy ranges and their extension to linear algebra.  Seems to align with this pretty well.
+
+BL: If we want to allow these sorts of optimizations then we want something like lazy ranges, a lazy API where you can build in an expression tree.
+
+DH: That's concepts, not class templates.
+
+BL: This is new territory for the library.
+
+?? (NI?): We have some ideas based on ranges.  I have an early draft that I would be happy to share.  Have similar heterogeneous computing interests and needs.  Our library is concepts driven.
+
+CE: First, make sure linear algebra operators decoupled from storage representation.  mdspan focused entirely on storage and layout, representation.
+
+??: We agree CE, definitely.
+
+CE: I didn't see enough detail to be sure of that.  Second, on what parallel resources will you perform your linear algebra operations?  If large, want all threads, or large set of small system?
+
+MH: Batched linear algebra.
+
+GD: Could extend the interface; have to start somewhere.
+
+BS: Decomposition of abstract and concrete, esp. element layout and storage vs. arith operations themselves, 3 orthogonal axes.  Customization points.
+
+?? (NI?): I agree with Bob; this is our requirement.  Need to be able to communicate with third-party libraries etc. that have storage format requirements.
+
+LC: When this reaches rest of C++ committee: Why should this be in the standard?  Need to point out use cases for average programmers.  How does this help a broader community?
+
+BS: My experience in functional MRI.  4-D signal.  Solving a multiple regression problem, highly overdetermined.  I ended up writing a linear algebra library to solve this problem, with a lot of the features of this library.  90% of the code I wrote was interface to wrap these concepts.  Real work done by BLAS MKL; it did all the hard work.  This library would have made medical imaging developers' lives easier.
+
+LC: It takes almost nothing to convince _me_ that we need this, but I'm not the committee as a whole.  Having a good story ready to go will help grease the wheels.
+
+BL: NI talk now in 10 minutes.
+
+DH: What GD said 5 minutes ago: I agree we need to get something ready and have to start somewhere, but potential to have situation with ranges and executors, where hard to build lazy rep on top of eager rep, but other way around is much more straightforward.  Thus, thinking about these things early is a good idea.
+
+NI: [showing slides] "Examples of an index based C++ linear algebra system" -- abstract your reductions and for loops based on indices.  "Index" is a placeholder for evaluation iteration.  It doesn't know how to iterate yet.  e.g., "B(j,i) = A(i,j)" does the transpose, where i and j are each instances of this special index type [templated on a name thing].  A(i,j) generates an expression; operator= on an expression generates loops.  Can use Einstein [tensor index] notation: e.g., "double s = v(i);".
+
+DH: Have you seen this analogous effort in quantum chemistry?  About a dozen libraries that do this.
+
+NI: Yes, I have seen this.  Tacho(?) and F(?)tensor(?).
+
+DH: Tiled array, Cyclops.  2014: summit of these groups that met to establish a standard for Einstein summation libraries.  Just curious if you've coordinated with their effort.
+
+NI: Not yet.
+
+NI: [numerical differentiation example; subarrays at compile time; matrix compositions; closest points between two sets]
+
+NI: Sparse container [filter].
+
+---
+
+BL: Wrap-up first, then let people chat after.  What do we do going forward?  At Kona, GD and BS are working on a proposal.  Do we have an interest in building a wider gropu to work on a unified proposal, or do we want people to work on different ideas?  Evening session at Kona or in SG6 where we talk about this problem space?
+
+LC: Best to explore the space early on, and reach agreement for how much of the space we want to tackle.  Standard is large and growing; biggest criticism of C++.  Want mechanism with a lot of power to cover more space.
+
+BL: Is this sufficiently large to have its own study group, or can we use an existing study group, e.g., numerics?
+
+LC: May not need study group route at this point.  Right now, people that are interested should be getting together informally.  There are a lot of ideas in this space that would be very helpful to a lot of people, but not helpful if delivered inuncoordinated fashion.
+
+MW: Still too fragmented now.  Let's see where BS and GD are going.  Specific study group not important.  SG14 meets monthly to talk about this.  SG14 meets more regularly than SG6 or 7.  We should probably keep it in SG14.  Doesn't have to be in SG14 either.
+
+BL: My preference would be informal discussion group.
+
+MW: Yes, that's fine, I have no problem with that.  SG14 has enough to work on already.  This is big enough group that it could gather its own momentum.
+
+BL: Yes,Want to make sure this doesn't get time boxed.
+
+MW: We will track this in SG14 for now.  Also, proposal from Herb to split up Evolution Working Group into e.g., long-term vs. short-term proposals.
+
+BL: Getting kicked out of conf room now.  Let's meet again in 2 weeks.
+
+MW: Please copy SG14.
+
+BL: Yes.

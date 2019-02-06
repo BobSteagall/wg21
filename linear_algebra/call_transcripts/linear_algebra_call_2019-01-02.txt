@@ -1,0 +1,273 @@
+C++ linear algebra meeting
+20:00 UTC, 02 Jan 2019
+
+Present:
+ - Mark Hoemmen (mfh)
+ - Bob Steagall
+ - brett
+ - Guy Davidson
+ - John McFarlane
+ - Philippe Groarke
+ - Cem Bassoy
+ - Patrice Roy
+ - vincent
+ - Michael Wong
+ - Jayesh Badwaik
+ - Nasos Iliopoulos
+ - Charles Bay
+
+Bob: One goal of this meeting is to look at the Google doc we've written, and separate out the "beginning," "intermediate," and "advanced" levels of the design.
+
+Michael Wolf (MW): The sg14 Google group has been having an issue (on Google's side) that prevents many people (including us) from posting.  std proposal group has been having the same problem.  If you are trying to send messages to SG14 and they are not showing up, this is what's going on.
+
+Here is a link to the document that Bob mentioned:
+
+https://docs.google.com/document/d/1poXfr7mUPovJC9ZQ5SDVM_1Nb6oYAXlK_d0ljdUAtSQ/edit
+
+Brett will drive; looking at document:
+
+Brett: Regarding Layer 0: Why treat row vectors and column vectors as different types?
+
+Guy: Bob and I decided on this design so that we can overload operator* to compute both inner and outer products.  [For example, a row vector times a column vector is a matrix, the result of an outer product; a column vector times a row vector is a scalar, the result of an inner product.]  Another choice would have been to have used explicit function names like "inner_product" and "outer_product," rather than overloading operator*.
+
+Brett: What about vectors of different sizes?  e.g., what if [you attempt to do arithmetic with] a length 3 row vector and a length 4 row vector?
+
+Guy: It would be a compile-time error if the vectors had a different number of entries.
+
+mfh: Compare to span and mdspan: Just like span and mdspan allow either compile-time or run-time sizes, it could either be a compile-time or a run-time error (e.g., to compute the inner product of two vectors with different lengths).
+
+Bob: Guy's reason for distinguishing between row vectors and column vectors in the type system is right on.  We want to use the type system to minimize surprise.  Second, we imagine these row and column vector and matrix types as adapter types.  They would wrap "engines" that provide the actual implementation.  Examples of engines: fixed size and fixed capacity (compile-time dimensions), or dynamic capacity and dynamic sizes, or fixed capacity but dynamic sizes.  Engines handle implementation details, and traits classes provide best performance.
+
+Brett: I was just thinking that row vs. column could be an enum.
+
+Bob: Then you would need to make a run-time decision as to whether it's a row vector or a column vector.  What does operator* return?  Depends on whether the inputs are row vectors or column vectors.
+
+mfh: Could just use explicit names [like inner_product and outer_product, instead of overloading operator*].
+
+Guy: Could also ignore vectors and treat everything as a matrix; row vectors would have one column, and column vectors would have one row.
+
+mfh: Explains how the linear algebra library we built with Kokkos::View (inspiration for mdspan) works.  operator() could be more efficient if one knows at compile time that there is only one dimension: e.g., x(i,0) could be less efficient than x(i), because the compiler may not realize that it's stride-one access.  Thus, our library has some run-time special cases for "matrices" with a single row or column, where it specializes from a rank-2 mdspan (x(i,j)) to a rank-1 mdspan (x(i)).  If a library treats all vectors as matrices, then it might not be possible to have efficient specializations like this without reaching inside of the interface.  That is, we would want the interface to be a zero-overhead abstraction that suffices to implement any linear algebra algorithm; if we can't express "vector" at compile time, it might not be a zero-overhead abstraction.
+
+Brett: What about the type of a list of eigenvalues? complex? float or double?
+
+Bob: "Matrices" generically mean matrices, row vectors, and column vectors.  "Matrices" should support element types that make sense.  float and double, complex float and double.  It may make sense to allow them to work with signed integer types.  For medical imaging, MRI reconstructions, raw data from scanner are signed 32-bit complex integers.  Guy and I think it makes sense also to support element types which are arithmetical, that are not part fo the standard, e.g., fixed-size floats, or high-precision or dynamically resizable floats -- anything that behaves like a real number.
+
+Nasos Iliopoulos: Why not a general field?  Why not allow anything?
+
+Bob: We haven't figured out the set of constraints that should be imposed on the element type of the matrices.  Concepts may help with this, e.g., a "field" concept.
+
+mfh: Computer science concepts like "trivially memcpy-able" may be just as important for the implementation as mathematical concepts like "semiring" or "field."
+
+Bob: Another important design point: Source of memory? Addressing model?  Natively, one addresses elements through normal pointer arithmetic, but "fancy pointers" should work too.
+
+mfh: mdspan takes care of all of that except for actual allocation.
+
+Bob: Reasonable.  Related question: Memory ownership?  Could have an engine type that leverages mdspan; it could be an owning or nonowning view into mdspan.
+
+Bob: Capacity and resizability.  std::string, std::vector have capacity and size.  In LAPACK, one can specify column capacities > column sizes [via arguments like LDA, "leading dimension of the matrix A"].  Useful for functional MRI.  Dynamically resizable memory could have row and column sizes and capacities.
+
+Bob: Element layout?
+
+Guy: When we originally presented this at Cppcon, the room assumed I was talking about mdspan.  I wasn't, but I'm pleased at the progress mdspan has made.  mdspan could be an implementation detail of this library.
+
+Brett: Is our focus to try to emulate mdspan?
+
+Guy: Not at all.  mdspan can be used to implement this linear algebra library.
+
+Bob: Yes.  mdspan could turn out to be a useful piece for how a library implementer would actually implement some of the default set of underlying engines.
+
+Guy: mdspan and linear algebra are at different levels of abstraction.
+
+Brett: What engines are we going to support?
+
+Bob: Will come to that. Now: element access and indexing.  User of this library would like to access individual elements in both const and mutable fashion.  1-D indexing for vectors, 2-D for matrices.  Guy and I differ on 0-based or 1-based indexing.  Guy favors 0-based, I lean towards 1-based.
+
+?: Could we do both?  Is that possible?
+
+Bob: Possible.
+
+mfh: It could be a function of the layout, in mdspan terms.  [With Kokkos::View, we have explored layouts that allow different index bases, to help simplify structured grid codes.]
+
+Bob: Element type promotation: We think it's important to allow expressions that have mixed element types.  If you multiply a matrix of double times a matrix of complex double, it should be a matrix of complex double.  Element type promotion should occur inside expressions, so that precision is never lost if possible.
+
+John McFarlane (JMF): Could that depend on types? [yes] I would prefer leaving that to the types themselves.  I can give examples.
+
+Bob: I would like to see those examples.
+
+JMF: Two examples: fixed point and units (for dimensional analysis).  If you multiply two numbers together, decltype(left*right) should be the type, else it could cause a conversion.  Any other option could only produce as much or more work and constrain the behavior as much or more as just letting them behave as they usually do.  Also: if you multiply two shorts together, you get int.  signed char * short, results in int.  We have been trying to get GLM to work with fixed-point types; the units guys have been trying similar thing; the first thing you notice is if you add two vectors together, whatever the scalar type fo the two operands, that is the type of the result.
+
+Bob: Could [customizable] element promotion traits help with that?
+
+JMF: I guess so?  Seems like you could just wrap the input arguments' element types in another type that changes the result type.  Would it not overstep the bounds of a linear algebra library to permit customizing the type of the result of an expression?
+
+mfh: [Explains related history of the POOMA project, discussed in the history paper in progress.]
+
+Bob: We conceive the result type as customizable via element traits.  This also defines the result type for cross-engine arithmetic expressions.  Default is still decltype(A*B).
+
+JMF: Do you promote before or after operating?  That's crucial.
+
+Bob: That's an implementation detail.
+
+Nasos: Why would a type promotion facility be a part of an algebra proposal, and not a proposal on its own?
+
+Bob: Traits would need to interoperate with linear algebra.  But that's an interesting idea -- breaking arithmetic promotion traits out of linear algebra is analogous to breaking linear algebra out of graphics.  I think we should try it inside the linear algbra proposal first before breaking it out.
+
+Brett: But isn't that part of the type traits library? Shouldn't we do that as a separate ... run time type traits ... to be supported?
+
+...
+
+Bob: What do you do when you have expression that mixes engine types?  e.g., fixed size, fixed capacity matrix, times dynamically resizable matrix?  Analogy with element type promotion.  We think promotion should be in the direction of more generality.  For example, towards dynamic.  But if all fixed size compile time, results should be too.
+
+JMF: Could you perhaps do this (defining the result type of expressions) by specializing  common_type for pairs of engines?  That might be blunt, since different operations might want to be different things, but that would be first goto.
+
+Nasos: Could "engine" include GPU, MPI?
+
+Bob: Currently: Fixed size and fixed capacity; dynamically allocated memory that might be mdspan'd; transpose engine.  Role of engine is to manage storage and layout.
+
+Cem: What does "engine" really solve?  If that many possibilities, e.g., with MPI governing parallelism.
+
+Bob: Engine is the mechanism of customization.  Matrix will be parametrized in terms of engine.  If you want a new storage layout or if you want to support a new type of hardware, you would do this by writing a new engine type and instantiating your matrices in those terms.  Analogy is with custom allocator.
+
+Cem: What about default engines?
+
+Bob: Set of default engines -- some immediately obvious, e.g., fixed size fixed capacity engines like 3x3, 4x1 commonly used in graphics.
+
+[some confusion about what "engine" means]
+
+mfh: [Read history paper in progress, in particular the POOMA section, for a definition of the "engine" idea.]
+
+Bob: Concurrency and parallelism are similiar but different.  Interface specification should not preclude implementations from exploiting these.  Custom engines come in here.
+
+Cem: It seems like an engine should just be an std::tuple of template parameters for your matrix, like how the Eigen library does it.
+
+mfh: Engine should not _be_ the template parameters; one should _deduce_ the engine type from the matrix's template parameters.  [This seems like a fine distinction, but it lets matrices have a default engine if users don't specify it, and would also let users specify only some but not all optional template parameters.  Compare to how Kokkos::View deduces the layout, execution space, and memory space from its template parameters.]
+
+Bob: Engine comes from template parameters, but the engine could itself be parameterized.
+
+mfh: I would prefer factoring out the allocation aspects of engine from the layout aspects of engine.  [Compare to how Kokkos::View factors out execution and memory spaces from the array layout.]
+
+Bob: This depends on how you factor out the template parameters.  It's an aesthetic choice, which of the 8-9 aspects belong to engine vs. adapter types.  Layout is an intrinsic property of the engine itself, though one could define a parameterized engine by layout.
+
+Nasos: I think Mark as a point.  "Engine" from HPC side sounds like computer architecture, e.g., shared memory, GPGPU, MPI.  We should factor out architecture from layout.
+
+mfh: An engine could have a default preferred layout.  For example, in Kokkos, the "Cuda" execution space defaults to use column-major ("layout left") matrices, and CPU execution spaces default to use row-major ("layout right") matrices.
+
+Nasos: That makes sense to me.
+
+Bob: ...
+
+mfh: Regarding the boundary between Layers 1 and 2 in your document: Layer 1 conflates computer science / BLAS ideas (e.g., transpose) with mathematical / LAPACK ideas (e.g., inverse).
+
+Guy: I culled Layer 1 from a standard linear algebra textbook.  what do you mean?
+
+mfh: Implementing inverse depends on numerical analysis knowledge; implementing transpose does not.
+
+Cem: ... layer 1 as fundamental layer ...
+
+Guy: ...
+
+mfh: [Explains above:] The BLAS and LAPACK are separate, because they express a dividing line between computer science domain knowledge, and numerical analysis domain knowledge.  For example, you may need a low-level understanding of computer architecture in order to implement dense matrix-matrix multiply efficiently, but you don't need to understand floating-point arithmetic.  In order to implement LU decomposition correctly, you need to know something about floating-point arithmetic and numerical analysis, but you don't necessarily need a low-level understanding of computer architecture.
+
+mfh: To relate this back to a C++ standard library context: The people most likely to implement and maintain a standard C++ library are unlikely to be trained as numerical analysts, and vice versa.
+
+Guy: Some things in Layer 1 are possibly too simple for 1 and belong in Layer 0; some things in Layer 1 are too complex and should be in Layer 2.  Layers could be separated either by domain [as above, in mfh's argument], or by  complexity of functionality.  We called Layer 1 "geometry" because it's the simplest set of things you could do with linear algebra.  In terms of the textbook I've been reading, it was a set of operations that required reading the least number of pages into the textbook.  It would be daft for a foundation paper not to include at least some features from Layer 1.  A first paper could include just the "trivial" functions from Layer 1; determinant and inverse could come later.  I included inverse because the immediate audience of graphics developers would want inverse.
+
+Brett: I would agree with that.  Do we need modulus, identity, subvector?
+
+Guy: There are a few ways to write the paper.  The beauty of linear algebra is that dependencies are well defined, so you can stop at any point to standardize, and write successive papers later to standardize more features.
+
+mfh: Skill sets of likely implementers should define the boundary between layers.  There's not much overlap between "numerical analysts" and "C++ standard library implementers."
+
+Guy: Yes, I agree.
+
+Vincent: "Geometry" -- does that mean "geometry of matrices," like transposing, or the "geometrical interpretation of matrices"?
+
+Guy: I mean the latter.
+
+V: Then, if we start talking about that, we enter a whole new domain.  If we only do the Euclidean part, it looks simple, but if we do more general geometry, we need tensor algebra and differential geometry.  That's the right way to do it, but would take a lot more work.
+
+Guy: This is a linear algebra paper, not a tensor algebra paper.  Once you go that far it stops being "linear."
+
+V: Not sure how to define this correctly without tensor algebra.
+
+Bob: "Geometry" means common kinds of geometry operations one might use when implementing a game.  Not thinking about geometry of multidimensional space in the differential geometry / tensor calculus sense.
+
+Guy: That's quite right.  Layer 1 is about applications of those.  We certainly do open the door of tensor analysis, but we don't have to go through it in this paper.
+
+V: Yeah, sure.
+
+Guy: Whole point of successor papers -- I don't want to tackle the whole field of linear algebra in a single paper, otherwise we'll get nothing until 2029.
+
+Brett: That's why ... layer 0 right now.
+
+Cem: Guy, What's your favorite textbook?
+
+Guy: I've read a lot of textbooks.  my favorite is by Seymour Lipschutz:
+
+https://www.amazon.co.uk/Schaums-Outline-Linear-Algebra-Outlines/dp/1260011445/ref=sr_1_5?s=books&ie=UTF8&qid=1546462998&sr=1-5
+
+Bob: I used Howard Anton's "Elementary Linear Algebra."  See also David C. Lay, "Linear algebra and applications."
+
+Cem: What about Gene Golub's book, "Matrix Computations"?
+
+mfh: It's good but not laid out pedagogically.
+
+Cem: Good to have standard functions we could use for linear algebra.  "Geometry" stuff might be specicial to geometry, but linear algebra needs more complicated stuff like LR decompositions.
+
+Guy: Those could be in successor papers.  Plenty of scope for growth.  I took my favorite early concepts for broad use.  "Geometry" tag for Layer 1 simply tries to find a domain for them.
+
+Bob: Our goal is to define an interface that allows for good implementations.  Interface should be implementable so people can get the performance they like.  To come back to what Mark said a few minutes ago: Where do we draw the line?  You made a point about inverse -- an example of one kind of decomposition, like least squares or SVD.  Are these things that should be part of first paper, or follow-on papers?  Should they have a default implementation provided by the standard library for at least float and double?  These are all questions to be answered.  We mentioned SVD last call -- several objections, it's really hard, how could we make it right for everyone all the time?  I don't think that's achievable, but by analogy with allocators, one could perhaps implement specialized versions of those algorithms for special element types.  Decompositions and eigenvalue problems belong at least to Level 1, and more likely to Level 2.
+
+mfh: One way to define Layer 1: Does it suffice to implement all the algorithms in Gene Golub's textbook?
+
+Cem: I got confused because "inverse" only needs a matrix decomposition for large matrices.  For small matrices, like 3x3, one could implement inverse directly, as an explicit formula.  That's why I got confused, because it's in Layer 1.  I was thinking that the BLAS 1, 2, and 3 could define Layer 1.  Layer 2 could be more complex operations, like what LAPACK provides.
+
+Guy: I'll have to think more about this.
+
+mfh: If we had parallel Ranges, would that undermine Layers 0 and 1 somewhat?  For example, would a fully parallel Ranges version of transform_reduce make "inner product" unnecessary?  Imagine a C++ developer who is not a linear algebra person; they might object to a linear algebra library adding redundant and "more special" ways of spelling existing things like transform_reduce.
+
+Guy: I have thought about Ranges and Layer 0.  We could implement Layer 0 in terms of Ranges.  But here we are defining vocabulary.
+
+mfh: So, for example, transform_reduce could be an implementation detail of inner product?
+
+Guy: Yes.
+
+Bob: We're trying to provide set of vocabulary types that mimic mathematical notation on paper.  Hence e.g., row vs. column vectors.
+
+Guy: We are without an agenda, an therefore without a schedule.  It's late in UK.
+
+Brett: I'll have to leave pretty soon myself.  I think we got a lot of info we need in order to work with, an we just need to start getting some papers out.
+
+MW: Sounds like we've done a lot of good work, and maybe it's time to come to a reasonable agreement on paper(s) for the 21 Jan (Mon 10 am ET) Kona paper deadline.  Do we have 1-2 papers?  This proposal + history document?
+
+Guy: I already have a paper number, 1166, into which I would fold this document and discussion.  Bob and I are also working on a different paper, 1385 (?), that will describe our first iteration of a response to 1166 (as an API or design sketch).
+
+mfh: Did you mean to fold the history paper into 1166?
+
+Guy: No.
+
+mfh: Would it be helpful to request a separate paper number for the history paper, so that Guy and Bob can cite it?
+
+Guy,MW: Yes, that would be good.
+
+MW: This is last linear algebra conference call before the Kona paper deadline.  Guy, would you like others to collaborate with you on this paper?  Also, I hope you have booked your hotel rooms for Kona.  If not, please do so as soon as possible; it may be too late.  If there are enough people at Kona, I plan to hold an SG14 face-to-face meeting to present these papers.
+
+Guy: We are by no means excluding collaboration.  Regarding presenting at Kona, we will present in SG14 Friday morning.
+
+MW: [confirms SG14 Friday morning]
+
+MW: SG19 (machine learning) is Friday afternoon.
+
+Guy: I have a rolling presentation.  I can make it again in Kona.  I will make it in two weeks, I'll be speaking at Prague, avast meetup, live streaming.  16 Jan?
+
+MW: Please post [streaming] link to SG14.
+
+Guy: I will.
+
+MW: I think this call went really well.
+
+Bob: Slack has "sg14" organization -- could be alternative means of communication, in case the Google group doesn't work.
+
+brett: It's on cpplang, probably #sg14.
+
+Bob: Next call will be first Wed of Feb: 06 Feb.  3pm ET, 20:00 UTC, per google poll.
