@@ -847,11 +847,11 @@ using matrix_engine_subtract_t = typename matrix_engine_subtract_promotion<E1, E
 
 ### Engine Promotion Traits for Multiplication
 
-~~~~
 Class template `matrix_engine_multiply_promotion<E1, E2>`
 implements a traits type that determines the resulting engine type when
 multiplying two compatible *MathObj*s.
 
+~~~~
 template<class E1, class E2>
 struct matrix_engine_multiply_promotion;
 

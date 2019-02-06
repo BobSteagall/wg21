@@ -2251,11 +2251,9 @@ subtracting two compatible <em>MathObj</em>s.</p>
 <c- k>using</c-> <c- n>matrix_engine_subtract_t</c-> <c- o>=</c-> <c- k>typename</c-> <c- n>matrix_engine_subtract_promotion</c-><c- o>&lt;</c-><c- n>E1</c-><c- p>,</c-> <c- n>E2</c-><c- o>>::</c-><c- n>engine_type</c-><c- p>;</c->
 </pre>
    <h4 class="heading settled" data-level="6.1.8" id="engine-promotion-traits-for-multiplication"><span class="secno">6.1.8. </span><span class="content">Engine Promotion Traits for Multiplication</span><a class="self-link" href="#engine-promotion-traits-for-multiplication"></a></h4>
-<pre class="highlight"><c- n>Class</c-> <c- k>template</c-> <c- o>&lt;</c-><c- n>code</c-> <c- n>data</c-><c- o>-</c-><c- n>opaque</c-> <c- n>bs</c-><c- o>-</c-><c- n>autolink</c-><c- o>-</c-><c- n>syntax</c-><c- o>=</c->'`<c- n>matrix_engine_multiply_promotion</c-><c- o>&lt;</c-><c- n>E1</c-><c- p>,</c-> <c- n>E2</c-><c- o>></c->`'<c- o>></c-><c- n>matrix_engine_multiply_promotion</c-><c- o>&amp;</c-><c- n>lt</c-><c- p>;</c-><c- n>E1</c-><c- p>,</c-> <c- n>E2</c-><c- o>>&lt;/</c-><c- n>code</c-><c- o>></c->
-<c- n>implements</c-> <c- n>a</c-> <c- n>traits</c-> <c- n>type</c-> <c- n>that</c-> <c- n>determines</c-> <c- n>the</c-> <c- n>resulting</c-> <c- n>engine</c-> <c- n>type</c-> <c- n>when</c->
-<c- n>multiplying</c-> <c- n>two</c-> <c- n>compatible</c-> <c- o>*</c-><c- n>MathObj</c-><c- o>*</c-><c- n>s</c-><c- p>.</c->
-
-<c- k>template</c-><c- o>&lt;</c-><c- n>class</c-> <c- n>E1</c-><c- p>,</c-> <c- n>class</c-> <c- n>E2</c-><c- o>></c->
+   <p>Class template <code class="highlight"><c- n>matrix_engine_multiply_promotion</c-><c- o>&lt;</c-><c- n>E1</c-><c- p>,</c-> <c- n>E2</c-><c- o>></c-></code> implements a traits type that determines the resulting engine type when
+multiplying two compatible <em>MathObj</em>s.</p>
+<pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- n>class</c-> <c- n>E1</c-><c- p>,</c-> <c- n>class</c-> <c- n>E2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_engine_multiply_promotion</c-><c- p>;</c->
 
 <c- p>{</c->
