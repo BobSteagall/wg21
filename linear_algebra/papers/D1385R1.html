@@ -1578,8 +1578,8 @@ infrastructure in order to maximize performance for specific problems
 and computing platforms. These users seek the highest possible run-time
 performance, and to achieve it, require the ability to customize any and
 every portion of the library’s computational infrastructure.</p>
-   <p>With these high-level user requirements in mind, we propose an interface
-specification intended to achieve the following goals:</p>
+   <p>With these high-level user requirements in mind, in this paper we propose
+an interface specification intended to achieve the following goals:</p>
    <ol>
     <li data-md>
      <p>To provide a set of vocabulary types for representing the
@@ -1968,17 +1968,16 @@ trivial constructors or destructors.</p>
    <p>In general, when multiple built-in arithmetic types are present in an
 arithmetical expression, the resulting type will have a precision
 greater than or equal to that of the type with greatest precision in the
-expression. In other words, to the greatest reasonable extent,
-information is preserved.</p>
-   <p>A similar principal should apply to expressions involving <em>MathObj</em>s
-where more than one element type is present. Arithmetic operations
-involving <em>MathObj</em>s should, to the greatest reasonable extent, preserve
+expression. In other words, to the greatest reasonable extent, information 
+is preserved.</p>
+   <p>We contend that a similar principal should apply to expressions involving <em>MathObj</em>s where more than one element type is present. Arithmetic operations
+involving <em>MathObj</em>s should, to the greatest reasonable extent, preserve 
 element-wise information.</p>
    <p>For example, just as the result of multiplying a <code class="highlight"><c- b>float</c-></code> by a <code class="highlight"><c- b>double</c-></code> is a <code class="highlight"><c- b>double</c-></code>, the result multiplying a matrix-of-<code class="highlight"><c- b>float</c-></code> by a matrix-of-<code class="highlight"><c- b>double</c-></code> should be a matrix-of-<code class="highlight"><c- b>double</c-></code>. We call the
 process of determining the resulting element type <em>element promotion</em>.</p>
    <h3 class="heading settled" data-level="5.9" id="mixed-engine-expressions"><span class="secno">5.9. </span><span class="content">Mixed-Engine Expressions</span><a class="self-link" href="#mixed-engine-expressions"></a></h3>
    <p>In analogy with element type, <em>MathObj</em> expressions may include mixed
-storage management strategies as implemented by their corresponding
+storage management strategies, as implemented by their corresponding
 engine types. For example, consider the case of a fixed-size matrix
 multiplied by a dynamically-resizable matrix. What is the engine type of
 the resulting matrix?</p>
@@ -2199,7 +2198,7 @@ Note the partial specializations involving <code class="highlight"><c- n>complex
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_element_promotion</c->
 <c- p>{</c->
-    <c- k>using</c-> <c- n>type</c-> <c- o>=</c-> <c- p>...;</c->
+    <c- k>using</c-> <c- n>type</c-> <c- o>=</c-> <c- p>...;</c->           <c- c1>//- Implementation-defined</c->
 <c- p>};</c->
 
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
@@ -2220,7 +2219,7 @@ traits type that determines the resulting engine type when negating a <em>MathOb
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>E1</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_engine_negate_promotion</c->
 <c- p>{</c->
-    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- p>...;</c->
+    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- p>...;</c->    <c- c1>//- Implementation-defined</c->
 <c- p>};</c->
 
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>E1</c-><c- o>></c->
@@ -2233,7 +2232,7 @@ compatible <em>MathObj</em>s.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>E1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>E2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_engine_add_promotion</c->
 <c- p>{</c->
-    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- p>...;</c->
+    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- p>...;</c->    <c- c1>//- Implementation-defined</c->
 <c- p>};</c->
 
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>E1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>E2</c-><c- o>></c->
@@ -2245,7 +2244,7 @@ subtracting two compatible <em>MathObj</em>s.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>E1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>E2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_engine_subtract_promotion</c->
 <c- p>{</c->
-    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- p>...;</c->
+    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- p>...;</c->    <c- c1>//- Implementation-defined</c->
 <c- p>};</c->
 
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>E1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>E2</c-><c- o>></c->
@@ -2256,9 +2255,8 @@ subtracting two compatible <em>MathObj</em>s.</p>
 multiplying two compatible <em>MathObj</em>s.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- n>class</c-> <c- n>E1</c-><c- p>,</c-> <c- n>class</c-> <c- n>E2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_engine_multiply_promotion</c-><c- p>;</c->
-
 <c- p>{</c->
-    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- p>...;</c->
+    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- p>...;</c->    <c- c1>//- Implementation-defined</c->
 <c- p>};</c->
 
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>E1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>E2</c-><c- o>></c->
