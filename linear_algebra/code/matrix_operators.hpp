@@ -1,7 +1,7 @@
-#ifndef MATRIX_MULTIPLY_HPP_DEFINED
-#define MATRIX_MULTIPLY_HPP_DEFINED
+#ifndef MATRIX_OPERATORS_HPP_DEFINED
+#define MATRIX_OPERATORS_HPP_DEFINED
 
-#include "matrix_operation_traits.hpp"
+#include "matrix_operator_traits.hpp"
 
 namespace std::la {
 //=================================================================================================
@@ -34,11 +34,16 @@ operator -(matrix<E1> const& cv)
 //  Binary addition operators, which forward to the addition traits do the work.
 //=================================================================================================
 //
-template<class E1, class E2>
+template<class ET1, class AT1, class ET2, class AT2>
 inline auto
-operator +(column_vector<E1> const& cv1, column_vector<E2> const& cv2)
+operator +(column_vector<ET1,AT1> const& cv1, column_vector<ET2,AT2> const& cv2)
 {
-    return matrix_addition_traits<column_vector<E1>, column_vector<E2>>::add(cv1, cv2);
+    using operator_traits = matrix_operator_traits_promotion_t<AT1, AT2>;
+    using op1_type        = column_vector<ET1, AT1>;
+    using op2_type        = column_vector<ET2, AT2>;
+    using addition_traits = typename operator_traits::template addition_traits<op1_type, op2_type>;
+
+    return addition_traits::add(cv1, cv2);
 }
 
 template<class E1, class E2>
@@ -196,4 +201,4 @@ operator *(matrix<E1> const& m1, matrix<E2> const& m2)
 }
 
 }       //- std::la namespace
-#endif  //- MATRIX_MULTIPLY_HPP_DEFINED
+#endif  //- MATRIX_OPERATORS_HPP_DEFINED

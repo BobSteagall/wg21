@@ -12,7 +12,7 @@ struct is_complex : public false_type
 {};
 
 template<class T>
-struct is_complex<std::complex<T>> 
+struct is_complex<std::complex<T>>
 :   public std::bool_constant<std::is_arithmetic_v<T>>
 {};
 
@@ -23,7 +23,7 @@ inline constexpr bool   is_complex_v = is_complex<T>::value;
 //- New trait "is_matrix_element" to detect valid matrix/vector element types.
 //
 template<class T>
-struct is_matrix_element 
+struct is_matrix_element
 :   public std::bool_constant<std::is_arithmetic_v<T> || is_complex_v<T>>
 {};
 
@@ -46,8 +46,10 @@ using element_promotion_helper_t = typename element_promotion_helper<T1, T2>::ty
 
 
 //- Unfortunately, in C++17, std::complex only permits arithmetical expressions between
-//  homogeneous element types: for example, complex<float>*complex<float> and 
-//  float*complex<float> are permitted but double*complex<float> is not.
+//  homogeneous element types: for example, expressions like complex<float>*complex<float>
+//  and float*complex<float> are permitted, but double*complex<float> is not.  This (yuck)
+//  macro enforces this homogeneity in the traits types below.  Hopefully std::complex
+//  will support heterogeneous expressions in the future.
 //
 #define ENFORCE_COMPLEX_OPERAND_HOMOGENEITY
 
@@ -60,34 +62,34 @@ using element_promotion_helper_t = typename element_promotion_helper<T1, T2>::ty
 //- Traits to perform type promotion for arithmetical expressions, using the helper above.
 //
 template<class T1, class T2>
-struct element_promotion
+struct matrix_element_promotion
 {
     using type = element_promotion_helper_t<T1, T2>;
 };
 
 template<class T1, class T2>
-struct element_promotion<T1, std::complex<T2>>
+struct matrix_element_promotion<T1, std::complex<T2>>
 {
     ASSERT_COMPLEX_OPERAND_HOMOGENEITY(T1,T2);
     using type = std::complex<element_promotion_helper_t<T1, T2>>;
 };
 
 template<class T1, class T2>
-struct element_promotion<std::complex<T1>, T2>
+struct matrix_element_promotion<std::complex<T1>, T2>
 {
     ASSERT_COMPLEX_OPERAND_HOMOGENEITY(T1,T2);
     using type = std::complex<element_promotion_helper_t<T1, T2>>;
 };
 
 template<class T1, class T2>
-struct element_promotion<std::complex<T1>, std::complex<T2>>
+struct matrix_element_promotion<std::complex<T1>, std::complex<T2>>
 {
     ASSERT_COMPLEX_OPERAND_HOMOGENEITY(T1,T2);
     using type = std::complex<element_promotion_helper_t<T1, T2>>;
 };
 
 template<class T1, class T2>
-using element_promotion_t = typename element_promotion<T1, T2>::type;
+using matrix_element_promotion_t = typename matrix_element_promotion<T1, T2>::type;
 
 }       //- std::la namespace
 #endif  //- MATRIX_ELEMENT_TRAITS_HPP_DEFINED

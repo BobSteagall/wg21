@@ -1,5 +1,5 @@
-#ifndef MATRIX_OPERATION_TRAITS_HPP_DEFINED
-#define MATRIX_OPERATION_TRAITS_HPP_DEFINED
+#ifndef MATRIX_EXPRESSION_TRAITS_HPP_DEFINED
+#define MATRIX_EXPRESSION_TRAITS_HPP_DEFINED
 
 #include "matrix.hpp"
 
@@ -7,7 +7,7 @@ namespace std::la {
 //=================================================================================================
 //                                      **** NEGATION ****
 //=================================================================================================
-//  Traits type that performs unary negations.
+//  Traits type that performs negation.
 //=================================================================================================
 //
 template<class OP1>
@@ -44,7 +44,7 @@ struct matrix_negation_traits<matrix<E1>>
 //=================================================================================================
 //                                      **** ADDITION ****
 //=================================================================================================
-//  Traits type that performs the additions.
+//  Traits type that performs addition.
 //=================================================================================================
 //
 template<class OP1, class OP2>
@@ -81,7 +81,7 @@ struct matrix_addition_traits<matrix<E1>, matrix<E2>>
 //=================================================================================================
 //                                     **** SUBTRACTION ****
 //=================================================================================================
-//  Traits type that performs the subtractions.
+//  Traits type that performs subtraction.
 //=================================================================================================
 //
 template<class OP1, class OP2>
@@ -118,7 +118,7 @@ struct matrix_subtraction_traits<matrix<E1>, matrix<E2>>
 //=================================================================================================
 //                                   **** MULTIPLICATION ****
 //=================================================================================================
-//  Traits type that performs the multiplications.
+//  Traits type that performs multiplication.
 //=================================================================================================
 //
 template<class OP1, class OP2>
@@ -164,7 +164,7 @@ struct matrix_multiplication_traits<row_vector<E1>, column_vector<E2>>
 {
     using elem_type_1 = typename row_vector<E1>::element_type;
     using elem_type_2 = typename column_vector<E2>::element_type;
-    using result_type = element_promotion_t<elem_type_1, elem_type_2>;
+    using result_type = matrix_element_promotion_t<elem_type_1, elem_type_2>;
 
     static result_type  multiply(row_vector<E1> const& rv, column_vector<E1> const& cv);
 };
@@ -232,5 +232,64 @@ struct matrix_multiplication_traits<matrix<E1>, matrix<E2>>
     static result_type  multiply(matrix<E1> const& m1, matrix<E2> const& m2);
 };
 
+
+//=================================================================================================
+//                                  **** OPERATOR TRAITS ****
+//=================================================================================================
+//  Traits type that contains and refers to the four arithmetic traits types.
+//=================================================================================================
+//
+struct matrix_operator_traits
+{
+    template<class OP1>
+    using negation_traits = matrix_negation_traits<OP1>;
+
+    template<class OP1, class OP2>
+    using addition_traits = matrix_addition_traits<OP1, OP2>;
+
+    template<class OP1, class OP2>
+    using subtraction_traits = matrix_subtraction_traits<OP1, OP2>;
+
+    template<class OP1, class OP2>
+    using multiplication_traits = matrix_multiplication_traits<OP1, OP2>;
+};
+
+
+//=================================================================================================
+//                             **** OPERATOR TRAITS PROMOTION ****
+//=================================================================================================
+//  Traits type that determines which operator traits to use in an expression.
+//=================================================================================================
+//
+template<class T1, class T2>
+struct matrix_operator_traits_promotion;
+
+template<class T1>
+struct matrix_operator_traits_promotion<T1, T1>
+{
+    using traits_type = T1;
+};
+
+template<class T1>
+struct matrix_operator_traits_promotion<T1, matrix_operator_traits>
+{
+    using traits_type = T1;
+};
+
+template<class T1>
+struct matrix_operator_traits_promotion<matrix_operator_traits, T1>
+{
+    using traits_type = T1;
+};
+
+template<>
+struct matrix_operator_traits_promotion<matrix_operator_traits, matrix_operator_traits>
+{
+    using traits_type = matrix_operator_traits;
+};
+
+template<class T1, class T2>
+using matrix_operator_traits_promotion_t = typename matrix_operator_traits_promotion<T1,T2>::traits_type;
+
 }       //- std::la namespace
-#endif  //- MATRIX_OPERATION_TRAITS_HPP_DEFINED
+#endif  //- MATRIX_EXPRESSION_TRAITS_HPP_DEFINED

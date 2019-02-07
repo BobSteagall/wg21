@@ -13,7 +13,7 @@ namespace std::la {
 template<class E1>
 struct matrix_engine_negate_promotion;
 
-//- Note that in the cases where allocators are rebound, there is an assumption that all 
+//- Note that in the cases where allocators are rebound, there is an assumption that all
 //  allocators are standard-conformant.
 //
 template<class T1, class A1>
@@ -52,13 +52,13 @@ using matrix_engine_negate_t = typename matrix_engine_negate_promotion<E1>::engi
 template<class E1, class E2>
 struct matrix_engine_add_promotion;
 
-//- Note that in the cases where allocators are rebound, there is an assumption that all 
+//- Note that in the cases where allocators are rebound, there is an assumption that all
 //  allocators are standard-conformant.
 //
 template<class T1, class A1, class T2, class A2>
 struct matrix_engine_add_promotion<dyn_matrix_engine<T1, A1>, dyn_matrix_engine<T2, A2>>
 {
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using alloc_type   = typename std::allocator_traits<A1>::template rebind_alloc<element_type>;
     using engine_type  = dyn_matrix_engine<element_type, alloc_type>;
 };
@@ -66,7 +66,7 @@ struct matrix_engine_add_promotion<dyn_matrix_engine<T1, A1>, dyn_matrix_engine<
 template<class T1, class A1, class T2, size_t R2, size_t C2>
 struct matrix_engine_add_promotion<dyn_matrix_engine<T1, A1>, fs_matrix_engine<T2, R2, C2>>
 {
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using alloc_type   = typename std::allocator_traits<A1>::template rebind_alloc<element_type>;
     using engine_type  = dyn_matrix_engine<element_type, alloc_type>;
 };
@@ -74,7 +74,7 @@ struct matrix_engine_add_promotion<dyn_matrix_engine<T1, A1>, fs_matrix_engine<T
 template<class T1, size_t R1, size_t C1, class T2, class A2>
 struct matrix_engine_add_promotion<fs_matrix_engine<T1, R1, C1>, dyn_matrix_engine<T2, A2>>
 {
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using alloc_type   = typename std::allocator_traits<A2>::template rebind_alloc<element_type>;
     using engine_type  = dyn_matrix_engine<element_type, alloc_type>;
 };
@@ -84,7 +84,7 @@ struct matrix_engine_add_promotion<fs_matrix_engine<T1, R1, C1>, fs_matrix_engin
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C2>;
 };
 
@@ -109,22 +109,22 @@ struct matrix_engine_add_promotion<matrix_transpose_engine<E1>, matrix_transpose
 };
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
-struct matrix_engine_add_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>, 
+struct matrix_engine_add_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
                                    fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C2>;
 };
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
-struct matrix_engine_add_promotion<fs_matrix_engine<T1, R1, C1>, 
+struct matrix_engine_add_promotion<fs_matrix_engine<T1, R1, C1>,
                                    matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C2>;
 };
 
@@ -144,13 +144,13 @@ using matrix_engine_add_t = typename matrix_engine_add_promotion<E1, E2>::engine
 template<class E1, class E2>
 struct matrix_engine_subtract_promotion;
 
-//- Note that in the cases where allocators are rebound, there is an assumption that all 
+//- Note that in the cases where allocators are rebound, there is an assumption that all
 //  allocators are standard-conformant.
 //
 template<class T1, class A1, class T2, class A2>
 struct matrix_engine_subtract_promotion<dyn_matrix_engine<T1, A1>, dyn_matrix_engine<T2, A2>>
 {
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using alloc_type   = typename std::allocator_traits<A1>::template rebind_alloc<element_type>;
     using engine_type  = dyn_matrix_engine<element_type, alloc_type>;
 };
@@ -158,7 +158,7 @@ struct matrix_engine_subtract_promotion<dyn_matrix_engine<T1, A1>, dyn_matrix_en
 template<class T1, class A1, class T2, size_t R2, size_t C2>
 struct matrix_engine_subtract_promotion<dyn_matrix_engine<T1, A1>, fs_matrix_engine<T2, R2, C2>>
 {
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using alloc_type   = typename std::allocator_traits<A1>::template rebind_alloc<element_type>;
     using engine_type  = dyn_matrix_engine<element_type, alloc_type>;
 };
@@ -166,7 +166,7 @@ struct matrix_engine_subtract_promotion<dyn_matrix_engine<T1, A1>, fs_matrix_eng
 template<class T1, size_t R1, size_t C1, class T2, class A2>
 struct matrix_engine_subtract_promotion<fs_matrix_engine<T1, R1, C1>, dyn_matrix_engine<T2, A2>>
 {
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using alloc_type   = typename std::allocator_traits<A2>::template rebind_alloc<element_type>;
     using engine_type  = dyn_matrix_engine<element_type, alloc_type>;
 };
@@ -176,7 +176,7 @@ struct matrix_engine_subtract_promotion<fs_matrix_engine<T1, R1, C1>, fs_matrix_
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C2>;
 };
 
@@ -201,22 +201,22 @@ struct matrix_engine_subtract_promotion<matrix_transpose_engine<E1>, matrix_tran
 };
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
-struct matrix_engine_subtract_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>, 
+struct matrix_engine_subtract_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
                                         fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C2>;
 };
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
-struct matrix_engine_subtract_promotion<fs_matrix_engine<T1, R1, C1>, 
+struct matrix_engine_subtract_promotion<fs_matrix_engine<T1, R1, C1>,
                                         matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C2>;
 };
 
@@ -243,7 +243,7 @@ struct matrix_engine_multiply_promotion<dyn_matrix_engine<T1, A1>, T2>
 {
     static_assert(is_matrix_element_v<T2>);
 
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using alloc_type   = typename std::allocator_traits<A1>::template rebind_alloc<element_type>;
     using engine_type  = dyn_matrix_engine<element_type, alloc_type>;
 };
@@ -253,7 +253,7 @@ struct matrix_engine_multiply_promotion<fs_matrix_engine<T1, R1, C1>, T2>
 {
     static_assert(is_matrix_element_v<T2>);
 
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C1>;
 };
 
@@ -264,7 +264,7 @@ struct matrix_engine_multiply_promotion<fs_matrix_engine<T1, R1, C1>, T2>
 template<class T1, class A1, class T2, class A2>
 struct matrix_engine_multiply_promotion<dyn_matrix_engine<T1, A1>, dyn_matrix_engine<T2, A2>>
 {
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using alloc_type   = typename std::allocator_traits<A1>::template rebind_alloc<element_type>;
     using engine_type  = dyn_matrix_engine<element_type, alloc_type>;
 };
@@ -272,7 +272,7 @@ struct matrix_engine_multiply_promotion<dyn_matrix_engine<T1, A1>, dyn_matrix_en
 template<class T1, class A1, class T2, size_t R2, size_t C2>
 struct matrix_engine_multiply_promotion<dyn_matrix_engine<T1, A1>, fs_matrix_engine<T2, R2, C2>>
 {
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using alloc_type   = typename std::allocator_traits<A1>::template rebind_alloc<element_type>;
     using engine_type  = dyn_matrix_engine<element_type, alloc_type>;
 };
@@ -280,7 +280,7 @@ struct matrix_engine_multiply_promotion<dyn_matrix_engine<T1, A1>, fs_matrix_eng
 template<class T1, size_t R1, size_t C1, class T2, class A2>
 struct matrix_engine_multiply_promotion<fs_matrix_engine<T1, R1, C1>, dyn_matrix_engine<T2, A2>>
 {
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using alloc_type   = typename std::allocator_traits<A2>::template rebind_alloc<element_type>;
     using engine_type  = dyn_matrix_engine<element_type, alloc_type>;
 };
@@ -289,7 +289,7 @@ template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
 struct matrix_engine_multiply_promotion<fs_matrix_engine<T1, R1, C1>, fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(C1 == R2);
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C2>;
 };
 
@@ -314,20 +314,20 @@ struct matrix_engine_multiply_promotion<matrix_transpose_engine<E1>, matrix_tran
 };
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
-struct matrix_engine_multiply_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>, 
+struct matrix_engine_multiply_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
                                         fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == C2);
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C2>;
 };
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
-struct matrix_engine_multiply_promotion<fs_matrix_engine<T1, R1, C1>, 
+struct matrix_engine_multiply_promotion<fs_matrix_engine<T1, R1, C1>,
                                         matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == C2);
-    using element_type = element_promotion_t<T1, T2>;
+    using element_type = matrix_element_promotion_t<T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C2>;
 };
 
