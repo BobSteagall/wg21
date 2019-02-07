@@ -3,46 +3,43 @@ Title: A proposal to add linear algebra support to the C++ standard library
 Status: D
 Group: WG21
 TR: http://wg21.link/P1385
-ED: https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/P1385R1-draft.bs
+ED: https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/D1385R1.html
 Markup Shorthands: markdown yes
-Revision: 1-Draft
+Revision: 1
 Editor: Guy Davidson, guy@hatcat.com
 Editor: Bob Steagall, bob.steagall.cpp@gmail.com
 Shortname: [linear.algebra]
 Abstract: This document proposes an interface specification for a set of fundamental linear algebra facilities in the standard C++ library.
 </pre>
-
-NOTE: This paper is superseded by D1385R1. Please see:
-+ [https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/D1385R1.bs](https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/D1385R1.bs), or
-+ [https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/D1385R1.html](https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/D1385R1.html)
+NOTE: This is a *draft* of P1385R1
 
 # Introduction
 
-Linear algebra is a mathematical discipline of ever-increasing
-importance, with direct application to a wide variety of problem
-domains, such as signal processing, computer graphics, medical imaging,
-scientific simulations, machine learning, analytics, financial modeling,
-and high-performance computing. And yet, despite the relevance of linear
-algebra to so many aspects of modern computing, the C++ standard library
-does not include a set of linear algebra facilities. This paper proposes
-to remedy this deficit for C++23.
+Linear algebra is a mathematical discipline of ever-increasing importance, 
+with direct application to a wide variety of problem domains, such as signal 
+processing, computer graphics, medical imaging, scientific simulations, 
+machine learning, analytics, financial modeling, and high-performance 
+computing.  And yet, despite the relevance of linear algebra to so many 
+aspects of modern computing, the C++ standard library does not include a 
+set of linear algebra facilities. This paper proposes to remedy this deficit 
+for C++23.
 
-This paper should be read after P1166, in which we describe a high-level
+This paper should be read after P1166, in which we describe a high-level 
 set of expectations for what a linear algebra library should contain.
 
 # Goals
 
 We expect that typical users of a standard linear algebra library are
 likely to value two features above all else: ease-of-use (including
-expressiveness), and high performance. This set of users will expect the
-ability to compose arithmetical expressions of linear algebra objects
-similarly to what one might find in a textbook; indeed, this has been
-deemed a "must-have" feature by several participants in recent SG14
-Linear Algebra SIG conference calls. And for a given arithmetical
-expression, they will expect run-time computational performance that is
-close to what they could obtain with an equivalent sequence of function
-calls to a more "traditional" linear algebra library, such as *LAPCK*,
-*Blaze*, *Eigen*, etc.
+expressiveness), and high performance out of the box. This set of users 
+will expect the ability to compose arithmetical expressions of linear 
+algebra objects similar to what one might find in a textbook; indeed, 
+this has been deemed a "must-have" feature by several participants in 
+recent SG14 Linear Algebra SIG conference calls. And for a given 
+arithmetical expression, they will expect run-time computational 
+performance that is close to what they could obtain with an equivalent 
+sequence of function calls to a more "traditional" linear algebra library, 
+such as *LAPCK*, *Blaze*, *Eigen*, etc.
 
 There also exists a set of linear algebra “super-users” who will value
 most highly a third feature – the ability to customize underlying
@@ -54,26 +51,26 @@ every portion of the library’s computational infrastructure.
 With these high-level user requirements in mind, we propose an interface
 specification intended to achieve the following goals:
 
-1.  To provide a set of vocabulary types for representing the
+1. To provide a set of vocabulary types for representing the
 mathematical objects and operations that are relevant to linear
 algebra;
 
-2.  To provide a public interface for linear algebra operations that is
+2. To provide a public interface for linear algebra operations that is
 intuitive, teachable, and mimics the expressiveness of mathematical
 notation to the greatest *reasonable* extent;
 
-3.  To exhibit out-of-the-box performance rivalling that of an
+3. To exhibit out-of-the-box performance rivalling that of an
 equivalent sequence of function calls to a more traditional linear
 algebra library, such as *LAPACK*, *Blaze*, *Eigen*, etc.;
 
-4.  To provide a set of building blocks that manage the source,
+4. To provide a set of building blocks that manage the source,
 ownership, lifetime, layout, and access to the memory required to
 represent the linear algebra vocabulary types, with the requirement
-that these building blocks are also suitable for eventually
+that some of these building blocks are also suitable for (eventually)
 representing other interesting mathematical entities, such as
 quaternions, octonions, and tensors; and,
 
-5.  To provide straightforward facilities and techniques for
+5. To provide straightforward facilities and techniques for
 customization that enable users to optimize performance for their
 specific problem domain on their specific hardware.
 
@@ -87,8 +84,8 @@ These terms have specific meanings in mathematics, as well as different,
 but confusingly similar, meanings to C++ programmers.
 
 In the following sections we provide definitions for relevant
-mathematical concepts, C++ type design concepts, and describe how this
-proposal employs those overloaded terms in various contexts.
+mathematical concepts, C++ type design concepts, and describe how 
+this proposal employs those overloaded terms in various contexts.
 
 ## Mathematical Terms
 
@@ -96,8 +93,8 @@ In order to facilitate subsequent discussion, we first provide the
 following *informal* set of definitions for important mathematical
 concepts:
 
-1.  A **vector space** is a collection of **vectors**, where vectors are
-objects that may be added together and multiplied by scalars.
+1.  A **vector space** is a collection of **vectors**, where vectors 
+are objects that may be added together and multiplied by scalars.
 Euclidean vectors are an example of a vector space, typically used
 to represent displacements, as well as physical quantities such as
 force or momentum. Linear algebra is concerned primarily with the
@@ -238,15 +235,15 @@ and column sizes and capacities may be changed at run time.
 
 ## Overloaded Terms
 
-This section describes how we use certain overloaded terms in this
-proposal and in future works.
+This section describes how we use certain overloaded terms in this proposal 
+and in future works.
 
 ### Matrix
 
 The term *matrix* is frequently used by C++ programmers to mean a
 general-purpose array of arbitrary size. For example, one of the authors
-worked at a company where it was common practice to refer to
-4-dimensional arrays as “4-dimensional matrices.”
+worked at a company where it was common practice to refer to 4-dimensional 
+arrays as “4-dimensional matrices.”
 
 In this proposal, we use the word *array* only to mean a data structure
 whose elements are accessible using one or more indices, and which has
@@ -283,9 +280,8 @@ of coordinates required to specify any point in *V*. However, in common
 programming parlance, *dimension* refers to the number of indices used
 to access an element in an array.
 
-We use the term dimension both ways in this proposal but try to do so
+We use the term dimension both ways in this proposal, but try to do so
 consistently and in a way that is clear from the context. For example, a
-matrix describing a rotation in a 3D virtual reality application is an
 example of a 2-dimensional data structure containing 3-dimensional row
 and column vectors. A vector describing an electric field is an example
 of a 1-dimensional data structure implemented as a 3-dimensional row

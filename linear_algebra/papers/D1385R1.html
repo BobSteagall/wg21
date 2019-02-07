@@ -2,7 +2,7 @@
  <head>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
-  <title>[linear.algebra]R1-Draft: A proposal to add linear algebra support to the C++ standard library</title>
+  <title>[linear.algebra]R1: A proposal to add linear algebra support to the C++ standard library</title>
 <style data-fill-with="stylesheet">/******************************************************************************
  *                   Style sheet for the W3C specifications                   *
  *
@@ -1438,12 +1438,12 @@ pre .property::before, pre .property::after {
  <body class="h-entry">
   <div class="head">
    <p data-fill-with="logo"></p>
-   <h1 class="p-name no-ref" id="title">[linear.algebra]R1-Draft<br>A proposal to add linear algebra support to the C++ standard library</h1>
+   <h1 class="p-name no-ref" id="title">[linear.algebra]R1<br>A proposal to add linear algebra support to the C++ standard library</h1>
    <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Proposal, <time class="dt-updated" datetime="2019-02-07">2019-02-07</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
-     <dd><a class="u-url" href="https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/P1385R1-draft.bs">https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/P1385R1-draft.bs</a>
+     <dd><a class="u-url" href="https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/D1385R1.html">https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/D1385R1.html</a>
      <dt>Latest published version:
      <dd><a href="http://wg21.link/P1385">http://wg21.link/P1385</a>
      <dt>Authors:
@@ -1548,35 +1548,30 @@ pre .property::before, pre .property::after {
    </ol>
   </nav>
   <main>
-   <p class="note" role="note"><span>NOTE:</span> This paper is superseded by D1385R1. Please see:</p>
-   <ul>
-    <li data-md>
-     <p><a href="https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/D1385R1.bs">https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/D1385R1.bs</a>, or</p>
-    <li data-md>
-     <p><a href="https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/D1385R1.html">https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/D1385R1.html</a></p>
-   </ul>
+   <p class="note" role="note"><span>NOTE:</span> This is a <em>draft</em> of P1385R1</p>
    <h2 class="heading settled" data-level="1" id="introduction"><span class="secno">1. </span><span class="content">Introduction</span><a class="self-link" href="#introduction"></a></h2>
-   <p>Linear algebra is a mathematical discipline of ever-increasing
-importance, with direct application to a wide variety of problem
-domains, such as signal processing, computer graphics, medical imaging,
-scientific simulations, machine learning, analytics, financial modeling,
-and high-performance computing. And yet, despite the relevance of linear
-algebra to so many aspects of modern computing, the C++ standard library
-does not include a set of linear algebra facilities. This paper proposes
-to remedy this deficit for C++23.</p>
+   <p>Linear algebra is a mathematical discipline of ever-increasing importance,
+with direct application to a wide variety of problem domains, such as signal 
+processing, computer graphics, medical imaging, scientific simulations, 
+machine learning, analytics, financial modeling, and high-performance 
+computing.  And yet, despite the relevance of linear algebra to so many 
+aspects of modern computing, the C++ standard library does not include a 
+set of linear algebra facilities. This paper proposes to remedy this deficit 
+for C++23.</p>
    <p>This paper should be read after P1166, in which we describe a high-level
 set of expectations for what a linear algebra library should contain.</p>
    <h2 class="heading settled" data-level="2" id="goals"><span class="secno">2. </span><span class="content">Goals</span><a class="self-link" href="#goals"></a></h2>
    <p>We expect that typical users of a standard linear algebra library are
 likely to value two features above all else: ease-of-use (including
-expressiveness), and high performance. This set of users will expect the
-ability to compose arithmetical expressions of linear algebra objects
-similarly to what one might find in a textbook; indeed, this has been
-deemed a "must-have" feature by several participants in recent SG14
-Linear Algebra SIG conference calls. And for a given arithmetical
-expression, they will expect run-time computational performance that is
-close to what they could obtain with an equivalent sequence of function
-calls to a more "traditional" linear algebra library, such as <em>LAPCK</em>, <em>Blaze</em>, <em>Eigen</em>, etc.</p>
+expressiveness), and high performance out of the box. This set of users 
+will expect the ability to compose arithmetical expressions of linear 
+algebra objects similar to what one might find in a textbook; indeed, 
+this has been deemed a "must-have" feature by several participants in 
+recent SG14 Linear Algebra SIG conference calls. And for a given 
+arithmetical expression, they will expect run-time computational 
+performance that is close to what they could obtain with an equivalent 
+sequence of function calls to a more "traditional" linear algebra library, 
+such as <em>LAPCK</em>, <em>Blaze</em>, <em>Eigen</em>, etc.</p>
    <p>There also exists a set of linear algebra “super-users” who will value
 most highly a third feature – the ability to customize underlying
 infrastructure in order to maximize performance for specific problems
@@ -1602,7 +1597,7 @@ algebra library, such as <em>LAPACK</em>, <em>Blaze</em>, <em>Eigen</em>, etc.;<
      <p>To provide a set of building blocks that manage the source,
 ownership, lifetime, layout, and access to the memory required to
 represent the linear algebra vocabulary types, with the requirement
-that these building blocks are also suitable for eventually
+that some of these building blocks are also suitable for (eventually)
 representing other interesting mathematical entities, such as
 quaternions, octonions, and tensors; and,</p>
     <li data-md>
@@ -1618,16 +1613,16 @@ defined and disambiguated if such discussions are to be productive.
 These terms have specific meanings in mathematics, as well as different,
 but confusingly similar, meanings to C++ programmers.</p>
    <p>In the following sections we provide definitions for relevant
-mathematical concepts, C++ type design concepts, and describe how this
-proposal employs those overloaded terms in various contexts.</p>
+mathematical concepts, C++ type design concepts, and describe how 
+this proposal employs those overloaded terms in various contexts.</p>
    <h3 class="heading settled" data-level="3.1" id="mathematical-terms"><span class="secno">3.1. </span><span class="content">Mathematical Terms</span><a class="self-link" href="#mathematical-terms"></a></h3>
    <p>In order to facilitate subsequent discussion, we first provide the
 following <em>informal</em> set of definitions for important mathematical
 concepts:</p>
    <ol>
     <li data-md>
-     <p>A <strong>vector space</strong> is a collection of <strong>vectors</strong>, where vectors are
-objects that may be added together and multiplied by scalars.
+     <p>A <strong>vector space</strong> is a collection of <strong>vectors</strong>, where vectors
+are objects that may be added together and multiplied by scalars.
 Euclidean vectors are an example of a vector space, typically used
 to represent displacements, as well as physical quantities such as
 force or momentum. Linear algebra is concerned primarily with the
@@ -1762,13 +1757,13 @@ thereafter.</p>
 and column sizes and capacities may be changed at run time.</p>
    </ol>
    <h3 class="heading settled" data-level="3.3" id="overloaded-terms"><span class="secno">3.3. </span><span class="content">Overloaded Terms</span><a class="self-link" href="#overloaded-terms"></a></h3>
-   <p>This section describes how we use certain overloaded terms in this
-proposal and in future works.</p>
+   <p>This section describes how we use certain overloaded terms in this proposal
+and in future works.</p>
    <h4 class="heading settled" data-level="3.3.1" id="matrix"><span class="secno">3.3.1. </span><span class="content">Matrix</span><a class="self-link" href="#matrix"></a></h4>
    <p>The term <em>matrix</em> is frequently used by C++ programmers to mean a
 general-purpose array of arbitrary size. For example, one of the authors
-worked at a company where it was common practice to refer to
-4-dimensional arrays as “4-dimensional matrices.”</p>
+worked at a company where it was common practice to refer to 4-dimensional 
+arrays as “4-dimensional matrices.”</p>
    <p>In this proposal, we use the word <em>array</em> only to mean a data structure
 whose elements are accessible using one or more indices, and which has
 no invariants pertaining to higher-level or mathematical meaning.</p>
@@ -1791,9 +1786,8 @@ span <em>V</em>. This is another way of saying that <em>n</em> is the minimum nu
 of coordinates required to specify any point in <em>V</em>. However, in common
 programming parlance, <em>dimension</em> refers to the number of indices used
 to access an element in an array.</p>
-   <p>We use the term dimension both ways in this proposal but try to do so
+   <p>We use the term dimension both ways in this proposal, but try to do so
 consistently and in a way that is clear from the context. For example, a
-matrix describing a rotation in a 3D virtual reality application is an
 example of a 2-dimensional data structure containing 3-dimensional row
 and column vectors. A vector describing an electric field is an example
 of a 1-dimensional data structure implemented as a 3-dimensional row
