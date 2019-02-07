@@ -5,22 +5,23 @@
 
 namespace std::la {
 
-template<class ENG> class column_vector;
-template<class ENG> class row_vector;
-template<class ENG> class matrix;
+struct matrix_operator_traits;
+template<class ENG, class XT=matrix_operator_traits> class column_vector;
+template<class ENG, class XT=matrix_operator_traits> class row_vector;
+template<class ENG, class XT=matrix_operator_traits> class matrix;
 
 //- New trait to use with SFINAE to determine if an engine is resizable; if it is, then
 //  something can be enabled.
 //
 template<class ET1, class ET2>
-using enable_if_resizable_t = 
+using enable_if_resizable_t =
     typename std::enable_if_t<is_same_v<ET1, ET2> && ET1::is_resizable_type::value, bool>;
 
 //=================================================================================================
 //  A column vector parametrized by an engine type.
 //=================================================================================================
 //
-template<class ENG>
+template<class ENG, class XT>
 class column_vector
 {
   public:
@@ -104,7 +105,7 @@ class column_vector
 //  A row vector parametrized by an engine type.
 //=================================================================================================
 //
-template<class ENG>
+template<class ENG, class XT>
 class row_vector
 {
   public:
@@ -188,7 +189,7 @@ class row_vector
 //  A matrix parametrized by an engine type.
 //=================================================================================================
 //
-template<class ENG>
+template<class ENG, class XT>
 class matrix
 {
   public:

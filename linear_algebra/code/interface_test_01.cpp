@@ -5,14 +5,14 @@ using cx_float  = std::complex<float>;
 using cx_double = std::complex<double>;
 using namespace std::la;
 
-//- Some dection idiom stuff to make sure SFINAE is working for fixed-size -versus-
-//  dynamic interfaces.
+//- Some detection idiom stuff to make sure SFINAE is working for fixed-size
+//  -vs- dynamic interfaces.
 //
 template<typename T, typename = void>
 struct has_resize : std::false_type {};
 
 template<typename T>
-struct has_resize<T, std::void_t<decltype(std::declval<T>().resize(0,0))>> 
+struct has_resize<T, std::void_t<decltype(std::declval<T>().resize(0,0))>>
 :   std::true_type {};
 
 template<typename T>
@@ -49,10 +49,10 @@ void t02()
     matrix_transpose_engine<dyn_matrix_engine<cx_double>>       te3(de3);
 
 #ifndef ENFORCE_COMPLEX_OPERAND_HOMOGENEITY
-    element_promotion_t<int32_t, cx_double>     v1 = 0;
-    element_promotion_t<cx_float, double>       v2 = 0;
-    element_promotion_t<double, cx_float>       v3 = 0;
-    element_promotion_t<cx_float, cx_double>    v4 = 0;
+    matrix_element_promotion_t<int32_t, cx_double>     v1 = 0;
+    matrix_element_promotion_t<cx_float, double>       v2 = 0;
+    matrix_element_promotion_t<double, cx_float>       v3 = 0;
+    matrix_element_promotion_t<cx_float, cx_double>    v4 = 0;
 #endif
 }
 
@@ -151,7 +151,7 @@ void t06()
     auto    m05 = fmd*dmd;
     auto    m06 = fmc*dmc;
     auto    m07 = fmf*fmd;
-    auto    m08 = fmd*fmc;
+    auto    m08 = fmf*fmf;
 }
 
 void t07()
@@ -281,15 +281,15 @@ void t10()
     fs_row_vector<float, 3>     frvf;
     fs_row_vector<double, 3>    frvd;
 
-    dyn_matrix<float>           dmf(3, 3);
     dyn_matrix<double>          dmd(3, 3);
-    dyn_matrix<float>           dmf_cv(1, 3);
-    dyn_matrix<float>           dmf_rv(3, 1);
+    dyn_matrix<float>           dmf(3, 3);
+    dyn_matrix<float>           dmf_cv(3, 1);
+    dyn_matrix<float>           dmf_rv(1, 3);
 
+    fs_matrix<double, 3, 3>     fmd;
     fs_matrix<float, 3, 3>      fmf;
     fs_matrix<float, 3, 1>      fmf_cv;
     fs_matrix<float, 1, 3>      fmf_rv;
-    fs_matrix<double, 3, 3>     fmd;
 
     auto    r01 = dmf * dcvf;       //- dyn_col_vector<float>
     auto    r02 = dmf_cv * drvf;    //- dyn_matrix<float>

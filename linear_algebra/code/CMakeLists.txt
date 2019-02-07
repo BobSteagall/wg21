@@ -1,10 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
-project(la_test)
+project(wg21_linear_algebra)
 
 include(CTest)
 
-##- This is the set of all headers comprising the Hades public API.
-##
 set(Includes
     linear_algebra.hpp
     matrix_element_promotions.hpp
@@ -16,13 +14,11 @@ set(Includes
     matrix_operators.hpp
 )
 
-##- This is the set of all private source and header files used to build Hades.
-##
 set(Sources
-    alt_test.cpp
+    interface_test_01.cpp
 )
 
-include_directories(api_bob)
+include_directories(.)
 
 add_executable(la_test ${Sources})
 
