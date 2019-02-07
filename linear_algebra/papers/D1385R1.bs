@@ -48,8 +48,8 @@ and computing platforms. These users seek the highest possible run-time
 performance, and to achieve it, require the ability to customize any and
 every portion of the library’s computational infrastructure.
 
-With these high-level user requirements in mind, we propose an interface
-specification intended to achieve the following goals:
+With these high-level user requirements in mind, in this paper we propose 
+an interface specification intended to achieve the following goals:
 
 1. To provide a set of vocabulary types for representing the
 mathematical objects and operations that are relevant to linear
@@ -506,12 +506,12 @@ trivial constructors or destructors.
 In general, when multiple built-in arithmetic types are present in an
 arithmetical expression, the resulting type will have a precision
 greater than or equal to that of the type with greatest precision in the
-expression. In other words, to the greatest reasonable extent,
-information is preserved.
+expression. In other words, to the greatest reasonable extent, information 
+is preserved.
 
-A similar principal should apply to expressions involving *MathObj*s
-where more than one element type is present. Arithmetic operations
-involving *MathObj*s should, to the greatest reasonable extent, preserve
+We contend that a similar principal should apply to expressions involving 
+*MathObj*s where more than one element type is present. Arithmetic operations
+involving *MathObj*s should, to the greatest reasonable extent, preserve 
 element-wise information.
 
 For example, just as the result of multiplying a `float` by a
@@ -522,7 +522,7 @@ process of determining the resulting element type *element promotion*.
 ## Mixed-Engine Expressions
 
 In analogy with element type, *MathObj* expressions may include mixed
-storage management strategies as implemented by their corresponding
+storage management strategies, as implemented by their corresponding
 engine types. For example, consider the case of a fixed-size matrix
 multiplied by a dynamically-resizable matrix. What is the engine type of
 the resulting matrix?
@@ -779,7 +779,7 @@ Note the partial specializations involving `complex<T>` elements.
 template<class T1, class T2>
 struct matrix_element_promotion
 {
-    using type = ...;
+    using type = ...;           //- Implementation-defined
 };
 
 template<class T1, class T2>
@@ -805,7 +805,7 @@ traits type that determines the resulting engine type when negating a
 template<class E1>
 struct matrix_engine_negate_promotion
 {
-    using engine_type = ...;
+    using engine_type = ...;    //- Implementation-defined
 };
 
 template<class E1>
@@ -822,7 +822,7 @@ compatible *MathObj*s.
 template<class E1, class E2>
 struct matrix_engine_add_promotion
 {
-    using engine_type = ...;
+    using engine_type = ...;    //- Implementation-defined
 };
 
 template<class E1, class E2>
@@ -839,7 +839,7 @@ subtracting two compatible *MathObj*s.
 template<class E1, class E2>
 struct matrix_engine_subtract_promotion
 {
-    using engine_type = ...;
+    using engine_type = ...;    //- Implementation-defined
 };
 
 template<class E1, class E2>
@@ -855,9 +855,8 @@ multiplying two compatible *MathObj*s.
 ~~~~
 template<class E1, class E2>
 struct matrix_engine_multiply_promotion;
-
 {
-    using engine_type = ...;
+    using engine_type = ...;    //- Implementation-defined
 };
 
 template<class E1, class E2>
