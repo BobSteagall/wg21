@@ -1,7 +1,11 @@
 #ifndef MATRIX_ELEMENT_TRAITS_HPP_DEFINED
 #define MATRIX_ELEMENT_TRAITS_HPP_DEFINED
 
-#include "matrix_engines.hpp"
+#include <cstdint>
+#include <complex>
+#include <memory>
+#include <tuple>
+#include <type_traits>
 
 namespace std::la {
 

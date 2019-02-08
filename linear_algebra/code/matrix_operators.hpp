@@ -34,30 +34,40 @@ operator -(matrix<E1> const& cv)
 //  Binary addition operators, which forward to the addition traits do the work.
 //=================================================================================================
 //
-template<class ET1, class AT1, class ET2, class AT2>
+template<class E1, class AT1, class E2, class AT2>
 inline auto
-operator +(column_vector<ET1,AT1> const& cv1, column_vector<ET2,AT2> const& cv2)
+operator +(column_vector<E1, AT1> const& cv1, column_vector<E2, AT2> const& cv2)
 {
-    using operator_traits = matrix_operator_traits_promotion_t<AT1, AT2>;
-    using op1_type        = column_vector<ET1, AT1>;
-    using op2_type        = column_vector<ET2, AT2>;
-    using addition_traits = typename operator_traits::template addition_traits<op1_type, op2_type>;
+    using oper_traits = matrix_operator_traits_promotion_t<AT1, AT2>;
+    using op1_type    = column_vector<E1, AT1>;
+    using op2_type    = column_vector<E2, AT2>;
+    using addn_traits = typename oper_traits::template addition_traits<op1_type, op2_type>;
 
-    return addition_traits::add(cv1, cv2);
+    return addn_traits::add(cv1, cv2);
 }
 
-template<class E1, class E2>
+template<class E1, class AT1, class E2, class AT2>
 inline auto
-operator +(row_vector<E1> const& rv1, row_vector<E2> const& rv2)
+operator +(row_vector<E1, AT1> const& rv1, row_vector<E2, AT2> const& rv2)
 {
-    return matrix_addition_traits<row_vector<E1>, row_vector<E2>>::add(rv1, rv2);
+    using oper_traits = matrix_operator_traits_promotion_t<AT1, AT2>;
+    using op1_type    = row_vector<E1, AT1>;
+    using op2_type    = row_vector<E2, AT2>;
+    using addn_traits = typename oper_traits::template addition_traits<op1_type, op2_type>;
+
+    return addn_traits::add(rv1, rv2);
 }
 
-template<class E1, class E2>
+template<class E1, class AT1, class E2, class AT2>
 inline auto
-operator +(matrix<E1> const& m1, matrix<E2> const& m2)
+operator +(matrix<E1, AT1> const& m1, matrix<E2, AT2> const& m2)
 {
-    return matrix_addition_traits<matrix<E1>, matrix<E2>>::add(m1, m2);
+    using oper_traits = matrix_operator_traits_promotion_t<AT1, AT2>;
+    using op1_type    = matrix<E1, AT1>;
+    using op2_type    = matrix<E2, AT2>;
+    using addn_traits = typename oper_traits::template addition_traits<op1_type, op2_type>;
+
+    return addn_traits::add(m1, m2);
 }
 
 

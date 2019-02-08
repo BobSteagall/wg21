@@ -1,18 +1,13 @@
 #ifndef MATRIX_ENGINES_HPP_DEFINED
 #define MATRIX_ENGINES_HPP_DEFINED
 
-#include <cstdint>
-#include <complex>
-#include <memory>
-#include <tuple>
-#include <type_traits>
+#include "matrix_element_traits.hpp"
 
 //- Experimental namespace for test implementation
 //
 namespace std::la {
-
 //=================================================================================================
-//  Fixed-size matrix engine.
+//  Fixed-size, fixed-capacity matrix engine.
 //=================================================================================================
 //
 template<class T, size_t R, size_t C>
