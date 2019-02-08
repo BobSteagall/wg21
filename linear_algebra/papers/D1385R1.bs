@@ -1601,15 +1601,15 @@ this lowest anticipated layer of linear algebra functionality.  The
 authors intend to continue evolving this paper, working to address
 (at a minimum) several remaining issues:
 
-+ the appropriate level of `constexpr`-fication;
++ the appropriate level and application of `constexpr`-fication;
 
 + parametrizing `matrix` member functions that return individual
 columns and rows in terms of a desired return engine type;
 
-+ the appropriate factorization of the engine promotion and matrix
-arithmetic traits; in particular, should these traits types be 
-segregated by arithmetic operation (as described above), or should
-they be combined into corresponding "master" traits types;
++ the appropriate factorization of the engine promotion traits;  in
+particular, should these traits types be segregated by their corresponding
+arithmetic operation (as described above), or should they be combined into
+a corresponding "master" traits type;
 
 + deciding whether or not to provide the degenerate row/column vector 
 multiplication operators mentioned in Section 6.4.4;
@@ -1623,5 +1623,4 @@ selected by an arithmetic operator's instantiation;
 
 We expect to provide (and present) a new revision of this paper (R1) 
 in Kona that makes a start at answering these questions.
-
 
