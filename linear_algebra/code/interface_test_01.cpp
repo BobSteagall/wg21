@@ -42,11 +42,11 @@ void t02()
     fs_matrix_engine<double, 2, 2>      e22;
     fs_matrix_engine<cx_double, 3, 3>   e33;
 
-    dyn_matrix_engine<double>       de2;
-    dyn_matrix_engine<cx_double>    de3;
+    dr_matrix_engine<double>       de2;
+    dr_matrix_engine<cx_double>    de3;
 
     matrix_transpose_engine<fs_matrix_engine<cx_double, 3, 3>>  te2(e33);
-    matrix_transpose_engine<dyn_matrix_engine<cx_double>>       te3(de3);
+    matrix_transpose_engine<dr_matrix_engine<cx_double>>       te3(de3);
 
 #ifndef ENFORCE_COMPLEX_OPERAND_HOMOGENEITY
     matrix_element_promotion_t<int32_t, cx_double>     v1 = 0;
@@ -525,53 +525,53 @@ void t40()
     fs_matrix<float, 3, 3>      fmf;
     fs_matrix<double, 3, 3>     fmd;
 
-    auto    r01 = dcvf.tr() + drvf;
-    auto    r02 = drvf + dcvd.tr();
-    auto    r03 = dcvd.tr() + dcvf.tr();
+    auto    r01 = dcvf.t() + drvf;
+    auto    r02 = drvf + dcvd.t();
+    auto    r03 = dcvd.t() + dcvf.t();
 
-    auto    r04 = fcvf.tr() + frvf;
-    auto    r05 = frvf + fcvd.tr();
-    auto    r06 = fcvd.tr() + fcvf.tr();
+    auto    r04 = fcvf.t() + frvf;
+    auto    r05 = frvf + fcvd.t();
+    auto    r06 = fcvd.t() + fcvf.t();
 
-    auto    r07 = dcvf.tr() + frvf;
-    auto    r08 = drvf + fcvd.tr();
-    auto    r09 = dcvd.tr() + fcvd.tr();
+    auto    r07 = dcvf.t() + frvf;
+    auto    r08 = drvf + fcvd.t();
+    auto    r09 = dcvd.t() + fcvd.t();
 
-    auto    r10 = fcvf.tr() + drvf;
-    auto    r11 = frvf + dcvd.tr();
-    auto    r12 = fcvd.tr() + dcvd.tr();
+    auto    r10 = fcvf.t() + drvf;
+    auto    r11 = frvf + dcvd.t();
+    auto    r12 = fcvd.t() + dcvd.t();
 
-    auto    r21 = drvf.tr() + dcvf;
-    auto    r22 = drvf + dcvd.tr();
-    auto    r23 = drvd.tr() + drvf.tr();
+    auto    r21 = drvf.t() + dcvf;
+    auto    r22 = drvf + dcvd.t();
+    auto    r23 = drvd.t() + drvf.t();
 
-    auto    r24 = frvf.tr() + fcvf;
-    auto    r25 = frvf + fcvd.tr();
-    auto    r26 = frvd.tr() + frvf.tr();
+    auto    r24 = frvf.t() + fcvf;
+    auto    r25 = frvf + fcvd.t();
+    auto    r26 = frvd.t() + frvf.t();
 
-    auto    r27 = drvf.tr() + fcvf;
-    auto    r28 = drvf + fcvd.tr();
-    auto    r29 = drvd.tr() + frvd.tr();
+    auto    r27 = drvf.t() + fcvf;
+    auto    r28 = drvf + fcvd.t();
+    auto    r29 = drvd.t() + frvd.t();
 
-    auto    r30 = fmf.tr() + dmf;
-    auto    r31 = fmf + dmd.tr();
-    auto    r32 = fmd.tr() + dmd.tr();
+    auto    r30 = fmf.t() + dmf;
+    auto    r31 = fmf + dmd.t();
+    auto    r32 = fmd.t() + dmd.t();
 
-    auto    r41 = dmf.tr() + dmf;
-    auto    r42 = dmf + dmd.tr();
-    auto    r43 = dmd.tr() + dmf.tr();
+    auto    r41 = dmf.t() + dmf;
+    auto    r42 = dmf + dmd.t();
+    auto    r43 = dmd.t() + dmf.t();
 
-    auto    r44 = fmf.tr() + fmf;
-    auto    r45 = fmf + fmd.tr();
-    auto    r46 = fmd.tr() + fmf.tr();
+    auto    r44 = fmf.t() + fmf;
+    auto    r45 = fmf + fmd.t();
+    auto    r46 = fmd.t() + fmf.t();
 
-    auto    r47 = dmf.tr() + fmf;
-    auto    r48 = dmf + fmd.tr();
-    auto    r49 = dmd.tr() + fmd.tr();
+    auto    r47 = dmf.t() + fmf;
+    auto    r48 = dmf + fmd.t();
+    auto    r49 = dmd.t() + fmd.t();
 
-    auto    r50 = fmf.tr() + dmf;
-    auto    r51 = fmf + dmd.tr();
-    auto    r52 = fmd.tr() + dmd.tr();
+    auto    r50 = fmf.t() + dmf;
+    auto    r51 = fmf + dmd.t();
+    auto    r52 = fmd.t() + dmd.t();
 }
 
 void t41()
@@ -594,53 +594,53 @@ void t41()
     fs_matrix<float, 3, 3>      fmf;
     fs_matrix<double, 3, 3>     fmd;
 
-    auto    r01 = dcvf.tr() - drvf;
-    auto    r02 = drvf - dcvd.tr();
-    auto    r03 = dcvd.tr() - dcvf.tr();
+    auto    r01 = dcvf.t() - drvf;
+    auto    r02 = drvf - dcvd.t();
+    auto    r03 = dcvd.t() - dcvf.t();
 
-    auto    r04 = fcvf.tr() - frvf;
-    auto    r05 = frvf - fcvd.tr();
-    auto    r06 = fcvd.tr() - fcvf.tr();
+    auto    r04 = fcvf.t() - frvf;
+    auto    r05 = frvf - fcvd.t();
+    auto    r06 = fcvd.t() - fcvf.t();
 
-    auto    r07 = dcvf.tr() - frvf;
-    auto    r08 = drvf - fcvd.tr();
-    auto    r09 = dcvd.tr() - fcvd.tr();
+    auto    r07 = dcvf.t() - frvf;
+    auto    r08 = drvf - fcvd.t();
+    auto    r09 = dcvd.t() - fcvd.t();
 
-    auto    r10 = fcvf.tr() - drvf;
-    auto    r11 = frvf - dcvd.tr();
-    auto    r12 = fcvd.tr() - dcvd.tr();
+    auto    r10 = fcvf.t() - drvf;
+    auto    r11 = frvf - dcvd.t();
+    auto    r12 = fcvd.t() - dcvd.t();
 
-    auto    r21 = drvf.tr() - dcvf;
-    auto    r22 = drvf - dcvd.tr();
-    auto    r23 = drvd.tr() - drvf.tr();
+    auto    r21 = drvf.t() - dcvf;
+    auto    r22 = drvf - dcvd.t();
+    auto    r23 = drvd.t() - drvf.t();
 
-    auto    r24 = frvf.tr() - fcvf;
-    auto    r25 = frvf - fcvd.tr();
-    auto    r26 = frvd.tr() - frvf.tr();
+    auto    r24 = frvf.t() - fcvf;
+    auto    r25 = frvf - fcvd.t();
+    auto    r26 = frvd.t() - frvf.t();
 
-    auto    r27 = drvf.tr() - fcvf;
-    auto    r28 = drvf - fcvd.tr();
-    auto    r29 = drvd.tr() - frvd.tr();
+    auto    r27 = drvf.t() - fcvf;
+    auto    r28 = drvf - fcvd.t();
+    auto    r29 = drvd.t() - frvd.t();
 
-    auto    r30 = fmf.tr() - dmf;
-    auto    r31 = fmf - dmd.tr();
-    auto    r32 = fmd.tr() - dmd.tr();
+    auto    r30 = fmf.t() - dmf;
+    auto    r31 = fmf - dmd.t();
+    auto    r32 = fmd.t() - dmd.t();
 
-    auto    r41 = dmf.tr() - dmf;
-    auto    r42 = dmf - dmd.tr();
-    auto    r43 = dmd.tr() - dmf.tr();
+    auto    r41 = dmf.t() - dmf;
+    auto    r42 = dmf - dmd.t();
+    auto    r43 = dmd.t() - dmf.t();
 
-    auto    r44 = fmf.tr() - fmf;
-    auto    r45 = fmf - fmd.tr();
-    auto    r46 = fmd.tr() - fmf.tr();
+    auto    r44 = fmf.t() - fmf;
+    auto    r45 = fmf - fmd.t();
+    auto    r46 = fmd.t() - fmf.t();
 
-    auto    r47 = dmf.tr() - fmf;
-    auto    r48 = dmf - fmd.tr();
-    auto    r49 = dmd.tr() - fmd.tr();
+    auto    r47 = dmf.t() - fmf;
+    auto    r48 = dmf - fmd.t();
+    auto    r49 = dmd.t() - fmd.t();
 
-    auto    r50 = fmf.tr() - dmf;
-    auto    r51 = fmf - dmd.tr();
-    auto    r52 = fmd.tr() - dmd.tr();
+    auto    r50 = fmf.t() - dmf;
+    auto    r51 = fmf - dmd.t();
+    auto    r52 = fmd.t() - dmd.t();
 }
 
 void t42()
@@ -652,12 +652,12 @@ void t42()
     dyn_matrix<float>           dmf(3, 3);
     fs_matrix<float, 3, 3>      fmf;
 
-    auto    r01 = -dcvf.tr();
-    auto    r02 = -fcvf.tr();
-    auto    r03 = -drvf.tr();
-    auto    r04 = -frvf.tr();
-    auto    r05 = -dmf.tr();
-    auto    r06 = -fmf.tr();
+    auto    r01 = -dcvf.t();
+    auto    r02 = -fcvf.t();
+    auto    r03 = -drvf.t();
+    auto    r04 = -frvf.t();
+    auto    r05 = -dmf.t();
+    auto    r06 = -fmf.t();
 }
 
 int main()

@@ -5,12 +5,13 @@ include(CTest)
 
 set(Includes
     linear_algebra.hpp
-    matrix_element_promotions.hpp
-    matrix_element_traits.hpp
-    matrix_engines.hpp
-    matrix_engine_traits.hpp
+    linear_algebra_fwd.hpp
     matrix.hpp
-    matrix_operation_traits.hpp
+    matrix_arithmetic_traits.hpp
+    matrix_element_traits.hpp
+    matrix_engine_traits.hpp
+    matrix_engines.hpp
+    matrix_operator_traits.hpp
     matrix_operators.hpp
 )
 

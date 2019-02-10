@@ -18,8 +18,10 @@ class fs_matrix_engine
 
   public:
     using element_type      = T;
-    using is_resizable_type = false_type;
-    using size_tuple        = tuple<size_t, size_t>;
+    using is_dense          = std::true_type;
+    using is_rectangular    = std::true_type;
+    using is_resizable_type = std::false_type;
+    using size_tuple        = std::tuple<size_t, size_t>;
 
   public:
     fs_matrix_engine();
@@ -49,8 +51,8 @@ class fs_matrix_engine
     void    swap_rows(size_t i, size_t j);
 
   private:
-    T       ma_elems[R*C];
-    T*      mp_bias;
+    T       ma_elems[R*C];      //- For exposition; data buffer
+    T*      mp_bias;            //- For exposition; bias pointer for 1-based indexing
 };
 
 
@@ -58,21 +60,27 @@ class fs_matrix_engine
 //  Dynamically-resizable matrix engine.
 //=================================================================================================
 //
-template<class T, class ALLOC = std::allocator<T>>
-class dyn_matrix_engine
+template<class T, class AT>
+class dr_matrix_engine
 {
   public:
     using element_type      = T;
-    using is_resizable_type = true_type;
-    using size_tuple        = tuple<size_t, size_t>;
+    using is_dense          = std::true_type;
+    using is_rectangular    = std::true_type;
+    using is_resizable_type = std::true_type;
+    using size_tuple        = std::tuple<size_t, size_t>;
 
   public:
-    dyn_matrix_engine();
-    dyn_matrix_engine(dyn_matrix_engine&&);
-    dyn_matrix_engine(dyn_matrix_engine const&);
+    dr_matrix_engine();
+    dr_matrix_engine(dr_matrix_engine&&);
+    dr_matrix_engine(dr_matrix_engine const&);
+    dr_matrix_engine(size_tuple size);
+    dr_matrix_engine(size_t rows, size_t cols);
+    dr_matrix_engine(size_tuple size, size_tuple cap);
+    dr_matrix_engine(size_t rows, size_t cols, size_t rowcap, size_t colcap);
 
-    dyn_matrix_engine&  operator =(dyn_matrix_engine&&);
-    dyn_matrix_engine&  operator =(dyn_matrix_engine const&);
+    dr_matrix_engine&   operator =(dr_matrix_engine&&);
+    dr_matrix_engine&   operator =(dr_matrix_engine const&);
 
     T           operator ()(size_t i) const;
     T           operator ()(size_t i, size_t j) const;
@@ -102,10 +110,10 @@ class dyn_matrix_engine
     void    swap_rows(size_t i, size_t j);
 
   private:
-    using pointer = typename std::allocator_traits<ALLOC>::pointer;
+    using pointer = typename std::allocator_traits<AT>::pointer;
 
-    pointer     mp_elems;
-    T*          mp_bias;
+    pointer     mp_elems;       //- For exposition; data buffer
+    T*          mp_bias;        //- For exposition; bias pointer for 1-based indexing
     size_t      m_rows;
     size_t      m_cols;
     size_t      m_rowcap;
@@ -114,17 +122,19 @@ class dyn_matrix_engine
 
 
 //=================================================================================================
-//  Matrix transpose engine, meant to act as an rvalue "view" in expressions, in order to prevent
-//  unnecessary allocation/copying.
+//  Matrix transpose engine, meant to act as an rvalue-ish "view" in expressions, in order to
+//  prevent unnecessary allocation and element copying.
 //=================================================================================================
 //
-template<class ENG>
+template<class ET>
 class matrix_transpose_engine
 {
   public:
-    using engine_type       = ENG;
+    using engine_type       = ET;
     using element_type      = typename engine_type::element_type;
-    using is_resizable_type = false_type;
+    using is_dense          = typename engine_type::is_dense;
+    using is_rectangular    = typename engine_type::is_rectangular;
+    using is_resizable_type = std::false_type;
     using size_tuple        = typename engine_type::size_tuple;
 
   public:
@@ -149,7 +159,7 @@ class matrix_transpose_engine
     size_tuple  capacity() const noexcept;
 
   private:
-    engine_type*    mp_other;
+    engine_type*    mp_other;   //- For exposition; pointer to actual engine
 };
 
 }       //- std::la namespace
