@@ -119,16 +119,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="alt_test.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="linear_algebra.hpp" />
+    <ClInclude Include="linear_algebra_fwd.hpp" />
     <ClInclude Include="matrix.hpp" />
+    <ClInclude Include="matrix_arithmetic_traits.hpp" />
     <ClInclude Include="matrix_engine_traits.hpp" />
-    <ClInclude Include="matrix_operation_traits.hpp" />
     <ClInclude Include="matrix_operators.hpp" />
     <ClInclude Include="matrix_engines.hpp" />
     <ClInclude Include="matrix_element_traits.hpp" />
+    <ClInclude Include="matrix_operator_traits.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="interface_test_01.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
