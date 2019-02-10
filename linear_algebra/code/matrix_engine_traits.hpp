@@ -10,7 +10,7 @@ namespace std::la {
 //  Traits type that performs engine promotion type computations for unary negation.
 //=================================================================================================
 //
-template<class E1>
+template<class ET1>
 struct matrix_negation_engine_promotion;
 
 //- Note that in the cases where allocators are rebound, there is an assumption that all
@@ -30,17 +30,16 @@ struct matrix_negation_engine_promotion<fs_matrix_engine<T1, R1, C1>>
 
 //- Transpose case.
 //
-template<class E1>
-struct matrix_negation_engine_promotion<matrix_transpose_engine<E1>>
+template<class ET1>
+struct matrix_negation_engine_promotion<matrix_transpose_engine<ET1>>
 {
-    using engine_type = E1;
+    using engine_type = ET1;
 };
-
 
 //- Alias interface to trait.
 //
-template<class E1>
-using matrix_negation_engine_t = typename matrix_negation_engine_promotion<E1>::engine_type;
+template<class ET1>
+using matrix_negation_engine_t = typename matrix_negation_engine_promotion<ET1>::engine_type;
 
 
 //=================================================================================================
@@ -49,7 +48,7 @@ using matrix_negation_engine_t = typename matrix_negation_engine_promotion<E1>::
 //  Traits type that performs engine promotion type computations for binary addition.
 //=================================================================================================
 //
-template<class E1, class E2>
+template<class ET1, class ET2>
 struct matrix_addition_engine_promotion;
 
 //- Note that in the cases where allocators are rebound, there is an assumption that all
@@ -90,27 +89,27 @@ struct matrix_addition_engine_promotion<fs_matrix_engine<T1, R1, C1>, fs_matrix_
 
 //- Transpose cases.
 //
-template<class E1, class E2>
-struct matrix_addition_engine_promotion<matrix_transpose_engine<E1>, E2>
+template<class ET1, class ET2>
+struct matrix_addition_engine_promotion<matrix_transpose_engine<ET1>, ET2>
 {
-    using engine_type = typename matrix_addition_engine_promotion<E1, E2>::engine_type;
+    using engine_type = typename matrix_addition_engine_promotion<ET1, ET2>::engine_type;
 };
 
-template<class E1, class E2>
-struct matrix_addition_engine_promotion<E1, matrix_transpose_engine<E2>>
+template<class ET1, class ET2>
+struct matrix_addition_engine_promotion<ET1, matrix_transpose_engine<ET2>>
 {
-    using engine_type = typename matrix_addition_engine_promotion<E1, E2>::engine_type;
+    using engine_type = typename matrix_addition_engine_promotion<ET1, ET2>::engine_type;
 };
 
-template<class E1, class E2>
-struct matrix_addition_engine_promotion<matrix_transpose_engine<E1>, matrix_transpose_engine<E2>>
+template<class ET1, class ET2>
+struct matrix_addition_engine_promotion<matrix_transpose_engine<ET1>, matrix_transpose_engine<ET2>>
 {
-    using engine_type = typename matrix_addition_engine_promotion<E1, E2>::engine_type;
+    using engine_type = typename matrix_addition_engine_promotion<ET1, ET2>::engine_type;
 };
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
 struct matrix_addition_engine_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
-                                   fs_matrix_engine<T2, R2, C2>>
+                                        fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
@@ -120,7 +119,7 @@ struct matrix_addition_engine_promotion<matrix_transpose_engine<fs_matrix_engine
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
 struct matrix_addition_engine_promotion<fs_matrix_engine<T1, R1, C1>,
-                                   matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
+                                        matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
@@ -128,11 +127,10 @@ struct matrix_addition_engine_promotion<fs_matrix_engine<T1, R1, C1>,
     using engine_type  = fs_matrix_engine<element_type, R1, C2>;
 };
 
-
 //- Alias interface to trait.
 //
-template<class E1, class E2>
-using matrix_addition_engine_t = typename matrix_addition_engine_promotion<E1, E2>::engine_type;
+template<class ET1, class ET2>
+using matrix_addition_engine_t = typename matrix_addition_engine_promotion<ET1, ET2>::engine_type;
 
 
 //=================================================================================================
@@ -141,7 +139,7 @@ using matrix_addition_engine_t = typename matrix_addition_engine_promotion<E1, E
 //  Traits type that performs engine promotion type computations for binary addition.
 //=================================================================================================
 //
-template<class E1, class E2>
+template<class ET1, class ET2>
 struct matrix_subtraction_engine_promotion;
 
 //- Note that in the cases where allocators are rebound, there is an assumption that all
@@ -182,27 +180,27 @@ struct matrix_subtraction_engine_promotion<fs_matrix_engine<T1, R1, C1>, fs_matr
 
 //- Transpose cases.
 //
-template<class E1, class E2>
-struct matrix_subtraction_engine_promotion<matrix_transpose_engine<E1>, E2>
+template<class ET1, class ET2>
+struct matrix_subtraction_engine_promotion<matrix_transpose_engine<ET1>, ET2>
 {
-    using engine_type = typename matrix_subtraction_engine_promotion<E1, E2>::engine_type;
+    using engine_type = typename matrix_subtraction_engine_promotion<ET1, ET2>::engine_type;
 };
 
-template<class E1, class E2>
-struct matrix_subtraction_engine_promotion<E1, matrix_transpose_engine<E2>>
+template<class ET1, class ET2>
+struct matrix_subtraction_engine_promotion<ET1, matrix_transpose_engine<ET2>>
 {
-    using engine_type = typename matrix_subtraction_engine_promotion<E1, E2>::engine_type;
+    using engine_type = typename matrix_subtraction_engine_promotion<ET1, ET2>::engine_type;
 };
 
-template<class E1, class E2>
-struct matrix_subtraction_engine_promotion<matrix_transpose_engine<E1>, matrix_transpose_engine<E2>>
+template<class ET1, class ET2>
+struct matrix_subtraction_engine_promotion<matrix_transpose_engine<ET1>, matrix_transpose_engine<ET2>>
 {
-    using engine_type = typename matrix_subtraction_engine_promotion<E1, E2>::engine_type;
+    using engine_type = typename matrix_subtraction_engine_promotion<ET1, ET2>::engine_type;
 };
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
 struct matrix_subtraction_engine_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
-                                        fs_matrix_engine<T2, R2, C2>>
+                                           fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
@@ -212,7 +210,7 @@ struct matrix_subtraction_engine_promotion<matrix_transpose_engine<fs_matrix_eng
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
 struct matrix_subtraction_engine_promotion<fs_matrix_engine<T1, R1, C1>,
-                                        matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
+                                           matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
@@ -220,11 +218,10 @@ struct matrix_subtraction_engine_promotion<fs_matrix_engine<T1, R1, C1>,
     using engine_type  = fs_matrix_engine<element_type, R1, C2>;
 };
 
-
 //- Alias interface to trait.
 //
-template<class E1, class E2>
-using matrix_subtraction_engine_t = typename matrix_subtraction_engine_promotion<E1, E2>::engine_type;
+template<class ET1, class ET2>
+using matrix_subtraction_engine_t = typename matrix_subtraction_engine_promotion<ET1, ET2>::engine_type;
 
 
 //=================================================================================================
@@ -233,7 +230,7 @@ using matrix_subtraction_engine_t = typename matrix_subtraction_engine_promotion
 //  Traits type that performs engine promotion type computations for multiplication.
 //=================================================================================================
 //
-template<class E1, class E2>
+template<class ET1, class ET2>
 struct matrix_multiplication_engine_promotion;
 
 //- engine * scalar cases.
@@ -295,27 +292,27 @@ struct matrix_multiplication_engine_promotion<fs_matrix_engine<T1, R1, C1>, fs_m
 
 //- Transpose cases.
 //
-template<class E1, class E2>
-struct matrix_multiplication_engine_promotion<matrix_transpose_engine<E1>, E2>
+template<class ET1, class ET2>
+struct matrix_multiplication_engine_promotion<matrix_transpose_engine<ET1>, ET2>
 {
-    using engine_type = typename matrix_multiplication_engine_promotion<E1, E2>::engine_type;
+    using engine_type = typename matrix_multiplication_engine_promotion<ET1, ET2>::engine_type;
 };
 
-template<class E1, class E2>
-struct matrix_multiplication_engine_promotion<E1, matrix_transpose_engine<E2>>
+template<class ET1, class ET2>
+struct matrix_multiplication_engine_promotion<ET1, matrix_transpose_engine<ET2>>
 {
-    using engine_type = typename matrix_multiplication_engine_promotion<E1, E2>::engine_type;
+    using engine_type = typename matrix_multiplication_engine_promotion<ET1, ET2>::engine_type;
 };
 
-template<class E1, class E2>
-struct matrix_multiplication_engine_promotion<matrix_transpose_engine<E1>, matrix_transpose_engine<E2>>
+template<class ET1, class ET2>
+struct matrix_multiplication_engine_promotion<matrix_transpose_engine<ET1>, matrix_transpose_engine<ET2>>
 {
-    using engine_type = typename matrix_multiplication_engine_promotion<E1, E2>::engine_type;
+    using engine_type = typename matrix_multiplication_engine_promotion<ET1, ET2>::engine_type;
 };
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
 struct matrix_multiplication_engine_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
-                                             fs_matrix_engine<T2, R2, C2>>
+                                              fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == R2);
     using element_type = matrix_element_promotion_t<T1, T2>;
@@ -342,8 +339,8 @@ struct matrix_multiplication_engine_promotion<matrix_transpose_engine<fs_matrix_
 
 //- Alias interface to trait.
 //
-template<class E1, class E2>
-using matrix_multiplication_engine_t = typename matrix_multiplication_engine_promotion<E1, E2>::engine_type;
+template<class ET1, class ET2>
+using matrix_multiplication_engine_t = typename matrix_multiplication_engine_promotion<ET1, ET2>::engine_type;
 
 }       //- std::la namespace
 #endif  //- MATRIX_ENGINE_TRAITS_HPP_DEFINED
