@@ -8,25 +8,37 @@ namespace std::la {
 //  Unary negation operators, which forward to the negation traits do the work.
 //=================================================================================================
 //
-template<class E1>
+template<class E1, class OT1>
 inline auto
-operator -(column_vector<E1> const& cv)
+operator -(column_vector<E1, OT1> const& cv1)
 {
-    return matrix_negation_traits<column_vector<E1>>::negate(cv);
+    using oper_traits = OT1;
+    using op1_type    = column_vector<E1, OT1>;
+    using negn_traits = typename oper_traits::template negation_traits<op1_type>;
+
+    return negn_traits::negate(cv1);
 }
 
-template<class E1>
+template<class E1, class OT1>
 inline auto
-operator -(row_vector<E1> const& cv)
+operator -(row_vector<E1, OT1> const& rv1)
 {
-    return matrix_negation_traits<row_vector<E1>>::negate(cv);
+    using oper_traits = OT1;
+    using op1_type    = row_vector<E1, OT1>;
+    using negn_traits = typename oper_traits::template negation_traits<op1_type>;
+
+    return negn_traits::negate(rv1);
 }
 
-template<class E1>
+template<class E1, class OT1>
 inline auto
-operator -(matrix<E1> const& cv)
+operator -(matrix<E1, OT1> const& m1)
 {
-    return matrix_negation_traits<matrix<E1>>::negate(cv);
+    using oper_traits = OT1;
+    using op1_type    = matrix<E1, OT1>;
+    using negn_traits = typename oper_traits::template negation_traits<op1_type>;
+
+    return negn_traits::negate(m1);
 }
 
 
@@ -34,37 +46,37 @@ operator -(matrix<E1> const& cv)
 //  Binary addition operators, which forward to the addition traits do the work.
 //=================================================================================================
 //
-template<class E1, class AT1, class E2, class AT2>
+template<class E1, class OT1, class E2, class OT2>
 inline auto
-operator +(column_vector<E1, AT1> const& cv1, column_vector<E2, AT2> const& cv2)
+operator +(column_vector<E1, OT1> const& cv1, column_vector<E2, OT2> const& cv2)
 {
-    using oper_traits = matrix_operator_traits_promotion_t<AT1, AT2>;
-    using op1_type    = column_vector<E1, AT1>;
-    using op2_type    = column_vector<E2, AT2>;
+    using oper_traits = matrix_operator_traits_promotion_t<OT1, OT2>;
+    using op1_type    = column_vector<E1, OT1>;
+    using op2_type    = column_vector<E2, OT2>;
     using addn_traits = typename oper_traits::template addition_traits<op1_type, op2_type>;
 
     return addn_traits::add(cv1, cv2);
 }
 
-template<class E1, class AT1, class E2, class AT2>
+template<class E1, class OT1, class E2, class OT2>
 inline auto
-operator +(row_vector<E1, AT1> const& rv1, row_vector<E2, AT2> const& rv2)
+operator +(row_vector<E1, OT1> const& rv1, row_vector<E2, OT2> const& rv2)
 {
-    using oper_traits = matrix_operator_traits_promotion_t<AT1, AT2>;
-    using op1_type    = row_vector<E1, AT1>;
-    using op2_type    = row_vector<E2, AT2>;
+    using oper_traits = matrix_operator_traits_promotion_t<OT1, OT2>;
+    using op1_type    = row_vector<E1, OT1>;
+    using op2_type    = row_vector<E2, OT2>;
     using addn_traits = typename oper_traits::template addition_traits<op1_type, op2_type>;
 
     return addn_traits::add(rv1, rv2);
 }
 
-template<class E1, class AT1, class E2, class AT2>
+template<class E1, class OT1, class E2, class OT2>
 inline auto
-operator +(matrix<E1, AT1> const& m1, matrix<E2, AT2> const& m2)
+operator +(matrix<E1, OT1> const& m1, matrix<E2, OT2> const& m2)
 {
-    using oper_traits = matrix_operator_traits_promotion_t<AT1, AT2>;
-    using op1_type    = matrix<E1, AT1>;
-    using op2_type    = matrix<E2, AT2>;
+    using oper_traits = matrix_operator_traits_promotion_t<OT1, OT2>;
+    using op1_type    = matrix<E1, OT1>;
+    using op2_type    = matrix<E2, OT2>;
     using addn_traits = typename oper_traits::template addition_traits<op1_type, op2_type>;
 
     return addn_traits::add(m1, m2);
