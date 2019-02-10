@@ -7,7 +7,7 @@ namespace std::la {
 //- New trait "is_complex" to detect std::complex<T> of an arithmetic type.
 //
 template<class T>
-struct is_complex : public false_type
+  struct is_complex : public std::false_type
 {};
 
 template<class T>
@@ -26,6 +26,8 @@ struct is_matrix_element
 :   public std::bool_constant<std::is_arithmetic_v<T> || is_complex_v<T>>
 {};
 
+//- Alias interface to trait.
+//
 template<class T>
 inline constexpr bool   is_matrix_element_v = is_matrix_element<T>::value;
 
@@ -47,8 +49,8 @@ using matrix_element_promotion_helper_t = typename matrix_element_promotion_help
 //- Unfortunately, in C++17 std::complex<T> only permits arithmetical expressions between
 //  homogeneous element types: for example, expressions like complex<float>*complex<float>
 //  and float*complex<float> are permitted, but double*complex<float> is not.  This macro
-//  enforces this homogeneity in the traits types below.  Hopefully std::complex wil support
-//  heterogeneous expressions at some point in the near future.
+//  enforces this homogeneity in the traits types below.  Hopefully std::complex<T> wil
+//  support heterogeneous expressions at some point in the near future.
 //
 #define ENFORCE_COMPLEX_OPERAND_HOMOGENEITY
 
@@ -87,6 +89,8 @@ struct matrix_element_promotion<std::complex<T1>, std::complex<T2>>
     using type = std::complex<matrix_element_promotion_helper_t<T1, T2>>;
 };
 
+//- Alias interface to trait.
+//
 template<class T1, class T2>
 using matrix_element_promotion_t = typename matrix_element_promotion<T1, T2>::type;
 

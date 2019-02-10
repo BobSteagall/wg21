@@ -1,11 +1,14 @@
 <pre class=metadata>
 Title: A proposal to add linear algebra support to the C++ standard library
-Status: D
+Status: WD
+!Audience: SG14, LEWG
 Group: WG21
 TR: http://wg21.link/P1385
 ED: https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/D1385R1.html
+!Previous version: [http://wg21.link/P1385R0](http://wg21.link/P1385R0)
 Markup Shorthands: markdown yes
 Revision: 1
+Line Numbers: true
 Editor: Guy Davidson, guy@hatcat.com
 Editor: Bob Steagall, bob.steagall.cpp@gmail.com
 Shortname: [linear.algebra]
@@ -274,7 +277,7 @@ interface code and test below to generically refer to a `row_vector`,
 ### Dimension
 
 In linear algebra, a vector space *V* is said to be of *dimension n*, or
-*n-dimensional*, if there exist *n* linearly independent vectors which
+be *n-dimensional*, if there exist *n* linearly independent vectors which
 span *V*. This is another way of saying that *n* is the minimum number
 of coordinates required to specify any point in *V*. However, in common
 programming parlance, *dimension* refers to the number of indices used
@@ -282,10 +285,10 @@ to access an element in an array.
 
 We use the term dimension both ways in this proposal, but try to do so
 consistently and in a way that is clear from the context. For example, a
-example of a 2-dimensional data structure containing 3-dimensional row
-and column vectors. A vector describing an electric field is an example
-of a 1-dimensional data structure implemented as a 3-dimensional row
-vector.
+rotation matix used by a game engine is two-dimensional data structure 
+composed of three-dimensional row and column vectors. A vector describing 
+an electric field is an example of a one-dimensional data structure that
+might implemented as a three-dimensional column vector.
 
 ### Rank
 
@@ -296,9 +299,9 @@ another meaning in tensor analysis, where it is commonly used as a
 synonym for a tensor’s *order*.
 
 However, rank also has a meaning in computer science where it is used as
-a synonym for dimension. In the C++ standard at
-[*meta.unary.prop.query*], rank is described as the number of
-dimensions of `T` if `T` names an array, otherwise it is zero.
+a synonym for dimension. In the C++ standard at [*meta.unary.prop.query*], 
+rank is described as the number of dimensions of `T` if `T` names an array, 
+otherwise it is zero.
 
 We avoid using the term *rank* in this proposal in the context of linear
 algebra, except as a quantity that might result from performing certain
@@ -575,15 +578,69 @@ alternate situations.
 In this section, we describe the various types, operators, and functions
 comprising the proposed interface. The reader should note that the
 descriptions below are by no means ready for wording; rather, they are
-intended to foster further discussions and refinements.
+intended to foster further discussions and refinements, and to serve
+as a guide for brave souls attempting to build implementations.
 
-## Engine Types and Supporting Traits
+## Element Promotion Traits
+
+Traits type `is_complex<T>` determines whether its template
+argument `T` is of type `std::complex<V>` for some type `V`,
+where `V` must itself be an arithmetical type as determined by
+`std::is_arithmetic_v<U>`. Defining what constitutes an arithmetic
+type can be challenging; our intention is that an arithmetic type is 
+one that models a field, although types that model rings should work
+as well.
+
+~~~~
+template<class T>  struct is_complex;
+template<class T>  constexpr bool is_complex_v = ...;
+~~~~
+
+Traits type `is_matrix_element<T>` is used in static assertions to
+ensure that *MathObj* types are instantiated only with element types
+representing a field (i.e., arithmetic types, or complex types per
+above). It uses `is_complex<T>` to help make that determination.
+
+~~~~
+template<class T>  struct is_matrix_element;
+template<class T>  constexpr bool is_matrix_element_v = ...;
+~~~~
+
+Class template `matrix_element_promotion<T1, T2>` implements a traits
+type that determines the appropriate result type of an arithmetical
+operation involving two (possibly different) *MathObj* element types.
+
+~~~~
+template<class T1, class T2>
+struct matrix_element_promotion
+{
+    using type = ...;           //- Implementation-defined
+};
+
+template<class T1, class T2>
+struct matrix_element_promotion<T1, std::complex<T2>>;
+
+template<class T1, class T2>
+struct matrix_element_promotion<std::complex<T1>, T2>;
+
+template<class T1, class T2>
+struct matrix_element_promotion<std::complex<T1>, std::complex<T2>>;
+
+template<class T1, class T2>
+using matrix_element_promotion_t = typename matrix_element_promotion<T1, T2>::type;
+~~~~
+
+Note the partial specializations involving `complex<T>` elements.  Also, as
+will be common practice for most of the traits types in this proposal, a
+a parameterized alias for the trait is also defined.
+
+## Engine Types
 
 All of the engine types provide a basic interface for const element
 indexing, row and column sizes, and row and column capacities. They also
-export public type aliases which specify their element type, whether or
-not they are resizable, and a 2-tuple for containing sizes and
-capacities.
+export public type aliases which specify their element type, whether or 
+not they are dense, whether or not they are rectangular, whether or not 
+they are resizable, and a 2-tuple for describing sizes and capacities.
 
 ### Fixed-Size Engine
 
@@ -596,14 +653,15 @@ rows and/or columns.
 template<class T, size_t R, size_t C>
 class fs_matrix_engine
 {
-    static_assert(is_matrix_element_v<T>);
     static_assert(R >= 1);
     static_assert(C >= 1);
 
   public:
-    using element_type      = T;
-    using is_resizable_type = false_type;
-    using size_tuple        = tuple<size_t, size_t>;
+    using element_type   = T;
+    using is_dense       = std::true_type;
+    using is_rectangular = std::true_type;
+    using is_resizable   = std::false_type;
+    using size_tuple     = std::tuple<size_t, size_t>;
 
   public:
     fs_matrix_engine();
@@ -633,36 +691,40 @@ class fs_matrix_engine
     void    swap_rows(size_t i, size_t j);
 
   private:
-    T       ma_elems[R*C];  //- for exposition
-    T*      mp_bias;        //- bias pointer for 1-based indexing; for exposition
+    T       ma_elems[R*C];      //- For exposition; data buffer
+    T*      mp_bias;            //- For exposition; bias pointer for 1-based indexing
 };
 ~~~~
 
 ### Dynamically-Resizable Engine
 
-Class template `dyn_matrix_engine<T, ALLOC>` implements an engine
-whose sizes and capacities can be changed at runtime. In addition to the
-basic engine interface, it provides member functions for mutable element
+Class template `dr_matrix_engine<T, ALLOC>` implements an engine whose
+sizes and capacities can be changed at runtime. In addition to the basic
+engine interface, it provides member functions for mutable element
 indexing, changing size and capacity, and swapping rows and/or columns.
 
 ~~~~
-template<class T, class ALLOC = std::allocator<T>>
-class dyn_matrix_engine
+template<class T, class AT>
+class dr_matrix_engine
 {
-    static_assert(is_matrix_element_v<T>);
+  public:
+    using element_type   = T;
+    using is_dense       = std::true_type;
+    using is_rectangular = std::true_type;
+    using is_resizable   = std::true_type;
+    using size_tuple     = std::tuple<size_t, size_t>;
 
   public:
-    using element_type      = T;
-    using is_resizable_type = true_type;
-    using size_tuple        = tuple<size_t, size_t>;
+    dr_matrix_engine();
+    dr_matrix_engine(dr_matrix_engine&&);
+    dr_matrix_engine(dr_matrix_engine const&);
+    dr_matrix_engine(size_tuple size);
+    dr_matrix_engine(size_t rows, size_t cols);
+    dr_matrix_engine(size_tuple size, size_tuple cap);
+    dr_matrix_engine(size_t rows, size_t cols, size_t rowcap, size_t colcap);
 
-  public:
-    dyn_matrix_engine();
-    dyn_matrix_engine(dyn_matrix_engine&&);
-    dyn_matrix_engine(dyn_matrix_engine const&);
-
-    dyn_matrix_engine&  operator =(dyn_matrix_engine&&);
-    dyn_matrix_engine&  operator =(dyn_matrix_engine const&);
+    dr_matrix_engine&   operator =(dr_matrix_engine&&);
+    dr_matrix_engine&   operator =(dr_matrix_engine const&);
 
     T           operator ()(size_t i) const;
     T           operator ()(size_t i, size_t j) const;
@@ -692,10 +754,10 @@ class dyn_matrix_engine
     void    swap_rows(size_t i, size_t j);
 
   private:
-    using pointer = typename std::allocator_traits<ALLOC>::pointer;
+    using pointer = typename std::allocator_traits<AT>::pointer;
 
-    pointer     mp_elems;   //- for exposition
-    T*          mp_bias;    //- bias pointer for 1-based indexing; for exposition
+    pointer     mp_elems;       //- For exposition; data buffer
+    T*          mp_bias;        //- For exposition; bias pointer for 1-based indexing
     size_t      m_rows;
     size_t      m_cols;
     size_t      m_rowcap;
@@ -705,20 +767,22 @@ class dyn_matrix_engine
 
 ### Transpose Engine
 
-Class template `matrix_transpose_engine<ENG>` implements a non-owning, 
+Class template `matrix_transpose_engine<ET>` implements a non-owning, 
 const view type that provides the basic engine interface.  Its primary 
-anticipated use case is as the return value of the `tr()` member function 
+anticipated use case is as the return value of the `t()` member function 
 of the *MathObj* types.
 
 ~~~~
-template<class ENG>
+template<class ET>
 class matrix_transpose_engine
 {
   public:
-    using engine_type       = ENG;
-    using element_type      = typename engine_type::element_type;
-    using is_resizable_type = false_type;
-    using size_tuple        = typename engine_type::size_tuple;
+    using engine_type    = ET;
+    using element_type   = typename engine_type::element_type;
+    using is_dense       = typename engine_type::is_dense;
+    using is_rectangular = typename engine_type::is_rectangular;
+    using is_resizable   = std::false_type;
+    using size_tuple     = typename engine_type::size_tuple;
 
   public:
     matrix_transpose_engine();
@@ -742,133 +806,84 @@ class matrix_transpose_engine
     size_tuple  capacity() const noexcept;
 
   private:
-    engine_type*    mp_other;
+    engine_type*    mp_other;   //- For exposition; pointer to actual engine
 };
 ~~~~
 
-### Element Promotion Traits
+## Engine Promotion Traits
 
-Traits type `is_complex<T>` determines whether its template
-argument `T` is of type `std::complex<V>` for some type `V`,
-where `V` must itself be an arithmetical type as determined by
-`std::is_arithmetic_v<U>`. Defining what constitutes an arithmetic
-type can be challenging; our intention is that an arithmetic type is 
-one representing a field.
+### Promotion Traits for Negation
+
+Class template `matrix_engine_negate_promotion<ET1>` implements a traits 
+type that determines the resulting engine type when negating a *MathObj*.
 
 ~~~~
-template<class T>  struct is_complex;
-template<class T>  constexpr bool is_complex_v = ...;
-~~~~
-
-Traits type `is_matrix_element<T>` is used in static assertions to
-ensure that *MathObj* types are instantiated only with element types
-representing a field (i.e., arithmetic types, or complex types per
-above). It uses `is_complex<T>` to help make that determination.
-
-~~~~
-template<class T>  struct is_matrix_element;
-template<class T>  constexpr bool is_matrix_element_v = ...;
-~~~~
-
-Class template `matrix_element_promotion<T1, T2>` implements a traits
-type that determines the appropriate result type of an arithmetical
-operation involving two (possibly different) *MathObj* element types.
-Note the partial specializations involving `complex<T>` elements.
-
-~~~~
-template<class T1, class T2>
-struct matrix_element_promotion
-{
-    using type = ...;           //- Implementation-defined
-};
-
-template<class T1, class T2>
-struct matrix_element_promotion<T1, std::complex<T2>>;
-
-template<class T1, class T2>
-struct matrix_element_promotion<std::complex<T1>, T2>;
-
-template<class T1, class T2>
-struct matrix_element_promotion<std::complex<T1>, std::complex<T2>>;
-
-template<class T1, class T2>
-using matrix_element_promotion_t = typename matrix_element_promotion<T1, T2>::type;
-~~~~
-
-### Engine Promotion Traits for Negation
-
-Class template `matrix_engine_negate_promotion<E1>` implements a
-traits type that determines the resulting engine type when negating a
-*MathObj*.
-
-~~~~
-template<class E1>
+template<class ET1>
 struct matrix_engine_negate_promotion
 {
     using engine_type = ...;    //- Implementation-defined
 };
 
-template<class E1>
-using matrix_engine_negate_t = typename matrix_engine_negate_promotion<E1>::engine_type;
+template<class ET1>
+using matrix_engine_negate_t = typename matrix_engine_negate_promotion<ET1>::engine_type;
 ~~~~
 
-### Engine Promotion Traits for Addition
+### Promotion Traits for Addition
 
-Class template `matrix_engine_add_promotion<E1, E2>` implements a
+Class template `matrix_engine_add_promotion<ET1, ET2>` implements a
 traits type that determines the resulting engine type when adding two
 compatible *MathObj*s.
 
 ~~~~
-template<class E1, class E2>
+template<class ET1, class ET2>
 struct matrix_engine_add_promotion
 {
     using engine_type = ...;    //- Implementation-defined
 };
 
-template<class E1, class E2>
-using matrix_engine_add_t = typename matrix_engine_add_promotion<E1, E2>::engine_type;
+template<class ET1, class ET2>
+using matrix_engine_add_t = typename matrix_engine_add_promotion<ET1, ET2>::engine_type;
 ~~~~
 
-### Engine Promotion Traits for Subtraction
+### Promotion Traits for Subtraction
 
-Class template `matrix_engine_subtract_promotion<E1, E2>`
-implements a traits type that determines the resulting engine type when
-subtracting two compatible *MathObj*s.
+Class template `matrix_engine_subtract_promotion<ET1, ET2>` implements a 
+traits type that determines the resulting engine type when subtracting 
+two compatible *MathObj*s.
 
 ~~~~
-template<class E1, class E2>
+template<class ET1, class ET2>
 struct matrix_engine_subtract_promotion
 {
     using engine_type = ...;    //- Implementation-defined
 };
 
-template<class E1, class E2>
-using matrix_engine_subtract_t = typename matrix_engine_subtract_promotion<E1, E2>::engine_type;
+template<class ET1, class ET2>
+using matrix_engine_subtract_t = typename matrix_engine_subtract_promotion<ET1, ET2>::engine_type;
 ~~~~
 
-### Engine Promotion Traits for Multiplication
+### Promotion Traits for Multiplication
 
-Class template `matrix_engine_multiply_promotion<E1, E2>`
-implements a traits type that determines the resulting engine type when
-multiplying two compatible *MathObj*s.
+Class template `matrix_engine_multiply_promotion<ET1, ET2>` implements a 
+traits type that determines the resulting engine type when multiplying two 
+compatible *MathObj*s.
 
 ~~~~
-template<class E1, class E2>
+template<class ET1, class ET2>
 struct matrix_engine_multiply_promotion;
 {
     using engine_type = ...;    //- Implementation-defined
 };
 
-template<class E1, class E2>
-using matrix_engine_multiply_t = typename matrix_engine_multiply_promotion<E1, E2>::engine_type;
+template<class ET1, class ET2>
+using matrix_engine_multiply_t = typename matrix_engine_multiply_promotion<ET1, ET2>::engine_type;
 
 ~~~~
 
 ## Mathematical Types
 
-This section describes the three main linear algebra object types
-proposed herein: the class templates `column_vector`,
-`row_vector`, and `matrix`.
+This section describes the three main linear algebra object types proposed 
+herein: the class templates `column_vector`, `row_vector`, and `matrix`.
 
 ### Helpers
 
@@ -884,39 +899,44 @@ using enable_if_resizable_t =
 
 ### Column Vector
 
-Class template `column_vector<ENG>` provides a representation of a
-column vector, with element type and storage management implemented by
-the engine type `ENG`. If the engine provides dynamic resizing, then 
-this class will as well.
+Class template `column_vector<ET, OT>` represents a column vector, with 
+element type and storage management implemented by the engine type `ET`, 
+and arithmetic operations specified by the operator traits type `OT`.  If 
+the underlying engine type provides dynamic resizing, then this class will 
+as well. 
 
 ~~~~
-template<class ENG>
+template<class ET, class OT>
 class column_vector
 {
   public:
-    using engine_type       = ENG;
-    using element_type      = typename ENG::element_type;
-    using is_resizable_type = typename ENG::is_resizable_type;
-    using size_tuple        = typename ENG::size_tuple;
-    using transpose_type    = row_vector<matrix_transpose_engine<ENG>>;
+    using engine_type    = ET;
+    using element_type   = typename ET::element_type;
+    using is_resizable   = typename ET::is_resizable;
+    using size_tuple     = typename ET::size_tuple;
+
+    using transpose_type = row_vector<matrix_transpose_engine<ET>>;
+    using hermitian_type = std::conditional_t<is_complex_v<element_type>,
+                                                  row_vector<ET, OT>,
+                                                  transpose_type>;
+
+    static_assert(is_matrix_element_v<element_type>);
 
   public:
     ~column_vector() = default;
     column_vector();
     column_vector(column_vector&&) = default;
     column_vector(column_vector const&) = default;
-
     template<class ET2>
     column_vector(column_vector<ET2> const& src);
 
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     column_vector(size_t rows);
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     column_vector(size_t rows, size_t rowcap);
 
     column_vector&  operator =(column_vector&&) = default;
     column_vector&  operator =(column_vector const&) = default;
-
     template<class ET2>
     column_vector&  operator =(column_vector<ET2> const& rhs);
 
@@ -927,17 +947,18 @@ class column_vector
 
     //- Accessors.
     //
-    size_t  columns() const noexcept;
-    size_t  rows() const noexcept;
-    size_t  size() const noexcept;
+    size_t      columns() const noexcept;
+    size_t      rows() const noexcept;
+    size_tuple  size() const noexcept;
 
-    size_t  column_capacity() const noexcept;
-    size_t  row_capacity() const noexcept;
-    size_t  capacity() const noexcept;
+    size_t      column_capacity() const noexcept;
+    size_t      row_capacity() const noexcept;
+    size_tuple  capacity() const noexcept;
 
-    //- Common functions.
+    //- Transpose and Hermitian.
     //
-    transpose_type  tr() const;
+    transpose_type  t() const;
+    hermitian_type  h() const;
 
     //- Mutable element access.
     //
@@ -946,17 +967,17 @@ class column_vector
 
     //- Change capacity.
     //
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     void    reserve(size_t rowcap);
 
     //- Change size.
     //
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     void    resize(size_t rows);
 
     //- Change size and capacity in one shot.
     //
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     void    resize(size_t rows, size_t rowcap);
 
     //- Row operations.
@@ -964,45 +985,50 @@ class column_vector
     void    swap_rows(size_t i, size_t j);
 
   private:
-    engine_type     m_engine;   //- for exposition
+    engine_type     m_engine;
 };
 ~~~~
 
 ### Row Vector
 
-Class template `row_vector<ENG>` provides a representation of a row
-vector, with element type and storage management implemented by the
-engine type `ENG`. If the engine provides resizing, then this class
-will as well.
+Class template `row_vector<ET, OT>` represents a row vector, with 
+element type and storage management implemented by the engine type `ET`, 
+and arithmetic operations specified by the operator traits type `OT`.  If 
+the underlying engine type provides dynamic resizing, then this class will 
+as well. 
 
 ~~~~
-template<class ENG>
+template<class ET, class OT>
 class row_vector
 {
   public:
-    using engine_type       = ENG;
-    using element_type      = typename ENG::element_type;
-    using is_resizable_type = typename ENG::is_resizable_type;
-    using size_tuple        = typename ENG::size_tuple;
-    using transpose_type    = column_vector<matrix_transpose_engine<ENG>>;
+    using engine_type    = ET;
+    using element_type   = typename ET::element_type;
+    using is_resizable   = typename ET::is_resizable;
+    using size_tuple     = typename ET::size_tuple;
+
+    using transpose_type = column_vector<matrix_transpose_engine<ET>>;
+    using hermitian_type = std::conditional_t<is_complex_v<element_type>,
+                                                  column_vector<ET, OT>,
+                                                  transpose_type>;
+
+    static_assert(is_matrix_element_v<element_type>);
 
   public:
     ~row_vector() = default;
     row_vector();
     row_vector(row_vector&&) = default;
     row_vector(row_vector const&) = default;
-
     template<class ET2>
     row_vector(row_vector<ET2> const& src);
 
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     row_vector(size_t cols);
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     row_vector(size_t cols, size_t colcap);
 
     row_vector&     operator =(row_vector&&) = default;
     row_vector&     operator =(row_vector const&) = default;
-
     template<class ET2>
     row_vector&     operator =(row_vector<ET2> const& rhs);
 
@@ -1013,17 +1039,18 @@ class row_vector
 
     //- Accessors.
     //
-    size_t  columns() const noexcept;
-    size_t  rows() const noexcept;
-    size_t  size() const noexcept;
+    size_t      columns() const noexcept;
+    size_t      rows() const noexcept;
+    size_tuple  size() const noexcept;
 
-    size_t  column_capacity() const noexcept;
-    size_t  row_capacity() const noexcept;
-    size_t  capacity() const noexcept;
+    size_t      column_capacity() const noexcept;
+    size_t      row_capacity() const noexcept;
+    size_tuple  capacity() const noexcept;
 
-    //- Common functions.
+    //- Transpose and Hermitian.
     //
-    transpose_type  tr() const;
+    transpose_type  t() const;
+    hermitian_type  h() const;
 
     //- Mutable element access.
     //
@@ -1032,17 +1059,17 @@ class row_vector
 
     //- Change capacity.
     //
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     void    reserve(size_t colcap);
 
     //- Change size.
     //
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     void    resize(size_t cols);
 
     //- Change size and capacity in one shot.
     //
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     void    resize(size_t cols, size_t colcap);
 
     //- column operations.
@@ -1050,48 +1077,54 @@ class row_vector
     void    swap_columns(size_t i, size_t j);
 
   private:
-    engine_type     m_engine;    //- for exposition
+    engine_type     m_engine;
 };
 ~~~~
 
 ### Matrix
 
-Class template `matrix<ENG>` provides a representation of a matrix,
-with element type and storage management implemented by the engine type
-`ENG`. If the engine provides resizing, then this class will as well.
+Class template `matrix<ET, OT>` represents a matrix, with element type 
+and storage management implemented by the engine type `ET`, and arithmetic 
+operations specified by the operator traits type `OT`.  If the underlying 
+engine type provides dynamic resizing, then this class will as well. 
 
 ~~~~
-template<class ENG>
+template<class ET, class OT>
 class matrix
 {
   public:
-    using engine_type       = ENG;
-    using element_type      = typename ENG::element_type;
-    using is_resizable_type = typename ENG::is_resizable_type;
-    using size_tuple        = typename ENG::size_tuple;
-    using column_type       = column_vector<ENG>;
-    using row_type          = row_vector<ENG>;
-    using transpose_type    = matrix<matrix_transpose_engine<ENG>>;
+    using engine_type    = ET;
+    using element_type   = typename ET::element_type;
+    using is_resizable   = typename ET::is_resizable;
+    using size_tuple     = typename ET::size_tuple;
+
+    using transpose_type = matrix<matrix_transpose_engine<ET>>;
+    using hermitian_type = std::conditional_t<is_complex_v<element_type>,
+                                                  matrix<ET, OT>,
+                                                  transpose_type>;
+
+    static_assert(is_matrix_element_v<element_type>);
 
   public:
     ~matrix() = default;
     matrix();
     matrix(matrix&&) = default;
     matrix(matrix const&) = default;
-
     template<class ET2>
     matrix(matrix<ET2> const& src);
 
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     matrix(size_tuple size);
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     matrix(size_t rows, size_t cols);
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
+    matrix(size_tuple size, size_tuple cap);
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     matrix(size_t rows, size_t cols, size_t rowcap, size_t colcap);
 
     matrix&     operator =(matrix&&) = default;
     matrix&     operator =(matrix const&) = default;
-
     template<class ET2>
     matrix&     operator =(matrix<ET2> const& rhs);
 
@@ -1110,11 +1143,10 @@ class matrix
     size_t      row_capacity() const noexcept;
     size_tuple  capacity() const noexcept;
 
-    //- Useful functions.
+    //- Transpose and Hermitian.
     //
-    column_type     column(size_t j) const;
-    row_type        row(size_t i) const;
-    transpose_type  tr() const;
+    transpose_type  t() const;
+    hermitian_type  h() const;
 
     //- Mutable element access.
     //
@@ -1123,23 +1155,23 @@ class matrix
 
     //- Change capacity.
     //
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     void    reserve(size_tuple cap);
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     void    reserve(size_t rowcap, size_t colcap);
 
     //- Change size.
     //
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     void    resize(size_tuple size);
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     void    resize(size_t rows, size_t cols);
 
     //- Change size and capacity in one shot.
     //
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     void    resize(size_tuple size, size_tuple cap);
-    template<class ET2 = ENG, enable_if_resizable_t<ENG, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     void    resize(size_t rows, size_t cols, size_t rowcap, size_t colcap);
 
     //- Row and column operations.
@@ -1148,156 +1180,156 @@ class matrix
     void    swap_rows(size_t i, size_t j);
 
   private:
-    engine_type     m_engine;   //- for exposition
+    engine_type     m_engine;
 };
 ~~~~
 
 ## Matrix Arithmetic Traits
 
-This section defines sets of arithmetic traits types for negation, 
-addition, subtraction, and multiplication. The purpose of these
-traits types is threefold:
+This section defines sets of arithmetic traits types for negation, addition, 
+subtraction, and multiplication. The purpose of these traits types is 
+threefold:
 
-1. determine the element type of the resulting *MathObj*,
+1. to determine the element type of the resulting *MathObj*;
 
-2. determine the engine type of the resulting *MathObj*, and
+2. to determine the engine type of the resulting *MathObj*; and
 
-3. perform the arithmetical operation.
+3. to carry out the arithmetical operation.
 
-The idea hear is that arithmetic operators (described below) simply
-forward to the appropriate traits type, which does the heavy lifting.
+The idea here is that arithmetic operators (described below) simply forward 
+to the appropriate traits type, which does the heavy lifting.
 
 ### Negation Traits
 
-Class template `matrix_negation_traits<E1>` is an arithmetic
+Class template `matrix_negation_traits<ET1>` is an arithmetic
 traits type that performs a negation of a *MathObj* and returns the
 result in another *MathObj* having an implementation-defined engine
 type. There are three partial specializations to support the
 three overloaded unary negation operators described below.
 
 ~~~~
-template<class E1>                              //- for exposition only; base template
+template<class ET1>                             //- for exposition only; base template
 struct matrix_negation_traits                   //  not implemented
 {
     using engine_type = ...;                    //- implementation-defined engine result
     using result_type = MathObj<engine_type>;   //- appropriate MathObj return type
 
-    static result_type  negate(MathObj<E1> const& m);
+    static result_type  negate(MathObj<ET1> const& m);
 };
 
-template<class E1>
-struct matrix_negation_traits<column_vector<E1>>;
+template<class ET1>
+struct matrix_negation_traits<column_vector<ET1>>;
 
-template<class E1>
-struct matrix_negation_traits<row_vector<E1>>;
+template<class ET1>
+struct matrix_negation_traits<row_vector<ET1>>;
 
-template<class E1>
-struct matrix_negation_traits<matrix<E1>>;
+template<class ET1>
+struct matrix_negation_traits<matrix<ET1>>;
 ~~~~
 
 ### Addition Traits
 
-Class template `matrix_addition_traits<E1, E2>` is an arithmetic
-traits type that performs an addition of two compatible *MathObj*s and
-returns the result in a *MathObj* having an implementation-defined
-engine type. There are three partial specializations to support the
-three overloaded binary addition operators described below.
+Class template `matrix_addition_traits<ET1, ET2>` is an arithmetic traits 
+type that performs an addition of two compatible *MathObj*s and returns 
+the result in a *MathObj* having an implementation-defined engine type. 
+There are three partial specializations to support the three overloaded 
+binary addition operators described below.
 
 ~~~~
-template<class E1, class E2>                    //- for exposition only; base template
+template<class ET1, class ET2>                  //- for exposition only; base template
 struct matrix_addition_traits                   //  not implemented
 {
     using engine_type = ...;                    //- implementation-defined engine result
     using result_type = MathObj<engine_type>;   //- appropriate MathObj return type
 
-    static result_type  add(MathObj<E1> const& m1, MathObj<E2> const& m2);
+    static result_type  add(MathObj<ET1> const& m1, MathObj<ET2> const& m2);
 };
 
-template<class E1, class E2>
-struct matrix_addition_traits<column_vector<E1>, column_vector<E2>>;
+template<class ET1, class ET2>
+struct matrix_addition_traits<column_vector<ET1>, column_vector<ET2>>;
 
-template<class E1, class E2>
-struct matrix_addition_traits<row_vector<E1>, row_vector<E2>>;
+template<class ET1, class ET2>
+struct matrix_addition_traits<row_vector<ET1>, row_vector<ET2>>;
 
-template<class E1, class E2>
-struct matrix_addition_traits<matrix<E1>, matrix<E2>>;
+template<class ET1, class ET2>
+struct matrix_addition_traits<matrix<ET1>, matrix<ET2>>;
 ~~~~
 
 ### Subtraction Traits
 
-Class template `matrix_subtraction_traits<E1, E2>` is an arithmetic 
+Class template `matrix_subtraction_traits<ET1, ET2>` is an arithmetic 
 traits type that performs a subtraction of two compatible *MathObj*s 
 and returns the result in a *MathObj* having an implementation-defined
 engine type. There are three partial specializations to support the
 three overloaded binary subtraction operators described below.
 
 ~~~~
-template<class E1, class E2>                    //- for exposition only; base template
+template<class ET1, class ET2>                  //- for exposition only; base template
 struct matrix_subtraction_traits                //  not implemented
 {
     using engine_type = ...;                    //- implementation-defined engine result
     using result_type = MathObj<engine_type>;   //- appropriate MathObj return type
 
-    static result_type  subtract(MathObj<E1> const& m1, MathObj<E2> const& m2);
+    static result_type  subtract(MathObj<ET1> const& m1, MathObj<ET2> const& m2);
 };
 
-template<class E1, class E2>
-struct matrix_subtraction_traits<column_vector<E1>, column_vector<E2>>;
+template<class ET1, class ET2>
+struct matrix_subtraction_traits<column_vector<ET1>, column_vector<ET2>>;
 
-template<class E1, class E2>
-struct matrix_subtraction_traits<row_vector<E1>, row_vector<E2>>;
+template<class ET1, class ET2>
+struct matrix_subtraction_traits<row_vector<ET1>, row_vector<ET2>>;
 
-template<class E1, class E2>
-struct matrix_subtraction_traits<matrix<E1>, matrix<E2>>;
+template<class ET1, class ET2>
+struct matrix_subtraction_traits<matrix<ET1>, matrix<ET2>>;
 ~~~~
 
 ### Multiplication Traits
 
-Class template `matrix_multiplication_traits<E1, E2>` is an arithmetic 
+Class template `matrix_multiplication_traits<ET1, ET2>` is an arithmetic 
 traits type that performs the multiplication of two compatible *MathObj*s 
 and returns the result in a *MathObj* having an implementation-defined 
 engine type.  Note that there are ten partial specializations to support
 the thirteen overloaded binary multiplication operators described below.
 
 ~~~~
-template<class E1, class E2>                    //- for exposition only; base template
+template<class ET1, class ET2>                  //- for exposition only; base template
 struct matrix_multiplication_traits             //  not implemented
 {
     using engine_type = ...;                    //- implementation-defined engine result
     using result_type = MathObj<engine_type>;   //- appropriate MathObj return type
 
-    static result_type  multiply(MathObj<E1> const& m1, MathObj<E2> const& m2);
+    static result_type  multiply(MathObj<ET1> const& m1, MathObj<ET2> const& m2);
 };
 
-template<class E1, class T2>
-struct matrix_multiplication_traits<column_vector<E1>, T2>;
+template<class ET1, class T2>
+struct matrix_multiplication_traits<column_vector<ET1>, T2>;
 
-template<class E1, class T2>
-struct matrix_multiplication_traits<row_vector<E1>, T2>;
+template<class ET1, class T2>
+struct matrix_multiplication_traits<row_vector<ET1>, T2>;
 
-template<class E1, class T2>
-struct matrix_multiplication_traits<matrix<E1>, T2>;
+template<class ET1, class T2>
+struct matrix_multiplication_traits<matrix<ET1>, T2>;
 
-template<class E1, class E2>
-struct matrix_multiplication_traits<row_vector<E1>, column_vector<E2>>;
+template<class ET1, class ET2>
+struct matrix_multiplication_traits<row_vector<ET1>, column_vector<ET2>>;
 
-template<class E1, class E2>
-struct matrix_multiplication_traits<column_vector<E1>, row_vector<E2>>;
+template<class ET1, class ET2>
+struct matrix_multiplication_traits<column_vector<ET1>, row_vector<ET2>>;
 
-template<class E1, class E2>
-struct matrix_multiplication_traits<matrix<E1>, column_vector<E2>>;
+template<class ET1, class ET2>
+struct matrix_multiplication_traits<matrix<ET1>, column_vector<ET2>>;
 
-template<class E1, class E2>
-struct matrix_multiplication_traits<matrix<E1>, row_vector<E2>>;
+template<class ET1, class ET2>
+struct matrix_multiplication_traits<matrix<ET1>, row_vector<ET2>>;
 
-template<class E1, class E2>
-struct matrix_multiplication_traits<column_vector<E1>, matrix<E2>>;
+template<class ET1, class ET2>
+struct matrix_multiplication_traits<column_vector<ET1>, matrix<ET2>>;
 
-template<class E1, class E2>
-struct matrix_multiplication_traits<row_vector<E1>, matrix<E2>>;
+template<class ET1, class ET2>
+struct matrix_multiplication_traits<row_vector<ET1>, matrix<ET2>>;
 
-template<class E1, class E2>
-struct matrix_multiplication_traits<matrix<E1>, matrix<E2>>;
+template<class ET1, class ET2>
+struct matrix_multiplication_traits<matrix<ET1>, matrix<ET2>>;
 ~~~~
 
 One partial specialization bears special consideration, and that is
@@ -1306,16 +1338,16 @@ the return value from `multiply()` is not a *MathObj*, but instead
 a scalar:
 
 ~~~~
-template<class E1, class E2>
-struct matrix_multiplication_traits<row_vector<E1>, column_vector<E2>>
+template<class ET1, class ET2>
+struct matrix_multiplication_traits<row_vector<ET1>, column_vector<ET2>>
 {
     //- For exposition
     //
-    using elem_type_1 = typename row_vector<E1>::element_type;
-    using elem_type_2 = typename column_vector<E2>::element_type;
+    using elem_type_1 = typename row_vector<ET1>::element_type;
+    using elem_type_2 = typename column_vector<ET2>::element_type;
     using result_type = matrix_element_promotion_t<elem_type_1, elem_type_2>;
 
-    static result_type  multiply(row_vector<E1> const& rv, column_vector<E1> const& cv);
+    static result_type  multiply(row_vector<ET1> const& rv, column_vector<ET1> const& cv);
 };
 ~~~~
 
@@ -1333,19 +1365,19 @@ Three overloaded unary negation operators are provided to perform
 element-wise negation of a *MathObj* instance.
 
 ~~~~
-template<class E1>
-auto operator -(column_vector<E1> const& m1);
+template<class ET1>
+auto operator -(column_vector<ET1> const& m1);
 
-template<class E1>
-auto operator -(row_vector<E1> const& m1);
+template<class ET1>
+auto operator -(row_vector<ET1> const& m1);
 
-template<class E1>
-auto operator -(matrix<E1> const& m1);
+template<class ET1>
+auto operator -(matrix<ET1> const& m1);
 ~~~~
 
-Note that function template `operator -(MathObj<E1> const&)` is 
+Note that function template `operator -(MathObj<ET1> const&)` is 
 equivalent to multiplying the argument by the scalar value of 
-`static_cast<E1>(-1)`.
+`static_cast<ET1>(-1)`.
 
 ### Addition Operator
 
@@ -1353,18 +1385,18 @@ Three overloaded binary addition operators are provided to perform
 element-wise addition of two *MathObj* instances.
 
 ~~~~
-template<class E1, class E2>
-auto operator +(column_vector<E1> const& m1, column_vector<E2> const& m2);
+template<class ET1, class ET2>
+auto operator +(column_vector<ET1> const& m1, column_vector<ET2> const& m2);
 
-template<class E1, class E2>
-auto operator +(row_vector<E1> const& m1, row_vector<E2> const& m2);
+template<class ET1, class ET2>
+auto operator +(row_vector<ET1> const& m1, row_vector<ET2> const& m2);
 
-template<class E1, class E2>
-auto operator +(matrix<E1> const& m1, matrix<E2> const& m2);
+template<class ET1, class ET2>
+auto operator +(matrix<ET1> const& m1, matrix<ET2> const& m2);
 ~~~~
 
-Specifically, function template `operator +(MathObj<E1> const&, 
-MathObj<E2>const&)` performs the addition of two `MathObj` instances 
+Specifically, function template `operator +(MathObj<ET1> const&, 
+MathObj<ET2>const&)` performs the addition of two `MathObj` instances 
 of identical dimension.
 
 ### Subtraction Operator
@@ -1373,18 +1405,18 @@ Three overloaded binary subtraction operators are provided to perform
 element-wise subtraction of two *MathObj* instances.
 
 ~~~~
-template<class E1, class E2>
-auto operator -(column_vector<E1> const& m1, column_vector<E2> const& m2);
+template<class ET1, class ET2>
+auto operator -(column_vector<ET1> const& m1, column_vector<ET2> const& m2);
 
-template<class E1, class E2>
-auto operator -(row_vector<E1> const& m1, row_vector<E2> const& m2);
+template<class ET1, class ET2>
+auto operator -(row_vector<ET1> const& m1, row_vector<ET2> const& m2);
 
-template<class E1, class E2>
-auto operator -(matrix<E1> const& m1, matrix<E2> const& m2);
+template<class ET1, class ET2>
+auto operator -(matrix<ET1> const& m1, matrix<ET2> const& m2);
 ~~~~
 
-Specifically, function template `operator -(MathObj<E1> const&, 
-MathObj<E2> const&)` performs the subtraction of two `MathObj` 
+Specifically, function template `operator -(MathObj<ET1> const&, 
+MathObj<ET2> const&)` performs the subtraction of two `MathObj` 
 instances of identical dimension.
 
 ### Multiplication Operator
@@ -1393,67 +1425,67 @@ Thirteen overloaded binary multiplication operators are provided to
 perform appropriate multiplication of two *MathObj* instances.
 
 ~~~~
-template<class E1, class E2>
-auto operator *(column_vector<E1> const& cv, E2 s);
+template<class ET1, class ET2>
+auto operator *(column_vector<ET1> const& cv, ET2 s);
 
-template<class E1, class E2>
-auto operator *(E1 s, column_vector<E2> const& cv);
+template<class ET1, class ET2>
+auto operator *(ET1 s, column_vector<ET2> const& cv);
 
-template<class E1, class E2>
-auto operator *(row_vector<E1> const& rv, E2 s);
+template<class ET1, class ET2>
+auto operator *(row_vector<ET1> const& rv, ET2 s);
 
-template<class E1, class E2>
-auto operator *(E1 s, row_vector<E2> const& rv);
+template<class ET1, class ET2>
+auto operator *(ET1 s, row_vector<ET2> const& rv);
 
-template<class E1, class E2>
-auto operator *(matrix<E1> const& m, E2 s);
+template<class ET1, class ET2>
+auto operator *(matrix<ET1> const& m, ET2 s);
 
-template<class E1, class E2>
-auto operator *(E1 s, matrix<E2> const& m);
+template<class ET1, class ET2>
+auto operator *(ET1 s, matrix<ET2> const& m);
 
-template<class E1, class E2>
-auto operator *(row_vector<E1> const& rv, column_vector<E2> const& cv);
+template<class ET1, class ET2>
+auto operator *(row_vector<ET1> const& rv, column_vector<ET2> const& cv);
 
-template<class E1, class E2>
-auto operator *(column_vector<E1> const& cv, row_vector<E2> const& rv);
+template<class ET1, class ET2>
+auto operator *(column_vector<ET1> const& cv, row_vector<ET2> const& rv);
 
-template<class E1, class E2>
-auto operator *(matrix<E1> const& m, column_vector<E2> const& cv);
+template<class ET1, class ET2>
+auto operator *(matrix<ET1> const& m, column_vector<ET2> const& cv);
 
-template<class E1, class E2>
-auto operator *(matrix<E1> const& m, row_vector<E2> const& rv);
+template<class ET1, class ET2>
+auto operator *(matrix<ET1> const& m, row_vector<ET2> const& rv);
 
-template<class E1, class E2>
-auto operator *(column_vector<E1> const& cv, matrix<E2> const& m);
+template<class ET1, class ET2>
+auto operator *(column_vector<ET1> const& cv, matrix<ET2> const& m);
 
-template<class E1, class E2>
-auto operator *(row_vector<E1> const& rv, matrix<E2> const& m);
+template<class ET1, class ET2>
+auto operator *(row_vector<ET1> const& rv, matrix<ET2> const& m);
 
-template<class E1, class E2>
-auto operator *(matrix<E1> const& m1, matrix<E2> const& m2);
+template<class ET1, class ET2>
+auto operator *(matrix<ET1> const& m1, matrix<ET2> const& m2);
 ~~~~
 
 The first six function templates,
 
-+ `operator *(column_vector<E1> const&, E2)`,
++ `operator *(column_vector<ET1> const&, ET2)`,
 
-+ `operator *(E1, column_vector<E2> const&)`,
++ `operator *(ET1, column_vector<ET2> const&)`,
 
-+ `operator *(row_vector<E1> const&, E2)`, 
++ `operator *(row_vector<ET1> const&, ET2)`, 
 
-+ `operator *(E1, row_vector<E2>const&)`, 
++ `operator *(ET1, row_vector<ET2>const&)`, 
 
-+ `operator *(matrix<E1> const&, E2)`, and 
++ `operator *(matrix<ET1> const&, ET2)`, and 
 
-+ `operator *(E1, matrix<E2> const&)` 
++ `operator *(ET1, matrix<ET2> const&)` 
 
 perform multiplication of a *MathObj* instance and a scalar value.
 
 The next two function templates,
 
-+ `operator *(row_vector<E1> const&, column_vector<E2> const&)` and 
++ `operator *(row_vector<ET1> const&, column_vector<ET2> const&)` and 
 
-+ `operator *(column_vector<E1> const&, row_vector<E2> const&)` 
++ `operator *(column_vector<ET1> const&, row_vector<ET2> const&)` 
 
 perform the inner product and outer product, respectively.  Although
 hidden by the `auto` return type, per the multiplication traits 
@@ -1462,22 +1494,22 @@ outer product returns `matrix`, as expected.
 
 The last five function templates,
 
-+ `operator *(matrix<E1> const&, column_vector<E2> const&)`, 
++ `operator *(matrix<ET1> const&, column_vector<ET2> const&)`, 
 
-+ `operator *(matrix<E1> const&, row_vector<E2> const&)`, 
++ `operator *(matrix<ET1> const&, row_vector<ET2> const&)`, 
 
-+ `operator *(column_vector<E1> const&, matrix<E2> const&)`, 
++ `operator *(column_vector<ET1> const&, matrix<ET2> const&)`, 
 
-+ `operator *(row_vector<E1> const&, matrix<E2> const&)`, and 
++ `operator *(row_vector<ET1> const&, matrix<ET2> const&)`, and 
 
-+ `operator *(matrix<E1> const&, matrix<E2> const&)` 
++ `operator *(matrix<ET1> const&, matrix<ET2> const&)` 
 
 perform matrix multiplication of *MathObj*s.
 
 The question may arise as to why thirteen multiplication operators
 are provided rather than the expected fifteen.  Strictly speaking, 
 it is certainly possible to specify multiplication operators for 
-`row_vector<E1>*row_vector<E2>` and `column_vector<E1>*column_vector<E2>`, 
+`row_vector<ET1>*row_vector<ET2>` and `column_vector<ET1>*column_vector<ET2>`, 
 but these represent degenerate cases of vectors having one element, 
 and so are not included in this revision.
 

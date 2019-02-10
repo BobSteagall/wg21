@@ -1,4 +1,3 @@
-#include <complex>
 #include "linear_algebra.hpp"
 
 using cx_float  = std::complex<float>;
