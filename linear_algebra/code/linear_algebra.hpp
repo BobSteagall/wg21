@@ -4,7 +4,7 @@
 #include "matrix_operators.hpp"
 
 namespace std::la {
-//- Aliases for matrix/row_vector/column_vector objects based on dynamic engines.
+//- Aliases for column_vector/row_vector/matrix objects based on dynamic engines.
 //
 template<class T, class A = std::allocator<T>>
 using dyn_column_vector = column_vector<dr_matrix_engine<T, A>>;
@@ -19,7 +19,7 @@ template<class T, class A = std::allocator<T>>
 using dyn_matrix = matrix<dr_matrix_engine<T, A>>;
 
 
-//- Aliases for matrix/row_vector/column_vector objects based on fixed-size engines.
+//- Aliases for column_vector/row_vector/matrix objects based on fixed-size engines.
 //
 template<class T, size_t R>
 using fs_column_vector = column_vector<fs_matrix_engine<T, R, 1>>;

@@ -39,12 +39,14 @@ template<class ET, class OT=matrix_operator_traits> class column_vector;
 template<class ET, class OT=matrix_operator_traits> class row_vector;
 template<class ET, class OT=matrix_operator_traits> class matrix;
 
+template<class ET, class OT> using col_vector = column_vector<ET, OT>;
+
 //- Matrix arithmetic traits.
 //
-template<class OP1>             struct matrix_negation_traits;
-template<class OP1, class OP2>  struct matrix_addition_traits;
-template<class OP1, class OP2>  struct matrix_subtraction_traits;
-template<class OP1, class OP2>  struct matrix_multiplication_traits;
+template<class OP1, class OTR>              struct matrix_negation_traits;
+template<class OP1, class OP2, class OTR>   struct matrix_addition_traits;
+template<class OP1, class OP2, class OTR>   struct matrix_subtraction_traits;
+template<class OP1, class OP2, class OTR>   struct matrix_multiplication_traits;
 
 //- Operator traits and traits promotion.
 //

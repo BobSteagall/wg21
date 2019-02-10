@@ -10,11 +10,11 @@ namespace std::la {
 //
 template<class ET1, class ET2>
 using enable_if_resizable_t =
-    typename std::enable_if_t<is_same_v<ET1, ET2> && ET1::is_resizable_type::value, bool>;
+    typename std::enable_if_t<is_same_v<ET1, ET2> && ET1::is_resizable::value, bool>;
 
-template<class ET1, class ET2>
-using enable_if_complex_t =
-    typename std::enable_if_t<is_same_v<ET1, ET2> && is_complex_v<typename ET1::element_type>, bool>;
+//  template<class ET1, class ET2>
+//  using enable_if_complex_t =
+//      typename std::enable_if_t<is_same_v<ET1, ET2> && is_complex_v<typename ET1::element_type>, bool>;
 
 //=================================================================================================
 //  A column vector parametrized by an engine type.
@@ -24,14 +24,14 @@ template<class ET, class OT>
 class column_vector
 {
   public:
-    using engine_type       = ET;
-    using element_type      = typename ET::element_type;
-    using is_resizable_type = typename ET::is_resizable_type;
-    using size_tuple        = typename ET::size_tuple;
-
-    using transpose_type    = row_vector<matrix_transpose_engine<ET>>;
-    using hermitian_type    = std::conditional_t<is_complex_v<element_type>, row_vector<ET, OT>, transpose_type>;
-
+    using engine_type    = ET;
+    using element_type   = typename ET::element_type;
+    using is_resizable   = typename ET::is_resizable;
+    using size_tuple     = typename ET::size_tuple;
+    using transpose_type = row_vector<matrix_transpose_engine<ET>>;
+    using hermitian_type = std::conditional_t<is_complex_v<element_type>,
+                                                  row_vector<ET, OT>,
+                                                  transpose_type>;
     static_assert(is_matrix_element_v<element_type>);
 
   public:
@@ -39,7 +39,6 @@ class column_vector
     column_vector();
     column_vector(column_vector&&) = default;
     column_vector(column_vector const&) = default;
-
     template<class ET2>
     column_vector(column_vector<ET2> const& src);
 
@@ -50,7 +49,6 @@ class column_vector
 
     column_vector&  operator =(column_vector&&) = default;
     column_vector&  operator =(column_vector const&) = default;
-
     template<class ET2>
     column_vector&  operator =(column_vector<ET2> const& rhs);
 
@@ -61,18 +59,17 @@ class column_vector
 
     //- Accessors.
     //
-    size_t  columns() const noexcept;
-    size_t  rows() const noexcept;
-    size_t  size() const noexcept;
+    size_t      columns() const noexcept;
+    size_t      rows() const noexcept;
+    size_tuple  size() const noexcept;
 
-    size_t  column_capacity() const noexcept;
-    size_t  row_capacity() const noexcept;
-    size_t  capacity() const noexcept;
+    size_t      column_capacity() const noexcept;
+    size_t      row_capacity() const noexcept;
+    size_tuple  capacity() const noexcept;
 
     //- Transpose and Hermitian.
     //
     transpose_type  t() const;
-    template<class ET2 = ET, enable_if_complex_t<ET, ET2> = true>
     hermitian_type  h() const;
 
     //- Mutable element access.
@@ -112,14 +109,14 @@ template<class ET, class OT>
 class row_vector
 {
   public:
-    using engine_type       = ET;
-    using element_type      = typename ET::element_type;
-    using is_resizable_type = typename ET::is_resizable_type;
-    using size_tuple        = typename ET::size_tuple;
-
-    using transpose_type    = column_vector<matrix_transpose_engine<ET>>;
-    using hermitian_type    = std::conditional_t<is_complex_v<element_type>, column_vector<ET, OT>, void>;
-
+    using engine_type    = ET;
+    using element_type   = typename ET::element_type;
+    using is_resizable   = typename ET::is_resizable;
+    using size_tuple     = typename ET::size_tuple;
+    using transpose_type = column_vector<matrix_transpose_engine<ET>>;
+    using hermitian_type = std::conditional_t<is_complex_v<element_type>,
+                                                  column_vector<ET, OT>,
+                                                  transpose_type>;
     static_assert(is_matrix_element_v<element_type>);
 
   public:
@@ -127,7 +124,6 @@ class row_vector
     row_vector();
     row_vector(row_vector&&) = default;
     row_vector(row_vector const&) = default;
-
     template<class ET2>
     row_vector(row_vector<ET2> const& src);
 
@@ -138,7 +134,6 @@ class row_vector
 
     row_vector&     operator =(row_vector&&) = default;
     row_vector&     operator =(row_vector const&) = default;
-
     template<class ET2>
     row_vector&     operator =(row_vector<ET2> const& rhs);
 
@@ -149,18 +144,17 @@ class row_vector
 
     //- Accessors.
     //
-    size_t  columns() const noexcept;
-    size_t  rows() const noexcept;
-    size_t  size() const noexcept;
+    size_t      columns() const noexcept;
+    size_t      rows() const noexcept;
+    size_tuple  size() const noexcept;
 
-    size_t  column_capacity() const noexcept;
-    size_t  row_capacity() const noexcept;
-    size_t  capacity() const noexcept;
+    size_t      column_capacity() const noexcept;
+    size_t      row_capacity() const noexcept;
+    size_tuple  capacity() const noexcept;
 
     //- Transpose and Hermitian.
     //
     transpose_type  t() const;
-    template<class ET2 = ET, enable_if_complex_t<ET, ET2> = true>
     hermitian_type  h() const;
 
     //- Mutable element access.
@@ -200,14 +194,14 @@ template<class ET, class OT>
 class matrix
 {
   public:
-    using engine_type       = ET;
-    using element_type      = typename ET::element_type;
-    using is_resizable_type = typename ET::is_resizable_type;
-    using size_tuple        = typename ET::size_tuple;
-
-    using transpose_type    = matrix<matrix_transpose_engine<ET>>;
-    using hermitian_type    = std::conditional_t<is_complex_v<element_type>, matrix, void>;
-
+    using engine_type    = ET;
+    using element_type   = typename ET::element_type;
+    using is_resizable   = typename ET::is_resizable;
+    using size_tuple     = typename ET::size_tuple;
+    using transpose_type = matrix<matrix_transpose_engine<ET>>;
+    using hermitian_type = std::conditional_t<is_complex_v<element_type>,
+                                                  matrix<ET, OT>,
+                                                  transpose_type>;
     static_assert(is_matrix_element_v<element_type>);
 
   public:
@@ -215,7 +209,6 @@ class matrix
     matrix();
     matrix(matrix&&) = default;
     matrix(matrix const&) = default;
-
     template<class ET2>
     matrix(matrix<ET2> const& src);
 
@@ -231,7 +224,6 @@ class matrix
 
     matrix&     operator =(matrix&&) = default;
     matrix&     operator =(matrix const&) = default;
-
     template<class ET2>
     matrix&     operator =(matrix<ET2> const& rhs);
 
@@ -253,7 +245,6 @@ class matrix
     //- Transpose and Hermitian.
     //
     transpose_type  t() const;
-    template<class ET2 = ET, enable_if_complex_t<ET, ET2> = true>
     hermitian_type  h() const;
 
     //- Mutable element access.

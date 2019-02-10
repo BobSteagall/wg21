@@ -17,11 +17,11 @@ class fs_matrix_engine
     static_assert(C >= 1);
 
   public:
-    using element_type      = T;
-    using is_dense          = std::true_type;
-    using is_rectangular    = std::true_type;
-    using is_resizable_type = std::false_type;
-    using size_tuple        = std::tuple<size_t, size_t>;
+    using element_type   = T;
+    using is_dense       = std::true_type;
+    using is_rectangular = std::true_type;
+    using is_resizable   = std::false_type;
+    using size_tuple     = std::tuple<size_t, size_t>;
 
   public:
     fs_matrix_engine();
@@ -64,11 +64,11 @@ template<class T, class AT>
 class dr_matrix_engine
 {
   public:
-    using element_type      = T;
-    using is_dense          = std::true_type;
-    using is_rectangular    = std::true_type;
-    using is_resizable_type = std::true_type;
-    using size_tuple        = std::tuple<size_t, size_t>;
+    using element_type   = T;
+    using is_dense       = std::true_type;
+    using is_rectangular = std::true_type;
+    using is_resizable   = std::true_type;
+    using size_tuple     = std::tuple<size_t, size_t>;
 
   public:
     dr_matrix_engine();
@@ -130,12 +130,12 @@ template<class ET>
 class matrix_transpose_engine
 {
   public:
-    using engine_type       = ET;
-    using element_type      = typename engine_type::element_type;
-    using is_dense          = typename engine_type::is_dense;
-    using is_rectangular    = typename engine_type::is_rectangular;
-    using is_resizable_type = std::false_type;
-    using size_tuple        = typename engine_type::size_tuple;
+    using engine_type    = ET;
+    using element_type   = typename engine_type::element_type;
+    using is_dense       = typename engine_type::is_dense;
+    using is_rectangular = typename engine_type::is_rectangular;
+    using is_resizable   = std::false_type;
+    using size_tuple     = typename engine_type::size_tuple;
 
   public:
     matrix_transpose_engine();
