@@ -7,16 +7,16 @@ namespace std::la {
 //- Aliases for matrix/row_vector/column_vector objects based on dynamic engines.
 //
 template<class T, class A = std::allocator<T>>
-using dyn_column_vector = column_vector<dyn_matrix_engine<T, A>>;
+using dyn_column_vector = column_vector<dr_matrix_engine<T, A>>;
 
 template<class T, class A = std::allocator<T>>
 using dyn_col_vector = dyn_column_vector<T, A>;
 
 template<class T, class A = std::allocator<T>>
-using dyn_row_vector = row_vector<dyn_matrix_engine<T, A>>;
+using dyn_row_vector = row_vector<dr_matrix_engine<T, A>>;
 
 template<class T, class A = std::allocator<T>>
-using dyn_matrix = matrix<dyn_matrix_engine<T, A>>;
+using dyn_matrix = matrix<dr_matrix_engine<T, A>>;
 
 
 //- Aliases for matrix/row_vector/column_vector objects based on fixed-size engines.
