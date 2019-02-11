@@ -10,6 +10,9 @@ namespace std::la {
 //  Traits type that performs negation.
 //=================================================================================================
 //
+template<class OP1, class OTR> 
+struct matrix_negation_traits;
+
 template<class ET1, class OT1, class OTR>
 struct matrix_negation_traits<column_vector<ET1, OT1>, OTR>
 {
@@ -47,6 +50,9 @@ struct matrix_negation_traits<matrix<ET1, OT1>, OTR>
 //  Traits type that performs addition.
 //=================================================================================================
 //
+template<class OP1, class OP2, class OTR> 
+struct matrix_addition_traits;
+
 template<class ET1, class OT1, class ET2, class OT2, class OTR>
 struct matrix_addition_traits<column_vector<ET1, OT1>, column_vector<ET2, OT2>, OTR>
 {
@@ -84,6 +90,9 @@ struct matrix_addition_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>
 //  Traits type that performs subtraction.
 //=================================================================================================
 //
+template<class OP1, class OP2, class OTR> 
+struct matrix_subtraction_traits;
+
 template<class ET1, class OT1, class ET2, class OT2, class OTR>
 struct matrix_subtraction_traits<column_vector<ET1, OT1>, column_vector<ET2, OT2>, OTR>
 {
@@ -120,6 +129,10 @@ struct matrix_subtraction_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>
 //=================================================================================================
 //  Traits type that performs multiplication.
 //=================================================================================================
+//
+template<class OP1, class OP2, class OTR> 
+struct matrix_multiplication_traits;
+
 //- vector*scalar
 //
 template<class ET1, class OT1, class T2, class OTR>
