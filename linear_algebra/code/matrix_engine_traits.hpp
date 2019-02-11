@@ -84,7 +84,7 @@ struct matrix_addition_engine_promotion<fs_matrix_engine<T1, R1, C1>, fs_matrix_
     static_assert(R1 == R2);
     static_assert(C1 == C2);
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using engine_type  = fs_matrix_engine<element_type, R1, C2>;
+    using engine_type  = fs_matrix_engine<element_type, R1, C1>;
 };
 
 //- Transpose cases.
@@ -114,7 +114,7 @@ struct matrix_addition_engine_promotion<matrix_transpose_engine<fs_matrix_engine
     static_assert(R1 == C2);
     static_assert(C1 == R2);
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using engine_type  = fs_matrix_engine<element_type, R1, C2>;
+    using engine_type  = fs_matrix_engine<element_type, R2, C2>;
 };
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
@@ -124,7 +124,17 @@ struct matrix_addition_engine_promotion<fs_matrix_engine<T1, R1, C1>,
     static_assert(R1 == C2);
     static_assert(C1 == R2);
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using engine_type  = fs_matrix_engine<element_type, R1, C2>;
+    using engine_type  = fs_matrix_engine<element_type, R1, C1>;
+};
+
+template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+struct matrix_addition_engine_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
+                                        matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
+{
+    static_assert(R1 == R2);
+    static_assert(C1 == C2);
+    using element_type = matrix_element_promotion_t<T1, T2>;
+    using engine_type  = fs_matrix_engine<element_type, C1, R1>;
 };
 
 //- Alias interface to trait.
@@ -205,7 +215,7 @@ struct matrix_subtraction_engine_promotion<matrix_transpose_engine<fs_matrix_eng
     static_assert(R1 == C2);
     static_assert(C1 == R2);
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using engine_type  = fs_matrix_engine<element_type, R1, C2>;
+    using engine_type  = fs_matrix_engine<element_type, R2, C2>;
 };
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
@@ -215,7 +225,17 @@ struct matrix_subtraction_engine_promotion<fs_matrix_engine<T1, R1, C1>,
     static_assert(R1 == C2);
     static_assert(C1 == R2);
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using engine_type  = fs_matrix_engine<element_type, R1, C2>;
+    using engine_type  = fs_matrix_engine<element_type, R1, C1>;
+};
+
+template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+struct matrix_subtraction_engine_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
+                                           matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
+{
+    static_assert(R1 == R2);
+    static_assert(C1 == C2);
+    using element_type = matrix_element_promotion_t<T1, T2>;
+    using engine_type  = fs_matrix_engine<element_type, C1, R1>;
 };
 
 //- Alias interface to trait.
