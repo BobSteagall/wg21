@@ -3,7 +3,7 @@
 
 #include "linear_algebra_fwd.hpp"
 
-namespace std::la {
+namespace STD_LA {
 //- New trait "is_complex" to detect std::complex<T> of an arithmetic type.
 //
 template<class T>
@@ -94,5 +94,5 @@ struct matrix_element_promotion<std::complex<T1>, std::complex<T2>>
 template<class T1, class T2>
 using matrix_element_promotion_t = typename matrix_element_promotion<T1, T2>::type;
 
-}       //- std::la namespace
+}       //- STD_LA namespace
 #endif  //- MATRIX_ELEMENT_TRAITS_HPP_DEFINED

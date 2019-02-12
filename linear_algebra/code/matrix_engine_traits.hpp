@@ -3,7 +3,7 @@
 
 #include "matrix_engines.hpp"
 
-namespace std::la {
+namespace STD_LA {
 //=================================================================================================
 //                                      **** NEGATION ****
 //=================================================================================================
@@ -362,5 +362,5 @@ struct matrix_multiplication_engine_promotion<matrix_transpose_engine<fs_matrix_
 template<class ET1, class ET2>
 using matrix_multiplication_engine_t = typename matrix_multiplication_engine_promotion<ET1, ET2>::engine_type;
 
-}       //- std::la namespace
+}       //- STD_LA namespace
 #endif  //- MATRIX_ENGINE_TRAITS_HPP_DEFINED

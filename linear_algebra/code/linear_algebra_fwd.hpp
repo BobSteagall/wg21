@@ -7,8 +7,13 @@
 #include <tuple>
 #include <type_traits>
 
-namespace std::la {
+//- Namespace alternatives to check for ADL issues.
+//
+//#define STD_LA  std
+#define STD_LA  la
+//#define STD_LA  std::experimental::la
 
+namespace STD_LA {
 //- Verifying appropriate matrix element types.
 //
 template<class T>   struct is_complex;
@@ -53,5 +58,5 @@ template<class OP1, class OP2, class OTR>   struct matrix_multiplication_traits;
 struct matrix_operator_traits;
 template<class T1, class T2>    struct matrix_operator_traits_promotion;
 
-}       //- std::la namespace
+}       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_FWD_HPP_DEFINED
