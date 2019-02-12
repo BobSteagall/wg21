@@ -17,7 +17,6 @@ struct has_resize<T, std::void_t<decltype(std::declval<T>().resize(0,0))>>
 template<typename T>
 inline constexpr bool   has_resize_v = has_resize<T>::value;
 
-namespace  {
 void    t01()
 {
     constexpr bool  b0 = is_complex_v<std::string>;
@@ -658,11 +657,4 @@ void t42()
     auto    r04 = -frvf.t();
     auto    r05 = -dmf.t();
     auto    r06 = -fmf.t();
-}
-
-}
-
-int main()
-{
-    return 0;
 }

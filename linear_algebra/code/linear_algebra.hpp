@@ -1,9 +1,9 @@
 #ifndef LINEAR_ALGEBRA_HPP_DEFINED
 #define LINEAR_ALGEBRA_HPP_DEFINED
 
-#include "matrix_operators.hpp"
+#include "matrix_test_impl.hpp"
 
-namespace std::la {
+namespace STD_LA {
 //- Aliases for column_vector/row_vector/matrix objects based on dynamic engines.
 //
 template<class T, class A = std::allocator<T>>
@@ -33,5 +33,5 @@ using fs_row_vector = row_vector<fs_matrix_engine<T, 1, C>>;
 template<class T, size_t R, size_t C>
 using fs_matrix = matrix<fs_matrix_engine<T, R, C>>;
 
-}       //- std::la namespace
+}       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_HPP_DEFINED
