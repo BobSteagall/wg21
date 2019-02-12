@@ -3,14 +3,14 @@
 
 #include "matrix_engine_traits.hpp"
 
-namespace std::la {
+namespace STD_LA {
 
 //- New trait to use with SFINAE to determine if an engine is resizable; if it is, then
 //  something can be enabled.
 //
 template<class ET1, class ET2>
 using enable_if_resizable_t =
-    typename std::enable_if_t<is_same_v<ET1, ET2> && ET1::is_resizable::value, bool>;
+    typename std::enable_if_t<std::is_same_v<ET1, ET2> && ET1::is_resizable::value, bool>;
 
 //  template<class ET1, class ET2>
 //  using enable_if_complex_t =
@@ -282,5 +282,5 @@ class matrix
     engine_type     m_engine;
 };
 
-}       //- std::la namespace
+}       //- STD_LA namespace
 #endif  //- MATRIX_HPP_DEFINED

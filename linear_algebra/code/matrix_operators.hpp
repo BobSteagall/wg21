@@ -3,7 +3,7 @@
 
 #include "matrix_operator_traits.hpp"
 
-namespace std::la {
+namespace STD_LA {
 //=================================================================================================
 //  Unary negation operators, which forward to the negation traits do the work.
 //=================================================================================================
@@ -302,5 +302,5 @@ operator *(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
     return mul_traits::multiply(m1, m2);
 }
 
-}       //- std::la namespace
+}       //- STD_LA namespace
 #endif  //- MATRIX_OPERATORS_HPP_DEFINED

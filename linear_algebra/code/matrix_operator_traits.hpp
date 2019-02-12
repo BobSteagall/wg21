@@ -3,7 +3,7 @@
 
 #include "matrix_arithmetic_traits.hpp"
 
-namespace std::la {
+namespace STD_LA {
 //=================================================================================================
 //                                  **** OPERATOR TRAITS ****
 //=================================================================================================
@@ -29,7 +29,7 @@ struct matrix_operator_traits
 //=================================================================================================
 //                             **** OPERATOR TRAITS PROMOTION ****
 //=================================================================================================
-//  Traits type that determines which operator traits to use in an expression.
+//  Traits type that determines which sets of operator traits to use in an expression.
 //=================================================================================================
 //
 template<class T1, class T2>
@@ -64,5 +64,5 @@ struct matrix_operator_traits_promotion<matrix_operator_traits, matrix_operator_
 template<class T1, class T2>
 using matrix_operator_traits_promotion_t = typename matrix_operator_traits_promotion<T1,T2>::traits_type;
 
-}       //- std::la namespace
+}       //- STD_LA namespace
 #endif  //- MATRIX_OPERATOR_TRAITS_HPP_DEFINED

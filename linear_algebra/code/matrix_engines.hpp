@@ -5,7 +5,7 @@
 
 //- Experimental namespace for test implementation
 //
-namespace std::la {
+namespace STD_LA {
 //=================================================================================================
 //  Fixed-size, fixed-capacity matrix engine.
 //=================================================================================================
@@ -21,15 +21,16 @@ class fs_matrix_engine
     using is_dense       = std::true_type;
     using is_rectangular = std::true_type;
     using is_resizable   = std::false_type;
+    using is_row_major   = std::true_type;
     using size_tuple     = std::tuple<size_t, size_t>;
 
   public:
-    fs_matrix_engine();
-    fs_matrix_engine(fs_matrix_engine&&);
-    fs_matrix_engine(fs_matrix_engine const&);
+    fs_matrix_engine() = default;
+    fs_matrix_engine(fs_matrix_engine&&) = default;
+    fs_matrix_engine(fs_matrix_engine const&) = default;
 
-    fs_matrix_engine&   operator =(fs_matrix_engine&&);
-    fs_matrix_engine&   operator =(fs_matrix_engine const&);
+    fs_matrix_engine&   operator =(fs_matrix_engine&&) = default;
+    fs_matrix_engine&   operator =(fs_matrix_engine const&) = default;
 
     T           operator ()(size_t i) const;
     T           operator ()(size_t i, size_t j) const;
@@ -68,6 +69,7 @@ class dr_matrix_engine
     using is_dense       = std::true_type;
     using is_rectangular = std::true_type;
     using is_resizable   = std::true_type;
+    using is_row_major   = std::true_type;
     using size_tuple     = std::tuple<size_t, size_t>;
 
   public:
@@ -135,6 +137,9 @@ class matrix_transpose_engine
     using is_dense       = typename engine_type::is_dense;
     using is_rectangular = typename engine_type::is_rectangular;
     using is_resizable   = std::false_type;
+    using is_row_major   = std::conditional_t<std::is_same_v<typename ET::is_row_major, std::true_type>,
+                                                  std::false_type,
+                                                  std::true_type>;
     using size_tuple     = typename engine_type::size_tuple;
 
   public:
@@ -162,5 +167,5 @@ class matrix_transpose_engine
     engine_type*    mp_other;   //- For exposition; pointer to actual engine
 };
 
-}       //- std::la namespace
+}       //- STD_LA namespace
 #endif  //- MATRIX_ENGINES_HPP_DEFINED

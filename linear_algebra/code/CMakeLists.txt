@@ -13,10 +13,12 @@ set(Includes
     matrix_engines.hpp
     matrix_operator_traits.hpp
     matrix_operators.hpp
+    matrix_test_impl.hpp
 )
 
 set(Sources
     interface_test_01.cpp
+    # interface_test_02.cpp
 )
 
 include_directories(.)
