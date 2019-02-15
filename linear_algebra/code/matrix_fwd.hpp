@@ -1,17 +1,5 @@
-#ifndef LINEAR_ALGEBRA_FWD_HPP_DEFINED
-#define LINEAR_ALGEBRA_FWD_HPP_DEFINED
-
-#include <cstdint>
-#include <complex>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-
-//- Namespace alternatives to check for ADL issues.
-//
-//#define STD_LA  std
-#define STD_LA  la
-//#define STD_LA  std::experimental::la
+#ifndef MATRIX_FWD_HPP_DEFINED
+#define MATRIX_FWD_HPP_DEFINED
 
 namespace STD_LA {
 //- Verifying appropriate matrix element types.
@@ -26,7 +14,7 @@ template<class T1, class T2>    struct matrix_element_promotion;
 //- Basic math object engine types.
 //
 template<class T, size_t R, size_t C>           class fs_matrix_engine;
-template<class T, class AT = std::allocator<T>> class dr_matrix_engine;
+template<class T, class AT=std::allocator<T>>   class dr_matrix_engine;
 template<class ET>                              class matrix_transpose_engine;
 
 //- Math object engine promotion, per arithmetical operation.
@@ -59,4 +47,4 @@ struct matrix_operator_traits;
 template<class T1, class T2>    struct matrix_operator_traits_promotion;
 
 }       //- STD_LA namespace
-#endif  //- LINEAR_ALGEBRA_FWD_HPP_DEFINED
+#endif  //- MATRIX_FWD_HPP_DEFINED

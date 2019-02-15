@@ -103,8 +103,8 @@ to represent displacements, as well as physical quantities such as
 force or momentum. Linear algebra is concerned primarily with the
 study of vector spaces.
 
-2.  The **dimension** of a vector space is defined as the minimum number
-of coordinates required to specify any point within the space.
+2.  The **dimension** of a vector space is the minimum number of
+coordinates required to specify any point within the space.
 
 3.  A **matrix** is a rectangular array of numbers, symbols, or
 expressions, arranged in rows and columns. A matrix having *m* rows
@@ -459,8 +459,8 @@ elements owned by some other object.
 
 As with `std::string` and `std::vector`, it is occasionally useful
 for a *MathObj* to have excess storage capacity in order to reduce the
-number of re-allocations required by future resizing operations. Some
-linear algebra libraries, like *LAPACK*, account for the fact that a
+number of re-allocations required by anticipated future resizing operations. 
+Some linear algebra libraries, like *LAPACK*, account for the fact that a
 *MathObj*’s capacity may be different than its size. This capability was
 of critical importance to the success of one author’s prior work in
 functional MRI image analysis.
@@ -1354,10 +1354,11 @@ struct matrix_multiplication_traits<row_vector<ET1>, column_vector<ET2>>
 ## Arithmetic Operators
 
 Readers will note that the return types of the overloaded operators 
-described below is left unspecified.  This is a deliberate choice 
-made so that implementers have the freedom to choose whatever default
-technique for evaluationg expressions they desire; for example, by 
-returning temporary objects or perhaps by using expression templates.
+described below are left unspecified.  This is a deliberate choice so
+that implementers have the freedom to choose whatever default technique
+for evaluationg expressions they desire; for example, by returning 
+temporary objects, or by using expression templates, or perhaps by 
+some other technique.
 
 ### Negation Operator
 

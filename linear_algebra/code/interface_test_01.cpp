@@ -533,7 +533,7 @@ void t40()
     auto    r05 = frvf + fcvd.t();
     auto    r06 = fcvd.t() + fcvf.t();
 
-    auto    r07 = dcvf.t() + frvf;
+    auto    r071 = dcvf.t() + frvf;
     auto    r08 = drvf + fcvd.t();
     auto    r09 = dcvd.t() + fcvd.t();
 
@@ -664,5 +664,6 @@ void t42()
 
 int main()
 {
+    t20();
     return 0;
 }
