@@ -12,10 +12,6 @@ template<class ET1, class ET2>
 using enable_if_resizable_t =
     typename std::enable_if_t<std::is_same_v<ET1, ET2> && ET1::is_resizable::value, bool>;
 
-//  template<class ET1, class ET2>
-//  using enable_if_complex_t =
-//      typename std::enable_if_t<is_same_v<ET1, ET2> && is_complex_v<typename ET1::element_type>, bool>;
-
 //=================================================================================================
 //  A column vector parametrized by an engine type.
 //=================================================================================================
@@ -39,8 +35,8 @@ class column_vector
     column_vector();
     column_vector(column_vector&&) = default;
     column_vector(column_vector const&) = default;
-    template<class ET2>
-    column_vector(column_vector<ET2> const& src);
+    template<class ET2, class OT2>
+    column_vector(column_vector<ET2, OT2> const& src);
 
     template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     column_vector(size_t rows);
@@ -49,13 +45,13 @@ class column_vector
 
     column_vector&  operator =(column_vector&&) = default;
     column_vector&  operator =(column_vector const&) = default;
-    template<class ET2>
-    column_vector&  operator =(column_vector<ET2> const& rhs);
+    template<class ET2, class OT2>
+    column_vector&  operator =(column_vector<ET2, OT2> const& rhs);
 
     //- Const element access.
     //
     element_type        operator ()(size_t i) const;
-    element_type const* data() const;
+    element_type const* data() const noexcept;
 
     //- Accessors.
     //
@@ -74,8 +70,8 @@ class column_vector
 
     //- Mutable element access.
     //
-    element_type    operator ()(size_t i);
-    element_type*   data();
+    element_type&   operator ()(size_t i);
+    element_type*   data() noexcept;
 
     //- Change capacity.
     //
@@ -97,7 +93,13 @@ class column_vector
     void    swap_rows(size_t i, size_t j);
 
   private:
+    template<class ET2, class OT2> friend class row_vector;
+
+  private:
     engine_type     m_engine;
+
+  private:
+    column_vector(engine_type const& eng);
 };
 
 
@@ -124,8 +126,10 @@ class row_vector
     row_vector();
     row_vector(row_vector&&) = default;
     row_vector(row_vector const&) = default;
+    template<class ET2, class OT2>
+    row_vector(row_vector<ET2, OT2> const& src);
     template<class ET2>
-    row_vector(row_vector<ET2> const& src);
+    row_vector(column_vector<matrix_transpose_engine<ET2>> const& src);
 
     template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     row_vector(size_t cols);
@@ -134,13 +138,13 @@ class row_vector
 
     row_vector&     operator =(row_vector&&) = default;
     row_vector&     operator =(row_vector const&) = default;
-    template<class ET2>
-    row_vector&     operator =(row_vector<ET2> const& rhs);
+    template<class ET2, class OT2>
+    row_vector&     operator =(row_vector<ET2, OT2> const& rhs);
 
     //- Const element access.
     //
     element_type        operator ()(size_t i) const;
-    element_type const* data() const;
+    element_type const* data() const noexcept;
 
     //- Accessors.
     //
@@ -159,8 +163,8 @@ class row_vector
 
     //- Mutable element access.
     //
-    element_type    operator ()(size_t i);
-    element_type*   data();
+    element_type&   operator ()(size_t i);
+    element_type*   data() noexcept;
 
     //- Change capacity.
     //
@@ -182,7 +186,13 @@ class row_vector
     void    swap_columns(size_t i, size_t j);
 
   private:
+    template<class ET2, class OT2> friend class column_vector;
+
+  private:
     engine_type     m_engine;
+
+  private:
+    row_vector(engine_type const& eng);
 };
 
 
@@ -209,8 +219,8 @@ class matrix
     matrix();
     matrix(matrix&&) = default;
     matrix(matrix const&) = default;
-    template<class ET2>
-    matrix(matrix<ET2> const& src);
+    template<class ET2, class OT2>
+    matrix(matrix<ET2, OT2> const& src);
 
     template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     matrix(size_tuple size);
@@ -224,13 +234,13 @@ class matrix
 
     matrix&     operator =(matrix&&) = default;
     matrix&     operator =(matrix const&) = default;
-    template<class ET2>
-    matrix&     operator =(matrix<ET2> const& rhs);
+    template<class ET2, class OT2>
+    matrix&     operator =(matrix<ET2, OT2> const& rhs);
 
     //- Const element access.
     //
     element_type        operator ()(size_t i, size_t j) const;
-    element_type const* data() const;
+    element_type const* data() const noexcept;
 
     //- Accessors.
     //
@@ -249,8 +259,8 @@ class matrix
 
     //- Mutable element access.
     //
-    element_type    operator ()(size_t i, size_t j);
-    element_type*   data();
+    element_type&   operator ()(size_t i, size_t j);
+    element_type*   data() noexcept;
 
     //- Change capacity.
     //
@@ -279,7 +289,13 @@ class matrix
     void    swap_rows(size_t i, size_t j);
 
   private:
+    template<class ET2, class OT2> friend class matrix;
+
+  private:
     engine_type     m_engine;
+
+  private:
+    matrix(engine_type const& eng);
 };
 
 }       //- STD_LA namespace

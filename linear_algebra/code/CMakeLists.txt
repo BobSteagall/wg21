@@ -5,12 +5,12 @@ include(CTest)
 
 set(Includes
     linear_algebra.hpp
-    linear_algebra_fwd.hpp
     matrix.hpp
     matrix_arithmetic_traits.hpp
     matrix_element_traits.hpp
     matrix_engine_traits.hpp
     matrix_engines.hpp
+    matrix_fwd.hpp
     matrix_operator_traits.hpp
     matrix_operators.hpp
     matrix_test_impl.hpp
@@ -38,18 +38,18 @@ endif()
 if(CMAKE_CXX_COMPILER STREQUAL clang++)
 
     set(CMAKE_C_FLAGS_DEBUG   "-g -Wall -pedantic -Wextra")
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -std=c++17 -Wall -pedantic -Wextra -Wno-unused-parameter")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -std=c++17 -Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function")
 
     set(CMAKE_C_FLAGS_RELEASE   "-O3 -march=westmere -Wall -pedantic -Wextra")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=westmere -std=c++17 -stdlib=libc++ -Wall -pedantic -Wextra -Wno-unused-parameter")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=westmere -std=c++17 -stdlib=libc++ -Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function")
 
 elseif(CMAKE_CXX_COMPILER STREQUAL g++)
 
     set(CMAKE_C_FLAGS_DEBUG   "-g -Wall -pedantic")
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -std=c++17 -Wall -pedantic -Wextra -Wno-unused-variable -W -Wno-unused-but-set-variable")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -std=c++17 -Wall -pedantic -Wextra  -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable")
 
     set(CMAKE_C_FLAGS_RELEASE   "-O3 -march=westmere -Wall -pedantic")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=westmere -std=c++17 -Wall -pedantic -Wextra -Wno-unused-variable -W -Wno-unused-but-set-variable")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=westmere -std=c++17 -Wall -pedantic -Wextra -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable")
 
 endif()
 

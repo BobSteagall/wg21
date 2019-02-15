@@ -1,7 +1,7 @@
 #ifndef MATRIX_ELEMENT_TRAITS_HPP_DEFINED
 #define MATRIX_ELEMENT_TRAITS_HPP_DEFINED
 
-#include "linear_algebra_fwd.hpp"
+#include "matrix_fwd.hpp"
 
 namespace STD_LA {
 //- New trait "is_complex" to detect std::complex<T> of an arithmetic type.
