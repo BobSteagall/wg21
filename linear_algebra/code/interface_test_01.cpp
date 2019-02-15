@@ -17,28 +17,38 @@ struct has_resize<T, std::void_t<decltype(std::declval<T>().resize(0,0))>>
 template<typename T>
 inline constexpr bool   has_resize_v = has_resize<T>::value;
 
+#define PRINT_FN_NAME(name) \
+    std::cout \
+        << "********************************************************************************\n" \
+        << "********************************************************************************\n" \
+        << "entering test function " << #name << "()" << std::endl << std::endl
+
 namespace  {
 void    t01()
 {
-    constexpr bool  b0 = is_complex_v<std::string>;
-    constexpr bool  b1 = is_complex_v<double>;
-    constexpr bool  b2 = is_complex_v<std::complex<int>>;
+    PRINT_FN_NAME(t01);
 
-    constexpr bool  b4 = is_matrix_element_v<double>;
-    constexpr bool  b5 = is_matrix_element_v<std::complex<double>>;
-    constexpr bool  b6 = is_matrix_element_v<std::complex<int32_t>>;
+    static_assert(!is_complex_v<std::string>);
+    static_assert(!is_complex_v<double>);
+    static_assert(is_complex_v<std::complex<int>>);
 
-    constexpr bool  b001 = is_matrix_element_v<std::string>;
-    constexpr bool  b002 = is_matrix_element_v<std::complex<std::string>>;
+    static_assert(is_matrix_element_v<double>);
+    static_assert(is_matrix_element_v<std::complex<double>>);
+    static_assert(is_matrix_element_v<std::complex<int32_t>>);
+
+    static_assert(!is_matrix_element_v<std::string>);
+    static_assert(!is_matrix_element_v<std::complex<std::string>>);
 
     //- use detection idiom stuff from above.
     //
-    constexpr bool  b003 = has_resize_v<fs_matrix<double, 3, 3>>;
-    constexpr bool  b004 = has_resize_v<dyn_matrix<double>>;
+    static_assert(!has_resize_v<fs_matrix<double, 3, 3>>);
+    static_assert(has_resize_v<dyn_matrix<double>>);
 }
 
 void t02()
 {
+    PRINT_FN_NAME(t02);
+
     fs_matrix_engine<double, 2, 2>      e22;
     fs_matrix_engine<cx_double, 3, 3>   e33;
 
@@ -46,7 +56,7 @@ void t02()
     dr_matrix_engine<cx_double>    de3;
 
     matrix_transpose_engine<fs_matrix_engine<cx_double, 3, 3>>  te2(e33);
-    matrix_transpose_engine<dr_matrix_engine<cx_double>>       te3(de3);
+    matrix_transpose_engine<dr_matrix_engine<cx_double>>        te3(de3);
 
 #ifndef ENFORCE_COMPLEX_OPERAND_HOMOGENEITY
     matrix_element_promotion_t<int32_t, cx_double>     v1 = 0;
@@ -58,6 +68,8 @@ void t02()
 
 void t03()
 {
+    PRINT_FN_NAME(t03);
+
     fs_col_vector<double, 3>    fcv1;
     fs_row_vector<double, 3>    frv1;
     fs_matrix<double, 3, 3>     fm1;
@@ -69,6 +81,8 @@ void t03()
 
 void t04()
 {
+    PRINT_FN_NAME(t04);
+
     float       f = 1.0f;
     double      d = 1.0;
     cx_double   c = {1.0, 0.0};
@@ -98,6 +112,8 @@ void t04()
 
 void t05()
 {
+    PRINT_FN_NAME(t05);
+
     float       f = 1.0f;
     double      d = 1.0;
     cx_double   c = {1.0, 0.0};
@@ -132,6 +148,8 @@ void t05()
 
 void t06()
 {
+    PRINT_FN_NAME(t06);
+
     float       f = 1.0f;
     double      d = 1.0;
     cx_double   c = {1.0, 0.0};
@@ -156,6 +174,8 @@ void t06()
 
 void t07()
 {
+    PRINT_FN_NAME(t07);
+
     float       f = 1.0f;
     double      d = 1.0;
     cx_double   c = {1.0, 0.0};
@@ -195,6 +215,8 @@ void t07()
 
 void t08()
 {
+    PRINT_FN_NAME(t08);
+
     float       f = 1.0f;
     double      d = 1.0;
     cx_double   c = {1.0, 0.0};
@@ -234,6 +256,8 @@ void t08()
 
 void t09()
 {
+    PRINT_FN_NAME(t09);
+
     dyn_col_vector<float>       dcvf(3);
     dyn_col_vector<double>      dcvd(3);
 
@@ -269,6 +293,8 @@ void t09()
 
 void t10()
 {
+    PRINT_FN_NAME(t10);
+
     dyn_col_vector<float>       dcvf(3);
     dyn_col_vector<double>      dcvd(3);
 
@@ -318,6 +344,8 @@ void t10()
 
 void t20()
 {
+    PRINT_FN_NAME(t20);
+
     dyn_col_vector<float>       dcvf(3, 3);
     dyn_col_vector<double>      dcvd(3, 3);
 
@@ -387,6 +415,8 @@ void t20()
 
 void t21()
 {
+    PRINT_FN_NAME(t21);
+
     dyn_col_vector<float>       dcvf(3, 3);
     dyn_col_vector<double>      dcvd(3, 3);
 
@@ -457,6 +487,8 @@ void t21()
 
 void t22()
 {
+    PRINT_FN_NAME(t22);
+
     dyn_col_vector<float>       dcvf(3, 3);
     fs_col_vector<float, 3>     fcvf;
     dyn_row_vector<float>       drvf(3, 3);
@@ -474,6 +506,8 @@ void t22()
 
 void t30()
 {
+    PRINT_FN_NAME(t30);
+
     float       f = 1.0f;
     double      d = 1.0;
     cx_double   c = {1.0, 0.0};
@@ -507,6 +541,8 @@ void t30()
 
 void t40()
 {
+    PRINT_FN_NAME(t40);
+
     dyn_col_vector<float>       dcvf(3, 3);
     dyn_col_vector<double>      dcvd(3, 3);
 
@@ -576,6 +612,8 @@ void t40()
 
 void t41()
 {
+    PRINT_FN_NAME(t41);
+
     dyn_col_vector<float>       dcvf(3, 3);
     dyn_col_vector<double>      dcvd(3, 3);
 
@@ -645,6 +683,8 @@ void t41()
 
 void t42()
 {
+    PRINT_FN_NAME(t42);
+
     dyn_col_vector<float>       dcvf(3, 3);
     fs_col_vector<float, 3>     fcvf;
     dyn_row_vector<float>       drvf(3, 3);
@@ -664,6 +704,26 @@ void t42()
 
 int main()
 {
+    t01();
+    t02();
+    t03();
+    t04();
+    t05();
+    t06();
+    t07();
+    t08();
+    t09();
+    t10();
+
     t20();
+    t21();
+    t22();
+
+    t30();
+
+    t40();
+    t41();
+    t42();
+
     return 0;
 }

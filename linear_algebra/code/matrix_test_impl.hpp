@@ -864,7 +864,7 @@ matrix<ET,OT>::swap_rows(size_t, size_t)
 
 template<class RT, class O1>
 void
-PrintOperandTypes(std::string_view loc, O1 const& o1)
+PrintOperandTypes(std::string const& loc, O1 const& o1)
 {
     cout << "in " << loc << endl
          << "  op1: " << GetTypeName(o1) << endl
@@ -873,7 +873,7 @@ PrintOperandTypes(std::string_view loc, O1 const& o1)
 
 template<class RT, class O1, class O2>
 void
-PrintOperandTypes(std::string_view loc, O1 const& o1, O2 const& o2)
+PrintOperandTypes(std::string const& loc, O1 const& o1, O2 const& o2)
 {
     cout << "in " << loc << endl
          << "  op1: " << GetTypeName(o1) << endl
