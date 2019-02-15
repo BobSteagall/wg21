@@ -34,7 +34,7 @@ class fs_matrix_engine
 
     T           operator ()(size_t i) const;
     T           operator ()(size_t i, size_t j) const;
-    T const*    data() const;
+    T const*    data() const noexcept;
 
     size_t      columns() const noexcept;
     size_t      rows() const noexcept;
@@ -46,7 +46,7 @@ class fs_matrix_engine
 
     T&      operator ()(size_t i);
     T&      operator ()(size_t i, size_t j);
-    T*      data();
+    T*      data() noexcept;
 
     void    swap_columns(size_t i, size_t j);
     void    swap_rows(size_t i, size_t j);
@@ -86,7 +86,7 @@ class dr_matrix_engine
 
     T           operator ()(size_t i) const;
     T           operator ()(size_t i, size_t j) const;
-    T const*    data() const;
+    T const*    data() const noexcept;
 
     size_t      columns() const noexcept;
     size_t      rows() const noexcept;
@@ -98,7 +98,7 @@ class dr_matrix_engine
 
     T&      operator ()(size_t i);
     T&      operator ()(size_t i, size_t j);
-    T*      data();
+    T*      data() noexcept;
 
     void    reserve(size_tuple cap);
     void    reserve(size_t rowcap, size_t colcap);
@@ -153,7 +153,7 @@ class matrix_transpose_engine
 
     element_type        operator ()(size_t i) const;
     element_type        operator ()(size_t i, size_t j) const;
-    element_type const* data() const;
+    element_type const* data() const noexcept;
 
     size_t      columns() const noexcept;
     size_t      rows() const noexcept;

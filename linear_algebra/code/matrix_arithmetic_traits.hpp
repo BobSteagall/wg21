@@ -208,6 +208,16 @@ struct matrix_multiplication_traits<T1, matrix<ET2, OT2>, OTR>
 //- vector*vector
 //
 template<class ET1, class OT1, class ET2, class OT2, class OTR>
+struct matrix_multiplication_traits<column_vector<ET1, OT1>, row_vector<ET2, OT2>, OTR>
+{
+    using engine_type = matrix_multiplication_engine_t<ET1, ET2>;
+    using op_traits   = OTR;
+    using result_type = matrix<engine_type, op_traits>;
+
+    static result_type  multiply(column_vector<ET1, OT1> const& cv1, row_vector<ET2, OT2> const& rv2);
+};
+
+template<class ET1, class OT1, class ET2, class OT2, class OTR>
 struct matrix_multiplication_traits<row_vector<ET1, OT1>, column_vector<ET2, OT2>, OTR>
 {
     using elem_type_1 = typename row_vector<ET1, OT1>::element_type;
@@ -215,17 +225,7 @@ struct matrix_multiplication_traits<row_vector<ET1, OT1>, column_vector<ET2, OT2
     using engine_type = void;
     using result_type = matrix_element_promotion_t<elem_type_1, elem_type_2>;
 
-    static result_type  multiply(row_vector<ET1, OT1> const& rv1, column_vector<ET1, OT1> const& cv2);
-};
-
-template<class ET1, class OT1, class ET2, class OT2, class OTR>
-struct matrix_multiplication_traits<column_vector<ET1, OT1>, row_vector<ET2, OT2>, OTR>
-{
-    using engine_type = matrix_multiplication_engine_t<ET1, ET2>;
-    using op_traits   = OTR;
-    using result_type = matrix<engine_type, op_traits>;
-
-    static result_type  multiply(column_vector<ET1, OT1> const& cv1, row_vector<ET1, OT1> const& rv2);
+    static result_type  multiply(row_vector<ET1, OT1> const& rv1, column_vector<ET2, OT2> const& cv2);
 };
 
 
