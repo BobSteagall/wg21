@@ -10,31 +10,42 @@
 //- These are some helpers, used for printing useful information.
 //
 #include <iostream>
-#include <cxxabi.h>
 
-inline std::string
-GetTypeName(std::type_info const& info)
+template <class T>
+constexpr std::string_view
+TypeNameHelper()                //- Thanks to Howard Hinnant for this!
 {
-    using CrtlStrPtr = std::unique_ptr<char, decltype(&::free)>;
-
-    int         status = 0;
-    CrtlStrPtr  pName{abi::__cxa_demangle(info.name(), nullptr, nullptr, &status), &::free};
-
-    return pName.get();
+    using namespace std;
+#ifdef __clang__
+    string_view p = __PRETTY_FUNCTION__;
+    return string_view(p.data() + 34, p.size() - 34 - 1);
+#elif defined(__GNUC__)
+    string_view p = __PRETTY_FUNCTION__;
+#  if __cplusplus < 201402
+    return string_view(p.data() + 36, p.size() - 36 - 1);
+#  else
+    return string_view(p.data() + 49, p.find(';', 49) - 49);
+#  endif
+#elif defined(_MSC_VER)
+    string_view p = __FUNCSIG__;
+    return string_view(p.data() + 84, p.size() - 84 - 7);
+#endif
 }
 
 template<class T>
 inline std::string
 GetTypeName()
 {
-    return GetTypeName(typeid(T));
+    auto    view = TypeNameHelper<T>();
+    return std::string(view.data(), view.size());
 }
 
 template<class T>
 inline std::string
-GetTypeName(T const& t)
+GetTypeName(T const&)
 {
-    return GetTypeName(typeid(t));
+    auto    view = TypeNameHelper<T>();
+    return std::string(view.data(), view.size());
 }
 
 using std::cout;    //- Yes, we're cheating....
@@ -53,7 +64,7 @@ using std::endl;
 #include "matrix_fwd.hpp"
 #include "matrix_element_traits.hpp"
 #include "matrix_engines.hpp"
-#include "matrix_element_traits.hpp"
+#include "matrix_engine_traits.hpp"
 #include "matrix.hpp"
 #include "matrix_arithmetic_traits.hpp"
 #include "matrix_operator_traits.hpp"
