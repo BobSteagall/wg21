@@ -119,19 +119,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="test_new_number.hpp" />
     <ClInclude Include="linear_algebra.hpp" />
-    <ClInclude Include="linear_algebra_fwd.hpp" />
     <ClInclude Include="matrix.hpp" />
     <ClInclude Include="matrix_arithmetic_traits.hpp" />
     <ClInclude Include="matrix_engine_traits.hpp" />
+    <ClInclude Include="matrix_fwd.hpp" />
     <ClInclude Include="matrix_operators.hpp" />
     <ClInclude Include="matrix_engines.hpp" />
     <ClInclude Include="matrix_element_traits.hpp" />
     <ClInclude Include="matrix_operator_traits.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="interface_test_01.cpp" />
-    <ClCompile Include="interface_test_02.cpp" />
+    <ClCompile Include="test_01.cpp" />
+    <ClCompile Include="test_02.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

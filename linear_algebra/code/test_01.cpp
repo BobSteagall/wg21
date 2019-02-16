@@ -17,14 +17,8 @@ struct has_resize<T, std::void_t<decltype(std::declval<T>().resize(0,0))>>
 template<typename T>
 inline constexpr bool   has_resize_v = has_resize<T>::value;
 
-#define PRINT_FN_NAME(name) \
-    std::cout \
-        << "********************************************************************************\n" \
-        << "********************************************************************************\n" \
-        << "entering test function " << #name << "()" << std::endl << std::endl
-
 namespace  {
-void    t01()
+void t01()
 {
     PRINT_FN_NAME(t01);
 
@@ -699,8 +693,9 @@ void t30()
 
     auto    r01 = -(dmf*(fmd*fcvd) + dcvf - fcvf)*c;
 }
-
 }
+
+void    t100();
 
 int main()
 {
@@ -723,5 +718,6 @@ int main()
     t25();
     t30();
 
+    t100();
     return 0;
 }
