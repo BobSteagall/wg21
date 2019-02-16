@@ -33,21 +33,24 @@
     <ClInclude Include="matrix_engines.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="linear_algebra_fwd.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="matrix_arithmetic_traits.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="matrix_operator_traits.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="matrix_fwd.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test_new_number.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="interface_test_01.cpp">
+    <ClCompile Include="test_01.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="interface_test_02.cpp">
+    <ClCompile Include="test_02.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

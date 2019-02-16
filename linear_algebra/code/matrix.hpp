@@ -13,7 +13,7 @@ using enable_if_resizable_t =
     typename std::enable_if_t<std::is_same_v<ET1, ET2> && ET1::is_resizable::value, bool>;
 
 //=================================================================================================
-//  A column vector parametrized by an engine type.
+//  A column vector parametrized by an engine type and operator traits.
 //=================================================================================================
 //
 template<class ET, class OT>
@@ -104,7 +104,7 @@ class column_vector
 
 
 //=================================================================================================
-//  A row vector parametrized by an engine type.
+//  A row vector parametrized by an engine type and operator traits.
 //=================================================================================================
 //
 template<class ET, class OT>
@@ -197,7 +197,7 @@ class row_vector
 
 
 //=================================================================================================
-//  A matrix parametrized by an engine type.
+//  A matrix parametrized by an engine type and operator traits.
 //=================================================================================================
 //
 template<class ET, class OT>
