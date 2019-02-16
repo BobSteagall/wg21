@@ -11,7 +11,11 @@ namespace STD_LA {
 //=================================================================================================
 //
 template<class ET1>
-struct matrix_negation_engine_promotion;
+struct matrix_negation_engine_promotion
+{
+    using element_type = typename ET1::element_type;
+    using engine_type  = dr_matrix_engine<element_type>;
+};
 
 //- Note that in the cases where allocators are rebound, there is an assumption that all
 //  allocators are standard-conformant.
@@ -49,7 +53,13 @@ using matrix_negation_engine_t = typename matrix_negation_engine_promotion<ET1>:
 //=================================================================================================
 //
 template<class ET1, class ET2>
-struct matrix_addition_engine_promotion;
+struct matrix_addition_engine_promotion
+{
+    using element_type_1 = typename ET1::element_type;
+    using element_type_2 = typename ET2::element_type;
+    using element_type   = matrix_element_promotion_t<element_type_1, element_type_2>;
+    using engine_type    = dr_matrix_engine<element_type>;
+};
 
 //- Note that in the cases where allocators are rebound, there is an assumption that all
 //  allocators are standard-conformant.
@@ -150,7 +160,13 @@ using matrix_addition_engine_t = typename matrix_addition_engine_promotion<ET1, 
 //=================================================================================================
 //
 template<class ET1, class ET2>
-struct matrix_subtraction_engine_promotion;
+struct matrix_subtraction_engine_promotion
+{
+    using element_type_1 = typename ET1::element_type;
+    using element_type_2 = typename ET2::element_type;
+    using element_type   = matrix_element_promotion_t<element_type_1, element_type_2>;
+    using engine_type    = dr_matrix_engine<element_type>;
+};
 
 //- Note that in the cases where allocators are rebound, there is an assumption that all
 //  allocators are standard-conformant.
@@ -251,7 +267,13 @@ using matrix_subtraction_engine_t = typename matrix_subtraction_engine_promotion
 //=================================================================================================
 //
 template<class ET1, class ET2>
-struct matrix_multiplication_engine_promotion;
+struct matrix_multiplication_engine_promotion
+{
+    using element_type_1 = typename ET1::element_type;
+    using element_type_2 = typename ET2::element_type;
+    using element_type   = matrix_element_promotion_t<element_type_1, element_type_2>;
+    using engine_type    = dr_matrix_engine<element_type>;
+};
 
 //- engine * scalar cases.
 //
