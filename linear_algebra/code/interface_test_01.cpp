@@ -504,44 +504,9 @@ void t22()
     auto    r06 = -fmf;
 }
 
-void t30()
+void t23()
 {
-    PRINT_FN_NAME(t30);
-
-    float       f = 1.0f;
-    double      d = 1.0;
-    cx_double   c = {1.0, 0.0};
-
-    dyn_row_vector<float>       drvf(3);
-    dyn_row_vector<double>      drvd(3);
-    dyn_row_vector<cx_double>   drvc(3);
-
-    fs_row_vector<float, 3>     frvf;
-    fs_row_vector<double, 3>    frvd;
-    fs_row_vector<cx_double, 3> frvc;
-
-    dyn_col_vector<float>       dcvf(3, 3);
-    dyn_col_vector<double>      dcvd(3, 3);
-    dyn_col_vector<cx_double>   dcvc(3, 3);
-
-    fs_col_vector<float, 3>     fcvf;
-    fs_col_vector<double, 3>    fcvd;
-    fs_col_vector<cx_double, 3> fcvc;
-
-    dyn_matrix<float>           dmf(3, 3);
-    dyn_matrix<double>          dmd(3, 3);
-    dyn_matrix<cx_double>       dmc(3, 3);
-
-    fs_matrix<float, 3, 3>      fmf;
-    fs_matrix<double, 3, 3>     fmd;
-    fs_matrix<cx_double, 3, 3>  fmc;
-
-    auto    r01 = -(dmf*(fmd*fcvd) + dcvf - fcvf)*c;
-}
-
-void t40()
-{
-    PRINT_FN_NAME(t40);
+    PRINT_FN_NAME(t23);
 
     dyn_col_vector<float>       dcvf(3, 3);
     dyn_col_vector<double>      dcvd(3, 3);
@@ -610,9 +575,9 @@ void t40()
     auto    r52 = fmd.t() + dmd.t();
 }
 
-void t41()
+void t24()
 {
-    PRINT_FN_NAME(t41);
+    PRINT_FN_NAME(t24);
 
     dyn_col_vector<float>       dcvf(3, 3);
     dyn_col_vector<double>      dcvd(3, 3);
@@ -681,9 +646,9 @@ void t41()
     auto    r52 = fmd.t() - dmd.t();
 }
 
-void t42()
+void t25()
 {
-    PRINT_FN_NAME(t42);
+    PRINT_FN_NAME(t25);
 
     dyn_col_vector<float>       dcvf(3, 3);
     fs_col_vector<float, 3>     fcvf;
@@ -698,6 +663,41 @@ void t42()
     auto    r04 = -frvf.t();
     auto    r05 = -dmf.t();
     auto    r06 = -fmf.t();
+}
+
+void t30()
+{
+    PRINT_FN_NAME(t30);
+
+    float       f = 1.0f;
+    double      d = 1.0;
+    cx_double   c = {1.0, 0.0};
+
+    dyn_row_vector<float>       drvf(3);
+    dyn_row_vector<double>      drvd(3);
+    dyn_row_vector<cx_double>   drvc(3);
+
+    fs_row_vector<float, 3>     frvf;
+    fs_row_vector<double, 3>    frvd;
+    fs_row_vector<cx_double, 3> frvc;
+
+    dyn_col_vector<float>       dcvf(3, 3);
+    dyn_col_vector<double>      dcvd(3, 3);
+    dyn_col_vector<cx_double>   dcvc(3, 3);
+
+    fs_col_vector<float, 3>     fcvf;
+    fs_col_vector<double, 3>    fcvd;
+    fs_col_vector<cx_double, 3> fcvc;
+
+    dyn_matrix<float>           dmf(3, 3);
+    dyn_matrix<double>          dmd(3, 3);
+    dyn_matrix<cx_double>       dmc(3, 3);
+
+    fs_matrix<float, 3, 3>      fmf;
+    fs_matrix<double, 3, 3>     fmd;
+    fs_matrix<cx_double, 3, 3>  fmc;
+
+    auto    r01 = -(dmf*(fmd*fcvd) + dcvf - fcvf)*c;
 }
 
 }
@@ -718,12 +718,11 @@ int main()
     t20();
     t21();
     t22();
+    t23();
+    t24();
+    t25();
 
     t30();
-
-    t40();
-    t41();
-    t42();
 
     return 0;
 }

@@ -13,7 +13,7 @@
 
 template <class T>
 constexpr std::string_view
-TypeNameHelper()                //- Thanks to Howard Hinnant for this!
+type_name()                //- Thanks to Howard Hinnant for this!
 {
     using namespace std;
 #ifdef __clang__
@@ -34,17 +34,17 @@ TypeNameHelper()                //- Thanks to Howard Hinnant for this!
 
 template<class T>
 inline std::string
-GetTypeName()
+get_type_name()
 {
-    auto    view = TypeNameHelper<T>();
+    auto    view = type_name<T>();
     return std::string(view.data(), view.size());
 }
 
 template<class T>
 inline std::string
-GetTypeName(T const&)
+get_type_name(T const&)
 {
-    auto    view = TypeNameHelper<T>();
+    auto    view = type_name<T>();
     return std::string(view.data(), view.size());
 }
 
@@ -52,7 +52,7 @@ using std::cout;    //- Yes, we're cheating....
 using std::endl;
 
 
-//- Namespace alternatives to for testing and avoiding ADL issues.
+//- Namespace alternatives for testing and avoiding ADL issues.
 //
 //#define STD_LA  std
 #define STD_LA  la
