@@ -51,6 +51,12 @@ get_type_name(T const&)
 using std::cout;    //- Yes, we're cheating....
 using std::endl;
 
+#define PRINT_FN_NAME(name) \
+    std::cout \
+        << "********************************************************************************\n" \
+        << "********************************************************************************\n" \
+        << "entering test function " << #name << "()" << std::endl << std::endl
+
 
 //- Namespace alternatives for testing and avoiding ADL issues.
 //
