@@ -867,8 +867,8 @@ void
 PrintOperandTypes(std::string const& loc, O1 const& o1)
 {
     cout << "in " << loc << endl
-         << "  op1: " << GetTypeName(o1) << endl
-         << "  ret: " << GetTypeName<RT>() << endl << endl;
+         << "  op1: " << get_type_name(o1) << endl
+         << "  ret: " << get_type_name<RT>() << endl << endl;
 }
 
 template<class RT, class O1, class O2>
@@ -876,9 +876,9 @@ void
 PrintOperandTypes(std::string const& loc, O1 const& o1, O2 const& o2)
 {
     cout << "in " << loc << endl
-         << "  op1: " << GetTypeName(o1) << endl
-         << "  op2: " << GetTypeName(o2) << endl
-         << "  ret: " << GetTypeName<RT>() << endl << endl;
+         << "  op1: " << get_type_name(o1) << endl
+         << "  op2: " << get_type_name(o2) << endl
+         << "  ret: " << get_type_name<RT>() << endl << endl;
 }
 
 //=================================================================================================
@@ -983,7 +983,7 @@ typename matrix_multiplication_traits<column_vector<ET1, OT1>, T2, OTR>::result_
 matrix_multiplication_traits<column_vector<ET1, OT1>, T2, OTR>::multiply
 (column_vector<ET1, OT1> const& cv1, T2 s2)
 {
-    PrintOperandTypes<result_type>("multiplicaton_traits", cv1, s2);
+    PrintOperandTypes<result_type>("multiplication_traits", cv1, s2);
     return result_type();
 }
 
@@ -992,7 +992,7 @@ typename matrix_multiplication_traits<T1, column_vector<ET2, OT2>, OTR>::result_
 matrix_multiplication_traits<T1, column_vector<ET2, OT2>, OTR>::multiply
 (T1 s1, column_vector<ET2, OT2> const& cv2)
 {
-    PrintOperandTypes<result_type>("multiplicaton_traits", s1, cv2);
+    PrintOperandTypes<result_type>("multiplication_traits", s1, cv2);
     return result_type();
 }
 
@@ -1003,7 +1003,7 @@ typename matrix_multiplication_traits<row_vector<ET1, OT1>, T2, OTR>::result_typ
 matrix_multiplication_traits<row_vector<ET1, OT1>, T2, OTR>::multiply
 (row_vector<ET1, OT1> const& rv1, T2 s2)
 {
-    PrintOperandTypes<result_type>("multiplicaton_traits", rv1, s2);
+    PrintOperandTypes<result_type>("multiplication_traits", rv1, s2);
     return result_type();
 }
 
@@ -1012,7 +1012,7 @@ typename matrix_multiplication_traits<T1, row_vector<ET2, OT2>, OTR>::result_typ
 matrix_multiplication_traits<T1, row_vector<ET2, OT2>, OTR>::multiply
 (T1 s1, row_vector<ET2, OT2> const& rv2)
 {
-    PrintOperandTypes<result_type>("multiplicaton_traits", s1, rv2);
+    PrintOperandTypes<result_type>("multiplication_traits", s1, rv2);
     return result_type();
 }
 
@@ -1022,7 +1022,7 @@ template<class ET1, class OT1, class T2, class OTR> inline
 typename matrix_multiplication_traits<matrix<ET1, OT1>, T2, OTR>::result_type
 matrix_multiplication_traits<matrix<ET1, OT1>, T2, OTR>::multiply(matrix<ET1, OT1> const& m1, T2 s2)
 {
-    PrintOperandTypes<result_type>("multiplicaton_traits", m1, s2);
+    PrintOperandTypes<result_type>("multiplication_traits", m1, s2);
     return result_type();
 }
 
@@ -1032,7 +1032,7 @@ template<class T1, class ET2, class OT2, class OTR> inline
 typename matrix_multiplication_traits<T1, matrix<ET2, OT2>, OTR>::result_type
 matrix_multiplication_traits<T1, matrix<ET2, OT2>, OTR>::multiply(T1 s1, matrix<ET2, OT2> const& m2)
 {
-    PrintOperandTypes<result_type>("multiplicaton_traits", s1, m2);
+    PrintOperandTypes<result_type>("multiplication_traits", s1, m2);
     return result_type();
 }
 
@@ -1043,7 +1043,7 @@ typename matrix_multiplication_traits<column_vector<ET1, OT1>, row_vector<ET2, O
 matrix_multiplication_traits<column_vector<ET1, OT1>, row_vector<ET2, OT2>, OTR>::multiply
 (column_vector<ET1, OT1> const& cv1, row_vector<ET2, OT2> const& rv2)
 {
-    PrintOperandTypes<result_type>("multiplicaton_traits", cv1, rv2);
+    PrintOperandTypes<result_type>("multiplication_traits", cv1, rv2);
     return result_type();
 }
 
@@ -1052,7 +1052,7 @@ typename matrix_multiplication_traits<row_vector<ET1, OT1>, column_vector<ET2, O
 matrix_multiplication_traits<row_vector<ET1, OT1>, column_vector<ET2, OT2>, OTR>::multiply
 (row_vector<ET1, OT1> const& rv1, column_vector<ET2, OT2> const& cv2)
 {
-    PrintOperandTypes<result_type>("multiplicaton_traits", rv1, cv2);
+    PrintOperandTypes<result_type>("multiplication_traits", rv1, cv2);
     return result_type();
 }
 
@@ -1063,7 +1063,7 @@ typename matrix_multiplication_traits<matrix<ET1, OT1>, column_vector<ET2, OT2>,
 matrix_multiplication_traits<matrix<ET1, OT1>, column_vector<ET2, OT2>, OTR>::multiply
 (matrix<ET1, OT1> const& m1, column_vector<ET2, OT2> const& cv2)
 {
-    PrintOperandTypes<result_type>("multiplicaton_traits", m1, cv2);
+    PrintOperandTypes<result_type>("multiplication_traits", m1, cv2);
     return result_type();
 }
 
@@ -1072,7 +1072,7 @@ typename matrix_multiplication_traits<matrix<ET1, OT1>, row_vector<ET2, OT2>, OT
 matrix_multiplication_traits<matrix<ET1, OT1>, row_vector<ET2, OT2>, OTR>::multiply
 (matrix<ET1, OT1> const& m1, row_vector<ET2, OT2> const& rv2)
 {
-    PrintOperandTypes<result_type>("multiplicaton_traits", m1, rv2);
+    PrintOperandTypes<result_type>("multiplication_traits", m1, rv2);
     return result_type();
 }
 
@@ -1083,7 +1083,7 @@ typename matrix_multiplication_traits<column_vector<ET1, OT1>, matrix<ET2, OT2>,
 matrix_multiplication_traits<column_vector<ET1, OT1>, matrix<ET2, OT2>, OTR>::multiply
 (column_vector<ET1, OT1> const& cv1, matrix<ET2, OT2> const& m2)
 {
-    PrintOperandTypes<result_type>("multiplicaton_traits", cv1, m2);
+    PrintOperandTypes<result_type>("multiplication_traits", cv1, m2);
     return result_type();
 }
 
@@ -1092,7 +1092,7 @@ typename matrix_multiplication_traits<row_vector<ET1, OT1>, matrix<ET2, OT2>, OT
 matrix_multiplication_traits<row_vector<ET1, OT1>, matrix<ET2, OT2>, OTR>::multiply
 (row_vector<ET1, OT1> const& rv1, matrix<ET2, OT2> const& m2)
 {
-    PrintOperandTypes<result_type>("multiplicaton_traits", rv1, m2);
+    PrintOperandTypes<result_type>("multiplication_traits", rv1, m2);
     return result_type();
 }
 
@@ -1103,7 +1103,7 @@ typename matrix_multiplication_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>::
 matrix_multiplication_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>::multiply
 (matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
 {
-    PrintOperandTypes<result_type>("multiplicaton_traits", m1, m2);
+    PrintOperandTypes<result_type>("multiplication_traits", m1, m2);
     return result_type();
 }
 
