@@ -45,6 +45,12 @@
     <ClInclude Include="test_new_number.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="matrix_test_impl.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test_new_engine.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_01.cpp">
