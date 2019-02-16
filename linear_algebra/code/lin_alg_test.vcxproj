@@ -119,6 +119,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="matrix_test_impl.hpp" />
+    <ClInclude Include="test_new_engine.hpp" />
     <ClInclude Include="test_new_number.hpp" />
     <ClInclude Include="linear_algebra.hpp" />
     <ClInclude Include="matrix.hpp" />
