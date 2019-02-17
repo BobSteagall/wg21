@@ -165,4 +165,14 @@ struct STD_LA::matrix_addition_engine_promotion<fs_matrix_engine_tst<T1, R1, C1>
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
 };
 
+template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+struct STD_LA::matrix_addition_engine_promotion<fs_matrix_engine_tst<T1, R1, C1>, 
+                                                STD_LA::fs_matrix_engine<T2, R2, C2>>
+{
+    static_assert(R1 == R2);
+    static_assert(C1 == C2);
+    using element_type = matrix_element_promotion_t<T1, T2>;
+    using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
+};
+
 #endif  //- TEST_NEW_ENGINE_HPP_DEFINED

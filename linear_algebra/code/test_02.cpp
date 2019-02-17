@@ -1,6 +1,7 @@
 #include "linear_algebra.hpp"
 #include "test_new_number.hpp"
 #include "test_new_engine.hpp"
+#include "test_new_arithmetic.hpp"
 
 using cx_float  = std::complex<float>;
 using cx_double = std::complex<double>;
@@ -69,9 +70,15 @@ void t201()
     auto    r2 = fmp1 + fmf1;
     auto    r3 = fmp1 + dmd1;
 
-    fs_matrix<cx_newnum, 3, 4>  fmcp1;
+    fs_matrix<cx_newnum, 3, 4>      fmcp1;
 
     auto    r4 = fmcp1 + fmp2;
+
+    fs_matrix<float, 3, 4>          fmf2;
+    fs_matrix<double, 3, 4>         fmd2;
+
+    auto    r5 = fmf1 + fmf2;
+    auto    r6 = fmf2 + fmf1;
 }
 
 void t100()
