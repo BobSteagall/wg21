@@ -21,10 +21,12 @@ class column_vector
 {
   public:
     using engine_type    = ET;
-    using element_type   = typename ET::element_type;
-    using is_resizable   = typename ET::is_resizable;
-    using size_tuple     = typename ET::size_tuple;
-    using transpose_type = row_vector<matrix_transpose_engine<ET>>;
+    using element_type   = typename engine_type::element_type;
+    using is_dense       = typename engine_type::is_dense;
+    using is_rectangular = typename engine_type::is_rectangular;
+    using is_resizable   = typename engine_type::is_resizable;
+    using size_tuple     = typename engine_type::size_tuple;
+    using transpose_type = row_vector<matrix_transpose_engine<engine_type>>;
     using hermitian_type = std::conditional_t<is_complex_v<element_type>,
                                                   row_vector<ET, OT>,
                                                   transpose_type>;
@@ -112,10 +114,12 @@ class row_vector
 {
   public:
     using engine_type    = ET;
-    using element_type   = typename ET::element_type;
-    using is_resizable   = typename ET::is_resizable;
-    using size_tuple     = typename ET::size_tuple;
-    using transpose_type = column_vector<matrix_transpose_engine<ET>>;
+    using element_type   = typename engine_type::element_type;
+    using is_dense       = typename engine_type::is_dense;
+    using is_rectangular = typename engine_type::is_rectangular;
+    using is_resizable   = typename engine_type::is_resizable;
+    using size_tuple     = typename engine_type::size_tuple;
+    using transpose_type = column_vector<matrix_transpose_engine<engine_type>>;
     using hermitian_type = std::conditional_t<is_complex_v<element_type>,
                                                   column_vector<ET, OT>,
                                                   transpose_type>;
@@ -205,10 +209,12 @@ class matrix
 {
   public:
     using engine_type    = ET;
-    using element_type   = typename ET::element_type;
-    using is_resizable   = typename ET::is_resizable;
-    using size_tuple     = typename ET::size_tuple;
-    using transpose_type = matrix<matrix_transpose_engine<ET>>;
+    using element_type   = typename engine_type::element_type;
+    using is_dense       = typename engine_type::is_dense;
+    using is_rectangular = typename engine_type::is_rectangular;
+    using is_resizable   = typename engine_type::is_resizable;
+    using size_tuple     = typename engine_type::size_tuple;
+    using transpose_type = matrix<matrix_transpose_engine<engine_type>>;
     using hermitian_type = std::conditional_t<is_complex_v<element_type>,
                                                   matrix<ET, OT>,
                                                   transpose_type>;
