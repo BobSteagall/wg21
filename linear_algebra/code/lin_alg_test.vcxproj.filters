@@ -51,6 +51,9 @@
     <ClInclude Include="test_new_engine.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="test_new_arithmetic.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_01.cpp">
