@@ -1,63 +1,69 @@
-#include <complex>
 #include "linear_algebra.hpp"
 
 using cx_float  = std::complex<float>;
 using cx_double = std::complex<double>;
-using namespace std::la;
+using namespace STD_LA;
 
-//- Some dection idiom stuff to make sure SFINAE is working for fixed-size -versus-
-//  dynamic interfaces.
+//- Some detection idiom stuff to make sure SFINAE is working for fixed-size
+//  -vs- dynamic interfaces.
 //
 template<typename T, typename = void>
 struct has_resize : std::false_type {};
 
 template<typename T>
-struct has_resize<T, std::void_t<decltype(std::declval<T>().resize(0,0))>> 
+struct has_resize<T, std::void_t<decltype(std::declval<T>().resize(0,0))>>
 :   std::true_type {};
 
 template<typename T>
 inline constexpr bool   has_resize_v = has_resize<T>::value;
 
-void    t01()
+namespace  {
+void t01()
 {
-    constexpr bool  b0 = is_complex_v<std::string>;
-    constexpr bool  b1 = is_complex_v<double>;
-    constexpr bool  b2 = is_complex_v<std::complex<int>>;
+    PRINT_FN_NAME(t01);
 
-    constexpr bool  b4 = is_matrix_element_v<double>;
-    constexpr bool  b5 = is_matrix_element_v<std::complex<double>>;
-    constexpr bool  b6 = is_matrix_element_v<std::complex<int32_t>>;
+    static_assert(!is_complex_v<std::string>);
+    static_assert(!is_complex_v<double>);
+    static_assert(is_complex_v<std::complex<int>>);
 
-    constexpr bool  b001 = is_matrix_element_v<std::string>;
-    constexpr bool  b002 = is_matrix_element_v<std::complex<std::string>>;
+    static_assert(is_matrix_element_v<double>);
+    static_assert(is_matrix_element_v<std::complex<double>>);
+    static_assert(is_matrix_element_v<std::complex<int32_t>>);
+
+    static_assert(!is_matrix_element_v<std::string>);
+    static_assert(!is_matrix_element_v<std::complex<std::string>>);
 
     //- use detection idiom stuff from above.
     //
-    constexpr bool  b003 = has_resize_v<fs_matrix<double, 3, 3>>;
-    constexpr bool  b004 = has_resize_v<dyn_matrix<double>>;
+    static_assert(!has_resize_v<fs_matrix<double, 3, 3>>);
+    static_assert(has_resize_v<dyn_matrix<double>>);
 }
 
 void t02()
 {
+    PRINT_FN_NAME(t02);
+
     fs_matrix_engine<double, 2, 2>      e22;
     fs_matrix_engine<cx_double, 3, 3>   e33;
 
-    dyn_matrix_engine<double>       de2;
-    dyn_matrix_engine<cx_double>    de3;
+    dr_matrix_engine<double>       de2;
+    dr_matrix_engine<cx_double>    de3;
 
     matrix_transpose_engine<fs_matrix_engine<cx_double, 3, 3>>  te2(e33);
-    matrix_transpose_engine<dyn_matrix_engine<cx_double>>       te3(de3);
+    matrix_transpose_engine<dr_matrix_engine<cx_double>>        te3(de3);
 
 #ifndef ENFORCE_COMPLEX_OPERAND_HOMOGENEITY
-    element_promotion_t<int32_t, cx_double>     v1 = 0;
-    element_promotion_t<cx_float, double>       v2 = 0;
-    element_promotion_t<double, cx_float>       v3 = 0;
-    element_promotion_t<cx_float, cx_double>    v4 = 0;
+    matrix_element_promotion_t<int32_t, cx_double>     v1 = 0;
+    matrix_element_promotion_t<cx_float, double>       v2 = 0;
+    matrix_element_promotion_t<double, cx_float>       v3 = 0;
+    matrix_element_promotion_t<cx_float, cx_double>    v4 = 0;
 #endif
 }
 
 void t03()
 {
+    PRINT_FN_NAME(t03);
+
     fs_col_vector<double, 3>    fcv1;
     fs_row_vector<double, 3>    frv1;
     fs_matrix<double, 3, 3>     fm1;
@@ -69,6 +75,8 @@ void t03()
 
 void t04()
 {
+    PRINT_FN_NAME(t04);
+
     float       f = 1.0f;
     double      d = 1.0;
     cx_double   c = {1.0, 0.0};
@@ -98,6 +106,8 @@ void t04()
 
 void t05()
 {
+    PRINT_FN_NAME(t05);
+
     float       f = 1.0f;
     double      d = 1.0;
     cx_double   c = {1.0, 0.0};
@@ -132,6 +142,8 @@ void t05()
 
 void t06()
 {
+    PRINT_FN_NAME(t06);
+
     float       f = 1.0f;
     double      d = 1.0;
     cx_double   c = {1.0, 0.0};
@@ -151,11 +163,13 @@ void t06()
     auto    m05 = fmd*dmd;
     auto    m06 = fmc*dmc;
     auto    m07 = fmf*fmd;
-    auto    m08 = fmd*fmc;
+    auto    m08 = fmf*fmf;
 }
 
 void t07()
 {
+    PRINT_FN_NAME(t07);
+
     float       f = 1.0f;
     double      d = 1.0;
     cx_double   c = {1.0, 0.0};
@@ -195,6 +209,8 @@ void t07()
 
 void t08()
 {
+    PRINT_FN_NAME(t08);
+
     float       f = 1.0f;
     double      d = 1.0;
     cx_double   c = {1.0, 0.0};
@@ -234,6 +250,8 @@ void t08()
 
 void t09()
 {
+    PRINT_FN_NAME(t09);
+
     dyn_col_vector<float>       dcvf(3);
     dyn_col_vector<double>      dcvd(3);
 
@@ -269,6 +287,8 @@ void t09()
 
 void t10()
 {
+    PRINT_FN_NAME(t10);
+
     dyn_col_vector<float>       dcvf(3);
     dyn_col_vector<double>      dcvd(3);
 
@@ -281,15 +301,15 @@ void t10()
     fs_row_vector<float, 3>     frvf;
     fs_row_vector<double, 3>    frvd;
 
-    dyn_matrix<float>           dmf(3, 3);
     dyn_matrix<double>          dmd(3, 3);
-    dyn_matrix<float>           dmf_cv(1, 3);
-    dyn_matrix<float>           dmf_rv(3, 1);
+    dyn_matrix<float>           dmf(3, 3);
+    dyn_matrix<float>           dmf_cv(3, 1);
+    dyn_matrix<float>           dmf_rv(1, 3);
 
+    fs_matrix<double, 3, 3>     fmd;
     fs_matrix<float, 3, 3>      fmf;
     fs_matrix<float, 3, 1>      fmf_cv;
     fs_matrix<float, 1, 3>      fmf_rv;
-    fs_matrix<double, 3, 3>     fmd;
 
     auto    r01 = dmf * dcvf;       //- dyn_col_vector<float>
     auto    r02 = dmf_cv * drvf;    //- dyn_matrix<float>
@@ -318,6 +338,8 @@ void t10()
 
 void t20()
 {
+    PRINT_FN_NAME(t20);
+
     dyn_col_vector<float>       dcvf(3, 3);
     dyn_col_vector<double>      dcvd(3, 3);
 
@@ -387,6 +409,8 @@ void t20()
 
 void t21()
 {
+    PRINT_FN_NAME(t21);
+
     dyn_col_vector<float>       dcvf(3, 3);
     dyn_col_vector<double>      dcvd(3, 3);
 
@@ -457,6 +481,8 @@ void t21()
 
 void t22()
 {
+    PRINT_FN_NAME(t22);
+
     dyn_col_vector<float>       dcvf(3, 3);
     fs_col_vector<float, 3>     fcvf;
     dyn_row_vector<float>       drvf(3, 3);
@@ -472,8 +498,171 @@ void t22()
     auto    r06 = -fmf;
 }
 
+void t23()
+{
+    PRINT_FN_NAME(t23);
+
+    dyn_col_vector<float>       dcvf(3, 3);
+    dyn_col_vector<double>      dcvd(3, 3);
+
+    fs_col_vector<float, 3>     fcvf;
+    fs_col_vector<double, 3>    fcvd;
+
+    dyn_row_vector<float>       drvf(3, 3);
+    dyn_row_vector<double>      drvd(3, 3);
+
+    fs_row_vector<float, 3>     frvf;
+    fs_row_vector<double, 3>    frvd;
+
+    dyn_matrix<float>           dmf(3, 3);
+    dyn_matrix<double>          dmd(3, 3);
+
+    fs_matrix<float, 3, 3>      fmf;
+    fs_matrix<double, 3, 3>     fmd;
+
+    auto    r01 = dcvf.t() + drvf;
+    auto    r02 = drvf + dcvd.t();
+    auto    r03 = dcvd.t() + dcvf.t();
+
+    auto    r04 = fcvf.t() + frvf;
+    auto    r05 = frvf + fcvd.t();
+    auto    r06 = fcvd.t() + fcvf.t();
+
+    auto    r071 = dcvf.t() + frvf;
+    auto    r08 = drvf + fcvd.t();
+    auto    r09 = dcvd.t() + fcvd.t();
+
+    auto    r10 = fcvf.t() + drvf;
+    auto    r11 = frvf + dcvd.t();
+    auto    r12 = fcvd.t() + dcvd.t();
+
+    auto    r21 = drvf.t() + dcvf;
+    auto    r22 = drvf + dcvd.t();
+    auto    r23 = drvd.t() + drvf.t();
+
+    auto    r24 = frvf.t() + fcvf;
+    auto    r25 = frvf + fcvd.t();
+    auto    r26 = frvd.t() + frvf.t();
+
+    auto    r27 = drvf.t() + fcvf;
+    auto    r28 = drvf + fcvd.t();
+    auto    r29 = drvd.t() + frvd.t();
+
+    auto    r30 = fmf.t() + dmf;
+    auto    r31 = fmf + dmd.t();
+    auto    r32 = fmd.t() + dmd.t();
+
+    auto    r41 = dmf.t() + dmf;
+    auto    r42 = dmf + dmd.t();
+    auto    r43 = dmd.t() + dmf.t();
+
+    auto    r44 = fmf.t() + fmf;
+    auto    r45 = fmf + fmd.t();
+    auto    r46 = fmd.t() + fmf.t();
+
+    auto    r47 = dmf.t() + fmf;
+    auto    r48 = dmf + fmd.t();
+    auto    r49 = dmd.t() + fmd.t();
+
+    auto    r50 = fmf.t() + dmf;
+    auto    r51 = fmf + dmd.t();
+    auto    r52 = fmd.t() + dmd.t();
+}
+
+void t24()
+{
+    PRINT_FN_NAME(t24);
+
+    dyn_col_vector<float>       dcvf(3, 3);
+    dyn_col_vector<double>      dcvd(3, 3);
+
+    fs_col_vector<float, 3>     fcvf;
+    fs_col_vector<double, 3>    fcvd;
+
+    dyn_row_vector<float>       drvf(3, 3);
+    dyn_row_vector<double>      drvd(3, 3);
+
+    fs_row_vector<float, 3>     frvf;
+    fs_row_vector<double, 3>    frvd;
+
+    dyn_matrix<float>           dmf(3, 3);
+    dyn_matrix<double>          dmd(3, 3);
+
+    fs_matrix<float, 3, 3>      fmf;
+    fs_matrix<double, 3, 3>     fmd;
+
+    auto    r01 = dcvf.t() - drvf;
+    auto    r02 = drvf - dcvd.t();
+    auto    r03 = dcvd.t() - dcvf.t();
+
+    auto    r04 = fcvf.t() - frvf;
+    auto    r05 = frvf - fcvd.t();
+    auto    r06 = fcvd.t() - fcvf.t();
+
+    auto    r07 = dcvf.t() - frvf;
+    auto    r08 = drvf - fcvd.t();
+    auto    r09 = dcvd.t() - fcvd.t();
+
+    auto    r10 = fcvf.t() - drvf;
+    auto    r11 = frvf - dcvd.t();
+    auto    r12 = fcvd.t() - dcvd.t();
+
+    auto    r21 = drvf.t() - dcvf;
+    auto    r22 = drvf - dcvd.t();
+    auto    r23 = drvd.t() - drvf.t();
+
+    auto    r24 = frvf.t() - fcvf;
+    auto    r25 = frvf - fcvd.t();
+    auto    r26 = frvd.t() - frvf.t();
+
+    auto    r27 = drvf.t() - fcvf;
+    auto    r28 = drvf - fcvd.t();
+    auto    r29 = drvd.t() - frvd.t();
+
+    auto    r30 = fmf.t() - dmf;
+    auto    r31 = fmf - dmd.t();
+    auto    r32 = fmd.t() - dmd.t();
+
+    auto    r41 = dmf.t() - dmf;
+    auto    r42 = dmf - dmd.t();
+    auto    r43 = dmd.t() - dmf.t();
+
+    auto    r44 = fmf.t() - fmf;
+    auto    r45 = fmf - fmd.t();
+    auto    r46 = fmd.t() - fmf.t();
+
+    auto    r47 = dmf.t() - fmf;
+    auto    r48 = dmf - fmd.t();
+    auto    r49 = dmd.t() - fmd.t();
+
+    auto    r50 = fmf.t() - dmf;
+    auto    r51 = fmf - dmd.t();
+    auto    r52 = fmd.t() - dmd.t();
+}
+
+void t25()
+{
+    PRINT_FN_NAME(t25);
+
+    dyn_col_vector<float>       dcvf(3, 3);
+    fs_col_vector<float, 3>     fcvf;
+    dyn_row_vector<float>       drvf(3, 3);
+    fs_row_vector<float, 3>     frvf;
+    dyn_matrix<float>           dmf(3, 3);
+    fs_matrix<float, 3, 3>      fmf;
+
+    auto    r01 = -dcvf.t();
+    auto    r02 = -fcvf.t();
+    auto    r03 = -drvf.t();
+    auto    r04 = -frvf.t();
+    auto    r05 = -dmf.t();
+    auto    r06 = -fmf.t();
+}
+
 void t30()
 {
+    PRINT_FN_NAME(t30);
+
     float       f = 1.0f;
     double      d = 1.0;
     cx_double   c = {1.0, 0.0};
@@ -504,163 +693,31 @@ void t30()
 
     auto    r01 = -(dmf*(fmd*fcvd) + dcvf - fcvf)*c;
 }
-
-void t40()
-{
-    dyn_col_vector<float>       dcvf(3, 3);
-    dyn_col_vector<double>      dcvd(3, 3);
-
-    fs_col_vector<float, 3>     fcvf;
-    fs_col_vector<double, 3>    fcvd;
-
-    dyn_row_vector<float>       drvf(3, 3);
-    dyn_row_vector<double>      drvd(3, 3);
-
-    fs_row_vector<float, 3>     frvf;
-    fs_row_vector<double, 3>    frvd;
-
-    dyn_matrix<float>           dmf(3, 3);
-    dyn_matrix<double>          dmd(3, 3);
-
-    fs_matrix<float, 3, 3>      fmf;
-    fs_matrix<double, 3, 3>     fmd;
-
-    auto    r01 = dcvf.tr() + drvf;
-    auto    r02 = drvf + dcvd.tr();
-    auto    r03 = dcvd.tr() + dcvf.tr();
-
-    auto    r04 = fcvf.tr() + frvf;
-    auto    r05 = frvf + fcvd.tr();
-    auto    r06 = fcvd.tr() + fcvf.tr();
-
-    auto    r07 = dcvf.tr() + frvf;
-    auto    r08 = drvf + fcvd.tr();
-    auto    r09 = dcvd.tr() + fcvd.tr();
-
-    auto    r10 = fcvf.tr() + drvf;
-    auto    r11 = frvf + dcvd.tr();
-    auto    r12 = fcvd.tr() + dcvd.tr();
-
-    auto    r21 = drvf.tr() + dcvf;
-    auto    r22 = drvf + dcvd.tr();
-    auto    r23 = drvd.tr() + drvf.tr();
-
-    auto    r24 = frvf.tr() + fcvf;
-    auto    r25 = frvf + fcvd.tr();
-    auto    r26 = frvd.tr() + frvf.tr();
-
-    auto    r27 = drvf.tr() + fcvf;
-    auto    r28 = drvf + fcvd.tr();
-    auto    r29 = drvd.tr() + frvd.tr();
-
-    auto    r30 = fmf.tr() + dmf;
-    auto    r31 = fmf + dmd.tr();
-    auto    r32 = fmd.tr() + dmd.tr();
-
-    auto    r41 = dmf.tr() + dmf;
-    auto    r42 = dmf + dmd.tr();
-    auto    r43 = dmd.tr() + dmf.tr();
-
-    auto    r44 = fmf.tr() + fmf;
-    auto    r45 = fmf + fmd.tr();
-    auto    r46 = fmd.tr() + fmf.tr();
-
-    auto    r47 = dmf.tr() + fmf;
-    auto    r48 = dmf + fmd.tr();
-    auto    r49 = dmd.tr() + fmd.tr();
-
-    auto    r50 = fmf.tr() + dmf;
-    auto    r51 = fmf + dmd.tr();
-    auto    r52 = fmd.tr() + dmd.tr();
 }
 
-void t41()
-{
-    dyn_col_vector<float>       dcvf(3, 3);
-    dyn_col_vector<double>      dcvd(3, 3);
-
-    fs_col_vector<float, 3>     fcvf;
-    fs_col_vector<double, 3>    fcvd;
-
-    dyn_row_vector<float>       drvf(3, 3);
-    dyn_row_vector<double>      drvd(3, 3);
-
-    fs_row_vector<float, 3>     frvf;
-    fs_row_vector<double, 3>    frvd;
-
-    dyn_matrix<float>           dmf(3, 3);
-    dyn_matrix<double>          dmd(3, 3);
-
-    fs_matrix<float, 3, 3>      fmf;
-    fs_matrix<double, 3, 3>     fmd;
-
-    auto    r01 = dcvf.tr() - drvf;
-    auto    r02 = drvf - dcvd.tr();
-    auto    r03 = dcvd.tr() - dcvf.tr();
-
-    auto    r04 = fcvf.tr() - frvf;
-    auto    r05 = frvf - fcvd.tr();
-    auto    r06 = fcvd.tr() - fcvf.tr();
-
-    auto    r07 = dcvf.tr() - frvf;
-    auto    r08 = drvf - fcvd.tr();
-    auto    r09 = dcvd.tr() - fcvd.tr();
-
-    auto    r10 = fcvf.tr() - drvf;
-    auto    r11 = frvf - dcvd.tr();
-    auto    r12 = fcvd.tr() - dcvd.tr();
-
-    auto    r21 = drvf.tr() - dcvf;
-    auto    r22 = drvf - dcvd.tr();
-    auto    r23 = drvd.tr() - drvf.tr();
-
-    auto    r24 = frvf.tr() - fcvf;
-    auto    r25 = frvf - fcvd.tr();
-    auto    r26 = frvd.tr() - frvf.tr();
-
-    auto    r27 = drvf.tr() - fcvf;
-    auto    r28 = drvf - fcvd.tr();
-    auto    r29 = drvd.tr() - frvd.tr();
-
-    auto    r30 = fmf.tr() - dmf;
-    auto    r31 = fmf - dmd.tr();
-    auto    r32 = fmd.tr() - dmd.tr();
-
-    auto    r41 = dmf.tr() - dmf;
-    auto    r42 = dmf - dmd.tr();
-    auto    r43 = dmd.tr() - dmf.tr();
-
-    auto    r44 = fmf.tr() - fmf;
-    auto    r45 = fmf - fmd.tr();
-    auto    r46 = fmd.tr() - fmf.tr();
-
-    auto    r47 = dmf.tr() - fmf;
-    auto    r48 = dmf - fmd.tr();
-    auto    r49 = dmd.tr() - fmd.tr();
-
-    auto    r50 = fmf.tr() - dmf;
-    auto    r51 = fmf - dmd.tr();
-    auto    r52 = fmd.tr() - dmd.tr();
-}
-
-void t42()
-{
-    dyn_col_vector<float>       dcvf(3, 3);
-    fs_col_vector<float, 3>     fcvf;
-    dyn_row_vector<float>       drvf(3, 3);
-    fs_row_vector<float, 3>     frvf;
-    dyn_matrix<float>           dmf(3, 3);
-    fs_matrix<float, 3, 3>      fmf;
-
-    auto    r01 = -dcvf.tr();
-    auto    r02 = -fcvf.tr();
-    auto    r03 = -drvf.tr();
-    auto    r04 = -frvf.tr();
-    auto    r05 = -dmf.tr();
-    auto    r06 = -fmf.tr();
-}
+void    t100();
 
 int main()
 {
+    t01();
+    t02();
+    t03();
+    t04();
+    t05();
+    t06();
+    t07();
+    t08();
+    t09();
+    t10();
+
+    t20();
+    t21();
+    t22();
+    t23();
+    t24();
+    t25();
+    t30();
+
+    t100();
     return 0;
 }
