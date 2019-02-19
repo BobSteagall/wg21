@@ -1488,7 +1488,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
      <dd>SG14, LEWG
      <dt>Previous version:
      <dd><a href="http://wg21.link/P1385R0">http://wg21.link/P1385R0</a>
-     <dt>Sample implementation:
+     <dt>Strawman implementation:
      <dd><a href="https://github.com/BobSteagall/wg21/tree/master/linear_algebra/code">https://github.com/BobSteagall/wg21/tree/master/linear_algebra/code</a>
     </dl>
    </div>
@@ -2074,9 +2074,8 @@ capabilities, etc.</p>
    <p>One such possible optimization is the use of multiple cores, perhaps
 distributed across a network, to carry out multiplication on very large 
 pairs of matrices, particularly in situations where the operation is used 
-to produce a third matrix rather than modify one of the operands. The 
-matrix multiplication operation is particularly amenable to this approach, 
-since a thread may be used for each row of the source matrix.</p>
+to produce a third matrix rather than modify one of the operands; the 
+matrix multiplication operation is particularly amenable to this approach.</p>
    <p>Developers may also wish to make use of SIMD intrinsics to enable
 parallel evaluation of matrix multiplication. This is common in game
 development environments where programs are written for very specific
@@ -2119,7 +2118,7 @@ out the promised arithmetic.</p>
    <p>At a lower level, and behind the scenes, are a number of supporting
 traits types employed by the operators to determine the return type of 
 the operator and perform the corresponding arithmetic operation.  There 
-are several important traits types:</p>
+are several such traits types:</p>
    <ul>
     <li data-md>
      <p><strong>Element promotion helper traits</strong> determine whether or not a given
