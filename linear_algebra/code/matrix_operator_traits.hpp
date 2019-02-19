@@ -10,7 +10,7 @@ namespace STD_LA {
 //  Traits type that refers to the four basic arithmetic traits types.
 //=================================================================================================
 //
-struct matrix_operator_traits
+struct default_matrix_operator_traits
 {
     template<class OP1, class OTR>
     using negation_traits = matrix_negation_traits<OP1, OTR>;
@@ -42,21 +42,21 @@ struct matrix_operator_traits_promotion<T1, T1>
 };
 
 template<class T1>
-struct matrix_operator_traits_promotion<T1, matrix_operator_traits>
+struct matrix_operator_traits_promotion<T1, default_matrix_operator_traits>
 {
     using traits_type = T1;
 };
 
 template<class T1>
-struct matrix_operator_traits_promotion<matrix_operator_traits, T1>
+struct matrix_operator_traits_promotion<default_matrix_operator_traits, T1>
 {
     using traits_type = T1;
 };
 
 template<>
-struct matrix_operator_traits_promotion<matrix_operator_traits, matrix_operator_traits>
+struct matrix_operator_traits_promotion<default_matrix_operator_traits, default_matrix_operator_traits>
 {
-    using traits_type = matrix_operator_traits;
+    using traits_type = default_matrix_operator_traits;
 };
 
 //- Alias interface to trait.
