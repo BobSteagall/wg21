@@ -6,6 +6,7 @@ Group: WG21
 TR: http://wg21.link/P1385
 ED: https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/D1385R1.html
 !Previous version: [http://wg21.link/P1385R0](http://wg21.link/P1385R0)
+!Strawman implementation: [https://github.com/BobSteagall/wg21/tree/master/linear_algebra/code](https://github.com/BobSteagall/wg21/tree/master/linear_algebra/code)
 Markup Shorthands: markdown yes
 Revision: 1
 Line Numbers: true
@@ -56,17 +57,17 @@ every portion of the library’s computational infrastructure.
 With these high-level user requirements in mind, in this paper we propose 
 an interface specification intended to achieve the following goals:
 
-1. To provide a set of vocabulary types for representing the
+1. To provide a set of vocabulary types for representing the 
 mathematical objects and operations that are relevant to linear
 algebra;
 
-2. To provide a public interface for linear algebra operations that is
+1. To provide a public interface for linear algebra operations that is
 intuitive, teachable, and mimics the expressiveness of mathematical
 notation to the greatest *reasonable* extent;
 
-3. To exhibit out-of-the-box performance in the neighborhood of that 
-of an equivalent sequence of function calls to a more traditional linear
-algebra library, such as *LAPACK*, *Blaze*, *Eigen*, etc.;
+1. To exhibit out-of-the-box performance in the neighborhood of that 
+of that exhibited by an equivalent sequence of function calls to a more 
+traditional linear algebra library, such as *LAPACK*, *Blaze*, *Eigen*, etc.;
 
 1. To provide a set of building blocks that manage the source,
 ownership, lifetime, layout, and access of the memory required to
@@ -75,14 +76,14 @@ that some of these building blocks are also suitable for (eventually)
 representing other interesting mathematical entities, such as quaternions, 
 octonions, and tensors;
 
-5. To provide straightforward facilities and techniques for
+1. To provide straightforward facilities and techniques for
 customization that enable users to optimize performance for their
 specific problem domain on their specific hardware; and,
 
-6. To provide a *reasonable* level of granularity for customization so 
-that developers have to implement a close-to-minimum set of types and 
-functions to integrate their performance enhancements with the standard
-linear algebra facilities.
+1. To provide a *reasonable* level of granularity for customization so 
+that developers only have to implement a minimum set of types and 
+functions to integrate their performance enhancements with the rest of
+the linear algebra facilities described here.
 
 # Definitions
 
@@ -110,10 +111,10 @@ to represent displacements, as well as physical quantities such as
 force or momentum. Linear algebra is concerned primarily with the
 study of vector spaces.
 
-2.  The **dimension** of a vector space is the minimum number of
+1.  The **dimension** of a vector space is the minimum number of
 coordinates required to specify any point within the space.
 
-3.  A **matrix** is a rectangular array of numbers, symbols, or
+1.  A **matrix** is a rectangular array of numbers, symbols, or
 expressions, arranged in rows and columns. A matrix having *m* rows
 and *n* columns is said to have size *m* x *n*. Although matrices
 can be used solve systems of simultaneous linear equations, they are
@@ -121,12 +122,12 @@ most commonly used to represent linear transformations, solve linear
 least squares problems, and to explore and/or manipulate the
 properties of vector spaces.
 
-4.  The **rank** of a matrix is the dimension of the vector space
+1.  The **rank** of a matrix is the dimension of the vector space
 spanned by its columns, which is equal to the dimension of the
 vector space spanned by its rows. The rank is also equal to the
 maximum number of linearly-independent columns and rows.
 
-5.  An **element** of a matrix is an individual member (number, symbol,
+1.  An **element** of a matrix is an individual member (number, symbol,
 expression) of the rectangular array comprising the matrix, lying at
 the intersection of a single row and a single column. In traditional
 mathematical notation, row and column indexing is 1-based, where
@@ -136,51 +137,51 @@ element in the upper left-hand corner of the array and element
 *a*<sub>*mn*</sub> refers to the element in the lower right-hand
 corner.
 
-6.  A **row vector** is a matrix containing a single row; in other
+1.  A **row vector** is a matrix containing a single row; in other
 words, a matrix of size *1* x *n*. In many applications of linear
 algebra, row vectors represent spatial vectors.
 
-7.  A **column vector** is a matrix containing a single column; in other
+1.  A **column vector** is a matrix containing a single column; in other
 words, a matrix of size *m* x *1*. In many applications of linear
 algebra, column vectors represent spatial vectors.
 
-8.  **Element transforms** are non-arithmetical operations that modify
+1.  **Element transforms** are non-arithmetical operations that modify
 the relative positions of elements in a matrix, such as transpose,
 column exchange, and row exchange.
 
-9.  **Element arithmetic** refers to arithmetical operations that read
+1.  **Element arithmetic** refers to arithmetical operations that read
 or modify the values of individual elements independently of other
 elements, such assigning a value to a specific element or
 multiplying a row by some value.
 
-10. **Matrix arithmetic** refers to the assignment, addition,
+1. **Matrix arithmetic** refers to the assignment, addition,
 subtraction, negation, multiplication, and determinant operations
 defined for matrices, row vectors, and column vectors as wholes.
 
-11. A **rectangular matrix** is a matrix requiring a full *m* x *n*
+1. A **rectangular matrix** is a matrix requiring a full *m* x *n*
 representation; that is, a matrix not possessing a special form,
 such as identity, triangular, band, etc.
 
-12. The **identity matrix** is a square matrix where all elements on the
+1. The **identity matrix** is a square matrix where all elements on the
 diagonal are equal to one and all off-diagonal elements are equal to
 zero.
 
-13. A **triangular matrix** is a matrix where all elements above or
+1. A **triangular matrix** is a matrix where all elements above or
 below the diagonal are zero; those with non-zero elements above the
 diagonal are called *upper triangular*, while those with non-zero
 elements below the diagonal are called *lower triangular*.
 
-14. A **band matrix** is a sparse matrix whose non-zero entries are
+1. A **band matrix** is a sparse matrix whose non-zero entries are
 confined to a diagonal band, lying on the main diagonal and zero or
 more diagonals on either side.
 
-15. **Decompositions** are complex sequences of arithmetic operations,
+1. **Decompositions** are complex sequences of arithmetic operations,
 element arithmetic, and element transforms performed upon a matrix
 that expose important mathematical properties of that matrix.
 Several types of decomposition are often performed in solving
 least-squares problems.
 
-16. **Eigen-decompositions** are decompositions performed upon a
+1. **Eigen-decompositions** are decompositions performed upon a
 symmetric matrix in order to compute the eigenvalues and
 eigenvectors of that matrix; this is often performed when solving
 problems involving linear dynamic systems.
@@ -191,56 +192,58 @@ The following are terms used in this proposal that describe various
 aspects of how the mathematical concepts described above in Section 3.1
 might be implemented:
 
-1.  An **array** is a data structure representing an indexable
-collection of objects (elements) such that each element is
-identified by at least one index. An array is said to be
-*one-dimensional* array if its elements are accessible with a single
-index; a *multi-dimensional* array is an array for which more than
-one index is required to access its elements.
+1.  An **array** is a data structure representing an indexable collection 
+of objects (elements) such that each element is identified by at 
+least one index. An array is said to be *one-dimensional* array if its 
+elements are accessible with a single index; a *multi-dimensional* array 
+is an array for which more than one index is required to access its 
+elements.
 
-2.  The **dimension** of an array refers to the number of indices
+1.  The **dimension** of an array refers to the number of indices
 required to access an element of that array. The **rank** of an
 array is a synonym for its dimension.
 
-3.  This proposal uses the term **MathObj** to refer generically to one
+1.  This proposal uses the term **MathObj** to refer generically to one
 of the C++ types described herein representing matrices, row
 vectors, and column vectors. These are the public-facing facilities
 developers will use in their code.
 
-4.  An **engine** is an implementation type that manages the
-storage-related aspects of, and access to, the elements of a
-*MathObj*. In this proposal, an engine object is a private member of
-a *MathObj*. Other than as a template parameter, engines are not
-part of a *MathObj*’s public interface.
+1.  An **engine** is an implementation type that manages the resources
+associated with a *MathObj* instance.  This includes, at a minumum, the 
+storage-related aspects of, and access to, the elements of a *MathObj*. 
+It could also include execution-related aspects, such as an execution 
+context. In this proposal, an engine object is a private member of a 
+*MathObj*. Other than as a template parameter, engines are not part of 
+a *MathObj*’s public interface.
 
-5.  The adjective **dense** refers to a *MathObj* representation where
+1.  The adjective **dense** refers to a *MathObj* representation where
 storage is allocated for every element.
 
-6.  The adjective **sparse** refers to a *MathObj* representation where
+1.  The adjective **sparse** refers to a *MathObj* representation where
 storage is allocated only for non-zero elements;
 
-7.  **Storage** is used by this proposal as a synonym for memory.
+1.  **Storage** is used by this proposal as a synonym for memory.
 
-8.  **Traits** refers to a stateless class template that provides some
+1.  **Traits** refers to a stateless class template that provides some
 set of services, normalizing those services over its set of template
 parameters.
 
-9.  **Row size** and **column size** refer to the number of rows and
+1.  **Row size** and **column size** refer to the number of rows and
 columns, respectively, that a *MathObj* represents, which must be
 less than or equal to its row and column capacities, defined below.
 
-10. **Row capacity** and **column capacity** refer to the maximum number
+1. **Row capacity** and **column capacity** refer to the maximum number
 of rows and columns, respectively, that a *MathObj* can possibly
 represent.
 
-11. **Fixed-size** (FS) refers to an engine type whose row and column
+1. **Fixed-size** (FS) refers to an engine type whose row and column
 sizes are fixed at instantiation time and constant thereafter.
 
-12. **Fixed-capacity** (FC) refers to an engine type whose row and
+1. **Fixed-capacity** (FC) refers to an engine type whose row and
 column capacities are fixed at instantiation time and constant
 thereafter.
 
-13. **Dynamically re-sizable** (DR) refers to an engine type whose row
+1. **Dynamically re-sizable** (DR) refers to an engine type whose row
 and column sizes and capacities may be changed at run time.
 
 ## Overloaded Terms
@@ -274,12 +277,11 @@ exacerbated by the unforgivably awful naming of `std::vector`.
 
 This proposal uses the term *vector* to mean an element of a vector
 space, per Section 3.1. Further, *row vector* and *column vector* have
-the meanings set out in 3.1, while `row_vector` and
-`column_vector` (in monospaced font) are the C++ class templates
-implementing those mathematical objects, respectively. We sometimes use
-`MathObj` (in monospaced font) in some of the component code
-interface code and test below to generically refer to a `row_vector`,
-`column_vector`, or `matrix` object.
+the meanings set out in 3.1, while `row_vector` and `column_vector` (in 
+monospaced font) are the C++ class templates implementing those mathematical 
+objects, respectively. We sometimes use `MathObj` (in monospaced font) in
+some of the component code interface code and test below to generically 
+refer to a `row_vector`, `column_vector`, or `matrix` object.
 
 ### Dimension
 
@@ -312,7 +314,7 @@ otherwise it is zero.
 
 We avoid using the term *rank* in this proposal in the context of linear
 algebra, except as a quantity that might result from performing certain
-decompositions.
+decompositions wherein the mathematical rank of a matrix is computed.
 
 # Scope
 
@@ -320,8 +322,8 @@ We contend that the best approach for standardizing a set of linear
 algebra components for C++23 will be one that is layered, iterative, and
 incremental. This paper is quite deliberately a “basic linear algebra-only”
 proposal; it describes what we believe is a foundational layer providing
-the minimum set of components necessary to provide a reasonable basic 
-level of functionality.
+the minimum set of components and arithmetic operations necessary to provide 
+a reasonable, basic level of functionality.
 
 Higher-level functionality can be specified in terms of the interfaces
 described here, and we encourage succession papers to explore this
@@ -330,22 +332,22 @@ possibility.
 ## Functionality
 
 The foundational layer, as described here, should include the minimal
-set of types and functions required to perform operations matrix in
+set of types and functions required to perform matrix arithmetic in
 finite dimensional spaces. This includes:
 
-- Matrix, row vector, and column vector class templates;
++ Matrix, row vector, and column vector class templates;
 
-- Arithmetic operations for addition, subtraction, negation, and
++ Arithmetic operations for addition, subtraction, negation, and
 multiplication of matrices and row/column vectors;
 
-- Arithmetic operations for scalar multiplication of matrices and
++ Arithmetic operations for scalar multiplication of matrices and
 row/column vectors;
 
-- Well-defined facilities for integrating new element types;
++ Well-defined facilities for integrating new element types;
 
-- Well-defined facilities for creating and integtrating custom engines; and,
++ Well-defined facilities for creating and integrating custom engines; and,
 
-- Well-defined facilitites for optimizing the performance of arithmetic 
++ Well-defined facilities for creating and integrating custom arithmetic 
 operations.
 
 ## Considered but Excluded
@@ -368,7 +370,7 @@ transform according to certain rules under a coordinate system change.
 In a *p*-dimensional space, a tensor of rank *n* will have
 *p*<sup>*n*</sup> elements. In particular, a rank-2 tensor in a
 *p*-dimensional space may be represented by a *p* x *p* matrix having
-certain properties related to coordinate transformation not possessed by
+certain invariants related to coordinate transformation not possessed by
 all *p* x *p* matrices.
 
 These defining characteristics of a tensor lead us to the crux of the
@@ -424,19 +426,19 @@ Perhaps the first question to be answered is that of the source of
 memory in which elements will reside. One can easily imagine multiple
 sources of memory:
 
-- Elements reside in an external buffer allocated from the global heap.
++ Elements reside in an external buffer allocated from the global heap.
 
-- Elements reside in an external buffer allocated by a custom allocator
++ Elements reside in an external buffer allocated by a custom allocator
 and/or specialized heap.
 
-- Elements reside in an external fixed-size buffer that exists
++ Elements reside in an external fixed-size buffer that exists
 independently of the *MathObj*, not allocated from a heap, and which
 has a lifetime greater than that of the *MathObj*.
 
-- Elements reside in a fixed-size buffer that is a member of the
++ Elements reside in a fixed-size buffer that is a member of the
 *MathObj* itself.
 
-- Elements reside collectively in a set of buffers distributed across
++ Elements reside collectively in a set of buffers distributed across
 multiple machines.
 
 ## Addressing Model
@@ -562,12 +564,11 @@ multiplication.  Customization might be based on things like element
 layout in memory, fixed-size -vs- dynamically resizable, special hardware
 capabilities, etc.
 
-One such possible optimization is the use of multiple cores to carry out 
-multiplication on very large pairs of matrices, particularly in situations 
-where the operation is used to produce a third matrix rather than modify 
-one of the operands. The matrix multiplication operation is highly amenable 
-to this approach, since a thread may be used for each row of the source 
-matrix.
+One such possible optimization is the use of multiple cores, perhaps
+distributed across a network, to carry out multiplication on very large 
+pairs of matrices, particularly in situations where the operation is used 
+to produce a third matrix rather than modify one of the operands; the 
+matrix multiplication operation is particularly amenable to this approach.
 
 Developers may also wish to make use of SIMD intrinsics to enable
 parallel evaluation of matrix multiplication. This is common in game
@@ -595,7 +596,7 @@ allowing customizations to defer to them in `constexpr` evaluations
 while taking the customization’s notionally superior run-time path in
 alternate situations.
 
-# Interface Description
+# Interface Design Description
 
 In this section, we describe the various types, operators, and functions
 comprising the proposed interface. The reader should note that the
@@ -604,7 +605,61 @@ intended to foster further discussions and refinements, and to serve
 as a guide for brave souls attempting to build implementations from this
 specification.
 
-## Element Helper Traits
+## Overview
+
+At the highest level, the interface is divided into three broad categories:
+
+1. **MathObjs**, each of which provides an interface intended to model a 
+corresponding mathematical object (column vector, row vector, matrix);
+
+1. **Engines**, which are implementation types that manage the resources
+associated with a *MothObj* instance; and, 
+
+1. **Operators**, which provide the desired mathematical syntax and carry
+out the promised arithmetic.
+
+At a lower level, and behind the scenes, are a number of supporting 
+traits types employed by the operators to determine the return type of 
+the operator and perform the corresponding arithmetic operation.  There 
+are several such traits types:
+
++ **Element promotion helper traits** determine whether or not a given 
+type `T` is an acceptable *MathObj* element type.
+
++ **Element promotion traits** determine the resulting element type for
+an arithmetical operation based on two the element types of two input 
+operands. This traits type uses the element promotion helper traits to 
+verify that both input types are in fact acceptable matrix element types.
+
++ **Engine promotion traits** determine the type of an engine resulting 
+from an arithemtical operation.  As part of that process, this traits
+type uses the element promotion traits to determine the element type of 
+the resulting engine.
+
++ **Arithmetic traits** determine the type of a *MathObj* resulting 
+from an arithmetical operation.  As part of that process, this traits
+type uses the engine promotion traits to determine the engine type of
+the resulting *MathObj*.  Having determined the result type, the
+arithmetic traits also have a member function that carries ot the 
+actual computations.
+
++ **Operator traits** specify a collection of four specific arithmetic
+traits types, one type for each supported arithmetic operation.  This 
+traits type is a template parameter to the *MathObj* types, and provides 
+a way to inform an operator of the set of suggested arithmetic traits to 
+be used when deciding how to perform an arithmetic operation.
+
++ **Operator promotion traits** provide the means by which an operator 
+selects the operator traits that will performg the arithmetic.  In the
+case where each operand has the same operator traits, the decision is
+simple.  However, it is possible that the operands may be instantiated
+with different operator traits types, and in this case, the operator
+must decide with operator traits type to use in computing its result.
+
+The following sections describe the building blocks in more detail, 
+starting at the lowest level, and working upward in order of dependency.
+
+## Element Promotion Helper Traits
 
 Traits type `is_complex<T>` determines whether its template paramater `T` 
 is of type `std::complex<V>` for some type `V`, where `V` must itself be 
@@ -620,8 +675,9 @@ template<class T>  constexpr bool is_complex_v = ...;
 
 Traits type `is_matrix_element<T>` is used in static assertions to
 ensure that *MathObj* types are instantiated only with element types
-representing a field (i.e., arithmetic types, or complex types per
-above). It uses `is_complex<T>` to help make that determination.
+representing a field or ring (i.e., arithmetic types, or complex types 
+per above). It uses `is_complex<T>` as appropriate to help make that 
+determination.
 
 ~~~~
 template<class T>  struct is_matrix_element;
@@ -631,7 +687,7 @@ template<class T>  constexpr bool is_matrix_element_v = ...;
 ## Element Promotion Traits
 
 Element promotion traits are used by the engine promotion traits to
-determine the resulting element type in an binary  expression involving 
+determine the resulting element type in an binary expression involving 
 engines with possibly two different element types.
 
 Class template `matrix_element_promotion<T1, T2>` implements a traits
@@ -664,12 +720,16 @@ parameterized alias for the trait is also defined.
 
 ## Engine Types
 
-All of the engine types provide a basic interface for const element
+The over-arching purpose of the engine types is to perform resource 
+management on behalf of an associated *MathObj* instance.  At a minimum,
+all of the engine types provide a basic interface for const element
 indexing, row and column sizes, and row and column capacities. They also
 export public type aliases which specify their element type, whether or 
 not they are dense, whether or not they are rectangular, whether or not 
 they are resizable, whether or not their memory layout is row-major, and 
 a 2-tuple for describing sizes and capacities.
+
+One can imagine engines that also manage resources related to execution.
 
 ### Fixed-Size Engine
 
@@ -728,7 +788,7 @@ class fs_matrix_engine
 
 ### Dynamically-Resizable Engine
 
-Class template `dr_matrix_engine<T, ALLOC>` implements an engine whose
+Class template `dr_matrix_engine<T, AT>` implements an engine whose
 sizes and capacities can be changed at runtime. In addition to the basic
 engine interface, it provides member functions for mutable element
 indexing, changing size and capacity, and swapping rows and/or columns.
@@ -847,8 +907,7 @@ class matrix_transpose_engine
 ## Engine Promotion Traits
 
 Engine promotion traits are used by the arithmetic traits to determine
-the resulting element and engine types in unary and binary arithmetical
-expressions.
+the resulting engine types in an arithmetical expression.
 
 ### For Negation
 
@@ -938,6 +997,10 @@ using matrix_engine_multiply_t =
 
 This section describes the three main linear algebra object types proposed 
 herein: the class templates `column_vector`, `row_vector`, and `matrix`.
+The purpose of these types is to model the corresponding mathematical 
+concepts, manage underlying implemetations through their engine type 
+template parameter, and provide interfaces which can be employed by
+overloaded arithmetic operators.
 
 ### Helper Traits
 
@@ -954,7 +1017,7 @@ using enable_if_resizable_t =
 ### Column Vector
 
 Class template `column_vector<ET, OT>` represents a column vector, with 
-element type and storage management implemented by the engine type `ET`, 
+element type and resource management implemented by the engine type `ET`, 
 and arithmetic operations specified by the operator traits type `OT`.  If 
 the underlying engine type provides dynamic resizing, then this class will 
 as well. 
@@ -1052,7 +1115,7 @@ class column_vector
 ### Row Vector
 
 Class template `row_vector<ET, OT>` represents a row vector, with 
-element type and storage management implemented by the engine type `ET`, 
+element type and resource management implemented by the engine type `ET`, 
 and arithmetic operations specified by the operator traits type `OT`.  If 
 the underlying engine type provides dynamic resizing, then this class will 
 as well. 
@@ -1152,7 +1215,7 @@ class row_vector
 ### Matrix
 
 Class template `matrix<ET, OT>` represents a matrix, with element type 
-and storage management implemented by the engine type `ET`, and arithmetic 
+and resource management implemented by the engine type `ET`, and arithmetic 
 operations specified by the operator traits type `OT`.  If the underlying 
 engine type provides dynamic resizing, then this class will as well. 
 
@@ -1260,9 +1323,9 @@ class matrix
 
 ## Matrix Arithmetic Traits
 
-This section defines sets of arithmetic traits types for negation, addition, 
-subtraction, and multiplication. The purpose of these traits types is 
-threefold:
+This section defines a set of arithmetic traits types for negation, 
+addition, subtraction, and multiplication. The purpose of these traits 
+types is threefold:
 
 1. to determine the element type of the resulting *MathObj*;
 
@@ -1275,14 +1338,14 @@ to the appropriate traits type, which does the heavy lifting.
 
 ### Negation Traits
 
-Class template `matrix_negation_traits<OP1, OTR>` is an arithmetic
-traits type that performs a negation of a *MathObj* and returns the
-result in another *MathObj* having an implementation-defined engine
-type. There are three partial specializations to support the
-three overloaded unary negation operators described below.
+Class template `matrix_negation_traits<OP1, OTR>` is an arithmetic traits 
+type that performs the negation of a *MathObj* and returns the result in 
+another *MathObj* having an implementation-defined engine type. There 
+are three partial specializations to support the three overloaded unary 
+negation operators described below.
 
 ~~~~
-template<class OP1, class OTR>                  //- Unimplemented base template
+template<class OP1, class OTR> 
 struct matrix_negation_traits;
 
 //- A possible partial specialization
@@ -1311,13 +1374,13 @@ struct matrix_negation_traits<row_vector<ET1, OT1>, OTR>
 ### Addition Traits
 
 Class template `matrix_addition_traits<OP1, OP2, OTR>` is an arithmetic traits 
-type that performs an addition of two compatible *MathObj*s and returns 
-the result in a *MathObj* having an implementation-defined engine type. 
-There are three partial specializations to support the three overloaded 
-binary addition operators described below.
+type that performs the addition of two compatible *MathObj*s and returns the
+result in a *MathObj* having an implementation-defined engine type.  There 
+are three partial specializations to support the three overloaded binary 
+addition operators described below.
 
 ~~~~
-template<class OP1, class OP2, class OTR>       //- Unimplemented base template
+template<class OP1, class OP2, class OTR> 
 struct matrix_addition_traits;
 
 //- A possible partial specialization
@@ -1346,13 +1409,13 @@ struct matrix_addition_traits<row_vector<ET1, OT1>, row_vector<ET2, OT2>, OTR>
 ### Subtraction Traits
 
 Class template `matrix_subtraction_traits<OP1, OP2, OTR>` is an arithmetic 
-traits type that performs a subtraction of two compatible *MathObj*s 
+traits type that performs the subtraction of two compatible *MathObj*s 
 and returns the result in a *MathObj* having an implementation-defined
-engine type. There are three partial specializations to support the
-three overloaded binary subtraction operators described below.
+engine type. There are three partial specializations to support the three 
+overloaded binary subtraction operators described below.
 
 ~~~~
-template<class OP1, class OP2, class OTR>       //- Unimplemented base template
+template<class OP1, class OP2, class OTR> 
 struct matrix_subtraction_traits;
 
 //- A possible partial specialization
@@ -1388,7 +1451,7 @@ support the thirteen overloaded binary multiplication operators described
 below.
 
 ~~~~
-template<class OP1, class OP2, class OTR>       //- Unimplemented base template
+template<class OP1, class OP2, class OTR> 
 struct matrix_multiplication_traits;
 
 //- A possible partial specialization
@@ -1454,10 +1517,10 @@ struct matrix_multiplication_traits<row_vector<ET1, OT1>, matrix<ET2, OT2>, OTR>
 {...};
 ~~~~
 
-One partial specialization bears special consideration, and that is
-the one corresponding to the inner product.  In this particular case,
-the return value from `multiply()` is not a *MathObj*, but instead
-a scalar:
+One of the partial specializations bears special mention, and that is the 
+one  corresponding to the inner product.  In this particular case, the 
+return value from `multiply()` is not a *MathObj*, but instead a promoted
+element type:
 
 ~~~~
 template<class ET1, class OT1, class ET2, class OT2, class OTR>
@@ -1534,6 +1597,10 @@ struct matrix_operator_traits_promotion<default_matrix_operator_traits,
 ~~~~
 
 ## Arithmetic Operators
+
+The arithmetic operators provide syntax that mimics common mathematical
+notation, with computation executed by an arithmetic traits type 
+specified by at least one of the operands' template parameters.
 
 Readers will note that the return types of the overloaded operators 
 described below are left unspecified.  This is a deliberate choice so
@@ -1730,8 +1797,8 @@ using fs_matrix = matrix<fs_matrix_engine<T, R, C>>;
 
 ## Expression Results
 
-The following are some expressions that demonstrate how element
-and engine promotions are performed.
+The following are some expressions that demonstrate how element and 
+engine promotions are performed.
 
 ~~~~
 using cx_float  = std::complex<float>;
@@ -1761,7 +1828,7 @@ void t1()
     auto    m06 = fmc*dmc;      //- dyn_matrix<complex<double>>
 
     auto    m07 = fmf*fmd;      //- fs_matrix<double, 3, 3>
-    auto    m08 = fmf*fmc;      //- fs_matrix<complex<double>, 3, 3>
+    auto    m08 = fmd*fmc;      //- fs_matrix<complex<double>, 3, 3>
 }
 
 void t2()
@@ -1814,7 +1881,7 @@ void t2()
 }
 ~~~~
 
-# But How Does it Work?
+# How Does it Work?
 
 The preceding sections described the various components comprising the 
 interface, starting with the most basic, and proceeding in a bottom-up
@@ -1823,11 +1890,11 @@ the interface, it may help to look at how the interface works from a
 top-down perspective in order to understand how the pieces work together.
 
 At a high level, the process for binary operators is as follows:
-1. A binary operator is invoked.
+1. A binary operator, say multiplication, is invoked.
 1. The operator examines the operator traits types of its two operands, 
 employing operator traits promotion to determine which of the two 
-it will use to perfrom the arithmetic operation; this operator traits 
-type is also passed on as a template argument for the result.
+it will use to perform the multiplication; this operator traits 
+type is also passed on as a template argument to the result type.
 1. The operator extracts the appropriate arithmetic traits type from the
 operator traits.
 1. The arithmetic traits examines the engine types of the two operands,
@@ -1836,17 +1903,20 @@ employing engine promotion to determine the engine type of the result.
 operands, employing element promotion to determine the element type of
 the result.
 1. The element promotion traits determines a suitable element type that
-can contain the result of the arithmetic operation with (little or) no 
+can contain the result of the arithmetic operation with little or no 
 loss of information.
 1. The engine promotion traits specifies the appropriate engine type 
-parametrized in terms of the resulting element type.
+parametrized in terms of the resulting element type and other types
+specific to that engine type.
 1. The arithmetic traits combines the engine type with the operator traits
-type to specify the *MathObj* return type.
-1. The arithmetic traits provides a static member function that impelements
-the operation.
-1. The operator calls that function with the operands and returns the result.
+type to specify the actual *MathObj* return type.
+1. The arithmetic traits provides a static member function that implements
+the multiplication operation.
+1. The multiplication operator calls that function with the supplied operands 
+and returns the result.
 
-The process for negation is quite a bit simpler, and is not covered here.
+The process for negation is quite a bit simpler, and so is not outlined
+here.
 
 ## An Example
 
@@ -1865,6 +1935,10 @@ void f()
 One might ask the very reasonable question: how does the library determine 
 that `m1` is a dynamically-resizable matrix of double, and how does it know
 how to perform the requested multiplication?  
+
+We attempt to answer that question in the following sections.  The reader
+may find it helpful to follow along by looking at the strawman implementation
+provided in the repo listed at the top of this document.
 
 ### Calling an Operator
 
@@ -1899,7 +1973,7 @@ OT2  -->>  default_matrix_operator_traits
 ### Selecting the Operator Traits
 
 The resulting operator traits type is then determined by instantiating the 
-alias template  `matrix_operator_traits_promotion_t` from Section 6.8 above:
+alias template  `matrix_operator_traits_promotion_t` from Section 6.9 above:
 
 ~~~~
 op_traits  -->>  matrix_operator_traits_promotion_t<default_matrix_operator_traits,
@@ -1910,9 +1984,8 @@ op_traits  -->>  matrix_operator_traits_promotion_t<default_matrix_operator_trai
 ~~~~
 
 Now that the operator traits are known, we also know the four corresponding
-arithmetic traits templates that will determine the resulting element type, 
-engine type, and perform the actual work of negation, addition, subtraction, 
-or multiplication, as the case may be.
+arithmetic traits templates that will determine the resulting engine type 
+and perform the actual computational work.
 
 The operand types are:
 
@@ -1927,7 +2000,7 @@ op2_type  -->>  matrix<dr_matrix_engine<float, std::allocator<float>>,
 ### Selecting the Multiplication Traits
 
 Given the operand types and operator traits types, the multiplication 
-traits type is then determined using them, per Section 6.7:
+traits type is then determined using them, per Section 6.8:
 
 ~~~~
 mul_traits  -->> 
@@ -1938,7 +2011,7 @@ mul_traits  -->>
             default_matrix_operator_traits>
 ~~~~
 
-From Section 6.6.4 above, we can see that the appropriate multiplication 
+From Section 6.7.4 above, we can see that the appropriate multiplication 
 traits partial specialization is:
 
 ~~~~
@@ -1981,7 +2054,7 @@ engine_type  -->>  matrix_multiplication_engine_t<
                        dr_matrix_engine<float, std::allocator<float>>>::engine_type
 ~~~~
 
-From the example in Section 6.4.4 above, this partial specialization looks
+From the example in Section 6.5.4 above, this partial specialization looks
 like the following:
 
 ~~~~
@@ -1996,8 +2069,9 @@ struct matrix_multiplication_engine_promotion<fs_matrix_engine<T1, R1, C1>,
 };
 ~~~~
 
-We can see that this engine promotion traits will specify a dynamically
-resizable engine as the result type.  The template arguments are:
+We can see that this example engine promotion traits will specify a 
+dynamically resizable engine as the result type.  The template arguments 
+are:
 
 ~~~~
 T1  -->>  double
@@ -2085,16 +2159,11 @@ authors intend to continue evolving this paper, working to address
 + adding `matrix` member function templates that return individual
 columns, rows, and sub-matrices in terms of a desired return engine type;
 
-+ the appropriate factorization of the engine promotion traits;  in
-particular, should these traits types be segregated by their corresponding
-arithmetic operation (as described above), or should they be combined into
-a corresponding "master" traits type;
++ deciding whether or not provide a unary plus operator;
 
-+ deciding whether or not to provide the degenerate row/column vector 
-multiplication operators mentioned in Section 6.4.4;
-
-+ integrating `mdspan` as an engine type; 
++ experimenting with `mdspan` as an engine type; 
   
-+ implementing test distributed/MPI engines; and,
++ implementing engines and arithmetic traits that manage and perform 
+distributed arithmetic; and,
 
 + providing a larger set of illustrative examples.
