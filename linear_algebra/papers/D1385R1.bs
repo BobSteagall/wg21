@@ -576,6 +576,11 @@ platforms, where the make and model of processor is well defined. This
 would impact on element layout and storage. Such work has already been
 demonstrated in paper N4454.
 
+It is possible that two operands may be associated with different arithmetic
+customizations.  We call the process of determining which of those two 
+customizations to employ when performing the actual arithmetic operations
+*operator traits promotion*.
+
 ## Linear Algebra and `constexpr`
 
 The fundamental set of operations for linear algebra can all be
@@ -845,7 +850,7 @@ Engine promotion traits are used by the arithmetic traits to determine
 the resulting element and engine types in unary and binary arithmetical
 expressions.
 
-### Promotion Traits for Negation
+### For Negation
 
 Class template `matrix_engine_negate_promotion<ET1>` implements a traits 
 type that determines the resulting engine type when negating a *MathObj*.
@@ -862,7 +867,7 @@ using matrix_engine_negate_t =
     typename matrix_engine_negate_promotion<ET1>::engine_type;
 ~~~~
 
-### Promotion Traits for Addition
+### For Addition
 
 Class template `matrix_engine_add_promotion<ET1, ET2>` implements a
 traits type that determines the resulting engine type when adding two
@@ -880,7 +885,7 @@ using matrix_engine_add_t =
     typename matrix_engine_add_promotion<ET1, ET2>::engine_type;
 ~~~~
 
-### Promotion Traits for Subtraction
+### For Subtraction
 
 Class template `matrix_engine_subtract_promotion<ET1, ET2>` implements a 
 traits type that determines the resulting engine type when subtracting 
@@ -898,7 +903,7 @@ using matrix_engine_subtract_t =
     typename matrix_engine_subtract_promotion<ET1, ET2>::engine_type;
 ~~~~
 
-### Promotion Traits for Multiplication
+### For Multiplication
 
 Class template `matrix_engine_multiply_promotion<ET1, ET2>` implements a 
 traits type that determines the resulting engine type when multiplying two 
@@ -911,26 +916,17 @@ struct matrix_engine_multiply_promotion;
     using engine_type = ...;    //- Implementation-defined
 };
 
-//- Example specializations
+//- A possible partial specialization
 //
 template<class T1, size_t R1, size_t C1, class T2, class A2>
 struct matrix_multiplication_engine_promotion<fs_matrix_engine<T1, R1, C1>, 
                                               dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using alloc_type   = typename std::allocator_traits<A2>::template rebind_alloc<element_type>;
+    using alloc_type   = 
+        typename std::allocator_traits<A2>::template rebind_alloc<element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
-
-template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
-struct matrix_multiplication_engine_promotion<fs_matrix_engine<T1, R1, C1>, 
-                                              fs_matrix_engine<T2, R2, C2>>
-{
-    static_assert(C1 == R2);
-    using element_type = matrix_element_promotion_t<T1, T2>;
-    using engine_type  = fs_matrix_engine<element_type, R1, C2>;
-};
-
 
 template<class ET1, class ET2>
 using matrix_engine_multiply_t = 
@@ -1289,7 +1285,7 @@ three overloaded unary negation operators described below.
 template<class OP1, class OTR>                  //- Unimplemented base template
 struct matrix_negation_traits;
 
-//- Example
+//- A possible partial specialization
 //
 template<class ET1, class OT1, class OTR>
 struct matrix_negation_traits<matrix<ET1, OT1>, OTR>
@@ -1301,7 +1297,7 @@ struct matrix_negation_traits<matrix<ET1, OT1>, OTR>
     static result_type  negate(matrix<ET1, OT1> const& m1);
 };
 
-//- Other specializations
+//- Other partial specializations
 //
 template<class ET1, class OT1, class OTR>
 struct matrix_negation_traits<column_vector<ET1, OT1>, OTR>
@@ -1324,7 +1320,7 @@ binary addition operators described below.
 template<class OP1, class OP2, class OTR>       //- Unimplemented base template
 struct matrix_addition_traits;
 
-//- Example
+//- A possible partial specialization
 //
 template<class ET1, class OT1, class ET2, class OT2, class OTR>
 struct matrix_addition_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>
@@ -1336,7 +1332,7 @@ struct matrix_addition_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>
     static result_type  add(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
 };
 
-//- Other specializations
+//- Other partial specializations
 //
 template<class ET1, class OT1, class ET2, class OT2, class OTR>
 struct matrix_addition_traits<column_vector<ET1, OT1>, column_vector<ET2, OT2>, OTR>
@@ -1359,7 +1355,7 @@ three overloaded binary subtraction operators described below.
 template<class OP1, class OP2, class OTR>       //- Unimplemented base template
 struct matrix_subtraction_traits;
 
-//- Example
+//- A possible partial specialization
 //
 template<class ET1, class OT1, class ET2, class OT2, class OTR>
 struct matrix_subtraction_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>
@@ -1371,7 +1367,7 @@ struct matrix_subtraction_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>
     static result_type  subtract(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
 };
 
-//- Other specializations
+//- Other partial specializations
 //
 template<class ET1, class OT1, class ET2, class OT2, class OTR>
 struct matrix_subtraction_traits<column_vector<ET1, OT1>, column_vector<ET2, OT2>, OTR>
@@ -1395,7 +1391,7 @@ below.
 template<class OP1, class OP2, class OTR>       //- Unimplemented base template
 struct matrix_multiplication_traits;
 
-//- Example
+//- A possible partial specialization
 //
 template<class ET1, class OT1, class ET2, class OT2, class OTR>
 struct matrix_multiplication_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>
@@ -1407,7 +1403,7 @@ struct matrix_multiplication_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>
     static result_type  multiply(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
 };
 
-//- Other specializations
+//- Other partial specializations
 //
 template<class ET1, class OT1, class T2, class OTR>
 struct matrix_multiplication_traits<column_vector<ET1, OT1>, T2, OTR> 
@@ -1479,13 +1475,13 @@ struct matrix_multiplication_traits<row_vector<ET1, OT1>, column_vector<ET2, OT2
 
 ## Operator Traits
 
-Class `matrix_operator_traits` is a traits-style template parameter to 
+Class `default_matrix_operator_traits` is a traits-style template parameter to 
 `column_vector`, `row_vector`, and `matrix`.  Its purpose is to convey a
 suggested set of arithmetical operations to be associated with a given
 `MathObj`.
 
 ~~~~
-struct matrix_operator_traits
+struct default_matrix_operator_traits
 {
     template<class OP1, class OTR>
     using negation_traits = matrix_negation_traits<OP1, OTR>;
@@ -1518,21 +1514,22 @@ struct matrix_operator_traits_promotion<T1, T1>
 };
 
 template<class T1>
-struct matrix_operator_traits_promotion<T1, matrix_operator_traits>
+struct matrix_operator_traits_promotion<T1, default_matrix_operator_traits>
 {
     using traits_type = T1;
 };
 
 template<class T1>
-struct matrix_operator_traits_promotion<matrix_operator_traits, T1>
+struct matrix_operator_traits_promotion<default_matrix_operator_traits, T1>
 {
     using traits_type = T1;
 };
 
 template<>
-struct matrix_operator_traits_promotion<matrix_operator_traits, matrix_operator_traits>
+struct matrix_operator_traits_promotion<default_matrix_operator_traits,
+                                        default_matrix_operator_traits>
 {
-    using traits_type = matrix_operator_traits;
+    using traits_type = default_matrix_operator_traits;
 };
 ~~~~
 
@@ -1820,34 +1817,60 @@ void t2()
 # But How Does it Work?
 
 The preceding sections described the various components comprising the 
-interface, starting with the most basic, and adding to them in a bottom-up
+interface, starting with the most basic, and proceeding in a bottom-up
 fashion.  While this is useful for understanding the static structure of
-the interface, it may help to look at how the interface works from a top-down
-perspective in order to understand how the pieces work together.
+the interface, it may help to look at how the interface works from a 
+top-down perspective in order to understand how the pieces work together.
 
-Consider the following:
+At a high level, the process for binary operators is as follows:
+1. A binary operator is invoked.
+1. The operator examines the operator traits types of its two operands, 
+employing operator traits promotion to determine which of the two 
+it will use to perfrom the arithmetic operation; this operator traits 
+type is also passed on as a template argument for the result.
+1. The operator extracts the appropriate arithmetic traits type from the
+operator traits.
+1. The arithmetic traits examines the engine types of the two operands,
+employing engine promotion to determine the engine type of the result.
+1. The engine promotion traits examines the element types of the two
+operands, employing element promotion to determine the element type of
+the result.
+1. The element promotion traits determines a suitable element type that
+can contain the result of the arithmetic operation with (little or) no 
+loss of information.
+1. The engine promotion traits specifies the appropriate engine type 
+parametrized in terms of the resulting element type.
+1. The arithmetic traits combines the engine type with the operator traits
+type to specify the *MathObj* return type.
+1. The arithmetic traits provides a static member function that impelements
+the operation.
+1. The operator calls that function with the operands and returns the result.
+
+The process for negation is quite a bit simpler, and is not covered here.
+
+## An Example
+
+Consider the following simple function:
 
 ~~~~
 void f()
 {
     fs_matrix<double, 3, 4>     fsmd;         //- fixed-size matrix of double
     dyn_matrix<float>           drmf(4, 5);   //- dynamic matrix of float
-    fs_matrix<float, 4, 5>      fsmf;         //- fixed-size matrix of float
 
     auto    m1 = fsmd * drmf;   //- dyn_matrix<double> of size 3x5
-    auto    m2 = fsmd * fsmf;   //- fs_matrix<double, 3, 5>
 }
 ~~~~
 
-One might ask the very reasonable question: how does the library know that
-the result type is a dynamically-resizable matrix of double, and how does it
-know how to perform the requested multiplication?  
+One might ask the very reasonable question: how does the library determine 
+that `m1` is a dynamically-resizable matrix of double, and how does it know
+how to perform the requested multiplication?  
 
-## Choosing the Arithmetic Traits
+### Calling an Operator
 
-Let's begin by looking at the statement on line 7, the instantiation of 
-matrix `m1`, which invokes the binary multiplication operator.  The 
-implementation might look of that operator might look like the following:
+Let's begin by examining the the instantiation of matrix `m1`, in which 
+the binary multiplication operator is invoked with operands `fsmd` and 
+`drmf`.  The implementation of that operator might look like the following:
 
 ~~~~
 template<class ET1, class OT1, class ET2, class OT2>
@@ -1864,48 +1887,59 @@ operator *(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
 }
 ~~~~
 
-The template parameters are deduced as
+The template parameters are deduced as:
 
 ~~~~
 ET1  -->>  fs_matrix_engine<double, 3, 4>
-OT1  -->>  matrix_operator_traits
+OT1  -->>  default_matrix_operator_traits
 ET2  -->>  dr_matrix_engine<float, std::allocator<float>>
-OT2  -->>  matrix_operator_traits
+OT2  -->>  default_matrix_operator_traits
 ~~~~
 
-The resulting operator traits type is determined by the alias template 
-`matrix_operator_traits_promotion_t`
+### Selecting the Operator Traits
+
+The resulting operator traits type is then determined by instantiating the 
+alias template  `matrix_operator_traits_promotion_t` from Section 6.8 above:
 
 ~~~~
-op_traits  -->>  matrix_operator_traits_promotion_t<matrix_operator_traits,
-                                                    matrix_operator_traits>
-           -->>  matrix_operator_traits
+op_traits  -->>  matrix_operator_traits_promotion_t<default_matrix_operator_traits,
+                                                    default_matrix_operator_traits>
+           -->>  matrix_operator_traits_promotion<default_matrix_operator_traits,
+                                                  default_matrix_operator_traits>::alias_type
+           -->>  default_matrix_operator_traits
 ~~~~
 
-The operand types are
+Now that the operator traits are known, we also know the four corresponding
+arithmetic traits templates that will determine the resulting element type, 
+engine type, and perform the actual work of negation, addition, subtraction, 
+or multiplication, as the case may be.
+
+The operand types are:
+
 ~~~~
-op1_type  -->>  matrix<fs_matrix_engine<double, 3, 4>, matrix_operator_traits>
-op2_type  -->>  matrix<dr_matrix_engine<float, std::allocator<float>>, matrix_operator_traits>
+op1_type  -->>  matrix<fs_matrix_engine<double, 3, 4>, 
+                       default_matrix_operator_traits>
+
+op2_type  -->>  matrix<dr_matrix_engine<float, std::allocator<float>>, 
+                       default_matrix_operator_traits>
 ~~~~
 
-The multiplication traits are then determined as
+### Selecting the Multiplication Traits
+
+Given the operand types and operator traits types, the multiplication 
+traits type is then determined using them, per Section 6.7:
 
 ~~~~
 mul_traits  -->> 
-    matrix_operator_traits::
-        matrix_multiplication_traits
-        <
-            matrix<fs_matrix_engine<double, 3, 4>, matrix_operator_traits>,
+    default_matrix_operator_traits::
+        matrix_multiplication_traits<
+            matrix<fs_matrix_engine<double, 3, 4>, default_matrix_operator_traits>,
             matrix<dr_matrix_engine<float, std::allocator<float>>, 
-            matrix_operator_traits
-        >
+            default_matrix_operator_traits>
 ~~~~
 
-## Selecting the Engine and Element Types
-
-The next step in the process is to determine the engine and operator traits 
-types of the matrix that results from the multiplication.  From above, we 
-can see that the appropriate multiplication traits partial specialization is:
+From Section 6.6.4 above, we can see that the appropriate multiplication 
+traits partial specialization is:
 
 ~~~~
 template<class ET1, class OT1, class ET2, class OT2, class OTR>
@@ -1919,20 +1953,36 @@ struct matrix_multiplication_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>
 };
 ~~~~
 
-We know that the template parameters are
+### Selecting the Engine Type
+
+Now that we know the operator traits to be passed on to the resulting matrix,
+and which specialization will perform the multiplication, the next step in 
+the process is to determine the engine type of the result.  We know that 
+the template arguments to the multiplication traits are:
 
 ~~~~
 ET1  -->>  fs_matrix_engine<double, 3, 4>
-OT1  -->>  matrix_operator_traits
+OT1  -->>  default_matrix_operator_traits
 ET2  -->>  dr_matrix_engine<float, std::allocator<float>>
-OT2  -->>  matrix_operator_traits
-OTR  -->>  matrix_operator_traits
+OT2  -->>  default_matrix_operator_traits
+OTR  -->>  default_matrix_operator_traits
 ~~~~
 
-and so the next order of business is to select the resulting engine type.
-The instantiation of the alias template `matrix_multiplication_engine_t` 
-takes us to the  partial specialization of engine promotion traits relevant 
-to multiplication.
+We use these to select the resulting engine type.  The instantiation of the 
+alias template `matrix_multiplication_engine_t` takes us to the  partial 
+specialization of engine promotion traits relevant to multiplication:
+
+~~~~
+engine_type  -->>  matrix_multiplication_engine_t<
+                       fs_matrix_engine<double, 3, 4>,
+                       dr_matrix_engine<float, std::allocator<float>>>
+             -->>  matrix_multiplication_engine_promotion<
+                       fs_matrix_engine<double, 3, 4>,
+                       dr_matrix_engine<float, std::allocator<float>>>::engine_type
+~~~~
+
+From the example in Section 6.4.4 above, this partial specialization looks
+like the following:
 
 ~~~~
 template<class T1, size_t R1, size_t C1, class T2, class A2>
@@ -1940,12 +1990,14 @@ struct matrix_multiplication_engine_promotion<fs_matrix_engine<T1, R1, C1>,
                                               dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using alloc_type   = typename std::allocator_traits<A2>::template rebind_alloc<element_type>;
+    using alloc_type   = 
+        typename std::allocator_traits<A2>::template rebind_alloc<element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 ~~~~
 
-We can see that the template parameters are
+We can see that this engine promotion traits will specify a dynamically
+resizable engine as the result type.  The template arguments are:
 
 ~~~~
 T1  -->>  double
@@ -1955,68 +2007,66 @@ T2  -->>  float
 A2  -->>  std::allocator<float>
 ~~~~
 
-From these, we next determine the promoted element type.  The instantiation
-of template alias `matrix_element_promotion_t` leads to
+From these, we can determine the promoted element type.  The instantiation
+of template alias `matrix_element_promotion_t` leads to:
 
 ~~~~
-element_type  -->>  matrix_element_promotion<double, float>::type
+element_type  -->>  matrix_element_promotion_t<double, float>
+              -->>  matrix_element_promotion<double, float>::type
               -->>  double
 ~~~~
 
-Next we use the rebinder facility from `std::allocator_traits` to select 
-the resulting allocator type
+We next use the rebinder facility from `std::allocator_traits` to select 
+the resulting allocator type:
 
 ~~~~
 alloc_type  -->>  std::allocator_traits<std::allocator<float>>::rebind_alloc<double>
             -->>  std::allocator<double>
 ~~~~
 
-This then yields the resulting engine type
+These are then combined to yield the resulting engine type:
 
 ~~~~
 engine_type  -->>  dr_matrix_engine<double, std::allocator<double>>
 ~~~~
 
-## Selecting the Return Type
-
-Now that we know the engine type, it is possible to determine the resulting
-*MathObj* type.  Returning to `matrix_multiplication_traits`, we now have
+Now that we know the engine type, it is possible to determine the template
+arguments of the resulting matrix type.  Popping the instantiation stack 
+and returning to `matrix_multiplication_traits`, we now know that:
 
 ~~~~
 engine_type  -->>  dr_matrix_engine<double, std::allocator<double>>
-op_traits    -->>  matrix_operator_traits
+op_traits    -->>  default_matrix_operator_traits
 ~~~~
 
-which means that the resulting matrix will have the type:
+These now form the template arguments of resulting matrix type:
 
 ~~~~
 result_type  -->>  matrix<dr_matrix_engine<double, std::allocator<double>>, 
-                          matrix_operator_traits>
+                          default_matrix_operator_traits>
 ~~~~
 
-## The Fully Instantiated Multiplication Traits
+### The Fully Instantiated Multiplication Traits
 
 So, after all of the preceding work is done, the fully specialized matrix
 multiplication traits looks like this:
 
 ~~~~
 template<>
-struct  matrix_multiplication_traits
-        <
-            matrix<fs_matrix_engine<double, 3, 4>, matrix_operator_traits>,
+struct  matrix_multiplication_traits<
+            matrix<fs_matrix_engine<double, 3, 4>, default_matrix_operator_traits>,
             matrix<dr_matrix_engine<float, std::allocator<float>>, 
-            matrix_operator_traits
-        >
+            default_matrix_operator_traits>
 {
     using engine_type = dr_matrix_engine<double, std::allocator<double>>;
-    using op_traits   = matrix_operator_traits;
+    using op_traits   = default_matrix_operator_traits;
     using result_type = matrix<dr_matrix_engine<double, std::allocator<double>>, 
-                               matrix_operator_traits>;
+                               default_matrix_operator_traits>;
 
     static 
-    matrix<dr_matrix_engine<double, std::allocator<double>>, matrix_operator_traits>  
-        multiply(matrix<fs_matrix_engine<double, 3, 4>, matrix_operator_traits> const& m1,
-                 matrix<dr_matrix_engine<float, std::allocator<float>> const& m2);
+    matrix<dr_matrix_engine<double, std::allocator<double>>, default_matrix_operator_traits>  
+      multiply(matrix<fs_matrix_engine<double,3,4>, default_matrix_operator_traits> const& m1,
+               matrix<dr_matrix_engine<float, std::allocator<float>> const& m2);
 };
 ~~~~
 

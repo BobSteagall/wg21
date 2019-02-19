@@ -26,11 +26,11 @@ template<class E1, class E2>    struct matrix_multiplication_engine_promotion;
 
 //- Primary mathematical object types.
 //
-struct matrix_operator_traits;
+struct default_matrix_operator_traits;
 
-template<class ET, class OT=matrix_operator_traits> class column_vector;
-template<class ET, class OT=matrix_operator_traits> class row_vector;
-template<class ET, class OT=matrix_operator_traits> class matrix;
+template<class ET, class OT=default_matrix_operator_traits> class column_vector;
+template<class ET, class OT=default_matrix_operator_traits> class row_vector;
+template<class ET, class OT=default_matrix_operator_traits> class matrix;
 
 template<class ET, class OT> using col_vector = column_vector<ET, OT>;
 
@@ -43,7 +43,7 @@ template<class OP1, class OP2, class OTR>   struct matrix_multiplication_traits;
 
 //- Operator traits and traits promotion.
 //
-struct matrix_operator_traits;
+struct default_matrix_operator_traits;
 template<class T1, class T2>    struct matrix_operator_traits_promotion;
 
 }       //- STD_LA namespace
