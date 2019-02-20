@@ -30,6 +30,12 @@ class NewNum
     template<class U>   NewNum&      operator /=(U rhs);
 };
 
+template<>
+struct std::is_arithmetic<NewNum> : public std::true_type
+{};
+
+//------
+//
 inline
 NewNum::NewNum()
 :   m_value(0.)
@@ -98,7 +104,7 @@ template<class U>
 inline NewNum& 
 NewNum::operator +=(U rhs)
 {
-    m_value += rhs;
+    m_value += (double) rhs;
     return *this;
 }
 
@@ -106,7 +112,7 @@ template<class U>
 inline NewNum& 
 NewNum::operator -=(U rhs)
 {
-    m_value -= rhs;
+    m_value -= (double) rhs;
     return *this;
 }
 
@@ -114,7 +120,7 @@ template<class U>
 inline NewNum& 
 NewNum::operator *=(U rhs)
 {
-    m_value *= rhs;
+    m_value *= (double) rhs;
     return *this;
 }
 
@@ -122,7 +128,7 @@ template<class U>
 inline NewNum& 
 NewNum::operator /=(U rhs)
 {
-    m_value /= rhs;
+    m_value /= (double) rhs;
     return *this;
 }
 
