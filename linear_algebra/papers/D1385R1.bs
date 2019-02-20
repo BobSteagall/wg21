@@ -9,7 +9,7 @@ ED: https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/D1385R
 !Strawman implementation: [https://github.com/BobSteagall/wg21/tree/master/linear_algebra/code](https://github.com/BobSteagall/wg21/tree/master/linear_algebra/code)
 Markup Shorthands: markdown yes
 Revision: 1
-Line Numbers: true
+Line Numbers: false
 Editor: Guy Davidson, guy@hatcat.com
 Editor: Bob Steagall, bob.steagall.cpp@gmail.com
 Shortname: [linear.algebra]
@@ -2146,6 +2146,270 @@ struct  matrix_multiplication_traits<
 
 Finally, the binary multiplication operator wraps the call to `mulitply()`, 
 returning the result as determined above.
+
+# Customization
+
+The library provides for three forms of customization: custom element types,
+custom engines, and custom arithmetical operations.  The following sections
+show examples of each.
+
+## Integrating a New Element Type
+
+Suppose that you have created a new type that models a real number in some
+way and you wish for that type to be used as a matrix element:
+
+~~~~
+class NewNum 
+{
+  public:
+    NewNum();
+    NewNum(NewNum&&) = default;
+    NewNum(NewNum const&) = default;
+    template<class U>   NewNum(U other);
+
+    NewNum&     operator =(NewNum&&) = default;
+    NewNum&     operator =(NewNum const&) = default;
+    template<class U>   NewNum&     operator =(U rhs);
+
+    NewNum     operator -() const;
+    NewNum     operator +() const;
+
+    NewNum&     operator +=(NewNum rhs);
+    NewNum&     operator -=(NewNum rhs);
+    NewNum&     operator *=(NewNum rhs);
+    NewNum&     operator /=(NewNum rhs);
+
+    template<class U>   NewNum&      operator +=(U rhs);
+    template<class U>   NewNum&      operator -=(U rhs);
+    template<class U>   NewNum&      operator *=(U rhs);
+    template<class U>   NewNum&      operator /=(U rhs);
+
+  private:
+    ...     //- implementation stuff
+};
+
+inline bool operator ==(NewNum lhs, NewNum rhs);
+template<class U> inline bool operator ==(NewNum lhs, U rhs);
+template<class U> inline bool operator ==(U lhs, NewNum rhs);
+...
+//- other comparison operators...
+...
+//- other arithmetic operators...
+...
+inline bool operator *(NewNum lhs, NewNum rhs);
+template<class U> inline bool operator *(NewNum lhs, U rhs);
+template<class U> inline bool operator *(U lhs, NewNum rhs);
+~~~~
+
+Assuming that this type works as intended, and that all arithmetic 
+interactions with other types are handled the set of operator overloads 
+that you provide, then all that is required for the library to accept 
+`NewNum` as an element type is this:
+
+~~~~
+template<>
+struct std::is_arithmetic<NewNum> : public std::true_type
+{};
+~~~~
+
+By stating that the type is an arithmetic type, and by ensuring that its
+arithmetic operators functions as promised, the library's traits types will
+allow compiliation to succeed.  
+
+However, if the default arithmetic traits do not understand how to use your 
+new element type, then you will need to provide specializations of them as 
+well.
+
+## Integrating a New Engine Type
+
+Suppose that you want to create a custom fixed-size matrix engine that is
+somehow different from `fs_matrix_engine`; perhaps it is instrumented in
+some way for debugging, or uses fixed-size storage that is external to
+the engine object.  It might look like this:
+
+~~~~
+template<class T, size_t R, size_t C>
+class fs_matrix_engine_TST
+{
+    static_assert(R >= 1);
+    static_assert(C >= 1);
+
+  public:
+    using element_type   = T;
+    using is_dense       = std::true_type;
+    using is_rectangular = std::true_type;
+    using is_resizable   = std::false_type;
+    using is_row_major   = std::true_type;
+    using size_tuple     = std::tuple<size_t, size_t>;
+
+  public:
+    fs_matrix_engine_TST() = default;
+    fs_matrix_engine_TST(fs_matrix_engine_TST&&) = default;
+    fs_matrix_engine_TST(fs_matrix_engine_TST const&) = default;
+
+    fs_matrix_engine_TST&   operator =(fs_matrix_engine_TST&&) = default;
+    fs_matrix_engine_TST&   operator =(fs_matrix_engine_TST const&) = default;
+
+    T           operator ()(size_t i) const;
+    T           operator ()(size_t i, size_t j) const;
+    T const*    data() const noexcept;
+
+    size_t      columns() const noexcept;
+    size_t      rows() const noexcept;
+    size_tuple  size() const noexcept;
+
+    size_t      column_capacity() const noexcept;
+    size_t      row_capacity() const noexcept;
+    size_tuple  capacity() const noexcept;
+
+    T&      operator ()(size_t i);
+    T&      operator ()(size_t i, size_t j);
+    T*      data() noexcept;
+
+    void    swap_columns(size_t i, size_t j);
+    void    swap_rows(size_t i, size_t j);
+
+  private:
+    ...     //- implementation stuff
+};
+~~~~
+
+For each arithmetic operation in which you expect the new engine type to 
+be involved, you will need to provide a specialization (full or partial) 
+of the engine promotion traits for that operation.  For example, let's 
+assume that you're only interested in addition operations involving two 
+operands having the new engine type, or where one operand has the standard 
+fixed-size engine and the other has the new engine.  Then your engine 
+promotion traits might look like this:
+
+~~~~
+template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+struct matrix_addition_engine_promotion<fs_matrix_engine_TST<T1, R1, C1>, 
+                                        fs_matrix_engine_TST<T2, R2, C2>>
+{
+    static_assert(R1 == R2);
+    static_assert(C1 == C2);
+    using element_type = matrix_element_promotion_t<T1, T2>;
+    using engine_type  = fs_matrix_engine_TST<element_type, R1, C1>;
+};
+
+template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+struct matrix_addition_engine_promotion<fs_matrix_engine<T1, R1, C1>, 
+                                        fs_matrix_engine_TST<T2, R2, C2>>
+{
+    static_assert(R1 == R2);
+    static_assert(C1 == C2);
+    using element_type = matrix_element_promotion_t<T1, T2>;
+    using engine_type  = fs_matrix_engine_TST<element_type, R1, C1>;
+};
+
+template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+struct matrix_addition_engine_promotion<fs_matrix_engine_TST<T1, R1, C1>, 
+                                        fs_matrix_engine<T2, R2, C2>>
+{
+    static_assert(R1 == R2);
+    static_assert(C1 == C2);
+    using element_type = matrix_element_promotion_t<T1, T2>;
+    using engine_type  = fs_matrix_engine_TST<element_type, R1, C1>;
+};
+~~~~
+
+As we can see, these promotion traits dictate the result engine type to 
+be the new engine type. Another option is that the result engine type 
+be `fs_matrix_engine`; yet another option is that the return engine type
+be some other type, like an expression engine.
+
+What about performing the computation?  If the default implementation of 
+the addition arithmetic traits understands how to perform the addition 
+operation, then you are done.  
+
+However, if the default addition traits don't understand how to use the 
+new engine type, then you will also have to write specializations of the 
+corresponding addition traits types.  That might look something like this:
+
+~~~~
+template<class T1, size_t R, size_t C, class T2, class OTR>
+struct matrix_addition_traits<matrix<fs_matrix_engine_TST<T1, R, C>, OTR>, 
+                              matrix<fs_matrix_engine_TST<T2, R, C>, OTR>, 
+                              OTR>
+{
+    using engine_type = matrix_addition_engine_t<fs_matrix_engine_TST<T1, R, C>, 
+                                                 fs_matrix_engine_TST<T2, R, C>>;
+    using op_traits   = OTR;
+    using result_type = matrix<engine_type, op_traits>;
+
+    static result_type  add(matrix<fs_matrix_engine_TST<T1, R, C>, OTR> const& m1, 
+                            matrix<fs_matrix_engine_TST<T2, R, C>, OTR> const& m2);
+};
+
+template<class T1, size_t R, size_t C, class T2, class OTR>
+struct matrix_addition_traits<matrix<fs_matrix_engine<T1, R, C>, OTR>, 
+                              matrix<fs_matrix_engine_TST<T2, R, C>, OTR>, 
+                              OTR>
+{
+    using engine_type = matrix_addition_engine_t<fs_matrix_engine<T1, R, C>, 
+                                                 fs_matrix_engine_TST<T2, R, C>>;
+    using op_traits   = OTR;
+    using result_type = matrix<engine_type, op_traits>;
+
+    static result_type  add(matrix<fs_matrix_engine<T1, R, C>, OTR> const& m1, 
+                            matrix<fs_matrix_engine_TST<T2, R, C>, OTR> const& m2);
+};
+
+template<class T1, size_t R, size_t C, class T2, class OTR>
+struct matrix_addition_traits<matrix<fs_matrix_engine_TST<T1, R, C>, OTR>, 
+                              matrix<fs_matrix_engine<T2, R, C>, OTR>, 
+                              OTR>
+{
+    using engine_type = matrix_addition_engine_t<fs_matrix_engine_TST<T1, R, C>, 
+                                                 fs_matrix_engine_<T2, R, C>>;
+    using op_traits   = OTR;
+    using result_type = matrix<engine_type, op_traits>;
+
+    static result_type  add(matrix<fs_matrix_engine_TST<T1, R, C>, OTR> const& m1, 
+                            matrix<fs_matrix_engine_TST<T2, R, C>, OTR> const& m2);
+};
+~~~~
+
+Note that namespace qualifiers which should actually appear in the above 
+code have been ommitted in the interest of brevity.
+
+## Customizing an Arithmetic Operation
+
+Suppose that you are working on a game engine, and you are interested in
+experimenting with different algorithms for performing affine transforms
+on spatial vectors.  To do this, you might be using fixed-size 4 x 4 matrices
+and fixed size column vectors of size 4 x 1.  To test your new algorithm(s),
+you could specialize the multiplication traits, which might look like this:
+
+~~~~
+template<>
+struct matrix_multiplication_traits<fs_matrix<float, 4, 4>, 
+                                    fs_column_vector<float, 4>, 
+                                    default_matrix_operator_traits>
+{
+    using engine_type = matrix_multiplication_engine_t<fs_matrix<float, 4, 4>::engine_type, 
+                                                       fs_column_vector<float, 4>::engine_type>;
+
+    using result_type = column_vector<engine_type, default_matrix_operator_traits>;
+
+    static result_type  multiply(fs_matrix<float, 4, 4> const& m1, 
+                                 fs_column_vector<float, 4> const& cv2);
+};
+~~~~
+
+With this specialization visible, the following code would call the new,
+specialized `multiply()` member function, and thus employ your new algorithm:
+
+~~~~
+void f()
+{
+    fs_matrix<float, 4, 4>      m1;
+    fs_column_vector<float, 4>  cv1, cvr;
+
+    cvr = m1 * cv1;
+}
+~~~~
 
 # Ongoing Work / Future Directions
 
