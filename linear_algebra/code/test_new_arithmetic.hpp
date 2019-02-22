@@ -23,25 +23,7 @@ struct matrix_addition_traits<matrix<fs_matrix_engine_tst<T1, R, C>, OTR>,
                             return result_type();
                         }
 };
-/*
-template<class T1, class T2>
-struct matrix_multiplication_traits<matrix<fs_matrix_engine<T1, 4, 4>, default_matrix_operator_traits>, 
-                                    column_vector<fs_matrix_engine<T2, 4, 1>, default_matrix_operator_traits>, 
-                                    default_matrix_operator_traits>
-{
-    using engine_type = matrix_multiplication_engine_t<fs_matrix_engine<T1, 4, 4>, 
-                                                       fs_matrix_engine<T2, 4, 1>>;
 
-    using result_type = column_vector<engine_type, default_matrix_operator_traits>;
-
-    static result_type  multiply(matrix<fs_matrix_engine<T1, 4, 4>, default_matrix_operator_traits> const& m1, 
-                                 column_vector<fs_matrix_engine<T2, 4, 1>, default_matrix_operator_traits> const& cv2)
-                        {
-                            PrintOperandTypes<result_type>("multiplication_traits_4x4*4x1", m1, cv2);
-                            return result_type();
-                        }
-};
-*/
 template<>
 struct matrix_multiplication_traits<fs_matrix<float, 4, 4>, 
                                     fs_column_vector<float, 4>, 
