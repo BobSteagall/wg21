@@ -6,6 +6,8 @@
 #include <memory>
 #include <tuple>
 #include <type_traits>
+#include <typeinfo>
+#include <string_view>
 
 //- These are some helpers, used for printing useful information.
 //
