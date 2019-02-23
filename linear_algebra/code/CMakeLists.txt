@@ -17,8 +17,8 @@ set(Includes
 )
 
 set(Sources
-    interface_test_01.cpp
-    interface_test_02.cpp
+    test_01.cpp
+    test_02.cpp
 )
 
 include_directories(.)
