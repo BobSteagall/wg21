@@ -62,6 +62,7 @@ using std::endl;
 //
 //#define STD_LA  std
 #define STD_LA  la
+//#define STD_LA  std::math
 //#define STD_LA  std::experimental::la
 
 
