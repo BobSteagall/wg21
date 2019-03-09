@@ -1,0 +1,386 @@
+Wed 06 Mar 2019
+C++ linear algebra phone meeting
+
+Present:
+
+  - Bob Steagall (BS) (leading)
+  - Mark Hoemmen (MH)
+  - Jayesh Badwaik (JB)
+  - Cem Bassoy (CB)
+  - Klaus Iglberger (KI)
+  - Graham Lopez (GL)
+  - Andrew Lumsdaine (AL)
+  - Michael Wong (MW)
+  - Charles Bay (CB2)
+
+MH: I met Jeff Hammond at SIAM CSE last week.  He expressed the wish
+that a linear algebra proposal include or at least be open to tensor
+algebra.  I suggested that he write a tensor proposal, since we didn't
+have any at the Kona meeting and he is an expert.  He wishes he had
+time to write a tensor proposal.
+
+CB: I have a couple suggestions for recent tensor papers to read.
+
+  1. "High-Performance tensor contraction without transposition,"
+     Davin Matthews. I think Jeff [Hammond] might have even worked
+     with him.  https://epubs.siam.org/doi/abs/10.1137/16M108968X 
+
+  2. "Design of a High-Performance GEMM-like Tensor-Tensor
+     Multiplication," Paul Springer:
+      https://dl.acm.org/citation.cfm?id=3157733
+
+---
+
+BS: In my e-mail, I circulated a write-up by JB, called "Some
+Observations on Implementation of P1385."  Shall we begin by
+discussing this paper?
+
+JB: I think some of my points in the "some observations" paper were
+addressed in the minutes from the Kona meeting; let's talk about that
+first.
+
+BS: I just got minutes from LEWG-I yesterday, so I haven't yet
+incorporated their feedback into 1385.  I will do so then submit a new
+version of P1385 for the post-Kona-meeting mailing.  What we learned:
+
+  1. Indexing: Everyone strongly in favor of zero-based indexing.
+  2. Against separate row vector vs. column vector types; want one
+     vector type, with context-dependent orientation.
+  3. Star would default to inner; explicit outer product.
+  4. Explore Engine types, to implement in terms of mdspan, to get
+     reuse.  Also need storage.
+  5. Explciitly like named functions, in addition to operators.
+
+Andrew Lumsdaine, original author of the Matrix Template Library
+(MTL), presented both in LEWG-I and at the SG14/19 combined session.
+At end of day, after his MTL presentation, I debriefed with him.  He
+thinks our approach is good.
+
+Vincent Reverdy raised a point about the naming of Vector -- see
+review attached to meeting notice.  "Hypermatrix" etc.  He objects to
+the name "vector."  I have a different objection to the name "vector"
+-- it would collide with std::vector -- unless we put it in a
+different namespace.  A proposal for named constants would live in the
+std::math namespace, so perhaps we could use std::math for our vector
+type.
+
+MH: I brought up this issue with Jeff Hammond last week.  JH pointed
+out that there are three main communities of tensor users: general
+relativity, quantum chemistry, and machine learning.  Vincent does
+general relativity.  JH says that quantum chemistry and machine
+learning have needs that are most alike.  I'm not saying we should
+marginalize Vincent's needs, but it could also be true that the
+largest community of users is less concerned about careful
+distinctions between hypermatrices, matrices, vectors, and tensors.
+
+GL: Regardless of the representation share of the tensor community, it
+seems like, at very start, what we're doing here with the linear
+algebra proposal, something like tensors could be built on top of it.
+We don't need to design a tensor library at the same time.  If we do a
+good job with these lower-level designs, tensors could reuse all of
+this.  It's a tangential issue anyway.
+
+JB: Linear algebra objects have very common names, like "vector."
+This suggests that there should be a separate namespace for linear
+algebra.  I'm not sure how enthusiastic the Committee would be about
+that.  Did you get feedback?
+
+BS: Titus Winters (chairman of LEWG) will push back against having new
+namespaces.  He doesn't want an explosion of subnamespaces.  But if
+you can make a convincing case, I don't think he would stand against
+it.  For example, a convincing case was made for the chrono namespace
+and literals.
+
+[AL & MW enter]
+
+GL: If we need to push for a new namespace, we would have more weight
+pushing for "math" than for [something like] "linear_algebra."
+
+BS: That was feedback from LEWG-I and the SG14/19 combined meeting.
+More feedback: Not reflected in poll but was in LEWG-I minutes: They
+want P1385 to have more discussion of prior art.  SG20 feedback: They
+want a "Gor table" (see P1362R0, Section 4.4) -- showing feature
+levels and anticipated user sophistication for each.  SG20 would like
+authors of new papers to include tables like this.  We generally got
+favorable feedback from both rooms.  Working in strawman
+implementation repository.  If anyone wants to try implementing
+arithmetic traits, even in naive way that returns temporaries, please
+feel welcome.  Some people -- JB and KI already -- have already tried
+implementing P1385.
+
+MH: We plan to write a paper on a low-level interface, and want that
+to be complementary to P1385.  Christian Trott (CT) and I discussed
+this with you at Kona.
+
+BS: Great idea, would like to help, map primitive ops to corresponding
+arithmetic traits, see how they fit.
+
+MH: We don't have a proposal yet, and are not sure if we will make the
+post-Kona-meeting mailing deadline, but do plan to submit at least for
+the pre-Cologne-meeting deadline.  We will keep in touch with you
+about it.
+
+---
+
+BS: Let's talk about JB's write-up "some observations."
+
+JB: I'll share my own screen.  I started implementing this before the
+Kona meeting, so this is based on P1385P0.  First, in the Standard
+Template Library, we have sort algorithm, can provide it with any kind
+of container which has begin and end.  Do we want similar thing with
+the linear algebra library, so that users can give it different linear
+algebra data structures?
+
+AL: Yes, I think we need to.  What made the STL successful was its
+openness.  Need not be based on iterators, could be generic indexing
+syntax.
+
+MH: First, we have the experience that users treat matrix data
+structures as data containers to share between software modules.  For
+example, users use Trilinos' matrix data structures well beyond the
+original intended use case.  Thus, it would be good for a linear
+algebra library to be able to work with users' data structures, rather
+than mandating a particular data structure.  Second, mdspan offers a
+generic indexing syntax.
+
+AL: There's a difference between users' use of a matrix, and
+implementing the functions over it.  mdspan could be a matrix at the
+implementation level.
+
+MH: I agree.  Also, mdspan is not necessarily a matrix at the user
+level, for reasons discussed in my Kona talk.
+
+JB: Regarding engine promotion traits for arithmetic operations: if
+Engine1 and Engine2 are standard types, then we can decide what to do.
+If one is a user's type, the user can decide.  What if both are
+[different] user types?  Then best is that no one would specify what
+would happen in that case.
+
+BS: Two situations there.  JB's example, two diff engine types, one
+from library1 and one from library2.  Implementers of the two
+libraries don't know anything about each other.  User wants to use the
+lbiraries together in a mixed expression.  No predefined way to
+determined how to promote.
+
+JB: Yes, and best practice would be not to define it.
+
+BS: Yes.  In the strawman implementation, and how Guy and I envisioned
+it, that would be a case where the library provides no guidance.  No
+default promotion.  User would have to create their own traits and
+decide how to promote.  It might be a third engine type altogether.
+
+JB: Even then, if library1 and library2 do different things, this might
+introduce bugs in the code.
+
+CB: I agree with Bob: it's the responsibility of the library user; we
+can't ensure, except with concepts, that there is a certain type given
+out.
+
+JB: I agree with that.  But even the user cannot do it very well --
+they would have to redefine all the machinery on their own.
+
+BS: Definitely that's true.  However, today, if you had two linear
+algebra libraries and you wanted to mix their types, could you even do
+it?
+
+JB: No, you couldn't.
+
+BS: So, our hope is that at least by providing this traits mechanism,
+permitting user specialization, it would help a sufficiently motivated
+user solve this problem.
+
+JB: I think I have a solution to this issue, which I'll present.  Keep
+that in mind.  See Point (3) of my paper.
+
+BS: About your Point (4): It's not clear that we want to require that
+elements are fields.  Some people wanted quaternions, which do not
+obey all the field axioms.
+
+MH: Also, some people want to express graph algorithms using linear
+algebra operations [see e.g., the GraphBLAS effort].  In that case,
+the ring axioms or even less suffice for matrix entries.
+
+JB: That takes care of Point (5).  Point (6) handled in meeting
+minutes.  Point (7): minutes said that Kronecker vs. outer product are
+different.  I'm still not decided on the position.
+
+BS: Vector / matrix of dimension 1 / 1x1, mathematically, is
+synonymous with an instance of the element type.  Problem is getting
+C++ type system to conform.
+
+[Charles Bay (CB2) joins]
+
+BS: If fixed size engine, size 1, then can have conversion operator,
+no performance cost.
+
+MH: That may be true mathematically, but may not be true in the
+computer science sense.  A scalar value is immediately available.
+Accessing an entry in a matrix may require dereferencing a pointer, or
+something even more complicated [when using mdspan with a custom
+access policy].  The referenced datum may be expensive to access --
+for example, it may live on a GPU.
+
+BS: For static matrix storage, should be minimum run-time cost.  For
+dynamic storage, would require run-time check.  This is one reason why
+we pushed for row vs. column vectors to have different types -- so
+that the multiply operation could return a scalar in that case,
+instead of a 1x1 matrix.
+
+MH: GPU example, may not want 1x1 to behave like scalar value always.
+
+JB: I'll show how I dealt with the problem of different traits /
+types.  addition_trait, subtraction_trait, negation_trait.  On
+right-hand side, I have a custom class (jvector), in my own namespace
+(testlac).  I gave jvector an execution policy (EP) template
+parameter.  All types that want to interact with the standard library
+should have this parameter.  Then we can specialize the traits; they
+only define result type, not how to compute.  Then I defined separate
+traits classes, called "engines," templated on EP, that define how to
+compute e.g., negation, addition, and subtraction.  I specialize the
+engines for my own execution policy.  I show different execution
+policies; some can be provided by default.  Now, since execution
+policy is just a tag, we can demand a templated move constructor, that
+moves a jvector with one policy into a jvector with another policy.
+That's a cheap conversion from one to another.  Now we can demand that
+for any operations, the two execution policies must be the same.  Now
+all the arithmetic operations can work.  Addition engine can just call
+already implemented addition engines, if they want to reuse something
+that's already been done.  I've been able to have, for example, a
+"verbose" policy [representing a custom user policy] and a
+system-provided policy, with a static vector templated on the
+execution policy and other stuff, and a different vector class, and I
+can combine them in arithmetic operations.  Another advantage: suppose
+you have a tridiagonal matrix, but no arithmetic -- then you can
+define your own execution policy, with existing containers, and you
+can specialize that matrix multiplication operation and use it in your
+code.  Main idea is that we should require that every type which wants
+to deal with our linear algebra library, should have this template
+parameter.  Need more experiments to see whether this works.  See code
+in my GitHub repository.
+
+MH: JB, you require that the matrix or vector type take this
+"execution policy" template parameter.  What if a given execution
+policy is not compatible with my matrix type?  For example, I may have
+a matrix that stores data on the GPU, so that it's not even correct to
+execute on the CPU.
+
+JB: First, could use static_assert to restrict type, but then your
+class would need to know what to exclude.
+
+CB: Eigen's tensor library has a solution to this.  It uses expression
+templates for that.  You don't clip [attach] the execution policy to
+the matrix or vector -- instead, you say to the expression that you
+want to have it executed on the GPU, for instance.  C.on(gpu) = A+B.
+When operator= evaluates the expression, the ".on(gpu)" tells it to
+run on the GPU.
+
+BS: MH and Christian Trott in Kona suggested a similar syntax for
+this.  I agree that it would make sense for our proposal, and it seems
+easy to do.  JB, I like exec policy, ties into that conversation, but
+I haven't had time to study your code since the latest developments.
+
+MH: It sounds like the "C.on(gpu)" syntax, and JB's move constructor
+(that is meant to allow changing the execution policy cheaply) are
+trying to address the same issue.
+
+CB (?): The problem is that there are two competing execution policies
+with the Engine.  I don't know how to solve; gets complicated... I
+would rather like to have an expression to be executed on the GPU.
+
+JB: I thought about tthis.  Issue is that the types of the matrix or
+vector can also affect how you want to execute -- e.g., sparse matrix
+needs different iteration.  Policy is based on type as well, not just
+expression.
+
+MH: JB, your "execution policy" conflates _where_ to run, vs. how to
+iterate or access the matrix.
+
+JB: They are conflated.  [Sparse matrix example.]
+
+MH: I could see that, e.g., for hardware that has a special execution
+path for sparse matrix-vector multiply.
+
+JB: This is my solution for the traits not matching.
+
+BS: Any more questions or comments?
+
+MH: We just need to look a bit more.
+
+BS (? or JB): Should I continue?
+
+MH: Yes, it's good for more of us to try implementing this, so we can
+discover any issues.
+
+BS: I'd like some time to study what you [JB] have, and to combine
+that with what I've learend from Mark and Christian and Graham, and
+see how that impacts our paper.  JB, if you have suggestions for
+execution policies in our paper, we'd love to hear them.  Keep
+exploring.
+
+---
+
+BS: Next steps for P1385: Incorporate Kona feedback into post-meeting
+paper, now extra avenue of research raised by JB to think about before
+Cologne.
+
+MH: [discusses plan for low-level linear algebra interface paper, to
+be complementary to P1385]
+
+BS: Succession papers?  MH mentioned one, JB may decide to write one
+too, up to you.  Guy and I would like to encourage people to write
+papers.  We want to build linear algebra momentum.  For example, a
+succession paper could propose an interface for doing matrix
+decompositions [like LU or QR]; here's what the input and output types
+would look like, based on 1385.  Comments or discussion?
+
+CB: Have you thought about views?  Sections or ranges of matrices and
+vectors?
+
+BS: Yes, at bottom of D1385R1, Section 9, third bullet, would address
+that.  Could have views of a vector, matrix, etc.  Does that answer
+your question?
+
+CB: Yes.  I think we need that.
+
+AL: This is where mdspan becomes very powerful.  You can define a
+separately indexable thing over the same data.  LAPACK and standard
+textbook linear algebra algorithms require / are written in terms of
+subviews.  Also needed for blocking and parallelization.
+
+BS: I agree with AL.  This would be a perfect way to test mdspan in
+terms of two nonowning view types -- one const, one mutable -- need
+the latter for decompositions.  Definitnely on TODO list.
+
+CB: I could help with that; I've implemented such things.
+
+BS: OK, connect with me offline.
+
+MW: You technically don't have to go through LEWG-I [for review].  I
+spoke with (? ...) about this, since there has been some confusion.
+It's normal for papers that pass SG review to go straight to LEWG or
+EWG.  Thus, it's up to you, Bob, to decide whether you get periodic
+[LEWG-I] reviews.  Normally, a paper that comes out of SG14 or SG19
+would go directly to LEWG or EWG.  But thank you, I'm really glad of
+the implementation that is coming out of JB's work.
+
+AL: Course I've been teaching at UW, simple linear algebra library,
+compatible with design being proposed here.
+
+MW: Good validation.
+
+---
+
+BS: Open floor to misc topics.
+
+MH: Bob, you mentioned getting feedback on P1385 asking for prior art.
+I do plan on expanding the history paper (P1417) to include new
+material, based on both what I've found and what AL sent me.  However,
+I imagine that they would want P1385 to do more than just review
+existing work -- they would want to see how that work connects with
+your design.  This would mean that an expansion of P1417 wouldn't
+suffice; you would also need to add material to P1385 relating to your
+design.
+
+[Bob acknowledges this.]
+
+
