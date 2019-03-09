@@ -1,0 +1,157 @@
+SG14 SIG Call
+Date: February 6, 2019
+Time: 21:00 CET
+Note Taker: Jayesh Badwaik
+
+Bob lists out the agenda and asks for volunteer to discuss them.
+Mentions P1385R1 to be complete by Kona
+Asks if someone wants to discuss P1166R0? No takers.
+Asks if someone wants to discuss P1416R0? No takers.
+Discussion about P1416R0 deferred to Kona face to face meetings.
+
+
+Asks for volunteers for P1417?
+Jayesh talks about Joel's observations about expression templates.
+
+Cem Bassoy mentions how there are two types of expression templates and their
+impact on the decision.
+
+Michael Wong mentions that he has his own ET types and will follow up on it.
+
+Cem Bassoy talks about fixing misleading description of matrix operations about
+Matlab in the paper.
+
+Nothing more on the paper. The dicussion proceeds to P1385 where Bob starts
+describing the paper.
+
+Bob:
+By high performance, the paper means: reasonably high performance. Not extreme
+high performance.
+There are people working in labs are looking for highest possible performance.
+For them, ability to tune and customize is key.
+
+ And take care to ensure that the tunability and customization
+of interface is maintained to ensure that high performance algorithms can be
+implemented.
+
+The objective is to provide an interface specification and not an
+implementation.
+
+The objective is for the interface to be intuitive, expressive and provide Out
+of the box performance (Rivaling calls to Blaze/LAPACK) within 80-90% of the
+possible performance range.
+
+It should provide basic build blocks to manage things like layout, access to
+memory.
+
+Building blocks could also be used to represent other mathematical things of
+interest like Quaternions, Tensors etc, but that is for later.
+
+It should provide straightforward set of facilities for customization.
+
+Bob then describes the notation in the paper to solve ambiguities between
+fields of computer science and mathematics and points out definitions which are
+different in the two fields.
+
+Cem Bassoy talks about using field as element types. Bob responds that talking
+to Casey Carter indicates that using Concepts to do that is extremely
+difficult.
+
+Jayesh says that one of the best ways to do it is manually specifying which
+type is field, since the actualy float point numbers (as specified by the IEEE
+Standards) are not a field due to NaNs and negative and positive zero.
+
+Bob explains 3.2 with special mention to MathObj. He explains how rank for
+tensor and matrix are ambigous.
+
+Cem Bassoy: says that rank is also referred to an order and may be that can be used.
+
+Bob then proceeds to overloaded terms and disambiguate the two things.
+
+Bob then proceeds to Layered approach about linear algebra and explains that
+the paper is the fundamental services only proposal as listed in 4.1 of the
+paper.
+
+Bob then moves onto tensor and explains why to exclude tensors from the design
+and not to combine the design. Similar logic for quaternions and octonions.
+
+Cem Bassoy asks a question about quaternions and octonions.
+
+Bob clarifies that the only intent is to separate quaternions completely, and
+clarifies that using the example of compledx numbers. Even though complex
+number can be represented by the vector, it is not a vector and hence should be
+modeled by a different type.
+
+Bob then goes onto the section of design aspects (Section 5.3)
+
+Jeff Hammond notes that Fortran allows any indexing range and says that C++
+should go that route for allowing arbitrary indexing.  He says there is
+tremendous value in having both 0 and 1, and once you are supporting two, you
+might as well support arbitrary ones. He gives an example of angular momentum.
+
+Ronan Keryell says that mdspace proposal is very similar. Michael supports the
+idea or 0 or 1.
+
+Bob explains his motivation of 1-based indexing, that it's easier for people to
+transfer algorithms from book to code directly.
+
+Bob then moves onto Element Type.
+
+Bob asks question about mixed element types (section 5.11) and how to deal with it.
+
+Bob brings up constexpr of linear algebra and requests for ideas on how to make
+it work with linear algebra in general.
+
+Cem Bassoy wants some elaboration on parallelism and SIMD.
+
+Bob gives an example of how a multiplication trait can be specialized for a
+certain type to give a SIMD implementation of the type multiplication.
+
+Cem Bassoy asks if there has been any thought about execution polcies.
+
+The discussion now moves onto section 6. Even though its an R1 draft, the
+interface is R0.  No big surprises there. Fundamental design principles are
+unchanged. They take a bottom up approach instead of top down. An engine type
+is something that is responsible for something managing storage.
+
+The real difference for the dynamic engine is in the methods having to do with
+changing the size and capacity.
+
+Jeff Hammond: Says that for complex numbers, its better to have much better to
+have more, because Lapack sometimes wants transpose without conjugate,
+sometimes without.  Jeff asks for a template parameter based engine.  Bob says
+that it will be possible to do so  based on templated engine. And since, engine
+knows the element type, it can be then be optimized for it.
+
+Jeff says that part of the thinking in being careful about this is that, the
+design should not actively interfering with SIMD as the similar fault exists
+with `std::reduce`.
+
+Bob would allow one to create additional engines or at least not preclude one
+from getting performance.
+
+Now, we move onto the traits.
+
+Partial specialization of traits in 6.3 traits is suggested to be allowed.
+
+Bob mentions the repo of the paper and the interface code and mentions that in
+the repo.
+
+Unfortunately, the standard library does not allow mixed element types in
+complex which is the subject of a different paper by Bob.
+
+Promotion traits for negation are trivial.
+
+Bob explains, why have a separate promotion type for engines. The reason to
+keep them separate, that way the implementer might to use expression templates
+as the result. by not specifying that, the freedom is to the implementer and
+this promotion type traits allow that flexibility.
+
+Bob then descirbes the Mathematical Types in Section 6.2
+
+Guy Davidson tells us that he presented the paper on Tuesday on CpponSea and
+the reception of encouraging. There is real enthusiasm for the paper.
+
+Bob then closes out the meeting.
+
+
