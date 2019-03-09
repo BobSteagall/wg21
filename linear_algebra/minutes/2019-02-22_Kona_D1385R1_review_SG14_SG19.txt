@@ -1,0 +1,100 @@
+D1385R1: SG14/19
+
+Bob presenting:
+
+Bob: in terms of regular users, we're trying to support ease of use, meaning expressiveness, and reasonable performance out of the box
+Bob: having overloaded operators that looks and feel like what they see in textbooks is a must-have for games programmers
+Bob: others users will want the best possible performance and will want to tweak everything to get maximum out of the hardware
+Bob: games programmers use lots of small matrices. They're the ideal users
+Bob: HPC user matrices are very large
+Vincent: a part of the HPC commnity has tens of billions of small matrices, e.g. for general relativity
+Bob: we try to address these two "markets" based on our perception of their needs: an interface that's intuitive and usable, a set of reusable building blocks for the vocabulary types, as well as highly customizable facilities to allow optimization for specific problems on specific hardware
+Bob: we want to minimize boilerplate code required for customization
+Michael: have you thought of using concepts?
+Bob: the point of the paper is to make sure the design makes sense from a high-level perspective. We're deferring constexpr and concepts, but it's on the radad
+Mark: there are nice models for pre-concepts concepts in existing library
+Michael: constexpr, concepts, parallelization and heterogeneous are things to consider
+Bob: we try to define workable and correct definitions for the key ideas and operations expected from such a library
+Bob: we also offer a list of terms from computer science (but in the C++ sense) to avoid ambiguous interpretation
+Bob: en engine manages resources associated with a math object
+Bob: among other things, we use the term vector in the mathematical sense
+Mark: we hope to make vocabulary and concepts converge with what is being done with mdspan
+Bob: our target is C++23, and we progress iteratively
+Bob: we decided to delay tensor support to C++26, due to the scope of such an effort
+Christian: I'd like to have a discussion on tensors later, as I'm not sure we should address this
+Vincent: I have a presentation on this, later
+Bob: GuyD and I are not sure we could complete such an undertaking for C++23
+GuyS: for game developers, this library will be less useful without quaternions
+GuyD: I agree, but we'll add it incrementally
+Andrew: quaternions are otrhogonal to linear algebra
+GuyD: I agree, and maths are underrepresented in the standard
+GuyS: thank you, I was scared we were throwing them away
+Bob: we see quaternions and octonions as complementary types
+Michael: should they be developed in parallel on in sequence?
+Bob: in parallel. I welcome a quaternion library; being rings, not fields, they will be a good test for the library
+Graham: I hoped for sequential development, to reuse the rest of the library
+GuyD: this would slow down our progress
+Mark: when people develop tensor libraries, they reach for the BLAS
+Bob: we allow for parametric memory source management
+Bob: we also allow for parametric addressing model, using fancy pointers
+Christian: do you have composable ownership semantics?
+Bob: yes
+(discussion ensues with respect to 1-based indexing vs 0-based indexing)
+Bob: if only for performance reasons, let's stick to 0-based
+Break starts at 9:48
+
+Work resumes at 10:11
+
+Bob: we can envision expressions with mixed element types
+Bob explains how customization is expected to be done, e.g. to benefit from intrinsics or SIMD instructions
+Bob presents considerations with respect to constexpr in the library
+Bob suggests we skip section 6 first, seeing an example in section 7, then returning to section 6
+Bob presents a design based on layered traits for elements, promotion, arithmetic, operators...
+Christian: a related property of this is that for parallel computation with executors, we might hit a case where objects don't agree on execution. One can specialize operator traits to decide what to do
+Bob illustrates the design using a multiplication of a fixed sized matrix of double with a dynamically resizable matrix of floats
+Paul: this shows how we could special-case matrices of specific dimensions
+Bob: yes, through partial specialization of names found in the std:: namespace
+Mark: it's an example of customization for special use-cases
+Paul: engine promotion is just a metafunction, so engine promotion would be a somewhat trivial task?
+Bob explains the nuances between element_type and engine_type
+Bob: there's a strawman implementation in the Github repo
+Mark: since std::allocator returns raw pointers, there's no ownership attached. Matrices are owning
+Bob: engine types are owning. This is intended to be similar in design to standard containers, which will be clearer when we go back and look at the implementation
+Christian: we need things more like containers, which is probably the right thing for small matrices, but not for huge matrices where view semantics are better
+Mark: I thing the customization points provided can deliver
+Bob: engine types can be owning or non-owning
+Patrice recommends Bob reads the matrix_multiplication_traits expanded example aloud at conferences, like Michael Caisse did with his Standard Slam in the past
+Christian: I agree with the conceptual components proposed. I'm not sure that the general design with engines and partial specializations (instead of concept customization points) are the right approach. It's not a fundamental issue, and all components shown for customizability are the right ones, the thing that remains to be seen is if we're doing it the right way
+Bob: the question is whether we cover the needs of 80% of our users out of the box
+Paul: can you put in your own engine?
+Bob: yes, and in your own namespace. There's an example used for debugging purposes in the document
+Christian: I don't think the current engines will suffice for 80% of the users. I need a fixed sized engine with an allocator but which doesn't own its memory. There are many orthogonal dimensions
+Bob: I will buy your argument, that's a very good idea
+GuyD: we could add that with additional succession papers
+Andreas: I agree that we should not standardize an engine that's not orthogonal enough. I think we should start with a small subset, assess what makes sense, and build from orthogonal parts
+Mark: no similarly designed matrix library exists
+GuyD: Matt Godbolt follows this project and will integrate it in Compiler Explorer. It will become simple to test new engine types and such, and look at the generated assembly
+GuyS: I'm in the 80%. How many in this room are too? (about half of the room)
+Patrice: cool, we just found co-authors to add stuff to the library!
+Graham: should scalar types be first-class citizens?
+Mark: they are
+Graham: if I do scalar times matrix, can scalar compete? Are they equal citizens?
+Bob: interesting question. I need to think about it
+Paul: I think it can be implemented
+Bob provides examples
+GuyS: if I'm multiplying a matrix of T with a matrix of U, how does this get resolved? (Bob explains the traits manoeuver)
+Mark: we could use defaults, but it's tricky if we target heterogeneous computing. Maybe no defaults is better
+Bob: we have defaults in the paper, but I'm not sure they're the correct ones
+Questions / answers:
+
+Mark: to me, since you're using the same names and words than other libraries, this feels like standardizing existing practice
+Bob: compiler and languages advances have really helped
+Bob: we've had guidance from LEWGI which will help us progress
+Bob: following feedback from Mark, Christian and Graham, we're revisiting some parts of the design. In the R2 version of the paper, we'll have a single vector type with an orientation based on context
+Mark: inner product is more useful that outer product in terms of operations
+Bob: this will reduce the number of traits and overloads, as well as the number of ADL attack vectors
+Bob: the reference implementation on Github is for debugging purposes only
+Michael: objection to encouraging further work? (none)
+Christian: we should specify the scope of what we wanrt to see in C++23 in order to focus our efforts
+Michael: we'll discuss in the next telecon on March 6
+Applause.
