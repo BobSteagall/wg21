@@ -2548,7 +2548,7 @@ There were some additional requests:
 + In this session, there was very broad agreement that the one-vector approach
   advocated by LEWG(I) was the way to proceed.
 
-+ Outer product computation is rare in practice, so, the vector-vector 
++ Outer product computation is rare in practice, therefore the vector-vector 
   multiplication operator should return the inner product, and the outer
   product should be a named function.
 
