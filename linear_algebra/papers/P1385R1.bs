@@ -18,7 +18,7 @@ Abstract: This document proposes an interface specification for a set of fundame
 
 ## Revision History
 
-<table style="width: 100%;">
+<table id="t01" style="width: 100%;">
   <tr>
     <th style="text-align: center;"> Version </th>
     <th style="text-align: left;"> Description </th>
@@ -32,7 +32,8 @@ Abstract: This document proposes an interface specification for a set of fundame
   <tr>
     <td style="text-align: center;"> D1 </td>
     <td>
-      Update for presentation at Kona; includes operator traits.
+      Update for presentation at Kona; includes operator traits, some
+      customization examples, and several typo and readability fixes.
     </td>
   </tr>
   <tr>
@@ -2545,7 +2546,7 @@ There were some additional requests:
 
 + Provide a fixed-size engine whose memory is dynamically allocated.
   
-+ In this session, there was very broad agreement that the one-vector approach
++ In this session, there was broad agreement that the one-vector approach
   advocated by LEWG(I) was the way to proceed.
 
 + Outer product computation is rare in practice, therefore the vector-vector 
@@ -2553,12 +2554,13 @@ There were some additional requests:
   product should be a named function.
 
 
-### Other Suggestions Gathered at the Meeting
+### Other Suggestions Gathered Received at Kona
 
-+ Experiment with executors for concurrent operations. 
++ Figure out how to incorporate executors for concurrent operations. 
   
-+ Include a "Gor table" (see [P1362R0](http://wg21.link/p1362r0), Section 
-  4.4) showing feature levels and anticipated user sophistication for each.
++ Per SG20's recent guidance, include a "Gor table" (for example, see 
+  [P1362R0](http://wg21.link/p1362r0), Section 4.4) showing feature levels 
+   and anticipated user sophistication for each.
 
 + Include tutorial material on how the library can be used and extended, with
   several illustrative examples.
