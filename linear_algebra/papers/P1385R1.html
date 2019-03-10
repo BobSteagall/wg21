@@ -1439,7 +1439,7 @@ pre .property::before, pre .property::after {
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">[linear.algebra]R1<br>A proposal to add linear algebra support to the C++ standard library</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Working Draft, <time class="dt-updated" datetime="2019-03-09">2019-03-09</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Working Draft, <time class="dt-updated" datetime="2019-03-10">2019-03-10</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1586,14 +1586,14 @@ pre .property::before, pre .property::after {
        <ol class="toc">
         <li><a href="#lewg-i-polls-and-feedback-wednesday-2019-02-20"><span class="secno">9.1.1</span> <span class="content">LEWG(I) Polls and Feedback (Wednesday 2019-02-20)</span></a>
         <li><a href="#feedback-from-joint-sg14-sg19-session-friday-2019-02-22"><span class="secno">9.1.2</span> <span class="content">Feedback From Joint SG14/SG19 Session (Friday 2019-02-22)</span></a>
-        <li><a href="#other-suggestions-gathered-at-the-meeting"><span class="secno">9.1.3</span> <span class="content">Other Suggestions Gathered at the Meeting</span></a>
+        <li><a href="#other-suggestions-gathered-received-at-kona"><span class="secno">9.1.3</span> <span class="content">Other Suggestions Gathered Received at Kona</span></a>
        </ol>
      </ol>
    </ol>
   </nav>
   <main>
    <h3 class="heading settled" id="revision-history"><span class="content">Revision History</span></h3>
-   <table style="width: 100%;">
+   <table id="t01" style="width: 100%;">
     <tbody>
      <tr>
       <th style="text-align: center;"> Version 
@@ -1603,7 +1603,8 @@ pre .property::before, pre .property::after {
       <td> Inital version for pre-Kona mailing 
      <tr>
       <td style="text-align: center;"> D1 
-      <td> Update for presentation at Kona; includes operator traits. 
+      <td> Update for presentation at Kona; includes operator traits, some
+      customization examples, and several typo and readability fixes. 
      <tr>
       <td style="text-align: center;"> R1 
       <td> Update for post-Kona mailing; includes feedback from LEWG(I) and joint
@@ -3780,20 +3781,20 @@ future directions were taken.</p>
     <li data-md>
      <p>Provide a fixed-size engine whose memory is dynamically allocated.</p>
     <li data-md>
-     <p>In this session, there was very broad agreement that the one-vector approach
+     <p>In this session, there was broad agreement that the one-vector approach
   advocated by LEWG(I) was the way to proceed.</p>
     <li data-md>
-     <p>Outer product computation is rare in practice, so, the vector-vector
+     <p>Outer product computation is rare in practice, therefore the vector-vector
   multiplication operator should return the inner product, and the outer
   product should be a named function.</p>
    </ul>
-   <h4 class="heading settled" data-level="9.1.3" id="other-suggestions-gathered-at-the-meeting"><span class="secno">9.1.3. </span><span class="content">Other Suggestions Gathered at the Meeting</span><a class="self-link" href="#other-suggestions-gathered-at-the-meeting"></a></h4>
+   <h4 class="heading settled" data-level="9.1.3" id="other-suggestions-gathered-received-at-kona"><span class="secno">9.1.3. </span><span class="content">Other Suggestions Gathered Received at Kona</span><a class="self-link" href="#other-suggestions-gathered-received-at-kona"></a></h4>
    <ul>
     <li data-md>
-     <p>Experiment with executors for concurrent operations.</p>
+     <p>Figure out how to incorporate executors for concurrent operations.</p>
     <li data-md>
-     <p>Include a "Gor table" (see <a href="http://wg21.link/p1362r0">P1362R0</a>, Section
-  4.4) showing feature levels and anticipated user sophistication for each.</p>
+     <p>Per SG20’s recent guidance, include a "Gor table" (for example, see <a href="http://wg21.link/p1362r0">P1362R0</a>, Section 4.4) showing feature levels 
+   and anticipated user sophistication for each.</p>
     <li data-md>
      <p>Include tutorial material on how the library can be used and extended, with
   several illustrative examples.</p>
