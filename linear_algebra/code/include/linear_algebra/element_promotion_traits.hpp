@@ -1,7 +1,7 @@
-#ifndef MATRIX_ELEMENT_TRAITS_HPP_DEFINED
-#define MATRIX_ELEMENT_TRAITS_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_ELEMENT_PROMOTION_TRAITS_HPP_DEFINED
+#define LINEAR_ALGEBRA_ELEMENT_PROMOTION_TRAITS_HPP_DEFINED
 
-#include "matrix_fwd.hpp"
+#include "forward_declarations.hpp"
 
 namespace STD_LA {
 //- New trait "is_complex" to detect std::complex<T> of an arithmetic type.
@@ -95,4 +95,4 @@ template<class T1, class T2>
 using matrix_element_promotion_t = typename matrix_element_promotion<T1, T2>::type;
 
 }       //- STD_LA namespace
-#endif  //- MATRIX_ELEMENT_TRAITS_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_ELEMENT_PROMOTION_TRAITS_HPP_DEFINED

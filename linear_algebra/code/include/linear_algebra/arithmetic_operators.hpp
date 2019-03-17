@@ -1,7 +1,7 @@
-#ifndef MATRIX_OPERATORS_HPP_DEFINED
-#define MATRIX_OPERATORS_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_ARITHMETIC_OPERATORS_HPP_DEFINED
+#define LINEAR_ALGEBRA_ARITHMETIC_OPERATORS_HPP_DEFINED
 
-#include "matrix_operator_traits.hpp"
+#include "operator_promotion_traits.hpp"
 
 namespace STD_LA {
 //=================================================================================================
@@ -303,4 +303,4 @@ operator *(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
 }
 
 }       //- STD_LA namespace
-#endif  //- MATRIX_OPERATORS_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_ARITHMETIC_OPERATORS_HPP_DEFINED

@@ -1,17 +1,18 @@
-#ifndef MATRIX_FWD_HPP_DEFINED
-#define MATRIX_FWD_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_FORWARD_DECLARATIONS_HPP_DEFINED
+#define LINEAR_ALGEBRA_FORWARD_DECLARATIONS_HPP_DEFINED
 
 namespace STD_LA {
-//- Verifying appropriate matrix element types.
+
+//- Traits for verifying appropriate matrix element types.
 //
 template<class T>   struct is_complex;
 template<class T>   struct is_matrix_element;
 
-//- Element promotion.
+//- A traits type for element promotion.
 //
 template<class T1, class T2>    struct matrix_element_promotion;
 
-//- Basic math object engine types.
+//- Basic linear algebra math object engine types.
 //
 template<class T, size_t R, size_t C>           class fs_matrix_engine;
 template<class T, class AT=std::allocator<T>>   class dr_matrix_engine;
@@ -47,4 +48,4 @@ struct default_matrix_operator_traits;
 template<class T1, class T2>    struct matrix_operator_traits_promotion;
 
 }       //- STD_LA namespace
-#endif  //- MATRIX_FWD_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_FORWARD_DECLARATIONS_HPP_DEFINED

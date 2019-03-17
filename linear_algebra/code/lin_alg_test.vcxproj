@@ -18,36 +18,60 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\linear_algebra.hpp" />
+    <ClInclude Include="include\linear_algebra\operator_promotion_traits.hpp" />
+    <ClInclude Include="include\linear_algebra\dynamic_engines.hpp" />
+    <ClInclude Include="include\linear_algebra\forward_declarations.hpp" />
+    <ClInclude Include="include\linear_algebra\library_aliases.hpp" />
+    <ClInclude Include="include\linear_algebra\matrix.hpp" />
+    <ClInclude Include="include\linear_algebra\arithmetic_traits.hpp" />
+    <ClInclude Include="include\linear_algebra\element_promotion_traits.hpp" />
+    <ClInclude Include="include\linear_algebra\fixed_size_engines.hpp" />
+    <ClInclude Include="include\linear_algebra\engine_promotion_traits.hpp" />
+    <ClInclude Include="include\linear_algebra\arithmetic_operators.hpp" />
+    <ClInclude Include="include\linear_algebra\matrix_test_impl.hpp" />
+    <ClInclude Include="include\linear_algebra\operator_traits.hpp" />
+    <ClInclude Include="include\linear_algebra\vector.hpp" />
+    <ClInclude Include="include\linear_algebra\view_based_engines.hpp" />
+    <ClInclude Include="test\test_new_arithmetic.hpp" />
+    <ClInclude Include="test\test_new_engine.hpp" />
+    <ClInclude Include="test\test_new_number.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="test\test_01.cpp" />
+    <ClCompile Include="test\test_02.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{8D598CBC-C629-4CC0-ACFC-E791A695ACD1}</ProjectGuid>
     <RootNamespace>linalgtest</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -69,7 +93,18 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -118,25 +153,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="matrix_test_impl.hpp" />
-    <ClInclude Include="test_new_arithmetic.hpp" />
-    <ClInclude Include="test_new_engine.hpp" />
-    <ClInclude Include="test_new_number.hpp" />
-    <ClInclude Include="linear_algebra.hpp" />
-    <ClInclude Include="matrix.hpp" />
-    <ClInclude Include="matrix_arithmetic_traits.hpp" />
-    <ClInclude Include="matrix_engine_traits.hpp" />
-    <ClInclude Include="matrix_fwd.hpp" />
-    <ClInclude Include="matrix_operators.hpp" />
-    <ClInclude Include="matrix_engines.hpp" />
-    <ClInclude Include="matrix_element_traits.hpp" />
-    <ClInclude Include="matrix_operator_traits.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="test_01.cpp" />
-    <ClCompile Include="test_02.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
