@@ -1,7 +1,9 @@
-#ifndef MATRIX_ENGINE_TRAITS_HPP_DEFINED
-#define MATRIX_ENGINE_TRAITS_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_ENGINE_PROMOTION_TRAITS_HPP_DEFINED
+#define LINEAR_ALGEBRA_ENGINE_PROMOTION_TRAITS_HPP_DEFINED
 
-#include "matrix_engines.hpp"
+#include "dynamic_engines.hpp"
+#include "fixed_size_engines.hpp"
+#include "view_based_engines.hpp"
 
 namespace STD_LA {
 //=================================================================================================
@@ -385,4 +387,4 @@ template<class ET1, class ET2>
 using matrix_multiplication_engine_t = typename matrix_multiplication_engine_promotion<ET1, ET2>::engine_type;
 
 }       //- STD_LA namespace
-#endif  //- MATRIX_ENGINE_TRAITS_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_ENGINE_PROMOTION_TRAITS_HPP_DEFINED

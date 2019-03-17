@@ -7,7 +7,9 @@
 #include <tuple>
 #include <type_traits>
 
-//- These are some helpers, used for printing useful information.
+//-------------------------------------------------------------------------------------------------
+//  Helper functions and utilities for testing the interfacce; not part of the final proposal!
+//-------------------------------------------------------------------------------------------------
 //
 #include <iostream>
 
@@ -48,7 +50,7 @@ get_type_name(T const&)
     return std::string(view.data(), view.size());
 }
 
-using std::cout;    //- Yes, we're cheating....
+using std::cout;    //- Yes, we're cheating, but only for convenience, we promise....
 using std::endl;
 
 #define PRINT_FN_NAME(name) \
@@ -58,55 +60,28 @@ using std::endl;
         << "entering test function " << #name << "()" << std::endl << std::endl
 
 
-//- Namespace alternatives for testing and avoiding ADL issues.
+//-------------------------------------------------------------------------------------------------
+//- Namespace alternatives for testing and also for detecting/avoiding ADL issues.
 //
-//#define STD_LA  std
 #define STD_LA  la
+//#define STD_LA  std
 //#define STD_LA  std::math
-//#define STD_LA  std::experimental::la
 
 
 //- OK, now include implementation headers.
 //
-#include "matrix_fwd.hpp"
-#include "matrix_element_traits.hpp"
-#include "matrix_engines.hpp"
-#include "matrix_engine_traits.hpp"
-#include "matrix.hpp"
-#include "matrix_arithmetic_traits.hpp"
-#include "matrix_operator_traits.hpp"
-#include "matrix_operators.hpp"
-#include "matrix_test_impl.hpp"
-
-namespace STD_LA {
-//- Aliases for column_vector/row_vector/matrix objects based on dynamic engines.
-//
-template<class T, class A = std::allocator<T>>
-using dyn_column_vector = column_vector<dr_matrix_engine<T, A>>;
-
-template<class T, class A = std::allocator<T>>
-using dyn_col_vector = dyn_column_vector<T, A>;
-
-template<class T, class A = std::allocator<T>>
-using dyn_row_vector = row_vector<dr_matrix_engine<T, A>>;
-
-template<class T, class A = std::allocator<T>>
-using dyn_matrix = matrix<dr_matrix_engine<T, A>>;
-
-
-//- Aliases for column_vector/row_vector/matrix objects based on fixed-size engines.
-//
-template<class T, size_t R>
-using fs_column_vector = column_vector<fs_matrix_engine<T, R, 1>>;
-
-template<class T, size_t R>
-using fs_col_vector = fs_column_vector<T, R>;
-
-template<class T, size_t C>
-using fs_row_vector = row_vector<fs_matrix_engine<T, 1, C>>;
-
-template<class T, size_t R, size_t C>
-using fs_matrix = matrix<fs_matrix_engine<T, R, C>>;
+#include "linear_algebra/forward_declarations.hpp"
+#include "linear_algebra/element_promotion_traits.hpp"
+#include "linear_algebra/dynamic_engines.hpp"
+#include "linear_algebra/fixed_size_engines.hpp"
+#include "linear_algebra/view_based_engines.hpp"
+#include "linear_algebra/engine_promotion_traits.hpp"
+#include "linear_algebra/vector.hpp"
+#include "linear_algebra/matrix.hpp"
+#include "linear_algebra/arithmetic_traits.hpp"
+#include "linear_algebra/operator_traits.hpp"
+#include "linear_algebra/operator_promotion_traits.hpp"
+#include "linear_algebra/arithmetic_operators.hpp"
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_HPP_DEFINED
