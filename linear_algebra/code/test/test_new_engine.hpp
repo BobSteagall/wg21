@@ -143,20 +143,14 @@ inline void
 fs_matrix_engine_tst<T,R,C>::swap_rows(size_t, size_t)
 {}
 
-template<class T, size_t R>
-using fs_column_vector_tst = STD_LA::column_vector<fs_matrix_engine_tst<T, R, 1>>;
-
-template<class T, size_t R>
-using fs_col_vector_tst = fs_column_vector_tst<T, R>;
-
 template<class T, size_t C>
-using fs_row_vector_tst = STD_LA::row_vector<fs_matrix_engine_tst<T, 1, C>>;
+using fs_vector_tst = STD_LA::vector<fs_matrix_engine_tst<T, 1, C>>;
 
 template<class T, size_t R, size_t C>
 using fs_matrix_tst = STD_LA::matrix<fs_matrix_engine_tst<T, R, C>>;
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
-struct STD_LA::matrix_addition_engine_promotion<fs_matrix_engine_tst<T1, R1, C1>, 
+struct STD_LA::matrix_addition_engine_promotion<fs_matrix_engine_tst<T1, R1, C1>,
                                                 fs_matrix_engine_tst<T2, R2, C2>>
 {
     static_assert(R1 == R2);
@@ -166,7 +160,7 @@ struct STD_LA::matrix_addition_engine_promotion<fs_matrix_engine_tst<T1, R1, C1>
 };
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
-struct STD_LA::matrix_addition_engine_promotion<STD_LA::fs_matrix_engine<T1, R1, C1>, 
+struct STD_LA::matrix_addition_engine_promotion<STD_LA::fs_matrix_engine<T1, R1, C1>,
                                                 fs_matrix_engine_tst<T2, R2, C2>>
 {
     static_assert(R1 == R2);
@@ -176,7 +170,7 @@ struct STD_LA::matrix_addition_engine_promotion<STD_LA::fs_matrix_engine<T1, R1,
 };
 
 template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
-struct STD_LA::matrix_addition_engine_promotion<fs_matrix_engine_tst<T1, R1, C1>, 
+struct STD_LA::matrix_addition_engine_promotion<fs_matrix_engine_tst<T1, R1, C1>,
                                                 STD_LA::fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == R2);

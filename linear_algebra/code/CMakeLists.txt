@@ -4,24 +4,34 @@ project(wg21_linear_algebra)
 include(CTest)
 
 set(Includes
-    linear_algebra.hpp
-    matrix.hpp
-    matrix_arithmetic_traits.hpp
-    matrix_element_traits.hpp
-    matrix_engine_traits.hpp
-    matrix_engines.hpp
-    matrix_fwd.hpp
-    matrix_operator_traits.hpp
-    matrix_operators.hpp
-    matrix_test_impl.hpp
+    include/linear_algebra.hpp
+    include/linear_algebra/arithmetic_operators.hpp
+    include/linear_algebra/arithmetic_traits.hpp
+    include/linear_algebra/dynamic_engines.hpp
+    include/linear_algebra/element_promotion_traits.hpp
+    include/linear_algebra/engine_promotion_traits.hpp
+    include/linear_algebra/fixed_size_engines.hpp
+    include/linear_algebra/helper_traits.hpp
+    include/linear_algebra/library_aliases.hpp
+    include/linear_algebra/matrix.hpp
+    include/linear_algebra/operator_promotion_traits.hpp
+    include/linear_algebra/operator_traits.hpp
+    include/linear_algebra/vector.hpp
+    include/linear_algebra/view_based_engines.hpp
+)
+
+set(TestIncludes
+    test/test_new_arithmetic.hpp
+    test/test_new_engine.hpp
+    test/test_new_number.hpp
 )
 
 set(Sources
-    test_01.cpp
-    test_02.cpp
+    test/test_01.cpp
+    test/test_02.cpp
 )
 
-include_directories(.)
+include_directories(include_directories(include .))
 
 add_executable(la_test ${Sources})
 
@@ -52,4 +62,3 @@ elseif(CMAKE_CXX_COMPILER STREQUAL g++)
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=westmere -std=c++17 -Wall -pedantic -Wextra -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable")
 
 endif()
-

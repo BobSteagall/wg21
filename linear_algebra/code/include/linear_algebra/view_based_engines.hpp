@@ -49,5 +49,98 @@ class matrix_transpose_engine
     engine_type* mp_other;   //- For exposition; pointer to actual engine
 };
 
+template<class ET> inline
+matrix_transpose_engine<ET>::matrix_transpose_engine()
+{}
+
+template<class ET> inline
+matrix_transpose_engine<ET>::matrix_transpose_engine(engine_type const&)
+{}
+
+template<class ET> inline
+matrix_transpose_engine<ET>::matrix_transpose_engine(matrix_transpose_engine&&)
+{}
+
+template<class ET> inline
+matrix_transpose_engine<ET>::matrix_transpose_engine(matrix_transpose_engine const&)
+{}
+
+template<class ET> inline
+matrix_transpose_engine<ET>&
+matrix_transpose_engine<ET>::operator =(matrix_transpose_engine&&)
+{
+    return *this;
+}
+
+template<class ET> inline
+matrix_transpose_engine<ET>&
+matrix_transpose_engine<ET>::operator =(matrix_transpose_engine const&)
+{
+    return *this;
+}
+
+template<class ET>
+inline typename matrix_transpose_engine<ET>::element_type
+matrix_transpose_engine<ET>::operator ()(size_t i) const
+{
+    return (*mp_other)[i];
+}
+
+template<class ET>
+inline typename matrix_transpose_engine<ET>::element_type
+matrix_transpose_engine<ET>::operator ()(size_t i, size_t j) const
+{
+    return (*mp_other)(j, i);
+}
+
+template<class ET>
+inline typename matrix_transpose_engine<ET>::element_type const*
+matrix_transpose_engine<ET>::data() const noexcept
+{
+    return mp_other->data();
+}
+
+template<class ET>
+inline size_t
+matrix_transpose_engine<ET>::columns() const noexcept
+{
+    return mp_other->rows();
+}
+
+template<class ET>
+inline size_t
+matrix_transpose_engine<ET>::rows() const noexcept
+{
+    return mp_other->columns();
+}
+
+template<class ET>
+inline typename matrix_transpose_engine<ET>::size_tuple
+matrix_transpose_engine<ET>::size() const noexcept
+{
+    return size_tuple(columns(), rows());
+}
+
+template<class ET>
+inline size_t
+matrix_transpose_engine<ET>::column_capacity() const noexcept
+{
+    return mp_other->row_capacity();
+}
+
+template<class ET>
+inline size_t
+matrix_transpose_engine<ET>::row_capacity() const noexcept
+{
+    return mp_other->column_capacity();
+}
+
+template<class ET>
+inline typename matrix_transpose_engine<ET>::size_tuple
+matrix_transpose_engine<ET>::capacity() const noexcept
+{
+    return size_tuple(column_capacity(), row_capacity());
+}
+
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_VIEW_BASED_ENGINES_HPP_DEFINED

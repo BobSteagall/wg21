@@ -81,10 +81,10 @@ void t301()
 {
     PRINT_FN_NAME(t301);
 
-    fs_matrix<float, 4, 4>      m1;
-    fs_column_vector<float, 4>  cv1, cvr;
+    fs_matrix<float, 4, 4>  m1;
+    fs_vector<float, 4>     v1, vr;
 
-    cvr = m1 * cv1;
+    vr = m1 * v1;
 }
 
 void t100()
