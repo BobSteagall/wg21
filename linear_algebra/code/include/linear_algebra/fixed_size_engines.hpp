@@ -55,5 +55,100 @@ class fs_matrix_engine
     T       ma_elems[R*C];      //- For exposition; data buffer
 };
 
+template<class T, size_t R, size_t C>
+inline T
+fs_matrix_engine<T,R,C>::operator ()(size_t i) const
+{
+    return ma_elems[i];
+}
+
+template<class T, size_t R, size_t C>
+inline T
+fs_matrix_engine<T,R,C>::operator ()(size_t i, size_t j) const
+{
+    return ma_elems[i*C + j];
+}
+
+template<class T, size_t R, size_t C>
+inline T const*
+fs_matrix_engine<T,R,C>::data() const noexcept
+{
+    return &ma_elems[0];
+}
+
+template<class T, size_t R, size_t C>
+inline size_t
+fs_matrix_engine<T,R,C>::columns() const noexcept
+{
+    return C;
+}
+
+template<class T, size_t R, size_t C>
+inline size_t
+fs_matrix_engine<T,R,C>::rows() const noexcept
+{
+    return R;
+}
+
+template<class T, size_t R, size_t C>
+inline typename fs_matrix_engine<T,R,C>::size_tuple
+fs_matrix_engine<T,R,C>::size() const noexcept
+{
+    return size_tuple(R, C);
+}
+
+template<class T, size_t R, size_t C>
+inline size_t
+fs_matrix_engine<T,R,C>::column_capacity() const noexcept
+{
+    return C;
+}
+
+template<class T, size_t R, size_t C>
+inline size_t
+fs_matrix_engine<T,R,C>::row_capacity() const noexcept
+{
+    return R;
+}
+
+template<class T, size_t R, size_t C>
+inline typename fs_matrix_engine<T,R,C>::size_tuple
+fs_matrix_engine<T,R,C>::capacity() const noexcept
+{
+    return size_tuple(R, C);
+}
+
+template<class T, size_t R, size_t C>
+inline T&
+fs_matrix_engine<T,R,C>::operator ()(size_t i)
+{
+    return ma_elems[i];
+}
+
+template<class T, size_t R, size_t C>
+inline T&
+fs_matrix_engine<T,R,C>::operator ()(size_t i, size_t j)
+{
+    return ma_elems[i*C + j];
+}
+
+template<class T, size_t R, size_t C>
+inline T*
+fs_matrix_engine<T,R,C>::data() noexcept
+{
+    return &ma_elems[0];
+}
+
+template<class T, size_t R, size_t C>
+inline void
+fs_matrix_engine<T,R,C>::swap_columns(size_t, size_t)
+{}
+
+template<class T, size_t R, size_t C>
+inline void
+fs_matrix_engine<T,R,C>::swap_rows(size_t, size_t)
+{}
+
+
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_FIXED_SIZE_ENGINES_HPP_DEFINED

@@ -64,13 +64,11 @@ void t03()
 {
     PRINT_FN_NAME(t03);
 
-    fs_col_vector<double, 3>    fcv1;
-    fs_row_vector<double, 3>    frv1;
-    fs_matrix<double, 3, 3>     fm1;
+    fs_vector<double, 3>    fv1;
+    fs_matrix<double, 3, 3> fm1;
 
-    dyn_col_vector<double>      dcv1(16);
-    dyn_row_vector<double>      drv1(16);
-    dyn_matrix<double>          dmd1(16, 16);
+    dyn_vector<double>      dv1(16);
+    dyn_matrix<double>      dmd1(16, 16);
 }
 
 void t04()
@@ -166,47 +164,6 @@ void t06()
     auto    m08 = fmf*fmf;
 }
 
-void t07()
-{
-    PRINT_FN_NAME(t07);
-
-    float       f = 1.0f;
-    double      d = 1.0;
-    cx_double   c = {1.0, 0.0};
-
-    dyn_col_vector<float>       dcvf(3);
-    dyn_col_vector<double>      dcvd(3);
-    dyn_col_vector<cx_double>   dcvc(3);
-
-    fs_col_vector<float, 3>     fcvf;
-    fs_col_vector<double, 3>    fcvd;
-    fs_col_vector<cx_double, 3> fcvc;
-
-    auto    r01 = dcvf * f;
-    auto    r02 = dcvd * d;
-    auto    r03 = dcvc * c;
-    auto    r04 = dcvf * d;
-    auto    r05 = dcvd * f;
-
-    auto    r11 = f * dcvf;
-    auto    r12 = d * dcvd;
-    auto    r13 = c * dcvc;
-    auto    r14 = d * dcvf;
-    auto    r15 = f * dcvd;
-
-    auto    r21 = fcvf * f;
-    auto    r22 = fcvd * d;
-    auto    r23 = fcvc * c;
-    auto    r24 = fcvf * d;
-    auto    r25 = fcvd * f;
-
-    auto    r31 = f * fcvf;
-    auto    r32 = d * fcvd;
-    auto    r33 = c * fcvc;
-    auto    r34 = d * fcvf;
-    auto    r35 = f * fcvd;
-}
-
 void t08()
 {
     PRINT_FN_NAME(t08);
@@ -215,176 +172,125 @@ void t08()
     double      d = 1.0;
     cx_double   c = {1.0, 0.0};
 
-    dyn_row_vector<float>       drvf(3);
-    dyn_row_vector<double>      drvd(3);
-    dyn_row_vector<cx_double>   drvc(3);
+    dyn_vector<float>       dvf(3);
+    dyn_vector<double>      dvd(3);
+    dyn_vector<cx_double>   dvc(3);
 
-    fs_row_vector<float, 3>     frvf;
-    fs_row_vector<double, 3>    frvd;
-    fs_row_vector<cx_double, 3> frvc;
+    fs_vector<float, 3>     fvf;
+    fs_vector<double, 3>    fvd;
+    fs_vector<cx_double, 3> fvc;
 
-    auto    r01 = drvf * f;
-    auto    r02 = drvd * d;
-    auto    r03 = drvc * c;
-    auto    r04 = drvf * d;
-    auto    r05 = drvd * f;
+    auto    r01 = dvf * f;
+    auto    r02 = dvd * d;
+    auto    r03 = dvc * c;
+    auto    r04 = dvf * d;
+    auto    r05 = dvd * f;
 
-    auto    r11 = f * drvf;
-    auto    r12 = d * drvd;
-    auto    r13 = c * drvc;
-    auto    r14 = d * drvf;
-    auto    r15 = f * drvd;
+    auto    r11 = f * dvf;
+    auto    r12 = d * dvd;
+    auto    r13 = c * dvc;
+    auto    r14 = d * dvf;
+    auto    r15 = f * dvd;
 
-    auto    r21 = frvf * f;
-    auto    r22 = frvd * d;
-    auto    r23 = frvc * c;
-    auto    r24 = frvf * d;
-    auto    r25 = frvd * f;
+    auto    r21 = fvf * f;
+    auto    r22 = fvd * d;
+    auto    r23 = fvc * c;
+    auto    r24 = fvf * d;
+    auto    r25 = fvd * f;
 
-    auto    r31 = f * frvf;
-    auto    r32 = d * frvd;
-    auto    r33 = c * frvc;
-    auto    r34 = d * frvf;
-    auto    r35 = f * frvd;
+    auto    r31 = f * fvf;
+    auto    r32 = d * fvd;
+    auto    r33 = c * fvc;
+    auto    r34 = d * fvf;
+    auto    r35 = f * fvd;
 }
 
 void t09()
 {
     PRINT_FN_NAME(t09);
 
-    dyn_col_vector<float>       dcvf(3);
-    dyn_col_vector<double>      dcvd(3);
+    dyn_vector<float>       dvf(3);
+    dyn_vector<double>      dvd(3);
 
-    fs_col_vector<float, 3>     fcvf;
-    fs_col_vector<double, 3>    fcvd;
+    fs_vector<float, 3>     fvf;
+    fs_vector<double, 3>    fvd;
 
-    dyn_row_vector<float>       drvf(3);
-    dyn_row_vector<double>      drvd(3);
+    auto    r11 = dvf * dvf;
+    auto    r12 = fvf * dvf;
+    auto    r13 = dvf * fvf;
+    auto    r14 = fvf * fvf;
 
-    fs_row_vector<float, 3>     frvf;
-    fs_row_vector<double, 3>    frvd;
+    auto    r21 = dvf * dvd;
+    auto    r22 = fvf * dvd;
+    auto    r23 = dvf * fvd;
+    auto    r24 = fvf * fvd;
 
-    auto    r01 = drvf * dcvf;
-    auto    r02 = frvf * dcvf;
-    auto    r03 = drvf * fcvf;
-    auto    r04 = frvf * fcvf;
-
-    auto    r11 = dcvf * drvf;
-    auto    r12 = fcvf * drvf;
-    auto    r13 = dcvf * frvf;
-    auto    r14 = fcvf * frvf;
-
-    auto    r21 = drvf * dcvd;
-    auto    r22 = frvf * dcvd;
-    auto    r23 = drvf * fcvd;
-    auto    r24 = frvf * fcvd;
-
-    auto    r31 = dcvf * drvd;
-    auto    r32 = fcvf * drvd;
-    auto    r33 = dcvf * frvd;
-    auto    r34 = fcvf * frvd;
+    auto    r31 = dvf * dvd;
+    auto    r32 = fvf * dvd;
+    auto    r33 = dvf * fvd;
+    auto    r34 = fvf * fvd;
 }
 
 void t10()
 {
     PRINT_FN_NAME(t10);
 
-    dyn_col_vector<float>       dcvf(3);
-    dyn_col_vector<double>      dcvd(3);
+    dyn_vector<float>       dvf(3);
+    dyn_vector<double>      dvd(3);
 
-    fs_col_vector<float, 3>     fcvf;
-    fs_col_vector<double, 3>    fcvd;
+    fs_vector<float, 3>     fvf;
+    fs_vector<double, 3>    fvd;
 
-    dyn_row_vector<float>       drvf(3);
-    dyn_row_vector<double>      drvd(3);
+    dyn_matrix<double>      dmd(3, 3);
+    dyn_matrix<float>       dmf(3, 3);
+    dyn_matrix<float>       dmf_cv(3, 1);
+    dyn_matrix<float>       dmf_rv(1, 3);
 
-    fs_row_vector<float, 3>     frvf;
-    fs_row_vector<double, 3>    frvd;
+    fs_matrix<double, 3, 3> fmd;
+    fs_matrix<float, 3, 3>  fmf;
+    fs_matrix<float, 3, 1>  fmf_cv;
+    fs_matrix<float, 1, 3>  fmf_rv;
 
-    dyn_matrix<double>          dmd(3, 3);
-    dyn_matrix<float>           dmf(3, 3);
-    dyn_matrix<float>           dmf_cv(3, 1);
-    dyn_matrix<float>           dmf_rv(1, 3);
+    auto    r02 = dmf_cv * dvf;     //- dyn_matrix<float>
+    auto    r03 = dvf * dmf;        //- dyn_vector<float>
 
-    fs_matrix<double, 3, 3>     fmd;
-    fs_matrix<float, 3, 3>      fmf;
-    fs_matrix<float, 3, 1>      fmf_cv;
-    fs_matrix<float, 1, 3>      fmf_rv;
+    auto    r12 = dmf_cv * dvd;     //- dyn_matrix<double>
+    auto    r13 = dvf * dmd;        //- dyn_vector<double>
 
-    auto    r01 = dmf * dcvf;       //- dyn_col_vector<float>
-    auto    r02 = dmf_cv * drvf;    //- dyn_matrix<float>
-    auto    r03 = drvf * dmf;       //- dyn_row_vector<float>
-    auto    r04 = dcvf * fmf_rv;    //- dyn_matrix<float>
+    auto    r22 = fmf_cv * fvf;     //- fs_matrix<float, 3, 3>
+    auto    r23 = fvf * fmf;        //- fs_vector<float, 3>
 
-    auto    r11 = dmf * dcvd;       //- dyn_col_vector<double>
-    auto    r12 = dmf_cv * drvd;    //- dyn_matrix<double>
-    auto    r13 = drvf * dmd;       //- dyn_row_vector<double>
-    auto    r14 = dcvd * dmf_rv;    //- dyn_matrix<double>
-
-    auto    r21 = fmf * fcvf;       //- fs_col_vector<float, 3>
-    auto    r22 = fmf_cv * frvf;    //- fs_matrix<float, 3, 3>
-    auto    r23 = frvf * fmf;       //- fs_row_vector<float, 3>
-    auto    r24 = fcvf * fmf_rv;    //- fs_matrix<float, 3, 3>
-
-    auto    r31 = fmf * fcvd;       //- fs_col_vector<double, 3>
-    auto    r32 = fmf_cv * frvd;    //- fs_matrix<double, 3, 3>
-    auto    r33 = frvf * fmd;       //- fs_row_vector<3>
-    auto    r34 = fcvd * fmf_rv;    //- fs_matrix<double, 3, 3>
-
-    auto    r41 = drvf * dcvf;      //- float
-    auto    r42 = frvf * dcvd;      //- double
-    auto    r43 = frvd * fcvd;      //- double
+    auto    r32 = fmf_cv * fvd;     //- fs_matrix<double, 3, 3>
+    auto    r33 = fvf * fmd;        //- fs_vector<3>
 }
 
 void t20()
 {
     PRINT_FN_NAME(t20);
 
-    dyn_col_vector<float>       dcvf(3, 3);
-    dyn_col_vector<double>      dcvd(3, 3);
+    dyn_vector<float>       dvf(3, 3);
+    dyn_vector<double>      dvd(3, 3);
 
-    fs_col_vector<float, 3>     fcvf;
-    fs_col_vector<double, 3>    fcvd;
+    fs_vector<float, 3>     fvf;
+    fs_vector<double, 3>    fvd;
 
-    dyn_row_vector<float>       drvf(3, 3);
-    dyn_row_vector<double>      drvd(3, 3);
+    dyn_matrix<float>       dmf(3, 3);
+    dyn_matrix<double>      dmd(3, 3);
 
-    fs_row_vector<float, 3>     frvf;
-    fs_row_vector<double, 3>    frvd;
+    fs_matrix<float, 3, 3>  fmf;
+    fs_matrix<double, 3, 3> fmd;
 
-    dyn_matrix<float>           dmf(3, 3);
-    dyn_matrix<double>          dmd(3, 3);
+    auto    r21 = dvf + dvf;
+    auto    r22 = dvf + dvd;
+    auto    r23 = dvd + dvf;
 
-    fs_matrix<float, 3, 3>      fmf;
-    fs_matrix<double, 3, 3>     fmd;
+    auto    r24 = fvf + fvf;
+    auto    r25 = fvf + fvd;
+    auto    r26 = fvd + fvf;
 
-    auto    r01 = dcvf + dcvf;
-    auto    r02 = dcvf + dcvd;
-    auto    r03 = dcvd + dcvf;
-
-    auto    r04 = fcvf + fcvf;
-    auto    r05 = fcvf + fcvd;
-    auto    r06 = fcvd + fcvf;
-
-    auto    r07 = dcvf + fcvf;
-    auto    r08 = dcvf + fcvd;
-    auto    r09 = dcvd + fcvd;
-
-    auto    r10 = fcvf + dcvf;
-    auto    r11 = fcvf + dcvd;
-    auto    r12 = fcvd + dcvd;
-
-    auto    r21 = drvf + drvf;
-    auto    r22 = drvf + drvd;
-    auto    r23 = drvd + drvf;
-
-    auto    r24 = frvf + frvf;
-    auto    r25 = frvf + frvd;
-    auto    r26 = frvd + frvf;
-
-    auto    r27 = drvf + frvf;
-    auto    r28 = drvf + frvd;
-    auto    r29 = drvd + frvd;
+    auto    r27 = dvf + fvf;
+    auto    r28 = dvf + fvd;
+    auto    r29 = dvd + fvd;
 
     auto    r30 = fmf + dmf;
     auto    r31 = fmf + dmd;
@@ -411,51 +317,29 @@ void t21()
 {
     PRINT_FN_NAME(t21);
 
-    dyn_col_vector<float>       dcvf(3, 3);
-    dyn_col_vector<double>      dcvd(3, 3);
+    dyn_vector<float>       dvf(3, 3);
+    dyn_vector<double>      dvd(3, 3);
 
-    fs_col_vector<float, 3>     fcvf;
-    fs_col_vector<double, 3>    fcvd;
+    fs_vector<float, 3>     fvf;
+    fs_vector<double, 3>    fvd;
 
-    dyn_row_vector<float>       drvf(3, 3);
-    dyn_row_vector<double>      drvd(3, 3);
+    dyn_matrix<float>       dmf(3, 3);
+    dyn_matrix<double>      dmd(3, 3);
 
-    fs_row_vector<float, 3>     frvf;
-    fs_row_vector<double, 3>    frvd;
+    fs_matrix<float, 3, 3>  fmf;
+    fs_matrix<double, 3, 3> fmd;
 
-    dyn_matrix<float>           dmf(3, 3);
-    dyn_matrix<double>          dmd(3, 3);
+    auto    r21 = dvf - dvf;
+    auto    r22 = dvf - dvd;
+    auto    r23 = dvd - dvf;
 
-    fs_matrix<float, 3, 3>      fmf;
-    fs_matrix<double, 3, 3>     fmd;
+    auto    r24 = fvf - fvf;
+    auto    r25 = fvf - fvd;
+    auto    r26 = fvd - fvf;
 
-    auto    r01 = dcvf - dcvf;
-    auto    r02 = dcvf - dcvd;
-    auto    r03 = dcvd - dcvf;
-
-    auto    r04 = fcvf - fcvf;
-    auto    r05 = fcvf - fcvd;
-    auto    r06 = fcvd - fcvf;
-
-    auto    r07 = dcvf - fcvf;
-    auto    r08 = dcvf - fcvd;
-    auto    r09 = dcvd - fcvd;
-
-    auto    r10 = fcvf - dcvf;
-    auto    r11 = fcvf - dcvd;
-    auto    r12 = fcvd - dcvd;
-
-    auto    r21 = drvf - drvf;
-    auto    r22 = drvf - drvd;
-    auto    r23 = drvd - drvf;
-
-    auto    r24 = frvf - frvf;
-    auto    r25 = frvf - frvd;
-    auto    r26 = frvd - frvf;
-
-    auto    r27 = drvf - frvf;
-    auto    r28 = drvf - frvd;
-    auto    r29 = drvd - frvd;
+    auto    r27 = dvf - fvf;
+    auto    r28 = dvf - fvd;
+    auto    r29 = dvd - fvd;
 
     auto    r30 = fmf - dmf;
     auto    r31 = fmf - dmd;
@@ -483,17 +367,13 @@ void t22()
 {
     PRINT_FN_NAME(t22);
 
-    dyn_col_vector<float>       dcvf(3, 3);
-    fs_col_vector<float, 3>     fcvf;
-    dyn_row_vector<float>       drvf(3, 3);
-    fs_row_vector<float, 3>     frvf;
-    dyn_matrix<float>           dmf(3, 3);
-    fs_matrix<float, 3, 3>      fmf;
+    dyn_vector<float>       dvf(3, 3);
+    fs_vector<float, 3>     fvf;
+    dyn_matrix<float>       dmf(3, 3);
+    fs_matrix<float, 3, 3>  fmf;
 
-    auto    r01 = -dcvf;
-    auto    r02 = -fcvf;
-    auto    r03 = -drvf;
-    auto    r04 = -frvf;
+    auto    r03 = -dvf;
+    auto    r04 = -fvf;
     auto    r05 = -dmf;
     auto    r06 = -fmf;
 }
@@ -502,17 +382,11 @@ void t23()
 {
     PRINT_FN_NAME(t23);
 
-    dyn_col_vector<float>       dcvf(3, 3);
-    dyn_col_vector<double>      dcvd(3, 3);
+    dyn_vector<float>       dvf(3, 3);
+    dyn_vector<double>      dvd(3, 3);
 
-    fs_col_vector<float, 3>     fcvf;
-    fs_col_vector<double, 3>    fcvd;
-
-    dyn_row_vector<float>       drvf(3, 3);
-    dyn_row_vector<double>      drvd(3, 3);
-
-    fs_row_vector<float, 3>     frvf;
-    fs_row_vector<double, 3>    frvd;
+    fs_vector<float, 3>     fvf;
+    fs_vector<double, 3>    fvd;
 
     dyn_matrix<float>           dmf(3, 3);
     dyn_matrix<double>          dmd(3, 3);
@@ -520,33 +394,7 @@ void t23()
     fs_matrix<float, 3, 3>      fmf;
     fs_matrix<double, 3, 3>     fmd;
 
-    auto    r01 = dcvf.t() + drvf;
-    auto    r02 = drvf + dcvd.t();
-    auto    r03 = dcvd.t() + dcvf.t();
-
-    auto    r04 = fcvf.t() + frvf;
-    auto    r05 = frvf + fcvd.t();
-    auto    r06 = fcvd.t() + fcvf.t();
-
-    auto    r071 = dcvf.t() + frvf;
-    auto    r08 = drvf + fcvd.t();
-    auto    r09 = dcvd.t() + fcvd.t();
-
-    auto    r10 = fcvf.t() + drvf;
-    auto    r11 = frvf + dcvd.t();
-    auto    r12 = fcvd.t() + dcvd.t();
-
-    auto    r21 = drvf.t() + dcvf;
-    auto    r22 = drvf + dcvd.t();
-    auto    r23 = drvd.t() + drvf.t();
-
-    auto    r24 = frvf.t() + fcvf;
-    auto    r25 = frvf + fcvd.t();
-    auto    r26 = frvd.t() + frvf.t();
-
-    auto    r27 = drvf.t() + fcvf;
-    auto    r28 = drvf + fcvd.t();
-    auto    r29 = drvd.t() + frvd.t();
+    auto    r29 = dvd.t() + fvd.t();
 
     auto    r30 = fmf.t() + dmf;
     auto    r31 = fmf + dmd.t();
@@ -573,51 +421,19 @@ void t24()
 {
     PRINT_FN_NAME(t24);
 
-    dyn_col_vector<float>       dcvf(3, 3);
-    dyn_col_vector<double>      dcvd(3, 3);
+    dyn_vector<float>       dvf(3, 3);
+    dyn_vector<double>      dvd(3, 3);
 
-    fs_col_vector<float, 3>     fcvf;
-    fs_col_vector<double, 3>    fcvd;
+    fs_vector<float, 3>     fvf;
+    fs_vector<double, 3>    fvd;
 
-    dyn_row_vector<float>       drvf(3, 3);
-    dyn_row_vector<double>      drvd(3, 3);
+    dyn_matrix<float>       dmf(3, 3);
+    dyn_matrix<double>      dmd(3, 3);
 
-    fs_row_vector<float, 3>     frvf;
-    fs_row_vector<double, 3>    frvd;
+    fs_matrix<float, 3, 3>  fmf;
+    fs_matrix<double, 3, 3> fmd;
 
-    dyn_matrix<float>           dmf(3, 3);
-    dyn_matrix<double>          dmd(3, 3);
-
-    fs_matrix<float, 3, 3>      fmf;
-    fs_matrix<double, 3, 3>     fmd;
-
-    auto    r01 = dcvf.t() - drvf;
-    auto    r02 = drvf - dcvd.t();
-    auto    r03 = dcvd.t() - dcvf.t();
-
-    auto    r04 = fcvf.t() - frvf;
-    auto    r05 = frvf - fcvd.t();
-    auto    r06 = fcvd.t() - fcvf.t();
-
-    auto    r07 = dcvf.t() - frvf;
-    auto    r08 = drvf - fcvd.t();
-    auto    r09 = dcvd.t() - fcvd.t();
-
-    auto    r10 = fcvf.t() - drvf;
-    auto    r11 = frvf - dcvd.t();
-    auto    r12 = fcvd.t() - dcvd.t();
-
-    auto    r21 = drvf.t() - dcvf;
-    auto    r22 = drvf - dcvd.t();
-    auto    r23 = drvd.t() - drvf.t();
-
-    auto    r24 = frvf.t() - fcvf;
-    auto    r25 = frvf - fcvd.t();
-    auto    r26 = frvd.t() - frvf.t();
-
-    auto    r27 = drvf.t() - fcvf;
-    auto    r28 = drvf - fcvd.t();
-    auto    r29 = drvd.t() - frvd.t();
+    auto    r29 = dvd.t() - fvd.t();
 
     auto    r30 = fmf.t() - dmf;
     auto    r31 = fmf - dmd.t();
@@ -644,19 +460,15 @@ void t25()
 {
     PRINT_FN_NAME(t25);
 
-    dyn_col_vector<float>       dcvf(3, 3);
-    fs_col_vector<float, 3>     fcvf;
-    dyn_row_vector<float>       drvf(3, 3);
-    fs_row_vector<float, 3>     frvf;
-    dyn_matrix<float>           dmf(3, 3);
-    fs_matrix<float, 3, 3>      fmf;
+    dyn_vector<float>       dvf(3, 3);
+    fs_vector<float, 3>     fvf;
+    dyn_matrix<float>       dmf(3, 3);
+    fs_matrix<float, 3, 3>  fmf;
 
-    auto    r01 = -dcvf.t();
-    auto    r02 = -fcvf.t();
-    auto    r03 = -drvf.t();
-    auto    r04 = -frvf.t();
-    auto    r05 = -dmf.t();
-    auto    r06 = -fmf.t();
+    auto    r01 = -dvf.t();
+    auto    r02 = -fvf.t();
+    auto    r03 = -dmf.t();
+    auto    r04 = -fmf.t();
 }
 
 void t30()
@@ -667,21 +479,13 @@ void t30()
     double      d = 1.0;
     cx_double   c = {1.0, 0.0};
 
-    dyn_row_vector<float>       drvf(3);
-    dyn_row_vector<double>      drvd(3);
-    dyn_row_vector<cx_double>   drvc(3);
+    dyn_vector<float>       dvf(3);
+    dyn_vector<double>      dvd(3);
+    dyn_vector<cx_double>   dvc(3);
 
-    fs_row_vector<float, 3>     frvf;
-    fs_row_vector<double, 3>    frvd;
-    fs_row_vector<cx_double, 3> frvc;
-
-    dyn_col_vector<float>       dcvf(3, 3);
-    dyn_col_vector<double>      dcvd(3, 3);
-    dyn_col_vector<cx_double>   dcvc(3, 3);
-
-    fs_col_vector<float, 3>     fcvf;
-    fs_col_vector<double, 3>    fcvd;
-    fs_col_vector<cx_double, 3> fcvc;
+    fs_vector<float, 3>     fvf;
+    fs_vector<double, 3>    fvd;
+    fs_vector<cx_double, 3> fvc;
 
     dyn_matrix<float>           dmf(3, 3);
     dyn_matrix<double>          dmd(3, 3);
@@ -691,8 +495,9 @@ void t30()
     fs_matrix<double, 3, 3>     fmd;
     fs_matrix<cx_double, 3, 3>  fmc;
 
-    auto    r01 = -(dmf*(fmd*fcvd) + dcvf - fcvf)*c;
+    auto    r01 = -(dmf*(fmd*fvd) + dvf - fvf)*c;
 }
+
 }
 
 void    t100();
@@ -705,7 +510,6 @@ int main()
     t04();
     t05();
     t06();
-    t07();
     t08();
     t09();
     t10();

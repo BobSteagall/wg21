@@ -8,10 +8,20 @@
 #include <type_traits>
 
 //-------------------------------------------------------------------------------------------------
-//  Helper functions and utilities for testing the interfacce; not part of the final proposal!
+//- Namespace alternatives for testing and also for detecting/avoiding ADL issues.
+//
+#define STD_LA  la
+//#define STD_LA  std
+//#define STD_LA  std::math
+
+
+//-------------------------------------------------------------------------------------------------
+//  Helper functions and utilities for testing the interface; not part of the final proposal!
 //-------------------------------------------------------------------------------------------------
 //
 #include <iostream>
+
+namespace STD_LA {
 
 template <class T>
 constexpr std::string_view
@@ -59,14 +69,7 @@ using std::endl;
         << "********************************************************************************\n" \
         << "entering test function " << #name << "()" << std::endl << std::endl
 
-
-//-------------------------------------------------------------------------------------------------
-//- Namespace alternatives for testing and also for detecting/avoiding ADL issues.
-//
-#define STD_LA  la
-//#define STD_LA  std
-//#define STD_LA  std::math
-
+}   //- STD_LA namespace
 
 //- OK, now include implementation headers.
 //
@@ -82,6 +85,6 @@ using std::endl;
 #include "linear_algebra/operator_traits.hpp"
 #include "linear_algebra/operator_promotion_traits.hpp"
 #include "linear_algebra/arithmetic_operators.hpp"
+#include "linear_algebra/library_aliases.hpp"
 
-}       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_HPP_DEFINED

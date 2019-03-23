@@ -4,7 +4,6 @@
 #include "vector.hpp"
 
 namespace STD_LA {
-
 //=================================================================================================
 //  A matrix parametrized by an engine type and operator traits.
 //=================================================================================================
@@ -23,6 +22,7 @@ class matrix
     using hermitian_type = std::conditional_t<is_complex_v<element_type>,
                                                   matrix<ET, OT>,
                                                   transpose_type>;
+
     static_assert(is_matrix_element_v<element_type>);
 
   public:
@@ -108,6 +108,184 @@ class matrix
   private:
     matrix(engine_type const& eng);
 };
+
+template<class ET, class OT> inline
+matrix<ET,OT>::matrix()
+{}
+
+template<class ET, class OT>
+template<class ET2, class OT2> inline
+matrix<ET,OT>::matrix(matrix<ET2, OT2> const&)
+{}
+
+template<class ET, class OT>
+template<class ET2, enable_if_resizable_t<ET, ET2>> inline
+matrix<ET,OT>::matrix(size_tuple)
+{}
+
+template<class ET, class OT>
+template<class ET2, enable_if_resizable_t<ET, ET2>>
+matrix<ET,OT>::matrix(size_t, size_t)
+{}
+
+template<class ET, class OT>
+template<class ET2, enable_if_resizable_t<ET, ET2>> inline
+matrix<ET,OT>::matrix(size_tuple, size_tuple)
+{}
+
+template<class ET, class OT>
+template<class ET2, enable_if_resizable_t<ET, ET2>>
+matrix<ET,OT>::matrix(size_t, size_t, size_t, size_t)
+{}
+
+template<class ET, class OT> inline
+matrix<ET,OT>::matrix(engine_type const&)
+{}
+
+template<class ET, class OT>
+template<class ET2, class OT2> inline
+matrix<ET,OT>&
+matrix<ET,OT>::operator =(matrix<ET2, OT2> const&)
+{
+    return *this;
+}
+
+template<class ET, class OT> inline
+typename matrix<ET,OT>::element_type
+matrix<ET,OT>::operator ()(size_t i, size_t j) const
+{
+    return m_engine(i, j);
+}
+
+template<class ET, class OT> inline
+typename matrix<ET,OT>::element_type const*
+matrix<ET,OT>::data() const noexcept
+{
+    return m_engine.data();
+}
+
+template<class ET, class OT> inline
+size_t
+matrix<ET,OT>::columns() const noexcept
+{
+    return m_engine.columns();
+}
+
+template<class ET, class OT> inline
+size_t
+matrix<ET,OT>::rows() const noexcept
+{
+    return m_engine.rows();
+}
+
+template<class ET, class OT> inline
+typename matrix<ET,OT>::size_tuple
+matrix<ET,OT>::size() const noexcept
+{
+    return m_engine.size();
+}
+
+template<class ET, class OT> inline
+size_t
+matrix<ET,OT>::column_capacity() const noexcept
+{
+    return m_engine.column_capacity();
+}
+
+template<class ET, class OT> inline
+size_t
+matrix<ET,OT>::row_capacity() const noexcept
+{
+    return m_engine.row_capacity();
+}
+
+template<class ET, class OT> inline
+typename matrix<ET,OT>::size_tuple
+matrix<ET,OT>::capacity() const noexcept
+{
+    return m_engine.capacity();
+}
+
+template<class ET, class OT> inline
+typename matrix<ET,OT>::transpose_type
+matrix<ET,OT>::t() const
+{
+    return transpose_type(m_engine);
+}
+
+template<class ET, class OT> inline
+typename matrix<ET,OT>::hermitian_type
+matrix<ET,OT>::h() const
+{
+    if constexpr (is_complex_v<element_type>)
+    {
+        return hermitian_type();
+    }
+    else
+    {
+        return hermitian_type(m_engine);
+    }
+}
+
+template<class ET, class OT> inline
+typename matrix<ET,OT>::element_type&
+matrix<ET,OT>::operator ()(size_t i, size_t j)
+{
+    return m_engine(i, j);
+}
+
+template<class ET, class OT> inline
+typename matrix<ET,OT>::element_type*
+matrix<ET,OT>::data() noexcept
+{
+    return m_engine.data();
+}
+
+template<class ET, class OT>
+template<class ET2, enable_if_resizable_t<ET, ET2>> inline
+void
+matrix<ET,OT>::reserve(size_tuple)
+{}
+
+template<class ET, class OT>
+template<class ET2, enable_if_resizable_t<ET, ET2>> inline
+void
+matrix<ET,OT>::reserve(size_t, size_t)
+{}
+
+template<class ET, class OT>
+template<class ET2, enable_if_resizable_t<ET, ET2>> inline
+void
+matrix<ET,OT>::resize(size_tuple)
+{}
+
+template<class ET, class OT>
+template<class ET2, enable_if_resizable_t<ET, ET2>> inline
+void
+matrix<ET,OT>::resize(size_t, size_t)
+{}
+
+template<class ET, class OT>
+template<class ET2, enable_if_resizable_t<ET, ET2>> inline
+void
+matrix<ET,OT>::resize(size_tuple, size_tuple)
+{}
+
+template<class ET, class OT>
+template<class ET2, enable_if_resizable_t<ET, ET2>> inline
+void
+matrix<ET,OT>::resize(size_t, size_t, size_t, size_t)
+{}
+
+template<class ET, class OT> inline
+void
+matrix<ET,OT>::swap_columns(size_t, size_t)
+{}
+
+template<class ET, class OT> inline
+void
+matrix<ET,OT>::swap_rows(size_t, size_t)
+{}
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_MATRIX_HPP_DEFINED

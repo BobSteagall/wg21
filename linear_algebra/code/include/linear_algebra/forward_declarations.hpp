@@ -29,11 +29,8 @@ template<class E1, class E2>    struct matrix_multiplication_engine_promotion;
 //
 struct default_matrix_operator_traits;
 
-template<class ET, class OT=default_matrix_operator_traits> class column_vector;
-template<class ET, class OT=default_matrix_operator_traits> class row_vector;
+template<class ET, class OT=default_matrix_operator_traits> class vector;
 template<class ET, class OT=default_matrix_operator_traits> class matrix;
-
-template<class ET, class OT> using col_vector = column_vector<ET, OT>;
 
 //- Matrix arithmetic traits.
 //
