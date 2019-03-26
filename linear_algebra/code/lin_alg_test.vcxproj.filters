@@ -71,6 +71,12 @@
     <ClInclude Include="include\linear_algebra\operator_traits.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
+    <ClInclude Include="include\linear_algebra\helper_traits.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\debug_helpers.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\test_01.cpp">
