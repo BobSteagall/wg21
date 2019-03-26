@@ -14,62 +14,9 @@
 //#define STD_LA  std
 //#define STD_LA  std::math
 
-
-//-------------------------------------------------------------------------------------------------
-//  Helper functions and utilities for testing the interface; not part of the final proposal!
-//-------------------------------------------------------------------------------------------------
+//- Some helpers
 //
-#include <iostream>
-
-namespace STD_LA {
-
-template <class T>
-constexpr std::string_view
-type_name()                //- Thanks to Howard Hinnant for this!
-{
-    using namespace std;
-#ifdef __clang__
-    string_view p = __PRETTY_FUNCTION__;
-    return string_view(p.data() + 34, p.size() - 34 - 1);
-#elif defined(__GNUC__)
-    string_view p = __PRETTY_FUNCTION__;
-#  if __cplusplus < 201402
-    return string_view(p.data() + 36, p.size() - 36 - 1);
-#  else
-    return string_view(p.data() + 49, p.find(';', 49) - 49);
-#  endif
-#elif defined(_MSC_VER)
-    string_view p = __FUNCSIG__;
-    return string_view(p.data() + 84, p.size() - 84 - 7);
-#endif
-}
-
-template<class T>
-inline std::string
-get_type_name()
-{
-    auto    view = type_name<T>();
-    return std::string(view.data(), view.size());
-}
-
-template<class T>
-inline std::string
-get_type_name(T const&)
-{
-    auto    view = type_name<T>();
-    return std::string(view.data(), view.size());
-}
-
-using std::cout;    //- Yes, we're cheating, but only for convenience, we promise....
-using std::endl;
-
-#define PRINT_FN_NAME(name) \
-    std::cout \
-        << "********************************************************************************\n" \
-        << "********************************************************************************\n" \
-        << "entering test function " << #name << "()" << std::endl << std::endl
-
-}   //- STD_LA namespace
+#include "linear_algebra/debug_helpers.hpp"
 
 //- OK, now include implementation headers.
 //
@@ -79,6 +26,7 @@ using std::endl;
 #include "linear_algebra/fixed_size_engines.hpp"
 #include "linear_algebra/view_based_engines.hpp"
 #include "linear_algebra/engine_promotion_traits.hpp"
+#include "linear_algebra/helper_traits.hpp"
 #include "linear_algebra/vector.hpp"
 #include "linear_algebra/matrix.hpp"
 #include "linear_algebra/arithmetic_traits.hpp"

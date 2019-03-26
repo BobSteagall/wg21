@@ -1,3 +1,4 @@
+
 #include "linear_algebra.hpp"
 
 using cx_float  = std::complex<float>;
@@ -523,5 +524,7 @@ int main()
     t30();
 
     t100();
+
+    cout << "comp ver " << _MSC_VER << endl;
     return 0;
 }
