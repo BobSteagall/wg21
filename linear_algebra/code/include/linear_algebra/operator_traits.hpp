@@ -12,6 +12,9 @@ namespace STD_LA {
 //
 struct default_matrix_operator_traits
 {
+    template<class T1, class T2>
+    using element_promotion_traits = matrix_element_promotion<T1, T2>;
+
     template<class OP1, class OTR>
     using negation_traits = matrix_negation_traits<OP1, OTR>;
 
