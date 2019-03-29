@@ -525,6 +525,5 @@ int main()
 
     t100();
 
-    cout << "comp ver " << _MSC_VER << endl;
     return 0;
 }
