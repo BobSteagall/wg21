@@ -18,7 +18,6 @@ struct has_resize<T, std::void_t<decltype(std::declval<T>().resize(0,0))>>
 template<typename T>
 inline constexpr bool   has_resize_v = has_resize<T>::value;
 
-namespace  {
 void t01()
 {
     PRINT_FN_NAME(t01);
@@ -44,14 +43,18 @@ void t02()
 {
     PRINT_FN_NAME(t02);
 
+    fs_vector_engine<double, 2>         e12;
+    fs_vector_engine<cx_double, 3>      e13;
     fs_matrix_engine<double, 2, 2>      e22;
-    fs_matrix_engine<cx_double, 3, 3>   e33;
+    fs_matrix_engine<cx_double, 3, 3>   e23;
 
-    dr_matrix_engine<double>       de2;
-    dr_matrix_engine<cx_double>    de3;
+    dr_vector_engine<double>       de12;
+    dr_vector_engine<cx_double>    de13;
+    dr_matrix_engine<double>       de22;
+    dr_matrix_engine<cx_double>    de23;
 
-    matrix_transpose_engine<fs_matrix_engine<cx_double, 3, 3>>  te2(e33);
-    matrix_transpose_engine<dr_matrix_engine<cx_double>>        te3(de3);
+    matrix_transpose_engine<fs_matrix_engine<cx_double, 3, 3>>  te2(e23);
+    matrix_transpose_engine<dr_matrix_engine<cx_double>>        te3(de23);
 
 #ifndef ENFORCE_COMPLEX_OPERAND_HOMOGENEITY
     matrix_element_promotion_t<int32_t, cx_double>     v1 = 0;
@@ -139,6 +142,7 @@ void t05()
     auto    m31 = md2 * md3;
 }
 
+#if 0
 void t06()
 {
     PRINT_FN_NAME(t06);
@@ -499,7 +503,6 @@ void t30()
     auto    r01 = -(dmf*(fmd*fvd) + dvf - fvf)*c;
 }
 
-}
 
 void    t100();
 
@@ -527,3 +530,4 @@ int main()
 
     return 0;
 }
+#endif

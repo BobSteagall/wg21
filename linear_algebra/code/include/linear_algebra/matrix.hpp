@@ -17,7 +17,10 @@ class matrix
     using is_dense       = typename engine_type::is_dense;
     using is_rectangular = typename engine_type::is_rectangular;
     using is_resizable   = typename engine_type::is_resizable;
+    using index_type     = typename engine_type::index_type;
+    using size_type      = typename engine_type::size_type;
     using size_tuple     = typename engine_type::size_tuple;
+
     using transpose_type = matrix<matrix_transpose_engine<engine_type>>;
     using hermitian_type = std::conditional_t<is_complex_v<element_type>,
                                                   matrix<ET, OT>,
@@ -36,12 +39,12 @@ class matrix
     template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     matrix(size_tuple size);
     template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
-    matrix(size_t rows, size_t cols);
+    matrix(size_type rows, size_type cols);
 
     template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     matrix(size_tuple size, size_tuple cap);
     template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
-    matrix(size_t rows, size_t cols, size_t rowcap, size_t colcap);
+    matrix(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 
     matrix&     operator =(matrix&&) = default;
     matrix&     operator =(matrix const&) = default;
@@ -50,17 +53,17 @@ class matrix
 
     //- Const element access.
     //
-    element_type        operator ()(size_t i, size_t j) const;
+    element_type        operator ()(index_type i, index_type j) const;
     element_type const* data() const noexcept;
 
     //- Accessors.
     //
-    size_t      columns() const noexcept;
-    size_t      rows() const noexcept;
+    size_type   columns() const noexcept;
+    size_type   rows() const noexcept;
     size_tuple  size() const noexcept;
 
-    size_t      column_capacity() const noexcept;
-    size_t      row_capacity() const noexcept;
+    size_type   column_capacity() const noexcept;
+    size_type   row_capacity() const noexcept;
     size_tuple  capacity() const noexcept;
 
     //- Transpose and Hermitian.
@@ -70,7 +73,7 @@ class matrix
 
     //- Mutable element access.
     //
-    element_type&   operator ()(size_t i, size_t j);
+    element_type&   operator ()(size_type i, size_type j);
     element_type*   data() noexcept;
 
     //- Change capacity.
@@ -78,26 +81,26 @@ class matrix
     template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     void    reserve(size_tuple cap);
     template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
-    void    reserve(size_t rowcap, size_t colcap);
+    void    reserve(size_type rowcap, size_type colcap);
 
     //- Change size.
     //
     template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     void    resize(size_tuple size);
     template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
-    void    resize(size_t rows, size_t cols);
+    void    resize(size_type rows, size_type cols);
 
     //- Change size and capacity in one shot.
     //
     template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
     void    resize(size_tuple size, size_tuple cap);
     template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
-    void    resize(size_t rows, size_t cols, size_t rowcap, size_t colcap);
+    void    resize(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 
     //- Row and column operations.
     //
-    void    swap_columns(size_t i, size_t j);
-    void    swap_rows(size_t i, size_t j);
+    void    swap_columns(index_type i, index_type j);
+    void    swap_rows(index_type i, index_type j);
 
   private:
     template<class ET2, class OT2> friend class matrix;
@@ -125,7 +128,7 @@ matrix<ET,OT>::matrix(size_tuple)
 
 template<class ET, class OT>
 template<class ET2, enable_if_resizable_t<ET, ET2>>
-matrix<ET,OT>::matrix(size_t, size_t)
+matrix<ET,OT>::matrix(size_type, size_type)
 {}
 
 template<class ET, class OT>
@@ -135,7 +138,7 @@ matrix<ET,OT>::matrix(size_tuple, size_tuple)
 
 template<class ET, class OT>
 template<class ET2, enable_if_resizable_t<ET, ET2>>
-matrix<ET,OT>::matrix(size_t, size_t, size_t, size_t)
+matrix<ET,OT>::matrix(size_type, size_type, size_type, size_type)
 {}
 
 template<class ET, class OT> inline
@@ -152,7 +155,7 @@ matrix<ET,OT>::operator =(matrix<ET2, OT2> const&)
 
 template<class ET, class OT> inline
 typename matrix<ET,OT>::element_type
-matrix<ET,OT>::operator ()(size_t i, size_t j) const
+matrix<ET,OT>::operator ()(index_type i, index_type j) const
 {
     return m_engine(i, j);
 }
@@ -165,14 +168,14 @@ matrix<ET,OT>::data() const noexcept
 }
 
 template<class ET, class OT> inline
-size_t
+typename matrix<ET,OT>::size_type
 matrix<ET,OT>::columns() const noexcept
 {
     return m_engine.columns();
 }
 
 template<class ET, class OT> inline
-size_t
+typename matrix<ET,OT>::size_type
 matrix<ET,OT>::rows() const noexcept
 {
     return m_engine.rows();
@@ -186,14 +189,14 @@ matrix<ET,OT>::size() const noexcept
 }
 
 template<class ET, class OT> inline
-size_t
+typename matrix<ET,OT>::size_type
 matrix<ET,OT>::column_capacity() const noexcept
 {
     return m_engine.column_capacity();
 }
 
 template<class ET, class OT> inline
-size_t
+typename matrix<ET,OT>::size_type
 matrix<ET,OT>::row_capacity() const noexcept
 {
     return m_engine.row_capacity();
@@ -229,7 +232,7 @@ matrix<ET,OT>::h() const
 
 template<class ET, class OT> inline
 typename matrix<ET,OT>::element_type&
-matrix<ET,OT>::operator ()(size_t i, size_t j)
+matrix<ET,OT>::operator ()(size_type i, size_type j)
 {
     return m_engine(i, j);
 }
@@ -250,7 +253,7 @@ matrix<ET,OT>::reserve(size_tuple)
 template<class ET, class OT>
 template<class ET2, enable_if_resizable_t<ET, ET2>> inline
 void
-matrix<ET,OT>::reserve(size_t, size_t)
+matrix<ET,OT>::reserve(size_type, size_type)
 {}
 
 template<class ET, class OT>
@@ -262,7 +265,7 @@ matrix<ET,OT>::resize(size_tuple)
 template<class ET, class OT>
 template<class ET2, enable_if_resizable_t<ET, ET2>> inline
 void
-matrix<ET,OT>::resize(size_t, size_t)
+matrix<ET,OT>::resize(size_type, size_type)
 {}
 
 template<class ET, class OT>
@@ -274,17 +277,17 @@ matrix<ET,OT>::resize(size_tuple, size_tuple)
 template<class ET, class OT>
 template<class ET2, enable_if_resizable_t<ET, ET2>> inline
 void
-matrix<ET,OT>::resize(size_t, size_t, size_t, size_t)
+matrix<ET,OT>::resize(size_type, size_type, size_type, size_type)
 {}
 
 template<class ET, class OT> inline
 void
-matrix<ET,OT>::swap_columns(size_t, size_t)
+matrix<ET,OT>::swap_columns(index_type, index_type)
 {}
 
 template<class ET, class OT> inline
 void
-matrix<ET,OT>::swap_rows(size_t, size_t)
+matrix<ET,OT>::swap_rows(index_type, index_type)
 {}
 
 }       //- STD_LA namespace

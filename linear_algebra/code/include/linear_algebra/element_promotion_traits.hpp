@@ -71,21 +71,21 @@ struct matrix_element_promotion
 template<class T1, class T2>
 struct matrix_element_promotion<T1, std::complex<T2>>
 {
-    ASSERT_COMPLEX_OPERAND_HOMOGENEITY(T1,T2);
+    ASSERT_COMPLEX_OPERAND_HOMOGENEITY(T1, T2);
     using type = std::complex<matrix_element_promotion_helper_t<T1, T2>>;
 };
 
 template<class T1, class T2>
 struct matrix_element_promotion<std::complex<T1>, T2>
 {
-    ASSERT_COMPLEX_OPERAND_HOMOGENEITY(T1,T2);
+    ASSERT_COMPLEX_OPERAND_HOMOGENEITY(T1, T2);
     using type = std::complex<matrix_element_promotion_helper_t<T1, T2>>;
 };
 
 template<class T1, class T2>
 struct matrix_element_promotion<std::complex<T1>, std::complex<T2>>
 {
-    ASSERT_COMPLEX_OPERAND_HOMOGENEITY(T1,T2);
+    ASSERT_COMPLEX_OPERAND_HOMOGENEITY(T1, T2);
     using type = std::complex<matrix_element_promotion_helper_t<T1, T2>>;
 };
 

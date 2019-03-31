@@ -22,7 +22,7 @@
     <ClInclude Include="include\linear_algebra.hpp" />
     <ClInclude Include="include\linear_algebra\debug_helpers.hpp" />
     <ClInclude Include="include\linear_algebra\helper_traits.hpp" />
-    <ClInclude Include="include\linear_algebra\operator_promotion_traits.hpp" />
+    <ClInclude Include="include\linear_algebra\operator_traits_selector.hpp" />
     <ClInclude Include="include\linear_algebra\dynamic_engines.hpp" />
     <ClInclude Include="include\linear_algebra\forward_declarations.hpp" />
     <ClInclude Include="include\linear_algebra\library_aliases.hpp" />
