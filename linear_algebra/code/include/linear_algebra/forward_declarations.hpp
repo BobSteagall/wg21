@@ -14,7 +14,9 @@ template<class T1, class T2>    struct matrix_element_promotion;
 
 //- Basic linear algebra math object engine types.
 //
-template<class T, size_t R, size_t C>           class fs_matrix_engine;
+template<class T, int32_t N>                    class fs_vector_engine;
+template<class T, int32_t R, int32_t C>         class fs_matrix_engine;
+template<class T, class AT=std::allocator<T>>   class dr_vector_engine;
 template<class T, class AT=std::allocator<T>>   class dr_matrix_engine;
 template<class ET>                              class matrix_transpose_engine;
 
@@ -42,7 +44,7 @@ template<class OP1, class OP2, class OTR>   struct matrix_multiplication_traits;
 //- Operator traits and traits promotion.
 //
 struct default_matrix_operator_traits;
-template<class T1, class T2>    struct matrix_operator_traits_promotion;
+template<class T1, class T2>    struct matrix_operator_traits_selector;
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_FORWARD_DECLARATIONS_HPP_DEFINED

@@ -31,7 +31,7 @@
 #include "linear_algebra/matrix.hpp"
 #include "linear_algebra/arithmetic_traits.hpp"
 #include "linear_algebra/operator_traits.hpp"
-#include "linear_algebra/operator_promotion_traits.hpp"
+#include "linear_algebra/operator_traits_selector.hpp"
 #include "linear_algebra/arithmetic_operators.hpp"
 #include "linear_algebra/library_aliases.hpp"
 

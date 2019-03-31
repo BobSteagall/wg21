@@ -39,8 +39,8 @@ type_name()                //- Thanks to Howard Hinnant for this!
 #endif
 }
 
-#define STRINGIFY_H(X)  #X
-#define STRINGIFY(X)    STRINGIFY_H(X)
+#define MATRIX_STRINGIFY_H(X)   #X
+#define MATRIX_STRINGIFY(X)     MATRIX_STRINGIFY_H(X)
 #ifdef _MSC_VER
 
 template<class C, class T, class A>
@@ -49,7 +49,7 @@ clean_type_name(std::basic_string<C,T,A> tname)
 {
     static std::basic_string<C,T,A> const   cl = "class ";
     static std::basic_string<C,T,A> const   st = "struct ";
-    static std::basic_string<C,T,A> const   ns = STRINGIFY(STD_LA) "::";
+    static std::basic_string<C,T,A> const   ns = MATRIX_STRINGIFY(STD_LA) "::";
     static std::basic_string<C,T,A> const   aa = "> >";
 
     for (auto pos = std::string::npos;  (pos = tname.rfind(cl, pos)) != std::string::npos; )
@@ -92,8 +92,8 @@ clean_type_name(std::basic_string<C,T,A> tname)
 }
 
 #endif
-#undef STRINGIFY
-#undef STRINGIFY_H
+#undef MATRIX_STRINGIFY
+#undef MATRIX_STRINGIFY_H
 
 template<class T>
 std::string

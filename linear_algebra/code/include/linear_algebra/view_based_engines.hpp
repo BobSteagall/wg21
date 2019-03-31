@@ -5,8 +5,7 @@
 
 //- Experimental namespace for test implementation
 //
-namespace STD_LA
-{
+namespace STD_LA {
 //=================================================================================================
 //  Matrix transpose engine, meant to act as an rvalue-ish "view" in expressions, in order to
 //  prevent unnecessary allocation and element copying.
@@ -22,6 +21,8 @@ class matrix_transpose_engine
     using is_rectangular = typename engine_type::is_rectangular;
     using is_resizable   = std::false_type;
     using is_row_major   = std::conditional_t<ET::is_row_major::value, std::false_type, std::true_type>;
+    using index_type     = typename engine_type::index_type;
+    using size_type      = typename engine_type::size_type;
     using size_tuple     = typename engine_type::size_tuple;
 
   public:
@@ -33,16 +34,15 @@ class matrix_transpose_engine
     matrix_transpose_engine& operator =(matrix_transpose_engine&&);
     matrix_transpose_engine& operator =(matrix_transpose_engine const&);
 
-    element_type        operator ()(size_t i) const;
-    element_type        operator ()(size_t i, size_t j) const;
+    element_type        operator ()(index_type i, index_type j) const;
     element_type const* data() const noexcept;
 
-    size_t      columns() const noexcept;
-    size_t      rows() const noexcept;
+    size_type   columns() const noexcept;
+    size_type   rows() const noexcept;
     size_tuple  size() const noexcept;
 
-    size_t      column_capacity() const noexcept;
-    size_t      row_capacity() const noexcept;
+    size_type   column_capacity() const noexcept;
+    size_type   row_capacity() const noexcept;
     size_tuple  capacity() const noexcept;
 
   private:
@@ -79,64 +79,57 @@ matrix_transpose_engine<ET>::operator =(matrix_transpose_engine const&)
     return *this;
 }
 
-template<class ET>
-inline typename matrix_transpose_engine<ET>::element_type
-matrix_transpose_engine<ET>::operator ()(size_t i) const
-{
-    return (*mp_other)[i];
-}
-
-template<class ET>
-inline typename matrix_transpose_engine<ET>::element_type
-matrix_transpose_engine<ET>::operator ()(size_t i, size_t j) const
+template<class ET> inline 
+typename matrix_transpose_engine<ET>::element_type
+matrix_transpose_engine<ET>::operator ()(index_type i, index_type j) const
 {
     return (*mp_other)(j, i);
 }
 
-template<class ET>
-inline typename matrix_transpose_engine<ET>::element_type const*
+template<class ET> inline 
+typename matrix_transpose_engine<ET>::element_type const*
 matrix_transpose_engine<ET>::data() const noexcept
 {
     return mp_other->data();
 }
 
-template<class ET>
-inline size_t
+template<class ET> inline 
+typename matrix_transpose_engine<ET>::size_type
 matrix_transpose_engine<ET>::columns() const noexcept
 {
     return mp_other->rows();
 }
 
-template<class ET>
-inline size_t
+template<class ET> inline 
+typename matrix_transpose_engine<ET>::size_type
 matrix_transpose_engine<ET>::rows() const noexcept
 {
     return mp_other->columns();
 }
 
-template<class ET>
-inline typename matrix_transpose_engine<ET>::size_tuple
+template<class ET> inline 
+typename matrix_transpose_engine<ET>::size_tuple
 matrix_transpose_engine<ET>::size() const noexcept
 {
     return size_tuple(columns(), rows());
 }
 
-template<class ET>
-inline size_t
+template<class ET> inline 
+typename matrix_transpose_engine<ET>::size_type
 matrix_transpose_engine<ET>::column_capacity() const noexcept
 {
     return mp_other->row_capacity();
 }
 
-template<class ET>
-inline size_t
+template<class ET> inline 
+typename matrix_transpose_engine<ET>::size_type
 matrix_transpose_engine<ET>::row_capacity() const noexcept
 {
     return mp_other->column_capacity();
 }
 
-template<class ET>
-inline typename matrix_transpose_engine<ET>::size_tuple
+template<class ET> inline 
+typename matrix_transpose_engine<ET>::size_tuple
 matrix_transpose_engine<ET>::capacity() const noexcept
 {
     return size_tuple(column_capacity(), row_capacity());
