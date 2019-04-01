@@ -23,8 +23,8 @@ class matrix
 
     using transpose_type = matrix<matrix_transpose_engine<engine_type>>;
     using hermitian_type = std::conditional_t<is_complex_v<element_type>,
-                                                  matrix<ET, OT>,
-                                                  transpose_type>;
+                                                matrix<ET, OT>,
+                                                transpose_type>;
 
     static_assert(is_matrix_element_v<element_type>);
 

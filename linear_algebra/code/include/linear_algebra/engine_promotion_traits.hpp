@@ -28,7 +28,7 @@ struct matrix_negation_engine_promotion<dr_matrix_engine<T1, A1>>
     using engine_type = dr_matrix_engine<T1, A1>;
 };
 
-template<class T1, size_t R1, size_t C1>
+template<class T1, int32_t R1, int32_t C1>
 struct matrix_negation_engine_promotion<fs_matrix_engine<T1, R1, C1>>
 {
     using engine_type = fs_matrix_engine<T1, R1, C1>;
@@ -74,7 +74,7 @@ struct matrix_addition_engine_promotion<dr_matrix_engine<T1, A1>, dr_matrix_engi
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class T1, class A1, class T2, size_t R2, size_t C2>
+template<class T1, class A1, class T2, int32_t R2, int32_t C2>
 struct matrix_addition_engine_promotion<dr_matrix_engine<T1, A1>, fs_matrix_engine<T2, R2, C2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
@@ -82,7 +82,7 @@ struct matrix_addition_engine_promotion<dr_matrix_engine<T1, A1>, fs_matrix_engi
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class T1, size_t R1, size_t C1, class T2, class A2>
+template<class T1, int32_t R1, int32_t C1, class T2, class A2>
 struct matrix_addition_engine_promotion<fs_matrix_engine<T1, R1, C1>, dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
@@ -90,7 +90,7 @@ struct matrix_addition_engine_promotion<fs_matrix_engine<T1, R1, C1>, dr_matrix_
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_addition_engine_promotion<fs_matrix_engine<T1, R1, C1>, fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == R2);
@@ -119,7 +119,7 @@ struct matrix_addition_engine_promotion<matrix_transpose_engine<ET1>, matrix_tra
     using engine_type = typename matrix_addition_engine_promotion<ET1, ET2>::engine_type;
 };
 
-template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_addition_engine_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
                                         fs_matrix_engine<T2, R2, C2>>
 {
@@ -129,7 +129,7 @@ struct matrix_addition_engine_promotion<matrix_transpose_engine<fs_matrix_engine
     using engine_type  = fs_matrix_engine<element_type, R2, C2>;
 };
 
-template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_addition_engine_promotion<fs_matrix_engine<T1, R1, C1>,
                                         matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
 {
@@ -139,7 +139,7 @@ struct matrix_addition_engine_promotion<fs_matrix_engine<T1, R1, C1>,
     using engine_type  = fs_matrix_engine<element_type, R1, C1>;
 };
 
-template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_addition_engine_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
                                         matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
 {
@@ -181,7 +181,7 @@ struct matrix_subtraction_engine_promotion<dr_matrix_engine<T1, A1>, dr_matrix_e
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class T1, class A1, class T2, size_t R2, size_t C2>
+template<class T1, class A1, class T2, int32_t R2, int32_t C2>
 struct matrix_subtraction_engine_promotion<dr_matrix_engine<T1, A1>, fs_matrix_engine<T2, R2, C2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
@@ -189,7 +189,7 @@ struct matrix_subtraction_engine_promotion<dr_matrix_engine<T1, A1>, fs_matrix_e
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class T1, size_t R1, size_t C1, class T2, class A2>
+template<class T1, int32_t R1, int32_t C1, class T2, class A2>
 struct matrix_subtraction_engine_promotion<fs_matrix_engine<T1, R1, C1>, dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
@@ -197,7 +197,7 @@ struct matrix_subtraction_engine_promotion<fs_matrix_engine<T1, R1, C1>, dr_matr
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_subtraction_engine_promotion<fs_matrix_engine<T1, R1, C1>, fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == R2);
@@ -226,7 +226,7 @@ struct matrix_subtraction_engine_promotion<matrix_transpose_engine<ET1>, matrix_
     using engine_type = typename matrix_subtraction_engine_promotion<ET1, ET2>::engine_type;
 };
 
-template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_subtraction_engine_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
                                            fs_matrix_engine<T2, R2, C2>>
 {
@@ -236,7 +236,7 @@ struct matrix_subtraction_engine_promotion<matrix_transpose_engine<fs_matrix_eng
     using engine_type  = fs_matrix_engine<element_type, R2, C2>;
 };
 
-template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_subtraction_engine_promotion<fs_matrix_engine<T1, R1, C1>,
                                            matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
 {
@@ -246,7 +246,7 @@ struct matrix_subtraction_engine_promotion<fs_matrix_engine<T1, R1, C1>,
     using engine_type  = fs_matrix_engine<element_type, R1, C1>;
 };
 
-template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_subtraction_engine_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
                                            matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
 {
@@ -289,7 +289,7 @@ struct matrix_multiplication_engine_promotion<dr_matrix_engine<T1, A1>, T2>
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class T1, size_t R1, size_t C1, class T2>
+template<class T1, int32_t R1, int32_t C1, class T2>
 struct matrix_multiplication_engine_promotion<fs_matrix_engine<T1, R1, C1>, T2>
 {
     static_assert(is_matrix_element_v<T2>);
@@ -310,7 +310,7 @@ struct matrix_multiplication_engine_promotion<dr_matrix_engine<T1, A1>, dr_matri
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class T1, class A1, class T2, size_t R2, size_t C2>
+template<class T1, class A1, class T2, int32_t R2, int32_t C2>
 struct matrix_multiplication_engine_promotion<dr_matrix_engine<T1, A1>, fs_matrix_engine<T2, R2, C2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
@@ -318,7 +318,7 @@ struct matrix_multiplication_engine_promotion<dr_matrix_engine<T1, A1>, fs_matri
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class T1, size_t R1, size_t C1, class T2, class A2>
+template<class T1, int32_t R1, int32_t C1, class T2, class A2>
 struct matrix_multiplication_engine_promotion<fs_matrix_engine<T1, R1, C1>, dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
@@ -326,7 +326,7 @@ struct matrix_multiplication_engine_promotion<fs_matrix_engine<T1, R1, C1>, dr_m
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_multiplication_engine_promotion<fs_matrix_engine<T1, R1, C1>, fs_matrix_engine<T2, R2, C2>>
 {
 //    static_assert(C1 == R2);
@@ -354,7 +354,7 @@ struct matrix_multiplication_engine_promotion<matrix_transpose_engine<ET1>, matr
     using engine_type = typename matrix_multiplication_engine_promotion<ET1, ET2>::engine_type;
 };
 
-template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_multiplication_engine_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
                                               fs_matrix_engine<T2, R2, C2>>
 {
@@ -363,7 +363,7 @@ struct matrix_multiplication_engine_promotion<matrix_transpose_engine<fs_matrix_
     using engine_type  = fs_matrix_engine<element_type, C1, C2>;
 };
 
-template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_multiplication_engine_promotion<fs_matrix_engine<T1, R1, C1>,
                                               matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
 {
@@ -372,7 +372,7 @@ struct matrix_multiplication_engine_promotion<fs_matrix_engine<T1, R1, C1>,
     using engine_type  = fs_matrix_engine<element_type, R1, R2>;
 };
 
-template<class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_multiplication_engine_promotion<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
                                               matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
 {

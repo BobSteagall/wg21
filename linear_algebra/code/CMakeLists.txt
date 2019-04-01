@@ -7,15 +7,17 @@ set(Includes
     include/linear_algebra.hpp
     include/linear_algebra/arithmetic_operators.hpp
     include/linear_algebra/arithmetic_traits.hpp
+    include/linear_algebra/debug_helpers.hpp
     include/linear_algebra/dynamic_engines.hpp
     include/linear_algebra/element_promotion_traits.hpp
     include/linear_algebra/engine_promotion_traits.hpp
     include/linear_algebra/fixed_size_engines.hpp
+    include/linear_algebra/forward_declarations.hpp
     include/linear_algebra/helper_traits.hpp
     include/linear_algebra/library_aliases.hpp
     include/linear_algebra/matrix.hpp
-    include/linear_algebra/operator_promotion_traits.hpp
     include/linear_algebra/operator_traits.hpp
+    include/linear_algebra/operator_traits_selector.hpp
     include/linear_algebra/vector.hpp
     include/linear_algebra/view_based_engines.hpp
 )
@@ -56,9 +58,9 @@ if(CMAKE_CXX_COMPILER STREQUAL clang++)
 elseif(CMAKE_CXX_COMPILER STREQUAL g++)
 
     set(CMAKE_C_FLAGS_DEBUG   "-g -Wall -pedantic")
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -std=c++17 -Wall -pedantic -Wextra  -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -std=c++17 -Wall -pedantic -Wextra  -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable -fmax-errors=10")
 
     set(CMAKE_C_FLAGS_RELEASE   "-O3 -march=westmere -Wall -pedantic")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=westmere -std=c++17 -Wall -pedantic -Wextra -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=westmere -std=c++17 -Wall -pedantic -Wextra -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable -fmax-errors=10")
 
 endif()
