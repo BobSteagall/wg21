@@ -9,7 +9,7 @@
 
 namespace STD_LA {
 
-using std::cout;    //- Yes, we're cheating, but only for convenience, we promise....
+using std::cout;    //- Yes, we're cheating, but only for convenience, and only for now, we promise....
 using std::endl;
 
 template <class T>
@@ -81,7 +81,7 @@ template<class C, class T, class A>
 std::basic_string<C,T,A>
 clean_type_name(std::basic_string<C,T,A> tname)
 {
-    static std::basic_string<C,T,A> const   ns = STRINGIFY(STD_LA) "::";
+    static std::basic_string<C,T,A> const   ns = MATRIX_STRINGIFY(STD_LA) "::";
 
     for (auto pos = std::string::npos;  (pos = tname.rfind(ns, pos)) != std::string::npos; )
     {

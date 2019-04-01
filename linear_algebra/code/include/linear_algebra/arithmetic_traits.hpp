@@ -4,6 +4,9 @@
 #include "matrix.hpp"
 
 namespace STD_LA {
+namespace detail
+{
+}
 //=================================================================================================
 //                                      **** NEGATION ****
 //=================================================================================================
@@ -330,11 +333,16 @@ struct matrix_multiplication_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>
     static result_type  multiply(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
 };
 
-template<class ET1, class OT1, class ET2, class OT2, class OTR> inline
-typename matrix_multiplication_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>::result_type
+
+template<class ET1, class OT1, class ET2, class OT2, class OTR> inline auto
+//typename matrix_multiplication_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>::result_type
 matrix_multiplication_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>::multiply
-(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
+(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2) -> result_type
 {
+    if constexpr (!ET1::is_resizable::value && ET2::is_resizable::value)
+    {
+        cout << "hi\n";
+    }
     PrintOperandTypes<result_type>("multiplication_traits", m1, m2);
     return result_type();
 }

@@ -12,11 +12,32 @@ template<typename T, typename = void>
 struct has_resize : std::false_type {};
 
 template<typename T>
-struct has_resize<T, std::void_t<decltype(std::declval<T>().resize(0,0))>>
+struct has_resize<T, std::void_t<decltype(std::declval<T>().resize(0, 0))>>
+:   std::true_type {};
+
+template<typename T, typename = void>
+struct has_resize_1 : std::false_type {};
+
+template<typename T>
+struct has_resize_1<T, std::void_t<decltype(std::declval<T>().resize(0))>>
 :   std::true_type {};
 
 template<typename T>
-inline constexpr bool   has_resize_v = has_resize<T>::value;
+inline constexpr bool   has_resize_1_v = has_resize_1<T>::value;
+
+
+template<typename T, typename = void>
+struct has_resize_2 : std::false_type {};
+
+template<typename T>
+struct has_resize_2<T, std::void_t<decltype(std::declval<T>().resize(0, 0))>>
+:   std::true_type {};
+
+template<typename T>
+inline constexpr bool   has_resize_2_v = has_resize_2<T>::value;
+
+template<typename T>
+inline constexpr bool   has_resize_v = has_resize_1_v<T> || has_resize_2_v<T>;
 
 void t01()
 {
@@ -142,7 +163,6 @@ void t05()
     auto    m31 = md2 * md3;
 }
 
-#if 0
 void t06()
 {
     PRINT_FN_NAME(t06);
@@ -210,6 +230,7 @@ void t08()
     auto    r35 = f * fvd;
 }
 
+#if 0
 void t09()
 {
     PRINT_FN_NAME(t09);
