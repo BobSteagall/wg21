@@ -185,7 +185,7 @@ template<class ET, class OT> inline
 typename matrix<ET,OT>::size_tuple
 matrix<ET,OT>::size() const noexcept
 {
-    return m_engine.size();
+    return size_tuple(m_engine.rows(), m_engine.columns());
 }
 
 template<class ET, class OT> inline
@@ -206,7 +206,7 @@ template<class ET, class OT> inline
 typename matrix<ET,OT>::size_tuple
 matrix<ET,OT>::capacity() const noexcept
 {
-    return m_engine.capacity();
+    return size_tuple(m_engine.row_capacity(), m_engine.column_capacity());
 }
 
 template<class ET, class OT> inline
@@ -247,48 +247,64 @@ matrix<ET,OT>::data() noexcept
 template<class ET, class OT>
 template<class ET2, enable_if_resizable_t<ET, ET2>> inline
 void
-matrix<ET,OT>::reserve(size_tuple)
-{}
+matrix<ET,OT>::reserve(size_tuple cap)
+{
+    m_engine.resize(std::get<0>(cap), std::get<1>(cap));
+}
 
 template<class ET, class OT>
 template<class ET2, enable_if_resizable_t<ET, ET2>> inline
 void
-matrix<ET,OT>::reserve(size_type, size_type)
-{}
+matrix<ET,OT>::reserve(size_type rowcap, size_type colcap)
+{
+    m_engine.reserve(rowcap, colcap);
+}
 
 template<class ET, class OT>
 template<class ET2, enable_if_resizable_t<ET, ET2>> inline
 void
-matrix<ET,OT>::resize(size_tuple)
-{}
+matrix<ET,OT>::resize(size_tuple size)
+{
+    m_engine.resize(std::get<0>(size), std::get<1>(size));
+}
 
 template<class ET, class OT>
 template<class ET2, enable_if_resizable_t<ET, ET2>> inline
 void
-matrix<ET,OT>::resize(size_type, size_type)
-{}
+matrix<ET,OT>::resize(size_type rows, size_type cols)
+{
+    m_engine.resize(rows, cols);
+}
 
 template<class ET, class OT>
 template<class ET2, enable_if_resizable_t<ET, ET2>> inline
 void
-matrix<ET,OT>::resize(size_tuple, size_tuple)
-{}
+matrix<ET,OT>::resize(size_tuple size, size_tuple cap)
+{
+    m_engine.resize(std::get<0>(size), std::get<1>(size), std::get<0>(cap), std::get<1>(cap));
+}
 
 template<class ET, class OT>
 template<class ET2, enable_if_resizable_t<ET, ET2>> inline
 void
-matrix<ET,OT>::resize(size_type, size_type, size_type, size_type)
-{}
+matrix<ET,OT>::resize(size_type rows, size_type cols, size_type rowcap, size_type colcap)
+{
+    m_engine.resize(rows, cols, rowcap, colcap);
+}
 
 template<class ET, class OT> inline
 void
-matrix<ET,OT>::swap_columns(index_type, index_type)
-{}
+matrix<ET,OT>::swap_columns(index_type c1, index_type c2)
+{
+    m_engine.swap_columns(c1, c2);
+}
 
 template<class ET, class OT> inline
 void
-matrix<ET,OT>::swap_rows(index_type, index_type)
-{}
+matrix<ET,OT>::swap_rows(index_type r1, index_type r2)
+{
+    m_engine.swap_rows(r1, r2);
+}
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_MATRIX_HPP_DEFINED

@@ -43,6 +43,13 @@ void t01()
 {
     PRINT_FN_NAME(t01);
 
+    static_assert(is_field_v<double>);
+    static_assert(!is_field_v<std::string>);
+    static_assert(is_ring_v<double>);
+    static_assert(!is_ring_v<std::string>);
+    static_assert(is_semi_ring_v<double>);
+    static_assert(!is_semi_ring_v<std::string>);
+
     static_assert(!is_complex_v<std::string>);
     static_assert(!is_complex_v<double>);
     static_assert(is_complex_v<std::complex<int>>);
@@ -189,6 +196,7 @@ void t06()
     auto    m08 = fmf*fmf;
 }
 
+#if 0
 void t08()
 {
     PRINT_FN_NAME(t08);
@@ -230,7 +238,6 @@ void t08()
     auto    r35 = f * fvd;
 }
 
-#if 0
 void t09()
 {
     PRINT_FN_NAME(t09);

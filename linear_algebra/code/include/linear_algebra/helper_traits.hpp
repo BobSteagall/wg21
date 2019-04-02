@@ -1,13 +1,13 @@
 #ifndef LINEAR_ALGEBRA_HELPER_TRAITS_HPP_DEFINED
 #define LINEAR_ALGEBRA_HELPER_TRAITS_HPP_DEFINED
 
-#include "engine_promotion_traits.hpp"
+#include "engine_traits.hpp"
 
 namespace STD_LA {
 
 template<class ET1, class ET2>
 using enable_if_resizable_t =
-typename std::enable_if_t<std::is_same_v<ET1, ET2>&& ET1::is_resizable::value, bool>;
+typename std::enable_if_t<std::is_same_v<ET1, ET2> && ET1::is_resizable::value, bool>;
 
 template<class RT, class O1>
 void

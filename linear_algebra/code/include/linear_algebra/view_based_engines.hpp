@@ -1,10 +1,8 @@
 #ifndef LINEAR_ALGEBRA_VIEW_BASED_ENGINES_HPP_DEFINED
 #define LINEAR_ALGEBRA_VIEW_BASED_ENGINES_HPP_DEFINED
 
-#include "element_promotion_traits.hpp"
+#include "element_traits.hpp"
 
-//- Experimental namespace for test implementation
-//
 namespace STD_LA {
 //=================================================================================================
 //  Matrix transpose engine, meant to act as an rvalue-ish "view" in expressions, in order to
@@ -79,56 +77,56 @@ matrix_transpose_engine<ET>::operator =(matrix_transpose_engine const&)
     return *this;
 }
 
-template<class ET> inline 
+template<class ET> inline
 typename matrix_transpose_engine<ET>::element_type
 matrix_transpose_engine<ET>::operator ()(index_type i, index_type j) const
 {
     return (*mp_other)(j, i);
 }
 
-template<class ET> inline 
+template<class ET> inline
 typename matrix_transpose_engine<ET>::element_type const*
 matrix_transpose_engine<ET>::data() const noexcept
 {
     return mp_other->data();
 }
 
-template<class ET> inline 
+template<class ET> inline
 typename matrix_transpose_engine<ET>::size_type
 matrix_transpose_engine<ET>::columns() const noexcept
 {
     return mp_other->rows();
 }
 
-template<class ET> inline 
+template<class ET> inline
 typename matrix_transpose_engine<ET>::size_type
 matrix_transpose_engine<ET>::rows() const noexcept
 {
     return mp_other->columns();
 }
 
-template<class ET> inline 
+template<class ET> inline
 typename matrix_transpose_engine<ET>::size_tuple
 matrix_transpose_engine<ET>::size() const noexcept
 {
     return size_tuple(columns(), rows());
 }
 
-template<class ET> inline 
+template<class ET> inline
 typename matrix_transpose_engine<ET>::size_type
 matrix_transpose_engine<ET>::column_capacity() const noexcept
 {
     return mp_other->row_capacity();
 }
 
-template<class ET> inline 
+template<class ET> inline
 typename matrix_transpose_engine<ET>::size_type
 matrix_transpose_engine<ET>::row_capacity() const noexcept
 {
     return mp_other->column_capacity();
 }
 
-template<class ET> inline 
+template<class ET> inline
 typename matrix_transpose_engine<ET>::size_tuple
 matrix_transpose_engine<ET>::capacity() const noexcept
 {
