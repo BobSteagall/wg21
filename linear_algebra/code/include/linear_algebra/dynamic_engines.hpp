@@ -1,10 +1,8 @@
 #ifndef LINEAR_ALGEBRA_DYNAMIC_ENGINES_HPP_DEFINED
 #define LINEAR_ALGEBRA_DYNAMIC_ENGINES_HPP_DEFINED
 
-#include "element_promotion_traits.hpp"
+#include "element_traits.hpp"
 
-//- Experimental namespace for test implementation
-//
 namespace STD_LA {
 //=================================================================================================
 //  Dynamically-resizable matrix engine.
@@ -89,64 +87,64 @@ dr_vector_engine<T,AT>::operator =(dr_vector_engine const&)
     return *this;
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 T
 dr_vector_engine<T,AT>::operator ()(index_type i) const
 {
     return mp_elems[i];
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 T const*
 dr_vector_engine<T,AT>::data() const noexcept
 {
     return &mp_elems[0];
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 typename dr_vector_engine<T,AT>::size_type
 dr_vector_engine<T,AT>::elements() const noexcept
 {
     return m_elems;
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 typename dr_vector_engine<T,AT>::size_type
 dr_vector_engine<T,AT>::capacity() const noexcept
 {
     return m_elemcap;
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 T&
 dr_vector_engine<T,AT>::operator ()(size_type i)
 {
     return mp_elems[i];
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 T*
 dr_vector_engine<T,AT>::data() noexcept
 {
     return &mp_elems[0];
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 void
 dr_vector_engine<T,AT>::reserve(size_type)
 {}
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 void
 dr_vector_engine<T,AT>::resize(size_type)
 {}
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 void
 dr_vector_engine<T,AT>::resize(size_type, size_type)
 {}
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 void
 dr_vector_engine<T,AT>::swap_elements(index_type, index_type)
 {}
@@ -258,112 +256,112 @@ dr_matrix_engine<T,AT>::operator =(dr_matrix_engine const&)
     return *this;
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 T
 dr_matrix_engine<T,AT>::operator ()(size_type i, size_type j) const
 {
     return mp_elems[i*m_colcap + j];
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 T const*
 dr_matrix_engine<T,AT>::data() const noexcept
 {
     return &mp_elems[0];
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 typename dr_matrix_engine<T,AT>::size_type
 dr_matrix_engine<T,AT>::columns() const noexcept
 {
     return m_cols;
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 typename dr_matrix_engine<T,AT>::size_type
 dr_matrix_engine<T,AT>::rows() const noexcept
 {
     return m_rows;
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 typename dr_matrix_engine<T,AT>::size_tuple
 dr_matrix_engine<T,AT>::size() const noexcept
 {
     return size_tuple(m_rows, m_cols);
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 typename dr_matrix_engine<T,AT>::size_type
 dr_matrix_engine<T,AT>::column_capacity() const noexcept
 {
     return m_colcap;
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 typename dr_matrix_engine<T,AT>::size_type
 dr_matrix_engine<T,AT>::row_capacity() const noexcept
 {
     return m_rowcap;
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 typename dr_matrix_engine<T,AT>::size_tuple
 dr_matrix_engine<T,AT>::capacity() const noexcept
 {
     return size_tuple(m_rowcap, m_colcap);
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 T&
 dr_matrix_engine<T,AT>::operator ()(size_type i, size_type j)
 {
     return mp_elems[i*m_colcap + j];
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 T*
 dr_matrix_engine<T,AT>::data() noexcept
 {
     return &mp_elems[0];
 }
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 void
 dr_matrix_engine<T,AT>::reserve(size_tuple)
 {}
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 void
 dr_matrix_engine<T,AT>::reserve(index_type, index_type)
 {}
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 void
 dr_matrix_engine<T,AT>::resize(size_tuple)
 {}
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 void
 dr_matrix_engine<T,AT>::resize(index_type, index_type)
 {}
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 void
 dr_matrix_engine<T,AT>::resize(size_tuple, size_tuple)
 {}
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 void
 dr_matrix_engine<T,AT>::resize(size_type, size_type, size_type, size_type)
 {}
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 void
 dr_matrix_engine<T,AT>::swap_columns(index_type, index_type)
 {}
 
-template<class T, class AT> inline 
+template<class T, class AT> inline
 void
 dr_matrix_engine<T,AT>::swap_rows(index_type, index_type)
 {}

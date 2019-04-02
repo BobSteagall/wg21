@@ -1,7 +1,7 @@
 #ifndef LINEAR_ALGEBRA_ARITHMETIC_OPERATORS_HPP_DEFINED
 #define LINEAR_ALGEBRA_ARITHMETIC_OPERATORS_HPP_DEFINED
 
-#include "operator_traits_selector.hpp"
+#include "operator_traits.hpp"
 
 namespace STD_LA {
 //=================================================================================================

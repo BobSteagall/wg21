@@ -1,10 +1,8 @@
 #ifndef LINEAR_ALGEBRA_FIXED_SIZE_ENGINES_HPP_DEFINED
 #define LINEAR_ALGEBRA_FIXED_SIZE_ENGINES_HPP_DEFINED
 
-#include "element_promotion_traits.hpp"
+#include "element_traits.hpp"
 
-//- Experimental namespace for test implementation
-//
 namespace STD_LA {
 //=================================================================================================
 //  Fixed-size, fixed-capacity matrix engine.

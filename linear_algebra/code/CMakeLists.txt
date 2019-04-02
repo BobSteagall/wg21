@@ -9,13 +9,14 @@ set(Includes
     include/linear_algebra/arithmetic_traits.hpp
     include/linear_algebra/debug_helpers.hpp
     include/linear_algebra/dynamic_engines.hpp
-    include/linear_algebra/element_promotion_traits.hpp
-    include/linear_algebra/engine_promotion_traits.hpp
+    include/linear_algebra/element_traits.hpp
+    include/linear_algebra/engine_traits.hpp
     include/linear_algebra/fixed_size_engines.hpp
     include/linear_algebra/forward_declarations.hpp
     include/linear_algebra/helper_traits.hpp
     include/linear_algebra/library_aliases.hpp
     include/linear_algebra/matrix.hpp
+    include/linear_algebra/number_traits.hpp
     include/linear_algebra/operator_traits.hpp
     include/linear_algebra/operator_traits_selector.hpp
     include/linear_algebra/vector.hpp
