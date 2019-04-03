@@ -39,6 +39,8 @@ inline constexpr bool   has_resize_2_v = has_resize_2<T>::value;
 template<typename T>
 inline constexpr bool   has_resize_v = has_resize_1_v<T> || has_resize_2_v<T>;
 
+
+
 void t01()
 {
     PRINT_FN_NAME(t01);

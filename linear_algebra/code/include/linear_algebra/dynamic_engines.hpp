@@ -21,6 +21,7 @@ class dr_vector_engine
     using size_type      = ptrdiff_t;
 
   public:
+    ~dr_vector_engine();
     dr_vector_engine();
     dr_vector_engine(dr_vector_engine&&);
     dr_vector_engine(dr_vector_engine const&);
@@ -52,6 +53,10 @@ class dr_vector_engine
     size_type   m_elems;
     size_type   m_elemcap;
 };
+
+template<class T, class AT> inline
+dr_vector_engine<T,AT>::~dr_vector_engine()
+{}
 
 template<class T, class AT> inline
 dr_vector_engine<T,AT>::dr_vector_engine()
@@ -168,12 +173,11 @@ class dr_matrix_engine
     using size_tuple     = std::tuple<size_type, size_type>;
 
   public:
+    ~dr_matrix_engine();
     dr_matrix_engine();
     dr_matrix_engine(dr_matrix_engine&&);
     dr_matrix_engine(dr_matrix_engine const&);
-    dr_matrix_engine(size_tuple size);
     dr_matrix_engine(size_type rows, size_type cols);
-    dr_matrix_engine(size_tuple size, size_tuple cap);
     dr_matrix_engine(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 
     dr_matrix_engine& operator =(dr_matrix_engine&&);
@@ -193,12 +197,8 @@ class dr_matrix_engine
     T&      operator ()(size_type i, size_type j);
     T*      data() noexcept;
 
-    void    reserve(size_tuple cap);
     void    reserve(size_type rowcap, size_type colcap);
-
-    void    resize(size_tuple size);
     void    resize(size_type rows, size_type cols);
-    void    resize(size_tuple size, size_tuple cap);
     void    resize(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 
     void    swap_columns(index_type i, index_type j);
@@ -215,6 +215,10 @@ class dr_matrix_engine
 };
 
 template<class T, class AT> inline
+dr_matrix_engine<T,AT>::~dr_matrix_engine()
+{}
+
+template<class T, class AT> inline
 dr_matrix_engine<T,AT>::dr_matrix_engine()
 {}
 
@@ -227,15 +231,7 @@ dr_matrix_engine<T,AT>::dr_matrix_engine(dr_matrix_engine const&)
 {}
 
 template<class T, class AT> inline
-dr_matrix_engine<T,AT>::dr_matrix_engine(size_tuple)
-{}
-
-template<class T, class AT> inline
 dr_matrix_engine<T,AT>::dr_matrix_engine(size_type, size_type)
-{}
-
-template<class T, class AT> inline
-dr_matrix_engine<T,AT>::dr_matrix_engine(size_tuple, size_tuple)
 {}
 
 template<class T, class AT> inline
@@ -328,27 +324,12 @@ dr_matrix_engine<T,AT>::data() noexcept
 
 template<class T, class AT> inline
 void
-dr_matrix_engine<T,AT>::reserve(size_tuple)
-{}
-
-template<class T, class AT> inline
-void
 dr_matrix_engine<T,AT>::reserve(index_type, index_type)
 {}
 
 template<class T, class AT> inline
 void
-dr_matrix_engine<T,AT>::resize(size_tuple)
-{}
-
-template<class T, class AT> inline
-void
 dr_matrix_engine<T,AT>::resize(index_type, index_type)
-{}
-
-template<class T, class AT> inline
-void
-dr_matrix_engine<T,AT>::resize(size_tuple, size_tuple)
 {}
 
 template<class T, class AT> inline

@@ -22,9 +22,7 @@ class matrix
     using size_tuple     = typename engine_type::size_tuple;
 
     using transpose_type = matrix<matrix_transpose_engine<engine_type>>;
-    using hermitian_type = std::conditional_t<is_complex_v<element_type>,
-                                                matrix<ET, OT>,
-                                                transpose_type>;
+    using hermitian_type = std::conditional_t<is_complex_v<element_type>, matrix, transpose_type>;
 
     static_assert(is_matrix_element_v<element_type>);
 
