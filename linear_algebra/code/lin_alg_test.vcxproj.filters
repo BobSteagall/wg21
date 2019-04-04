@@ -44,9 +44,6 @@
     <ClInclude Include="include\linear_algebra\arithmetic_operators.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="include\linear_algebra\matrix_test_impl.hpp">
-      <Filter>Implementation Headers</Filter>
-    </ClInclude>
     <ClInclude Include="include\linear_algebra\vector.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
@@ -59,12 +56,6 @@
     <ClInclude Include="include\linear_algebra\view_based_engines.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="include\linear_algebra\element_promotion_traits.hpp">
-      <Filter>Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\linear_algebra\engine_promotion_traits.hpp">
-      <Filter>Implementation Headers</Filter>
-    </ClInclude>
     <ClInclude Include="include\linear_algebra\operator_traits.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
@@ -74,7 +65,13 @@
     <ClInclude Include="include\linear_algebra\debug_helpers.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="include\linear_algebra\operator_traits_selector.hpp">
+    <ClInclude Include="include\linear_algebra\element_traits.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\engine_traits.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\number_traits.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
   </ItemGroup>

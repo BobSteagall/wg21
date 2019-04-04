@@ -122,7 +122,7 @@ dr_vector_engine<T,AT>::capacity() const noexcept
 
 template<class T, class AT> inline
 T&
-dr_vector_engine<T,AT>::operator ()(size_type i)
+dr_vector_engine<T,AT>::operator ()(index_type i)
 {
     return mp_elems[i];
 }
