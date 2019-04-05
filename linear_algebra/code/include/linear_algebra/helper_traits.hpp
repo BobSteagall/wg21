@@ -30,6 +30,15 @@ struct has_resize_x<CT, std::void_t<decltype(detection_helper<void (CT::*)(ST,ST
 :   std::true_type {};
 */
 
+template<class ET1, class ET2>
+using enable_if_engine_is_mutable =
+typename std::enable_if_t<std::is_same_v<ET1, ET2> && (ET1::engine_category::value >= 2), bool>;
+
+template<class ET1, class ET2>
+using enable_if_mutable_test =
+typename std::enable_if_t<std::is_same_v<ET1, ET2> && (ET1::engine_category::value >= 2), std::true_type>;
+
+
 template<class RT, class O1>
 void
 PrintOperandTypes(std::string const& loc, O1 const& o1)

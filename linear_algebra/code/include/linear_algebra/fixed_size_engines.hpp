@@ -14,14 +14,15 @@ class fs_vector_engine
     static_assert(N >= 1);
 
   public:
-    using element_type   = T;
-    using is_dense       = std::true_type;
-    using is_fixed_size  = std::true_type;
-    using is_rectangular = std::true_type;
-    using is_resizable   = std::false_type;
-    using is_row_major   = std::true_type;
-    using index_type     = int_fast32_t;
-    using size_type      = int_fast32_t;
+    using engine_category = mutable_matrix_engine_tag;
+    using element_type    = T;
+    using is_dense        = std::true_type;
+    using is_fixed_size   = std::true_type;
+    using is_rectangular  = std::true_type;
+    using is_resizable    = std::false_type;
+    using is_row_major    = std::true_type;
+    using index_type      = int_fast32_t;
+    using size_type       = int_fast32_t;
 
   public:
     fs_vector_engine() = default;
@@ -105,14 +106,15 @@ class fs_matrix_engine
     static_assert(C >= 1);
 
   public:
-    using element_type   = T;
-    using is_dense       = std::true_type;
-    using is_fixed_size  = std::true_type;
-    using is_rectangular = std::true_type;
-    using is_resizable   = std::false_type;
-    using is_row_major   = std::true_type;
-    using index_type     = std::int_fast32_t;
-    using size_type      = std::int_fast32_t;
+    using engine_category = mutable_matrix_engine_tag;
+    using element_type    = T;
+    using is_dense        = std::true_type;
+    using is_fixed_size   = std::true_type;
+    using is_rectangular  = std::true_type;
+    using is_resizable    = std::false_type;
+    using is_row_major    = std::true_type;
+    using index_type      = int_fast32_t;
+    using size_type       = int_fast32_t;
     using size_tuple     = std::tuple<size_type, size_type>;
 
   public:
