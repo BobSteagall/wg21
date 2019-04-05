@@ -12,13 +12,13 @@ template<class T, class AT>
 class dr_vector_engine
 {
   public:
-    using element_type   = T;
-    using is_dense       = std::true_type;
-    using is_rectangular = std::true_type;
-    using is_resizable   = std::true_type;
-    using is_row_major   = std::true_type;
-    using index_type     = ptrdiff_t;
-    using size_type      = ptrdiff_t;
+    using engine_category = resizable_matrix_engine_tag;
+    using element_type    = T;
+    using is_dense        = std::true_type;
+    using is_rectangular  = std::true_type;
+    using is_row_major    = std::true_type;
+    using index_type      = ptrdiff_t;
+    using size_type       = ptrdiff_t;
 
   public:
     ~dr_vector_engine();
@@ -163,14 +163,14 @@ template<class T, class AT>
 class dr_matrix_engine
 {
   public:
-    using element_type   = T;
-    using is_dense       = std::true_type;
-    using is_rectangular = std::true_type;
-    using is_resizable   = std::true_type;
-    using is_row_major   = std::true_type;
-    using index_type     = ptrdiff_t;
-    using size_type      = ptrdiff_t;
-    using size_tuple     = std::tuple<size_type, size_type>;
+    using engine_category = resizable_matrix_engine_tag;
+    using element_type    = T;
+    using is_dense        = std::true_type;
+    using is_rectangular  = std::true_type;
+    using is_row_major    = std::true_type;
+    using index_type      = ptrdiff_t;
+    using size_type       = ptrdiff_t;
+    using size_tuple      = std::tuple<size_type, size_type>;
 
   public:
     ~dr_matrix_engine();

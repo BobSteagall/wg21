@@ -196,6 +196,12 @@ void t06()
     auto    m06 = fmc*dmc;
     auto    m07 = fmf*fmd;
     auto    m08 = fmf*fmf;
+
+    dmf.resize(1, 1, 3, 3);
+    dmf.swap_rows(1, 2);
+
+    //fmf.resize(1, 1, 3, 3);
+    //fmf.swap_rows(1, 2);
 }
 
 #if 0

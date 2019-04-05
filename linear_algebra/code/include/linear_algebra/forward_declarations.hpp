@@ -3,8 +3,16 @@
 
 namespace STD_LA {
 
+using const_matrix_engine_tag     = std::integral_constant<int, 1>;
+using mutable_matrix_engine_tag   = std::integral_constant<int, 2>;
+using resizable_matrix_engine_tag = std::integral_constant<int, 3>;
+
 //- Traits for verifying appropriate matrix element types.
 //
+template<class T>   struct number_traits;
+template<class T>   struct is_field;
+template<class T>   struct is_ring;
+template<class T>   struct is_semi_ring;
 template<class T>   struct is_complex;
 template<class T>   struct is_matrix_element;
 

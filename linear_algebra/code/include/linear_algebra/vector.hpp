@@ -12,7 +12,7 @@ template<class ET, class OT>
 class vector
 {
     template<class ET1, class ET2>
-    using enable_if_resizable_t =
+    using enable_if_resizable_z =
     typename std::enable_if_t<std::is_same_v<ET1, ET2> && ET1::is_resizable::value, bool>;
 
   public:
@@ -20,7 +20,6 @@ class vector
     using element_type   = typename engine_type::element_type;
     using is_dense       = typename engine_type::is_dense;
     using is_rectangular = typename engine_type::is_rectangular;
-    using is_resizable   = typename engine_type::is_resizable;
     using index_type     = typename engine_type::index_type;
     using size_type      = typename engine_type::size_type;
 
@@ -37,9 +36,9 @@ class vector
     template<class ET2, class OT2>
     vector(vector<ET2, OT2> const& src);
 
-    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable<ET, ET2> = true>
     vector(size_type elems);
-    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable<ET, ET2> = true>
     vector(size_type elems, size_type elemcap);
 
     vector& operator =(vector&&) = default;
@@ -69,17 +68,17 @@ class vector
 
     //- Change capacity.
     //
-    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable<ET, ET2> = true>
     void    reserve(size_type elemcap);
 
     //- Change size.
     //
-    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable<ET, ET2> = true>
     void    resize(size_type elems);
 
     //- Change size and capacity in one shot.
     //
-    template<class ET2 = ET, enable_if_resizable_t<ET, ET2> = true>
+    template<class ET2 = ET, enable_if_resizable<ET, ET2> = true>
     void    resize(size_type elems, size_type elemcap);
 
     //- column operations.
@@ -106,12 +105,12 @@ vector<ET,OT>::vector(vector<ET2, OT2> const&)
 {}
 
 template<class ET, class OT>
-template<class ET2, enable_if_resizable_t<ET, ET2>> inline
+template<class ET2, enable_if_resizable<ET, ET2>> inline
 vector<ET,OT>::vector(size_type)
 {}
 
 template<class ET, class OT>
-template<class ET2, enable_if_resizable_t<ET, ET2>> inline
+template<class ET2, enable_if_resizable<ET, ET2>> inline
 vector<ET,OT>::vector(size_type, size_type)
 {}
 
@@ -191,19 +190,19 @@ vector<ET,OT>::data() noexcept
 }
 
 template<class ET, class OT>
-template<class ET2, enable_if_resizable_t<ET, ET2>> inline
+template<class ET2, enable_if_resizable<ET, ET2>> inline
 void
 vector<ET,OT>::reserve(size_type)
 {}
 
 template<class ET, class OT>
-template<class ET2, enable_if_resizable_t<ET, ET2>> inline
+template<class ET2, enable_if_resizable<ET, ET2>> inline
 void
 vector<ET,OT>::resize(size_type)
 {}
 
 template<class ET, class OT>
-template<class ET2, enable_if_resizable_t<ET, ET2>> inline
+template<class ET2, enable_if_resizable<ET, ET2>> inline
 void
 vector<ET,OT>::resize(size_type, size_type)
 {}
