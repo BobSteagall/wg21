@@ -6,6 +6,33 @@
 #include "view_based_engines.hpp"
 
 namespace STD_LA {
+namespace detail {
+//- Testing to see if an engine has mutable element indexing.
+//
+template<class ET>
+constexpr bool  has_mutable_tag_v = ET::engine_category::value >= mutable_matrix_engine_tag::value;
+
+template<class ET1, class ET2>
+constexpr bool  is_mutable_engine_v = is_same_v<ET1, ET2> && has_mutable_tag_v<ET1>;
+
+
+template<class ET1, class ET2>
+using enable_if_mutable = enable_if_t<is_mutable_engine_v<ET1, ET2>, bool>;
+
+
+//- Testing to see if an engine is resizable.
+//
+template<class ET>
+constexpr bool  has_resizable_tag_v = ET::engine_category::value >= resizable_matrix_engine_tag::value;
+
+template<class ET1, class ET2>
+constexpr bool  is_resizable_engine_v = is_same_v<ET1, ET2> && has_resizable_tag_v<ET1>;
+
+
+template<class ET1, class ET2>
+using enable_if_resizable = enable_if_t<is_resizable_engine_v<ET1, ET2>, bool>;
+
+}   //- namespace detail
 //=================================================================================================
 //                                      **** NEGATION ****
 //=================================================================================================
@@ -70,7 +97,7 @@ template<class T1, class A1, class T2, class A2>
 struct matrix_addition_engine_promotion<dr_matrix_engine<T1, A1>, dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using alloc_type   = typename std::allocator_traits<A1>::template rebind_alloc<element_type>;
+    using alloc_type   = typename allocator_traits<A1>::template rebind_alloc<element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
@@ -78,7 +105,7 @@ template<class T1, class A1, class T2, int32_t R2, int32_t C2>
 struct matrix_addition_engine_promotion<dr_matrix_engine<T1, A1>, fs_matrix_engine<T2, R2, C2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using alloc_type   = typename std::allocator_traits<A1>::template rebind_alloc<element_type>;
+    using alloc_type   = typename allocator_traits<A1>::template rebind_alloc<element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
@@ -86,7 +113,7 @@ template<class T1, int32_t R1, int32_t C1, class T2, class A2>
 struct matrix_addition_engine_promotion<fs_matrix_engine<T1, R1, C1>, dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using alloc_type   = typename std::allocator_traits<A2>::template rebind_alloc<element_type>;
+    using alloc_type   = typename allocator_traits<A2>::template rebind_alloc<element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
@@ -177,7 +204,7 @@ template<class T1, class A1, class T2, class A2>
 struct matrix_subtraction_engine_promotion<dr_matrix_engine<T1, A1>, dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using alloc_type   = typename std::allocator_traits<A1>::template rebind_alloc<element_type>;
+    using alloc_type   = typename allocator_traits<A1>::template rebind_alloc<element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
@@ -185,7 +212,7 @@ template<class T1, class A1, class T2, int32_t R2, int32_t C2>
 struct matrix_subtraction_engine_promotion<dr_matrix_engine<T1, A1>, fs_matrix_engine<T2, R2, C2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using alloc_type   = typename std::allocator_traits<A1>::template rebind_alloc<element_type>;
+    using alloc_type   = typename allocator_traits<A1>::template rebind_alloc<element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
@@ -193,7 +220,7 @@ template<class T1, int32_t R1, int32_t C1, class T2, class A2>
 struct matrix_subtraction_engine_promotion<fs_matrix_engine<T1, R1, C1>, dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using alloc_type   = typename std::allocator_traits<A2>::template rebind_alloc<element_type>;
+    using alloc_type   = typename allocator_traits<A2>::template rebind_alloc<element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
@@ -282,18 +309,14 @@ struct matrix_multiplication_engine_promotion
 template<class T1, class A1, class T2>
 struct matrix_multiplication_engine_promotion<dr_matrix_engine<T1, A1>, T2>
 {
-    static_assert(is_matrix_element_v<T2>);
-
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using alloc_type   = typename std::allocator_traits<A1>::template rebind_alloc<element_type>;
+    using alloc_type   = typename allocator_traits<A1>::template rebind_alloc<element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2>
 struct matrix_multiplication_engine_promotion<fs_matrix_engine<T1, R1, C1>, T2>
 {
-    static_assert(is_matrix_element_v<T2>);
-
     using element_type = matrix_element_promotion_t<T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C1>;
 };
@@ -306,7 +329,7 @@ template<class T1, class A1, class T2, class A2>
 struct matrix_multiplication_engine_promotion<dr_matrix_engine<T1, A1>, dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using alloc_type   = typename std::allocator_traits<A1>::template rebind_alloc<element_type>;
+    using alloc_type   = typename allocator_traits<A1>::template rebind_alloc<element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
@@ -314,7 +337,7 @@ template<class T1, class A1, class T2, int32_t R2, int32_t C2>
 struct matrix_multiplication_engine_promotion<dr_matrix_engine<T1, A1>, fs_matrix_engine<T2, R2, C2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using alloc_type   = typename std::allocator_traits<A1>::template rebind_alloc<element_type>;
+    using alloc_type   = typename allocator_traits<A1>::template rebind_alloc<element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
@@ -322,14 +345,14 @@ template<class T1, int32_t R1, int32_t C1, class T2, class A2>
 struct matrix_multiplication_engine_promotion<fs_matrix_engine<T1, R1, C1>, dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
-    using alloc_type   = typename std::allocator_traits<A2>::template rebind_alloc<element_type>;
+    using alloc_type   = typename allocator_traits<A2>::template rebind_alloc<element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_multiplication_engine_promotion<fs_matrix_engine<T1, R1, C1>, fs_matrix_engine<T2, R2, C2>>
 {
-//    static_assert(C1 == R2);
+    static_assert(C1 == R2);
     using element_type = matrix_element_promotion_t<T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C2>;
 };

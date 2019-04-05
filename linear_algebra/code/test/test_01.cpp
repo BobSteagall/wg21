@@ -67,9 +67,6 @@ void t01()
     //
     static_assert(!has_resize_v<fs_matrix<double, 3, 3>>);
     static_assert(has_resize_v<dyn_matrix<double>>);
-
-    static_assert(!has_resize_x<fs_matrix<double, 3, 3>>::value);
-    static_assert(has_resize_x<dyn_matrix<double>>::value);
 }
 
 void t02()

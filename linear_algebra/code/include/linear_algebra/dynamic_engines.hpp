@@ -14,9 +14,9 @@ class dr_vector_engine
   public:
     using engine_category = resizable_matrix_engine_tag;
     using element_type    = T;
-    using is_dense        = std::true_type;
-    using is_rectangular  = std::true_type;
-    using is_row_major    = std::true_type;
+    using is_dense        = true_type;
+    using is_rectangular  = true_type;
+    using is_row_major    = true_type;
     using index_type      = ptrdiff_t;
     using size_type       = ptrdiff_t;
 
@@ -47,7 +47,7 @@ class dr_vector_engine
     void    swap_elements(index_type i, index_type j);
 
   private:
-    using pointer = typename std::allocator_traits<AT>::pointer;
+    using pointer = typename allocator_traits<AT>::pointer;
 
     pointer     mp_elems;       //- For exposition; data buffer
     size_type   m_elems;
@@ -165,12 +165,12 @@ class dr_matrix_engine
   public:
     using engine_category = resizable_matrix_engine_tag;
     using element_type    = T;
-    using is_dense        = std::true_type;
-    using is_rectangular  = std::true_type;
-    using is_row_major    = std::true_type;
+    using is_dense        = true_type;
+    using is_rectangular  = true_type;
+    using is_row_major    = true_type;
     using index_type      = ptrdiff_t;
     using size_type       = ptrdiff_t;
-    using size_tuple      = std::tuple<size_type, size_type>;
+    using size_tuple      = tuple<size_type, size_type>;
 
   public:
     ~dr_matrix_engine();
@@ -205,7 +205,7 @@ class dr_matrix_engine
     void    swap_rows(index_type i, index_type j);
 
   private:
-    using pointer = typename std::allocator_traits<AT>::pointer;
+    using pointer = typename allocator_traits<AT>::pointer;
 
     pointer     mp_elems;       //- For exposition; data buffer
     size_type   m_rows;

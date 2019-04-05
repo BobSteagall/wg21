@@ -17,8 +17,7 @@ class matrix_transpose_engine
     using element_type   = typename engine_type::element_type;
     using is_dense       = typename engine_type::is_dense;
     using is_rectangular = typename engine_type::is_rectangular;
-    using is_resizable   = std::false_type;
-    using is_row_major   = std::conditional_t<ET::is_row_major::value, std::false_type, std::true_type>;
+    using is_row_major   = typename engine_type::is_row_major;
     using index_type     = typename engine_type::index_type;
     using size_type      = typename engine_type::size_type;
     using size_tuple     = typename engine_type::size_tuple;

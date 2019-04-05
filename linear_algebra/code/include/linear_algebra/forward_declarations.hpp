@@ -3,9 +3,11 @@
 
 namespace STD_LA {
 
-using const_matrix_engine_tag     = std::integral_constant<int, 1>;
-using mutable_matrix_engine_tag   = std::integral_constant<int, 2>;
-using resizable_matrix_engine_tag = std::integral_constant<int, 3>;
+USING_STD
+
+using const_matrix_engine_tag     = integral_constant<int, 1>;
+using mutable_matrix_engine_tag   = integral_constant<int, 2>;
+using resizable_matrix_engine_tag = integral_constant<int, 3>;
 
 //- Traits for verifying appropriate matrix element types.
 //
@@ -22,11 +24,11 @@ template<class T1, class T2>    struct matrix_element_promotion;
 
 //- Basic linear algebra math object engine types.
 //
-template<class T, int32_t N>                    class fs_vector_engine;
-template<class T, int32_t R, int32_t C>         class fs_matrix_engine;
-template<class T, class AT=std::allocator<T>>   class dr_vector_engine;
-template<class T, class AT=std::allocator<T>>   class dr_matrix_engine;
-template<class ET>                              class matrix_transpose_engine;
+template<class T, int32_t N>                class fs_vector_engine;
+template<class T, int32_t R, int32_t C>     class fs_matrix_engine;
+template<class T, class AT=allocator<T>>    class dr_vector_engine;
+template<class T, class AT=allocator<T>>    class dr_matrix_engine;
+template<class ET>                          class matrix_transpose_engine;
 
 //- Math object engine promotion, per arithmetical operation.
 //
