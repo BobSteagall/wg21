@@ -11,21 +11,21 @@ namespace detail {
 //
 struct builtin_number_traits
 {
-    using is_field    = std::true_type;
-    using is_ring     = std::true_type;
-    using is_semiring = std::true_type;
+    using is_field    = true_type;
+    using is_ring     = true_type;
+    using is_semiring = true_type;
 };
 
 struct non_number_traits
 {
-    using is_field    = std::false_type;
-    using is_ring     = std::false_type;
-    using is_semiring = std::false_type;
+    using is_field    = false_type;
+    using is_ring     = false_type;
+    using is_semiring = false_type;
 };
 
 template<class T>
 using scalar_number_traits_helper_t =
-    std::conditional_t<std::is_arithmetic_v<T>, builtin_number_traits, non_number_traits>;
+    conditional_t<is_arithmetic_v<T>, builtin_number_traits, non_number_traits>;
 
 }   //- detail namespace
 
@@ -38,7 +38,7 @@ struct number_traits : public detail::scalar_number_traits_helper_t<T>
 {};
 
 template<class T>
-struct number_traits<std::complex<T>> : public number_traits<T>
+struct number_traits<complex<T>> : public number_traits<T>
 {};
 
 //--------------------------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ struct number_traits<std::complex<T>> : public number_traits<T>
 //--------------------------------------------------------------------------------------------------
 //
 template<class T>
-struct is_field : public std::bool_constant<number_traits<T>::is_field::value>
+struct is_field : public bool_constant<number_traits<T>::is_field::value>
 {};
 
 template<class T>
@@ -57,7 +57,7 @@ constexpr bool  is_field_v = is_field<T>::value;
 //--------------------------------------------------------------------------------------------------
 //
 template<class T>
-struct is_ring : public std::bool_constant<number_traits<T>::is_field::value>
+struct is_ring : public bool_constant<number_traits<T>::is_field::value>
 {};
 
 template<class T>
@@ -68,22 +68,22 @@ constexpr bool  is_ring_v = is_ring<T>::value;
 //--------------------------------------------------------------------------------------------------
 //
 template<class T>
-struct is_semi_ring : public std::bool_constant<number_traits<T>::is_field::value>
+struct is_semi_ring : public bool_constant<number_traits<T>::is_field::value>
 {};
 
 template<class T>
 constexpr bool  is_semi_ring_v = is_semi_ring<T>::value;
 
 //--------------------------------------------------------------------------------------------------
-//- New trait "is_complex<T>" to detect if a type is std::complex<T>.
+//- New trait "is_complex<T>" to detect if a type is complex<T>.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T>
-struct is_complex : public std::false_type
+struct is_complex : public false_type
 {};
 
 template<class T>
-struct is_complex<std::complex<T>> : public std::true_type
+struct is_complex<complex<T>> : public true_type
 {};
 
 template<class T>
@@ -94,7 +94,7 @@ constexpr bool  is_complex_v = is_complex<T>::value;
 //--------------------------------------------------------------------------------------------------
 //
 template<class T>
-struct is_matrix_element : public std::bool_constant<std::is_arithmetic_v<T> || is_field_v<T>>
+struct is_matrix_element : public bool_constant<is_arithmetic_v<T> || is_field_v<T>>
 {};
 
 template<class T>

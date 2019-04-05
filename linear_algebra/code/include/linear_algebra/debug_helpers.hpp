@@ -6,14 +6,14 @@
 //-------------------------------------------------------------------------------------------------
 //
 #include <iostream>
+#include <string_view>
 
 namespace STD_LA {
 
-using std::cout;    //- Yes, we're cheating, but only for convenience, and only for now, we promise....
-using std::endl;
+USING_STD
 
 template <class T>
-constexpr std::string_view
+constexpr string_view
 type_name()                //- Thanks to Howard Hinnant for this!
 {
     using namespace std;
@@ -44,30 +44,30 @@ type_name()                //- Thanks to Howard Hinnant for this!
 #ifdef _MSC_VER
 
 template<class C, class T, class A>
-std::basic_string<C,T,A>
-clean_type_name(std::basic_string<C,T,A> tname)
+basic_string<C,T,A>
+clean_type_name(basic_string<C,T,A> tname)
 {
-    static std::basic_string<C,T,A> const   cl = "class ";
-    static std::basic_string<C,T,A> const   st = "struct ";
-    static std::basic_string<C,T,A> const   ns = MATRIX_STRINGIFY(STD_LA) "::";
-    static std::basic_string<C,T,A> const   aa = "> >";
+    static basic_string<C,T,A> const   cl = "class ";
+    static basic_string<C,T,A> const   st = "struct ";
+    static basic_string<C,T,A> const   ns = MATRIX_STRINGIFY(STD_LA) "::";
+    static basic_string<C,T,A> const   aa = "> >";
 
-    for (auto pos = std::string::npos;  (pos = tname.rfind(cl, pos)) != std::string::npos; )
+    for (auto pos = string::npos;  (pos = tname.rfind(cl, pos)) != string::npos; )
     {
         tname.erase(pos, cl.size());
     }
 
-    for (auto pos = std::string::npos;  (pos = tname.rfind(st, pos)) != std::string::npos; )
+    for (auto pos = string::npos;  (pos = tname.rfind(st, pos)) != string::npos; )
     {
         tname.erase(pos, st.size());
     }
 
-    for (auto pos = std::string::npos;  (pos = tname.rfind(ns, pos)) != std::string::npos; )
+    for (auto pos = string::npos;  (pos = tname.rfind(ns, pos)) != string::npos; )
     {
         tname.erase(pos, ns.size());
     }
 
-    for (auto pos = std::string::npos;  (pos = tname.rfind(aa, pos)) != std::string::npos; )
+    for (auto pos = string::npos;  (pos = tname.rfind(aa, pos)) != string::npos; )
     {
         tname.replace(pos, 3u, ">>");
     }
@@ -78,12 +78,12 @@ clean_type_name(std::basic_string<C,T,A> tname)
 #else
 
 template<class C, class T, class A>
-std::basic_string<C,T,A>
-clean_type_name(std::basic_string<C,T,A> tname)
+basic_string<C,T,A>
+clean_type_name(basic_string<C,T,A> tname)
 {
-    static std::basic_string<C,T,A> const   ns = MATRIX_STRINGIFY(STD_LA) "::";
+    static basic_string<C,T,A> const   ns = MATRIX_STRINGIFY(STD_LA) "::";
 
-    for (auto pos = std::string::npos;  (pos = tname.rfind(ns, pos)) != std::string::npos; )
+    for (auto pos = string::npos;  (pos = tname.rfind(ns, pos)) != string::npos; )
     {
         tname.erase(pos, ns.size());
     }
@@ -96,26 +96,47 @@ clean_type_name(std::basic_string<C,T,A> tname)
 #undef MATRIX_STRINGIFY_H
 
 template<class T>
-std::string
+string
 get_type_name()
 {
     auto    view = type_name<T>();
-    return clean_type_name(std::string(view.data(), view.size()));
+    return clean_type_name(string(view.data(), view.size()));
 }
 
 template<class T>
-std::string
+string
 get_type_name(T const&)
 {
     auto    view = type_name<T>();
-    return clean_type_name(std::string(view.data(), view.size()));
+    return clean_type_name(string(view.data(), view.size()));
 }
 
 #define PRINT_FN_NAME(name) \
-    std::cout \
+    cout \
         << "********************************************************************************\n" \
         << "********************************************************************************\n" \
-        << "entering test function " << #name << "()\n" << std::endl
+        << "entering test function " << #name << "()\n" << endl
+
+
+
+template<class RT, class O1>
+void
+PrintOperandTypes(string const& loc, O1 const& o1)
+{
+    cout << "in " << loc << endl
+         << "  op1: " << get_type_name(o1) << endl
+         << "  ret: " << get_type_name<RT>() << endl << endl;
+}
+
+template<class RT, class O1, class O2>
+void
+PrintOperandTypes(string const& loc, O1 const& o1, O2 const& o2)
+{
+    cout << "in " << loc << endl
+         << "  op1: " << get_type_name(o1) << endl
+         << "  op2: " << get_type_name(o2) << endl
+         << "  ret: " << get_type_name<RT>() << endl << endl;
+}
 
 }   //- STD_LA namespace
 

@@ -16,11 +16,9 @@ class fs_vector_engine
   public:
     using engine_category = mutable_matrix_engine_tag;
     using element_type    = T;
-    using is_dense        = std::true_type;
-    using is_fixed_size   = std::true_type;
-    using is_rectangular  = std::true_type;
-    using is_resizable    = std::false_type;
-    using is_row_major    = std::true_type;
+    using is_dense        = true_type;
+    using is_rectangular  = true_type;
+    using is_row_major    = true_type;
     using index_type      = int_fast32_t;
     using size_type       = int_fast32_t;
 
@@ -32,15 +30,12 @@ class fs_vector_engine
     fs_vector_engine&   operator =(fs_vector_engine&&) = default;
     fs_vector_engine&   operator =(fs_vector_engine const&) = default;
 
-    T           operator ()(index_type i) const;
-    T const*    data() const noexcept;
+    T       operator ()(index_type i) const;
 
     constexpr size_type     capacity() const noexcept;
     constexpr size_type     elements() const noexcept;
 
     T&      operator ()(index_type i);
-    T*      data() noexcept;
-
     void    swap_elements(index_type i, index_type j);
 
   private:
@@ -52,13 +47,6 @@ T
 fs_vector_engine<T,N>::operator ()(index_type i) const
 {
     return ma_elems[i];
-}
-
-template<class T, int32_t N> inline
-T const*
-fs_vector_engine<T,N>::data() const noexcept
-{
-    return &ma_elems[0];
 }
 
 template<class T, int32_t N> inline constexpr
@@ -83,13 +71,6 @@ fs_vector_engine<T,N>::operator ()(index_type i)
 }
 
 template<class T, int32_t N> inline
-T*
-fs_vector_engine<T,N>::data() noexcept
-{
-    return &ma_elems[0];
-}
-
-template<class T, int32_t N> inline
 void
 fs_vector_engine<T,N>::swap_elements(index_type, index_type)
 {}
@@ -108,14 +89,12 @@ class fs_matrix_engine
   public:
     using engine_category = mutable_matrix_engine_tag;
     using element_type    = T;
-    using is_dense        = std::true_type;
-    using is_fixed_size   = std::true_type;
-    using is_rectangular  = std::true_type;
-    using is_resizable    = std::false_type;
-    using is_row_major    = std::true_type;
+    using is_dense        = true_type;
+    using is_rectangular  = true_type;
+    using is_row_major    = true_type;
     using index_type      = int_fast32_t;
     using size_type       = int_fast32_t;
-    using size_tuple     = std::tuple<size_type, size_type>;
+    using size_tuple      = tuple<size_type, size_type>;
 
   public:
     fs_matrix_engine() = default;
@@ -125,8 +104,7 @@ class fs_matrix_engine
     fs_matrix_engine&   operator =(fs_matrix_engine&&) = default;
     fs_matrix_engine&   operator =(fs_matrix_engine const&) = default;
 
-    T           operator ()(index_type i, index_type j) const;
-    T const*    data() const noexcept;
+    T       operator ()(index_type i, index_type j) const;
 
     constexpr size_type     columns() const noexcept;
     constexpr size_type     rows() const noexcept;
@@ -137,8 +115,6 @@ class fs_matrix_engine
     constexpr size_tuple    capacity() const noexcept;
 
     T&      operator ()(index_type i, index_type j);
-    T*      data() noexcept;
-
     void    swap_columns(index_type i, index_type j);
     void    swap_rows(index_type i, index_type j);
 
@@ -151,13 +127,6 @@ T
 fs_matrix_engine<T,R,C>::operator ()(index_type i, index_type j) const
 {
     return ma_elems[i*C + j];
-}
-
-template<class T, int32_t R, int32_t C> inline
-T const*
-fs_matrix_engine<T,R,C>::data() const noexcept
-{
-    return &ma_elems[0];
 }
 
 template<class T, int32_t R, int32_t C> inline constexpr
@@ -207,13 +176,6 @@ T&
 fs_matrix_engine<T,R,C>::operator ()(index_type i, index_type j)
 {
     return ma_elems[i*C + j];
-}
-
-template<class T, int32_t R, int32_t C> inline
-T*
-fs_matrix_engine<T,R,C>::data() noexcept
-{
-    return &ma_elems[0];
 }
 
 template<class T, int32_t R, int32_t C> inline
