@@ -542,14 +542,22 @@ void t30()
 
 void    t100();
 
+#endif
+
+void t200()
+{
+}
+
 int main()
 {
+#if 0
     t01();
     t02();
     t03();
     t04();
     t05();
     t06();
+
     t08();
     t09();
     t10();
@@ -563,7 +571,9 @@ int main()
     t30();
 
     t100();
-
+#else
+    t200();
+#endif
+    
     return 0;
 }
-#endif

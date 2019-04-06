@@ -50,6 +50,7 @@ clean_type_name(basic_string<C,T,A> tname)
     static basic_string<C,T,A> const   cl = "class ";
     static basic_string<C,T,A> const   st = "struct ";
     static basic_string<C,T,A> const   ns = MATRIX_STRINGIFY(STD_LA) "::";
+    static basic_string<C,T,A> const   sl = "std::";
     static basic_string<C,T,A> const   aa = "> >";
 
     for (auto pos = string::npos;  (pos = tname.rfind(cl, pos)) != string::npos; )
@@ -65,6 +66,11 @@ clean_type_name(basic_string<C,T,A> tname)
     for (auto pos = string::npos;  (pos = tname.rfind(ns, pos)) != string::npos; )
     {
         tname.erase(pos, ns.size());
+    }
+
+    for (auto pos = string::npos;  (pos = tname.rfind(sl, pos)) != string::npos; )
+    {
+        tname.erase(pos, sl.size());
     }
 
     for (auto pos = string::npos;  (pos = tname.rfind(aa, pos)) != string::npos; )
