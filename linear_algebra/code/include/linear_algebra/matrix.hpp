@@ -1,8 +1,6 @@
 #ifndef LINEAR_ALGEBRA_MATRIX_HPP_DEFINED
 #define LINEAR_ALGEBRA_MATRIX_HPP_DEFINED
 
-#include "vector.hpp"
-
 namespace STD_LA {
 //=================================================================================================
 //  A matrix parametrized by an engine type and operator traits.

@@ -1,8 +1,6 @@
 #ifndef LINEAR_ALGEBRA_NUMBER_TRAITS_HPP_DEFINED
 #define LINEAR_ALGEBRA_NUMBER_TRAITS_HPP_DEFINED
 
-#include "forward_declarations.hpp"
-
 namespace STD_LA {
 namespace detail {
 //--------------------------------------------------------------------------------------------------
@@ -12,6 +10,7 @@ namespace detail {
 struct builtin_number_traits
 {
     using is_field    = true_type;
+    using is_nc_ring  = true_type;
     using is_ring     = true_type;
     using is_semiring = true_type;
 };
@@ -19,6 +18,7 @@ struct builtin_number_traits
 struct non_number_traits
 {
     using is_field    = false_type;
+    using is_nc_ring  = false_type;
     using is_ring     = false_type;
     using is_semiring = false_type;
 };
@@ -53,6 +53,17 @@ template<class T>
 constexpr bool  is_field_v = is_field<T>::value;
 
 //--------------------------------------------------------------------------------------------------
+//- New trait "is_nc_ring<T>" to detect if a numerical type models a non_commutative ring.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T>
+struct is_nc_ring : public bool_constant<number_traits<T>::is_field::value>
+{};
+
+template<class T>
+constexpr bool  is_nc_ring_v = is_ring<T>::value;
+
+//--------------------------------------------------------------------------------------------------
 //- New trait "is_ring<T>" to detect if a numerical type models a ring.
 //--------------------------------------------------------------------------------------------------
 //
@@ -64,7 +75,7 @@ template<class T>
 constexpr bool  is_ring_v = is_ring<T>::value;
 
 //--------------------------------------------------------------------------------------------------
-//- New trait "is_semi_ring<T>" to detect if a type models a semiring (i.e., is non-commutative).
+//- New trait "is_semi_ring<T>" to detect if a type models a semiring.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T>

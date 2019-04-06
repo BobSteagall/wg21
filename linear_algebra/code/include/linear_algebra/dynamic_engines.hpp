@@ -1,8 +1,6 @@
 #ifndef LINEAR_ALGEBRA_DYNAMIC_ENGINES_HPP_DEFINED
 #define LINEAR_ALGEBRA_DYNAMIC_ENGINES_HPP_DEFINED
 
-#include "element_traits.hpp"
-
 namespace STD_LA {
 //=================================================================================================
 //  Dynamically-resizable matrix engine.
