@@ -1,8 +1,6 @@
 #ifndef LINEAR_ALGEBRA_ELEMENT_TRAITS_HPP_DEFINED
 #define LINEAR_ALGEBRA_ELEMENT_TRAITS_HPP_DEFINED
 
-#include "number_traits.hpp"
-
 namespace STD_LA {
 namespace detail {
 //--------------------------------------------------------------------------------------------------
@@ -20,6 +18,34 @@ template<class T1, class T2>
 using matrix_element_promotion_helper_t = typename matrix_element_promotion_helper<T1, T2>::type;
 
 }   //- detail namespace
+
+
+template<class T1>
+struct matrix_element_negation_traits
+{
+    using type = decltype(-declval<T1>());
+};
+
+template<class T1, class T2>
+struct matrix_element_addition_traits
+{
+    using type = decltype(declval<T1>() + declval<T2>());
+};
+
+template<class T1, class T2>
+struct matrix_element_subtraction_traits
+{
+    using type = decltype(declval<T1>() - declval<T2>());
+};
+
+template<class T1, class T2>
+struct matrix_element_multiplication_traits
+{
+    using type = decltype(declval<T1>() * declval<T2>());
+};
+
+template<class T1, class T2>
+using matrix_element_multiplication_t = typename matrix_element_multiplication_traits<T1, T2>::type;
 
 //--------------------------------------------------------------------------------------------------
 //- Unfortunately, in C++17 complex<T> only permits arithmetical expressions between

@@ -27,12 +27,12 @@ struct matrix_addition_traits<matrix<fs_matrix_engine_tst<T1, R, C>, OTR>,
 template<>
 struct matrix_multiplication_traits<fs_matrix<float, 4, 4>,
                                     fs_vector<float, 4>,
-                                    default_matrix_operator_traits>
+                                    default_matrix_operation_traits>
 {
     using engine_type = matrix_multiplication_engine_t<fs_matrix<float, 4, 4>::engine_type,
                                                        fs_vector<float, 4>::engine_type>;
 
-    using result_type = vector<engine_type, default_matrix_operator_traits>;
+    using result_type = vector<engine_type, default_matrix_operation_traits>;
 
     static result_type  multiply(fs_matrix<float, 4, 4> const& m1, fs_vector<float, 4> const& cv2)
                         {

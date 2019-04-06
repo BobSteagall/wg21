@@ -1,8 +1,6 @@
 #ifndef MATRIX_ARITHMETIC_TRAITS_HPP_DEFINED
 #define MATRIX_ARITHMETIC_TRAITS_HPP_DEFINED
 
-#include "matrix.hpp"
-
 namespace STD_LA {
 //=================================================================================================
 //                                      **** NEGATION ****

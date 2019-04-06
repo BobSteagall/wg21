@@ -1,8 +1,6 @@
 #ifndef LINEAR_ALGEBRA_VIEW_BASED_ENGINES_HPP_DEFINED
 #define LINEAR_ALGEBRA_VIEW_BASED_ENGINES_HPP_DEFINED
 
-#include "element_traits.hpp"
-
 namespace STD_LA {
 //=================================================================================================
 //  Matrix transpose engine, meant to act as an rvalue-ish "view" in expressions, in order to

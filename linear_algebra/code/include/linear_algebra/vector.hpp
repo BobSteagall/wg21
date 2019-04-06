@@ -1,8 +1,6 @@
 #ifndef LINEAR_ALGEBRA_VECTOR_HPP_DEFINED
 #define LINEAR_ALGEBRA_VECTOR_HPP_DEFINED
 
-#include "engine_traits.hpp"
-
 namespace STD_LA {
 //=================================================================================================
 //  A vector type parametrized by an engine type and operator traits.

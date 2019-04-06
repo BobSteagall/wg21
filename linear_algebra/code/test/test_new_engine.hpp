@@ -136,7 +136,7 @@ template<class T, int32_t R, int32_t C>
 using fs_matrix_tst = STD_LA::matrix<fs_matrix_engine_tst<T, R, C>>;
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct STD_LA::matrix_addition_engine_promotion<fs_matrix_engine_tst<T1, R1, C1>,
+struct STD_LA::matrix_engine_addition_traits<fs_matrix_engine_tst<T1, R1, C1>,
                                                 fs_matrix_engine_tst<T2, R2, C2>>
 {
     static_assert(R1 == R2);
@@ -146,7 +146,7 @@ struct STD_LA::matrix_addition_engine_promotion<fs_matrix_engine_tst<T1, R1, C1>
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct STD_LA::matrix_addition_engine_promotion<STD_LA::fs_matrix_engine<T1, R1, C1>,
+struct STD_LA::matrix_engine_addition_traits<STD_LA::fs_matrix_engine<T1, R1, C1>,
                                                 fs_matrix_engine_tst<T2, R2, C2>>
 {
     static_assert(R1 == R2);
@@ -156,7 +156,7 @@ struct STD_LA::matrix_addition_engine_promotion<STD_LA::fs_matrix_engine<T1, R1,
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct STD_LA::matrix_addition_engine_promotion<fs_matrix_engine_tst<T1, R1, C1>,
+struct STD_LA::matrix_engine_addition_traits<fs_matrix_engine_tst<T1, R1, C1>,
                                                 STD_LA::fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == R2);
