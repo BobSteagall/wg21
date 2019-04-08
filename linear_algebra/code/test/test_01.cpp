@@ -42,7 +42,7 @@ inline constexpr bool   has_resize_v = has_resize_1_v<T> || has_resize_2_v<T>;
 
 
 template<typename T, typename = void>
-struct has_element_addition_traits 
+struct has_element_addition_traits
 :   std::false_type {};
 
 template<typename T>
@@ -61,61 +61,73 @@ template<typename T, typename M1, typename M2>
 constexpr bool  has_element_addition_traits_v = has_element_addition_traits<T>::type::value ||
                                                 has_element_addition_traits_mt<T, M1, M2>::type::value;
 
-template<class T1, class T2>
+template<class T1, class T2, class DEF>
 struct nv_traits_chooser;
 
-template<class T1>
-struct nv_traits_chooser<T1, void>
+template<class T1, class DEF>
+struct nv_traits_chooser<T1, void, DEF>
 {
     using type = T1;
 };
 
-template<class T2>
-struct nv_traits_chooser<void, T2>
+template<class T2, class DEF>
+struct nv_traits_chooser<void, T2, DEF>
 {
     using type = T2;
 };
 
-template<>
-struct nv_traits_chooser<void, void>
+template<class T1, class DEF>
+struct nv_traits_chooser<T1, T1, DEF>
 {
-    using type = void;
+    using type = T1;
+};
+
+template<class DEF>
+struct nv_traits_chooser<void, void, DEF>
+{
+    using type = DEF;
 };
 
 
 template<typename T, typename L, typename R, typename = void>
-struct has_add_traits_mt
+struct extract_addition_traits_mtf
 {
-    using type = void;
+    using type = default_matrix_operation_traits::element_addition_traits<L, R>;
     static constexpr bool  value = false;
 };
 
 template<typename T, typename L, typename R>
-struct has_add_traits_mt<T, L, R, void_t<decltype(std::declval<typename T::template element_addition_traits<L, R>>())>>
+struct extract_addition_traits_mtf<T, L, R, void_t<decltype(std::declval<typename T::template element_addition_traits<L, R>>())>>
 {
     using type = typename T::template element_addition_traits<L, R>;
     static constexpr bool  value = true;
 };
 
 
-template<typename T, typename = void>
-struct has_add_traits_tt
+template<typename T, typename L, typename R, typename = void>
+struct extract_addition_traits_stf
 {
-    using type = void;
+    using type = default_matrix_operation_traits::element_addition_traits<L, R>;
     static constexpr bool  value = false;
 };
 
-template<typename T>
-struct has_add_traits_tt<T, void_t<decltype(std::declval<typename T::element_addition_traits>())>>
+template<typename T, typename L, typename R>
+struct extract_addition_traits_stf<T, L, R, void_t<decltype(std::declval<typename T::element_addition_traits>())>>
 {
     using type = typename T::element_addition_traits;
     static constexpr bool  value = true;
 };
 
 
+template<typename OT1, typename OT2>
+struct extract_addition_traits
+{
+
+};
+
 template<class T, class L, class R>
-constexpr bool  has_add_traits_v = has_add_traits_mt<T, L, R>::value || 
-                                   has_add_traits_tt<T>::value
+constexpr bool  has_add_traits_v = extract_addition_traits_mtf<T, L, R>::value ||
+                                   extract_addition_traits_stf<T, L, R>::value
                                     ;
 
 
@@ -681,6 +693,6 @@ int main()
 #else
     t200();
 #endif
-    
+
     return 0;
 }

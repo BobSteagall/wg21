@@ -29,7 +29,7 @@ set(TestIncludes
 
 set(Sources
     test/test_01.cpp
-    test/test_02.cpp
+#    test/test_02.cpp
 )
 
 include_directories(include_directories(include .))

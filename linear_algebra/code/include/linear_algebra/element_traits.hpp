@@ -29,7 +29,8 @@ struct matrix_element_negation_traits
 template<class T1, class T2>
 struct matrix_element_addition_traits
 {
-    using type = decltype(declval<T1>() + declval<T2>());
+    using traits_category = matrix_element_addition_traits_tag;
+    using result_type     = decltype(declval<T1>() + declval<T2>());
 };
 
 template<class T1, class T2>
