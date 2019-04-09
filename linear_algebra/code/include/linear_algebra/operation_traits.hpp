@@ -32,8 +32,8 @@ struct default_matrix_operation_traits
     template<class ET1>
     using engine_negation_traits = matrix_engine_negation_traits<ET1>;
 
-    template<class ET1, class ET2>
-    using engine_addition_traits = matrix_engine_addition_traits<ET1, ET2>;
+    template<class OTR, class ET1, class ET2>
+    using engine_addition_traits = matrix_engine_addition_traits<OTR, ET1, ET2>;
 
     template<class ET1, class ET2>
     using engine_subtraction_traits = matrix_engine_subtraction_traits<ET1, ET2>;
@@ -46,8 +46,8 @@ struct default_matrix_operation_traits
     template<class OP1, class OTR>
     using negation_traits = matrix_negation_traits<OP1, OTR>;
 
-    template<class OP1, class OP2>
-    using addition_traits = matrix_addition_traits<OP1, OP2>;
+    template<class OTR, class OP1, class OP2>
+    using addition_traits = matrix_addition_traits<OTR, OP1, OP2>;
 
     template<class OP1, class OP2, class OTR>
     using subtraction_traits = matrix_subtraction_traits<OP1, OP2, OTR>;

@@ -57,13 +57,13 @@ matrix_negation_traits<matrix<ET1, OT1>, OTR>::negate(matrix<ET1,OT1> const& m1)
 //  Traits type that performs addition.
 //=================================================================================================
 //
-template<class OP1, class OP2>
+template<class OTR, class OP1, class OP2>
 struct matrix_addition_traits;
-
+/*
 //------
 //
-template<class ET1, class OT1, class ET2, class OT2>
-struct matrix_addition_traits<vector<ET1, OT1>, vector<ET2, OT2>>
+template<class OTR, class ET1, class OT1, class ET2, class OT2>
+struct matrix_addition_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>
 {
     using engine_type = matrix_addition_engine_t<ET1, ET2>;
     using op_traits   = OT1;
@@ -72,9 +72,9 @@ struct matrix_addition_traits<vector<ET1, OT1>, vector<ET2, OT2>>
     static result_type  add(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
 };
 
-template<class ET1, class OT1, class ET2, class OT2>
+template<class OTR, class ET1, class OT1, class ET2, class OT2>
 auto
-matrix_addition_traits<vector<ET1, OT1>, vector<ET2, OT2>>::add
+matrix_addition_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>::add
 (vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2) -> result_type
 {
     PrintOperandTypes<result_type>("addition_traits", v1, v2);
@@ -83,25 +83,25 @@ matrix_addition_traits<vector<ET1, OT1>, vector<ET2, OT2>>::add
 
 //------
 //
-template<class ET1, class OT1, class ET2, class OT2>
-struct matrix_addition_traits<matrix<ET1, OT1>, matrix<ET2, OT2>>
+template<class OTR, class ET1, class OT1, class ET2, class OT2>
+struct matrix_addition_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>
 {
-    using engine_type = matrix_addition_engine_t<ET1, ET2>;
+    using engine_type = matrix_addition_engine_t<OTR, ET1, ET2>;
     using op_traits   = OT1;
     using result_type = matrix<engine_type, op_traits>;
 
     static result_type  add(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
 };
 
-template<class ET1, class OT1, class ET2, class OT2>
-typename matrix_addition_traits<matrix<ET1, OT1>, matrix<ET2, OT2>>::result_type
-matrix_addition_traits<matrix<ET1, OT1>, matrix<ET2, OT2>>::add
+template<class OTR, class ET1, class OT1, class ET2, class OT2>
+typename matrix_addition_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::result_type
+matrix_addition_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
 (matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
 {
     PrintOperandTypes<result_type>("addition_traits", m1, m2);
     return result_type();
 }
-
+*/
 //=================================================================================================
 //                                     **** SUBTRACTION ****
 //=================================================================================================

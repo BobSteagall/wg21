@@ -40,7 +40,6 @@ template<typename T>
 inline constexpr bool   has_resize_v = has_resize_1_v<T> || has_resize_2_v<T>;
 
 
-
 template<typename T, typename = void>
 struct has_element_addition_traits
 :   std::false_type {};
@@ -61,75 +60,198 @@ template<typename T, typename M1, typename M2>
 constexpr bool  has_element_addition_traits_v = has_element_addition_traits<T>::type::value ||
                                                 has_element_addition_traits_mt<T, M1, M2>::type::value;
 
-template<class T1, class T2, class DEF>
-struct nv_traits_chooser;
+
+template<class T1, class T2, class T3, class DEF>
+struct nv_traits_chooser3;
 
 template<class T1, class DEF>
-struct nv_traits_chooser<T1, void, DEF>
+struct nv_traits_chooser3<T1, void, void, DEF>
 {
     using type = T1;
 };
 
 template<class T2, class DEF>
-struct nv_traits_chooser<void, T2, DEF>
+struct nv_traits_chooser3<void, T2, void, DEF>
 {
     using type = T2;
 };
 
-template<class T1, class DEF>
-struct nv_traits_chooser<T1, T1, DEF>
+template<class T3, class DEF>
+struct nv_traits_chooser3<void, void, T3, DEF>
 {
-    using type = T1;
+    using type = T3;
 };
 
 template<class DEF>
-struct nv_traits_chooser<void, void, DEF>
+struct nv_traits_chooser3<void, void, void, DEF>
 {
     using type = DEF;
 };
 
+template<class T1, class T2, class DEF>
+struct nv_traits_chooser2;
 
-template<typename T, typename L, typename R, typename = void>
-struct extract_addition_traits_mtf
+template<class T1, class DEF>
+struct nv_traits_chooser2<T1, void, DEF>
 {
-    using type = default_matrix_operation_traits::element_addition_traits<L, R>;
-    static constexpr bool  value = false;
+    using type = T1;
 };
 
-template<typename T, typename L, typename R>
-struct extract_addition_traits_mtf<T, L, R, void_t<decltype(std::declval<typename T::template element_addition_traits<L, R>>())>>
+template<class T2, class DEF>
+struct nv_traits_chooser2<void, T2, DEF>
 {
-    using type = typename T::template element_addition_traits<L, R>;
-    static constexpr bool  value = true;
+    using type = T2;
+};
+
+template<class DEF>
+struct nv_traits_chooser2<void, void, DEF>
+{
+    using type = DEF;
+};
+
+//------
+//
+template<typename OT, typename = void>
+struct extract_element_addition_traits_stf : public std::false_type
+{
+    using type = void;
+};
+
+template<typename OT>
+struct extract_element_addition_traits_stf<OT, void_t<decltype(std::declval<typename OT::element_addition_traits>())>>  : public std::true_type
+{
+    using type = typename OT::element_addition_traits;
 };
 
 
-template<typename T, typename L, typename R, typename = void>
+template<typename OT, typename T1, typename T2, typename = void>
+struct extract_element_addition_traits_mtf : public std::false_type
+{
+    using type = void;
+};
+
+template<typename OT, typename T1, typename T2>
+struct extract_element_addition_traits_mtf<OT, T1, T2, void_t<decltype(std::declval<typename OT::template element_addition_traits<T1, T2>>())>> : public std::true_type
+{
+    using type = typename OT::template element_addition_traits<T1, T2>;
+};
+
+
+template<template<typename, typename> typename OT, typename T1, typename T2, typename = void>
+struct extract_element_addition_traits_ttf : public std::false_type
+{
+    using type = void;
+};
+
+template<template<typename, typename> typename OT, typename T1, typename T2>
+struct extract_element_addition_traits_ttf<OT, T1, T2, void_t<decltype(std::declval<typename OT<T1, T2>::element_addition_traits>())>> : public std::true_type
+{
+    using type = typename OT<T1, T2>::element_addition_traits;
+};
+
+
+template<typename OT, typename T1, typename T2>
+struct extract_element_addition_traits
+{
+    using CT1 = typename extract_element_addition_traits_stf<OT>::type;
+    using CT2 = typename extract_element_addition_traits_mtf<OT, T1, T2>::type;
+    using DEF = STD_LA::matrix_element_addition_traits<T1, T2>;
+
+    using type = typename nv_traits_chooser2<CT1, CT2, DEF>::type;
+};
+
+template<typename OT, typename T1, typename T2>
+using extract_element_addition_traits_t = typename extract_element_addition_traits<OT, T1, T2>::type;
+
+
+//------
+//
+template<typename OT, typename = void>
+struct extract_engine_addition_traits_stf
+{
+    using type = void;
+};
+
+template<typename OT>
+struct extract_engine_addition_traits_stf<OT, void_t<decltype(std::declval<typename OT::engine_addition_traits>())>>
+{
+    using type = typename OT::engine_addition_traits;
+};
+
+
+template<typename OT, typename ET1, typename ET2, typename = void>
+struct extract_engine_addition_traits_mtf
+{
+    using type = void;
+};
+
+template<typename OT, typename ET1, typename ET2>
+struct extract_engine_addition_traits_mtf<OT, ET1, ET2, void_t<decltype(std::declval<typename OT::template engine_addition_traits<ET1, ET2>>())>>
+{
+    using type = typename OT::template engine_addition_traits<ET1, ET2>;
+};
+
+
+template<typename OT, typename ET1, typename ET2>
+struct extract_engine_addition_traits
+{
+    using CET1 = typename extract_engine_addition_traits_stf<OT>::type;
+    using CET2 = typename extract_engine_addition_traits_mtf<OT, ET1, ET2>::type;
+    using DEF  = STD_LA::matrix_engine_addition_traits<OT, ET1, ET2>;
+
+    using type = typename nv_traits_chooser2<CET1, CET2, DEF>::type;
+};
+
+template<typename OT, typename ET1, typename ET2>
+using extract_engine_addition_traits_t = typename extract_engine_addition_traits<OT, ET1, ET2>::type;
+
+
+//------
+//
+template<typename OT, typename = void>
 struct extract_addition_traits_stf
 {
-    using type = default_matrix_operation_traits::element_addition_traits<L, R>;
-    static constexpr bool  value = false;
+    using type = void;
 };
 
-template<typename T, typename L, typename R>
-struct extract_addition_traits_stf<T, L, R, void_t<decltype(std::declval<typename T::element_addition_traits>())>>
+template<typename OT>
+struct extract_addition_traits_stf<OT, void_t<decltype(std::declval<typename OT::addition_traits>())>>
 {
-    using type = typename T::element_addition_traits;
-    static constexpr bool  value = true;
+    using type = typename OT::addition_traits;
 };
 
 
-template<typename OT1, typename OT2>
+template<typename OT, typename OP1, typename OP2, typename = void>
+struct extract_addition_traits_mtf
+{
+    using type = void;
+};
+
+template<typename OT, typename OP1, typename OP2>
+struct extract_addition_traits_mtf<OT, OP1, OP2, void_t<decltype(std::declval<typename OT::template addition_traits<OP1, OP2>>())>>
+{
+    using type = typename OT::template addition_traits<OP1, OP2>;
+};
+
+
+template<typename OT, typename OP1, typename OP2>
 struct extract_addition_traits
 {
+    using COP1 = typename extract_addition_traits_stf<OT>::type;
+    using COP2 = typename extract_addition_traits_mtf<OT, OP1, OP2>::type;
+    using DEF  = STD_LA::matrix_addition_traits<OT, OP1, OP2>;
 
+    using type = typename nv_traits_chooser2<COP1, COP2, DEF>::type;
 };
 
-template<class T, class L, class R>
-constexpr bool  has_add_traits_v = extract_addition_traits_mtf<T, L, R>::value ||
-                                   extract_addition_traits_stf<T, L, R>::value
-                                    ;
+template<typename OT, typename OP1, typename OP2>
+using extract_addition_traits_t = typename extract_addition_traits<OT, OP1, OP2>::type;
 
+
+template<class T, class L, class R>
+constexpr bool  has_add_traits_v = extract_element_addition_traits_mtf<T, L, R>::value ||
+                                   extract_element_addition_traits_stf<T>::value
+                                    ;
 
 template<class OT1, class OT2>
 struct extract_element_addition
@@ -138,7 +260,7 @@ struct extract_element_addition
 
 struct foo {};
 
-template<class OT1, class OT2>
+template<class T1, class T2>
 struct test_element_addition_traits {};
 
 template<class T1, class T2>
@@ -147,6 +269,30 @@ struct test_matrix_operation_traits
     using element_addition_traits = test_element_addition_traits<T1, T2>;
 };
 
+struct test_element_add_traits
+{
+    using type = double;
+};
+
+struct test_engine_add_traits
+{
+    using type = dr_matrix_engine<double>;
+};
+
+struct test_add_traits
+{
+    using type = matrix<dr_matrix_engine<double>>;
+};
+
+struct test_op_traits
+{
+    using element_addition_traits = test_element_add_traits;
+    using engine_addition_traits  = test_engine_add_traits;
+    using addition_traits         = test_add_traits;
+};
+
+
+#define PRINT_TYPE(T)   cout << get_type_name<T>() << endl
 
 void t200()
 {
@@ -160,6 +306,41 @@ void t200()
     static_assert(has_add_traits_v<test_matrix_operation_traits<LT, RT>, LT, RT>);
     static_assert(!has_add_traits_v<foo, LT, RT>);
     static_assert(!has_add_traits_v<double, LT, RT>);
+
+    cout << get_type_name< extract_element_addition_traits_t<default_matrix_operation_traits, float, double> >() << std::endl;
+    cout << get_type_name< extract_element_addition_traits_t<default_matrix_operations, float, double>       >() << std::endl;
+    cout << get_type_name< extract_element_addition_traits_t<test_matrix_operation_traits<float, double>, float, double>                  >() << std::endl;
+    cout << get_type_name< extract_element_addition_traits_t<test_op_traits, float, double>                  >() << std::endl;
+
+    using t00 = extract_engine_addition_traits_t<default_matrix_operations,
+                                                 fs_matrix_engine<double, 3, 3>,
+                                                 fs_matrix_engine<double, 3, 3>>;
+    PRINT_TYPE(t00);
+
+    using t01 = extract_engine_addition_traits_t<default_matrix_operation_traits,
+                                                 fs_matrix_engine<double, 3, 3>,
+                                                 fs_matrix_engine<double, 3, 3>>;
+    PRINT_TYPE(t01);
+
+    using t02 = extract_engine_addition_traits_t<test_op_traits,
+                                                 fs_matrix_engine<double, 3, 3>,
+                                                 fs_matrix_engine<double, 3, 3>>;
+    PRINT_TYPE(t02);
+
+    using t10 = extract_addition_traits_t<default_matrix_operations,
+                                          matrix<fs_matrix_engine<double, 3, 3>, default_matrix_operations>,
+                                          matrix<fs_matrix_engine<double, 3, 3>, default_matrix_operations>>;
+    PRINT_TYPE(t10);
+
+    using t11 = extract_addition_traits_t<default_matrix_operation_traits,
+                                          matrix<fs_matrix_engine<double, 3, 3>, default_matrix_operation_traits>,
+                                          matrix<fs_matrix_engine<double, 3, 3>, default_matrix_operation_traits>>;
+    PRINT_TYPE(t11);
+
+    using t12 = extract_addition_traits_t<test_op_traits,
+                                          matrix<fs_matrix_engine<double, 3, 3>, test_op_traits>,
+                                          matrix<fs_matrix_engine<double, 3, 3>, test_op_traits>>;
+    PRINT_TYPE(t12);
 }
 
 

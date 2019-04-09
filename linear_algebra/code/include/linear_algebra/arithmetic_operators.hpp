@@ -3,7 +3,7 @@
 
 namespace STD_LA {
 //=================================================================================================
-//  Unary negation operators, which forward to the negation traits do the work.
+//  Unary negation operators, which forward to the negation traits to do the work.
 //=================================================================================================
 //
 template<class ET1, class OT1>
@@ -30,7 +30,7 @@ operator -(matrix<ET1, OT1> const& m1)
 
 
 //=================================================================================================
-//  Binary addition operators, which forward to the addition traits do the work.
+//  Binary addition operators, which forward to the addition traits to do the work.
 //=================================================================================================
 //
 template<class ET1, class OT1, class ET2, class OT2>
@@ -59,7 +59,7 @@ operator +(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
 
 
 //=================================================================================================
-//  Binary subtraction operators, which forward to the subraction traits do the work.
+//  Binary subtraction operators, which forward to the subtraction traits to do the work.
 //=================================================================================================
 //
 template<class ET1, class OT1, class ET2, class OT2>
@@ -87,7 +87,7 @@ operator -(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
 }
 
 //=================================================================================================
-//  Multiplication operators, which forward to the traits types that perform the multiplications.
+//  Multiplication operators, which forward to the multiplication traits to do the work.
 //=================================================================================================
 //- vector*scalar
 //

@@ -52,7 +52,7 @@ using matrix_element_multiplication_t = typename matrix_element_multiplication_t
 //- Unfortunately, in C++17 complex<T> only permits arithmetical expressions between
 //  homogeneous element types: for example, expressions like complex<float>*complex<float>
 //  and float*complex<float> are permitted, but double*complex<float> is not.  This macro
-//  enforces this homogeneity in the traits types below.  Hopefully complex<T> wil
+//  enforces this homogeneity in the traits types below.  Hopefully complex<T> will
 //  support heterogeneous expressions at some point in the near future.
 //--------------------------------------------------------------------------------------------------
 //
