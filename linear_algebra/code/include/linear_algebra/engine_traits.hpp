@@ -77,6 +77,7 @@ using matrix_negation_engine_t = typename matrix_engine_negation_traits<ET1>::en
 //  Traits type that performs engine promotion type computations for binary addition.
 //=================================================================================================
 //
+/*
 template<class ET1, class ET2>
 struct matrix_engine_addition_traits
 {
@@ -186,7 +187,7 @@ struct matrix_engine_addition_traits<matrix_transpose_engine<fs_matrix_engine<T1
 //
 template<class ET1, class ET2>
 using matrix_addition_engine_t = typename matrix_engine_addition_traits<ET1, ET2>::engine_type;
-
+*/
 
 //=================================================================================================
 //                                     **** SUBTRACTION ****
