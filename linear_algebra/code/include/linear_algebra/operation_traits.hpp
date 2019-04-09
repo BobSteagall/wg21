@@ -46,8 +46,8 @@ struct default_matrix_operation_traits
     template<class OP1, class OTR>
     using negation_traits = matrix_negation_traits<OP1, OTR>;
 
-    template<class OP1, class OP2, class OTR>
-    using addition_traits = matrix_addition_traits<OP1, OP2, OTR>;
+    template<class OP1, class OP2>
+    using addition_traits = matrix_addition_traits<OP1, OP2>;
 
     template<class OP1, class OP2, class OTR>
     using subtraction_traits = matrix_subtraction_traits<OP1, OP2, OTR>;
@@ -87,6 +87,24 @@ template<>
 struct matrix_operation_traits_selector<default_matrix_operation_traits, default_matrix_operation_traits>
 {
     using traits_type = default_matrix_operation_traits;
+};
+
+template<class T1>
+struct matrix_operation_traits_selector<T1, default_matrix_operations>
+{
+    using traits_type = T1;
+};
+
+template<class T1>
+struct matrix_operation_traits_selector<default_matrix_operations, T1>
+{
+    using traits_type = T1;
+};
+
+template<>
+struct matrix_operation_traits_selector<default_matrix_operations, default_matrix_operations>
+{
+    using traits_type = default_matrix_operations;
 };
 
 //- Alias interface to trait.
