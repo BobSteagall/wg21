@@ -35,6 +35,8 @@ template<class T>   struct is_semi_ring;
 
 template<class T>   struct is_matrix_element;
 
+struct default_matrix_operations {};
+
 //- A traits type for element promotion.
 //
 template<class T1, class T2>    struct matrix_element_promotion;
