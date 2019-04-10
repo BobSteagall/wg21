@@ -57,9 +57,10 @@ matrix_negation_traits<matrix<ET1, OT1>, OTR>::negate(matrix<ET1,OT1> const& m1)
 //  Traits type that performs addition.
 //=================================================================================================
 //
+/*
 template<class OTR, class OP1, class OP2>
 struct matrix_addition_traits;
-/*
+
 //------
 //
 template<class OTR, class ET1, class OT1, class ET2, class OT2>
@@ -80,7 +81,7 @@ matrix_addition_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>::add
     PrintOperandTypes<result_type>("addition_traits", v1, v2);
     return result_type();
 }
-*/
+
 //------
 //
 template<class OTR, class ET1, class OT1, class ET2, class OT2>
@@ -102,7 +103,7 @@ matrix_addition_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
     PrintOperandTypes<result_type>("addition_traits", m1, m2);
     return result_type();
 }
-
+*/
 //=================================================================================================
 //                                     **** SUBTRACTION ****
 //=================================================================================================

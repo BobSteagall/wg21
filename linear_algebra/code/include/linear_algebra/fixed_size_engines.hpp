@@ -15,8 +15,10 @@ class fs_vector_engine
     using engine_category = mutable_matrix_engine_tag;
     using element_type    = T;
     using is_dense        = true_type;
+    using is_matrix       = false_type;
     using is_rectangular  = true_type;
     using is_row_major    = true_type;
+    using is_vector       = true_type;
     using index_type      = int_fast32_t;
     using size_type       = int_fast32_t;
 
@@ -88,8 +90,10 @@ class fs_matrix_engine
     using engine_category = mutable_matrix_engine_tag;
     using element_type    = T;
     using is_dense        = true_type;
+    using is_matrix       = true_type;
     using is_rectangular  = true_type;
     using is_row_major    = true_type;
+    using is_vector       = false_type;
     using index_type      = int_fast32_t;
     using size_type       = int_fast32_t;
     using size_tuple      = tuple<size_type, size_type>;

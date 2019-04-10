@@ -12,6 +12,10 @@ namespace STD_LA {
 
 USING_STD
 
+/*
+constexpr string_view type_name() [with T = vector<dr_vector_engine<double, allocator<double> >, default_matrix_operation_traits>; string_view = basic_string_view<char>]
+ */
+
 template <class T>
 constexpr string_view
 type_name()                //- Thanks to Howard Hinnant for this!
@@ -25,7 +29,10 @@ type_name()                //- Thanks to Howard Hinnant for this!
     # if __cplusplus < 201402
         return string_view(p.data() + 36, p.size() - 36 - 1);
     #else
-        return string_view(p.data() + 49, p.find(';', 49) - 49);
+//        return string_view(p.data() + 49, p.find(';', 49) - 49);   //- 49, 53
+        auto    n1 = p.find('[', 0) + 10;
+        auto    n2 = p.find(';', n1);
+        return string_view(p.data() + n1, n2 - n1);
     #endif
 #elif defined(_MSC_VER)
     string_view p = __FUNCSIG__;
@@ -88,11 +95,17 @@ basic_string<C,T,A>
 clean_type_name(basic_string<C,T,A> tname)
 {
     static basic_string<C,T,A> const   ns = MATRIX_STRINGIFY(STD_LA) "::";
+    static basic_string<C,T,A> const   sl = "std::";
     static basic_string<C,T,A> const   aa = "> >";
 
     for (auto pos = string::npos;  (pos = tname.rfind(ns, pos)) != string::npos; )
     {
         tname.erase(pos, ns.size());
+    }
+
+    for (auto pos = string::npos;  (pos = tname.rfind(sl, pos)) != string::npos; )
+    {
+        tname.erase(pos, sl.size());
     }
 
     for (auto pos = string::npos;  (pos = tname.rfind(aa, pos)) != string::npos; )

@@ -19,10 +19,10 @@ using matrix_engine_addition_traits_tag       = integral_constant<int, 201>;
 using matrix_engine_subtraction_traits_tag    = integral_constant<int, 202>;
 using matrix_engine_multiplication_traits_tag = integral_constant<int, 203>;
 
-using matrix_arithmetic_negation_traits_tag       = integral_constant<int, 300>;
-using matrix_arithmetic_addition_traits_tag       = integral_constant<int, 301>;
-using matrix_arithmetic_subtraction_traits_tag    = integral_constant<int, 302>;
-using matrix_arithmetic_multiplication_traits_tag = integral_constant<int, 303>;
+using matrix_negation_traits_tag       = integral_constant<int, 300>;
+using matrix_addition_traits_tag       = integral_constant<int, 301>;
+using matrix_subtraction_traits_tag    = integral_constant<int, 302>;
+using matrix_multiplication_traits_tag = integral_constant<int, 303>;
 
 //- Traits for verifying appropriate matrix element types.
 //
@@ -73,12 +73,66 @@ template<class T, int32_t N>                class fs_vector_engine;
 template<class T, int32_t R, int32_t C>     class fs_matrix_engine;
 template<class T, class AT=allocator<T>>    class dr_vector_engine;
 template<class T, class AT=allocator<T>>    class dr_matrix_engine;
-template<class ET>                          class matrix_transpose_engine;
+template<class ET>                          class tr_matrix_engine;
 
 //- Primary mathematical object types.
 //
 template<class ET, class OT=default_matrix_operation_traits> class vector;
 template<class ET, class OT=default_matrix_operation_traits> class matrix;
+
+namespace detail {
+//- Testing to see if an engine has mutable element indexing.
+//
+template<class ET>
+constexpr bool  has_mutable_tag_v = ET::engine_category::value >= mutable_matrix_engine_tag::value;
+
+template<class ET1, class ET2>
+constexpr bool  is_mutable_engine_v = is_same_v<ET1, ET2> && has_mutable_tag_v<ET1>;
+
+
+template<class ET1, class ET2>
+using enable_if_mutable = enable_if_t<is_mutable_engine_v<ET1, ET2>, bool>;
+
+
+//- Testing to see if an engine is resizable.
+//
+template<class ET>
+constexpr bool  has_resizable_tag_v = ET::engine_category::value >= resizable_matrix_engine_tag::value;
+
+template<class ET1, class ET2>
+constexpr bool  is_resizable_engine_v = is_same_v<ET1, ET2> && has_resizable_tag_v<ET1>;
+
+
+template<class ET1, class ET2>
+using enable_if_resizable = enable_if_t<is_resizable_engine_v<ET1, ET2>, bool>;
+
+template<class A1, class T1>
+using rebind_alloc_t = typename allocator_traits<A1>::template rebind_alloc<T1>;
+
+}       //- namespace detail
+
+//------
+//
+template<class T1, class T2, class DEF>
+struct non_void_traits_chooser;
+
+template<class T1, class DEF>
+struct non_void_traits_chooser<T1, void, DEF>
+{
+    using type = T1;
+};
+
+template<class T2, class DEF>
+struct non_void_traits_chooser<void, T2, DEF>
+{
+    using type = T2;
+};
+
+template<class DEF>
+struct non_void_traits_chooser<void, void, DEF>
+{
+    using type = DEF;
+};
 
 
 }       //- STD_LA namespace

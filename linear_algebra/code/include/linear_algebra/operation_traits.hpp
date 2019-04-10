@@ -114,23 +114,24 @@ using matrix_operation_traits_selector_t = typename matrix_operation_traits_sele
 
 //------
 //
+/*
 template<class T1, class T2, class DEF>
-struct nv_traits_chooser2;
+struct non_void_traits_chooser;
 
 template<class T1, class DEF>
-struct nv_traits_chooser2<T1, void, DEF>
+struct non_void_traits_chooser<T1, void, DEF>
 {
     using type = T1;
 };
 
 template<class T2, class DEF>
-struct nv_traits_chooser2<void, T2, DEF>
+struct non_void_traits_chooser<void, T2, DEF>
 {
     using type = T2;
 };
 
 template<class DEF>
-struct nv_traits_chooser2<void, void, DEF>
+struct non_void_traits_chooser<void, void, DEF>
 {
     using type = DEF;
 };
@@ -183,7 +184,7 @@ struct extract_element_addition_traits
     using CT2 = typename extract_element_addition_traits_mtf<OT, T1, T2>::type;
     using DEF = matrix_element_addition_traits<T1, T2>;
 
-    using type = typename nv_traits_chooser2<CT1, CT2, DEF>::type;
+    using type = typename non_void_traits_chooser<CT1, CT2, DEF>::type;
 };
 
 template<typename OT, typename T1, typename T2>
@@ -225,7 +226,7 @@ struct extract_engine_addition_traits
     using CET2 = typename extract_engine_addition_traits_mtf<OT, ET1, ET2>::type;
     using DEF  = matrix_engine_addition_traits<OT, ET1, ET2>;
 
-    using type = typename nv_traits_chooser2<CET1, CET2, DEF>::type;
+    using type = typename non_void_traits_chooser<CET1, CET2, DEF>::type;
 };
 
 template<typename OT, typename ET1, typename ET2>
@@ -263,17 +264,17 @@ struct extract_addition_traits_mtf<OT, OP1, OP2, void_t<decltype(std::declval<ty
 template<typename OT, typename OP1, typename OP2>
 struct extract_addition_traits
 {
-    using COP1 = typename extract_addition_traits_stf<OT>::type;
-    using COP2 = typename extract_addition_traits_mtf<OT, OP1, OP2>::type;
+    using CT1 = typename extract_addition_traits_stf<OT>::type;
+    using CT2 = typename extract_addition_traits_mtf<OT, OP1, OP2>::type;
     using DEF  = matrix_addition_traits<OT, OP1, OP2>;
 
-    using type = typename nv_traits_chooser2<COP1, COP2, DEF>::type;
+    using type = typename non_void_traits_chooser<CT1, CT2, DEF>::type;
 };
 
 template<typename OT, typename OP1, typename OP2>
 using extract_addition_traits_t = typename extract_addition_traits<OT, OP1, OP2>::type;
 
-
+*/
 #if 0
 
 given operator traits types OT1 and OT2:

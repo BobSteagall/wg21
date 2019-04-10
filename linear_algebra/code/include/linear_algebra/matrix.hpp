@@ -18,7 +18,7 @@ class matrix
     using size_type      = typename engine_type::size_type;
     using size_tuple     = typename engine_type::size_tuple;
 
-    using transpose_type = matrix<matrix_transpose_engine<engine_type>>;
+    using transpose_type = matrix<tr_matrix_engine<engine_type>>;
     using hermitian_type = conditional_t<is_complex_v<element_type>, matrix, transpose_type>;
 
     static_assert(is_matrix_element_v<element_type>);
