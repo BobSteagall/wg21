@@ -82,5 +82,11 @@
     <ClCompile Include="test\test_02.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
+    <ClCompile Include="test\test_00.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\test_main.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
