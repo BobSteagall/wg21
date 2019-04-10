@@ -80,15 +80,16 @@ matrix_addition_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>::add
     PrintOperandTypes<result_type>("addition_traits", v1, v2);
     return result_type();
 }
-
+*/
 //------
 //
 template<class OTR, class ET1, class OT1, class ET2, class OT2>
 struct matrix_addition_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>
 {
-    using engine_type = matrix_addition_engine_t<OTR, ET1, ET2>;
-    using op_traits   = OT1;
-    using result_type = matrix<engine_type, op_traits>;
+    using engine_traits = extract_engine_addition_traits_t<OTR, ET1, ET2>;
+    using engine_type   = typename engine_traits::type;
+    using op_traits     = OTR;
+    using result_type   = matrix<engine_type, op_traits>;
 
     static result_type  add(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
 };
@@ -101,7 +102,7 @@ matrix_addition_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
     PrintOperandTypes<result_type>("addition_traits", m1, m2);
     return result_type();
 }
-*/
+
 //=================================================================================================
 //                                     **** SUBTRACTION ****
 //=================================================================================================

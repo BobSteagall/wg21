@@ -52,8 +52,8 @@ operator +(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
     using op_traits  = matrix_operation_traits_selector_t<OT1, OT2>;
     using op1_type   = matrix<ET1, OT1>;
     using op2_type   = matrix<ET2, OT2>;
-    using add_traits = typename op_traits::template addition_traits<op1_type, op2_type, op_traits>;
-
+    using add_traits = //typename op_traits::template addition_traits<op1_type, op2_type, op_traits>;
+        extract_addition_traits_t<op_traits, op1_type, op2_type>;
     return add_traits::add(m1, m2);
 }
 

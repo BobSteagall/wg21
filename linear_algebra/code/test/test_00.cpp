@@ -87,166 +87,8 @@ struct nv_traits_chooser3<void, void, void, DEF>
     using type = DEF;
 };
 
-template<class T1, class T2, class DEF>
-struct nv_traits_chooser2;
-
-template<class T1, class DEF>
-struct nv_traits_chooser2<T1, void, DEF>
-{
-    using type = T1;
-};
-
-template<class T2, class DEF>
-struct nv_traits_chooser2<void, T2, DEF>
-{
-    using type = T2;
-};
-
-template<class DEF>
-struct nv_traits_chooser2<void, void, DEF>
-{
-    using type = DEF;
-};
-
 //------
 //
-template<typename OT, typename = void>
-struct extract_element_addition_traits_stf : public std::false_type
-{
-    using type = void;
-};
-
-template<typename OT>
-struct extract_element_addition_traits_stf<OT, void_t<decltype(std::declval<typename OT::element_addition_traits>())>>  : public std::true_type
-{
-    using type = typename OT::element_addition_traits;
-};
-
-
-template<typename OT, typename T1, typename T2, typename = void>
-struct extract_element_addition_traits_mtf : public std::false_type
-{
-    using type = void;
-};
-
-template<typename OT, typename T1, typename T2>
-struct extract_element_addition_traits_mtf<OT, T1, T2, void_t<decltype(std::declval<typename OT::template element_addition_traits<T1, T2>>())>> : public std::true_type
-{
-    using type = typename OT::template element_addition_traits<T1, T2>;
-};
-
-
-template<template<typename, typename> typename OT, typename T1, typename T2, typename = void>
-struct extract_element_addition_traits_ttf : public std::false_type
-{
-    using type = void;
-};
-
-template<template<typename, typename> typename OT, typename T1, typename T2>
-struct extract_element_addition_traits_ttf<OT, T1, T2, void_t<decltype(std::declval<typename OT<T1, T2>::element_addition_traits>())>> : public std::true_type
-{
-    using type = typename OT<T1, T2>::element_addition_traits;
-};
-
-
-template<typename OT, typename T1, typename T2>
-struct extract_element_addition_traits
-{
-    using CT1 = typename extract_element_addition_traits_stf<OT>::type;
-    using CT2 = typename extract_element_addition_traits_mtf<OT, T1, T2>::type;
-    using DEF = STD_LA::matrix_element_addition_traits<T1, T2>;
-
-    using type = typename nv_traits_chooser2<CT1, CT2, DEF>::type;
-};
-
-template<typename OT, typename T1, typename T2>
-using extract_element_addition_traits_t = typename extract_element_addition_traits<OT, T1, T2>::type;
-
-
-//------
-//
-template<typename OT, typename = void>
-struct extract_engine_addition_traits_stf
-{
-    using type = void;
-};
-
-template<typename OT>
-struct extract_engine_addition_traits_stf<OT, void_t<decltype(std::declval<typename OT::engine_addition_traits>())>>
-{
-    using type = typename OT::engine_addition_traits;
-};
-
-
-template<typename OT, typename ET1, typename ET2, typename = void>
-struct extract_engine_addition_traits_mtf
-{
-    using type = void;
-};
-
-template<typename OT, typename ET1, typename ET2>
-struct extract_engine_addition_traits_mtf<OT, ET1, ET2, void_t<decltype(std::declval<typename OT::template engine_addition_traits<ET1, ET2>>())>>
-{
-    using type = typename OT::template engine_addition_traits<ET1, ET2>;
-};
-
-
-template<typename OT, typename ET1, typename ET2>
-struct extract_engine_addition_traits
-{
-    using CET1 = typename extract_engine_addition_traits_stf<OT>::type;
-    using CET2 = typename extract_engine_addition_traits_mtf<OT, ET1, ET2>::type;
-    using DEF  = STD_LA::matrix_engine_addition_traits<OT, ET1, ET2>;
-
-    using type = typename nv_traits_chooser2<CET1, CET2, DEF>::type;
-};
-
-template<typename OT, typename ET1, typename ET2>
-using extract_engine_addition_traits_t = typename extract_engine_addition_traits<OT, ET1, ET2>::type;
-
-
-//------
-//
-template<typename OT, typename = void>
-struct extract_addition_traits_stf
-{
-    using type = void;
-};
-
-template<typename OT>
-struct extract_addition_traits_stf<OT, void_t<decltype(std::declval<typename OT::addition_traits>())>>
-{
-    using type = typename OT::addition_traits;
-};
-
-
-template<typename OT, typename OP1, typename OP2, typename = void>
-struct extract_addition_traits_mtf
-{
-    using type = void;
-};
-
-template<typename OT, typename OP1, typename OP2>
-struct extract_addition_traits_mtf<OT, OP1, OP2, void_t<decltype(std::declval<typename OT::template addition_traits<OP1, OP2>>())>>
-{
-    using type = typename OT::template addition_traits<OP1, OP2>;
-};
-
-
-template<typename OT, typename OP1, typename OP2>
-struct extract_addition_traits
-{
-    using COP1 = typename extract_addition_traits_stf<OT>::type;
-    using COP2 = typename extract_addition_traits_mtf<OT, OP1, OP2>::type;
-    using DEF  = STD_LA::matrix_addition_traits<OT, OP1, OP2>;
-
-    using type = typename nv_traits_chooser2<COP1, COP2, DEF>::type;
-};
-
-template<typename OT, typename OP1, typename OP2>
-using extract_addition_traits_t = typename extract_addition_traits<OT, OP1, OP2>::type;
-
-
 template<class T, class L, class R>
 constexpr bool  has_add_traits_v = extract_element_addition_traits_mtf<T, L, R>::value ||
                                    extract_element_addition_traits_stf<T>::value
@@ -343,8 +185,17 @@ void t200()
 }
 
 
+void t201()
+{
+    fs_matrix<double, 3, 3> fm1;
+    dyn_matrix<double>      dmd1(3, 3);
+
+    cout << get_type_name<decltype(fm1 + dmd1)>() << endl;
+}
+
 void
 TestGroup00()
 {
     t200();
+    t201();
 }
