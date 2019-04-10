@@ -2,33 +2,6 @@
 #define LINEAR_ALGEBRA_ENGINE_PROMOTION_TRAITS_HPP_DEFINED
 
 namespace STD_LA {
-namespace detail {
-//- Testing to see if an engine has mutable element indexing.
-//
-template<class ET>
-constexpr bool  has_mutable_tag_v = ET::engine_category::value >= mutable_matrix_engine_tag::value;
-
-template<class ET1, class ET2>
-constexpr bool  is_mutable_engine_v = is_same_v<ET1, ET2> && has_mutable_tag_v<ET1>;
-
-
-template<class ET1, class ET2>
-using enable_if_mutable = enable_if_t<is_mutable_engine_v<ET1, ET2>, bool>;
-
-
-//- Testing to see if an engine is resizable.
-//
-template<class ET>
-constexpr bool  has_resizable_tag_v = ET::engine_category::value >= resizable_matrix_engine_tag::value;
-
-template<class ET1, class ET2>
-constexpr bool  is_resizable_engine_v = is_same_v<ET1, ET2> && has_resizable_tag_v<ET1>;
-
-
-template<class ET1, class ET2>
-using enable_if_resizable = enable_if_t<is_resizable_engine_v<ET1, ET2>, bool>;
-
-}   //- namespace detail
 //=================================================================================================
 //                                      **** NEGATION ****
 //=================================================================================================
@@ -60,7 +33,7 @@ struct matrix_engine_negation_traits<fs_matrix_engine<T1, R1, C1>>
 //- Transpose case.
 //
 template<class ET1>
-struct matrix_engine_negation_traits<matrix_transpose_engine<ET1>>
+struct matrix_engine_negation_traits<tr_matrix_engine<ET1>>
 {
     using engine_type = ET1;
 };
@@ -130,28 +103,28 @@ struct matrix_engine_addition_traits<fs_matrix_engine<T1, R1, C1>, fs_matrix_eng
 //- Transpose cases.
 //
 template<class ET1, class ET2>
-struct matrix_engine_addition_traits<matrix_transpose_engine<ET1>, ET2>
+struct matrix_engine_addition_traits<tr_matrix_engine<ET1>, ET2>
 {
     using traits_category = matrix_engine_addition_traits_tag;
     using engine_type     = typename matrix_engine_addition_traits<ET1, ET2>::engine_type;
 };
 
 template<class ET1, class ET2>
-struct matrix_engine_addition_traits<ET1, matrix_transpose_engine<ET2>>
+struct matrix_engine_addition_traits<ET1, tr_matrix_engine<ET2>>
 {
     using traits_category = matrix_engine_addition_traits_tag;
     using engine_type     = typename matrix_engine_addition_traits<ET1, ET2>::engine_type;
 };
 
 template<class ET1, class ET2>
-struct matrix_engine_addition_traits<matrix_transpose_engine<ET1>, matrix_transpose_engine<ET2>>
+struct matrix_engine_addition_traits<tr_matrix_engine<ET1>, tr_matrix_engine<ET2>>
 {
     using traits_category = matrix_engine_addition_traits_tag;
     using engine_type     = typename matrix_engine_addition_traits<ET1, ET2>::engine_type;
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_addition_traits<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
+struct matrix_engine_addition_traits<tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
                                         fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == C2);
@@ -163,7 +136,7 @@ struct matrix_engine_addition_traits<matrix_transpose_engine<fs_matrix_engine<T1
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_engine_addition_traits<fs_matrix_engine<T1, R1, C1>,
-                                        matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
+                                        tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
@@ -173,8 +146,8 @@ struct matrix_engine_addition_traits<fs_matrix_engine<T1, R1, C1>,
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_addition_traits<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
-                                        matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
+struct matrix_engine_addition_traits<tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
+                                        tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
@@ -243,25 +216,25 @@ struct matrix_engine_subtraction_traits<fs_matrix_engine<T1, R1, C1>, fs_matrix_
 //- Transpose cases.
 //
 template<class ET1, class ET2>
-struct matrix_engine_subtraction_traits<matrix_transpose_engine<ET1>, ET2>
+struct matrix_engine_subtraction_traits<tr_matrix_engine<ET1>, ET2>
 {
     using engine_type = typename matrix_engine_subtraction_traits<ET1, ET2>::engine_type;
 };
 
 template<class ET1, class ET2>
-struct matrix_engine_subtraction_traits<ET1, matrix_transpose_engine<ET2>>
+struct matrix_engine_subtraction_traits<ET1, tr_matrix_engine<ET2>>
 {
     using engine_type = typename matrix_engine_subtraction_traits<ET1, ET2>::engine_type;
 };
 
 template<class ET1, class ET2>
-struct matrix_engine_subtraction_traits<matrix_transpose_engine<ET1>, matrix_transpose_engine<ET2>>
+struct matrix_engine_subtraction_traits<tr_matrix_engine<ET1>, tr_matrix_engine<ET2>>
 {
     using engine_type = typename matrix_engine_subtraction_traits<ET1, ET2>::engine_type;
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_subtraction_traits<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
+struct matrix_engine_subtraction_traits<tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
                                            fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == C2);
@@ -272,7 +245,7 @@ struct matrix_engine_subtraction_traits<matrix_transpose_engine<fs_matrix_engine
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_engine_subtraction_traits<fs_matrix_engine<T1, R1, C1>,
-                                           matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
+                                           tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
@@ -281,8 +254,8 @@ struct matrix_engine_subtraction_traits<fs_matrix_engine<T1, R1, C1>,
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_subtraction_traits<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
-                                           matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
+struct matrix_engine_subtraction_traits<tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
+                                           tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
@@ -367,25 +340,25 @@ struct matrix_engine_multiplication_traits<fs_matrix_engine<T1, R1, C1>, fs_matr
 //- Transpose cases.
 //
 template<class ET1, class ET2>
-struct matrix_engine_multiplication_traits<matrix_transpose_engine<ET1>, ET2>
+struct matrix_engine_multiplication_traits<tr_matrix_engine<ET1>, ET2>
 {
     using engine_type = typename matrix_engine_multiplication_traits<ET1, ET2>::engine_type;
 };
 
 template<class ET1, class ET2>
-struct matrix_engine_multiplication_traits<ET1, matrix_transpose_engine<ET2>>
+struct matrix_engine_multiplication_traits<ET1, tr_matrix_engine<ET2>>
 {
     using engine_type = typename matrix_engine_multiplication_traits<ET1, ET2>::engine_type;
 };
 
 template<class ET1, class ET2>
-struct matrix_engine_multiplication_traits<matrix_transpose_engine<ET1>, matrix_transpose_engine<ET2>>
+struct matrix_engine_multiplication_traits<tr_matrix_engine<ET1>, tr_matrix_engine<ET2>>
 {
     using engine_type = typename matrix_engine_multiplication_traits<ET1, ET2>::engine_type;
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_multiplication_traits<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
+struct matrix_engine_multiplication_traits<tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
                                               fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == R2);
@@ -395,7 +368,7 @@ struct matrix_engine_multiplication_traits<matrix_transpose_engine<fs_matrix_eng
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_engine_multiplication_traits<fs_matrix_engine<T1, R1, C1>,
-                                              matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
+                                              tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(C1 == C2);
     using element_type = matrix_element_promotion_t<T1, T2>;
@@ -403,8 +376,8 @@ struct matrix_engine_multiplication_traits<fs_matrix_engine<T1, R1, C1>,
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_multiplication_traits<matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
-                                              matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>>>
+struct matrix_engine_multiplication_traits<tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
+                                              tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == C2);
     using element_type = matrix_element_promotion_t<T1, T2>;

@@ -10,7 +10,7 @@ namespace STD_LA {
 //- Aliases for column_vector/row_vector/matrix objects based on dynamic engines.
 //
 template<class T, class A = allocator<T>>
-using dyn_vector = vector<dr_matrix_engine<T, A>>;
+using dyn_vector = vector<dr_vector_engine<T, A>>;
 
 template<class T, class A = allocator<T>>
 using dyn_matrix = matrix<dr_matrix_engine<T, A>>;
