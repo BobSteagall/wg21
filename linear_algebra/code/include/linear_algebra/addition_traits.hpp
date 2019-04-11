@@ -1,7 +1,8 @@
 #ifndef LINEAR_ALGEBRA_ADDITION_TRAITS_HPP_DEFINED
 #define LINEAR_ALGEBRA_ADDITION_TRAITS_HPP_DEFINED
 
-//- These helper macros are used only in the addition-related detectors defined below.
+//- These helper macros are used only in the addition-related detectors defined below.  Each one
+//  corresponds to a form of detection, where "form" means the syntactic pattern to be detected.
 //
 #define VOID_T_ADD_F1(TT, TN)           void_t<decltype(std::declval<typename TT::TN>())>
 #define VOID_T_ADD_F2(TT, X1, X2, TN)   void_t<decltype(std::declval<typename TT::template TN<X1, X2>>())>
@@ -22,6 +23,8 @@ struct matrix_element_addition_traits
     using element_type    = decltype(declval<T1>() + declval<T2>());
 };
 
+//- Alias interface to trait.
+//
 template<class T1, class T2>
 using matrix_element_addition_t = typename matrix_element_addition_traits<T1, T2>::element_type;
 
@@ -117,8 +120,8 @@ struct matrix_engine_addition_traits
     using element_type_2  = typename ET2::element_type;
     using element_type    = detail::element_add_type_t<OT, element_type_1, element_type_2>;
     using engine_type     = conditional_t<ET1::is_matrix::value,
-                                          dr_matrix_engine<element_type>,
-                                          dr_vector_engine<element_type>>;
+                                          dr_matrix_engine<element_type, allocator<element_type>>,
+                                          dr_vector_engine<element_type, allocator<element_type>>>;
 };
 
 
@@ -168,7 +171,7 @@ struct matrix_engine_addition_traits<OT, dr_matrix_engine<T1,A1>, dr_matrix_engi
     using traits_category = matrix_engine_addition_traits_tag;
     using element_type    = detail::element_add_type_t<OT, T1, T2>;
     using alloc_type      = detail::rebind_alloc_t<A1, element_type>;
-    using engine_type     = dr_vector_engine<element_type, alloc_type>;
+    using engine_type     = dr_matrix_engine<element_type, alloc_type>;
 };
 
 template<class OT, class T1, class A1, class T2, int32_t R2, int32_t C2>

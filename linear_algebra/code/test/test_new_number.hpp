@@ -1,54 +1,54 @@
 #ifndef TEST_NEW_NUMBER_HPP_DEFINED
 #define TEST_NEW_NUMBER_HPP_DEFINED
 
-class NewNum 
+class new_num
 {
   public:
     double  m_value;
 
   public:
-    NewNum();
-    NewNum(NewNum&&) = default;
-    NewNum(NewNum const&) = default;
-    template<class U>   NewNum(U other);
+    new_num();
+    new_num(new_num&&) = default;
+    new_num(new_num const&) = default;
+    template<class U>   new_num(U other);
 
-    NewNum&     operator =(NewNum&&) = default;
-    NewNum&     operator =(NewNum const&) = default;
-    template<class U>   NewNum&     operator =(U rhs);
+    new_num&    operator =(new_num&&) = default;
+    new_num&    operator =(new_num const&) = default;
+    template<class U>   new_num&    operator =(U rhs);
 
-    NewNum     operator -() const;
-    NewNum     operator +() const;
+    new_num     operator -() const;
+    new_num     operator +() const;
 
-    NewNum&     operator +=(NewNum rhs);
-    NewNum&     operator -=(NewNum rhs);
-    NewNum&     operator *=(NewNum rhs);
-    NewNum&     operator /=(NewNum rhs);
+    new_num&    operator +=(new_num rhs);
+    new_num&    operator -=(new_num rhs);
+    new_num&    operator *=(new_num rhs);
+    new_num&    operator /=(new_num rhs);
 
-    template<class U>   NewNum&      operator +=(U rhs);
-    template<class U>   NewNum&      operator -=(U rhs);
-    template<class U>   NewNum&      operator *=(U rhs);
-    template<class U>   NewNum&      operator /=(U rhs);
+    template<class U>   new_num&    operator +=(U rhs);
+    template<class U>   new_num&    operator -=(U rhs);
+    template<class U>   new_num&    operator *=(U rhs);
+    template<class U>   new_num&    operator /=(U rhs);
 };
 
 template<>
-struct std::is_arithmetic<NewNum> : public std::true_type
+struct std::is_arithmetic<new_num> : public std::true_type
 {};
 
 //------
 //
 inline
-NewNum::NewNum()
+new_num::new_num()
 :   m_value(0.)
 {}
 
 template<class U> inline
-NewNum::NewNum(U other)
+new_num::new_num(U other)
 :   m_value(other)
 {}
 
-template<class U> inline 
-NewNum& 
-NewNum::operator =(U rhs)
+template<class U> inline
+new_num&
+new_num::operator =(U rhs)
 {
     m_value = rhs;
     return *this;
@@ -56,43 +56,43 @@ NewNum::operator =(U rhs)
 
 //------
 //
-inline NewNum
-NewNum::operator -() const
+inline new_num
+new_num::operator -() const
 {
-    return NewNum(-m_value);
+    return new_num(-m_value);
 }
 
-inline NewNum
-NewNum::operator +() const
+inline new_num
+new_num::operator +() const
 {
     return *this;
 }
 
 //------
 //
-inline NewNum& 
-NewNum::operator +=(NewNum rhs)
+inline new_num&
+new_num::operator +=(new_num rhs)
 {
     m_value += rhs.m_value;
     return *this;
 }
 
-inline NewNum& 
-NewNum::operator -=(NewNum rhs)
+inline new_num&
+new_num::operator -=(new_num rhs)
 {
     m_value -= rhs.m_value;
     return *this;
 }
 
-inline NewNum& 
-NewNum::operator *=(NewNum rhs)
+inline new_num&
+new_num::operator *=(new_num rhs)
 {
     m_value *= rhs.m_value;
     return *this;
 }
 
-inline NewNum& 
-NewNum::operator /=(NewNum rhs)
+inline new_num&
+new_num::operator /=(new_num rhs)
 {
     m_value += rhs.m_value;
     return *this;
@@ -101,32 +101,32 @@ NewNum::operator /=(NewNum rhs)
 //------
 //
 template<class U>
-inline NewNum& 
-NewNum::operator +=(U rhs)
+inline new_num&
+new_num::operator +=(U rhs)
 {
     m_value += (double) rhs;
     return *this;
 }
 
 template<class U>
-inline NewNum& 
-NewNum::operator -=(U rhs)
+inline new_num&
+new_num::operator -=(U rhs)
 {
     m_value -= (double) rhs;
     return *this;
 }
 
 template<class U>
-inline NewNum& 
-NewNum::operator *=(U rhs)
+inline new_num&
+new_num::operator *=(U rhs)
 {
     m_value *= (double) rhs;
     return *this;
 }
 
 template<class U>
-inline NewNum& 
-NewNum::operator /=(U rhs)
+inline new_num&
+new_num::operator /=(U rhs)
 {
     m_value /= (double) rhs;
     return *this;
@@ -135,21 +135,21 @@ NewNum::operator /=(U rhs)
 //------
 //
 inline bool
-operator ==(NewNum lhs, NewNum rhs)
+operator ==(new_num lhs, new_num rhs)
 {
     return lhs.m_value == rhs.m_value;
 }
 
 template<class U>
 inline bool
-operator ==(NewNum lhs, U rhs)
+operator ==(new_num lhs, U rhs)
 {
     return lhs.m_value == (double) rhs;
 }
 
 template<class U>
 inline bool
-operator ==(U lhs, NewNum rhs)
+operator ==(U lhs, new_num rhs)
 {
     return (double) lhs == rhs.m_value;
 }
@@ -157,21 +157,21 @@ operator ==(U lhs, NewNum rhs)
 //------
 //
 inline bool
-operator !=(NewNum lhs, NewNum rhs)
+operator !=(new_num lhs, new_num rhs)
 {
     return lhs.m_value == rhs.m_value;
 }
 
 template<class U>
 inline bool
-operator !=(NewNum lhs, U rhs)
+operator !=(new_num lhs, U rhs)
 {
     return lhs.m_value != (double) rhs;
 }
 
 template<class U>
 inline bool
-operator !=(U lhs, NewNum rhs)
+operator !=(U lhs, new_num rhs)
 {
     return (double) lhs != rhs.m_value;
 }
@@ -179,21 +179,21 @@ operator !=(U lhs, NewNum rhs)
 //------
 //
 inline bool
-operator <(NewNum lhs, NewNum rhs)
+operator <(new_num lhs, new_num rhs)
 {
     return lhs.m_value < rhs.m_value;
 }
 
 template<class U>
 inline bool
-operator <(NewNum lhs, U rhs)
+operator <(new_num lhs, U rhs)
 {
     return lhs.m_value < (double) rhs;
 }
 
 template<class U>
 inline bool
-operator <(U lhs, NewNum rhs)
+operator <(U lhs, new_num rhs)
 {
     return (double) lhs < rhs.m_value;
 }
@@ -201,21 +201,21 @@ operator <(U lhs, NewNum rhs)
 //------
 //
 inline bool
-operator <=(NewNum lhs, NewNum rhs)
+operator <=(new_num lhs, new_num rhs)
 {
     return lhs.m_value <= rhs.m_value;
 }
 
 template<class U>
 inline bool
-operator <=(NewNum lhs, U rhs)
+operator <=(new_num lhs, U rhs)
 {
     return lhs.m_value <= (double) rhs;
 }
 
 template<class U>
 inline bool
-operator <=(U lhs, NewNum rhs)
+operator <=(U lhs, new_num rhs)
 {
     return (double) lhs <= rhs.m_value;
 }
@@ -223,21 +223,21 @@ operator <=(U lhs, NewNum rhs)
 //------
 //
 inline bool
-operator >(NewNum lhs, NewNum rhs)
+operator >(new_num lhs, new_num rhs)
 {
     return lhs.m_value < rhs.m_value;
 }
 
 template<class U>
 inline bool
-operator >(NewNum lhs, U rhs)
+operator >(new_num lhs, U rhs)
 {
     return lhs.m_value < (double) rhs;
 }
 
 template<class U>
 inline bool
-operator >(U lhs, NewNum rhs)
+operator >(U lhs, new_num rhs)
 {
     return (double) lhs < rhs.m_value;
 }
@@ -245,121 +245,121 @@ operator >(U lhs, NewNum rhs)
 //------
 //
 inline bool
-operator >=(NewNum lhs, NewNum rhs)
+operator >=(new_num lhs, new_num rhs)
 {
     return lhs.m_value <= rhs.m_value;
 }
 
 template<class U>
 inline bool
-operator >=(NewNum lhs, U rhs)
+operator >=(new_num lhs, U rhs)
 {
     return lhs.m_value <= (double) rhs;
 }
 
 template<class U>
 inline bool
-operator >=(U lhs, NewNum rhs)
+operator >=(U lhs, new_num rhs)
 {
     return (double) lhs <= rhs.m_value;
 }
 
 //------
 //
-inline NewNum
-operator +(NewNum lhs, NewNum rhs)
+inline new_num
+operator +(new_num lhs, new_num rhs)
 {
-    return NewNum(lhs.m_value + rhs.m_value);
+    return new_num(lhs.m_value + rhs.m_value);
 }
 
 template<class U>
-inline NewNum
-operator +(NewNum lhs, U rhs)
+inline new_num
+operator +(new_num lhs, U rhs)
 {
-    return NewNum(lhs.m_value + (double) rhs);
+    return new_num(lhs.m_value + (double) rhs);
 }
 
 template<class U>
-inline NewNum
-operator +(U lhs, NewNum rhs)
+inline new_num
+operator +(U lhs, new_num rhs)
 {
-    return NewNum((double) lhs + rhs.m_value);
+    return new_num((double) lhs + rhs.m_value);
 }
 
 //------
 //
-inline NewNum
-operator -(NewNum lhs, NewNum rhs)
+inline new_num
+operator -(new_num lhs, new_num rhs)
 {
-    return NewNum(lhs.m_value - rhs.m_value);
+    return new_num(lhs.m_value - rhs.m_value);
 }
 
 template<class U>
-inline NewNum
-operator -(NewNum lhs, U rhs)
+inline new_num
+operator -(new_num lhs, U rhs)
 {
-    return NewNum(lhs.m_value - (double) rhs);
+    return new_num(lhs.m_value - (double) rhs);
 }
 
 template<class U>
-inline NewNum
-operator -(U lhs, NewNum rhs)
+inline new_num
+operator -(U lhs, new_num rhs)
 {
-    return NewNum((double) lhs - rhs.m_value);
+    return new_num((double) lhs - rhs.m_value);
 }
 
 //------
 //
-inline NewNum
-operator *(NewNum lhs, NewNum rhs)
+inline new_num
+operator *(new_num lhs, new_num rhs)
 {
-    return NewNum(lhs.m_value * rhs.m_value);
+    return new_num(lhs.m_value * rhs.m_value);
 }
 
 template<class U>
-inline NewNum
-operator *(NewNum lhs, U rhs)
+inline new_num
+operator *(new_num lhs, U rhs)
 {
-    return NewNum(lhs.m_value * (double) rhs);
+    return new_num(lhs.m_value * (double) rhs);
 }
 
 template<class U>
-inline NewNum
-operator *(U lhs, NewNum rhs)
+inline new_num
+operator *(U lhs, new_num rhs)
 {
-    return NewNum((double) lhs * rhs.m_value);
+    return new_num((double) lhs * rhs.m_value);
 }
 
 //------
 //
-inline NewNum
-operator /(NewNum lhs, NewNum rhs)
+inline new_num
+operator /(new_num lhs, new_num rhs)
 {
-    return NewNum(lhs.m_value / rhs.m_value);
+    return new_num(lhs.m_value / rhs.m_value);
 }
 
 template<class U>
-inline NewNum
-operator /(NewNum lhs, U rhs)
+inline new_num
+operator /(new_num lhs, U rhs)
 {
-    return NewNum(lhs.m_value / (double) rhs);
+    return new_num(lhs.m_value / (double) rhs);
 }
 
 template<class U>
-inline NewNum
-operator /(U lhs, NewNum rhs)
+inline new_num
+operator /(U lhs, new_num rhs)
 {
-    return NewNum((double) lhs / rhs.m_value);
+    return new_num((double) lhs / rhs.m_value);
 }
 
-
-void fake_num_compile_test()
+inline void
+new_num_compile_test()
 {
-    NewNum p0;
+    new_num p0;
     double  d0 = 1.0;
     float   f0 = 2.0f;
 
-    NewNum p1(p0), p2(d0), p3(f0);
+    new_num p1(p0), p2(d0), p3(f0);
 
     p1 = p2;
     p1 = d0;
@@ -414,5 +414,14 @@ void fake_num_compile_test()
     f0 * p2;
     f0 / p2;
 }
+
+template<>
+struct STD_LA::number_traits<new_num>
+{
+    using is_field    = true_type;
+    using is_nc_ring  = true_type;
+    using is_ring     = true_type;
+    using is_semiring = true_type;
+};
 
 #endif  //- TEST_NEW_NUMBER_HPP_DEFINED

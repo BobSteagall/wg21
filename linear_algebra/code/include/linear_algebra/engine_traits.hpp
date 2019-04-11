@@ -12,7 +12,7 @@ template<class ET1>
 struct matrix_engine_negation_traits
 {
     using element_type = typename ET1::element_type;
-    using engine_type  = dr_matrix_engine<element_type>;
+    using engine_type  = dr_matrix_engine<element_type, allocator<element_type>>;
 };
 
 //- Note that in the cases where allocators are rebound, there is an assumption that all
@@ -174,7 +174,7 @@ struct matrix_engine_subtraction_traits
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
     using element_type   = matrix_element_promotion_t<element_type_1, element_type_2>;
-    using engine_type    = dr_matrix_engine<element_type>;
+    using engine_type    = dr_matrix_engine<element_type, allocator<element_type>>;
 };
 
 //- Note that in the cases where allocators are rebound, there is an assumption that all
@@ -281,7 +281,7 @@ struct matrix_engine_multiplication_traits
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
     using element_type   = matrix_element_promotion_t<element_type_1, element_type_2>;
-    using engine_type    = dr_matrix_engine<element_type>;
+    using engine_type    = dr_matrix_engine<element_type, allocator<element_type>>;
 };
 
 //- engine * scalar cases.

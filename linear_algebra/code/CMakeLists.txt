@@ -16,12 +16,10 @@ set(Includes
     include/linear_algebra/library_aliases.hpp
     include/linear_algebra/matrix.hpp
     include/linear_algebra/number_traits.hpp
-    include/linear_algebra/operator_traits.hpp
+    include/linear_algebra/operation_traits.hpp
     include/linear_algebra/vector.hpp
     include/linear_algebra/view_based_engines.hpp
-)
 
-set(TestIncludes
     test/test_new_arithmetic.hpp
     test/test_new_engine.hpp
     test/test_new_number.hpp
@@ -34,9 +32,9 @@ set(Sources
     test/test_main.cpp
 )
 
-include_directories(include_directories(include .))
+include_directories(include test .)
 
-add_executable(la_test ${Sources})
+add_executable(la_test ${Sources} ${Includes})
 
 set(CMAKE_VERBOSE_MAKEFILE 1)
 
