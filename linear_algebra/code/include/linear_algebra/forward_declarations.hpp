@@ -69,11 +69,11 @@ template<class T1, class T2>    struct matrix_operation_traits_selector;
 
 //- Basic linear algebra math object engine types.
 //
-template<class T, int32_t N>                class fs_vector_engine;
-template<class T, int32_t R, int32_t C>     class fs_matrix_engine;
-template<class T, class AT=allocator<T>>    class dr_vector_engine;
-template<class T, class AT=allocator<T>>    class dr_matrix_engine;
-template<class ET>                          class tr_matrix_engine;
+template<class T, int32_t N>            class fs_vector_engine;
+template<class T, int32_t R, int32_t C> class fs_matrix_engine;
+template<class T, class AT>             class dr_vector_engine;
+template<class T, class AT>             class dr_matrix_engine;
+template<class ET>                      class tr_matrix_engine;
 
 //- Primary mathematical object types.
 //
