@@ -73,19 +73,7 @@ struct test_add_op_traits_nct                   //- Suffix "_nct" means "nested 
 };
 
 
-void PrintFuncName(char const* name)
-{
-    cout << "********************************************************************************\n";
-    cout << "********************************************************************************\n";
-    cout << "    In test function: " << name << endl;
-}
-
-
-#define PRINT_FNAME()       PrintFuncName(__func__)
-
-#define PRINT_TYPE(T)       cout << #T << ": " << get_type_name<T>() << endl
-
-#define EXEC_A_ADD_B(A, B)  (A() + B())
+#define EXEC_A_ADD_B(A, B)  (void)(A() + B())
 
 #define ASSERT_A_ADD_B_EQ_C(A, B, C) \
     static_assert(std::is_same_v<decltype(std::declval<A>() + std::declval<B>()), C>)
