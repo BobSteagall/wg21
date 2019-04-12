@@ -4,9 +4,9 @@
 //- These helper macros are used only in the addition-related detectors defined below.  Each one
 //  corresponds to a form of detection, where "form" means the syntactic pattern to be detected.
 //
-#define VOID_T_ADD_F1(TT, TN)           void_t<decltype(std::declval<typename TT::TN>())>
-#define VOID_T_ADD_F2(TT, X1, X2, TN)   void_t<decltype(std::declval<typename TT::template TN<X1, X2>>())>
-#define VOID_T_ADD_F3(TT, X1, X2, TN)   void_t<decltype(std::declval<typename TT::template TN<TT, X1, X2>>())>
+#define VOID_T_ADD_F1(TT,TN)        void_t<decltype(std::declval<typename TT::TN>())>
+#define VOID_T_ADD_F2(TT,X1,X2,TN)  void_t<decltype(std::declval<typename TT::template TN<X1,X2>>())>
+#define VOID_T_ADD_F3(TT,X1,X2,TN)  void_t<decltype(std::declval<typename TT::template TN<TT,X1,X2>>())>
 
 namespace STD_LA {
 //==================================================================================================

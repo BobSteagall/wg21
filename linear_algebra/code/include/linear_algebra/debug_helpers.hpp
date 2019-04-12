@@ -120,6 +120,15 @@ clean_type_name(basic_string<C,T,A> tname)
 #undef MATRIX_STRINGIFY
 #undef MATRIX_STRINGIFY_H
 
+void PrintFuncName(char const* name)
+{
+    cout << "********************************************************************************\n";
+    cout << "********************************************************************************\n";
+    cout << "    In test function: " << name << endl;
+}
+
+#define PRINT_FNAME()   STD_LA::PrintFuncName(__func__)
+
 template<class T>
 string
 get_type_name()
@@ -135,14 +144,6 @@ get_type_name(T const&)
     auto    view = type_name<T>();
     return clean_type_name(string(view.data(), view.size()));
 }
-
-#define PRINT_FN_NAME(name) \
-    cout \
-        << "********************************************************************************\n" \
-        << "********************************************************************************\n" \
-        << "entering test function " << #name << "()\n" << endl
-
-
 
 template<class RT, class O1>
 void
@@ -162,6 +163,8 @@ PrintOperandTypes(string const& loc, O1 const& o1, O2 const& o2)
          << "  op2: " << get_type_name(o2) << endl
          << "  ret: " << get_type_name<RT>() << endl << endl;
 }
+
+#define PRINT_TYPE(T)       cout << #T << ": " << STD_LA::get_type_name<T>() << endl
 
 }   //- STD_LA namespace
 
