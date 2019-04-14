@@ -1,6 +1,7 @@
 #include "linear_algebra.hpp"
 #include "test_new_number.hpp"
 #include "test_new_engine.hpp"
+#include "test_new_arithmetic.hpp"
 
 using cx_float  = std::complex<float>;
 using cx_double = std::complex<double>;
@@ -21,11 +22,13 @@ struct test_add_op_traits_empty {};
 //- This operation traits type has its element/engine/operation nested traits type as ordinary
 //  type aliases.
 //
+//  Suffix "_ord" means "ordinary"
+//
 struct test_element_add_traits_ord {};
 struct test_engine_add_traits_ord {};
 struct test_add_traits_ord {};
 
-struct test_add_op_traits_ord                   //- Suffix "_ord" means "ordinary"
+struct test_add_op_traits_ord 
 {
     using element_addition_traits = test_element_add_traits_ord;
     using engine_addition_traits  = test_engine_add_traits_ord;
@@ -36,8 +39,13 @@ struct test_add_op_traits_ord                   //- Suffix "_ord" means "ordinar
 //- This operation traits type is analogous to STD_LA::default_matrix_operation_traits, where its nested
 //  traits types for element/engine/operation are template type aliases.
 //
+//  Suffix "_nta" means "nested type alias"
+//
 template<class T1, class T2>
-struct test_element_add_traits_nta {};
+struct test_element_add_traits_nta 
+{
+    using type = std::common_type_t<T1, T2>;
+};
 
 template<class OT, class T1, class T2>
 struct test_engine_add_traits_nta {};
@@ -45,7 +53,7 @@ struct test_engine_add_traits_nta {};
 template<class OT, class T1, class T2>
 struct test_add_traits_nta {};
 
-struct test_add_op_traits_nta                   //- Suffix "_nta" means "nested type alias"
+struct test_add_op_traits_nta
 {
     template<class T1, class T2>
     using element_addition_traits = test_element_add_traits_nta<T1, T2>;
@@ -60,10 +68,15 @@ struct test_add_op_traits_nta                   //- Suffix "_nta" means "nested 
 
 //- This operation traits type is has the element/engine/operation traits as nested class templates.
 //
-struct test_add_op_traits_nct                   //- Suffix "_nct" means "nested class type"
+//  Suffix "_nct" means "nested class type"
+//
+struct test_add_op_traits_nct
 {
     template<class T1, class T2>
-    struct element_addition_traits {};
+    struct element_addition_traits 
+    {
+        using type = std::common_type<T1, T2>;
+    };
 
     template<class OT, class T1, class T2>
     struct engine_addition_traits {};
@@ -73,14 +86,38 @@ struct test_add_op_traits_nct                   //- Suffix "_nct" means "nested 
 };
 
 
-#define EXEC_A_ADD_B(A, B)  (void)(A() + B())
+//- This operation traits type is has the element/engine/operation traits as nested class templates.
+//
+//  Suffix "_spc" means "speical"
+//
+template<class T1, class T2>
+struct elem_prom_tst;
 
+template<>
+struct elem_prom_tst<float, float>
+{
+    using type = double;
+};
+
+struct test_add_op_traits_spc
+{
+     template<class T1, class T2>
+     using element_addition_traits = elem_prom_tst<T1, T2>;
+};
+
+
+//- A couple of helper macros to assist in readability below
+//
 #define ASSERT_A_ADD_B_EQ_C(A, B, C) \
     static_assert(std::is_same_v<decltype(std::declval<A>() + std::declval<B>()), C>)
 
+#define EXEC_A_ADD_B(A, B)  (void)(A() + B())
 
-//- The purpose of this test function is to ensure that the type detection meta-functions are
-//  working properly.  It tests only the detection meta-functions.
+
+//--------------------------------------------------------------------------------------------------
+//  This test ensures that the type detection meta-functions are working properly.  It exercises
+//  only the detection meta-functions.
+//--------------------------------------------------------------------------------------------------
 //
 void t200()
 {
@@ -126,6 +163,10 @@ void t200()
     static_assert(STD_LA::detail::has_add_traits_v<test_add_op_traits_nct, opnd_t, opnd_t>);
 }
 
+//--------------------------------------------------------------------------------------------------
+//  This test verifies that addition operations on matrices return the correct result type.
+//--------------------------------------------------------------------------------------------------
+//
 void t201()
 {
     PRINT_FNAME();
@@ -332,6 +373,11 @@ void t201()
     cout << endl;
 }
 
+//--------------------------------------------------------------------------------------------------
+//  This test verifies that addition operations on matrices actually execute.  It prints the 
+//  operand and result types for manual review.
+//--------------------------------------------------------------------------------------------------
+//
 void t202()
 {
     PRINT_FNAME();
@@ -509,6 +555,10 @@ void t202()
     EXEC_A_ADD_B(drm_new_num_tr,  drm_new_num_tr);
 }
 
+//--------------------------------------------------------------------------------------------------
+//  This test verifies that addition operations on vectors return the correct result type.
+//--------------------------------------------------------------------------------------------------
+//
 void t203()
 {
     PRINT_FNAME();
@@ -576,6 +626,11 @@ void t203()
     cout << endl;
 }
 
+//--------------------------------------------------------------------------------------------------
+//  This test verifies that addition operations on vectors actually execute.  It prints the 
+//  operand and result types for manual review.
+//--------------------------------------------------------------------------------------------------
+//
 void t204()
 {
     PRINT_FNAME();
@@ -633,32 +688,26 @@ void t204()
     EXEC_A_ADD_B(drv_new_num,  drv_new_num);
 }
 
-void t204x()
+void t2000()
 {
-    PRINT_FNAME();
 
-    STD_LA::fs_vector<double, 3>    fv1;
-    STD_LA::dyn_vector<double>      dvd1(3);
+    static_assert(STD_LA::detail::has_element_add_traits_v<test_add_op_traits_spc, float, float>);
+    static_assert(!STD_LA::detail::has_element_add_traits_v<test_add_op_traits_spc, float, double>);
+    static_assert(!STD_LA::detail::has_element_add_traits_v<test_add_op_traits_spc, double, float>);
 
-    cout << get_type_name<decltype(fv1 + dvd1)>() << endl;
-    cout << get_type_name<decltype(fv1 + dvd1)>() << endl;
-    fv1 + dvd1;
+    using t00 = STD_LA::detail::element_add_traits_t<test_add_op_traits_spc, float, float>;
+    PRINT_TYPE(t00);
 
-    STD_LA::fs_matrix<double, 3, 3>     fm1;
-    STD_LA::dyn_matrix<double>          dmd1(3, 3);
+    using t01 = STD_LA::detail::element_add_traits_t<test_add_op_traits_spc, float, double>;
+    PRINT_TYPE(t01);
 
-    cout << get_type_name<STD_LA::dyn_matrix<float>>() << endl;
-    cout << get_type_name<STD_LA::dyn_matrix<double>>() << endl;
-    cout << get_type_name<decltype(fm1 + dmd1)>() << endl;
-    cout << get_type_name<decltype(fm1.t() + dmd1.t())>() << endl;
-    fm1 + dmd1;
 }
 
 void
 TestGroup00()
 {
     PRINT_FNAME();
-
+    t2000();
     t200();
     t201();
     t202();

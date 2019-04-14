@@ -6,6 +6,9 @@
 
 namespace STD_LA {
 
+/*
+template<c
+
 template<class T1, size_t R, size_t C, class T2, class OTR>
 struct matrix_addition_traits<matrix<fs_matrix_engine_tst<T1, R, C>, OTR>,
                               matrix<fs_matrix_engine_tst<T2, R, C>, OTR>,
@@ -40,5 +43,8 @@ struct matrix_multiplication_traits<fs_matrix<float, 4, 4>,
                             return result_type();
                         }
 };
+
+*/
+
 }
 #endif  //- TEST_NEW_ARITHMETIC_HPP_DEFINED
