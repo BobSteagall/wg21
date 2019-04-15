@@ -88,7 +88,7 @@ struct test_add_op_traits_nct
 
 //- This operation traits type is has the element/engine/operation traits as nested class templates.
 //
-//  Suffix "_spc" means "speical"
+//  Suffix "_tst" means "test"
 //
 template<class T1, class T2>
 struct elem_prom_tst;
@@ -99,10 +99,30 @@ struct elem_prom_tst<float, float>
     using type = double;
 };
 
-struct test_add_op_traits_spc
+//------
+//
+template<class OT, class E1, class E2>
+struct engine_add_traits_tst;
+
+template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
+struct engine_add_traits_tst<OT, fs_matrix_engine_tst<T1, R1, C1>, fs_matrix_engine_tst<T2, R2, C2>>
+{
+    static_assert(R1 == R2);
+    static_assert(C1 == C2);
+    using traits_category = STD_LA::matrix_engine_addition_traits_tag;
+    using element_type    = STD_LA::detail::element_add_type_t<OT, T1, T2>;
+    using engine_type     = fs_matrix_engine_tst<element_type, R1, C1>;
+};
+
+//------
+//
+struct test_add_op_traits_tst
 {
      template<class T1, class T2>
      using element_addition_traits = elem_prom_tst<T1, T2>;
+
+     template<class OT, class E1, class E2>
+     using engine_addition_traits = engine_add_traits_tst<OT, E1, E2>;
 };
 
 
@@ -691,16 +711,23 @@ void t204()
 void t2000()
 {
 
-    static_assert(STD_LA::detail::has_element_add_traits_v<test_add_op_traits_spc, float, float>);
-    static_assert(!STD_LA::detail::has_element_add_traits_v<test_add_op_traits_spc, float, double>);
-    static_assert(!STD_LA::detail::has_element_add_traits_v<test_add_op_traits_spc, double, float>);
+    static_assert(STD_LA::detail::has_element_add_traits_v<test_add_op_traits_tst, float, float>);
+    static_assert(!STD_LA::detail::has_element_add_traits_v<test_add_op_traits_tst, float, double>);
+    static_assert(!STD_LA::detail::has_element_add_traits_v<test_add_op_traits_tst, double, float>);
 
-    using t00 = STD_LA::detail::element_add_traits_t<test_add_op_traits_spc, float, float>;
+    using t00 = STD_LA::detail::element_add_traits_t<test_add_op_traits_tst, float, float>;
     PRINT_TYPE(t00);
 
-    using t01 = STD_LA::detail::element_add_traits_t<test_add_op_traits_spc, float, double>;
+    using t01 = STD_LA::detail::element_add_traits_t<test_add_op_traits_tst, float, double>;
     PRINT_TYPE(t01);
 
+    using t02 = STD_LA::detail::engine_add_traits_t<test_add_op_traits_tst, 
+                                                    fs_matrix_engine_tst<float, 3, 4>,
+                                                    fs_matrix_engine_tst<double, 3, 4>>;
+    PRINT_TYPE(t02);
+
+    using t03 = typename t02::engine_type;
+    PRINT_TYPE(t03);
 }
 
 void
