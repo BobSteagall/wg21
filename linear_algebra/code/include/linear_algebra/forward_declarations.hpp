@@ -119,19 +119,19 @@ struct non_void_traits_chooser;
 template<class T1, class DEF>
 struct non_void_traits_chooser<T1, void, DEF>
 {
-    using type = T1;
+    using traits_type = T1;
 };
 
 template<class T2, class DEF>
 struct non_void_traits_chooser<void, T2, DEF>
 {
-    using type = T2;
+    using traits_type = T2;
 };
 
 template<class DEF>
 struct non_void_traits_chooser<void, void, DEF>
 {
-    using type = DEF;
+    using traits_type = DEF;
 };
 
 
