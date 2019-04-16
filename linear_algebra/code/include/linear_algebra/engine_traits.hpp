@@ -160,7 +160,7 @@ struct matrix_engine_addition_traits<tr_matrix_engine<fs_matrix_engine<T1, R1, C
 //
 template<class ET1, class ET2>
 using matrix_addition_engine_t = typename matrix_engine_addition_traits<ET1, ET2>::engine_type;
-*/
+
 
 //=================================================================================================
 //                                     **** SUBTRACTION ****
@@ -267,7 +267,7 @@ struct matrix_engine_subtraction_traits<tr_matrix_engine<fs_matrix_engine<T1, R1
 //
 template<class ET1, class ET2>
 using matrix_subtraction_engine_t = typename matrix_engine_subtraction_traits<ET1, ET2>::engine_type;
-
+*/
 
 //=================================================================================================
 //                                   **** MULTIPLICATION ****

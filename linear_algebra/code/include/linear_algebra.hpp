@@ -34,6 +34,7 @@
 #include "linear_algebra/vector.hpp"
 #include "linear_algebra/matrix.hpp"
 #include "linear_algebra/addition_traits.hpp"
+#include "linear_algebra/subtraction_traits.hpp"
 #include "linear_algebra/element_traits.hpp"
 #include "linear_algebra/engine_traits.hpp"
 #include "linear_algebra/arithmetic_traits.hpp"

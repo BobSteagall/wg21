@@ -875,7 +875,7 @@ void t206()
 }
 
 void
-TestGroup00()
+TestGroup20()
 {
     PRINT_FNAME();
 

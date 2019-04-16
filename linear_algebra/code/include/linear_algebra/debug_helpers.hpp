@@ -120,7 +120,8 @@ clean_type_name(basic_string<C,T,A> tname)
 #undef MATRIX_STRINGIFY
 #undef MATRIX_STRINGIFY_H
 
-void PrintFuncName(char const* name)
+inline void 
+PrintFuncName(char const* name)
 {
     cout << "********************************************************************************\n";
     cout << "********************************************************************************\n";

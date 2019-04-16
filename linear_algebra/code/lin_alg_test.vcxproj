@@ -34,6 +34,7 @@
     <ClInclude Include="include\linear_algebra\arithmetic_operators.hpp" />
     <ClInclude Include="include\linear_algebra\number_traits.hpp" />
     <ClInclude Include="include\linear_algebra\operation_traits.hpp" />
+    <ClInclude Include="include\linear_algebra\subtraction_traits.hpp" />
     <ClInclude Include="include\linear_algebra\vector.hpp" />
     <ClInclude Include="include\linear_algebra\view_based_engines.hpp" />
     <ClInclude Include="test\test_new_arithmetic.hpp" />
@@ -41,7 +42,6 @@
     <ClInclude Include="test\test_new_number.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test\test_00.cpp" />
     <ClCompile Include="test\test_01.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -55,6 +55,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="test\test_main.cpp" />
+    <ClCompile Include="test\test_op_add.cpp" />
+    <ClCompile Include="test\test_op_sub.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

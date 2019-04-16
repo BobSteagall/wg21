@@ -103,7 +103,7 @@ matrix_addition_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
     PrintOperandTypes<result_type>("addition_traits", m1, m2);
     return result_type();
 }
-*/
+
 //=================================================================================================
 //                                     **** SUBTRACTION ****
 //=================================================================================================
@@ -154,7 +154,7 @@ matrix_subtraction_traits<matrix<ET1, OT1>, matrix<ET2, OT2>, OTR>::subtract
     PrintOperandTypes<result_type>("subtraction_traits", m1, m2);
     return result_type();
 }
-
+*/
 
 //=================================================================================================
 //                                   **** MULTIPLICATION ****
