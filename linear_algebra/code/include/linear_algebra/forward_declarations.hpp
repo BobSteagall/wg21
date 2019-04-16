@@ -29,14 +29,14 @@ template<class T1, class T2>    struct matrix_element_promotion;
 //
 template<class T1>              struct matrix_element_negation_traits;
 template<class T1, class T2>    struct matrix_addition_element_traits;
-template<class T1, class T2>    struct matrix_element_subtraction_traits;
+template<class T1, class T2>    struct matrix_subtraction_element_traits;
 template<class T1, class T2>    struct matrix_element_multiplication_traits;
 
 //- Math object engine promotion, per arithmetical operation.
 //
 template<class E1>              struct matrix_engine_negation_traits;
 template<class OTR, class E1, class E2>     struct matrix_addition_engine_traits;
-template<class E1, class E2>    struct matrix_engine_subtraction_traits;
+template<class OTR, class E1, class E2>     struct matrix_subtraction_engine_traits;
 template<class E1, class E2>    struct matrix_engine_multiplication_traits;
 
 //- Matrix arithmetic traits.

@@ -22,7 +22,7 @@ struct default_matrix_operation_traits
     using element_addition_traits = matrix_addition_element_traits<T1, T2>;
 
     template<class T1, class T2>
-    using element_subtraction_traits = matrix_element_subtraction_traits<T1, T2>;
+    using element_subtraction_traits = matrix_subtraction_element_traits<T1, T2>;
 
     template<class T1, class T2>
     using element_multiplication_traits = matrix_element_multiplication_traits<T1, T2>;
@@ -35,8 +35,8 @@ struct default_matrix_operation_traits
     template<class OTR, class ET1, class ET2>
     using engine_addition_traits = matrix_addition_engine_traits<OTR, ET1, ET2>;
 
-    template<class ET1, class ET2>
-    using engine_subtraction_traits = matrix_engine_subtraction_traits<ET1, ET2>;
+    template<class OTR, class ET1, class ET2>
+    using engine_subtraction_traits = matrix_subtraction_engine_traits<OTR, ET1, ET2>;
 
     template<class ET1, class ET2>
     using engine_multiplication_traits = matrix_engine_multiplication_traits<ET1, ET2>;
@@ -49,8 +49,8 @@ struct default_matrix_operation_traits
     template<class OTR, class OP1, class OP2>
     using addition_traits = matrix_addition_traits<OTR, OP1, OP2>;
 
-    template<class OP1, class OP2, class OTR>
-    using subtraction_traits = matrix_subtraction_traits<OP1, OP2, OTR>;
+    template<class OTR, class OP1, class OP2>
+    using subtraction_traits = matrix_subtraction_traits<OTR, OP1, OP2>;
 
     template<class OP1, class OP2, class OTR>
     using multiplication_traits = matrix_multiplication_traits<OP1, OP2, OTR>;
