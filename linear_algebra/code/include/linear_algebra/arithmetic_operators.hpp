@@ -40,7 +40,7 @@ operator +(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2)
     using op_traits  = matrix_operation_traits_selector_t<OT1, OT2>;
     using op1_type   = vector<ET1, OT1>;
     using op2_type   = vector<ET2, OT2>;
-    using add_traits = detail::addition_traits_t<op_traits, op1_type, op2_type>;
+    using add_traits = matrix_addition_traits_t<op_traits, op1_type, op2_type>;
 
     return add_traits::add(v1, v2);
 }
@@ -52,7 +52,7 @@ operator +(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
     using op_traits  = matrix_operation_traits_selector_t<OT1, OT2>;
     using op1_type   = matrix<ET1, OT1>;
     using op2_type   = matrix<ET2, OT2>;
-    using add_traits = detail::addition_traits_t<op_traits, op1_type, op2_type>;
+    using add_traits = matrix_addition_traits_t<op_traits, op1_type, op2_type>;
 
     return add_traits::add(m1, m2);
 }

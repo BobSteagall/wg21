@@ -700,12 +700,12 @@ void t204()
 //  Suffix "_tst" means "test"
 //
 template<class T1, class T2>
-struct elem_prom_tst;
+struct element_add_traits_tst;
 
 //- Promote any float/float addition to double.
 //
 template<>
-struct elem_prom_tst<float, float>
+struct element_add_traits_tst<float, float>
 {
     using element_type = double;
 };
@@ -722,9 +722,8 @@ struct engine_add_traits_tst<OT,
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
-    using traits_category = STD_LA::matrix_engine_addition_traits_tag;
-    using element_type    = STD_LA::matrix_element_addition_t<OT, T1, T2>;
-    using engine_type     = fs_matrix_engine_tst<element_type, R1, C1>;
+    using element_type = STD_LA::matrix_addition_element_t<OT, T1, T2>;
+    using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
 };
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
@@ -734,9 +733,8 @@ struct engine_add_traits_tst<OT,
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
-    using traits_category = STD_LA::matrix_engine_addition_traits_tag;
-    using element_type    = STD_LA::matrix_element_addition_t<OT, T1, T2>;
-    using engine_type     = fs_matrix_engine_tst<element_type, R1, C1>;
+    using element_type = STD_LA::matrix_addition_element_t<OT, T1, T2>;
+    using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
 };
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
@@ -746,9 +744,32 @@ struct engine_add_traits_tst<OT,
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
-    using traits_category = STD_LA::matrix_engine_addition_traits_tag;
-    using element_type    = STD_LA::matrix_element_addition_t<OT, T1, T2>;
-    using engine_type     = fs_matrix_engine_tst<element_type, C1, R1>;
+    using element_type = STD_LA::matrix_addition_element_t<OT, T1, T2>;
+    using engine_type  = fs_matrix_engine_tst<element_type, C1, R1>;
+};
+
+//------
+//
+template<class OTR, class OP1, class OP2>
+struct addition_traits_tst;
+
+template<class OTR>
+struct addition_traits_tst<OTR,
+                           STD_LA::matrix<fs_matrix_engine_tst<double, 3, 4>, OTR>,
+                           STD_LA::matrix<fs_matrix_engine_tst<double, 3, 4>, OTR>>
+{
+    using op_traits   = OTR;
+    using engine_type = STD_LA::matrix_addition_engine_t<op_traits,
+                                                         fs_matrix_engine_tst<double, 3, 4>,
+                                                         fs_matrix_engine_tst<double, 3, 4>>;
+    using result_type = STD_LA::matrix<engine_type, op_traits>;
+
+    static result_type  add(STD_LA::matrix<fs_matrix_engine_tst<double, 3, 4>, OTR> const& m1,
+                            STD_LA::matrix<fs_matrix_engine_tst<double, 3, 4>, OTR> const& m2)
+                        {
+                            STD_LA::PrintOperandTypes<result_type>("addition_traits_TST", m1, m2);
+                            return result_type();
+                        }
 };
 
 //------
@@ -756,10 +777,13 @@ struct engine_add_traits_tst<OT,
 struct test_add_op_traits_tst
 {
      template<class T1, class T2>
-     using element_addition_traits = elem_prom_tst<T1, T2>;
+     using element_addition_traits = element_add_traits_tst<T1, T2>;
 
      template<class OT, class E1, class E2>
      using engine_addition_traits = engine_add_traits_tst<OT, E1, E2>;
+
+     template<class OT, class OP1, class OP2>
+     using addition_traits = addition_traits_tst<OT, OP1, OP2>;
 };
 
 
@@ -780,6 +804,8 @@ void t205()
 
 void t206()
 {
+    PRINT_FNAME();
+
     using fsm_float       = STD_LA::fs_matrix<float, 2, 3>;
     using fsm_float_tst   = STD_LA::matrix<fs_matrix_engine_tst<float, 2, 3>, test_add_op_traits_tst>;
     using fsm_double_tst  = STD_LA::matrix<fs_matrix_engine_tst<double, 2, 3>, test_add_op_traits_tst>;
@@ -791,8 +817,6 @@ void t206()
 
     using drm_double_tst  = STD_LA::matrix<STD_LA::dr_matrix_engine<double, std::allocator<double>>, test_add_op_traits_tst>;
     using drm_new_num_tst = STD_LA::matrix<STD_LA::dr_matrix_engine<new_num, std::allocator<new_num>>, test_add_op_traits_tst>;
-
-    PRINT_FNAME();
 
     using t00 = STD_LA::detail::engine_add_traits_t<test_add_op_traits_tst,
                                                     fs_matrix_engine_tst<float, 3, 4>,
@@ -844,6 +868,10 @@ void t206()
     EXEC_A_ADD_B(fsm_double_tst_tr,   fsm_new_num_tst_tr);
     EXEC_A_ADD_B(fsm_new_num_tst_tr,  fsm_double_tst_tr);
     EXEC_A_ADD_B(fsm_new_num_tst_tr,  fsm_new_num_tst_tr);
+
+    using fsm_double_tst_34  = STD_LA::matrix<fs_matrix_engine_tst<double, 3, 4>, test_add_op_traits_tst>;
+    EXEC_A_ADD_B(fsm_double_tst,      fsm_double_tst);
+    EXEC_A_ADD_B(fsm_double_tst_34,   fsm_double_tst_34);
 }
 
 void

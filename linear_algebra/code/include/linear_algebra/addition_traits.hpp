@@ -10,10 +10,9 @@ namespace STD_LA {
 //  elements of possibly different types.
 //
 template<class T1, class T2>
-struct matrix_element_addition_traits
+struct matrix_addition_element_traits
 {
-    using traits_category = matrix_element_addition_traits_tag;
-    using element_type    = decltype(declval<T1>() + declval<T2>());
+    using element_type = decltype(declval<T1>() + declval<T2>());
 };
 
 
@@ -82,7 +81,7 @@ struct element_add_traits_chooser
 {
     using CT1 = typename detect_element_add_traits_f1<OT>::traits_type;
     using CT2 = typename detect_element_add_traits_f2<OT, T1, T2>::traits_type;
-    using DEF = matrix_element_addition_traits<T1, T2>;
+    using DEF = matrix_addition_element_traits<T1, T2>;
 
     using traits_type = typename non_void_traits_chooser<CT1, CT2, DEF>::traits_type;
 };
@@ -115,7 +114,7 @@ using element_add_type_t = typename element_add_type<OT, T1, T2>::element_type;
 //- Alias interface to trait.
 //
 template<class OT, class T1, class T2>
-using matrix_element_addition_t = detail::element_add_type_t<OT, T1, T2>;
+using matrix_addition_element_t = detail::element_add_type_t<OT, T1, T2>;
 
 
 //==================================================================================================
@@ -125,17 +124,16 @@ using matrix_element_addition_t = detail::element_add_type_t<OT, T1, T2>;
 //- This traits type performs engine promotion type computations for binary addition.
 //
 template<class OT, class ET1, class ET2>
-struct matrix_engine_addition_traits
+struct matrix_addition_engine_traits
 {
     static_assert(ET1::is_matrix::value == ET2::is_matrix::value  &&
                   ET1::is_vector::value == ET2::is_vector::value  &&
                   ET1::is_matrix::value != ET2::is_vector::value);
 
-    using traits_category = matrix_engine_addition_traits_tag;
-    using element_type_1  = typename ET1::element_type;
-    using element_type_2  = typename ET2::element_type;
-    using element_type    = detail::element_add_type_t<OT, element_type_1, element_type_2>;
-    using engine_type     = conditional_t<ET1::is_matrix::value,
+    using element_type_1 = typename ET1::element_type;
+    using element_type_2 = typename ET2::element_type;
+    using element_type   = matrix_addition_element_t<OT, element_type_1, element_type_2>;
+    using engine_type    = conditional_t<ET1::is_matrix::value,
                                           dr_matrix_engine<element_type, allocator<element_type>>,
                                           dr_vector_engine<element_type, allocator<element_type>>>;
 };
@@ -144,139 +142,124 @@ struct matrix_engine_addition_traits
 //- Note that all cases where allocators are rebound assume standard-conformant allocator types.
 //
 template<class OT, class T1, class A1, class T2, class A2>
-struct matrix_engine_addition_traits<OT, dr_vector_engine<T1, A1>, dr_vector_engine<T2, A2>>
+struct matrix_addition_engine_traits<OT, dr_vector_engine<T1, A1>, dr_vector_engine<T2, A2>>
 {
-    using traits_category = matrix_engine_addition_traits_tag;
-    using element_type    = detail::element_add_type_t<OT, T1, T2>;
-    using alloc_type      = detail::rebind_alloc_t<A1, element_type>;
-    using engine_type     = dr_vector_engine<element_type, alloc_type>;
+    using element_type = matrix_addition_element_t<OT, T1, T2>;
+    using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
+    using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
 
 template<class OT, class T1, class A1, class T2, int32_t N2>
-struct matrix_engine_addition_traits<OT, dr_vector_engine<T1, A1>, fs_vector_engine<T2, N2>>
+struct matrix_addition_engine_traits<OT, dr_vector_engine<T1, A1>, fs_vector_engine<T2, N2>>
 {
-    using traits_category = matrix_engine_addition_traits_tag;
-    using element_type    = detail::element_add_type_t<OT, T1, T2>;
-    using alloc_type      = detail::rebind_alloc_t<A1, element_type>;
-    using engine_type     = dr_vector_engine<element_type, alloc_type>;
+    using element_type = matrix_addition_element_t<OT, T1, T2>;
+    using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
+    using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
 
 template<class OT, class T1, int32_t N1, class T2, class A2>
-struct matrix_engine_addition_traits<OT, fs_vector_engine<T1, N1>, dr_vector_engine<T2, A2>>
+struct matrix_addition_engine_traits<OT, fs_vector_engine<T1, N1>, dr_vector_engine<T2, A2>>
 {
-    using traits_category = matrix_engine_addition_traits_tag;
-    using element_type    = detail::element_add_type_t<OT, T1, T2>;
-    using alloc_type      = detail::rebind_alloc_t<A2, element_type>;
-    using engine_type     = dr_vector_engine<element_type, alloc_type>;
+    using element_type = matrix_addition_element_t<OT, T1, T2>;
+    using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
+    using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
 
 template<class OT, class T1, int32_t N1, class T2, int32_t N2>
-struct matrix_engine_addition_traits<OT, fs_vector_engine<T1, N1>, fs_vector_engine<T2, N2>>
+struct matrix_addition_engine_traits<OT, fs_vector_engine<T1, N1>, fs_vector_engine<T2, N2>>
 {
     static_assert(N1 == N2);
-    using traits_category = matrix_engine_addition_traits_tag;
-    using element_type    = detail::element_add_type_t<OT, T1, T2>;
-    using engine_type     = fs_vector_engine<element_type, N1>;
+    using element_type = matrix_addition_element_t<OT, T1, T2>;
+    using engine_type  = fs_vector_engine<element_type, N1>;
 };
 
 //------
 //
 template<class OT, class T1, class A1, class T2, class A2>
-struct matrix_engine_addition_traits<OT, dr_matrix_engine<T1, A1>, dr_matrix_engine<T2, A2>>
+struct matrix_addition_engine_traits<OT, dr_matrix_engine<T1, A1>, dr_matrix_engine<T2, A2>>
 {
-    using traits_category = matrix_engine_addition_traits_tag;
-    using element_type    = detail::element_add_type_t<OT, T1, T2>;
-    using alloc_type      = detail::rebind_alloc_t<A1, element_type>;
-    using engine_type     = dr_matrix_engine<element_type, alloc_type>;
+    using element_type = matrix_addition_element_t<OT, T1, T2>;
+    using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
+    using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
 template<class OT, class T1, class A1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_addition_traits<OT, dr_matrix_engine<T1, A1>, fs_matrix_engine<T2, R2, C2>>
+struct matrix_addition_engine_traits<OT, dr_matrix_engine<T1, A1>, fs_matrix_engine<T2, R2, C2>>
 {
-    using traits_category = matrix_engine_addition_traits_tag;
-    using element_type    = detail::element_add_type_t<OT, T1, T2>;
-    using alloc_type      = detail::rebind_alloc_t<A1, element_type>;
-    using engine_type     = dr_matrix_engine<element_type, alloc_type>;
+    using element_type = matrix_addition_element_t<OT, T1, T2>;
+    using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
+    using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, class A2>
-struct matrix_engine_addition_traits<OT, fs_matrix_engine<T1, R1, C1>, dr_matrix_engine<T2, A2>>
+struct matrix_addition_engine_traits<OT, fs_matrix_engine<T1, R1, C1>, dr_matrix_engine<T2, A2>>
 {
-    using traits_category = matrix_engine_addition_traits_tag;
-    using element_type    = detail::element_add_type_t<OT, T1, T2>;
-    using alloc_type      = detail::rebind_alloc_t<A2, element_type>;
-    using engine_type     = dr_matrix_engine<element_type, alloc_type>;
+    using element_type = matrix_addition_element_t<OT, T1, T2>;
+    using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
+    using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_addition_traits<OT, fs_matrix_engine<T1, R1, C1>, fs_matrix_engine<T2, R2, C2>>
+struct matrix_addition_engine_traits<OT, fs_matrix_engine<T1, R1, C1>, fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
-    using traits_category = matrix_engine_addition_traits_tag;
-    using element_type    = detail::element_add_type_t<OT, T1, T2>;
-    using engine_type     = fs_matrix_engine<element_type, R1, C1>;
+    using element_type = matrix_addition_element_t<OT, T1, T2>;
+    using engine_type  = fs_matrix_engine<element_type, R1, C1>;
 };
 
 
 //- Transpose cases for matrices.
 //
 template<class OT, class ET1, class ET2>
-struct matrix_engine_addition_traits<OT, tr_matrix_engine<ET1>, ET2>
+struct matrix_addition_engine_traits<OT, tr_matrix_engine<ET1>, ET2>
 {
-    using traits_category = matrix_engine_addition_traits_tag;
-    using engine_type     = typename matrix_engine_addition_traits<OT, ET1, ET2>::engine_type;
+    using engine_type = typename matrix_addition_engine_traits<OT, ET1, ET2>::engine_type;
 };
 
 template<class OT, class ET1, class ET2>
-struct matrix_engine_addition_traits<OT, ET1, tr_matrix_engine<ET2>>
+struct matrix_addition_engine_traits<OT, ET1, tr_matrix_engine<ET2>>
 {
-    using traits_category = matrix_engine_addition_traits_tag;
-    using engine_type     = typename matrix_engine_addition_traits<OT, ET1, ET2>::engine_type;
+    using engine_type = typename matrix_addition_engine_traits<OT, ET1, ET2>::engine_type;
 };
 
 template<class OT, class ET1, class ET2>
-struct matrix_engine_addition_traits<OT, tr_matrix_engine<ET1>, tr_matrix_engine<ET2>>
+struct matrix_addition_engine_traits<OT, tr_matrix_engine<ET1>, tr_matrix_engine<ET2>>
 {
-    using traits_category = matrix_engine_addition_traits_tag;
-    using engine_type     = typename matrix_engine_addition_traits<OT, ET1, ET2>::engine_type;
+    using engine_type = typename matrix_addition_engine_traits<OT, ET1, ET2>::engine_type;
 };
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_addition_traits<OT,
+struct matrix_addition_engine_traits<OT,
                                      tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
                                      fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
-
-    using traits_category = matrix_engine_addition_traits_tag;
-    using element_type    = detail::element_add_type_t<OT, T1, T2>;
-    using engine_type     = fs_matrix_engine<element_type, R2, C2>;
+    using element_type = matrix_addition_element_t<OT, T1, T2>;
+    using engine_type  = fs_matrix_engine<element_type, R2, C2>;
 };
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_addition_traits<OT,
+struct matrix_addition_engine_traits<OT,
                                      fs_matrix_engine<T1, R1, C1>,
                                      tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
-    using traits_category = matrix_engine_addition_traits_tag;
-    using element_type    = detail::element_add_type_t<OT, T1, T2>;
-    using engine_type     = fs_matrix_engine<element_type, R1, C1>;
+    using element_type = matrix_addition_element_t<OT, T1, T2>;
+    using engine_type  = fs_matrix_engine<element_type, R1, C1>;
 };
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_addition_traits<OT,
+struct matrix_addition_engine_traits<OT,
                                      tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
                                      tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
-    using traits_category = matrix_engine_addition_traits_tag;
-    using element_type    = detail::element_add_type_t<OT, T1, T2>;
-    using engine_type     = fs_matrix_engine<element_type, C1, R1>;
+    using element_type = matrix_addition_element_t<OT, T1, T2>;
+    using engine_type  = fs_matrix_engine<element_type, C1, R1>;
 };
 
 
@@ -345,7 +328,7 @@ struct engine_add_traits_chooser
 {
     using CT1 = typename detect_engine_add_traits_f1<OT>::traits_type;
     using CT2 = typename detect_engine_add_traits_f2<OT, ET1, ET2>::traits_type;
-    using DEF = matrix_engine_addition_traits<OT, ET1, ET2>;
+    using DEF = matrix_addition_engine_traits<OT, ET1, ET2>;
 
     using traits_type = typename non_void_traits_chooser<CT1, CT2, DEF>::traits_type;
 };
@@ -378,7 +361,7 @@ using engine_add_type_t = typename engine_add_type<OT, ET1, ET2>::engine_type;
 //- Alias interface to trait.
 //
 template<class OT, class ET1, class ET2>
-using matrix_engine_addition_t = detail::engine_add_type_t<OT, ET1, ET2>;
+using matrix_addition_engine_t = detail::engine_add_type_t<OT, ET1, ET2>;
 
 
 //==================================================================================================
@@ -390,8 +373,7 @@ using matrix_engine_addition_t = detail::engine_add_type_t<OT, ET1, ET2>;
 template<class OTR, class ET1, class OT1, class ET2, class OT2>
 struct matrix_addition_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>
 {
-    using category    = matrix_addition_traits_tag;
-    using engine_type = detail::engine_add_type_t<OTR, ET1, ET2>;
+    using engine_type = matrix_addition_engine_t<OTR, ET1, ET2>;
     using op_traits   = OTR;
     using result_type = vector<engine_type, op_traits>;
 
@@ -413,8 +395,7 @@ matrix_addition_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>::add
 template<class OTR, class ET1, class OT1, class ET2, class OT2>
 struct matrix_addition_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>
 {
-    using category    = matrix_addition_traits_tag;
-    using engine_type = detail::engine_add_type_t<OTR, ET1, ET2>;
+    using engine_type = matrix_addition_engine_t<OTR, ET1, ET2>;
     using op_traits   = OTR;
     using result_type = matrix<engine_type, op_traits>;
 
@@ -509,5 +490,13 @@ constexpr bool  has_add_traits_v = detect_add_traits_f2<OT, OP1, OP2>::value ||
                                    detect_add_traits_f1<OT>::value;
 
 }       //- detail namespace
+
+//---------------------------
+//- Alias interface to trait.
+//
+template<class OT, class OP1, class OP2>
+using matrix_addition_traits_t = detail::addition_traits_t<OT, OP1, OP2>;
+
+
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_ADDITION_TRAITS_HPP_DEFINED
