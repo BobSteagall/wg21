@@ -2,27 +2,11 @@
 #define LINEAR_ALGEBRA_FORWARD_DECLARATIONS_HPP_DEFINED
 
 namespace STD_LA {
-
 USING_STD
 
 using const_matrix_engine_tag     = integral_constant<int, 1>;
 using mutable_matrix_engine_tag   = integral_constant<int, 2>;
 using resizable_matrix_engine_tag = integral_constant<int, 3>;
-
-using matrix_element_negation_traits_tag       = integral_constant<int, 100>;
-using matrix_element_addition_traits_tag       = integral_constant<int, 101>;
-using matrix_element_subtraction_traits_tag    = integral_constant<int, 102>;
-using matrix_element_multiplication_traits_tag = integral_constant<int, 103>;
-
-using matrix_engine_negation_traits_tag       = integral_constant<int, 200>;
-using matrix_engine_addition_traits_tag       = integral_constant<int, 201>;
-using matrix_engine_subtraction_traits_tag    = integral_constant<int, 202>;
-using matrix_engine_multiplication_traits_tag = integral_constant<int, 203>;
-
-using matrix_negation_traits_tag       = integral_constant<int, 300>;
-using matrix_addition_traits_tag       = integral_constant<int, 301>;
-using matrix_subtraction_traits_tag    = integral_constant<int, 302>;
-using matrix_multiplication_traits_tag = integral_constant<int, 303>;
 
 //- Traits for verifying appropriate matrix element types.
 //
@@ -44,14 +28,14 @@ template<class T1, class T2>    struct matrix_element_promotion;
 //- Math object engine promotion, per arithmetical operation.
 //
 template<class T1>              struct matrix_element_negation_traits;
-template<class T1, class T2>    struct matrix_element_addition_traits;
+template<class T1, class T2>    struct matrix_addition_element_traits;
 template<class T1, class T2>    struct matrix_element_subtraction_traits;
 template<class T1, class T2>    struct matrix_element_multiplication_traits;
 
 //- Math object engine promotion, per arithmetical operation.
 //
 template<class E1>              struct matrix_engine_negation_traits;
-template<class OTR, class E1, class E2>     struct matrix_engine_addition_traits;
+template<class OTR, class E1, class E2>     struct matrix_addition_engine_traits;
 template<class E1, class E2>    struct matrix_engine_subtraction_traits;
 template<class E1, class E2>    struct matrix_engine_multiplication_traits;
 
