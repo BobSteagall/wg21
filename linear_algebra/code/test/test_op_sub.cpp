@@ -60,13 +60,13 @@ struct test_element_sub_traits_nta
     using element_type = dummy_type;
 };
 
-template<class OT, class T1, class T2>
+template<class OT, class ET1, class ET2>
 struct test_engine_sub_traits_nta
 {
     using engine_type = dummy_type;
 };
 
-template<class OT, class T1, class T2>
+template<class OT, class OP1, class OP2>
 struct test_sub_traits_nta
 {
     using result_type = dummy_type;
@@ -77,11 +77,11 @@ struct test_sub_op_traits_nta
     template<class T1, class T2>
     using element_subtraction_traits = test_element_sub_traits_nta<T1, T2>;
 
-    template<class OT, class T1, class T2>
-    using engine_subtraction_traits = test_engine_sub_traits_nta<OT, T1, T2>;
+    template<class OT, class ET1, class ET2>
+    using engine_subtraction_traits = test_engine_sub_traits_nta<OT, ET1, ET2>;
 
-    template<class OT, class T1, class T2>
-    using subtraction_traits = test_sub_traits_nta<OT, T1, T2>;
+    template<class OT, class OP1, class OP2>
+    using subtraction_traits = test_sub_traits_nta<OT, OP1, OP2>;
 };
 
 
@@ -94,17 +94,16 @@ struct test_sub_op_traits_nct
     template<class T1, class T2>
     struct element_subtraction_traits
     {
-        using type = std::common_type<T1, T2>;
-        using element_type = type;
+        using element_type = dummy_type;
     };
 
-    template<class OT, class T1, class T2>
+    template<class OT, class ET1, class ET2>
     struct engine_subtraction_traits
     {
-        using engine_type = double;
+        using engine_type = dummy_type;
     };
 
-    template<class OT, class T1, class T2>
+    template<class OT, class OP1, class OP2>
     struct subtraction_traits
     {
         using result_type = dummy_type;
@@ -126,7 +125,7 @@ struct test_sub_op_traits_nct
 //  only the detection meta-functions.
 //--------------------------------------------------------------------------------------------------
 //
-void t300()
+void t200()
 {
     PRINT_FNAME();
 
@@ -174,7 +173,7 @@ void t300()
 //  This test verifies that subtraction operations on matrices return the correct result type.
 //--------------------------------------------------------------------------------------------------
 //
-void t301()
+void t201()
 {
     PRINT_FNAME();
 
@@ -385,7 +384,7 @@ void t301()
 //  operand and result types for manual review.
 //--------------------------------------------------------------------------------------------------
 //
-void t302()
+void t202()
 {
     PRINT_FNAME();
 
@@ -566,7 +565,7 @@ void t302()
 //  This test verifies that subtraction operations on vectors return the correct result type.
 //--------------------------------------------------------------------------------------------------
 //
-void t303()
+void t203()
 {
     PRINT_FNAME();
 
@@ -638,7 +637,7 @@ void t303()
 //  operand and result types for manual review.
 //--------------------------------------------------------------------------------------------------
 //
-void t304()
+void t204()
 {
     PRINT_FNAME();
 
@@ -712,7 +711,7 @@ struct element_sub_traits_tst<float, float>
 
 //------
 //
-template<class OT, class E1, class E2>
+template<class OT, class ET1, class ET2>
 struct engine_sub_traits_tst;
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
@@ -779,15 +778,15 @@ struct test_sub_op_traits_tst
      template<class T1, class T2>
      using element_subtraction_traits = element_sub_traits_tst<T1, T2>;
 
-     template<class OT, class E1, class E2>
-     using engine_subtraction_traits = engine_sub_traits_tst<OT, E1, E2>;
+     template<class OT, class ET1, class ET2>
+     using engine_subtraction_traits = engine_sub_traits_tst<OT, ET1, ET2>;
 
      template<class OT, class OP1, class OP2>
      using subtraction_traits = subtraction_traits_tst<OT, OP1, OP2>;
 };
 
 
-void t305()
+void t205()
 {
     PRINT_FNAME();
 
@@ -802,7 +801,7 @@ void t305()
     PRINT_TYPE(t01);
 }
 
-void t306()
+void t206()
 {
     PRINT_FNAME();
 
@@ -875,16 +874,16 @@ void t306()
 }
 
 void
-TestGroup30()
+TestGroup20()
 {
     PRINT_FNAME();
 
-    t300();
-    t301();
-    t302();
-    t303();
-    t304();
+    t200();
+    t201();
+    t202();
+    t203();
+    t204();
 
-    t305();
-    t306();
+    t205();
+    t206();
 }

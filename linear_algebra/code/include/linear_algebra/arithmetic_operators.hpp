@@ -12,7 +12,7 @@ operator -(vector<ET1, OT1> const& v1)
 {
     using op1_type   = vector<ET1, OT1>;
     using op_traits  = OT1;
-    using neg_traits = typename OT1::template negation_traits<op1_type, op_traits>;
+    using neg_traits = matrix_negation_traits_t<op_traits, op1_type>;
 
     return neg_traits::negate(v1);
 }
@@ -23,7 +23,7 @@ operator -(matrix<ET1, OT1> const& m1)
 {
     using op1_type   = matrix<ET1, OT1>;
     using op_traits  = OT1;
-    using neg_traits = typename OT1::template negation_traits<op1_type, op_traits>;
+    using neg_traits = matrix_negation_traits_t<op_traits, op1_type>;
 
     return neg_traits::negate(m1);
 }

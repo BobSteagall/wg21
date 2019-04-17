@@ -1,8 +1,6 @@
 #ifndef LINEAR_ALGEBRA_LIBRARY_ALIASES_HPP_DEFINED
 #define LINEAR_ALGEBRA_LIBRARY_ALIASES_HPP_DEFINED
 
-#include "arithmetic_operators.hpp"
-
 //- Convenience aliases.
 //
 namespace STD_LA {
