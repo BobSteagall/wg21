@@ -100,5 +100,8 @@
     <ClCompile Include="test\test_op_sub.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
+    <ClCompile Include="test\test_op_neg.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -57,6 +57,7 @@
     </ClCompile>
     <ClCompile Include="test\test_main.cpp" />
     <ClCompile Include="test\test_op_add.cpp" />
+    <ClCompile Include="test\test_op_neg.cpp" />
     <ClCompile Include="test\test_op_sub.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
