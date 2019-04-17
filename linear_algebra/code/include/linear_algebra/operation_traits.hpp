@@ -16,7 +16,7 @@ struct default_matrix_operation_traits
     //- Default element promotion traits.
     //
     template<class T1>
-    using element_negation_traits = matrix_element_negation_traits<T1>;
+    using element_negation_traits = matrix_negation_element_traits<T1>;
 
     template<class T1, class T2>
     using element_addition_traits = matrix_addition_element_traits<T1, T2>;
@@ -29,8 +29,8 @@ struct default_matrix_operation_traits
 
     //- Default engine promotion traits.
     //
-    template<class ET1>
-    using engine_negation_traits = matrix_engine_negation_traits<ET1>;
+    template<class OTR, class ET1>
+    using engine_negation_traits = matrix_negation_engine_traits<OTR, ET1>;
 
     template<class OTR, class ET1, class ET2>
     using engine_addition_traits = matrix_addition_engine_traits<OTR, ET1, ET2>;

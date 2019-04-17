@@ -2,6 +2,7 @@
 #define MATRIX_ARITHMETIC_TRAITS_HPP_DEFINED
 
 namespace STD_LA {
+/*
 //=================================================================================================
 //                                      **** NEGATION ****
 //=================================================================================================
@@ -57,7 +58,6 @@ matrix_negation_traits<matrix<ET1, OT1>, OTR>::negate(matrix<ET1,OT1> const& m1)
 //  Traits type that performs addition.
 //=================================================================================================
 //
-/*
 template<class OTR, class OP1, class OP2>
 struct matrix_addition_traits;
 

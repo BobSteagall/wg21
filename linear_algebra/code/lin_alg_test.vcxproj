@@ -32,6 +32,7 @@
     <ClInclude Include="include\linear_algebra\arithmetic_traits.hpp" />
     <ClInclude Include="include\linear_algebra\fixed_size_engines.hpp" />
     <ClInclude Include="include\linear_algebra\arithmetic_operators.hpp" />
+    <ClInclude Include="include\linear_algebra\negation_traits.hpp" />
     <ClInclude Include="include\linear_algebra\number_traits.hpp" />
     <ClInclude Include="include\linear_algebra\operation_traits.hpp" />
     <ClInclude Include="include\linear_algebra\subtraction_traits.hpp" />
