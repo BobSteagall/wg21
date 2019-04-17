@@ -2,6 +2,7 @@
 #define LINEAR_ALGEBRA_ENGINE_PROMOTION_TRAITS_HPP_DEFINED
 
 namespace STD_LA {
+/*
 //=================================================================================================
 //                                      **** NEGATION ****
 //=================================================================================================
@@ -9,7 +10,7 @@ namespace STD_LA {
 //=================================================================================================
 //
 template<class ET1>
-struct matrix_engine_negation_traits
+struct matrix_negation_engine_traits
 {
     using element_type = typename ET1::element_type;
     using engine_type  = dr_matrix_engine<element_type, allocator<element_type>>;
@@ -19,13 +20,13 @@ struct matrix_engine_negation_traits
 //  allocators are standard-conformant.
 //
 template<class T1, class A1>
-struct matrix_engine_negation_traits<dr_matrix_engine<T1, A1>>
+struct matrix_negation_engine_traits<dr_matrix_engine<T1, A1>>
 {
     using engine_type = dr_matrix_engine<T1, A1>;
 };
 
 template<class T1, int32_t R1, int32_t C1>
-struct matrix_engine_negation_traits<fs_matrix_engine<T1, R1, C1>>
+struct matrix_negation_engine_traits<fs_matrix_engine<T1, R1, C1>>
 {
     using engine_type = fs_matrix_engine<T1, R1, C1>;
 };
@@ -33,7 +34,7 @@ struct matrix_engine_negation_traits<fs_matrix_engine<T1, R1, C1>>
 //- Transpose case.
 //
 template<class ET1>
-struct matrix_engine_negation_traits<tr_matrix_engine<ET1>>
+struct matrix_negation_engine_traits<tr_matrix_engine<ET1>>
 {
     using engine_type = ET1;
 };
@@ -41,7 +42,7 @@ struct matrix_engine_negation_traits<tr_matrix_engine<ET1>>
 //- Alias interface to trait.
 //
 template<class ET1>
-using matrix_negation_engine_t = typename matrix_engine_negation_traits<ET1>::engine_type;
+using matrix_negation_engine_t = typename matrix_negation_engine_traits<ET1>::engine_type;
 
 
 //=================================================================================================
@@ -50,7 +51,6 @@ using matrix_negation_engine_t = typename matrix_engine_negation_traits<ET1>::en
 //  Traits type that performs engine promotion type computations for binary addition.
 //=================================================================================================
 //
-/*
 template<class ET1, class ET2>
 struct matrix_engine_addition_traits
 {

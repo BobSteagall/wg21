@@ -20,12 +20,13 @@ using matrix_element_promotion_helper_t = typename matrix_element_promotion_help
 }   //- detail namespace
 
 
+/*
 template<class T1>
-struct matrix_element_negation_traits
+struct matrix_negation_element_traits
 {
     using type = decltype(-declval<T1>());
 };
-/*
+
 template<class T1, class T2>
 struct matrix_element_addition_traits
 {
