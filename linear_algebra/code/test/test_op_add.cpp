@@ -77,11 +77,11 @@ struct test_add_op_traits_nta
     template<class T1, class T2>
     using element_addition_traits = test_element_add_traits_nta<T1, T2>;
 
-    template<class OT, class T1, class T2>
-    using engine_addition_traits = test_engine_add_traits_nta<OT, T1, T2>;
+    template<class OT, class ET1, class ET2>
+    using engine_addition_traits = test_engine_add_traits_nta<OT, ET1, ET2>;
 
-    template<class OT, class T1, class T2>
-    using addition_traits = test_add_traits_nta<OT, T1, T2>;
+    template<class OT, class OP1, class OP2>
+    using addition_traits = test_add_traits_nta<OT, OP1, OP2>;
 };
 
 
@@ -94,17 +94,16 @@ struct test_add_op_traits_nct
     template<class T1, class T2>
     struct element_addition_traits
     {
-        using type = std::common_type<T1, T2>;
-        using element_type = type;
+        using element_type = dummy_type;
     };
 
-    template<class OT, class T1, class T2>
+    template<class OT, class ET1, class ET2>
     struct engine_addition_traits
     {
-        using engine_type = double;
+        using engine_type = dummy_type;
     };
 
-    template<class OT, class T1, class T2>
+    template<class OT, class OP1, class OP2>
     struct addition_traits
     {
         using result_type = dummy_type;
@@ -126,7 +125,7 @@ struct test_add_op_traits_nct
 //  only the detection meta-functions.
 //--------------------------------------------------------------------------------------------------
 //
-void t200()
+void t100()
 {
     PRINT_FNAME();
 
@@ -174,7 +173,7 @@ void t200()
 //  This test verifies that addition operations on matrices return the correct result type.
 //--------------------------------------------------------------------------------------------------
 //
-void t201()
+void t101()
 {
     PRINT_FNAME();
 
@@ -385,7 +384,7 @@ void t201()
 //  operand and result types for manual review.
 //--------------------------------------------------------------------------------------------------
 //
-void t202()
+void t102()
 {
     PRINT_FNAME();
 
@@ -566,7 +565,7 @@ void t202()
 //  This test verifies that addition operations on vectors return the correct result type.
 //--------------------------------------------------------------------------------------------------
 //
-void t203()
+void t103()
 {
     PRINT_FNAME();
 
@@ -638,7 +637,7 @@ void t203()
 //  operand and result types for manual review.
 //--------------------------------------------------------------------------------------------------
 //
-void t204()
+void t104()
 {
     PRINT_FNAME();
 
@@ -712,7 +711,7 @@ struct element_add_traits_tst<float, float>
 
 //------
 //
-template<class OT, class E1, class E2>
+template<class OT, class ET1, class ET2>
 struct engine_add_traits_tst;
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
@@ -779,15 +778,15 @@ struct test_add_op_traits_tst
      template<class T1, class T2>
      using element_addition_traits = element_add_traits_tst<T1, T2>;
 
-     template<class OT, class E1, class E2>
-     using engine_addition_traits = engine_add_traits_tst<OT, E1, E2>;
+     template<class OT, class ET1, class ET2>
+     using engine_addition_traits = engine_add_traits_tst<OT, ET1, ET2>;
 
      template<class OT, class OP1, class OP2>
      using addition_traits = addition_traits_tst<OT, OP1, OP2>;
 };
 
 
-void t205()
+void t105()
 {
     PRINT_FNAME();
 
@@ -802,7 +801,7 @@ void t205()
     PRINT_TYPE(t01);
 }
 
-void t206()
+void t106()
 {
     PRINT_FNAME();
 
@@ -875,16 +874,16 @@ void t206()
 }
 
 void
-TestGroup20()
+TestGroup10()
 {
     PRINT_FNAME();
 
-    t200();
-    t201();
-    t202();
-    t203();
-    t204();
+    t100();
+    t101();
+    t102();
+    t103();
+    t104();
 
-    t205();
-    t206();
+    t105();
+    t106();
 }

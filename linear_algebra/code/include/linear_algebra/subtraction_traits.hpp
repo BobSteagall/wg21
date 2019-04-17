@@ -231,8 +231,8 @@ struct matrix_subtraction_engine_traits<OT, tr_matrix_engine<ET1>, tr_matrix_eng
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_subtraction_engine_traits<OT,
-                                     tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
-                                     fs_matrix_engine<T2, R2, C2>>
+                                        tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
+                                        fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
@@ -242,8 +242,8 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_subtraction_engine_traits<OT,
-                                     fs_matrix_engine<T1, R1, C1>,
-                                     tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
+                                        fs_matrix_engine<T1, R1, C1>,
+                                        tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
@@ -253,8 +253,8 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_subtraction_engine_traits<OT,
-                                     tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
-                                     tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
+                                        tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
+                                        tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);

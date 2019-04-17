@@ -5,6 +5,7 @@ include(CTest)
 
 set(Includes
     include/linear_algebra.hpp
+    include/linear_algebra/addition_traits.hpp
     include/linear_algebra/arithmetic_operators.hpp
     include/linear_algebra/arithmetic_traits.hpp
     include/linear_algebra/debug_helpers.hpp
@@ -15,8 +16,10 @@ set(Includes
     include/linear_algebra/forward_declarations.hpp
     include/linear_algebra/library_aliases.hpp
     include/linear_algebra/matrix.hpp
+    include/linear_algebra/negation_traits.hpp
     include/linear_algebra/number_traits.hpp
     include/linear_algebra/operation_traits.hpp
+    include/linear_algebra/subtraction_traits.hpp
     include/linear_algebra/vector.hpp
     include/linear_algebra/view_based_engines.hpp
 
@@ -26,7 +29,9 @@ set(Includes
 )
 
 set(Sources
-    test/test_00.cpp
+    test/test_op_add.cpp
+    test/test_op_neg.cpp
+    test/test_op_sub.cpp
 #    test/test_01.cpp
 #    test/test_02.cpp
     test/test_main.cpp
