@@ -30,6 +30,7 @@ set(Includes
 
 set(Sources
     test/test_op_add.cpp
+    test/test_op_mul.cpp
     test/test_op_neg.cpp
     test/test_op_sub.cpp
 #    test/test_01.cpp

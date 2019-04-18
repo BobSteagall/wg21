@@ -9,18 +9,18 @@ namespace detail {
 //
 struct builtin_number_traits
 {
-    using is_field    = true_type;
-    using is_nc_ring  = true_type;
-    using is_ring     = true_type;
-    using is_semiring = true_type;
+    using is_field     = true_type;
+    using is_nc_ring   = true_type;
+    using is_ring      = true_type;
+    using is_semi_ring = true_type;
 };
 
 struct non_number_traits
 {
-    using is_field    = false_type;
-    using is_nc_ring  = false_type;
-    using is_ring     = false_type;
-    using is_semiring = false_type;
+    using is_field     = false_type;
+    using is_nc_ring   = false_type;
+    using is_ring      = false_type;
+    using is_semi_ring = false_type;
 };
 
 template<class T>
@@ -57,7 +57,7 @@ constexpr bool  is_field_v = is_field<T>::value;
 //--------------------------------------------------------------------------------------------------
 //
 template<class T>
-struct is_nc_ring : public bool_constant<number_traits<T>::is_field::value>
+struct is_nc_ring : public bool_constant<number_traits<T>::is_nc_ring::value>
 {};
 
 template<class T>
@@ -68,7 +68,7 @@ constexpr bool  is_nc_ring_v = is_ring<T>::value;
 //--------------------------------------------------------------------------------------------------
 //
 template<class T>
-struct is_ring : public bool_constant<number_traits<T>::is_field::value>
+struct is_ring : public bool_constant<number_traits<T>::is_ring::value>
 {};
 
 template<class T>
@@ -79,7 +79,7 @@ constexpr bool  is_ring_v = is_ring<T>::value;
 //--------------------------------------------------------------------------------------------------
 //
 template<class T>
-struct is_semi_ring : public bool_constant<number_traits<T>::is_field::value>
+struct is_semi_ring : public bool_constant<number_traits<T>::is_semi_ring::value>
 {};
 
 template<class T>
