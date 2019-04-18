@@ -83,6 +83,9 @@
     <ClInclude Include="include\linear_algebra\negation_traits.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
+    <ClInclude Include="include\linear_algebra\multiplication_traits.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\test_01.cpp">
@@ -101,6 +104,9 @@
       <Filter>Test Files</Filter>
     </ClCompile>
     <ClCompile Include="test\test_op_neg.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\test_op_mul.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
   </ItemGroup>
