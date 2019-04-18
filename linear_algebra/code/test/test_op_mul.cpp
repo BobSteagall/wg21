@@ -125,7 +125,7 @@ struct test_mul_op_traits_nct
 //  only the detection meta-functions.
 //--------------------------------------------------------------------------------------------------
 //
-void t100()
+void t400()
 {
     PRINT_FNAME();
 
@@ -173,7 +173,7 @@ void t100()
 //  This test verifies that addition operations on matrices return the correct result type.
 //--------------------------------------------------------------------------------------------------
 //
-void t101()
+void t401()
 {
     PRINT_FNAME();
 
@@ -384,7 +384,7 @@ void t101()
 //  operand and result types for manual review.
 //--------------------------------------------------------------------------------------------------
 //
-void t102()
+void t402()
 {
     PRINT_FNAME();
 
@@ -565,7 +565,7 @@ void t102()
 //  This test verifies that addition operations on vectors return the correct result type.
 //--------------------------------------------------------------------------------------------------
 //
-void t103()
+void t403()
 {
     PRINT_FNAME();
 
@@ -637,7 +637,7 @@ void t103()
 //  operand and result types for manual review.
 //--------------------------------------------------------------------------------------------------
 //
-void t104()
+void t404()
 {
     PRINT_FNAME();
 
@@ -786,7 +786,7 @@ struct test_mul_op_traits_tst
 };
 
 
-void t105()
+void t405()
 {
     PRINT_FNAME();
 
@@ -801,7 +801,7 @@ void t105()
     PRINT_TYPE(t01);
 }
 
-void t106()
+void t406()
 {
     PRINT_FNAME();
 
@@ -874,16 +874,16 @@ void t106()
 }
 
 void
-TestGroup10()
+TestGroup40()
 {
     PRINT_FNAME();
 
-    t100();
-    t101();
-    t102();
-    t103();
-    t104();
+    t400();
+    t401();
+    t402();
+    t403();
+    t404();
 
-    t105();
-    t106();
+    t405();
+    t406();
 }
