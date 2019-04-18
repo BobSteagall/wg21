@@ -101,7 +101,7 @@ operator *(vector<ET1, OT1> const& v1, S2 s2)
     using op_traits  = OT1;
     using op1_type   = vector<ET1, OT1>;
     using op2_type   = S2;
-    using mul_traits = typename op_traits::template multiplication_traits<op1_type, op2_type, op_traits>;
+    using mul_traits = matrix_multiplication_traits_t<op_traits, op1_type, op2_type>;
 
     return mul_traits::multiply(v1, s2);
 }
@@ -115,7 +115,7 @@ operator *(S1 s1, vector<ET2, OT2> const& v2)
     using op_traits  = OT2;
     using op1_type   = S1;
     using op2_type   = vector<ET2, OT2>;
-    using mul_traits = typename op_traits::template multiplication_traits<op1_type, op2_type, op_traits>;
+    using mul_traits = matrix_multiplication_traits_t<op_traits, op1_type, op2_type>;
 
     return mul_traits::multiply(s1, v2);
 }
@@ -132,7 +132,7 @@ operator *(matrix<ET1, OT1> const& m1, S2 s2)
     using op_traits  = OT1;
     using op1_type   = matrix<ET1, OT1>;
     using op2_type   = S2;
-    using mul_traits = typename op_traits::template multiplication_traits<op1_type, op2_type, op_traits>;
+    using mul_traits = matrix_multiplication_traits_t<op_traits, op1_type, op2_type>;
 
     return mul_traits::multiply(m1, s2);
 }
@@ -146,7 +146,7 @@ operator *(S1 s1, matrix<ET2, OT2> const& m2)
     using op_traits  = OT2;
     using op1_type   = S1;
     using op2_type   = matrix<ET2, OT2>;
-    using mul_traits = typename op_traits::template multiplication_traits<op2_type, op1_type, op_traits>;
+    using mul_traits = matrix_multiplication_traits_t<op_traits, op1_type, op2_type>;
 
     return mul_traits::multiply(m2, s1);
 }
@@ -161,7 +161,7 @@ operator *(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2)
     using op_traits  = matrix_operation_traits_selector_t<OT1, OT2>;
     using op1_type   = vector<ET1, OT1>;
     using op2_type   = vector<ET2, OT2>;
-    using mul_traits = typename op_traits::template multiplication_traits<op1_type, op2_type, op_traits>;
+    using mul_traits = matrix_multiplication_traits_t<op_traits, op1_type, op2_type>;
 
     return mul_traits::multiply(v1, v2);
 }
@@ -176,7 +176,7 @@ operator *(matrix<ET1, OT1> const& m1, vector<ET2, OT2> const& v2)
     using op_traits  = matrix_operation_traits_selector_t<OT1, OT2>;
     using op1_type   = matrix<ET1, OT1>;
     using op2_type   = vector<ET2, OT2>;
-    using mul_traits = typename op_traits::template multiplication_traits<op1_type, op2_type, op_traits>;
+    using mul_traits = matrix_multiplication_traits_t<op_traits, op1_type, op2_type>;
 
     return mul_traits::multiply(m1, v2);
 }
@@ -191,7 +191,7 @@ operator *(vector<ET1, OT1> const& v1, matrix<ET2, OT2> const& m2)
     using op_traits  = matrix_operation_traits_selector_t<OT1, OT2>;
     using op1_type   = vector<ET1, OT1>;
     using op2_type   = matrix<ET2, OT2>;
-    using mul_traits = typename op_traits::template multiplication_traits<op1_type, op2_type, op_traits>;
+    using mul_traits = matrix_multiplication_traits_t<op_traits, op1_type, op2_type>;
 
     return mul_traits::multiply(v1, m2);
 }
@@ -206,7 +206,7 @@ operator *(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
     using op_traits  = matrix_operation_traits_selector_t<OT1, OT2>;
     using op1_type   = matrix<ET1, OT1>;
     using op2_type   = matrix<ET2, OT2>;
-    using mul_traits = typename op_traits::template multiplication_traits<op1_type, op2_type, op_traits>;
+    using mul_traits = matrix_multiplication_traits_t<op_traits, op1_type, op2_type>;
 
     return mul_traits::multiply(m1, m2);
 }

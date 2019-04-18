@@ -32,6 +32,7 @@
     <ClInclude Include="include\linear_algebra\arithmetic_traits.hpp" />
     <ClInclude Include="include\linear_algebra\fixed_size_engines.hpp" />
     <ClInclude Include="include\linear_algebra\arithmetic_operators.hpp" />
+    <ClInclude Include="include\linear_algebra\multiplication_traits.hpp" />
     <ClInclude Include="include\linear_algebra\negation_traits.hpp" />
     <ClInclude Include="include\linear_algebra\number_traits.hpp" />
     <ClInclude Include="include\linear_algebra\operation_traits.hpp" />
@@ -57,6 +58,7 @@
     </ClCompile>
     <ClCompile Include="test\test_main.cpp" />
     <ClCompile Include="test\test_op_add.cpp" />
+    <ClCompile Include="test\test_op_mul.cpp" />
     <ClCompile Include="test\test_op_neg.cpp" />
     <ClCompile Include="test\test_op_sub.cpp" />
   </ItemGroup>

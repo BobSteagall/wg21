@@ -267,7 +267,7 @@ struct matrix_engine_subtraction_traits<tr_matrix_engine<fs_matrix_engine<T1, R1
 //
 template<class ET1, class ET2>
 using matrix_subtraction_engine_t = typename matrix_engine_subtraction_traits<ET1, ET2>::engine_type;
-*/
+
 
 //=================================================================================================
 //                                   **** MULTIPLICATION ****
@@ -388,6 +388,7 @@ struct matrix_engine_multiplication_traits<tr_matrix_engine<fs_matrix_engine<T1,
 //
 template<class ET1, class ET2>
 using matrix_multiplication_engine_t = typename matrix_engine_multiplication_traits<ET1, ET2>::engine_type;
+*/
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_ENGINE_PROMOTION_TRAITS_HPP_DEFINED

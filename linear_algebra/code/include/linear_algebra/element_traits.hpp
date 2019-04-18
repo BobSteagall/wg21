@@ -39,8 +39,7 @@ struct matrix_element_subtraction_traits
 {
     using type = decltype(declval<T1>() - declval<T2>());
 };
-*/
-template<class T1, class T2>
+\template<class T1, class T2>
 struct matrix_element_multiplication_traits
 {
     using type = decltype(declval<T1>() * declval<T2>());
@@ -48,6 +47,7 @@ struct matrix_element_multiplication_traits
 
 template<class T1, class T2>
 using matrix_element_multiplication_t = typename matrix_element_multiplication_traits<T1, T2>::type;
+*/
 
 //--------------------------------------------------------------------------------------------------
 //- Unfortunately, in C++17 complex<T> only permits arithmetical expressions between
