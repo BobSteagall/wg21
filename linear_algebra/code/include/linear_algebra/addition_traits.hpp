@@ -2,31 +2,18 @@
 #define LINEAR_ALGEBRA_ADDITION_TRAITS_HPP_DEFINED
 
 namespace STD_LA {
-//==================================================================================================
-//                        **** ELEMENT ADDITION TRAITS AND DETECTORS ****
-//==================================================================================================
-//
-//- This traits type provides the default mechanism for determining the result of adding two
-//  elements of possibly different types.
-//
-template<class T1, class T2>
-struct matrix_addition_element_traits
-{
-    using element_type = decltype(declval<T1>() + declval<T2>());
-};
-
-
 namespace detail {
-//--------------------------------------------------------------------------------------------------
+//==================================================================================================
+//                         **** ELEMENT ADDITION TRAITS DETECTORS ****
+//==================================================================================================
+//
 //- Form 1 type detection of nested element addition traits.
-//  First, define two helper aliases.
 //
 template<typename OT>
 using element_add_traits_f1_t = typename OT::element_addition_traits;
 
 template<typename OT>
 using element_add_type_f1_t = typename element_add_traits_f1_t<OT>::element_type;
-
 
 //- Define the form 1 detectors.
 //
@@ -44,17 +31,14 @@ struct detect_element_add_traits_f1<OT, void_t<element_add_type_f1_t<OT>>>
     using traits_type = element_add_traits_f1_t<OT>;
 };
 
-
 //----------------------------------------------------------
 //- Form 2 type detection of nested element addition traits.
-//  First, define two helper aliases.
 //
 template<typename OT, typename T1, typename T2>
 using element_add_traits_f2_t = typename OT::template element_addition_traits<T1, T2>;
 
 template<typename OT, typename T1, typename T2>
 using element_add_type_f2_t = typename element_add_traits_f2_t<OT, T1, T2>::element_type;
-
 
 //- Define the form 2 detectors.
 //
@@ -71,7 +55,6 @@ struct detect_element_add_traits_f2<OT, T1, T2, void_t<element_add_type_f2_t<OT,
 {
     using traits_type = element_add_traits_f2_t<OT, T1, T2>;
 };
-
 
 //---------------------------------------------
 //- Element addition traits type determination.
@@ -93,7 +76,6 @@ template<class OT, class T1, class T2>
 constexpr bool  has_element_add_traits_v = detect_element_add_traits_f2<OT, T1, T2>::value ||
                                            detect_element_add_traits_f1<OT>::value;
 
-
 //---------------------------------------------
 //- Element addition result type determination.
 //
@@ -108,20 +90,200 @@ template<typename OT, typename T1, typename T2>
 using element_add_type_t = typename element_add_type<OT, T1, T2>::element_type;
 
 
-}       //- detail namespace
+//==================================================================================================
+//                          **** ENGINE ADDITION TRAITS DETECTORS ****
+//==================================================================================================
+//
+//- Form 1 type detection of nested engine addition traits.
+//
+template<typename OT>
+using engine_add_traits_f1_t = typename OT::engine_addition_traits;
 
-//---------------------------
-//- Alias interface to trait.
+template<typename OT>
+using engine_add_type_f1_t = typename engine_add_traits_f1_t<OT>::engine_type;
+
+//- Define the form 1 detectors.
+//
+template<typename OT, typename = void>
+struct detect_engine_add_traits_f1
+:   public false_type
+{
+    using traits_type = void;
+};
+
+template<typename OT>
+struct detect_engine_add_traits_f1<OT, void_t<engine_add_type_f1_t<OT>>>
+:   public true_type
+{
+    using traits_type = engine_add_traits_f1_t<OT>;
+};
+
+//---------------------------------------------------------
+//- Form 2 type detection of nested engine addition traits.
+//
+template<typename OT, typename T1, typename T2>
+using engine_add_traits_f2_t = typename OT::template engine_addition_traits<OT, T1, T2>;
+
+template<typename OT, typename T1, typename T2>
+using engine_add_type_f2_t = typename engine_add_traits_f2_t<OT, T1, T2>::engine_type;
+
+//- Define the form 2 detectors.
+//
+template<typename OT, typename ET1, typename ET2, typename = void>
+struct detect_engine_add_traits_f2
+:   public false_type
+{
+    using traits_type = void;
+};
+
+template<typename OT, typename ET1, typename ET2>
+struct detect_engine_add_traits_f2<OT, ET1, ET2, void_t<engine_add_type_f2_t<OT, ET1, ET2>>>
+:   public true_type
+{
+    using traits_type = engine_add_traits_f2_t<OT, ET1, ET2>;
+};
+
+//--------------------------------------------
+//- Engine addition traits type determination.
+//
+template<typename OT, typename ET1, typename ET2>
+struct engine_add_traits_chooser
+{
+    using CT1 = typename detect_engine_add_traits_f1<OT>::traits_type;
+    using CT2 = typename detect_engine_add_traits_f2<OT, ET1, ET2>::traits_type;
+    using DEF = matrix_addition_engine_traits<OT, ET1, ET2>;
+
+    using traits_type = typename non_void_traits_chooser<CT1, CT2, DEF>::traits_type;
+};
+
+template<typename OT, typename ET1, typename ET2>
+using engine_add_traits_t = typename engine_add_traits_chooser<OT, ET1, ET2>::traits_type;
+
+template<class OT, class ET1, class ET2>
+constexpr bool  has_engine_add_traits_v = detect_engine_add_traits_f2<OT, ET1, ET2>::value ||
+                                          detect_engine_add_traits_f1<OT>::value;
+
+//--------------------------------------------
+//- Engine addition result type determination.
+//
+template<typename OT, typename ET1, typename ET2>
+struct engine_add_type
+{
+    using traits_type = typename engine_add_traits_chooser<OT, ET1, ET2>::traits_type;
+    using engine_type = typename traits_type::engine_type;
+};
+
+template<typename OT, typename ET1, typename ET2>
+using engine_add_type_t = typename engine_add_type<OT, ET1, ET2>::engine_type;
+
+
+//==================================================================================================
+//                         **** ADDITION ARITHMETIC TRAITS DETECTORS ****
+//==================================================================================================
+//
+//- Form 1 type detection of nested addition arithmetic traits.
+//
+template<typename OT>
+using add_traits_f1_t = typename OT::addition_traits;
+
+template<typename OT>
+using add_type_f1_t = typename add_traits_f1_t<OT>::result_type;
+
+//- Define the form 1 detectors.
+//
+template<typename OT, typename = void>
+struct detect_add_traits_f1
+:   public false_type
+{
+    using traits_type = void;
+};
+
+template<typename OT>
+struct detect_add_traits_f1<OT, void_t<add_type_f1_t<OT>>>
+:   public true_type
+{
+    using traits_type = add_traits_f1_t<OT>;
+};
+
+//-------------------------------------------------------------
+//- Form 2 type detection of nested addition arithmetic traits.
+//
+template<typename OT, typename T1, typename T2>
+using add_traits_f2_t = typename OT::template addition_traits<OT, T1, T2>;
+
+template<typename OT, typename T1, typename T2>
+using add_type_f2_t = typename add_traits_f2_t<OT, T1, T2>::result_type;
+
+//- Define the form 2 detectors.
+//
+template<typename OT, typename OP1, typename OP2, typename = void>
+struct detect_add_traits_f2
+:   public false_type
+{
+    using traits_type = void;
+};
+
+template<typename OT, typename OP1, typename OP2>
+struct detect_add_traits_f2<OT, OP1, OP2, void_t<add_type_f2_t<OT, OP1, OP2>>>
+:   public true_type
+{
+    using traits_type = typename OT::template addition_traits<OT, OP1, OP2>;
+};
+
+//------------------------------------------------
+//- Addition arithmetic traits type determination.
+//
+template<typename OT, typename OP1, typename OP2>
+struct add_traits_chooser
+{
+    using CT1 = typename detect_add_traits_f1<OT>::traits_type;
+    using CT2 = typename detect_add_traits_f2<OT, OP1, OP2>::traits_type;
+    using DEF = matrix_addition_traits<OT, OP1, OP2>;
+
+    using traits_type = typename non_void_traits_chooser<CT1, CT2, DEF>::traits_type;
+};
+
+template<typename OT, typename OP1, typename OP2>
+using addition_traits_t = typename add_traits_chooser<OT, OP1, OP2>::traits_type;
+
+template<class OT, class OP1, class OP2>
+constexpr bool  has_add_traits_v = detect_add_traits_f2<OT, OP1, OP2>::value ||
+                                   detect_add_traits_f1<OT>::value;
+
+
+}   //- detail namespace
+//==================================================================================================
+//                              **** ELEMENT ADDITION TRAITS ****
+//==================================================================================================
+//
+//- Alias interface to detection meta-function that extracts the element addition traits type.
 //
 template<class OT, class T1, class T2>
 using matrix_addition_element_t = detail::element_add_type_t<OT, T1, T2>;
 
 
+//- The standard element addition traits type provides the default mechanism for determining the
+//  result of adding two elements of (possibly) different types.
+//
+template<class T1, class T2>
+struct matrix_addition_element_traits
+{
+    using element_type = decltype(declval<T1>() + declval<T2>());
+};
+
+
 //==================================================================================================
-//                         **** ENGINE ADDITION TRAITS AND DETECTORS ****
+//                               **** ENGINE ADDITION TRAITS ****
 //==================================================================================================
 //
-//- This traits type performs engine promotion type computations for binary addition.
+//- Alias interface to detection meta-function that extracts the engine addition traits type.
+//
+template<class OT, class ET1, class ET2>
+using matrix_addition_engine_t = detail::engine_add_type_t<OT, ET1, ET2>;
+
+
+//- The standard engine addition traits type provides the default mechanism for determining the
+//  correct engine type for a matrix/matrix or vector/vector addition.
 //
 template<class OT, class ET1, class ET2>
 struct matrix_addition_engine_traits
@@ -137,7 +299,6 @@ struct matrix_addition_engine_traits
                                           dr_matrix_engine<element_type, allocator<element_type>>,
                                           dr_vector_engine<element_type, allocator<element_type>>>;
 };
-
 
 //- Note that all cases where allocators are rebound assume standard-conformant allocator types.
 //
@@ -208,7 +369,6 @@ struct matrix_addition_engine_traits<OT, fs_matrix_engine<T1, R1, C1>, fs_matrix
     using engine_type  = fs_matrix_engine<element_type, R1, C1>;
 };
 
-
 //- Transpose cases for matrices.
 //
 template<class OT, class ET1, class ET2>
@@ -263,112 +423,18 @@ struct matrix_addition_engine_traits<OT,
 };
 
 
-namespace detail {
-//--------------------------------------------------------------------------------------------------
-//- Form 1 type detection of nested engine addition traits.
-//  First, define two helper aliases.
-//
-template<typename OT>
-using engine_add_traits_f1_t = typename OT::engine_addition_traits;
-
-template<typename OT>
-using engine_add_type_f1_t = typename engine_add_traits_f1_t<OT>::engine_type;
-
-
-//- Define the form 1 detectors.
-//
-template<typename OT, typename = void>
-struct detect_engine_add_traits_f1
-:   public false_type
-{
-    using traits_type = void;
-};
-
-template<typename OT>
-struct detect_engine_add_traits_f1<OT, void_t<engine_add_type_f1_t<OT>>>
-:   public true_type
-{
-    using traits_type = engine_add_traits_f1_t<OT>;
-};
-
-
-//---------------------------------------------------------
-//- Form 2 type detection of nested engine addition traits.
-//  First, define two helper aliases.
-//
-template<typename OT, typename T1, typename T2>
-using engine_add_traits_f2_t = typename OT::template engine_addition_traits<OT, T1, T2>;
-
-template<typename OT, typename T1, typename T2>
-using engine_add_type_f2_t = typename engine_add_traits_f2_t<OT, T1, T2>::engine_type;
-
-
-//- Define the form 2 detectors.
-//
-template<typename OT, typename ET1, typename ET2, typename = void>
-struct detect_engine_add_traits_f2
-:   public false_type
-{
-    using traits_type = void;
-};
-
-template<typename OT, typename ET1, typename ET2>
-struct detect_engine_add_traits_f2<OT, ET1, ET2, void_t<engine_add_type_f2_t<OT, ET1, ET2>>>
-:   public true_type
-{
-    using traits_type = engine_add_traits_f2_t<OT, ET1, ET2>;
-};
-
-
-//--------------------------------------------
-//- Engine addition traits type determination.
-//
-template<typename OT, typename ET1, typename ET2>
-struct engine_add_traits_chooser
-{
-    using CT1 = typename detect_engine_add_traits_f1<OT>::traits_type;
-    using CT2 = typename detect_engine_add_traits_f2<OT, ET1, ET2>::traits_type;
-    using DEF = matrix_addition_engine_traits<OT, ET1, ET2>;
-
-    using traits_type = typename non_void_traits_chooser<CT1, CT2, DEF>::traits_type;
-};
-
-template<typename OT, typename ET1, typename ET2>
-using engine_add_traits_t = typename engine_add_traits_chooser<OT, ET1, ET2>::traits_type;
-
-template<class OT, class ET1, class ET2>
-constexpr bool  has_engine_add_traits_v = detect_engine_add_traits_f2<OT, ET1, ET2>::value ||
-                                          detect_engine_add_traits_f1<OT>::value;
-
-
-//--------------------------------------------
-//- Engine addition result type determination.
-//
-template<typename OT, typename ET1, typename ET2>
-struct engine_add_type
-{
-    using traits_type = typename engine_add_traits_chooser<OT, ET1, ET2>::traits_type;
-    using engine_type = typename traits_type::engine_type;
-};
-
-template<typename OT, typename ET1, typename ET2>
-using engine_add_type_t = typename engine_add_type<OT, ET1, ET2>::engine_type;
-
-
-}       //- detail namespace
-
-//---------------------------
-//- Alias interface to trait.
-//
-template<class OT, class ET1, class ET2>
-using matrix_addition_engine_t = detail::engine_add_type_t<OT, ET1, ET2>;
-
-
 //==================================================================================================
-//                      **** ADDITION ARITHMETIC TRAITS AND DETECTORS ****
+//                                 **** ADDITION TRAITS ****
 //==================================================================================================
 //
-//- This traits type actually performs binary addition.
+//- Alias interface to detection meta-function that extracts the addition traits type.
+//
+template<class OT, class OP1, class OP2>
+using matrix_addition_traits_t = detail::addition_traits_t<OT, OP1, OP2>;
+
+
+//- The standard addition traits type provides the default mechanism for computing the result
+//  of a matrix/matrix or vector/vector addition.
 //
 template<class OTR, class ET1, class OT1, class ET2, class OT2>
 struct matrix_addition_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>
@@ -388,7 +454,6 @@ matrix_addition_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>::add
     PrintOperandTypes<result_type>("addition_traits", v1, v2);
     return result_type();
 }
-
 
 //------
 //
@@ -410,93 +475,6 @@ matrix_addition_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
     PrintOperandTypes<result_type>("addition_traits", m1, m2);
     return result_type();
 }
-
-
-namespace detail {
-//--------------------------------------------------------------------------------------------------
-//- Form 1 type detection of nested addition arithmetic traits.
-//  First, define two helper aliases.
-//
-template<typename OT>
-using add_traits_f1_t = typename OT::addition_traits;
-
-template<typename OT>
-using add_type_f1_t = typename add_traits_f1_t<OT>::result_type;
-
-
-//- Define the form 1 detectors.
-//
-template<typename OT, typename = void>
-struct detect_add_traits_f1
-:   public false_type
-{
-    using traits_type = void;
-};
-
-template<typename OT>
-struct detect_add_traits_f1<OT, void_t<add_type_f1_t<OT>>>
-:   public true_type
-{
-    using traits_type = add_traits_f1_t<OT>;
-};
-
-
-//-------------------------------------------------------------
-//- Form 2 type detection of nested addition arithmetic traits.
-//  First, define two helper aliases.
-//
-template<typename OT, typename T1, typename T2>
-using add_traits_f2_t = typename OT::template addition_traits<OT, T1, T2>;
-
-template<typename OT, typename T1, typename T2>
-using add_type_f2_t = typename add_traits_f2_t<OT, T1, T2>::result_type;
-
-
-//- Define the form 2 detectors.
-//
-template<typename OT, typename OP1, typename OP2, typename = void>
-struct detect_add_traits_f2
-:   public false_type
-{
-    using traits_type = void;
-};
-
-template<typename OT, typename OP1, typename OP2>
-struct detect_add_traits_f2<OT, OP1, OP2, void_t<add_type_f2_t<OT, OP1, OP2>>>
-:   public true_type
-{
-    using traits_type = typename OT::template addition_traits<OT, OP1, OP2>;
-};
-
-
-//------------------------------------------------
-//- Addition arithmetic traits type determination.
-//
-template<typename OT, typename OP1, typename OP2>
-struct add_traits_chooser
-{
-    using CT1 = typename detect_add_traits_f1<OT>::traits_type;
-    using CT2 = typename detect_add_traits_f2<OT, OP1, OP2>::traits_type;
-    using DEF = matrix_addition_traits<OT, OP1, OP2>;
-
-    using traits_type = typename non_void_traits_chooser<CT1, CT2, DEF>::traits_type;
-};
-
-template<typename OT, typename OP1, typename OP2>
-using addition_traits_t = typename add_traits_chooser<OT, OP1, OP2>::traits_type;
-
-template<class OT, class OP1, class OP2>
-constexpr bool  has_add_traits_v = detect_add_traits_f2<OT, OP1, OP2>::value ||
-                                   detect_add_traits_f1<OT>::value;
-
-}       //- detail namespace
-
-//---------------------------
-//- Alias interface to trait.
-//
-template<class OT, class OP1, class OP2>
-using matrix_addition_traits_t = detail::addition_traits_t<OT, OP1, OP2>;
-
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_ADDITION_TRAITS_HPP_DEFINED
