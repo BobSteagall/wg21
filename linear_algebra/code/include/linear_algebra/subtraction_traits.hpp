@@ -251,7 +251,7 @@ constexpr bool  has_sub_traits_v = detect_sub_traits_f2<OT, OP1, OP2>::value ||
                                    detect_sub_traits_f1<OT>::value;
 
 
-}   //- detail namespace
+}       //- detail namespace
 //==================================================================================================
 //                              **** ELEMENT SUBTRACTION TRAITS ****
 //==================================================================================================
@@ -427,7 +427,7 @@ struct matrix_subtraction_engine_traits<OT,
 //                                   **** SUBTRACTION TRAITS ****
 //==================================================================================================
 //
-//- Alias interface to detection meta-function that extracts the subtractiontraits type.
+//- Alias interface to detection meta-function that extracts the subtraction traits type.
 //
 template<class OT, class OP1, class OP2>
 using matrix_subtraction_traits_t = detail::subtraction_traits_t<OT, OP1, OP2>;
