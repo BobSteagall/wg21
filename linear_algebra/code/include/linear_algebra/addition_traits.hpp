@@ -251,7 +251,7 @@ constexpr bool  has_add_traits_v = detect_add_traits_f2<OT, OP1, OP2>::value ||
                                    detect_add_traits_f1<OT>::value;
 
 
-}   //- detail namespace
+}       //- detail namespace
 //==================================================================================================
 //                              **** ELEMENT ADDITION TRAITS ****
 //==================================================================================================

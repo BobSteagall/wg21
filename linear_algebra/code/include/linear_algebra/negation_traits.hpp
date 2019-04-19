@@ -254,7 +254,7 @@ constexpr bool  has_neg_traits_v = detect_neg_traits_f2<OT, OP1>::value ||
                                    detect_neg_traits_f1<OT>::value;
 
 
-}   //- detail namespace
+}       //- detail namespace
 //==================================================================================================
 //                                 **** ELEMENT NEGATION TRAITS ****
 //==================================================================================================

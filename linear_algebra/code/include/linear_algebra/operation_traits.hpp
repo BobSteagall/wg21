@@ -113,20 +113,5 @@ template<class T1, class T2>
 using matrix_operation_traits_selector_t = typename matrix_operation_traits_selector<T1,T2>::traits_type;
 
 
-#if 0
-
-given operator traits types OT1 and OT2:
-
-if OT1 and OT2 are both default
-    result = default
-else if OT1 == OT2
-    result = OT2
-else if exactly OT1 == default or OT2 == default
-    result = default | OT
-else
-    result = user-supplied operator traits selector chooses
-
-#endif
-
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_OPERATION_TRAITS_HPP_DEFINED
