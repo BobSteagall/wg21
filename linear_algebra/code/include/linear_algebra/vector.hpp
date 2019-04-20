@@ -10,12 +10,14 @@ template<class ET, class OT>
 class vector
 {
   public:
-    using engine_type    = ET;
-    using element_type   = typename engine_type::element_type;
-    using is_dense       = typename engine_type::is_dense;
-    using is_rectangular = typename engine_type::is_rectangular;
-    using index_type     = typename engine_type::index_type;
-    using size_type      = typename engine_type::size_type;
+    using engine_type  = ET;
+    using element_type = typename engine_type::element_type;
+    using index_type   = typename engine_type::index_type;
+    using size_type    = typename engine_type::size_type;
+
+    using is_dense     = typename engine_type::is_dense;
+    using is_matrix    = false_type;
+    using is_vector    = true_type;
 
     using transpose_type = vector const&;
     using hermitian_type = conditional_t<is_complex_v<element_type>, vector, transpose_type>;

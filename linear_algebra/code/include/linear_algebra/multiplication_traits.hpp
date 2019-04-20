@@ -274,7 +274,7 @@ struct matrix_multiplication_element_traits
 
 
 //==================================================================================================
-//                         **** ENGINE MULTIPLICATION TRAITS AND DETECTORS ****
+//                            **** ENGINE MULTIPLICATION TRAITS ****
 //==================================================================================================
 //
 //- Alias interface to detection meta-function that extracts the engine multiplication traits type.
@@ -297,53 +297,29 @@ struct matrix_multiplication_engine_traits
     using element_type_2 = typename ET2::element_type;
     using element_type   = matrix_multiplication_element_t<OT, element_type_1, element_type_2>;
     using engine_type    = conditional_t<ET1::is_matrix::value,
-                                          dr_matrix_engine<element_type, allocator<element_type>>,
-                                          dr_vector_engine<element_type, allocator<element_type>>>;
+                                         dr_matrix_engine<element_type, allocator<element_type>>,
+                                         dr_vector_engine<element_type, allocator<element_type>>>;
 };
 
-//- Note that all cases where allocators are rebound assume standard-conformant allocator types.
+//- ENGINE*SCALAR cases.
 //
-template<class OT, class T1, class A1, class T2, class A2>
-struct matrix_multiplication_engine_traits<OT, 
-                                           dr_vector_engine<T1, A1>, 
-                                           dr_vector_engine<T2, A2>>
+template<class OT, class T1, class A1, class T2>
+struct matrix_multiplication_engine_traits<OT, dr_matrix_engine<T1, A1>, T2>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
-    using engine_type  = dr_vector_engine<element_type, alloc_type>;
+    using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, class A1, class T2, int32_t N2>
-struct matrix_multiplication_engine_traits<OT, 
-                                           dr_vector_engine<T1, A1>, 
-                                           fs_vector_engine<T2, N2>>
+template<class OT, class T1, int32_t R1, int32_t C1, class T2>
+struct matrix_multiplication_engine_traits<OT, fs_matrix_engine<T1, R1, C1>, T2>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
-    using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
-    using engine_type  = dr_vector_engine<element_type, alloc_type>;
+    using engine_type  = fs_matrix_engine<element_type, R1, C1>;
 };
 
-template<class OT, class T1, int32_t N1, class T2, class A2>
-struct matrix_multiplication_engine_traits<OT, 
-                                           fs_vector_engine<T1, N1>, 
-                                           dr_vector_engine<T2, A2>>
-{
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
-    using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
-    using engine_type  = dr_vector_engine<element_type, alloc_type>;
-};
-
-template<class OT, class T1, int32_t N1, class T2, int32_t N2>
-struct matrix_multiplication_engine_traits<OT, 
-                                           fs_vector_engine<T1, N1>, 
-                                           fs_vector_engine<T2, N2>>
-{
-    static_assert(N1 == N2);
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
-    using engine_type  = fs_vector_engine<element_type, N1>;
-};
-
-//------
+//- ENGINE*ENGINE cases.  Note that all cases where allocators are rebound assume 
+//  standard-conformant allocator types.
 //
 template<class OT, class T1, class A1, class T2, class A2>
 struct matrix_multiplication_engine_traits<OT, 
@@ -380,10 +356,9 @@ struct matrix_multiplication_engine_traits<OT,
                                            fs_matrix_engine<T1, R1, C1>, 
                                            fs_matrix_engine<T2, R2, C2>>
 {
-    static_assert(R1 == R2);
-    static_assert(C1 == C2);
+    static_assert(C1 == R2);
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
-    using engine_type  = fs_matrix_engine<element_type, R1, C1>;
+    using engine_type  = fs_matrix_engine<element_type, R1, C2>;
 };
 
 //- Transpose cases for matrices.
@@ -441,7 +416,7 @@ struct matrix_multiplication_engine_traits<OT,
 
 
 //==================================================================================================
-//                      **** MULTIPLICATION ARITHMETIC TRAITS AND DETECTORS ****
+//                         **** MULTIPLICATION ARITHMETIC TRAITS ****
 //==================================================================================================
 //
 //- Alias interface to detection meta-function that extracts the multiplication traits type.
@@ -454,6 +429,90 @@ using matrix_multiplication_traits_t = detail::multiplication_traits_t<OT, OP1, 
 //  correct result type of a matrix/matrix, matrix/vector, matrix/scalar, vector/vector, or 
 //  vector/scalar multiplication.
 //
+//---------------
+//- vector*scalar
+//
+template<class OTR, class ET1, class OT1, class T2>
+struct matrix_multiplication_traits<OTR, vector<ET1, OT1>, T2>
+{
+    using engine_type = matrix_multiplication_engine_t<OTR, ET1, T2>;
+    using op_traits   = OTR;
+    using result_type = vector<engine_type, op_traits>;
+
+    static result_type  multiply(vector<ET1, OT1> const& v1, T2 s2);
+};
+
+template<class OTR, class ET1, class OT1, class T2> inline auto
+matrix_multiplication_traits<OTR, vector<ET1, OT1>, T2>::multiply
+(vector<ET1, OT1> const& v1, T2 s2) -> result_type
+{
+    PrintOperandTypes<result_type>("multiplication_traits", v1, s2);
+    return result_type();
+}
+
+//---------------
+//- scalar*vector
+//
+template<class OTR, class T1, class ET2, class OT2>
+struct matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>
+{
+    using engine_type = matrix_multiplication_engine_t<OTR, T1, ET2>;
+    using op_traits   = OTR;
+    using result_type = vector<engine_type, op_traits>;
+
+    static result_type  multiply(T1 s1, vector<ET2, OT2> const& v2);
+};
+
+template<class OTR, class T1, class ET2, class OT2> inline auto
+matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>::multiply
+(T1 s1, vector<ET2, OT2> const& v2) -> result_type
+{
+    PrintOperandTypes<result_type>("multiplication_traits", s1, v2);
+    return result_type();
+}
+
+//---------------
+//- matrix*scalar
+//
+template<class OTR, class ET1, class OT1, class T2>
+struct matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>
+{
+    using engine_type = matrix_multiplication_engine_t<OTR, ET1, T2>;
+    using op_traits   = OTR;
+    using result_type = matrix<engine_type, op_traits>;
+
+    static result_type  multiply(matrix<ET1, OT1> const& m1, T2 s2);
+};
+
+template<class OTR, class ET1, class OT1, class T2> inline auto
+matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>::multiply
+(matrix<ET1, OT1> const& m1, T2 s2) -> result_type
+{
+    PrintOperandTypes<result_type>("multiplication_traits", m1, s2);
+    return result_type();
+}
+
+//---------------
+//- scalar*matrix
+//
+template<class OTR, class T1, class ET2, class OT2>
+struct matrix_multiplication_traits<OTR, T1, matrix<ET2, OT2>>
+{
+    using engine_type = matrix_multiplication_engine_t<OTR, T1, ET2>;
+    using op_traits   = OTR;
+    using result_type = matrix<engine_type, op_traits>;
+
+    static result_type  multiply(T1 s1, matrix<ET2, OT2> const& m2);
+};
+
+template<class OTR, class T1, class ET2, class OT2> inline auto
+matrix_multiplication_traits<OTR, T1, matrix<ET2, OT2>>::multiply
+(T1 s1, matrix<ET2, OT2> const& m2) -> result_type
+{
+    PrintOperandTypes<result_type>("multiplication_traits", s1, m2);
+    return result_type();
+}
+
 //- vector*vector
 //
 template<class OTR, class ET1, class OT1, class ET2, class OT2>
@@ -467,8 +526,7 @@ struct matrix_multiplication_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>
     static result_type  multiply(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
 };
 
-template<class OTR, class ET1, class OT1, class ET2, class OT2>
-auto
+template<class OTR, class ET1, class OT1, class ET2, class OT2> inline auto
 matrix_multiplication_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>::multiply
 (vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2) -> result_type
 {
@@ -489,8 +547,7 @@ struct matrix_multiplication_traits<OTR, matrix<ET1, OT1>, vector<ET2, OT2>>
     static result_type  multiply(matrix<ET1, OT1> const& m1, vector<ET2, OT2> const& m2);
 };
 
-template<class OTR, class ET1, class OT1, class ET2, class OT2>
-auto
+template<class OTR, class ET1, class OT1, class ET2, class OT2> inline auto
 matrix_multiplication_traits<OTR, matrix<ET1, OT1>, vector<ET2, OT2>>::multiply
 (matrix<ET1, OT1> const& m1, vector<ET2, OT2> const& m2) -> result_type
 {
@@ -511,8 +568,7 @@ struct matrix_multiplication_traits<OTR, vector<ET1, OT1>, matrix<ET2, OT2>>
     static result_type  multiply(vector<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
 };
 
-template<class OTR, class ET1, class OT1, class ET2, class OT2>
-auto
+template<class OTR, class ET1, class OT1, class ET2, class OT2> inline auto
 matrix_multiplication_traits<OTR, vector<ET1, OT1>, matrix<ET2, OT2>>::multiply
 (vector<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2) -> result_type
 {
@@ -533,8 +589,7 @@ struct matrix_multiplication_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>
     static result_type  multiply(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
 };
 
-template<class OTR, class ET1, class OT1, class ET2, class OT2>
-auto
+template<class OTR, class ET1, class OT1, class ET2, class OT2> inline auto
 matrix_multiplication_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::multiply
 (matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2) -> result_type
 {
