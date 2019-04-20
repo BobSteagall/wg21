@@ -34,17 +34,17 @@ template<class T1, class T2>    struct matrix_multiplication_element_traits;
 
 //- Math object engine promotion, per arithmetical operation.
 //
-template<class OTR, class ET1>              struct matrix_negation_engine_traits;
-template<class OTR, class EY1, class ET2>   struct matrix_addition_engine_traits;
-template<class OTR, class ET1, class ET2>   struct matrix_subtraction_engine_traits;
-template<class OTR, class ET1, class ET2>   struct matrix_multiplication_engine_traits;
+template<class OT, class ET1>               struct matrix_negation_engine_traits;
+template<class OT, class EY1, class ET2>    struct matrix_addition_engine_traits;
+template<class OT, class ET1, class ET2>    struct matrix_subtraction_engine_traits;
+template<class OT, class ET1, class ET2>    struct matrix_multiplication_engine_traits;
 
 //- Matrix arithmetic traits.
 //
-template<class OTR, class OP1>              struct matrix_negation_traits;
-template<class OTR, class OP1, class OP2>   struct matrix_addition_traits;
-template<class OTR, class OP1, class OP2>   struct matrix_subtraction_traits;
-template<class OTR, class OP1, class OP2>   struct matrix_multiplication_traits;
+template<class OT, class OP1>               struct matrix_negation_traits;
+template<class OT, class OP1, class OP2>    struct matrix_addition_traits;
+template<class OT, class OP1, class OP2>    struct matrix_subtraction_traits;
+template<class OT, class OP1, class OP2>    struct matrix_multiplication_traits;
 
 //- Operator traits and traits promotion.
 //

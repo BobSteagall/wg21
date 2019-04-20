@@ -359,19 +359,19 @@ using matrix_negation_traits_t = detail::negation_traits_t<OT, OP1>;
 //- The standard addition traits type provides the default mechanism for computing the result
 //  of a matrix or vector negation.
 //
-template<class OTR, class ET1, class OT1>
-struct matrix_negation_traits<OTR, vector<ET1, OT1>>
+template<class OT, class ET1, class OT1>
+struct matrix_negation_traits<OT, vector<ET1, OT1>>
 {
-    using engine_type = matrix_negation_engine_t<OTR, ET1>;
-    using op_traits   = OTR;
+    using engine_type = matrix_negation_engine_t<OT, ET1>;
+    using op_traits   = OT;
     using result_type = vector<engine_type, op_traits>;
 
     static result_type  negate(vector<ET1, OT1> const& v1);
 };
 
-template<class OTR, class ET1, class OT1>
+template<class OT, class ET1, class OT1>
 auto
-matrix_negation_traits<OTR, vector<ET1, OT1>>::negate(vector<ET1, OT1> const& v1) -> result_type
+matrix_negation_traits<OT, vector<ET1, OT1>>::negate(vector<ET1, OT1> const& v1) -> result_type
 {
     PrintOperandTypes<result_type>("negation_traits", v1);
     return result_type();
@@ -379,19 +379,19 @@ matrix_negation_traits<OTR, vector<ET1, OT1>>::negate(vector<ET1, OT1> const& v1
 
 //------
 //
-template<class OTR, class ET1, class OT1>
-struct matrix_negation_traits<OTR, matrix<ET1, OT1>>
+template<class OT, class ET1, class OT1>
+struct matrix_negation_traits<OT, matrix<ET1, OT1>>
 {
-    using engine_type = matrix_negation_engine_t<OTR, ET1>;
-    using op_traits   = OTR;
+    using engine_type = matrix_negation_engine_t<OT, ET1>;
+    using op_traits   = OT;
     using result_type = matrix<engine_type, op_traits>;
 
     static result_type  negate(matrix<ET1, OT1> const& m1);
 };
 
-template<class OTR, class ET1, class OT1>
+template<class OT, class ET1, class OT1>
 auto
-matrix_negation_traits<OTR, matrix<ET1, OT1>>::negate(matrix<ET1, OT1> const& m1) -> result_type
+matrix_negation_traits<OT, matrix<ET1, OT1>>::negate(matrix<ET1, OT1> const& m1) -> result_type
 {
     PrintOperandTypes<result_type>("negation_traits", m1);
     return result_type();

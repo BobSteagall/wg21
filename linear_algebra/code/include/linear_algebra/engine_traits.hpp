@@ -276,7 +276,7 @@ using matrix_subtraction_engine_t = typename matrix_engine_subtraction_traits<ET
 //=================================================================================================
 //
 template<class ET1, class ET2>
-struct matrix_engine_multiplication_traits
+struct matrix_multiplication_engine_traits
 {
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
@@ -287,7 +287,7 @@ struct matrix_engine_multiplication_traits
 //- engine * scalar cases.
 //
 template<class T1, class A1, class T2>
-struct matrix_engine_multiplication_traits<dr_matrix_engine<T1, A1>, T2>
+struct matrix_multiplication_engine_traits<dr_matrix_engine<T1, A1>, T2>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
     using alloc_type   = typename allocator_traits<A1>::template rebind_alloc<element_type>;
@@ -295,7 +295,7 @@ struct matrix_engine_multiplication_traits<dr_matrix_engine<T1, A1>, T2>
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2>
-struct matrix_engine_multiplication_traits<fs_matrix_engine<T1, R1, C1>, T2>
+struct matrix_multiplication_engine_traits<fs_matrix_engine<T1, R1, C1>, T2>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C1>;
@@ -306,7 +306,7 @@ struct matrix_engine_multiplication_traits<fs_matrix_engine<T1, R1, C1>, T2>
 //  assumption that all allocators are standard-conformant.
 //
 template<class T1, class A1, class T2, class A2>
-struct matrix_engine_multiplication_traits<dr_matrix_engine<T1, A1>, dr_matrix_engine<T2, A2>>
+struct matrix_multiplication_engine_traits<dr_matrix_engine<T1, A1>, dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
     using alloc_type   = typename allocator_traits<A1>::template rebind_alloc<element_type>;
@@ -314,7 +314,7 @@ struct matrix_engine_multiplication_traits<dr_matrix_engine<T1, A1>, dr_matrix_e
 };
 
 template<class T1, class A1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_multiplication_traits<dr_matrix_engine<T1, A1>, fs_matrix_engine<T2, R2, C2>>
+struct matrix_multiplication_engine_traits<dr_matrix_engine<T1, A1>, fs_matrix_engine<T2, R2, C2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
     using alloc_type   = typename allocator_traits<A1>::template rebind_alloc<element_type>;
@@ -322,7 +322,7 @@ struct matrix_engine_multiplication_traits<dr_matrix_engine<T1, A1>, fs_matrix_e
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2, class A2>
-struct matrix_engine_multiplication_traits<fs_matrix_engine<T1, R1, C1>, dr_matrix_engine<T2, A2>>
+struct matrix_multiplication_engine_traits<fs_matrix_engine<T1, R1, C1>, dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_element_promotion_t<T1, T2>;
     using alloc_type   = typename allocator_traits<A2>::template rebind_alloc<element_type>;
@@ -330,7 +330,7 @@ struct matrix_engine_multiplication_traits<fs_matrix_engine<T1, R1, C1>, dr_matr
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_multiplication_traits<fs_matrix_engine<T1, R1, C1>, fs_matrix_engine<T2, R2, C2>>
+struct matrix_multiplication_engine_traits<fs_matrix_engine<T1, R1, C1>, fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(C1 == R2);
     using element_type = matrix_element_promotion_t<T1, T2>;
@@ -340,25 +340,25 @@ struct matrix_engine_multiplication_traits<fs_matrix_engine<T1, R1, C1>, fs_matr
 //- Transpose cases.
 //
 template<class ET1, class ET2>
-struct matrix_engine_multiplication_traits<tr_matrix_engine<ET1>, ET2>
+struct matrix_multiplication_engine_traits<tr_matrix_engine<ET1>, ET2>
 {
-    using engine_type = typename matrix_engine_multiplication_traits<ET1, ET2>::engine_type;
+    using engine_type = typename matrix_multiplication_engine_traits<ET1, ET2>::engine_type;
 };
 
 template<class ET1, class ET2>
-struct matrix_engine_multiplication_traits<ET1, tr_matrix_engine<ET2>>
+struct matrix_multiplication_engine_traits<ET1, tr_matrix_engine<ET2>>
 {
-    using engine_type = typename matrix_engine_multiplication_traits<ET1, ET2>::engine_type;
+    using engine_type = typename matrix_multiplication_engine_traits<ET1, ET2>::engine_type;
 };
 
 template<class ET1, class ET2>
-struct matrix_engine_multiplication_traits<tr_matrix_engine<ET1>, tr_matrix_engine<ET2>>
+struct matrix_multiplication_engine_traits<tr_matrix_engine<ET1>, tr_matrix_engine<ET2>>
 {
-    using engine_type = typename matrix_engine_multiplication_traits<ET1, ET2>::engine_type;
+    using engine_type = typename matrix_multiplication_engine_traits<ET1, ET2>::engine_type;
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_multiplication_traits<tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
+struct matrix_multiplication_engine_traits<tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
                                               fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == R2);
@@ -367,7 +367,7 @@ struct matrix_engine_multiplication_traits<tr_matrix_engine<fs_matrix_engine<T1,
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_multiplication_traits<fs_matrix_engine<T1, R1, C1>,
+struct matrix_multiplication_engine_traits<fs_matrix_engine<T1, R1, C1>,
                                               tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(C1 == C2);
@@ -376,7 +376,7 @@ struct matrix_engine_multiplication_traits<fs_matrix_engine<T1, R1, C1>,
 };
 
 template<class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct matrix_engine_multiplication_traits<tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
+struct matrix_multiplication_engine_traits<tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
                                               tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == C2);
@@ -387,7 +387,7 @@ struct matrix_engine_multiplication_traits<tr_matrix_engine<fs_matrix_engine<T1,
 //- Alias interface to trait.
 //
 template<class ET1, class ET2>
-using matrix_multiplication_engine_t = typename matrix_engine_multiplication_traits<ET1, ET2>::engine_type;
+using matrix_multiplication_engine_t = typename matrix_multiplication_engine_traits<ET1, ET2>::engine_type;
 */
 
 }       //- STD_LA namespace

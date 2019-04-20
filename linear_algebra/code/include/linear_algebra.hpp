@@ -40,9 +40,6 @@
 #include "linear_algebra/subtraction_traits.hpp"
 #include "linear_algebra/negation_traits.hpp"
 #include "linear_algebra/multiplication_traits.hpp"
-#include "linear_algebra/element_traits.hpp"
-#include "linear_algebra/engine_traits.hpp"
-#include "linear_algebra/arithmetic_traits.hpp"
 #include "linear_algebra/operation_traits.hpp"
 #include "linear_algebra/arithmetic_operators.hpp"
 
