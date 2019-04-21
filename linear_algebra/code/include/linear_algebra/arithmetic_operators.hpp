@@ -148,7 +148,7 @@ operator *(S1 s1, matrix<ET2, OT2> const& m2)
     using op2_type   = matrix<ET2, OT2>;
     using mul_traits = matrix_multiplication_traits_t<op_traits, op1_type, op2_type>;
 
-    return mul_traits::multiply(m2, s1);
+    return mul_traits::multiply(s1, m2);
 }
 
 //---------------

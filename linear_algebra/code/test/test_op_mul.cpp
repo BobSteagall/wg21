@@ -178,7 +178,7 @@ void t400()
 //  This test verifies that addition operations on matrices return the correct result type.
 //--------------------------------------------------------------------------------------------------
 //
-void t401()
+void t408()
 {
     PRINT_FNAME();
 
@@ -374,10 +374,182 @@ void t401()
 }
 
 //--------------------------------------------------------------------------------------------------
-//  This test verifies that addition operations on vectors return the correct result type.
+//  This test verifies that VECTOR*SCALAR multiplications return the correct result type.
+//--------------------------------------------------------------------------------------------------
+//
+void t401()
+{
+    PRINT_FNAME();
+
+    using fsv_float   = STD_LA::fs_vector<float, 3>;
+    using fsv_double  = STD_LA::fs_vector<double, 3>;
+    using fsv_new_num = STD_LA::fs_vector<new_num, 3>;
+
+    using drv_float   = STD_LA::dyn_vector<float>;
+    using drv_double  = STD_LA::dyn_vector<double>;
+    using drv_new_num = STD_LA::dyn_vector<new_num>;
+
+    ASSERT_A_MUL_B_EQ_C(fsv_float,  float,      fsv_float);
+    ASSERT_A_MUL_B_EQ_C(fsv_float,  double,     fsv_double);
+    ASSERT_A_MUL_B_EQ_C(fsv_float,  new_num,    fsv_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(fsv_double,  float,     fsv_double);
+    ASSERT_A_MUL_B_EQ_C(fsv_double,  double,    fsv_double);
+    ASSERT_A_MUL_B_EQ_C(fsv_double,  new_num,   fsv_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(fsv_new_num,  float,    fsv_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsv_new_num,  double,   fsv_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsv_new_num,  new_num,  fsv_new_num);
+
+    //------
+    //
+    ASSERT_A_MUL_B_EQ_C(drv_float,  float,      drv_float);
+    ASSERT_A_MUL_B_EQ_C(drv_float,  double,     drv_double);
+    ASSERT_A_MUL_B_EQ_C(drv_float,  new_num,    drv_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(drv_double,  float,     drv_double);
+    ASSERT_A_MUL_B_EQ_C(drv_double,  double,    drv_double);
+    ASSERT_A_MUL_B_EQ_C(drv_double,  new_num,   drv_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(drv_new_num,  float,    drv_new_num);
+    ASSERT_A_MUL_B_EQ_C(drv_new_num,  double,   drv_new_num);
+    ASSERT_A_MUL_B_EQ_C(drv_new_num,  new_num,  drv_new_num);
+}
+
+//--------------------------------------------------------------------------------------------------
+//  This test verifies that SCALAR*VECTOR multiplications return the correct result type.
 //--------------------------------------------------------------------------------------------------
 //
 void t402()
+{
+    PRINT_FNAME();
+
+    using fsv_float   = STD_LA::fs_vector<float, 3>;
+    using fsv_double  = STD_LA::fs_vector<double, 3>;
+    using fsv_new_num = STD_LA::fs_vector<new_num, 3>;
+
+    using drv_float   = STD_LA::dyn_vector<float>;
+    using drv_double  = STD_LA::dyn_vector<double>;
+    using drv_new_num = STD_LA::dyn_vector<new_num>;
+
+    ASSERT_A_MUL_B_EQ_C(float,  fsv_float,      fsv_float);
+    ASSERT_A_MUL_B_EQ_C(float,  fsv_double,     fsv_double);
+    ASSERT_A_MUL_B_EQ_C(float,  fsv_new_num,    fsv_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(double,  fsv_float,     fsv_double);
+    ASSERT_A_MUL_B_EQ_C(double,  fsv_double,    fsv_double);
+    ASSERT_A_MUL_B_EQ_C(double,  fsv_new_num,   fsv_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(new_num,  fsv_float,    fsv_new_num);
+    ASSERT_A_MUL_B_EQ_C(new_num,  fsv_double,   fsv_new_num);
+    ASSERT_A_MUL_B_EQ_C(new_num,  fsv_new_num,  fsv_new_num);
+
+    //------
+    //
+    ASSERT_A_MUL_B_EQ_C(float,  drv_float,      drv_float);
+    ASSERT_A_MUL_B_EQ_C(float,  drv_double,     drv_double);
+    ASSERT_A_MUL_B_EQ_C(float,  drv_new_num,    drv_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(double,  drv_float,     drv_double);
+    ASSERT_A_MUL_B_EQ_C(double,  drv_double,    drv_double);
+    ASSERT_A_MUL_B_EQ_C(double,  drv_new_num,   drv_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(new_num,  drv_float,    drv_new_num);
+    ASSERT_A_MUL_B_EQ_C(new_num,  drv_double,   drv_new_num);
+    ASSERT_A_MUL_B_EQ_C(new_num,  drv_new_num,  drv_new_num);
+}
+
+//--------------------------------------------------------------------------------------------------
+//  This test verifies that MATRIX*SCALAR multiplications return the correct result type.
+//--------------------------------------------------------------------------------------------------
+//
+void t403()
+{
+    PRINT_FNAME();
+
+    using fsm_float   = STD_LA::fs_matrix<float, 3, 4>;
+    using fsm_double  = STD_LA::fs_matrix<double, 3, 4>;
+    using fsm_new_num = STD_LA::fs_matrix<new_num, 3, 4>;
+
+    using drm_float   = STD_LA::dyn_matrix<float>;
+    using drm_double  = STD_LA::dyn_matrix<double>;
+    using drm_new_num = STD_LA::dyn_matrix<new_num>;
+
+    ASSERT_A_MUL_B_EQ_C(fsm_float,  float,      fsm_float);
+    ASSERT_A_MUL_B_EQ_C(fsm_float,  double,     fsm_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_float,  new_num,    fsm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(fsm_double,  float,     fsm_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_double,  double,    fsm_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_double,  new_num,   fsm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num,  float,    fsm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num,  double,   fsm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num,  new_num,  fsm_new_num);
+
+    //------
+    //
+    ASSERT_A_MUL_B_EQ_C(drm_float,  float,      drm_float);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  double,     drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  new_num,    drm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(drm_double,  float,     drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  double,    drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  new_num,   drm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  float,    drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  double,   drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  new_num,  drm_new_num);
+}
+
+//--------------------------------------------------------------------------------------------------
+//  This test verifies that SCALAR*MATRIX multiplications return the correct result type.
+//--------------------------------------------------------------------------------------------------
+//
+void t404()
+{
+    PRINT_FNAME();
+
+    using fsm_float   = STD_LA::fs_matrix<float, 3, 4>;
+    using fsm_double  = STD_LA::fs_matrix<double, 3, 4>;
+    using fsm_new_num = STD_LA::fs_matrix<new_num, 3, 4>;
+
+    using drm_float   = STD_LA::dyn_matrix<float>;
+    using drm_double  = STD_LA::dyn_matrix<double>;
+    using drm_new_num = STD_LA::dyn_matrix<new_num>;
+
+    ASSERT_A_MUL_B_EQ_C(float,  fsm_float,      fsm_float);
+    ASSERT_A_MUL_B_EQ_C(float,  fsm_double,     fsm_double);
+    ASSERT_A_MUL_B_EQ_C(float,  fsm_new_num,    fsm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(double,  fsm_float,     fsm_double);
+    ASSERT_A_MUL_B_EQ_C(double,  fsm_double,    fsm_double);
+    ASSERT_A_MUL_B_EQ_C(double,  fsm_new_num,   fsm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(new_num,  fsm_float,    fsm_new_num);
+    ASSERT_A_MUL_B_EQ_C(new_num,  fsm_double,   fsm_new_num);
+    ASSERT_A_MUL_B_EQ_C(new_num,  fsm_new_num,  fsm_new_num);
+
+    //------
+    //
+    ASSERT_A_MUL_B_EQ_C(float,  drm_float,      drm_float);
+    ASSERT_A_MUL_B_EQ_C(float,  drm_double,     drm_double);
+    ASSERT_A_MUL_B_EQ_C(float,  drm_new_num,    drm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(double,  drm_float,     drm_double);
+    ASSERT_A_MUL_B_EQ_C(double,  drm_double,    drm_double);
+    ASSERT_A_MUL_B_EQ_C(double,  drm_new_num,   drm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(new_num,  drm_float,    drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(new_num,  drm_double,   drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(new_num,  drm_new_num,  drm_new_num);
+}
+
+//--------------------------------------------------------------------------------------------------
+//  This test verifies that VECTOR*VECTOR multiplications return the correct result type.
+//--------------------------------------------------------------------------------------------------
+//
+void t405()
 {
     PRINT_FNAME();
 
@@ -433,6 +605,7 @@ void t402()
     ASSERT_A_MUL_B_EQ_C(drv_new_num,  drv_double,      new_num);
     ASSERT_A_MUL_B_EQ_C(drv_new_num,  drv_new_num,     new_num);
 }
+
 /*
 //--------------------------------------------------------------------------------------------------
 //  This test verifies that addition operations on vectors actually execute.  It prints the
@@ -682,11 +855,13 @@ TestGroup40()
 
     t400();
     t401();
-/*    t402();
+    t402();
     t403();
     t404();
-
     t405();
-    t406();
+
+/*    t406();
+    t407();
 */
+    t408();
 }

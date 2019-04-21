@@ -38,7 +38,7 @@ struct std::is_arithmetic<new_num> : public std::true_type
 //
 inline
 new_num::new_num()
-:   m_value(0.)
+:   m_value(0.0)
 {}
 
 template<class U> inline
@@ -317,14 +317,14 @@ operator *(new_num lhs, new_num rhs)
 }
 
 template<class U>
-inline new_num
+inline std::enable_if_t<std::is_arithmetic_v<U>, new_num>
 operator *(new_num lhs, U rhs)
 {
     return new_num(lhs.m_value * (double) rhs);
 }
 
 template<class U>
-inline new_num
+inline std::enable_if_t<std::is_arithmetic_v<U>, new_num>
 operator *(U lhs, new_num rhs)
 {
     return new_num((double) lhs * rhs.m_value);
