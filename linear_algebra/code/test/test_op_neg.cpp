@@ -111,14 +111,17 @@ struct test_neg_op_traits_nct
 };
 
 
-//- This operation traits type is has the element/engine/operation traits as nested class templates.
 //- A couple of helper macros to assist in readability below
 //
-#define ASSERT_NEG_A_EQ_B(A, B) \
-    static_assert(std::is_same_v<decltype(-std::declval<A>()), B>); \
-    (void)(-A())
+#ifdef EXEC_OP_TEST_OUTPUT
+    #define EXEC_NEG_A(A)   (void)(-A());
+#else
+    #define EXEC_NEG_A(A)
+#endif
 
-#define EXEC_NEG_A(A)   (void)(-A())
+#define ASSERT_NEG_A_EQ_B(A, B)     \
+    EXEC_NEG_A(A)                   \
+    static_assert(std::is_same_v<decltype(-std::declval<A>()), B>)
 
 
 //--------------------------------------------------------------------------------------------------
@@ -361,7 +364,8 @@ void t304()
     ASSERT_NEG_A_EQ_B(drm_double_tst,   drm_double_tst);
     ASSERT_NEG_A_EQ_B(drm_new_num_tst,  drm_new_num_tst);
 
-    using fsm_double_tst_34  = STD_LA::matrix<fs_matrix_engine_tst<double, 3, 4>, test_neg_op_traits_tst>;
+    using fsm_double_tst_34 = STD_LA::matrix<fs_matrix_engine_tst<double, 3, 4>, test_neg_op_traits_tst>;
+
     ASSERT_NEG_A_EQ_B(fsm_double_tst_34,  fsm_double_tst_34);
 }
 
