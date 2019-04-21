@@ -6,6 +6,7 @@ include(CTest)
 set(Includes
     include/linear_algebra.hpp
     include/linear_algebra/addition_traits.hpp
+    include/linear_algebra/addition_traits_impl.hpp
     include/linear_algebra/arithmetic_operators.hpp
     include/linear_algebra/arithmetic_traits.hpp
     include/linear_algebra/debug_helpers.hpp
@@ -16,10 +17,14 @@ set(Includes
     include/linear_algebra/forward_declarations.hpp
     include/linear_algebra/library_aliases.hpp
     include/linear_algebra/matrix.hpp
+    include/linear_algebra/multiplication_traits.hpp
+    include/linear_algebra/multiplication_traits_impl.hpp
     include/linear_algebra/negation_traits.hpp
+    include/linear_algebra/negation_traits_impl.hpp
     include/linear_algebra/number_traits.hpp
     include/linear_algebra/operation_traits.hpp
     include/linear_algebra/subtraction_traits.hpp
+    include/linear_algebra/subtraction_traits_impl.hpp
     include/linear_algebra/vector.hpp
     include/linear_algebra/view_based_engines.hpp
 
