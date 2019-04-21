@@ -111,13 +111,17 @@ struct test_sub_op_traits_nct
 };
 
 
-//- This operation traits type is has the element/engine/operation traits as nested class templates.
 //- A couple of helper macros to assist in readability below
 //
-#define ASSERT_A_SUB_B_EQ_C(A, B, C) \
-    static_assert(std::is_same_v<decltype(std::declval<A>() - std::declval<B>()), C>)
+#ifdef EXEC_OP_TEST_OUTPUT
+    #define EXEC_A_SUB_B(A, B)  (void)(A() - B());
+#else
+    #define EXEC_A_SUB_B(A, B)
+#endif
 
-#define EXEC_A_SUB_B(A, B)  (void)(A() - B())
+#define ASSERT_A_SUB_B_EQ_C(A, B, C)    \
+    EXEC_A_SUB_B(A, B)                  \
+    static_assert(std::is_same_v<decltype(std::declval<A>() - std::declval<B>()), C>)
 
 
 //--------------------------------------------------------------------------------------------------
@@ -348,224 +352,13 @@ void t201()
     ASSERT_A_SUB_B_EQ_C(drm_new_num_tr,  drm_float_tr,    drm_new_num);
     ASSERT_A_SUB_B_EQ_C(drm_new_num_tr,  drm_double_tr,   drm_new_num);
     ASSERT_A_SUB_B_EQ_C(drm_new_num_tr,  drm_new_num_tr,  drm_new_num);
-
-    STD_LA::fs_matrix<double, 3, 3>     fm1;
-    STD_LA::dyn_matrix<double>          dmd1(3, 3);
-
-    cout << get_type_name<STD_LA::dyn_matrix<float>>() << endl;
-    cout << get_type_name<STD_LA::dyn_matrix<double>>() << endl;
-    cout << get_type_name<decltype(fm1 - dmd1)>() << endl;
-    cout << get_type_name<decltype(fm1.t() - dmd1.t())>() << endl;
-    fm1 - dmd1;
-
-    PRINT_TYPE(fsm_float);
-    PRINT_TYPE(fsm_double);
-    PRINT_TYPE(fsm_new_num);
-    cout << endl;
-
-    PRINT_TYPE(fsm_float_tr);
-    PRINT_TYPE(fsm_double_tr);
-    PRINT_TYPE(fsm_new_num_tr);
-    cout << endl;
-
-    PRINT_TYPE(drm_float);
-    PRINT_TYPE(drm_double);
-    PRINT_TYPE(drm_new_num);
-    cout << endl;
-
-    PRINT_TYPE(drm_float_tr);
-    PRINT_TYPE(drm_double_tr);
-    PRINT_TYPE(drm_new_num_tr);
-    cout << endl;
-}
-
-//--------------------------------------------------------------------------------------------------
-//  This test verifies that subtraction operations on matrices actually execute.  It prints the
-//  operand and result types for manual review.
-//--------------------------------------------------------------------------------------------------
-//
-void t202()
-{
-    PRINT_FNAME();
-
-    using fsm_float      = STD_LA::fs_matrix<float, 2, 3>;
-    using fsm_double     = STD_LA::fs_matrix<double, 2, 3>;
-    using fsm_new_num    = STD_LA::fs_matrix<new_num, 2, 3>;
-    using fsm_float_tr   = decltype(std::declval<STD_LA::fs_matrix<float, 3, 2>>().t());
-    using fsm_double_tr  = decltype(std::declval<STD_LA::fs_matrix<double, 3, 2>>().t());
-    using fsm_new_num_tr = decltype(std::declval<STD_LA::fs_matrix<new_num, 3, 2>>().t());
-
-    using drm_float      = STD_LA::dyn_matrix<float>;
-    using drm_double     = STD_LA::dyn_matrix<double>;
-    using drm_new_num    = STD_LA::dyn_matrix<new_num>;
-    using drm_float_tr   = decltype(std::declval<drm_float>().t());
-    using drm_double_tr  = decltype(std::declval<drm_double>().t());
-    using drm_new_num_tr = decltype(std::declval<drm_new_num>().t());
-
-    EXEC_A_SUB_B(fsm_float,  fsm_float);
-    EXEC_A_SUB_B(fsm_float,  fsm_double);
-    EXEC_A_SUB_B(fsm_float,  fsm_new_num);
-    EXEC_A_SUB_B(fsm_float,  fsm_float_tr);
-    EXEC_A_SUB_B(fsm_float,  fsm_double_tr);
-    EXEC_A_SUB_B(fsm_float,  fsm_new_num_tr);
-    EXEC_A_SUB_B(fsm_float,  drm_float);
-    EXEC_A_SUB_B(fsm_float,  drm_double);
-    EXEC_A_SUB_B(fsm_float,  drm_new_num);
-    EXEC_A_SUB_B(fsm_float,  drm_float_tr);
-    EXEC_A_SUB_B(fsm_float,  drm_double_tr);
-    EXEC_A_SUB_B(fsm_float,  drm_new_num_tr);
-
-    EXEC_A_SUB_B(fsm_double,  fsm_float);
-    EXEC_A_SUB_B(fsm_double,  fsm_double);
-    EXEC_A_SUB_B(fsm_double,  fsm_new_num);
-    EXEC_A_SUB_B(fsm_double,  fsm_float_tr);
-    EXEC_A_SUB_B(fsm_double,  fsm_double_tr);
-    EXEC_A_SUB_B(fsm_double,  fsm_new_num_tr);
-    EXEC_A_SUB_B(fsm_double,  drm_float);
-    EXEC_A_SUB_B(fsm_double,  drm_double);
-    EXEC_A_SUB_B(fsm_double,  drm_new_num);
-    EXEC_A_SUB_B(fsm_double,  drm_float_tr);
-    EXEC_A_SUB_B(fsm_double,  drm_double_tr);
-    EXEC_A_SUB_B(fsm_double,  drm_new_num_tr);
-
-    EXEC_A_SUB_B(fsm_new_num,  fsm_float);
-    EXEC_A_SUB_B(fsm_new_num,  fsm_double);
-    EXEC_A_SUB_B(fsm_new_num,  fsm_new_num);
-    EXEC_A_SUB_B(fsm_new_num,  fsm_float_tr);
-    EXEC_A_SUB_B(fsm_new_num,  fsm_double_tr);
-    EXEC_A_SUB_B(fsm_new_num,  fsm_new_num_tr);
-    EXEC_A_SUB_B(fsm_new_num,  drm_float);
-    EXEC_A_SUB_B(fsm_new_num,  drm_double);
-    EXEC_A_SUB_B(fsm_new_num,  drm_new_num);
-    EXEC_A_SUB_B(fsm_new_num,  drm_float_tr);
-    EXEC_A_SUB_B(fsm_new_num,  drm_double_tr);
-    EXEC_A_SUB_B(fsm_new_num,  drm_new_num_tr);
-
-    EXEC_A_SUB_B(fsm_float_tr,  fsm_float);
-    EXEC_A_SUB_B(fsm_float_tr,  fsm_double);
-    EXEC_A_SUB_B(fsm_float_tr,  fsm_new_num);
-    EXEC_A_SUB_B(fsm_float_tr,  fsm_float_tr);
-    EXEC_A_SUB_B(fsm_float_tr,  fsm_double_tr);
-    EXEC_A_SUB_B(fsm_float_tr,  fsm_new_num_tr);
-    EXEC_A_SUB_B(fsm_float_tr,  drm_float);
-    EXEC_A_SUB_B(fsm_float_tr,  drm_double);
-    EXEC_A_SUB_B(fsm_float_tr,  drm_new_num);
-    EXEC_A_SUB_B(fsm_float_tr,  drm_float_tr);
-    EXEC_A_SUB_B(fsm_float_tr,  drm_double_tr);
-    EXEC_A_SUB_B(fsm_float_tr,  drm_new_num_tr);
-
-    EXEC_A_SUB_B(fsm_double_tr,  fsm_float);
-    EXEC_A_SUB_B(fsm_double_tr,  fsm_double);
-    EXEC_A_SUB_B(fsm_double_tr,  fsm_new_num);
-    EXEC_A_SUB_B(fsm_double_tr,  fsm_float_tr);
-    EXEC_A_SUB_B(fsm_double_tr,  fsm_double_tr);
-    EXEC_A_SUB_B(fsm_double_tr,  fsm_new_num_tr);
-    EXEC_A_SUB_B(fsm_double_tr,  drm_float);
-    EXEC_A_SUB_B(fsm_double_tr,  drm_double);
-    EXEC_A_SUB_B(fsm_double_tr,  drm_new_num);
-    EXEC_A_SUB_B(fsm_double_tr,  drm_float_tr);
-    EXEC_A_SUB_B(fsm_double_tr,  drm_double_tr);
-    EXEC_A_SUB_B(fsm_double_tr,  drm_new_num_tr);
-
-    EXEC_A_SUB_B(fsm_new_num_tr,  fsm_float);
-    EXEC_A_SUB_B(fsm_new_num_tr,  fsm_double);
-    EXEC_A_SUB_B(fsm_new_num_tr,  fsm_new_num);
-    EXEC_A_SUB_B(fsm_new_num_tr,  fsm_float_tr);
-    EXEC_A_SUB_B(fsm_new_num_tr,  fsm_double_tr);
-    EXEC_A_SUB_B(fsm_new_num_tr,  fsm_new_num_tr);
-    EXEC_A_SUB_B(fsm_new_num_tr,  drm_float);
-    EXEC_A_SUB_B(fsm_new_num_tr,  drm_double);
-    EXEC_A_SUB_B(fsm_new_num_tr,  drm_new_num);
-    EXEC_A_SUB_B(fsm_new_num_tr,  drm_float_tr);
-    EXEC_A_SUB_B(fsm_new_num_tr,  drm_double_tr);
-    EXEC_A_SUB_B(fsm_new_num_tr,  drm_new_num_tr);
-
-    //------
-    //
-    EXEC_A_SUB_B(drm_float,  fsm_float);
-    EXEC_A_SUB_B(drm_float,  fsm_double);
-    EXEC_A_SUB_B(drm_float,  fsm_new_num);
-    EXEC_A_SUB_B(drm_float,  fsm_float_tr);
-    EXEC_A_SUB_B(drm_float,  fsm_double_tr);
-    EXEC_A_SUB_B(drm_float,  fsm_new_num_tr);
-    EXEC_A_SUB_B(drm_float,  drm_float);
-    EXEC_A_SUB_B(drm_float,  drm_double);
-    EXEC_A_SUB_B(drm_float,  drm_new_num);
-    EXEC_A_SUB_B(drm_float,  drm_float_tr);
-    EXEC_A_SUB_B(drm_float,  drm_double_tr);
-    EXEC_A_SUB_B(drm_float,  drm_new_num_tr);
-
-    EXEC_A_SUB_B(drm_double,  fsm_float);
-    EXEC_A_SUB_B(drm_double,  fsm_double);
-    EXEC_A_SUB_B(drm_double,  fsm_new_num);
-    EXEC_A_SUB_B(drm_double,  fsm_float_tr);
-    EXEC_A_SUB_B(drm_double,  fsm_double_tr);
-    EXEC_A_SUB_B(drm_double,  fsm_new_num_tr);
-    EXEC_A_SUB_B(drm_double,  drm_float);
-    EXEC_A_SUB_B(drm_double,  drm_double);
-    EXEC_A_SUB_B(drm_double,  drm_new_num);
-    EXEC_A_SUB_B(drm_double,  drm_float_tr);
-    EXEC_A_SUB_B(drm_double,  drm_double_tr);
-    EXEC_A_SUB_B(drm_double,  drm_new_num_tr);
-
-    EXEC_A_SUB_B(drm_new_num,  fsm_float);
-    EXEC_A_SUB_B(drm_new_num,  fsm_double);
-    EXEC_A_SUB_B(drm_new_num,  fsm_new_num);
-    EXEC_A_SUB_B(drm_new_num,  fsm_float_tr);
-    EXEC_A_SUB_B(drm_new_num,  fsm_double_tr);
-    EXEC_A_SUB_B(drm_new_num,  fsm_new_num_tr);
-    EXEC_A_SUB_B(drm_new_num,  drm_float);
-    EXEC_A_SUB_B(drm_new_num,  drm_double);
-    EXEC_A_SUB_B(drm_new_num,  drm_new_num);
-    EXEC_A_SUB_B(drm_new_num,  drm_float_tr);
-    EXEC_A_SUB_B(drm_new_num,  drm_double_tr);
-    EXEC_A_SUB_B(drm_new_num,  drm_new_num_tr);
-
-    EXEC_A_SUB_B(drm_float_tr,  fsm_float);
-    EXEC_A_SUB_B(drm_float_tr,  fsm_double);
-    EXEC_A_SUB_B(drm_float_tr,  fsm_new_num);
-    EXEC_A_SUB_B(drm_float_tr,  fsm_float_tr);
-    EXEC_A_SUB_B(drm_float_tr,  fsm_double_tr);
-    EXEC_A_SUB_B(drm_float_tr,  fsm_new_num_tr);
-    EXEC_A_SUB_B(drm_float_tr,  drm_float);
-    EXEC_A_SUB_B(drm_float_tr,  drm_double);
-    EXEC_A_SUB_B(drm_float_tr,  drm_new_num);
-    EXEC_A_SUB_B(drm_float_tr,  drm_float_tr);
-    EXEC_A_SUB_B(drm_float_tr,  drm_double_tr);
-    EXEC_A_SUB_B(drm_float_tr,  drm_new_num_tr);
-
-    EXEC_A_SUB_B(drm_double_tr,  fsm_float);
-    EXEC_A_SUB_B(drm_double_tr,  fsm_double);
-    EXEC_A_SUB_B(drm_double_tr,  fsm_new_num);
-    EXEC_A_SUB_B(drm_double_tr,  fsm_float_tr);
-    EXEC_A_SUB_B(drm_double_tr,  fsm_double_tr);
-    EXEC_A_SUB_B(drm_double_tr,  fsm_new_num_tr);
-    EXEC_A_SUB_B(drm_double_tr,  drm_float);
-    EXEC_A_SUB_B(drm_double_tr,  drm_double);
-    EXEC_A_SUB_B(drm_double_tr,  drm_new_num);
-    EXEC_A_SUB_B(drm_double_tr,  drm_float_tr);
-    EXEC_A_SUB_B(drm_double_tr,  drm_double_tr);
-    EXEC_A_SUB_B(drm_double_tr,  drm_new_num_tr);
-
-    EXEC_A_SUB_B(drm_new_num_tr,  fsm_float);
-    EXEC_A_SUB_B(drm_new_num_tr,  fsm_double);
-    EXEC_A_SUB_B(drm_new_num_tr,  fsm_new_num);
-    EXEC_A_SUB_B(drm_new_num_tr,  fsm_float_tr);
-    EXEC_A_SUB_B(drm_new_num_tr,  fsm_double_tr);
-    EXEC_A_SUB_B(drm_new_num_tr,  fsm_new_num_tr);
-    EXEC_A_SUB_B(drm_new_num_tr,  drm_float);
-    EXEC_A_SUB_B(drm_new_num_tr,  drm_double);
-    EXEC_A_SUB_B(drm_new_num_tr,  drm_new_num);
-    EXEC_A_SUB_B(drm_new_num_tr,  drm_float_tr);
-    EXEC_A_SUB_B(drm_new_num_tr,  drm_double_tr);
-    EXEC_A_SUB_B(drm_new_num_tr,  drm_new_num_tr);
 }
 
 //--------------------------------------------------------------------------------------------------
 //  This test verifies that subtraction operations on vectors return the correct result type.
 //--------------------------------------------------------------------------------------------------
 //
-void t203()
+void t202()
 {
     PRINT_FNAME();
 
@@ -620,78 +413,6 @@ void t203()
     ASSERT_A_SUB_B_EQ_C(drv_new_num,  drv_float,       drv_new_num);
     ASSERT_A_SUB_B_EQ_C(drv_new_num,  drv_double,      drv_new_num);
     ASSERT_A_SUB_B_EQ_C(drv_new_num,  drv_new_num,     drv_new_num);
-
-    PRINT_TYPE(fsv_float);
-    PRINT_TYPE(fsv_double);
-    PRINT_TYPE(fsv_new_num);
-    cout << endl;
-
-    PRINT_TYPE(drv_float);
-    PRINT_TYPE(drv_double);
-    PRINT_TYPE(drv_new_num);
-    cout << endl;
-}
-
-//--------------------------------------------------------------------------------------------------
-//  This test verifies that subtraction operations on vectors actually execute.  It prints the
-//  operand and result types for manual review.
-//--------------------------------------------------------------------------------------------------
-//
-void t204()
-{
-    PRINT_FNAME();
-
-    using fsv_float      = STD_LA::fs_vector<float, 3>;
-    using fsv_double     = STD_LA::fs_vector<double, 3>;
-    using fsv_new_num    = STD_LA::fs_vector<new_num, 3>;
-
-    using drv_float      = STD_LA::dyn_vector<float>;
-    using drv_double     = STD_LA::dyn_vector<double>;
-    using drv_new_num    = STD_LA::dyn_vector<new_num>;
-
-    EXEC_A_SUB_B(fsv_float,  fsv_float);
-    EXEC_A_SUB_B(fsv_float,  fsv_double);
-    EXEC_A_SUB_B(fsv_float,  fsv_new_num);
-    EXEC_A_SUB_B(fsv_float,  drv_float);
-    EXEC_A_SUB_B(fsv_float,  drv_double);
-    EXEC_A_SUB_B(fsv_float,  drv_new_num);
-
-    EXEC_A_SUB_B(fsv_double,  fsv_float);
-    EXEC_A_SUB_B(fsv_double,  fsv_double);
-    EXEC_A_SUB_B(fsv_double,  fsv_new_num);
-    EXEC_A_SUB_B(fsv_double,  drv_float);
-    EXEC_A_SUB_B(fsv_double,  drv_double);
-    EXEC_A_SUB_B(fsv_double,  drv_new_num);
-
-    EXEC_A_SUB_B(fsv_new_num,  fsv_float);
-    EXEC_A_SUB_B(fsv_new_num,  fsv_double);
-    EXEC_A_SUB_B(fsv_new_num,  fsv_new_num);
-    EXEC_A_SUB_B(fsv_new_num,  drv_float);
-    EXEC_A_SUB_B(fsv_new_num,  drv_double);
-    EXEC_A_SUB_B(fsv_new_num,  drv_new_num);
-
-    //------
-    //
-    EXEC_A_SUB_B(drv_float,  fsv_float);
-    EXEC_A_SUB_B(drv_float,  fsv_double);
-    EXEC_A_SUB_B(drv_float,  fsv_new_num);
-    EXEC_A_SUB_B(drv_float,  drv_float);
-    EXEC_A_SUB_B(drv_float,  drv_double);
-    EXEC_A_SUB_B(drv_float,  drv_new_num);
-
-    EXEC_A_SUB_B(drv_double,  fsv_float);
-    EXEC_A_SUB_B(drv_double,  fsv_double);
-    EXEC_A_SUB_B(drv_double,  fsv_new_num);
-    EXEC_A_SUB_B(drv_double,  drv_float);
-    EXEC_A_SUB_B(drv_double,  drv_double);
-    EXEC_A_SUB_B(drv_double,  drv_new_num);
-
-    EXEC_A_SUB_B(drv_new_num,  fsv_float);
-    EXEC_A_SUB_B(drv_new_num,  fsv_double);
-    EXEC_A_SUB_B(drv_new_num,  fsv_new_num);
-    EXEC_A_SUB_B(drv_new_num,  drv_float);
-    EXEC_A_SUB_B(drv_new_num,  drv_double);
-    EXEC_A_SUB_B(drv_new_num,  drv_new_num);
 }
 
 
@@ -786,7 +507,7 @@ struct test_sub_op_traits_tst
 };
 
 
-void t205()
+void t203()
 {
     PRINT_FNAME();
 
@@ -801,7 +522,7 @@ void t205()
     PRINT_TYPE(t01);
 }
 
-void t206()
+void t204()
 {
     PRINT_FNAME();
 
@@ -831,46 +552,29 @@ void t206()
     using t03 = typename t02::engine_type;
     PRINT_TYPE(t03);
 
-    ASSERT_A_SUB_B_EQ_C(fsm_float_tst,  fsm_float_tst,  fsm_double_tst);
+    ASSERT_A_SUB_B_EQ_C(fsm_float,      fsm_float,      fsm_float);
     ASSERT_A_SUB_B_EQ_C(fsm_float,      fsm_float_tst,  drm_double_tst);
     ASSERT_A_SUB_B_EQ_C(fsm_float_tst,  fsm_float,      drm_double_tst);
-
-    EXEC_A_SUB_B(fsm_float_tst, fsm_float_tst);
-    EXEC_A_SUB_B(fsm_float,     fsm_float_tst);
-    EXEC_A_SUB_B(fsm_float_tst, fsm_float);
-    EXEC_A_SUB_B(fsm_float,     fsm_float);
+    ASSERT_A_SUB_B_EQ_C(fsm_float_tst,  fsm_float_tst,  fsm_double_tst);
 
     ASSERT_A_SUB_B_EQ_C(fsm_float_tst_tr,  fsm_float_tst_tr,  fsm_double_tst);
     ASSERT_A_SUB_B_EQ_C(fsm_float_tst_tr,  fsm_float_tst,     drm_double_tst);
     ASSERT_A_SUB_B_EQ_C(fsm_float_tst,     fsm_float_tst_tr,  drm_double_tst);
-
-    EXEC_A_SUB_B(fsm_float_tst_tr, fsm_float_tst_tr);
-    EXEC_A_SUB_B(fsm_float_tst_tr, fsm_float_tst);
-    EXEC_A_SUB_B(fsm_float_tst,    fsm_float_tst_tr);
 
     ASSERT_A_SUB_B_EQ_C(fsm_double_tst,   fsm_double_tst,   fsm_double_tst);
     ASSERT_A_SUB_B_EQ_C(fsm_double_tst,   fsm_new_num_tst,  fsm_new_num_tst);
     ASSERT_A_SUB_B_EQ_C(fsm_new_num_tst,  fsm_double_tst,   fsm_new_num_tst);
     ASSERT_A_SUB_B_EQ_C(fsm_new_num_tst,  fsm_new_num_tst,  fsm_new_num_tst);
 
-    EXEC_A_SUB_B(fsm_double_tst,   fsm_double_tst);
-    EXEC_A_SUB_B(fsm_double_tst,   fsm_new_num_tst);
-    EXEC_A_SUB_B(fsm_new_num_tst,  fsm_double_tst);
-    EXEC_A_SUB_B(fsm_new_num_tst,  fsm_new_num_tst);
-
     ASSERT_A_SUB_B_EQ_C(fsm_double_tst_tr,   fsm_double_tst_tr,   fsm_double_tst);
     ASSERT_A_SUB_B_EQ_C(fsm_double_tst_tr,   fsm_new_num_tst_tr,  fsm_new_num_tst);
     ASSERT_A_SUB_B_EQ_C(fsm_new_num_tst_tr,  fsm_double_tst_tr,   fsm_new_num_tst);
     ASSERT_A_SUB_B_EQ_C(fsm_new_num_tst_tr,  fsm_new_num_tst_tr,  fsm_new_num_tst);
 
-    EXEC_A_SUB_B(fsm_double_tst_tr,   fsm_double_tst_tr);
-    EXEC_A_SUB_B(fsm_double_tst_tr,   fsm_new_num_tst_tr);
-    EXEC_A_SUB_B(fsm_new_num_tst_tr,  fsm_double_tst_tr);
-    EXEC_A_SUB_B(fsm_new_num_tst_tr,  fsm_new_num_tst_tr);
+    using fsm_double_tst_34 = STD_LA::matrix<fs_matrix_engine_tst<double, 3, 4>, test_sub_op_traits_tst>;
 
-    using fsm_double_tst_34  = STD_LA::matrix<fs_matrix_engine_tst<double, 3, 4>, test_sub_op_traits_tst>;
-    EXEC_A_SUB_B(fsm_double_tst,      fsm_double_tst);
-    EXEC_A_SUB_B(fsm_double_tst_34,   fsm_double_tst_34);
+    ASSERT_A_SUB_B_EQ_C(fsm_double_tst,     fsm_double_tst,     fsm_double_tst);
+    ASSERT_A_SUB_B_EQ_C(fsm_double_tst_34,  fsm_double_tst_34,  fsm_double_tst_34);
 }
 
 void
@@ -883,7 +587,4 @@ TestGroup20()
     t202();
     t203();
     t204();
-
-    t205();
-    t206();
 }

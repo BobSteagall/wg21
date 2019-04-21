@@ -5,10 +5,10 @@ void TestGroup40();
 
 int main()
 {
-    TestGroup10();
+/*    TestGroup10();
     TestGroup20();
     TestGroup30();
-    TestGroup40();
+*/    TestGroup40();
 
     return 0;
 }

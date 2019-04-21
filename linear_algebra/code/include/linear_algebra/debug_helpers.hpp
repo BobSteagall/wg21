@@ -9,8 +9,9 @@
 #include <string_view>
 
 namespace STD_LA {
-
 USING_STD
+
+#define EXEC_OP_TEST_OUTPUT
 
 /*
 constexpr string_view type_name() [with T = vector<dr_vector_engine<double, allocator<double> >, default_matrix_operation_traits>; string_view = basic_string_view<char>]
