@@ -124,7 +124,6 @@ struct test_mul_op_traits_nct
     static_assert(std::is_same_v<decltype(std::declval<A>() * std::declval<B>()), C>)
 
 
-
 //--------------------------------------------------------------------------------------------------
 //  This test ensures that the type detection meta-functions are working properly.  It exercises
 //  only the detection meta-functions.
@@ -172,205 +171,6 @@ void t400()
     static_assert(STD_LA::detail::has_mul_traits_v<test_mul_op_traits_ord, opnd_t, opnd_t>);
     static_assert(STD_LA::detail::has_mul_traits_v<test_mul_op_traits_nta, opnd_t, opnd_t>);
     static_assert(STD_LA::detail::has_mul_traits_v<test_mul_op_traits_nct, opnd_t, opnd_t>);
-}
-
-//--------------------------------------------------------------------------------------------------
-//  This test verifies that addition operations on matrices return the correct result type.
-//--------------------------------------------------------------------------------------------------
-//
-void t408()
-{
-    PRINT_FNAME();
-
-    using fsm_float_34   = STD_LA::fs_matrix<float, 3, 4>;
-    using fsm_float_45   = STD_LA::fs_matrix<float, 4, 5>;
-    using fsm_float_35   = STD_LA::fs_matrix<float, 3, 5>;
-
-    using fsm_double_34  = STD_LA::fs_matrix<double, 3, 4>;
-    using fsm_double_45  = STD_LA::fs_matrix<double, 4, 5>;
-    using fsm_double_35  = STD_LA::fs_matrix<double, 3, 5>;
-
-    using fsm_new_num_34 = STD_LA::fs_matrix<new_num, 3, 4>;
-    using fsm_new_num_45 = STD_LA::fs_matrix<new_num, 4, 5>;
-    using fsm_new_num_35 = STD_LA::fs_matrix<new_num, 3, 5>;
-
-    using fsm_float_tr_34   = decltype(std::declval<STD_LA::fs_matrix<float, 4, 3>>().t());
-    using fsm_float_tr_45   = decltype(std::declval<STD_LA::fs_matrix<float, 5, 4>>().t());
-    using fsm_float_tr_35   = decltype(std::declval<STD_LA::fs_matrix<float, 5, 3>>().t());
-
-    using fsm_double_tr_34  = decltype(std::declval<STD_LA::fs_matrix<double, 4, 3>>().t());
-    using fsm_double_tr_45  = decltype(std::declval<STD_LA::fs_matrix<double, 5, 4>>().t());
-    using fsm_double_tr_35  = decltype(std::declval<STD_LA::fs_matrix<double, 5, 3>>().t());
-
-    using fsm_new_num_tr_34 = decltype(std::declval<STD_LA::fs_matrix<new_num, 4, 3>>().t());
-    using fsm_new_num_tr_45 = decltype(std::declval<STD_LA::fs_matrix<new_num, 5, 4>>().t());
-    using fsm_new_num_tr_35 = decltype(std::declval<STD_LA::fs_matrix<new_num, 5, 3>>().t());
-
-    using drm_float      = STD_LA::dyn_matrix<float>;
-    using drm_double     = STD_LA::dyn_matrix<double>;
-    using drm_new_num    = STD_LA::dyn_matrix<new_num>;
-
-    using drm_float_tr   = decltype(std::declval<drm_float>().t());
-    using drm_double_tr  = decltype(std::declval<drm_double>().t());
-    using drm_new_num_tr = decltype(std::declval<drm_new_num>().t());
-
-    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  fsm_float_45,       fsm_float_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  fsm_double_45,      fsm_double_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  fsm_new_num_45,     fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  fsm_float_tr_45,    fsm_float_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  fsm_double_tr_45,   fsm_double_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  fsm_new_num_tr_45,  fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  drm_float,          drm_float);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  drm_double,         drm_double);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  drm_new_num,        drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  drm_float_tr,       drm_float);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  drm_double_tr,      drm_double);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  drm_new_num_tr,     drm_new_num);
-
-    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  fsm_float_45,       fsm_double_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  fsm_double_45,      fsm_double_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  fsm_new_num_45,     fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  fsm_float_tr_45,    fsm_double_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  fsm_double_tr_45,   fsm_double_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  fsm_new_num_tr_45,  fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  drm_float,          drm_double);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  drm_double,         drm_double);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  drm_new_num,        drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  drm_float_tr,       drm_double);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  drm_double_tr,      drm_double);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  drm_new_num_tr,     drm_new_num);
-
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  fsm_float_45,       fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  fsm_double_45,      fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  fsm_new_num_45,     fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  fsm_float_tr_45,    fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  fsm_double_tr_45,   fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  fsm_new_num_tr_45,  fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  drm_float,          drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  drm_double,         drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  drm_new_num,        drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  drm_float_tr,       drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  drm_double_tr,      drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  drm_new_num_tr,     drm_new_num);
-
-    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  fsm_float_45,       fsm_float_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  fsm_double_45,      fsm_double_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  fsm_new_num_45,     fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  fsm_float_tr_45,    fsm_float_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  fsm_double_tr_45,   fsm_double_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  fsm_new_num_tr_45,  fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  drm_float,          drm_float);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  drm_double,         drm_double);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  drm_new_num,        drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  drm_float_tr,       drm_float);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  drm_double_tr,      drm_double);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  drm_new_num_tr,     drm_new_num);
-
-    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  fsm_float_45,       fsm_double_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  fsm_double_45,      fsm_double_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  fsm_new_num_45,     fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  fsm_float_tr_45,    fsm_double_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  fsm_double_tr_45,   fsm_double_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  fsm_new_num_tr_45,  fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  drm_float,          drm_double);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  drm_double,         drm_double);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  drm_new_num,        drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  drm_float_tr,       drm_double);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  drm_double_tr,      drm_double);
-    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  drm_new_num_tr,     drm_new_num);
-
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  fsm_float_45,       fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  fsm_double_45,      fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  fsm_new_num_45,     fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  fsm_float_tr_45,    fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  fsm_double_tr_45,   fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  fsm_new_num_tr_45,  fsm_new_num_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  drm_float,          drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  drm_double,         drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  drm_new_num,        drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  drm_float_tr,       drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  drm_double_tr,      drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  drm_new_num_tr,     drm_new_num);
-
-    //------
-    //
-    ASSERT_A_MUL_B_EQ_C(drm_float,  fsm_float_45,       drm_float);
-    ASSERT_A_MUL_B_EQ_C(drm_float,  fsm_double_45,      drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_float,  fsm_new_num_45,     drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_float,  fsm_float_tr_45,    drm_float);
-    ASSERT_A_MUL_B_EQ_C(drm_float,  fsm_double_tr_45,   drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_float,  fsm_new_num_tr_45,  drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_float,  drm_float,          drm_float);
-    ASSERT_A_MUL_B_EQ_C(drm_float,  drm_double,         drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_float,  drm_new_num,        drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_float,  drm_float_tr,       drm_float);
-    ASSERT_A_MUL_B_EQ_C(drm_float,  drm_double_tr,      drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_float,  drm_new_num_tr,     drm_new_num);
-
-    ASSERT_A_MUL_B_EQ_C(drm_double,  fsm_float_45,       drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double,  fsm_double_45,      drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double,  fsm_new_num_45,     drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_double,  fsm_float_tr_45,    drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double,  fsm_double_tr_45,   drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double,  fsm_new_num_tr_45,  drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_double,  drm_float,          drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double,  drm_double,         drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double,  drm_new_num,        drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_double,  drm_float_tr,       drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double,  drm_double_tr,      drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double,  drm_new_num_tr,     drm_new_num);
-
-    ASSERT_A_MUL_B_EQ_C(drm_new_num,  fsm_float_45,       drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num,  fsm_double_45,      drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num,  fsm_new_num_45,     drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num,  fsm_float_tr_45,    drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num,  fsm_double_tr_45,   drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num,  fsm_new_num_tr_45,  drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num,  drm_float,          drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num,  drm_double,         drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num,  drm_new_num,        drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num,  drm_float_tr,       drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num,  drm_double_tr,      drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num,  drm_new_num_tr,     drm_new_num);
-
-    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  fsm_float_45,       drm_float);
-    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  fsm_double_45,      drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  fsm_new_num_45,     drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  fsm_float_tr_45,    drm_float);
-    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  fsm_double_tr_45,   drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  fsm_new_num_tr_45,  drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  drm_float,          drm_float);
-    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  drm_double,         drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  drm_new_num,        drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  drm_float_tr,       drm_float);
-    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  drm_double_tr,      drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  drm_new_num_tr,     drm_new_num);
-
-    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  fsm_float_45,       drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  fsm_double_45,      drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  fsm_new_num_45,     drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  fsm_float_tr_45,    drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  fsm_double_tr_45,   drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  fsm_new_num_tr_45,  drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  drm_float,          drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  drm_double,         drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  drm_new_num,        drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  drm_float_tr,       drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  drm_double_tr,      drm_double);
-    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  drm_new_num_tr,     drm_new_num);
-
-    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  fsm_float_45,       drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  fsm_double_45,      drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  fsm_new_num_45,     drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  fsm_float_tr_45,    drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  fsm_double_tr_45,   drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  fsm_new_num_tr_45,  drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  drm_float,          drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  drm_double,         drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  drm_new_num,        drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  drm_float_tr,       drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  drm_double_tr,      drm_new_num);
-    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  drm_new_num_tr,     drm_new_num);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -604,6 +404,273 @@ void t405()
     ASSERT_A_MUL_B_EQ_C(drv_new_num,  drv_float,       new_num);
     ASSERT_A_MUL_B_EQ_C(drv_new_num,  drv_double,      new_num);
     ASSERT_A_MUL_B_EQ_C(drv_new_num,  drv_new_num,     new_num);
+}
+
+//--------------------------------------------------------------------------------------------------
+//  This test verifies that MATRIX*VECTOR multiplications return the correct result type.
+//--------------------------------------------------------------------------------------------------
+//
+void t406()
+{
+    PRINT_FNAME();
+
+    using fsm_float   = STD_LA::fs_matrix<float, 4, 3>;
+    using fsm_double  = STD_LA::fs_matrix<double, 4, 3>;
+    using fsm_new_num = STD_LA::fs_matrix<new_num, 4, 3>;
+    using drm_float   = STD_LA::dyn_matrix<float>;
+    using drm_double  = STD_LA::dyn_matrix<double>;
+    using drm_new_num = STD_LA::dyn_matrix<new_num>;
+
+    using fsv_float   = STD_LA::fs_vector<float, 3>;
+    using fsv_double  = STD_LA::fs_vector<double, 3>;
+    using fsv_new_num = STD_LA::fs_vector<new_num, 3>;
+    using drv_float   = STD_LA::dyn_vector<float>;
+    using drv_double  = STD_LA::dyn_vector<double>;
+    using drv_new_num = STD_LA::dyn_vector<new_num>;
+
+/*    ASSERT_A_MUL_B_EQ_C(fsm_float,  fsv_float,    fsv_float);
+/*    ASSERT_A_MUL_B_EQ_C(fsm_float,  fsv_double,   fsv_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_float,  fsv_new_num,  fsv_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_float,  drv_float,    drv_float);
+    ASSERT_A_MUL_B_EQ_C(fsm_float,  drv_double,   drv_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_float,  drv_new_num,  drv_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(fsm_double,  fsv_float,    fsv_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_double,  fsv_double,   fsv_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_double,  fsv_new_num,  fsv_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_double,  drv_float,    drv_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_double,  drv_double,   drv_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_double,  drv_new_num,  drv_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num,  fsv_float,    fsv_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num,  fsv_double,   fsv_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num,  fsv_new_num,  fsv_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num,  drv_float,    fsv_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num,  drv_double,   fsv_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num,  drv_new_num,  fsv_new_num);
+
+    //------
+    //
+    ASSERT_A_MUL_B_EQ_C(drm_float,  fsv_float,    drv_float);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  fsv_double,   drv_double);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  fsv_new_num,  drv_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  drv_float,    drv_float);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  drv_double,   drv_double);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  drv_new_num,  drv_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(drm_double,  fsv_float,    drv_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  fsv_double,   drv_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  fsv_new_num,  drv_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  drv_float,    drv_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  drv_double,   drv_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  drv_new_num,  drv_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  fsv_float,    drv_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  fsv_double,   drv_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  fsv_new_num,  drv_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  drv_float,    drv_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  drv_double,   drv_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  drv_new_num,  drv_new_num);
+*/
+}
+
+//--------------------------------------------------------------------------------------------------
+//  This test verifies that addition operations on matrices return the correct result type.
+//--------------------------------------------------------------------------------------------------
+//
+void t408()
+{
+    PRINT_FNAME();
+
+    using fsm_float_34   = STD_LA::fs_matrix<float, 3, 4>;
+    using fsm_float_45   = STD_LA::fs_matrix<float, 4, 5>;
+    using fsm_float_35   = STD_LA::fs_matrix<float, 3, 5>;
+
+    using fsm_double_34  = STD_LA::fs_matrix<double, 3, 4>;
+    using fsm_double_45  = STD_LA::fs_matrix<double, 4, 5>;
+    using fsm_double_35  = STD_LA::fs_matrix<double, 3, 5>;
+
+    using fsm_new_num_34 = STD_LA::fs_matrix<new_num, 3, 4>;
+    using fsm_new_num_45 = STD_LA::fs_matrix<new_num, 4, 5>;
+    using fsm_new_num_35 = STD_LA::fs_matrix<new_num, 3, 5>;
+
+    using fsm_float_tr_34   = decltype(std::declval<STD_LA::fs_matrix<float, 4, 3>>().t());
+    using fsm_float_tr_45   = decltype(std::declval<STD_LA::fs_matrix<float, 5, 4>>().t());
+    using fsm_float_tr_35   = decltype(std::declval<STD_LA::fs_matrix<float, 5, 3>>().t());
+
+    using fsm_double_tr_34  = decltype(std::declval<STD_LA::fs_matrix<double, 4, 3>>().t());
+    using fsm_double_tr_45  = decltype(std::declval<STD_LA::fs_matrix<double, 5, 4>>().t());
+    using fsm_double_tr_35  = decltype(std::declval<STD_LA::fs_matrix<double, 5, 3>>().t());
+
+    using fsm_new_num_tr_34 = decltype(std::declval<STD_LA::fs_matrix<new_num, 4, 3>>().t());
+    using fsm_new_num_tr_45 = decltype(std::declval<STD_LA::fs_matrix<new_num, 5, 4>>().t());
+    using fsm_new_num_tr_35 = decltype(std::declval<STD_LA::fs_matrix<new_num, 5, 3>>().t());
+
+    using drm_float      = STD_LA::dyn_matrix<float>;
+    using drm_double     = STD_LA::dyn_matrix<double>;
+    using drm_new_num    = STD_LA::dyn_matrix<new_num>;
+
+    using drm_float_tr   = decltype(std::declval<drm_float>().t());
+    using drm_double_tr  = decltype(std::declval<drm_double>().t());
+    using drm_new_num_tr = decltype(std::declval<drm_new_num>().t());
+
+    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  fsm_float_45,       fsm_float_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  fsm_double_45,      fsm_double_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  fsm_new_num_45,     fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  fsm_float_tr_45,    fsm_float_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  fsm_double_tr_45,   fsm_double_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  fsm_new_num_tr_45,  fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  drm_float,          drm_float);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  drm_double,         drm_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  drm_new_num,        drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  drm_float_tr,       drm_float);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  drm_double_tr,      drm_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_34,  drm_new_num_tr,     drm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  fsm_float_45,       fsm_double_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  fsm_double_45,      fsm_double_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  fsm_new_num_45,     fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  fsm_float_tr_45,    fsm_double_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  fsm_double_tr_45,   fsm_double_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  fsm_new_num_tr_45,  fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  drm_float,          drm_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  drm_double,         drm_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  drm_new_num,        drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  drm_float_tr,       drm_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  drm_double_tr,      drm_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_34,  drm_new_num_tr,     drm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  fsm_float_45,       fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  fsm_double_45,      fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  fsm_new_num_45,     fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  fsm_float_tr_45,    fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  fsm_double_tr_45,   fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  fsm_new_num_tr_45,  fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  drm_float,          drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  drm_double,         drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  drm_new_num,        drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  drm_float_tr,       drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  drm_double_tr,      drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_34,  drm_new_num_tr,     drm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  fsm_float_45,       fsm_float_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  fsm_double_45,      fsm_double_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  fsm_new_num_45,     fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  fsm_float_tr_45,    fsm_float_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  fsm_double_tr_45,   fsm_double_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  fsm_new_num_tr_45,  fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  drm_float,          drm_float);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  drm_double,         drm_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  drm_new_num,        drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  drm_float_tr,       drm_float);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  drm_double_tr,      drm_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_tr_34,  drm_new_num_tr,     drm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  fsm_float_45,       fsm_double_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  fsm_double_45,      fsm_double_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  fsm_new_num_45,     fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  fsm_float_tr_45,    fsm_double_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  fsm_double_tr_45,   fsm_double_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  fsm_new_num_tr_45,  fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  drm_float,          drm_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  drm_double,         drm_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  drm_new_num,        drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  drm_float_tr,       drm_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  drm_double_tr,      drm_double);
+    ASSERT_A_MUL_B_EQ_C(fsm_double_tr_34,  drm_new_num_tr,     drm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  fsm_float_45,       fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  fsm_double_45,      fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  fsm_new_num_45,     fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  fsm_float_tr_45,    fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  fsm_double_tr_45,   fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  fsm_new_num_tr_45,  fsm_new_num_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  drm_float,          drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  drm_double,         drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  drm_new_num,        drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  drm_float_tr,       drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  drm_double_tr,      drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(fsm_new_num_tr_34,  drm_new_num_tr,     drm_new_num);
+
+    //------
+    //
+    ASSERT_A_MUL_B_EQ_C(drm_float,  fsm_float_45,       drm_float);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  fsm_double_45,      drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  fsm_new_num_45,     drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  fsm_float_tr_45,    drm_float);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  fsm_double_tr_45,   drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  fsm_new_num_tr_45,  drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  drm_float,          drm_float);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  drm_double,         drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  drm_new_num,        drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  drm_float_tr,       drm_float);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  drm_double_tr,      drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_float,  drm_new_num_tr,     drm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(drm_double,  fsm_float_45,       drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  fsm_double_45,      drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  fsm_new_num_45,     drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  fsm_float_tr_45,    drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  fsm_double_tr_45,   drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  fsm_new_num_tr_45,  drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  drm_float,          drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  drm_double,         drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  drm_new_num,        drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  drm_float_tr,       drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  drm_double_tr,      drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double,  drm_new_num_tr,     drm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  fsm_float_45,       drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  fsm_double_45,      drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  fsm_new_num_45,     drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  fsm_float_tr_45,    drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  fsm_double_tr_45,   drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  fsm_new_num_tr_45,  drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  drm_float,          drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  drm_double,         drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  drm_new_num,        drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  drm_float_tr,       drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  drm_double_tr,      drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num,  drm_new_num_tr,     drm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  fsm_float_45,       drm_float);
+    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  fsm_double_45,      drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  fsm_new_num_45,     drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  fsm_float_tr_45,    drm_float);
+    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  fsm_double_tr_45,   drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  fsm_new_num_tr_45,  drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  drm_float,          drm_float);
+    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  drm_double,         drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  drm_new_num,        drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  drm_float_tr,       drm_float);
+    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  drm_double_tr,      drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_float_tr,  drm_new_num_tr,     drm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  fsm_float_45,       drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  fsm_double_45,      drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  fsm_new_num_45,     drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  fsm_float_tr_45,    drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  fsm_double_tr_45,   drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  fsm_new_num_tr_45,  drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  drm_float,          drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  drm_double,         drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  drm_new_num,        drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  drm_float_tr,       drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  drm_double_tr,      drm_double);
+    ASSERT_A_MUL_B_EQ_C(drm_double_tr,  drm_new_num_tr,     drm_new_num);
+
+    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  fsm_float_45,       drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  fsm_double_45,      drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  fsm_new_num_45,     drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  fsm_float_tr_45,    drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  fsm_double_tr_45,   drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  fsm_new_num_tr_45,  drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  drm_float,          drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  drm_double,         drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  drm_new_num,        drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  drm_float_tr,       drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  drm_double_tr,      drm_new_num);
+    ASSERT_A_MUL_B_EQ_C(drm_new_num_tr,  drm_new_num_tr,     drm_new_num);
 }
 
 /*

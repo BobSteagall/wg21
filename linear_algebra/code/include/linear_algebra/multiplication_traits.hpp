@@ -303,7 +303,7 @@ struct matrix_multiplication_engine_traits
                                          dr_vector_engine<element_type, allocator<element_type>>>;
 };
 
-//- ENGINE*SCALAR cases.
+//- ENGINE*SCALAR cases for vector.
 //
 template<class OT, class T1, class A1, class T2>
 struct matrix_multiplication_engine_traits<OT, dr_vector_engine<T1, A1>, detail::scalar_tag<T2>>
@@ -335,7 +335,7 @@ struct matrix_multiplication_engine_traits<OT, detail::scalar_tag<T1>, fs_vector
     using engine_type  = fs_vector_engine<element_type, N2>;
 };
 
-//------
+//- ENGINE*SCALAR cases for matrix.
 //
 template<class OT, class T1, class A1, class T2>
 struct matrix_multiplication_engine_traits<OT, dr_matrix_engine<T1, A1>, detail::scalar_tag<T2>>
