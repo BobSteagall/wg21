@@ -11,17 +11,17 @@ template<class ET>
 class tr_matrix_engine
 {
   public:
-    using engine_type    = ET;
-    using element_type   = typename engine_type::element_type;
-    using index_type     = typename engine_type::index_type;
-    using size_type      = typename engine_type::size_type;
-    using size_tuple     = typename engine_type::size_tuple;
+    using engine_type     = ET;
+    using engine_category = const_matrix_engine_tag;
+    using element_type    = typename engine_type::element_type;
+    using index_type      = typename engine_type::index_type;
+    using size_type       = typename engine_type::size_type;
+    using size_tuple      = typename engine_type::size_tuple;
 
-    using is_dense       = typename engine_type::is_dense;
-    using is_matrix      = typename engine_type::is_matrix;
-    using is_rectangular = typename engine_type::is_rectangular;
-    using is_row_major   = typename engine_type::is_row_major;
-    using is_vector      = typename engine_type::is_vector;
+    using is_column_major = typename engine_type::is_row_major;
+    using is_dense        = typename engine_type::is_dense;
+    using is_rectangular  = typename engine_type::is_rectangular;
+    using is_row_major    = typename engine_type::is_column_major;
 
   public:
     tr_matrix_engine();

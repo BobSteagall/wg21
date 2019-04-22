@@ -294,42 +294,12 @@ struct matrix_negation_engine_traits
 {
     using element_type_1 = typename ET1::element_type;
     using element_type   = matrix_negation_element_t<OT, element_type_1>;
-    using engine_type    = conditional_t<ET1::is_matrix::value,
+    using engine_type    = conditional_t<detail::is_matrix_engine_v<ET1>,
                                          dr_matrix_engine<element_type, allocator<element_type>>,
                                          dr_vector_engine<element_type, allocator<element_type>>>;
 };
 
-//- Note that all cases where allocators are rebound assume standard-conformant allocator types.
-//
-template<class OT, class T1, class A1>
-struct matrix_negation_engine_traits<OT, dr_vector_engine<T1, A1>>
-{
-    using element_type = matrix_negation_element_t<OT, T1>;
-    using engine_type  = dr_vector_engine<T1, A1>;
-};
-
-template<class OT, class T1, class A1>
-struct matrix_negation_engine_traits<OT, dr_matrix_engine<T1, A1>>
-{
-    using element_type = matrix_negation_element_t<OT, T1>;
-    using engine_type  = dr_matrix_engine<T1, A1>;
-};
-
-template<class OT, class T1, int32_t N1>
-struct matrix_negation_engine_traits<OT, fs_vector_engine<T1, N1>>
-{
-    using element_type = matrix_negation_element_t<OT, T1>;
-    using engine_type  = fs_vector_engine<T1, N1>;
-};
-
-template<class OT, class T1, int32_t R1, int32_t C1>
-struct matrix_negation_engine_traits<OT, fs_matrix_engine<T1, R1, C1>>
-{
-    using element_type = matrix_negation_element_t<OT, T1>;
-    using engine_type  = fs_matrix_engine<T1, R1, C1>;
-};
-
-//- Transpose cases for matrices.
+//- General transpose cases for matrices.
 //
 template<class OT, class ET1>
 struct matrix_negation_engine_traits<OT, tr_matrix_engine<ET1>>
@@ -338,11 +308,64 @@ struct matrix_negation_engine_traits<OT, tr_matrix_engine<ET1>>
     using engine_type  = typename matrix_negation_engine_traits<OT, ET1>::engine_type;
 };
 
+//--------------------------------------------------------------------------------------------------
+//  -ENGINE case for vector.  Note that all partial specializations below in which allocators
+//  are rebound assume standard-conformant allocator types.
+//
+//- dr_vector_engine.
+//
+template<class OT, class T1, class A1>
+struct matrix_negation_engine_traits<OT, dr_vector_engine<T1, A1>>
+{
+    using element_type = matrix_negation_element_t<OT, T1>;
+    using engine_type  = dr_vector_engine<T1, A1>;
+};
+
+//-------------------
+//- fs_vector_engine.
+//
+template<class OT, class T1, int32_t N1>
+struct matrix_negation_engine_traits<OT, fs_vector_engine<T1, N1>>
+{
+    using element_type = matrix_negation_element_t<OT, T1>;
+    using engine_type  = fs_vector_engine<T1, N1>;
+};
+
+//--------------------------------------------------------------------------------------------------
+//  -ENGINE case for matrix.  Note that all partial specializations below in which allocators
+//  are rebound assume standard-conformant allocator types.
+//
+//- dr_matrix_engine.
+//
+template<class OT, class T1, int32_t R1, int32_t C1>
+struct matrix_negation_engine_traits<OT, fs_matrix_engine<T1, R1, C1>>
+{
+    using element_type = matrix_negation_element_t<OT, T1>;
+    using engine_type  = fs_matrix_engine<T1, R1, C1>;
+};
+
 template<class OT, class T1, int32_t R1, int32_t C1>
 struct matrix_negation_engine_traits<OT, tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>>
 {
     using element_type = matrix_negation_element_t<OT, T1>;
     using engine_type  = fs_matrix_engine<element_type, C1, R1>;
+};
+
+//-------------------
+//- fs_matrix_engine.
+//
+template<class OT, class T1, class A1>
+struct matrix_negation_engine_traits<OT, dr_matrix_engine<T1, A1>>
+{
+    using element_type = matrix_negation_element_t<OT, T1>;
+    using engine_type  = dr_matrix_engine<T1, A1>;
+};
+
+template<class OT, class T1, class A1>
+struct matrix_negation_engine_traits<OT, tr_matrix_engine<dr_matrix_engine<T1, A1>>>
+{
+    using element_type = matrix_negation_element_t<OT, T1>;
+    using engine_type  = dr_matrix_engine<T1, A1>;
 };
 
 

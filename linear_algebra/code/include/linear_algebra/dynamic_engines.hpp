@@ -10,13 +10,16 @@ template<class T, class AT>
 class dr_vector_engine
 {
   public:
-    using engine_category = resizable_matrix_engine_tag;
+    using engine_category = resizable_vector_engine_tag;
     using element_type    = T;
     using index_type      = ptrdiff_t;
     using size_type       = ptrdiff_t;
 
+    using is_column_major = false_type;
     using is_dense        = true_type;
     using is_matrix       = false_type;
+    using is_rectangular  = true_type;
+    using is_row_major    = true_type;
     using is_vector       = true_type;
 
   public:
@@ -168,12 +171,10 @@ class dr_matrix_engine
     using size_type       = ptrdiff_t;
     using size_tuple      = tuple<size_type, size_type>;
 
-    using is_column_major = false_type;
+    using is_column_major = true_type;
     using is_dense        = true_type;
-    using is_matrix       = true_type;
     using is_rectangular  = true_type;
     using is_row_major    = true_type;
-    using is_vector       = false_type;
 
   public:
     ~dr_matrix_engine();

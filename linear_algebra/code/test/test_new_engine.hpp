@@ -12,14 +12,14 @@ class fs_matrix_engine_tst
   public:
     using engine_category = STD_LA::mutable_matrix_engine_tag;
     using element_type    = T;
-    using is_dense        = std::true_type;
-    using is_matrix       = std::true_type;
-    using is_rectangular  = std::true_type;
-    using is_row_major    = std::true_type;
-    using is_vector       = std::false_type;
     using index_type      = int_fast32_t;
     using size_type       = int_fast32_t;
     using size_tuple      = std::tuple<size_type, size_type>;
+
+    using is_column_major = std::false_type;
+    using is_dense        = std::true_type;
+    using is_rectangular  = std::true_type;
+    using is_row_major    = std::true_type;
 
   public:
     fs_matrix_engine_tst() = default;

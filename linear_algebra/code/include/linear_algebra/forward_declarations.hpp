@@ -4,9 +4,13 @@
 namespace STD_LA {
 USING_STD
 
-using const_matrix_engine_tag     = integral_constant<int, 1>;
-using mutable_matrix_engine_tag   = integral_constant<int, 2>;
-using resizable_matrix_engine_tag = integral_constant<int, 3>;
+using const_vector_engine_tag     = integral_constant<int, 1>;
+using mutable_vector_engine_tag   = integral_constant<int, 2>;
+using resizable_vector_engine_tag = integral_constant<int, 3>;
+
+using const_matrix_engine_tag     = integral_constant<int, 4>;
+using mutable_matrix_engine_tag   = integral_constant<int, 5>;
+using resizable_matrix_engine_tag = integral_constant<int, 6>;
 
 //- Traits for verifying appropriate matrix element types.
 //
@@ -49,6 +53,7 @@ template<class OT, class OP1, class OP2>    struct matrix_multiplication_traits;
 //- Operator traits and traits promotion.
 //
 struct default_matrix_operation_traits;
+
 template<class T1, class T2>    struct matrix_operation_traits_selector;
 
 //- Basic linear algebra math object engine types.

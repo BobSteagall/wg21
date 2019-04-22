@@ -10,16 +10,18 @@ template<class ET, class OT>
 class matrix
 {
   public:
-    using engine_type    = ET;
-    using element_type   = typename engine_type::element_type;
-    using is_dense       = typename engine_type::is_dense;
-    using is_rectangular = typename engine_type::is_rectangular;
-    using index_type     = typename engine_type::index_type;
-    using size_type      = typename engine_type::size_type;
-    using size_tuple     = typename engine_type::size_tuple;
+    using engine_type     = ET;
+    using element_type    = typename engine_type::element_type;
+    using index_type      = typename engine_type::index_type;
+    using size_type       = typename engine_type::size_type;
+    using size_tuple      = typename engine_type::size_tuple;
+    using transpose_type  = matrix<tr_matrix_engine<engine_type>, OT>;
+    using hermitian_type  = conditional_t<is_complex_v<element_type>, matrix, transpose_type>;
 
-    using transpose_type = matrix<tr_matrix_engine<engine_type>, OT>;
-    using hermitian_type = conditional_t<is_complex_v<element_type>, matrix, transpose_type>;
+    using is_column_major = typename engine_type::is_column_major;
+    using is_dense        = typename engine_type::is_dense;
+    using is_rectangular  = typename engine_type::is_rectangular;
+    using is_row_major    = typename engine_type::is_row_major;
 
     static_assert(is_matrix_element_v<element_type>);
 
