@@ -571,6 +571,11 @@ void t104()
     ASSERT_A_ADD_B_EQ_C(fsm_new_num_tst_tr,  fsm_double_tst_tr,   fsm_new_num_tst);
     ASSERT_A_ADD_B_EQ_C(fsm_new_num_tst_tr,  fsm_new_num_tst_tr,  fsm_new_num_tst);
 
+    ASSERT_A_ADD_B_EQ_C(fsm_double_tst,   drm_double_tst,   drm_double_tst);
+    ASSERT_A_ADD_B_EQ_C(drm_double_tst,   fsm_new_num_tst,  drm_new_num_tst);
+    ASSERT_A_ADD_B_EQ_C(drm_new_num_tst,  fsm_double_tst,   drm_new_num_tst);
+    ASSERT_A_ADD_B_EQ_C(fsm_new_num_tst,  drm_new_num_tst,  drm_new_num_tst);
+
     using fsm_double_tst_34 = STD_LA::matrix<fs_matrix_engine_tst<double, 3, 4>, test_add_op_traits_tst>;
 
     ASSERT_A_ADD_B_EQ_C(fsm_double_tst,     fsm_double_tst,     fsm_double_tst);

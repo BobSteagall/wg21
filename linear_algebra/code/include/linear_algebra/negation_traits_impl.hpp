@@ -6,7 +6,8 @@ namespace STD_LA {
 //                         **** NEGATION TRAITS FUNCTION IMPLEMENTATION ****
 //==================================================================================================
 //
-template<class OT, class ET1, class OT1> inline auto
+template<class OT, class ET1, class OT1> 
+inline auto
 matrix_negation_traits<OT, vector<ET1, OT1>>::negate(vector<ET1, OT1> const& v1) -> result_type
 {
     PrintOperandTypes<result_type>("negation_traits", v1);
@@ -15,7 +16,8 @@ matrix_negation_traits<OT, vector<ET1, OT1>>::negate(vector<ET1, OT1> const& v1)
 
 //------
 //
-template<class OT, class ET1, class OT1> inline auto
+template<class OT, class ET1, class OT1> 
+inline auto
 matrix_negation_traits<OT, matrix<ET1, OT1>>::negate(matrix<ET1, OT1> const& m1) -> result_type
 {
     PrintOperandTypes<result_type>("negation_traits", m1);
