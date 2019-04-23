@@ -29,14 +29,15 @@
 #include "linear_algebra/forward_declarations.hpp"
 #include "linear_algebra/number_traits.hpp"
 
-#include "linear_algebra/engine_traits.hpp"
 #include "linear_algebra/dynamic_engines.hpp"
 #include "linear_algebra/fixed_size_engines.hpp"
 #include "linear_algebra/view_based_engines.hpp"
+#include "linear_algebra/engine_traits.hpp"
 #include "linear_algebra/vector.hpp"
 #include "linear_algebra/matrix.hpp"
 #include "linear_algebra/library_aliases.hpp"
 
+#include "linear_algebra/arithmetic_traits.hpp"
 #include "linear_algebra/addition_traits.hpp"
 #include "linear_algebra/addition_traits_impl.hpp"
 #include "linear_algebra/subtraction_traits.hpp"
