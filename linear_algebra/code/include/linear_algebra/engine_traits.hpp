@@ -1,3 +1,10 @@
+//==================================================================================================
+//  File:       engine_traits.hpp
+//
+//  Summary:    This header defines several private traits types, used by the vector and matrix
+//              class templates, that report properties of an engine.
+//==================================================================================================
+//
 #ifndef LINEAR_ALGEBRA_ENGINE_TRAITS_HPP_DEFINED
 #define LINEAR_ALGEBRA_ENGINE_TRAITS_HPP_DEFINED
 

@@ -1,3 +1,19 @@
+//==================================================================================================
+//  File:       addition_traits.hpp
+//
+//  Summary:    This header defines several private and public traits types that are used to
+//              implement the binary addition operator.  This is a somewhat long file, divided
+//              into two main sections, each with three sub-sections:
+//                  1. Private traits definitions that:
+//                      A. determine the element promotion traits to be used for addition
+//                      B. determine the engine promotion traits to be used for addition
+//                      C. determine the arithmetic traits to be used to perform addition
+//                  2. Public traits definitions that:
+//                      A. perform element promotion for addition
+//                      B. perform engine promotion for addition
+//                      C. perform the actual act of addition
+//==================================================================================================
+//
 #ifndef LINEAR_ALGEBRA_ADDITION_TRAITS_HPP_DEFINED
 #define LINEAR_ALGEBRA_ADDITION_TRAITS_HPP_DEFINED
 
@@ -373,8 +389,8 @@ struct matrix_addition_engine_traits<OT, fs_vector_engine<T1, N1>, fs_vector_eng
 //- dr_matrix_engine + dr_matrix_engine.
 //
 template<class OT, class T1, class A1, class T2, class A2>
-struct matrix_addition_engine_traits<OT, 
-                                     dr_matrix_engine<T1, A1>, 
+struct matrix_addition_engine_traits<OT,
+                                     dr_matrix_engine<T1, A1>,
                                      dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_addition_element_t<OT, T1, T2>;
@@ -383,8 +399,8 @@ struct matrix_addition_engine_traits<OT,
 };
 
 template<class OT, class T1, class A1, class T2, class A2>
-struct matrix_addition_engine_traits<OT, 
-                                     dr_matrix_engine<T1, A1>, 
+struct matrix_addition_engine_traits<OT,
+                                     dr_matrix_engine<T1, A1>,
                                      tr_matrix_engine<dr_matrix_engine<T2, A2>>>
 {
     using element_type = matrix_addition_element_t<OT, T1, T2>;
@@ -393,8 +409,8 @@ struct matrix_addition_engine_traits<OT,
 };
 
 template<class OT, class T1, class A1, class T2, class A2>
-struct matrix_addition_engine_traits<OT, 
-                                     tr_matrix_engine<dr_matrix_engine<T1, A1>>, 
+struct matrix_addition_engine_traits<OT,
+                                     tr_matrix_engine<dr_matrix_engine<T1, A1>>,
                                      dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_addition_element_t<OT, T1, T2>;
@@ -403,8 +419,8 @@ struct matrix_addition_engine_traits<OT,
 };
 
 template<class OT, class T1, class A1, class T2, class A2>
-struct matrix_addition_engine_traits<OT, 
-                                     tr_matrix_engine<dr_matrix_engine<T1, A1>>, 
+struct matrix_addition_engine_traits<OT,
+                                     tr_matrix_engine<dr_matrix_engine<T1, A1>>,
                                      tr_matrix_engine<dr_matrix_engine<T2, A2>>>
 {
     using element_type = matrix_addition_element_t<OT, T1, T2>;
@@ -416,8 +432,8 @@ struct matrix_addition_engine_traits<OT,
 //- dr_matrix_engine + fs_matrix_engine.
 //
 template<class OT, class T1, class A1, class T2, int32_t R2, int32_t C2>
-struct matrix_addition_engine_traits<OT, 
-                                     dr_matrix_engine<T1, A1>, 
+struct matrix_addition_engine_traits<OT,
+                                     dr_matrix_engine<T1, A1>,
                                      fs_matrix_engine<T2, R2, C2>>
 {
     using element_type = matrix_addition_element_t<OT, T1, T2>;
@@ -426,8 +442,8 @@ struct matrix_addition_engine_traits<OT,
 };
 
 template<class OT, class T1, class A1, class T2, int32_t R2, int32_t C2>
-struct matrix_addition_engine_traits<OT, 
-                                     dr_matrix_engine<T1, A1>, 
+struct matrix_addition_engine_traits<OT,
+                                     dr_matrix_engine<T1, A1>,
                                      tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     using element_type = matrix_addition_element_t<OT, T1, T2>;
@@ -436,8 +452,8 @@ struct matrix_addition_engine_traits<OT,
 };
 
 template<class OT, class T1, class A1, class T2, int32_t R2, int32_t C2>
-struct matrix_addition_engine_traits<OT, 
-                                     tr_matrix_engine<dr_matrix_engine<T1, A1>>, 
+struct matrix_addition_engine_traits<OT,
+                                     tr_matrix_engine<dr_matrix_engine<T1, A1>>,
                                      fs_matrix_engine<T2, R2, C2>>
 {
     using element_type = matrix_addition_element_t<OT, T1, T2>;
@@ -446,8 +462,8 @@ struct matrix_addition_engine_traits<OT,
 };
 
 template<class OT, class T1, class A1, class T2, int32_t R2, int32_t C2>
-struct matrix_addition_engine_traits<OT, 
-                                     tr_matrix_engine<dr_matrix_engine<T1, A1>>, 
+struct matrix_addition_engine_traits<OT,
+                                     tr_matrix_engine<dr_matrix_engine<T1, A1>>,
                                      tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     using element_type = matrix_addition_element_t<OT, T1, T2>;
@@ -459,8 +475,8 @@ struct matrix_addition_engine_traits<OT,
 //- fs_matrix_engine + dr_matrix_engine.
 //
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, class A2>
-struct matrix_addition_engine_traits<OT, 
-                                     fs_matrix_engine<T1, R1, C1>, 
+struct matrix_addition_engine_traits<OT,
+                                     fs_matrix_engine<T1, R1, C1>,
                                      dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_addition_element_t<OT, T1, T2>;
@@ -469,8 +485,8 @@ struct matrix_addition_engine_traits<OT,
 };
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, class A2>
-struct matrix_addition_engine_traits<OT, 
-                                     fs_matrix_engine<T1, R1, C1>, 
+struct matrix_addition_engine_traits<OT,
+                                     fs_matrix_engine<T1, R1, C1>,
                                      tr_matrix_engine<dr_matrix_engine<T2, A2>>>
 {
     using element_type = matrix_addition_element_t<OT, T1, T2>;
@@ -479,8 +495,8 @@ struct matrix_addition_engine_traits<OT,
 };
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, class A2>
-struct matrix_addition_engine_traits<OT, 
-                                     tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>, 
+struct matrix_addition_engine_traits<OT,
+                                     tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
                                      dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_addition_element_t<OT, T1, T2>;
@@ -489,8 +505,8 @@ struct matrix_addition_engine_traits<OT,
 };
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, class A2>
-struct matrix_addition_engine_traits<OT, 
-                                     tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>, 
+struct matrix_addition_engine_traits<OT,
+                                     tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
                                      tr_matrix_engine<dr_matrix_engine<T2, A2>>>
 {
     using element_type = matrix_addition_element_t<OT, T1, T2>;
@@ -502,8 +518,8 @@ struct matrix_addition_engine_traits<OT,
 //- fs_matrix_engine + fs_matrix_engine.
 //
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
-struct matrix_addition_engine_traits<OT, 
-                                     fs_matrix_engine<T1, R1, C1>, 
+struct matrix_addition_engine_traits<OT,
+                                     fs_matrix_engine<T1, R1, C1>,
                                      fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == R2);

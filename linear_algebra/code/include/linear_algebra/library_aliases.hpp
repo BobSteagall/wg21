@@ -1,3 +1,10 @@
+//==================================================================================================
+//  File:       library_aliases.hpp
+//
+//  Summary:    This header defines several public type aliases, intended as a convenience for
+//              the user.
+//==================================================================================================
+//
 #ifndef LINEAR_ALGEBRA_LIBRARY_ALIASES_HPP_DEFINED
 #define LINEAR_ALGEBRA_LIBRARY_ALIASES_HPP_DEFINED
 

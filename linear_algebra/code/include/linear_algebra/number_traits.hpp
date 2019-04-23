@@ -1,3 +1,11 @@
+//==================================================================================================
+//  File:       number_traits.hpp
+//
+//  Summary:    This header defines several public traits types for reporting the properties of
+//              numeric types.  It also provides the primary template for the number_traits
+//              customization point, intended to be specialize-able by users.
+//==================================================================================================
+//
 #ifndef LINEAR_ALGEBRA_NUMBER_TRAITS_HPP_DEFINED
 #define LINEAR_ALGEBRA_NUMBER_TRAITS_HPP_DEFINED
 
@@ -110,6 +118,61 @@ struct is_matrix_element : public bool_constant<is_arithmetic_v<T> || is_field_v
 
 template<class T>
 constexpr bool  is_matrix_element_v = is_matrix_element<T>::value;
+
+#if 0
+//--------------------------------------------------------------------------------------------------
+//- Unfortunately, in C++17 complex<T> only permits arithmetical expressions between
+//  homogeneous element types: for example, expressions like complex<float>*complex<float>
+//  and float*complex<float> are permitted, but double*complex<float> is not.  This macro
+//  enforces this homogeneity in the traits types below.  Hopefully complex<T> will
+//  support heterogeneous expressions at some point in the near future.
+//--------------------------------------------------------------------------------------------------
+//
+#define ENFORCE_COMPLEX_OPERAND_HOMOGENEITY
+
+#ifdef ENFORCE_COMPLEX_OPERAND_HOMOGENEITY
+    #define ASSERT_COMPLEX_OPERAND_HOMOGENEITY(T1,T2)   static_assert(is_same_v<T1, T2>)
+#else
+    #define ASSERT_COMPLEX_OPERAND_HOMOGENEITY(T1,T2)
+#endif
+
+//--------------------------------------------------------------------------------------------------
+//- Traits type matrix_element_promotion<T1,T2> to perform element type promotion for arithmetical
+//  expressions, using the helper from above.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T1, class T2>
+struct matrix_element_promotion
+{
+    using type = detail::matrix_element_promotion_helper_t<T1, T2>;
+};
+
+template<class T1, class T2>
+struct matrix_element_promotion<T1, complex<T2>>
+{
+    ASSERT_COMPLEX_OPERAND_HOMOGENEITY(T1, T2);
+    using type = complex<detail::matrix_element_promotion_helper_t<T1, T2>>;
+};
+
+template<class T1, class T2>
+struct matrix_element_promotion<complex<T1>, T2>
+{
+    ASSERT_COMPLEX_OPERAND_HOMOGENEITY(T1, T2);
+    using type = complex<detail::matrix_element_promotion_helper_t<T1, T2>>;
+};
+
+template<class T1, class T2>
+struct matrix_element_promotion<complex<T1>, complex<T2>>
+{
+    ASSERT_COMPLEX_OPERAND_HOMOGENEITY(T1, T2);
+    using type = complex<detail::matrix_element_promotion_helper_t<T1, T2>>;
+};
+
+template<class T1, class T2>
+using matrix_element_promotion_t = typename matrix_element_promotion<T1, T2>::type;
+
+#undef ASSERT_COMPLEX_OPERAND_HOMOGENEITY
+#endif
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_NUMBER_TRAITS_HPP_DEFINED

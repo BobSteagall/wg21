@@ -1,10 +1,18 @@
+//==================================================================================================
+//  File:       fixed_size_engines.hpp
+//
+//  Summary:    This header defines fixed-size vector and matrix engines.  In this context,
+//              fixed-size means that the row and column extents of such objects are known at
+//              compile-time, and thus the engines can be made constexpr.
+//==================================================================================================
+//
 #ifndef LINEAR_ALGEBRA_FIXED_SIZE_ENGINES_HPP_DEFINED
 #define LINEAR_ALGEBRA_FIXED_SIZE_ENGINES_HPP_DEFINED
 
 namespace STD_LA {
-//=================================================================================================
+//==================================================================================================
 //  Fixed-size, fixed-capacity matrix engine.
-//=================================================================================================
+//==================================================================================================
 //
 template<class T, int32_t N>
 class fs_vector_engine
@@ -48,57 +56,57 @@ class fs_vector_engine
     T       ma_elems[N];      //- For exposition; data buffer
 };
 
-template<class T, int32_t N> inline 
+template<class T, int32_t N> inline
 constexpr T
 fs_vector_engine<T,N>::operator ()(index_type i) const
 {
     return ma_elems[i];
 }
 
-template<class T, int32_t N> inline 
+template<class T, int32_t N> inline
 constexpr T const*
 fs_vector_engine<T,N>::data() const noexcept
 {
     return &ma_elems[0];
 }
 
-template<class T, int32_t N> inline 
+template<class T, int32_t N> inline
 constexpr typename fs_vector_engine<T,N>::size_type
 fs_vector_engine<T,N>::capacity() const noexcept
 {
     return N;
 }
 
-template<class T, int32_t N> inline 
+template<class T, int32_t N> inline
 constexpr typename fs_vector_engine<T,N>::size_type
 fs_vector_engine<T,N>::elements() const noexcept
 {
     return N;
 }
 
-template<class T, int32_t N> inline 
+template<class T, int32_t N> inline
 constexpr T&
 fs_vector_engine<T,N>::operator ()(index_type i)
 {
     return ma_elems[i];
 }
 
-template<class T, int32_t N> inline 
+template<class T, int32_t N> inline
 constexpr T*
 fs_vector_engine<T,N>::data() noexcept
 {
     return &ma_elems[0];
 }
 
-template<class T, int32_t N> inline 
+template<class T, int32_t N> inline
 constexpr void
 fs_vector_engine<T,N>::swap_elements(index_type, index_type)
 {}
 
 
-//=================================================================================================
+//==================================================================================================
 //  Fixed-size, fixed-capacity matrix engine.
-//=================================================================================================
+//==================================================================================================
 //
 template<class T, int32_t R, int32_t C>
 class fs_matrix_engine
@@ -164,42 +172,42 @@ fs_matrix_engine<T,R,C>::data() const noexcept
     return &ma_elems[0];
 }
 
-template<class T, int32_t R, int32_t C> inline 
+template<class T, int32_t R, int32_t C> inline
 constexpr typename fs_matrix_engine<T,R,C>::size_type
 fs_matrix_engine<T,R,C>::columns() const noexcept
 {
     return C;
 }
 
-template<class T, int32_t R, int32_t C> inline 
+template<class T, int32_t R, int32_t C> inline
 constexpr typename fs_matrix_engine<T,R,C>::size_type
 fs_matrix_engine<T,R,C>::rows() const noexcept
 {
     return R;
 }
 
-template<class T, int32_t R, int32_t C> inline 
+template<class T, int32_t R, int32_t C> inline
 constexpr typename fs_matrix_engine<T,R,C>::size_tuple
 fs_matrix_engine<T,R,C>::size() const noexcept
 {
     return size_tuple(R, C);
 }
 
-template<class T, int32_t R, int32_t C> inline 
+template<class T, int32_t R, int32_t C> inline
 constexpr typename fs_matrix_engine<T,R,C>::size_type
 fs_matrix_engine<T,R,C>::column_capacity() const noexcept
 {
     return C;
 }
 
-template<class T, int32_t R, int32_t C> inline 
+template<class T, int32_t R, int32_t C> inline
 constexpr typename fs_matrix_engine<T,R,C>::size_type
 fs_matrix_engine<T,R,C>::row_capacity() const noexcept
 {
     return R;
 }
 
-template<class T, int32_t R, int32_t C> inline 
+template<class T, int32_t R, int32_t C> inline
 constexpr typename fs_matrix_engine<T,R,C>::size_tuple
 fs_matrix_engine<T,R,C>::capacity() const noexcept
 {

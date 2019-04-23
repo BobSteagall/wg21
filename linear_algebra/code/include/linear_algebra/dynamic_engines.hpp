@@ -1,10 +1,18 @@
+//==================================================================================================
+//  File:       dynamic_engines.hpp
+//
+//  Summary:    This header defines dynamically-resizable vector and matrix engines.  In this
+//              context, dynamically-resizable means that the row and column extents of such
+//              objects are set at run-time, and thus unknown at compile-time.
+//==================================================================================================
+//
 #ifndef LINEAR_ALGEBRA_DYNAMIC_ENGINES_HPP_DEFINED
 #define LINEAR_ALGEBRA_DYNAMIC_ENGINES_HPP_DEFINED
 
 namespace STD_LA {
-//=================================================================================================
+//==================================================================================================
 //  Dynamically-resizable matrix engine.
-//=================================================================================================
+//==================================================================================================
 //
 template<class T, class AT>
 class dr_vector_engine
@@ -158,9 +166,9 @@ dr_vector_engine<T,AT>::swap_elements(index_type, index_type)
 {}
 
 
-//=================================================================================================
+//==================================================================================================
 //  Dynamically-resizable matrix engine.
-//=================================================================================================
+//==================================================================================================
 //
 template<class T, class AT>
 class dr_matrix_engine

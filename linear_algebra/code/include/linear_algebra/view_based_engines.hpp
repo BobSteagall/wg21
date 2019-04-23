@@ -1,11 +1,17 @@
+//==================================================================================================
+//  File:       view_based_engines.hpp
+//
+//  Summary:    This header defines engines that act as const views of other engines.
+//==================================================================================================
+//
 #ifndef LINEAR_ALGEBRA_VIEW_BASED_ENGINES_HPP_DEFINED
 #define LINEAR_ALGEBRA_VIEW_BASED_ENGINES_HPP_DEFINED
 
 namespace STD_LA {
-//=================================================================================================
+//==================================================================================================
 //  Matrix transpose engine, meant to act as an rvalue-ish "view" in expressions, in order to
 //  prevent unnecessary allocation and element copying.
-//=================================================================================================
+//==================================================================================================
 //
 template<class ET>
 class tr_matrix_engine
@@ -47,20 +53,20 @@ class tr_matrix_engine
     constexpr size_tuple    capacity() const noexcept;
 
   private:
-    engine_type* mp_other;   //- For exposition; pointer to actual engine
+    engine_type* mp_other;  //- For exposition; pointer to actual engine
 };
 
-template<class ET> inline constexpr 
+template<class ET> inline constexpr
 tr_matrix_engine<ET>::tr_matrix_engine()
 :   mp_other(nullptr)
 {}
 
-template<class ET> inline constexpr 
+template<class ET> inline constexpr
 tr_matrix_engine<ET>::tr_matrix_engine(engine_type const& eng)
 :   mp_other(&eng)
 {}
 
-template<class ET> inline constexpr 
+template<class ET> inline constexpr
 typename tr_matrix_engine<ET>::element_type
 tr_matrix_engine<ET>::operator ()(index_type i, index_type j) const
 {

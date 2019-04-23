@@ -1,3 +1,19 @@
+//==================================================================================================
+//  File:       negation_traits.hpp
+//
+//  Summary:    This header defines several private and public traits types that are used to
+//              implement the unary negation operator.  This is a somewhat long file, divided
+//              into two main sections, each with three sub-sections:
+//                  1. Private traits definitions that:
+//                      A. determine the element promotion traits to be used for negation
+//                      B. determine the engine promotion traits to be used for negation
+//                      C. determine the arithmetic traits to be used to perform negation
+//                  2. Public traits definitions that:
+//                      A. perform element promotion for negation
+//                      B. perform engine promotion for negation
+//                      C. perform the actual act of negation
+//==================================================================================================
+//
 #ifndef LINEAR_ALGEBRA_NEGATION_TRAITS_HPP_DEFINED
 #define LINEAR_ALGEBRA_NEGATION_TRAITS_HPP_DEFINED
 
