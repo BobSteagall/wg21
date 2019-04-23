@@ -17,10 +17,13 @@ matrix_addition_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>::add
 
     if constexpr (result_requires_resize(vr))
     {
-//        vr.resize(v1.elements());
+        vr.resize(v1.elements());
     }
 
-    return result_type();
+    transform(v1.data(), v1.data() + v1.elements(), v2.data(), vr.data(),
+              [](auto lhs, auto rhs) {return lhs + rhs; });
+
+    return vr;
 }
 
 //------
