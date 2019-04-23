@@ -25,7 +25,7 @@ template<class ET>
 constexpr bool  has_resizable_tag_v = ET::engine_category::value >= resizable_matrix_engine_tag::value;
 
 template<class ET1, class ET2>
-constexpr bool  is_resizable_engine_v = is_same_v<ET1, ET2>;// && ET1::is_resizable::value == true; //has_resizable_tag_v<ET1>;
+constexpr bool  is_resizable_engine_v = is_same_v<ET1, ET2>  &&  ET1::is_resizable::value;
 
 //------
 //

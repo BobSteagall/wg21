@@ -151,7 +151,7 @@ template<class ET, class OT> inline
 typename vector<ET,OT>::size_type
 vector<ET,OT>::elements() const noexcept
 {
-    return m_engine.rows();
+    return m_engine.elements();
 }
 
 template<class ET, class OT> inline

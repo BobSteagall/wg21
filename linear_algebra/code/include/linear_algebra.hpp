@@ -2,6 +2,7 @@
 #define LINEAR_ALGEBRA_HPP_DEFINED
 
 #include <cstdint>
+#include <algorithm>
 #include <complex>
 #include <memory>
 #include <tuple>
