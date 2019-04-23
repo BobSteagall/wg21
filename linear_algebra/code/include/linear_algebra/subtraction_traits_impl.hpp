@@ -19,7 +19,18 @@ matrix_subtraction_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>::subtract
 (vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2) -> result_type
 {
     PrintOperandTypes<result_type>("subtraction_traits", v1, v2);
-    return result_type();
+
+	result_type     vr;
+
+	if constexpr (result_requires_resize(vr))
+	{
+		vr.resize(v1.elements());
+	}
+
+	transform(v1.data(), v1.data() + v1.elements(), v2.data(), vr.data(),
+		[](auto lhs, auto rhs) {return lhs - rhs; });
+
+	return vr;
 }
 
 //------

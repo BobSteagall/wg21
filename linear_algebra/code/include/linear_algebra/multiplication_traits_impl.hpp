@@ -8,6 +8,8 @@
 #ifndef LINEAR_ALGEBRA_MULTIPLICATION_TRAITS_IMPL_HPP_DEFINED
 #define LINEAR_ALGEBRA_MULTIPLICATION_TRAITS_HPP_DEFINED
 
+#include <numeric>
+
 namespace STD_LA {
 //==================================================================================================
 //                   **** MULTIPLICATION TRAITS FUNCTION IMPLEMENTATION ****
@@ -21,7 +23,18 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, T2>::multiply
 (vector<ET1, OT1> const& v1, T2 const& s2) -> result_type
 {
     PrintOperandTypes<result_type>("multiplication_traits (v*s)", v1, s2);
-    return result_type();
+
+	result_type     vr;
+
+	if constexpr (result_requires_resize(vr))
+	{
+		vr.resize(v1.elements());
+	}
+
+	transform(v1.data(), v1.data() + v1.elements(), vr.data(),
+		[&](auto val) {return val * s2; });
+
+	return vr;
 }
 
 //---------------
@@ -33,7 +46,18 @@ matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>::multiply
 (T1 const& s1, vector<ET2, OT2> const& v2) -> result_type
 {
     PrintOperandTypes<result_type>("multiplication_traits (s*v)", s1, v2);
-    return result_type();
+
+	result_type     vr;
+
+	if constexpr (result_requires_resize(vr))
+	{
+		vr.resize(v2.elements());
+	}
+
+	transform(v2.data(), v2.data() + v2.elements(), vr.data(),
+		[&](auto val) {return val * s1; });
+
+	return vr;
 }
 
 //---------------
@@ -68,7 +92,7 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>::multiply
 (vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2) -> result_type
 {
     PrintOperandTypes<result_type>("multiplication_traits (v*v)", v1, v2);
-    return result_type();
+    return std::inner_product(v1.data(), v1.data() + v1.elements(), v2.data(), result_type(0));
 }
 
 //---------------
