@@ -96,8 +96,8 @@ class matrix
 
     //- Row and column operations.
     //
+    template<class ET2 = ET, detail::enable_if_mutable<ET, ET2> = true>
     void    swap_columns(index_type i, index_type j);
-
     template<class ET2 = ET, detail::enable_if_mutable<ET, ET2> = true>
     void    swap_rows(index_type i, index_type j);
 
@@ -291,7 +291,8 @@ matrix<ET,OT>::resize(size_type rows, size_type cols, size_type rowcap, size_typ
     m_engine.resize(rows, cols, rowcap, colcap);
 }
 
-template<class ET, class OT> inline
+template<class ET, class OT> 
+template<class ET2, detail::enable_if_mutable<ET, ET2>> inline
 void
 matrix<ET,OT>::swap_columns(index_type c1, index_type c2)
 {

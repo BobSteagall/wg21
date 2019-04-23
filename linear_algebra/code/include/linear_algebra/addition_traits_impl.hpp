@@ -12,6 +12,14 @@ matrix_addition_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>::add
 (vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2) -> result_type
 {
     PrintOperandTypes<result_type>("addition_traits", v1, v2);
+
+    result_type     vr;
+
+    if constexpr (result_requires_resize(vr))
+    {
+//        vr.resize(v1.elements());
+    }
+
     return result_type();
 }
 

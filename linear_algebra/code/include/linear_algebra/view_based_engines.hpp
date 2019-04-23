@@ -18,66 +18,49 @@ class tr_matrix_engine
     using size_type       = typename engine_type::size_type;
     using size_tuple      = typename engine_type::size_tuple;
 
+    using is_fixed_size   = typename engine_type::is_fixed_size;
+    using is_resizable    = false_type;
+
     using is_column_major = typename engine_type::is_row_major;
     using is_dense        = typename engine_type::is_dense;
     using is_rectangular  = typename engine_type::is_rectangular;
     using is_row_major    = typename engine_type::is_column_major;
 
   public:
-    tr_matrix_engine();
-    tr_matrix_engine(engine_type const& eng);
-    tr_matrix_engine(tr_matrix_engine&&);
-    tr_matrix_engine(tr_matrix_engine const&);
+    constexpr tr_matrix_engine();
+    constexpr tr_matrix_engine(engine_type const& eng);
+    constexpr tr_matrix_engine(tr_matrix_engine&&) = default;
+    constexpr tr_matrix_engine(tr_matrix_engine const&) = default;
 
-    tr_matrix_engine& operator =(tr_matrix_engine&&);
-    tr_matrix_engine& operator =(tr_matrix_engine const&);
+    constexpr tr_matrix_engine&     operator =(tr_matrix_engine&&) = default;
+    constexpr tr_matrix_engine&     operator =(tr_matrix_engine const&) = default;
 
-    element_type        operator ()(index_type i, index_type j) const;
-    element_type const* data() const noexcept;
+    constexpr element_type          operator ()(index_type i, index_type j) const;
+    constexpr element_type const*   data() const noexcept;
 
-    size_type   columns() const noexcept;
-    size_type   rows() const noexcept;
-    size_tuple  size() const noexcept;
+    constexpr size_type     columns() const noexcept;
+    constexpr size_type     rows() const noexcept;
+    constexpr size_tuple    size() const noexcept;
 
-    size_type   column_capacity() const noexcept;
-    size_type   row_capacity() const noexcept;
-    size_tuple  capacity() const noexcept;
+    constexpr size_type     column_capacity() const noexcept;
+    constexpr size_type     row_capacity() const noexcept;
+    constexpr size_tuple    capacity() const noexcept;
 
   private:
     engine_type* mp_other;   //- For exposition; pointer to actual engine
 };
 
-template<class ET> inline
+template<class ET> inline constexpr 
 tr_matrix_engine<ET>::tr_matrix_engine()
+:   mp_other(nullptr)
 {}
 
-template<class ET> inline
-tr_matrix_engine<ET>::tr_matrix_engine(engine_type const&)
+template<class ET> inline constexpr 
+tr_matrix_engine<ET>::tr_matrix_engine(engine_type const& eng)
+:   mp_other(&eng)
 {}
 
-template<class ET> inline
-tr_matrix_engine<ET>::tr_matrix_engine(tr_matrix_engine&&)
-{}
-
-template<class ET> inline
-tr_matrix_engine<ET>::tr_matrix_engine(tr_matrix_engine const&)
-{}
-
-template<class ET> inline
-tr_matrix_engine<ET>&
-tr_matrix_engine<ET>::operator =(tr_matrix_engine&&)
-{
-    return *this;
-}
-
-template<class ET> inline
-tr_matrix_engine<ET>&
-tr_matrix_engine<ET>::operator =(tr_matrix_engine const&)
-{
-    return *this;
-}
-
-template<class ET> inline
+template<class ET> inline constexpr 
 typename tr_matrix_engine<ET>::element_type
 tr_matrix_engine<ET>::operator ()(index_type i, index_type j) const
 {
@@ -85,49 +68,49 @@ tr_matrix_engine<ET>::operator ()(index_type i, index_type j) const
 }
 
 template<class ET> inline
-typename tr_matrix_engine<ET>::element_type const*
+constexpr typename tr_matrix_engine<ET>::element_type const*
 tr_matrix_engine<ET>::data() const noexcept
 {
     return mp_other->data();
 }
 
 template<class ET> inline
-typename tr_matrix_engine<ET>::size_type
+constexpr typename tr_matrix_engine<ET>::size_type
 tr_matrix_engine<ET>::columns() const noexcept
 {
     return mp_other->rows();
 }
 
 template<class ET> inline
-typename tr_matrix_engine<ET>::size_type
+constexpr typename tr_matrix_engine<ET>::size_type
 tr_matrix_engine<ET>::rows() const noexcept
 {
     return mp_other->columns();
 }
 
 template<class ET> inline
-typename tr_matrix_engine<ET>::size_tuple
+constexpr typename tr_matrix_engine<ET>::size_tuple
 tr_matrix_engine<ET>::size() const noexcept
 {
     return size_tuple(columns(), rows());
 }
 
 template<class ET> inline
-typename tr_matrix_engine<ET>::size_type
+constexpr typename tr_matrix_engine<ET>::size_type
 tr_matrix_engine<ET>::column_capacity() const noexcept
 {
     return mp_other->row_capacity();
 }
 
 template<class ET> inline
-typename tr_matrix_engine<ET>::size_type
+constexpr typename tr_matrix_engine<ET>::size_type
 tr_matrix_engine<ET>::row_capacity() const noexcept
 {
     return mp_other->column_capacity();
 }
 
 template<class ET> inline
-typename tr_matrix_engine<ET>::size_tuple
+constexpr typename tr_matrix_engine<ET>::size_tuple
 tr_matrix_engine<ET>::capacity() const noexcept
 {
     return size_tuple(column_capacity(), row_capacity());

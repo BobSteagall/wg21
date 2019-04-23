@@ -17,6 +17,9 @@ class vector
     using transpose_type = vector const&;
     using hermitian_type = conditional_t<is_complex_v<element_type>, vector, transpose_type>;
 
+    using is_fixed_size   = typename engine_type::is_fixed_size;
+    using is_resizable    = typename engine_type::is_resizable;
+
     using is_column_major = typename engine_type::is_column_major;
     using is_dense        = typename engine_type::is_dense;
     using is_rectangular  = typename engine_type::is_rectangular;
@@ -111,7 +114,8 @@ vector<ET,OT>::vector(size_type, size_type)
 {}
 
 template<class ET, class OT> inline
-vector<ET,OT>::vector(engine_type const&)
+vector<ET,OT>::vector(engine_type const& eng)
+:   m_engine(eng)
 {}
 
 template<class ET, class OT>

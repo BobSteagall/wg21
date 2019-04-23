@@ -326,7 +326,7 @@ struct matrix_multiplication_engine_traits<OT, tr_matrix_engine<ET1>, tr_matrix_
 //- ENGINE * SCALAR cases for vectors.
 //
 template<class OT, class T1, class A1, class T2>
-struct matrix_multiplication_engine_traits<OT, dr_vector_engine<T1, A1>, detail::scalar_tag<T2>>
+struct matrix_multiplication_engine_traits<OT, dr_vector_engine<T1, A1>, detail::element_tag<T2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
@@ -334,7 +334,7 @@ struct matrix_multiplication_engine_traits<OT, dr_vector_engine<T1, A1>, detail:
 };
 
 template<class OT, class T1, int32_t N1, class T2>
-struct matrix_multiplication_engine_traits<OT, fs_vector_engine<T1, N1>, detail::scalar_tag<T2>>
+struct matrix_multiplication_engine_traits<OT, fs_vector_engine<T1, N1>, detail::element_tag<T2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_vector_engine<element_type, N1>;
@@ -344,7 +344,7 @@ struct matrix_multiplication_engine_traits<OT, fs_vector_engine<T1, N1>, detail:
 //- SCALAR * ENGINE cases for vectors.
 //
 template<class OT, class T1, class T2, class A2>
-struct matrix_multiplication_engine_traits<OT, detail::scalar_tag<T1>, dr_vector_engine<T2, A2>>
+struct matrix_multiplication_engine_traits<OT, detail::element_tag<T1>, dr_vector_engine<T2, A2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
@@ -352,7 +352,7 @@ struct matrix_multiplication_engine_traits<OT, detail::scalar_tag<T1>, dr_vector
 };
 
 template<class OT, class T1, class T2, int32_t N2>
-struct matrix_multiplication_engine_traits<OT, detail::scalar_tag<T1>, fs_vector_engine<T2, N2>>
+struct matrix_multiplication_engine_traits<OT, detail::element_tag<T1>, fs_vector_engine<T2, N2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_vector_engine<element_type, N2>;
@@ -366,7 +366,7 @@ struct matrix_multiplication_engine_traits<OT, detail::scalar_tag<T1>, fs_vector
 template<class OT, class T1, class A1, class T2>
 struct matrix_multiplication_engine_traits<OT, 
                                            dr_matrix_engine<T1, A1>, 
-                                           detail::scalar_tag<T2>>
+                                           detail::element_tag<T2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
@@ -376,7 +376,7 @@ struct matrix_multiplication_engine_traits<OT,
 template<class OT, class T1, class A1, class T2>
 struct matrix_multiplication_engine_traits<OT, 
                                            tr_matrix_engine<dr_matrix_engine<T1, A1>>, 
-                                           detail::scalar_tag<T2>>
+                                           detail::element_tag<T2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
@@ -389,7 +389,7 @@ struct matrix_multiplication_engine_traits<OT,
 template<class OT, class T1, int32_t R1, int32_t C1, class T2>
 struct matrix_multiplication_engine_traits<OT,  
                                            fs_matrix_engine<T1, R1, C1>, 
-                                           detail::scalar_tag<T2>>
+                                           detail::element_tag<T2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C1>;
@@ -398,7 +398,7 @@ struct matrix_multiplication_engine_traits<OT,
 template<class OT, class T1, int32_t R1, int32_t C1, class T2>
 struct matrix_multiplication_engine_traits<OT,  
                                            tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>, 
-                                           detail::scalar_tag<T2>>
+                                           detail::element_tag<T2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, C1, R1>;
@@ -411,7 +411,7 @@ struct matrix_multiplication_engine_traits<OT,
 //
 template<class OT, class T1, class T2, class A2>
 struct matrix_multiplication_engine_traits<OT, 
-                                           detail::scalar_tag<T1>, 
+                                           detail::element_tag<T1>, 
                                            dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
@@ -421,7 +421,7 @@ struct matrix_multiplication_engine_traits<OT,
 
 template<class OT, class T1, class T2, class A2>
 struct matrix_multiplication_engine_traits<OT, 
-                                           detail::scalar_tag<T1>, 
+                                           detail::element_tag<T1>, 
                                            tr_matrix_engine<dr_matrix_engine<T2, A2>>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
@@ -434,7 +434,7 @@ struct matrix_multiplication_engine_traits<OT,
 //
 template<class OT, class T1, class T2, int32_t R2, int32_t C2>
 struct matrix_multiplication_engine_traits<OT, 
-                                           detail::scalar_tag<T1>, 
+                                           detail::element_tag<T1>, 
                                            fs_matrix_engine<T2, R2, C2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
@@ -443,7 +443,7 @@ struct matrix_multiplication_engine_traits<OT,
 
 template<class OT, class T1, class T2, int32_t R2, int32_t C2>
 struct matrix_multiplication_engine_traits<OT, 
-                                           detail::scalar_tag<T1>, 
+                                           detail::element_tag<T1>, 
                                            tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
@@ -837,7 +837,7 @@ using matrix_multiplication_traits_t = detail::multiplication_traits_t<OT, OP1, 
 template<class OTR, class ET1, class OT1, class T2>
 struct matrix_multiplication_traits<OTR, vector<ET1, OT1>, T2>
 {
-    using scalar_type = detail::scalar_tag<T2>;
+    using scalar_type = detail::element_tag<T2>;
     using engine_type = matrix_multiplication_engine_t<OTR, ET1, scalar_type>;
     using op_traits   = OTR;
     using result_type = vector<engine_type, op_traits>;
@@ -851,7 +851,7 @@ struct matrix_multiplication_traits<OTR, vector<ET1, OT1>, T2>
 template<class OTR, class T1, class ET2, class OT2>
 struct matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>
 {
-    using scalar_type = detail::scalar_tag<T1>;
+    using scalar_type = detail::element_tag<T1>;
     using engine_type = matrix_multiplication_engine_t<OTR, scalar_type, ET2>;
     using op_traits   = OTR;
     using result_type = vector<engine_type, op_traits>;
@@ -865,7 +865,7 @@ struct matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>
 template<class OTR, class ET1, class OT1, class T2>
 struct matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>
 {
-    using scalar_type = detail::scalar_tag<T2>;
+    using scalar_type = detail::element_tag<T2>;
     using engine_type = matrix_multiplication_engine_t<OTR, ET1, scalar_type>;
     using op_traits   = OTR;
     using result_type = matrix<engine_type, op_traits>;
@@ -879,7 +879,7 @@ struct matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>
 template<class OTR, class T1, class ET2, class OT2>
 struct matrix_multiplication_traits<OTR, T1, matrix<ET2, OT2>>
 {
-    using scalar_type = detail::scalar_tag<T1>;
+    using scalar_type = detail::element_tag<T1>;
     using engine_type = matrix_multiplication_engine_t<OTR, scalar_type, ET2>;
     using op_traits   = OTR;
     using result_type = matrix<engine_type, op_traits>;

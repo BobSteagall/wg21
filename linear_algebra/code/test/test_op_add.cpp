@@ -413,6 +413,10 @@ void t102()
     ASSERT_A_ADD_B_EQ_C(drv_new_num,  drv_float,       drv_new_num);
     ASSERT_A_ADD_B_EQ_C(drv_new_num,  drv_double,      drv_new_num);
     ASSERT_A_ADD_B_EQ_C(drv_new_num,  drv_new_num,     drv_new_num);
+
+    fsv_float   vf;
+
+    vf.resize(32);
 }
 
 
