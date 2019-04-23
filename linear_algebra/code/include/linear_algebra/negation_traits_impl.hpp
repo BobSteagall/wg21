@@ -18,7 +18,18 @@ inline auto
 matrix_negation_traits<OT, vector<ET1, OT1>>::negate(vector<ET1, OT1> const& v1) -> result_type
 {
     PrintOperandTypes<result_type>("negation_traits", v1);
-    return result_type();
+
+	result_type     vr;
+
+	if constexpr (result_requires_resize(vr))
+	{
+		vr.resize(v1.elements());
+	}
+
+	transform(v1.data(), v1.data() + v1.elements(), vr.data(),
+		[](auto val) {return val * -1; });
+
+	return vr;
 }
 
 //------
