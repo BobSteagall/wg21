@@ -1,3 +1,10 @@
+//==================================================================================================
+//  File:       linear_algebra.hpp
+//
+//  Summary:    This is a driver header for including all of the linear algebra facilities
+//              defined by the library.
+//==================================================================================================
+//
 #ifndef LINEAR_ALGEBRA_HPP_DEFINED
 #define LINEAR_ALGEBRA_HPP_DEFINED
 

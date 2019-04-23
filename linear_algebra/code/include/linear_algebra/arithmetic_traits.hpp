@@ -1,3 +1,10 @@
+//==================================================================================================
+//  File:       arithmetic_traits.hpp
+//
+//  Summary:    This header defines several private traits types that are used by the various
+//              arithmetic traits types, public and private, to implement arithmetic operators.
+//==================================================================================================
+//
 #ifndef MATRIX_ARITHMETIC_TRAITS_HPP_DEFINED
 #define MATRIX_ARITHMETIC_TRAITS_HPP_DEFINED
 
@@ -38,8 +45,8 @@ using rebind_alloc_t = typename allocator_traits<A1>::template rebind_alloc<T1>;
 //--------------------------------------------------------------------------------------------------
 //- Internally-used tag type to facilitate distinguishing elements from vectors/matrices.
 //
-template<class T>   
-struct element_tag 
+template<class T>
+struct element_tag
 {
     using engine_category = integral_constant<int, 0>;
 };

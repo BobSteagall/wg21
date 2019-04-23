@@ -1,3 +1,10 @@
+//==================================================================================================
+//  File:       debug_helpers.hpp
+//
+//  Summary:    This header contains miscellaneous functions and macros used in the development
+//              of the library; nothing in this header is intended for standardization.
+//==================================================================================================
+//
 #ifndef LINEAR_ALGEBRA_DEBUG_HELPERS_HPP_DEFINED
 #define LINEAR_ALGEBRA_DEBUG_HELPERS_HPP_DEFINED
 
@@ -14,7 +21,7 @@ USING_STD
 #define EXEC_OP_TEST_OUTPUT
 
 /*
-constexpr string_view type_name() [with T = vector<dr_vector_engine<double, allocator<double> >, default_matrix_operation_traits>; string_view = basic_string_view<char>]
+constexpr string_view type_name() [with T = vector<dr_vector_engine<double, allocator<double> >, matrix_operation_traits>; string_view = basic_string_view<char>]
  */
 
 template <class T>
@@ -30,7 +37,6 @@ type_name()                //- Thanks to Howard Hinnant for this!
     # if __cplusplus < 201402
         return string_view(p.data() + 36, p.size() - 36 - 1);
     #else
-//        return string_view(p.data() + 49, p.find(';', 49) - 49);   //- 49, 53
         auto    n1 = p.find('[', 0) + 10;
         auto    n2 = p.find(';', n1);
         return string_view(p.data() + n1, n2 - n1);
@@ -121,7 +127,7 @@ clean_type_name(basic_string<C,T,A> tname)
 #undef MATRIX_STRINGIFY
 #undef MATRIX_STRINGIFY_H
 
-inline void 
+inline void
 PrintFuncName(char const* name)
 {
     cout << "********************************************************************************\n";

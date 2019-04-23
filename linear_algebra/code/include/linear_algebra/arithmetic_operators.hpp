@@ -1,3 +1,10 @@
+//==================================================================================================
+//  File:       arithmetic_operators.hpp
+//
+//  Summary:    This header defines the overloaded operators that implement basic arithmetic
+//              operations on vectors and matrices.
+//==================================================================================================
+//
 #ifndef LINEAR_ALGEBRA_ARITHMETIC_OPERATORS_HPP_DEFINED
 #define LINEAR_ALGEBRA_ARITHMETIC_OPERATORS_HPP_DEFINED
 

@@ -1,3 +1,19 @@
+//==================================================================================================
+//  File:       multiplication_traits.hpp
+//
+//  Summary:    This header defines several private and public traits types that are used to
+//              implement the binary multiplication operator.  This is a somewhat long file,
+//              divided into two main sections, each with three sub-sections:
+//                  1. Private traits definitions that:
+//                      A. determine the element promotion traits to be used for multiplication
+//                      B. determine the engine promotion traits to be used for multiplication
+//                      C. determine the arithmetic traits to be used to perform multiplication
+//                  2. Public traits definitions that:
+//                      A. perform element promotion for multiplication
+//                      B. perform engine promotion for multiplication
+//                      C. perform the actual act of multiplication
+//==================================================================================================
+//
 #ifndef LINEAR_ALGEBRA_MULTIPLICATION_TRAITS_HPP_DEFINED
 #define LINEAR_ALGEBRA_MULTIPLICATION_TRAITS_HPP_DEFINED
 
@@ -289,8 +305,8 @@ using matrix_multiplication_engine_t = detail::engine_mul_type_t<OT, ET1, ET2>;
 template<class OT, class ET1, class ET2>
 struct matrix_multiplication_engine_traits
 {
-    static constexpr bool   
-    use_matrix_engine =  (detail::is_matrix_engine_v<ET1> && detail::is_matrix_engine_v<ET2>) 
+    static constexpr bool
+    use_matrix_engine =  (detail::is_matrix_engine_v<ET1> && detail::is_matrix_engine_v<ET2>)
                       || (detail::is_matrix_engine_v<ET1> && detail::is_scalar_engine_v<ET2>)
                       || (detail::is_scalar_engine_v<ET1> && detail::is_matrix_engine_v<ET2>);
 
@@ -364,8 +380,8 @@ struct matrix_multiplication_engine_traits<OT, detail::element_tag<T1>, fs_vecto
 //- dr_matrix_engine * scalar.
 //
 template<class OT, class T1, class A1, class T2>
-struct matrix_multiplication_engine_traits<OT, 
-                                           dr_matrix_engine<T1, A1>, 
+struct matrix_multiplication_engine_traits<OT,
+                                           dr_matrix_engine<T1, A1>,
                                            detail::element_tag<T2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
@@ -374,8 +390,8 @@ struct matrix_multiplication_engine_traits<OT,
 };
 
 template<class OT, class T1, class A1, class T2>
-struct matrix_multiplication_engine_traits<OT, 
-                                           tr_matrix_engine<dr_matrix_engine<T1, A1>>, 
+struct matrix_multiplication_engine_traits<OT,
+                                           tr_matrix_engine<dr_matrix_engine<T1, A1>>,
                                            detail::element_tag<T2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
@@ -387,8 +403,8 @@ struct matrix_multiplication_engine_traits<OT,
 //- fs_matrix_engine * scalar.
 //
 template<class OT, class T1, int32_t R1, int32_t C1, class T2>
-struct matrix_multiplication_engine_traits<OT,  
-                                           fs_matrix_engine<T1, R1, C1>, 
+struct matrix_multiplication_engine_traits<OT,
+                                           fs_matrix_engine<T1, R1, C1>,
                                            detail::element_tag<T2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
@@ -396,8 +412,8 @@ struct matrix_multiplication_engine_traits<OT,
 };
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2>
-struct matrix_multiplication_engine_traits<OT,  
-                                           tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>, 
+struct matrix_multiplication_engine_traits<OT,
+                                           tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
                                            detail::element_tag<T2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
@@ -410,8 +426,8 @@ struct matrix_multiplication_engine_traits<OT,
 //- scalar * dr_matrix_engine.
 //
 template<class OT, class T1, class T2, class A2>
-struct matrix_multiplication_engine_traits<OT, 
-                                           detail::element_tag<T1>, 
+struct matrix_multiplication_engine_traits<OT,
+                                           detail::element_tag<T1>,
                                            dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
@@ -420,8 +436,8 @@ struct matrix_multiplication_engine_traits<OT,
 };
 
 template<class OT, class T1, class T2, class A2>
-struct matrix_multiplication_engine_traits<OT, 
-                                           detail::element_tag<T1>, 
+struct matrix_multiplication_engine_traits<OT,
+                                           detail::element_tag<T1>,
                                            tr_matrix_engine<dr_matrix_engine<T2, A2>>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
@@ -433,8 +449,8 @@ struct matrix_multiplication_engine_traits<OT,
 //- scalar * fs_matrix_engine.
 //
 template<class OT, class T1, class T2, int32_t R2, int32_t C2>
-struct matrix_multiplication_engine_traits<OT, 
-                                           detail::element_tag<T1>, 
+struct matrix_multiplication_engine_traits<OT,
+                                           detail::element_tag<T1>,
                                            fs_matrix_engine<T2, R2, C2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
@@ -442,8 +458,8 @@ struct matrix_multiplication_engine_traits<OT,
 };
 
 template<class OT, class T1, class T2, int32_t R2, int32_t C2>
-struct matrix_multiplication_engine_traits<OT, 
-                                           detail::element_tag<T1>, 
+struct matrix_multiplication_engine_traits<OT,
+                                           detail::element_tag<T1>,
                                            tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;

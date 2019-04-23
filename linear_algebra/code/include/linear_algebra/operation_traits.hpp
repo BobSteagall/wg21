@@ -1,3 +1,19 @@
+//==================================================================================================
+//  File:       operation_traits.hpp
+//
+//  Summary:    This header defines library's default operation traits type and a customization
+//              point that is specialize-able by users.
+//
+//              Class matrix_operation_traits provides a set of nested type aliases which, in
+//              turn, provide for element promotion, engine promotion, and computation for the
+//              four basic arithmetic operations (addition, subtraction, negation, multiplication).
+//
+//              Class template matrix_operation_traits_selector is a customization point,
+//              which can be specialized by users, that is used by the arithmetic operators
+//              to select the operation traits to be used in computing that operation's result
+//              type.
+//==================================================================================================
+//
 #ifndef LINEAR_ALGEBRA_OPERATION_TRAITS_HPP_DEFINED
 #define LINEAR_ALGEBRA_OPERATION_TRAITS_HPP_DEFINED
 
@@ -8,11 +24,8 @@ namespace STD_LA {
 //  Traits type that refers to the four basic arithmetic traits types.
 //==================================================================================================
 //
-struct default_matrix_operation_traits
+struct matrix_operation_traits
 {
-    template<class T1, class T2>
-    using element_promotion_traits = matrix_element_promotion<T1, T2>;
-
     //- Default element promotion traits.
     //
     template<class T1>
@@ -59,7 +72,7 @@ struct default_matrix_operation_traits
 //==================================================================================================
 //                             **** OPERATION TRAITS SELECTION ****
 //==================================================================================================
-//  Traits type that selects the set of operator traits to use in an expression.
+//  Traits type that selects the set of operator traits that is used in an arithmetic expression.
 //==================================================================================================
 //
 template<class T1, class T2>
@@ -72,21 +85,21 @@ struct matrix_operation_traits_selector<T1, T1>
 };
 
 template<class T1>
-struct matrix_operation_traits_selector<T1, default_matrix_operation_traits>
+struct matrix_operation_traits_selector<T1, matrix_operation_traits>
 {
     using traits_type = T1;
 };
 
 template<class T1>
-struct matrix_operation_traits_selector<default_matrix_operation_traits, T1>
+struct matrix_operation_traits_selector<matrix_operation_traits, T1>
 {
     using traits_type = T1;
 };
 
 template<>
-struct matrix_operation_traits_selector<default_matrix_operation_traits, default_matrix_operation_traits>
+struct matrix_operation_traits_selector<matrix_operation_traits, matrix_operation_traits>
 {
-    using traits_type = default_matrix_operation_traits;
+    using traits_type = matrix_operation_traits;
 };
 
 template<class T1>

@@ -49,7 +49,7 @@ struct test_mul_op_traits_ord
 };
 
 
-//- This operation traits type is analogous to STD_LA::default_matrix_operation_traits, where its nested
+//- This operation traits type is analogous to STD_LA::matrix_operation_traits, where its nested
 //  traits types for element/engine/operation are template type aliases.
 //
 //  Suffix "_nta" means "nested type alias"
@@ -141,7 +141,7 @@ void t400()
     static_assert(!STD_LA::detail::has_element_mul_traits_v<STD_LA::default_matrix_operations, elem_t, elem_t>);
     static_assert(!STD_LA::detail::has_element_mul_traits_v<void, elem_t, elem_t>);
 
-    static_assert(STD_LA::detail::has_element_mul_traits_v<STD_LA::default_matrix_operation_traits, elem_t, elem_t>);
+    static_assert(STD_LA::detail::has_element_mul_traits_v<STD_LA::matrix_operation_traits, elem_t, elem_t>);
     static_assert(STD_LA::detail::has_element_mul_traits_v<test_mul_op_traits_ord, elem_t, elem_t>);
     static_assert(STD_LA::detail::has_element_mul_traits_v<test_mul_op_traits_nta, elem_t, elem_t>);
     static_assert(STD_LA::detail::has_element_mul_traits_v<test_mul_op_traits_nct, elem_t, elem_t>);
@@ -154,7 +154,7 @@ void t400()
     static_assert(!STD_LA::detail::has_engine_mul_traits_v<STD_LA::default_matrix_operations, eng_t, eng_t>);
     static_assert(!STD_LA::detail::has_engine_mul_traits_v<void, eng_t, eng_t>);
 
-    static_assert(STD_LA::detail::has_engine_mul_traits_v<STD_LA::default_matrix_operation_traits, eng_t, eng_t>);
+    static_assert(STD_LA::detail::has_engine_mul_traits_v<STD_LA::matrix_operation_traits, eng_t, eng_t>);
     static_assert(STD_LA::detail::has_engine_mul_traits_v<test_mul_op_traits_ord, eng_t, eng_t>);
     static_assert(STD_LA::detail::has_engine_mul_traits_v<test_mul_op_traits_nta, eng_t, eng_t>);
     static_assert(STD_LA::detail::has_engine_mul_traits_v<test_mul_op_traits_nct, eng_t, eng_t>);
@@ -167,7 +167,7 @@ void t400()
     static_assert(!STD_LA::detail::has_mul_traits_v<STD_LA::default_matrix_operations, opnd_t, opnd_t>);
     static_assert(!STD_LA::detail::has_mul_traits_v<void, opnd_t, opnd_t>);
 
-    static_assert(STD_LA::detail::has_mul_traits_v<STD_LA::default_matrix_operation_traits, opnd_t, opnd_t>);
+    static_assert(STD_LA::detail::has_mul_traits_v<STD_LA::matrix_operation_traits, opnd_t, opnd_t>);
     static_assert(STD_LA::detail::has_mul_traits_v<test_mul_op_traits_ord, opnd_t, opnd_t>);
     static_assert(STD_LA::detail::has_mul_traits_v<test_mul_op_traits_nta, opnd_t, opnd_t>);
     static_assert(STD_LA::detail::has_mul_traits_v<test_mul_op_traits_nct, opnd_t, opnd_t>);
