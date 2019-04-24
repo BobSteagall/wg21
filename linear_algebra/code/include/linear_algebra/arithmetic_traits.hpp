@@ -71,12 +71,19 @@ constexpr bool  engines_match_v = (is_vector_engine_v<ET1> && is_vector_engine_v
 
 template<class ET, class OT> inline
 constexpr bool
-result_requires_resize(vector<ET,OT> const&)
+result_requires_resize(vector<ET, OT> const&)
 {
-    return vector<ET, OT>::engine_type::is_resizable::value == true  &&
-           vector<ET, OT>::engine_type::is_fixed_size::value == false;
+	return vector<ET, OT>::engine_type::is_resizable::value == true &&
+		vector<ET, OT>::engine_type::is_fixed_size::value == false;
 }
 
+template<class ET, class OT> inline
+constexpr bool
+result_requires_resize(matrix<ET, OT> const&)
+{
+	return matrix<ET, OT>::engine_type::is_resizable::value == true &&
+		matrix<ET, OT>::engine_type::is_fixed_size::value == false;
+}
 
 template<class ET, class OT> inline
 constexpr bool
