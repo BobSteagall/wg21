@@ -29,15 +29,10 @@
 //#define STD_LA  std::math
 //#define USING_STD
 
-//- Some helpers
-//
-#include "linear_algebra/debug_helpers.hpp"
-
-//- OK, now include implementation headers.
+//- Implementation headers.
 //
 #include "linear_algebra/forward_declarations.hpp"
 #include "linear_algebra/number_traits.hpp"
-
 #include "linear_algebra/dynamic_engines.hpp"
 #include "linear_algebra/fixed_size_engines.hpp"
 #include "linear_algebra/view_based_engines.hpp"
@@ -46,6 +41,12 @@
 #include "linear_algebra/matrix.hpp"
 #include "linear_algebra/library_aliases.hpp"
 
+//- Some helpers for debugging/testing.  Not for production.
+//
+#include "linear_algebra/debug_helpers.hpp"
+
+//- Some more implementation headers.
+//
 #include "linear_algebra/arithmetic_traits.hpp"
 #include "linear_algebra/addition_traits.hpp"
 #include "linear_algebra/addition_traits_impl.hpp"

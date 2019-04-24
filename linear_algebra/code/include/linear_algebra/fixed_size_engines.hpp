@@ -60,7 +60,10 @@ template<class T, int32_t N> inline
 constexpr
 fs_vector_engine<T,N>::fs_vector_engine()
 {
-    for (auto& elem : ma_elems) elem = static_cast<T>(0);
+    if constexpr (is_arithmetic_v<T>)
+    {
+        for (auto& elem : ma_elems) elem = static_cast<T>(0);
+    }
 }
 
 template<class T, int32_t N> inline
@@ -160,6 +163,8 @@ class fs_matrix_engine
     constexpr T&    operator ()(index_type i, index_type j);
     constexpr T*    data() noexcept;
 
+    constexpr void  assign(fs_matrix_engine const& rhs);
+    constexpr void  swap(fs_matrix_engine& rhs);
     constexpr void  swap_columns(index_type j1, index_type j2);
     constexpr void  swap_rows(index_type i1, index_type i2);
 
@@ -171,7 +176,10 @@ template<class T, int32_t R, int32_t C> inline
 constexpr
 fs_matrix_engine<T,R,C>::fs_matrix_engine()
 {
-    for (auto& elem : ma_elems) elem = static_cast<T>(0);
+    if constexpr (is_arithmetic_v<T>)
+    {
+        for (auto& elem : ma_elems) elem = static_cast<T>(0);
+    }
 }
 
 template<class T, int32_t R, int32_t C> inline
@@ -242,6 +250,32 @@ constexpr T*
 fs_matrix_engine<T,R,C>::data() noexcept
 {
     return &ma_elems[0];
+}
+
+template<class T, int32_t R, int32_t C> inline
+constexpr void
+fs_matrix_engine<T,R,C>::assign(fs_matrix_engine const& rhs)
+{
+    if (&rhs != this)
+    {
+        for (index_type i = 0;  i < R*C;  ++i)
+        {
+            ma_elems[i] = rhs.ma_elems[i];
+        }
+    }
+}
+
+template<class T, int32_t R, int32_t C> inline
+constexpr void
+fs_matrix_engine<T,R,C>::swap(fs_matrix_engine& rhs)
+{
+    if (&rhs != this)
+    {
+        for (index_type i = 0;  i < R*C;  ++i)
+        {
+            std::swap(ma_elems[i], rhs.ma_elems[i]);
+        }
+    }
 }
 
 template<class T, int32_t R, int32_t C> inline

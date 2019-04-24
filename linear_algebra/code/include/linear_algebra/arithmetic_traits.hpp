@@ -70,10 +70,40 @@ constexpr bool  engines_match_v = (is_vector_engine_v<ET1> && is_vector_engine_v
 }       //- detail namespace
 
 template<class ET, class OT> inline
-constexpr bool  result_requires_resize(vector<ET,OT> const&)
+constexpr bool
+result_requires_resize(vector<ET,OT> const&)
 {
     return vector<ET, OT>::engine_type::is_resizable::value == true  &&
            vector<ET, OT>::engine_type::is_fixed_size::value == false;
+}
+
+
+template<class ET, class OT> inline
+constexpr bool
+is_fixed_size(vector<ET,OT> const&)
+{
+    return vector<ET,OT>::engine_type::is_fixed_size::value;
+}
+
+template<class ET, class OT> inline
+constexpr bool
+is_fixed_size(matrix<ET,OT> const&)
+{
+    return matrix<ET,OT>::engine_type::is_fixed_size::value;
+}
+
+template<class ET, class OT> inline
+constexpr bool
+is_resizable(vector<ET,OT> const&)
+{
+    return vector<ET,OT>::engine_type::is_resizable::value;
+}
+
+template<class ET, class OT> inline
+constexpr bool
+is_resizable(matrix<ET,OT> const&)
+{
+    return matrix<ET,OT>::engine_type::is_resizable::value;
 }
 
 }       //- STD_LA namespace

@@ -193,8 +193,8 @@ class dr_matrix_engine
   public:
     ~dr_matrix_engine();
     dr_matrix_engine();
-    dr_matrix_engine(dr_matrix_engine&&);
-    dr_matrix_engine(dr_matrix_engine const&);
+    dr_matrix_engine(dr_matrix_engine&& rhs);
+    dr_matrix_engine(dr_matrix_engine const& rhs);
     dr_matrix_engine(size_type rows, size_type cols);
     dr_matrix_engine(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 
@@ -215,12 +215,13 @@ class dr_matrix_engine
     T&      operator ()(size_type i, size_type j);
     T*      data() noexcept;
 
+    void    assign(dr_matrix_engine const& rhs);
     void    reserve(size_type rowcap, size_type colcap);
     void    resize(size_type rows, size_type cols);
     void    resize(size_type rows, size_type cols, size_type rowcap, size_type colcap);
-
-    void    swap_columns(index_type i, index_type j);
-    void    swap_rows(index_type i, index_type j);
+    void    swap(dr_matrix_engine& other) noexcept;
+    void    swap_columns(index_type c1, index_type c2);
+    void    swap_rows(index_type r1, index_type r2);
 
   private:
     using pointer = typename allocator_traits<AT>::pointer;
@@ -230,43 +231,71 @@ class dr_matrix_engine
     size_type   m_cols;
     size_type   m_rowcap;
     size_type   m_colcap;
+
+    void    alloc_new(size_type rows, size_type cols, size_type rowcap, size_type colcap);
+    void    check_capacities(size_type rowcap, size_type colcap);
+    void    check_sizes(size_type rows, size_type cols);
+    void    reshape(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 };
 
-template<class T, class AT> inline
+template<class T, class AT>
 dr_matrix_engine<T,AT>::~dr_matrix_engine()
-{}
-
-template<class T, class AT> inline
-dr_matrix_engine<T,AT>::dr_matrix_engine()
-{}
-
-template<class T, class AT> inline
-dr_matrix_engine<T,AT>::dr_matrix_engine(dr_matrix_engine&&)
-{}
-
-template<class T, class AT> inline
-dr_matrix_engine<T,AT>::dr_matrix_engine(dr_matrix_engine const&)
-{}
-
-template<class T, class AT> inline
-dr_matrix_engine<T,AT>::dr_matrix_engine(size_type, size_type)
-{}
-
-template<class T, class AT> inline
-dr_matrix_engine<T,AT>::dr_matrix_engine(size_type, size_type, size_type, size_type)
-{}
-
-template<class T, class AT> inline
-dr_matrix_engine<T,AT>&
-dr_matrix_engine<T,AT>::operator =(dr_matrix_engine&&)
 {
+    delete [] mp_elems;
+}
+
+template<class T, class AT>
+dr_matrix_engine<T,AT>::dr_matrix_engine()
+:   mp_elems(nullptr)
+{
+    alloc_new(1, 1, 1, 1);
+}
+
+template<class T, class AT>
+dr_matrix_engine<T,AT>::dr_matrix_engine(dr_matrix_engine&& rhs)
+:   mp_elems(nullptr)
+{
+    alloc_new(1, 1, 1, 1);
+    rhs.swap(*this);
+}
+
+template<class T, class AT>
+dr_matrix_engine<T,AT>::dr_matrix_engine(dr_matrix_engine const& rhs)
+:   mp_elems(nullptr)
+{
+    assign(rhs);
+}
+
+template<class T, class AT>
+dr_matrix_engine<T,AT>::dr_matrix_engine(size_type rows, size_type cols)
+:   mp_elems(nullptr)
+{
+    alloc_new(rows, cols, rows, cols);
+}
+
+template<class T, class AT>
+dr_matrix_engine<T,AT>::dr_matrix_engine
+(size_type rows, size_type cols, size_type rowcap, size_type colcap)
+:   mp_elems(nullptr)
+{
+    alloc_new(rows, cols, rowcap, colcap);
+}
+
+template<class T, class AT>
+dr_matrix_engine<T,AT>&
+dr_matrix_engine<T,AT>::operator =(dr_matrix_engine&& rhs)
+{
+    dr_matrix_engine    tmp;
+    tmp.swap(rhs);
+    tmp.swap(*this);
     return *this;
 }
 
-template<class T, class AT> inline
+template<class T, class AT>
 dr_matrix_engine<T,AT>&
-dr_matrix_engine<T,AT>::operator =(dr_matrix_engine const&)
+dr_matrix_engine<T,AT>::operator =(dr_matrix_engine const& rhs)
 {
+    assign(rhs);
     return *this;
 }
 
@@ -281,7 +310,7 @@ template<class T, class AT> inline
 T const*
 dr_matrix_engine<T,AT>::data() const noexcept
 {
-    return &mp_elems[0];
+    return static_cast<T const*>(&mp_elems[0]);
 }
 
 template<class T, class AT> inline
@@ -337,33 +366,145 @@ template<class T, class AT> inline
 T*
 dr_matrix_engine<T,AT>::data() noexcept
 {
-    return &mp_elems[0];
+    return static_cast<T*>(&mp_elems[0]);
 }
 
-template<class T, class AT> inline
+template<class T, class AT>
 void
-dr_matrix_engine<T,AT>::reserve(size_type, size_type)
-{}
+dr_matrix_engine<T,AT>::assign(dr_matrix_engine const& rhs)
+{
+    if (&rhs != this)
+    {
+        dr_matrix_engine    tmp(rhs.m_rows, rhs.m_cols, rhs.m_rowcap, rhs.m_colcap);
+        copy(rhs.data(), rhs.data() + rhs.m_rowcap*rhs.m_colcap, tmp.data());
+        tmp.swap(*this);
+    }
+}
 
-template<class T, class AT> inline
+template<class T, class AT>
 void
-dr_matrix_engine<T,AT>::resize(size_type, size_type)
-{}
+dr_matrix_engine<T,AT>::reserve(size_type rowcap, size_type colcap)
+{
+    reshape(m_rows, m_cols, rowcap, colcap);
+}
 
-template<class T, class AT> inline
+template<class T, class AT>
 void
-dr_matrix_engine<T,AT>::resize(size_type, size_type, size_type, size_type)
-{}
+dr_matrix_engine<T,AT>::resize(size_type rows, size_type cols)
+{
+    reshape(rows, cols, m_rowcap, m_colcap);
+}
 
-template<class T, class AT> inline
+template<class T, class AT>
 void
-dr_matrix_engine<T,AT>::swap_columns(index_type, index_type)
-{}
+dr_matrix_engine<T,AT>::resize(size_type rows, size_type cols, size_type rowcap, size_type colcap)
+{
+    reshape(rows, cols, rowcap, colcap);
+}
 
-template<class T, class AT> inline
+template<class T, class AT>
 void
-dr_matrix_engine<T,AT>::swap_rows(index_type, index_type)
-{}
+dr_matrix_engine<T,AT>::swap(dr_matrix_engine& other) noexcept
+{
+    if (&other != this)
+    {
+        std::swap(mp_elems, other.mp_elems);
+        std::swap(m_rows,   other.m_rows);
+        std::swap(m_cols,   other.m_cols);
+        std::swap(m_rowcap, other.m_rowcap);
+        std::swap(m_colcap, other.m_colcap);
+    }
+}
+
+template<class T, class AT>
+void
+dr_matrix_engine<T,AT>::swap_columns(index_type c1, index_type c2)
+{
+    if (c1 != c2)
+    {
+        for (index_type i = 0;  i < m_rows;  ++i)
+        {
+            std::swap(mp_elems[i*m_colcap + c1], mp_elems[i*m_colcap + c2]);
+        }
+    }
+}
+
+template<class T, class AT>
+void
+dr_matrix_engine<T,AT>::swap_rows(index_type r1, index_type r2)
+{
+    if (r1 != r2)
+    {
+        for (index_type j = 0;  j < m_cols;  ++j)
+        {
+            std::swap(mp_elems[r1*m_colcap + j], mp_elems[r2*m_colcap + j]);
+        }
+    }
+}
+
+template<class T, class AT>
+void
+dr_matrix_engine<T,AT>::alloc_new(size_type rows, size_type cols, size_type rowcap, size_type colcap)
+{
+    check_sizes(rows, cols);
+    check_capacities(rowcap, colcap);
+
+    m_rows   = rows;
+    m_cols   = cols;
+    m_rowcap = max(rows, rowcap);
+    m_colcap = max(cols, colcap);
+    mp_elems = new T[m_rowcap*m_colcap]();
+}
+
+template<class T, class AT>
+void
+dr_matrix_engine<T,AT>::check_capacities(size_type rowcap, size_type colcap)
+{
+    if (rowcap < 1  || colcap < 1)
+    {
+        throw runtime_error("invalid capacity");
+    }
+}
+
+template<class T, class AT>
+void
+dr_matrix_engine<T,AT>::check_sizes(size_type rows, size_type cols)
+{
+    if (rows < 1  || cols < 1)
+    {
+        throw runtime_error("invalid size");
+    }
+}
+
+template<class T, class AT>
+void
+dr_matrix_engine<T,AT>::reshape(size_type rows, size_type cols, size_type rowcap, size_type colcap)
+{
+    if (rows > m_rowcap  ||  cols > m_colcap   ||  rowcap > m_rowcap  ||  colcap > m_colcap)
+    {
+        dr_matrix_engine    tmp(rows, cols, rowcap, colcap);
+        index_type const    dst_rows = min(rows, m_rows);
+        index_type const    dst_cols = min(cols, m_cols);
+
+        for (index_type i = 0;  i < dst_rows;  ++i)
+        {
+            for (index_type j = 0;  j < dst_cols;  ++j)
+            {
+                tmp(i, j) = (*this)(i, j);
+            }
+        }
+        tmp.swap(*this);
+    }
+    else
+    {
+        check_sizes(rows, cols);
+        check_capacities(rowcap, colcap);
+        m_rows   = rows;
+        m_cols   = cols;
+        m_rowcap = max(m_rowcap, rowcap);
+        m_colcap = max(m_colcap, colcap);
+    }
+}
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_DYNAMIC_ENGINES_HPP_DEFINED

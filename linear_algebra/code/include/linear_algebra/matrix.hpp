@@ -8,6 +8,8 @@
 #ifndef LINEAR_ALGEBRA_MATRIX_HPP_DEFINED
 #define LINEAR_ALGEBRA_MATRIX_HPP_DEFINED
 
+#include <linear_algebra.hpp>
+
 namespace STD_LA {
 //=================================================================================================
 //  A matrix parametrized by an engine type and operator traits.
@@ -34,12 +36,12 @@ class matrix
 
   public:
     ~matrix() = default;
-    matrix();
+    matrix() = default;
     matrix(matrix&&) = default;
     matrix(matrix const&) = default;
-    template<class ET2, class OT2>
-    matrix(matrix<ET2, OT2> const& src);
 
+    template<class ET2, class OT2, class ET3 = ET, detail::enable_if_resizable<ET, ET3> = true>
+    matrix(matrix<ET2, OT2> const& src);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     matrix(size_tuple size);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
@@ -52,7 +54,7 @@ class matrix
 
     matrix&     operator =(matrix&&) = default;
     matrix&     operator =(matrix const&) = default;
-    template<class ET2, class OT2>
+    template<class ET2, class OT2, class ET3 = ET, detail::enable_if_resizable<ET, ET3> = true>
     matrix&     operator =(matrix<ET2, OT2> const& rhs);
 
     //- Const element access.
@@ -80,6 +82,13 @@ class matrix
     element_type&   operator ()(size_type i, size_type j);
     element_type*   data() noexcept;
 
+    //- Assignment.
+    //
+    void    assign(matrix&& rhs);
+    void    assign(matrix const& rhs);
+    template<class ET2, class OT2>
+    void    assign(matrix<ET2, OT2> const& rhs);
+
     //- Change capacity.
     //
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
@@ -101,8 +110,11 @@ class matrix
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     void    resize(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 
-    //- Row and column operations.
+    //- Swapping operations.
     //
+
+    template<class ET2 = ET, detail::enable_if_mutable<ET, ET2> = true>
+    void    swap(matrix& rhs);
     template<class ET2 = ET, detail::enable_if_mutable<ET, ET2> = true>
     void    swap_columns(index_type i, index_type j);
     template<class ET2 = ET, detail::enable_if_mutable<ET, ET2> = true>
@@ -116,46 +128,54 @@ class matrix
 
   private:
     matrix(engine_type const& eng);
+
+    template<class ET2, class OT2>
+    void    copy_elements(matrix<ET2, OT2> const& rhs);
 };
 
-template<class ET, class OT> inline
-matrix<ET,OT>::matrix()
-{}
-
 template<class ET, class OT>
-template<class ET2, class OT2> inline
-matrix<ET,OT>::matrix(matrix<ET2, OT2> const&)
-{}
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> inline
-matrix<ET,OT>::matrix(size_tuple)
-{}
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>>
-matrix<ET,OT>::matrix(size_type, size_type)
-{}
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> inline
-matrix<ET,OT>::matrix(size_tuple, size_tuple)
-{}
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>>
-matrix<ET,OT>::matrix(size_type, size_type, size_type, size_type)
-{}
-
-template<class ET, class OT> inline
-matrix<ET,OT>::matrix(engine_type const&)
-{}
-
-template<class ET, class OT>
-template<class ET2, class OT2> inline
-matrix<ET,OT>&
-matrix<ET,OT>::operator =(matrix<ET2, OT2> const&)
+template<class ET2, class OT2, class ET3, detail::enable_if_resizable<ET, ET3>>
+matrix<ET,OT>::matrix(matrix<ET2, OT2> const& rhs)
+:   m_engine()
 {
+    assign(rhs);
+}
+
+template<class ET, class OT>
+template<class ET2, detail::enable_if_resizable<ET, ET2>>
+matrix<ET,OT>::matrix(size_tuple size)
+:   m_engine(get<0>(size), get<1>(size))
+{}
+
+template<class ET, class OT>
+template<class ET2, detail::enable_if_resizable<ET, ET2>>
+matrix<ET,OT>::matrix(size_type rows, size_type cols)
+:   m_engine(rows, cols)
+{}
+
+template<class ET, class OT>
+template<class ET2, detail::enable_if_resizable<ET, ET2>>
+matrix<ET,OT>::matrix(size_tuple size, size_tuple cap)
+:   m_engine(get<0>(size), get<1>(size), get<0>(cap), get<1>(cap))
+{}
+
+template<class ET, class OT>
+template<class ET2, detail::enable_if_resizable<ET, ET2>>
+matrix<ET,OT>::matrix(size_type rows, size_type cols, size_type rowcap, size_type colcap)
+:   m_engine(rows, cols, rowcap, colcap)
+{}
+
+template<class ET, class OT>
+matrix<ET,OT>::matrix(engine_type const& eng)
+:   m_engine(eng)
+{}
+
+template<class ET, class OT>
+template<class ET2, class OT2, class ET3, detail::enable_if_resizable<ET, ET3>>
+matrix<ET,OT>&
+matrix<ET,OT>::operator =(matrix<ET2, OT2> const& rhs)
+{
+    assign(rhs);
     return *this;
 }
 
@@ -251,6 +271,38 @@ matrix<ET,OT>::data() noexcept
 }
 
 template<class ET, class OT>
+void
+matrix<ET,OT>::assign(matrix&& rhs)
+{
+    m_engine.assign(std::move(rhs.m_engine));
+}
+
+template<class ET, class OT>
+void
+matrix<ET,OT>::assign(matrix const& rhs)
+{
+    m_engine.assign(rhs.m_engine);
+}
+
+template<class ET, class OT>
+template<class ET2, class OT2>
+void
+matrix<ET,OT>::assign(matrix<ET2, OT2> const& rhs)
+{
+    if constexpr (detail::is_fixed_size_engine_v<engine_type>)
+    {
+        static_assert(size() == rhs.size());
+        copy_elements(rhs);
+    }
+    else
+    {
+        matrix  tmp(rhs.size());
+        tmp.copy_elements(rhs);
+        tmp.swap(*this);
+    }
+}
+
+template<class ET, class OT>
 template<class ET2, detail::enable_if_resizable<ET, ET2>> inline
 void
 matrix<ET,OT>::reserve(size_tuple cap)
@@ -301,6 +353,14 @@ matrix<ET,OT>::resize(size_type rows, size_type cols, size_type rowcap, size_typ
 template<class ET, class OT>
 template<class ET2, detail::enable_if_mutable<ET, ET2>> inline
 void
+matrix<ET,OT>::swap(matrix& rhs)
+{
+    m_engine.swap(rhs.m_engine);
+}
+
+template<class ET, class OT>
+template<class ET2, detail::enable_if_mutable<ET, ET2>> inline
+void
 matrix<ET,OT>::swap_columns(index_type c1, index_type c2)
 {
     m_engine.swap_columns(c1, c2);
@@ -312,6 +372,23 @@ void
 matrix<ET,OT>::swap_rows(index_type r1, index_type r2)
 {
     m_engine.swap_rows(r1, r2);
+}
+
+template<class ET, class OT>
+template<class ET2, class OT2> inline
+void
+matrix<ET,OT>::copy_elements(matrix<ET2,OT2> const& rhs)
+{
+    index_type const    nrows = rows();
+    index_type const    ncols = columns();
+
+    for (index_type i = 0;  i < nrows;  ++i)
+    {
+        for (index_type j = 0;  j < ncols;  ++j)
+        {
+            m_engine(i, j) = rhs.m_engine(i, j);
+        }
+    }
 }
 
 }       //- STD_LA namespace
