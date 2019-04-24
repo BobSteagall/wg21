@@ -67,7 +67,26 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>::multiply
 (matrix<ET1, OT1> const& m1, T2 const& s2) -> result_type
 {
     PrintOperandTypes<result_type>("multiplication_traits (m*s)", m1, s2);
-    return result_type();
+
+	result_type		mr;
+	const auto		rows = m1.rows();
+	const auto		columns = m1.columns();
+
+	if constexpr (result_requires_resize(mr))
+	{
+		mr.resize(rows, columns);
+		auto data = mr.data();
+		for (auto i = 0; i < columns; ++i)
+			for (auto j = 0; j < rows; ++j)
+				* data++ = m1(i, j) * s2;		// Safe because the resize means that mr capacity = size for rows and columns.
+	}
+	else
+	{
+		transform(m1.data(), m1.data() + (rows * columns), mr.data(),
+			[&](auto val) {return val * s2; });
+	}
+
+	return mr;
 }
 
 //---------------
@@ -79,7 +98,26 @@ matrix_multiplication_traits<OTR, T1, matrix<ET2, OT2>>::multiply
 (T1 const& s1, matrix<ET2, OT2> const& m2) -> result_type
 {
     PrintOperandTypes<result_type>("multiplication_traits (s*m)", s1, m2);
-    return result_type();
+
+	result_type		mr;
+	const auto		rows = m2.rows();
+	const auto		columns = m2.columns();
+
+	if constexpr (result_requires_resize(mr))
+	{
+		mr.resize(rows, columns);
+		auto data = mr.data();
+		for (auto i = 0; i < columns; ++i)
+			for (auto j = 0; j < rows; ++j)
+				* data++ = m2(i, j) * s1;		// Safe because the resize means that mr capacity = size for rows and columns.
+	}
+	else
+	{
+		transform(m2.data(), m2.data() + (rows * columns), mr.data(),
+			[&](auto val) {return val * s1; });
+	}
+
+	return mr;
 }
 
 //- vector*vector
