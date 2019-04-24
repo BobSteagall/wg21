@@ -118,5 +118,8 @@
     <ClCompile Include="test\test_op_mul.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
+    <ClCompile Include="test\test_obj_matrix.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -156,6 +156,8 @@ class fs_matrix_engine
     constexpr size_type     rows() const noexcept;
     constexpr size_tuple    size() const noexcept;
 
+    static constexpr size_tuple size2() { return size_tuple(R, C); }
+
     constexpr size_type     column_capacity() const noexcept;
     constexpr size_type     row_capacity() const noexcept;
     constexpr size_tuple    capacity() const noexcept;
