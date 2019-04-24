@@ -41,7 +41,26 @@ matrix_addition_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
 (matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2) -> result_type
 {
     PrintOperandTypes<result_type>("addition_traits", m1, m2);
-    return result_type();
+
+	result_type		mr;
+	const auto		rows = m1.rows();
+	const auto		columns = m1.columns();
+
+	if constexpr (result_requires_resize(mr))
+	{
+		mr.resize(rows, columns);
+		auto data = mr.data();
+		for (auto i = 0; i < columns; ++i)
+			for (auto j = 0; j < rows; ++j)
+				* data++ = m1(i, j) + m2(i, j);		// Safe because the resize means that mr capacity = size for rows and columns.
+	}
+	else
+	{
+		transform(m1.data(), m1.data() + (rows * columns), m2.data(), mr.data(),
+			[](auto lhs, auto rhs) {return lhs + rhs; });
+	}
+
+	return mr;
 }
 
 }       //- STD_LA namespace
