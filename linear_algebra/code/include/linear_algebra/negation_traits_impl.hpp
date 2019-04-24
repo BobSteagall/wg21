@@ -43,4 +43,4 @@ matrix_negation_traits<OT, matrix<ET1, OT1>>::negate(matrix<ET1, OT1> const& m1)
 }
 
 }       //- STD_LA namespace
-#endif  //- LINEAR_ALGEBRA_NEGATION_TRAITS_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_NEGATION_TRAITS_IMPL_HPP_DEFINED
