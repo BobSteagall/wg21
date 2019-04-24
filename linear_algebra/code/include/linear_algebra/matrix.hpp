@@ -54,7 +54,7 @@ class matrix
 
     matrix&     operator =(matrix&&) = default;
     matrix&     operator =(matrix const&) = default;
-    template<class ET2, class OT2, class ET3 = ET, detail::enable_if_resizable<ET, ET3> = true>
+    template<class ET2, class OT2>
     matrix&     operator =(matrix<ET2, OT2> const& rhs);
 
     //- Const element access.
@@ -171,7 +171,7 @@ matrix<ET,OT>::matrix(engine_type const& eng)
 {}
 
 template<class ET, class OT>
-template<class ET2, class OT2, class ET3, detail::enable_if_resizable<ET, ET3>>
+template<class ET2, class OT2>
 matrix<ET,OT>&
 matrix<ET,OT>::operator =(matrix<ET2, OT2> const& rhs)
 {
@@ -289,9 +289,21 @@ template<class ET2, class OT2>
 void
 matrix<ET,OT>::assign(matrix<ET2, OT2> const& rhs)
 {
+    using engine_type2 = typename matrix<ET2,OT>::engine_type;
+
     if constexpr (detail::is_fixed_size_engine_v<engine_type>)
     {
-        static_assert(size() == rhs.size());
+        if constexpr (detail::is_fixed_size_engine_v<ET2>)
+        {
+            static_assert(engine_type::size2() == engine_type2::size2());
+        }
+        else
+        {
+            if (size() != rhs.size())
+            {
+                throw runtime_error("size mismatch on assignment to fixed-size matrix");
+            }
+        }
         copy_elements(rhs);
     }
     else
@@ -379,14 +391,20 @@ template<class ET2, class OT2> inline
 void
 matrix<ET,OT>::copy_elements(matrix<ET2,OT2> const& rhs)
 {
-    index_type const    nrows = rows();
-    index_type const    ncols = columns();
+    using src_index_type = typename matrix<ET2, OT2>::index_type;
+    using dst_index_type = index_type;
 
-    for (index_type i = 0;  i < nrows;  ++i)
+    dst_index_type  di, dj;
+    src_index_type  si, sj;
+
+    dst_index_type const    nrows = rows();
+    dst_index_type const    ncols = columns();
+
+    for (di = 0, si = 0;  di < nrows;  ++di, ++si)
     {
-        for (index_type j = 0;  j < ncols;  ++j)
+        for (dj = 0, sj = 0;  dj < ncols;  ++dj, ++sj)
         {
-            m_engine(i, j) = rhs.m_engine(i, j);
+            m_engine(di, dj) = rhs.m_engine(si, sj);
         }
     }
 }
