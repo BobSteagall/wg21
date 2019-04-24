@@ -6,9 +6,7 @@
 //==================================================================================================
 //
 #ifndef LINEAR_ALGEBRA_MULTIPLICATION_TRAITS_IMPL_HPP_DEFINED
-#define LINEAR_ALGEBRA_MULTIPLICATION_TRAITS_HPP_DEFINED
-
-#include <numeric>
+#define LINEAR_ALGEBRA_MULTIPLICATION_TRAITS_IMPL_HPP_DEFINED
 
 namespace STD_LA {
 //==================================================================================================
@@ -132,4 +130,4 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::multiply
 }
 
 }       //- STD_LA namespace
-#endif  //- LINEAR_ALGEBRA_MULTIPLICATION_TRAITS_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_MULTIPLICATION_TRAITS_IMPL_HPP_DEFINED

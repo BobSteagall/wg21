@@ -34,7 +34,7 @@ class fs_vector_engine
     using is_row_major    = true_type;
 
   public:
-    constexpr fs_vector_engine() = default;
+    constexpr fs_vector_engine();
     constexpr fs_vector_engine(fs_vector_engine&&) = default;
     constexpr fs_vector_engine(fs_vector_engine const&) = default;
 
@@ -55,6 +55,13 @@ class fs_vector_engine
   private:
     T       ma_elems[N];      //- For exposition; data buffer
 };
+
+template<class T, int32_t N> inline
+constexpr
+fs_vector_engine<T,N>::fs_vector_engine()
+{
+    for (auto& elem : ma_elems) elem = static_cast<T>(0);
+}
 
 template<class T, int32_t N> inline
 constexpr T
@@ -100,8 +107,10 @@ fs_vector_engine<T,N>::data() noexcept
 
 template<class T, int32_t N> inline
 constexpr void
-fs_vector_engine<T,N>::swap_elements(index_type, index_type)
-{}
+fs_vector_engine<T,N>::swap_elements(index_type i, index_type j)
+{
+    std::swap(ma_elems[i], ma_elems[j]);
+}
 
 
 //==================================================================================================
@@ -130,7 +139,7 @@ class fs_matrix_engine
     using is_row_major    = true_type;
 
   public:
-    constexpr fs_matrix_engine() = default;
+    constexpr fs_matrix_engine();
     constexpr fs_matrix_engine(fs_matrix_engine&&) = default;
     constexpr fs_matrix_engine(fs_matrix_engine const&) = default;
 
@@ -151,12 +160,19 @@ class fs_matrix_engine
     constexpr T&    operator ()(index_type i, index_type j);
     constexpr T*    data() noexcept;
 
-    constexpr void  swap_columns(index_type i, index_type j);
-    constexpr void  swap_rows(index_type i, index_type j);
+    constexpr void  swap_columns(index_type j1, index_type j2);
+    constexpr void  swap_rows(index_type i1, index_type i2);
 
   private:
     T       ma_elems[R*C];      //- For exposition; data buffer
 };
+
+template<class T, int32_t R, int32_t C> inline
+constexpr
+fs_matrix_engine<T,R,C>::fs_matrix_engine()
+{
+    for (auto& elem : ma_elems) elem = static_cast<T>(0);
+}
 
 template<class T, int32_t R, int32_t C> inline
 constexpr T
@@ -230,13 +246,29 @@ fs_matrix_engine<T,R,C>::data() noexcept
 
 template<class T, int32_t R, int32_t C> inline
 constexpr void
-fs_matrix_engine<T,R,C>::swap_columns(index_type, index_type)
-{}
+fs_matrix_engine<T,R,C>::swap_columns(index_type j1, index_type j2)
+{
+    if (j1 != j2)
+    {
+        for (index_type i = 0;  i < R;  ++i)
+        {
+            std::swap(ma_elems[i*C + j1], ma_elems[i*C + j2]);
+        }
+    }
+}
 
 template<class T, int32_t R, int32_t C> inline
 constexpr void
-fs_matrix_engine<T,R,C>::swap_rows(index_type, index_type)
-{}
+fs_matrix_engine<T,R,C>::swap_rows(index_type i1, index_type i2)
+{
+    if (i1 != i2)
+    {
+        for (index_type j = 0;  j < C;  ++j)
+        {
+            std::swap(ma_elems[i1*C + j], ma_elems[i2*C + j]);
+        }
+    }
+}
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_FIXED_SIZE_ENGINES_HPP_DEFINED

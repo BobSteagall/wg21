@@ -162,8 +162,10 @@ dr_vector_engine<T,AT>::resize(size_type, size_type)
 
 template<class T, class AT> inline
 void
-dr_vector_engine<T,AT>::swap_elements(index_type, index_type)
-{}
+dr_vector_engine<T,AT>::swap_elements(index_type i, index_type j)
+{
+    std::swap(mp_elems[i], mp_elems[j]);
+}
 
 
 //==================================================================================================
@@ -340,12 +342,12 @@ dr_matrix_engine<T,AT>::data() noexcept
 
 template<class T, class AT> inline
 void
-dr_matrix_engine<T,AT>::reserve(index_type, index_type)
+dr_matrix_engine<T,AT>::reserve(size_type, size_type)
 {}
 
 template<class T, class AT> inline
 void
-dr_matrix_engine<T,AT>::resize(index_type, index_type)
+dr_matrix_engine<T,AT>::resize(size_type, size_type)
 {}
 
 template<class T, class AT> inline
