@@ -13,6 +13,7 @@
 //-------------------------------------------------------------------------------------------------
 //
 #include <iostream>
+#include <iomanip>
 #include <string_view>
 
 namespace STD_LA {
@@ -173,6 +174,34 @@ PrintOperandTypes(string const& loc, O1 const& o1, O2 const& o2)
 }
 
 #define PRINT_TYPE(T)       cout << #T << ": " << STD_LA::get_type_name<T>() << endl
+
+
+template<class ET, class OT>
+void
+Print(matrix<ET, OT> const& m, char const* pname = nullptr)
+{
+    using index_type = typename matrix<ET, OT>::index_type;
+
+    cout << endl << "matrix: " << ((pname) ? pname : "<anon>") << endl;
+    cout << "  size: " << m.rows() << "x" << m.columns() << endl;
+    cout << "  capy: " << m.row_capacity() << "x" << m.column_capacity() << endl;
+    cout << "  addr: " << m.data() << endl;
+    cout << "  -----" << endl;
+
+    for (index_type i = 0;  i < m.rows();  ++i)
+    {
+        cout << right << setw(4) << setprecision(3) << (double) m(i, 0);
+
+        for (index_type j = 1;  j < m.columns();  ++j)
+        {
+             cout << right << setw(6) << setprecision(3) << (double) m(i, j);
+        }
+
+        cout << endl;
+    }
+}
+
+#define PRINT_MATRIX(M)     Print(M, #M)
 
 }   //- STD_LA namespace
 

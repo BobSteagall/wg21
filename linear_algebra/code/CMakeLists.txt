@@ -33,6 +33,7 @@ set(Includes
 )
 
 set(Sources
+    test/test_obj_matrix.cpp
     test/test_op_add.cpp
     test/test_op_mul.cpp
     test/test_op_neg.cpp

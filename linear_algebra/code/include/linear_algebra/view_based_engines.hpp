@@ -52,6 +52,8 @@ class tr_matrix_engine
     constexpr size_type     row_capacity() const noexcept;
     constexpr size_tuple    capacity() const noexcept;
 
+    constexpr void  assign(tr_matrix_engine const& rhs);
+
   private:
     engine_type* mp_other;  //- For exposition; pointer to actual engine
 };
@@ -98,7 +100,7 @@ template<class ET> inline
 constexpr typename tr_matrix_engine<ET>::size_tuple
 tr_matrix_engine<ET>::size() const noexcept
 {
-    return size_tuple(columns(), rows());
+    return size_tuple(mp_other->columns(), mp_other->rows());
 }
 
 template<class ET> inline
@@ -119,7 +121,14 @@ template<class ET> inline
 constexpr typename tr_matrix_engine<ET>::size_tuple
 tr_matrix_engine<ET>::capacity() const noexcept
 {
-    return size_tuple(column_capacity(), row_capacity());
+    return size_tuple(mp_other->column_capacity(), mp_other->row_capacity());
+}
+
+template<class ET> inline
+constexpr void
+tr_matrix_engine<ET>::assign(tr_matrix_engine const& rhs)
+{
+    mp_other == rhs.mp_other;
 }
 
 }       //- STD_LA namespace
