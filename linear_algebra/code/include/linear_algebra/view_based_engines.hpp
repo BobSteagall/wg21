@@ -55,7 +55,7 @@ class tr_matrix_engine
     constexpr void  assign(tr_matrix_engine const& rhs);
 
   private:
-    engine_type* mp_other;  //- For exposition; pointer to actual engine
+    engine_type const*  mp_other;  //- For exposition; pointer to actual engine
 };
 
 template<class ET> inline constexpr

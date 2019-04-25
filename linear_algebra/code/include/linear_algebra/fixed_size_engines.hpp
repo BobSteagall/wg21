@@ -156,8 +156,6 @@ class fs_matrix_engine
     constexpr size_type     rows() const noexcept;
     constexpr size_tuple    size() const noexcept;
 
-    static constexpr size_tuple size2() { return size_tuple(R, C); }
-
     constexpr size_type     column_capacity() const noexcept;
     constexpr size_type     row_capacity() const noexcept;
     constexpr size_tuple    capacity() const noexcept;
@@ -177,6 +175,7 @@ class fs_matrix_engine
 template<class T, int32_t R, int32_t C> inline
 constexpr
 fs_matrix_engine<T,R,C>::fs_matrix_engine()
+:   ma_elems()
 {
     if constexpr (is_arithmetic_v<T>)
     {
