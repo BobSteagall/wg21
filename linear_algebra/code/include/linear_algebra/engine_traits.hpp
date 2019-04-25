@@ -40,10 +40,16 @@ template<class ET1, class ET2>
 using enable_if_resizable = enable_if_t<is_same_v<ET1, ET2> && is_resizable_engine_v<ET1>, bool>;
 
 
+//--------------------------------------------------------------------------------------------------
+//- Tests/facilites for fixed-size engines.
+//
 template<class ET>
 constexpr bool  is_fixed_size_engine_v = ET::is_fixed_size::value;
 
+template<class ET>
+constexpr auto  engine_size_v = ET().size();
 
 }       //- detail namespace
+
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_ENGINE_TRAITS_HPP_DEFINED

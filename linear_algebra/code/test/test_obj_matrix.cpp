@@ -1,4 +1,5 @@
 #include "linear_algebra.hpp"
+#include <array>
 
 using std::cout;
 using std::endl;
@@ -67,9 +68,19 @@ void t000()
     fm3 = m1;
     PRINT_MATRIX(fm3);
 
-    fsm_float_35    fm4;
-    fm3 = fm4;
-    PRINT_MATRIX(fm3);
+    PRINT_MATRIX(fm3.t());
+
+    fsm_double_35   fm4;
+    fsm_float_35    fm5;
+
+    PRINT_MATRIX(fm4);
+    FillMatrix(fm5);
+    PRINT_MATRIX(fm5);
+    fm4 = fm5;
+    PRINT_MATRIX(fm4);
+
+    //  fm4 = fm5.t();              fails on static_assert, as expected
+    //  fsm_double_36   fm6(fm4);   fails on static_assert, as expected
 }
 
 void

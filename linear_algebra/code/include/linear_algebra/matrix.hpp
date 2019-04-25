@@ -37,10 +37,10 @@ class matrix
   public:
     ~matrix() = default;
     matrix() = default;
-    matrix(matrix&&) = default;
+    matrix(matrix&&) noexcept = default;
     matrix(matrix const&) = default;
 
-    template<class ET2, class OT2, class ET3 = ET, detail::enable_if_resizable<ET, ET3> = true>
+    template<class ET2, class OT2>
     matrix(matrix<ET2, OT2> const& src);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     matrix(size_tuple size);
@@ -52,7 +52,7 @@ class matrix
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     matrix(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 
-    matrix&     operator =(matrix&&) = default;
+    matrix&     operator =(matrix&&) noexcept = default;
     matrix&     operator =(matrix const&) = default;
     template<class ET2, class OT2>
     matrix&     operator =(matrix<ET2, OT2> const& rhs);
@@ -66,7 +66,7 @@ class matrix
     //
     size_type   columns() const noexcept;
     size_type   rows() const noexcept;
-    size_tuple  size() const noexcept;
+    constexpr size_tuple    size() const noexcept;
 
     size_type   column_capacity() const noexcept;
     size_type   row_capacity() const noexcept;
@@ -87,7 +87,7 @@ class matrix
     void    assign(matrix&& rhs);
     void    assign(matrix const& rhs);
     template<class ET2, class OT2>
-    void    assign(matrix<ET2, OT2> const& rhs);
+    constexpr void  assign(matrix<ET2, OT2> const& rhs);
 
     //- Change capacity.
     //
@@ -129,12 +129,13 @@ class matrix
   private:
     matrix(engine_type const& eng);
 
+  public:
     template<class ET2, class OT2>
-    void    copy_elements(matrix<ET2, OT2> const& rhs);
+    constexpr void    copy_elements(matrix<ET2, OT2> const& rhs);
 };
 
 template<class ET, class OT>
-template<class ET2, class OT2, class ET3, detail::enable_if_resizable<ET, ET3>>
+template<class ET2, class OT2>
 matrix<ET,OT>::matrix(matrix<ET2, OT2> const& rhs)
 :   m_engine()
 {
@@ -208,7 +209,7 @@ matrix<ET,OT>::rows() const noexcept
 }
 
 template<class ET, class OT> inline
-typename matrix<ET,OT>::size_tuple
+constexpr typename matrix<ET,OT>::size_tuple
 matrix<ET,OT>::size() const noexcept
 {
     return size_tuple(m_engine.rows(), m_engine.columns());
@@ -286,16 +287,14 @@ matrix<ET,OT>::assign(matrix const& rhs)
 
 template<class ET, class OT>
 template<class ET2, class OT2>
-void
+constexpr void
 matrix<ET,OT>::assign(matrix<ET2, OT2> const& rhs)
 {
-    using engine_type2 = typename matrix<ET2,OT>::engine_type;
-
-    if constexpr (detail::is_fixed_size_engine_v<engine_type>)
+    if constexpr (detail::is_fixed_size_engine_v<ET>)
     {
         if constexpr (detail::is_fixed_size_engine_v<ET2>)
         {
-            static_assert(engine_type::size2() == engine_type2::size2());
+            static_assert(detail::engine_size_v<ET> == detail::engine_size_v<ET2>);
         }
         else
         {
@@ -387,8 +386,8 @@ matrix<ET,OT>::swap_rows(index_type r1, index_type r2)
 }
 
 template<class ET, class OT>
-template<class ET2, class OT2> inline
-void
+template<class ET2, class OT2>
+constexpr void
 matrix<ET,OT>::copy_elements(matrix<ET2,OT2> const& rhs)
 {
     using src_index_type = typename matrix<ET2, OT2>::index_type;
