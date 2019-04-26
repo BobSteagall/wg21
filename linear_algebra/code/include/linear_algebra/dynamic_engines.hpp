@@ -34,7 +34,7 @@ class dr_vector_engine
   public:
     ~dr_vector_engine();
     dr_vector_engine();
-    dr_vector_engine(dr_vector_engine&&);
+    dr_vector_engine(dr_vector_engine&&) noexcept;
     dr_vector_engine(dr_vector_engine const&);
     dr_vector_engine(size_type elems);
     dr_vector_engine(size_type elems, size_type elem_cap);
@@ -74,7 +74,7 @@ dr_vector_engine<T,AT>::dr_vector_engine()
 {}
 
 template<class T, class AT> inline
-dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine&&)
+dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine&&) noexcept
 {}
 
 template<class T, class AT> inline
