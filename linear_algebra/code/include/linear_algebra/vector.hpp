@@ -17,12 +17,16 @@ template<class ET, class OT>
 class vector
 {
   public:
-    using engine_type    = ET;
-    using element_type   = typename engine_type::element_type;
-    using index_type     = typename engine_type::index_type;
-    using size_type      = typename engine_type::size_type;
-    using transpose_type = vector const&;
-    using hermitian_type = conditional_t<is_complex_v<element_type>, vector, transpose_type>;
+    using engine_type     = ET;
+    using element_type    = typename engine_type::element_type;
+    using reference       = typename engine_type::reference;
+    using pointer         = typename engine_type::pointer;
+    using const_reference = typename engine_type::const_reference;
+    using const_pointer   = typename engine_type::const_pointer;
+    using index_type      = typename engine_type::index_type;
+    using size_type       = typename engine_type::size_type;
+    using transpose_type  = vector const&;
+    using hermitian_type  = conditional_t<is_complex_v<element_type>, vector, transpose_type>;
 
     using is_fixed_size   = typename engine_type::is_fixed_size;
     using is_resizable    = typename engine_type::is_resizable;
@@ -54,13 +58,13 @@ class vector
 
     //- Const element access.
     //
-    element_type        operator ()(index_type i) const;
-    element_type const* data() const noexcept;
+    const_reference     operator ()(index_type i) const;
+    const_pointer       data() const noexcept;
 
     //- Accessors.
     //
-    size_type       capacity() const noexcept;
-    size_type       elements() const noexcept;
+    size_type   capacity() const noexcept;
+    size_type   elements() const noexcept;
 
     //- Transpose and Hermitian.
     //
@@ -69,8 +73,8 @@ class vector
 
     //- Mutable element access.
     //
-    element_type&   operator ()(index_type i);
-    element_type*   data() noexcept;
+    reference   operator ()(index_type i);
+    pointer     data() noexcept;
 
     //- Change capacity.
     //
@@ -134,14 +138,14 @@ vector<ET,OT>::operator =(vector<ET2, OT2> const&)
 }
 
 template<class ET, class OT> inline
-typename vector<ET,OT>::element_type
+typename vector<ET,OT>::const_reference
 vector<ET,OT>::operator ()(index_type i) const
 {
     return m_engine(i);
 }
 
 template<class ET, class OT> inline
-typename vector<ET,OT>::element_type const*
+typename vector<ET,OT>::const_pointer
 vector<ET,OT>::data() const noexcept
 {
     return m_engine.data();
@@ -183,14 +187,14 @@ vector<ET,OT>::h() const
 }
 
 template<class ET, class OT> inline
-typename vector<ET,OT>::element_type&
+typename vector<ET,OT>::reference
 vector<ET,OT>::operator ()(index_type i)
 {
     return m_engine(i);
 }
 
 template<class ET, class OT> inline
-typename vector<ET,OT>::element_type*
+typename vector<ET,OT>::pointer
 vector<ET,OT>::data() noexcept
 {
     return m_engine.data();

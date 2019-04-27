@@ -20,6 +20,10 @@ class dr_vector_engine
   public:
     using engine_category = resizable_vector_engine_tag;
     using element_type    = T;
+    using reference       = T&;
+    using pointer         = typename allocator_traits<AT>::pointer;
+    using const_reference = T const&;
+    using const_pointer   = typename allocator_traits<AT>::const_pointer;
     using index_type      = ptrdiff_t;
     using size_type       = ptrdiff_t;
 
@@ -42,14 +46,14 @@ class dr_vector_engine
     dr_vector_engine& operator =(dr_vector_engine&&);
     dr_vector_engine& operator =(dr_vector_engine const&);
 
-    T           operator ()(index_type i) const;
-    T const*    data() const noexcept;
+    const_reference     operator ()(index_type i) const;
+    const_pointer       data() const noexcept;
 
     size_type   elements() const noexcept;
     size_type   capacity() const noexcept;
 
-    T&      operator ()(index_type i);
-    T*      data() noexcept;
+    reference   operator ()(index_type i);
+    pointer     data() noexcept;
 
     void    reserve(size_type elem_cap);
     void    resize(size_type elems);
@@ -104,14 +108,14 @@ dr_vector_engine<T,AT>::operator =(dr_vector_engine const&)
 }
 
 template<class T, class AT> inline
-T
+typename dr_vector_engine<T,AT>::const_reference
 dr_vector_engine<T,AT>::operator ()(index_type i) const
 {
     return mp_elems[i];
 }
 
 template<class T, class AT> inline
-T const*
+typename dr_vector_engine<T,AT>::const_pointer
 dr_vector_engine<T,AT>::data() const noexcept
 {
     return &mp_elems[0];
@@ -132,14 +136,14 @@ dr_vector_engine<T,AT>::capacity() const noexcept
 }
 
 template<class T, class AT> inline
-T&
+typename dr_vector_engine<T,AT>::reference
 dr_vector_engine<T,AT>::operator ()(index_type i)
 {
     return mp_elems[i];
 }
 
 template<class T, class AT> inline
-T*
+typename dr_vector_engine<T,AT>::pointer
 dr_vector_engine<T,AT>::data() noexcept
 {
     return &mp_elems[0];
@@ -178,6 +182,10 @@ class dr_matrix_engine
   public:
     using engine_category = resizable_matrix_engine_tag;
     using element_type    = T;
+    using reference       = T&;
+    using pointer         = typename allocator_traits<AT>::pointer;
+    using const_reference = T const&;
+    using const_pointer   = typename allocator_traits<AT>::const_pointer;
     using index_type      = ptrdiff_t;
     using size_type       = ptrdiff_t;
     using size_tuple      = tuple<size_type, size_type>;
@@ -201,8 +209,8 @@ class dr_matrix_engine
     dr_matrix_engine& operator =(dr_matrix_engine&&);
     dr_matrix_engine& operator =(dr_matrix_engine const&);
 
-    T           operator ()(size_type i, size_type j) const;
-    T const*    data() const noexcept;
+    const_reference     operator ()(size_type i, size_type j) const;
+    const_pointer       data() const noexcept;
 
     size_type   columns() const noexcept;
     size_type   rows() const noexcept;
@@ -212,8 +220,8 @@ class dr_matrix_engine
     size_type   row_capacity() const noexcept;
     size_tuple  capacity() const noexcept;
 
-    T&      operator ()(size_type i, size_type j);
-    T*      data() noexcept;
+    reference   operator ()(size_type i, size_type j);
+    pointer     data() noexcept;
 
     void    assign(dr_matrix_engine const& rhs);
     void    reserve(size_type rowcap, size_type colcap);
@@ -300,14 +308,14 @@ dr_matrix_engine<T,AT>::operator =(dr_matrix_engine const& rhs)
 }
 
 template<class T, class AT> inline
-T
+typename dr_matrix_engine<T,AT>::const_reference
 dr_matrix_engine<T,AT>::operator ()(size_type i, size_type j) const
 {
     return mp_elems[i*m_colcap + j];
 }
 
 template<class T, class AT> inline
-T const*
+typename dr_matrix_engine<T,AT>::const_pointer
 dr_matrix_engine<T,AT>::data() const noexcept
 {
     return static_cast<T const*>(&mp_elems[0]);
@@ -356,14 +364,14 @@ dr_matrix_engine<T,AT>::capacity() const noexcept
 }
 
 template<class T, class AT> inline
-T&
+typename dr_matrix_engine<T,AT>::reference
 dr_matrix_engine<T,AT>::operator ()(size_type i, size_type j)
 {
     return mp_elems[i*m_colcap + j];
 }
 
 template<class T, class AT> inline
-T*
+typename dr_matrix_engine<T,AT>::pointer
 dr_matrix_engine<T,AT>::data() noexcept
 {
     return static_cast<T*>(&mp_elems[0]);

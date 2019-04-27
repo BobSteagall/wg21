@@ -150,7 +150,7 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, vector<ET2, OT2>>::multiply
 
 	for (auto e = 0; e < v2.elements(); ++e)
 	{
-		vr(e) = std::inner_product(m1(e, 0), m1(e, m1.columns()), v2.data(), result_type::element_type(0));
+		vr(e) = std::inner_product(&m1(e, 0), &m1(e, m1.columns()), v2.data(), result_type::element_type(0));
 	}
 	
 	return result_type();

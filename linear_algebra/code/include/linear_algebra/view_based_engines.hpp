@@ -20,6 +20,10 @@ class tr_matrix_engine
     using engine_type     = ET;
     using engine_category = const_matrix_engine_tag;
     using element_type    = typename engine_type::element_type;
+    using reference       = typename engine_type::const_reference;
+    using pointer         = typename engine_type::const_pointer;
+    using const_reference = typename engine_type::const_reference;
+    using const_pointer   = typename engine_type::const_pointer;
     using index_type      = typename engine_type::index_type;
     using size_type       = typename engine_type::size_type;
     using size_tuple      = typename engine_type::size_tuple;
@@ -41,8 +45,8 @@ class tr_matrix_engine
     constexpr tr_matrix_engine&     operator =(tr_matrix_engine&&) = default;
     constexpr tr_matrix_engine&     operator =(tr_matrix_engine const&) = default;
 
-    constexpr element_type          operator ()(index_type i, index_type j) const;
-    constexpr element_type const*   data() const noexcept;
+    constexpr const_reference   operator ()(index_type i, index_type j) const;
+    constexpr const_pointer     data() const noexcept;
 
     constexpr size_type     columns() const noexcept;
     constexpr size_type     rows() const noexcept;
@@ -58,25 +62,26 @@ class tr_matrix_engine
     engine_type const*  mp_other;  //- For exposition; pointer to actual engine
 };
 
-template<class ET> inline constexpr
-tr_matrix_engine<ET>::tr_matrix_engine()
+template<class ET> inline 
+constexpr tr_matrix_engine<ET>::tr_matrix_engine()
 :   mp_other(nullptr)
 {}
 
-template<class ET> inline constexpr
+template<class ET> inline 
+constexpr
 tr_matrix_engine<ET>::tr_matrix_engine(engine_type const& eng)
 :   mp_other(&eng)
 {}
 
-template<class ET> inline constexpr
-typename tr_matrix_engine<ET>::element_type
+template<class ET> inline 
+constexpr typename tr_matrix_engine<ET>::const_reference
 tr_matrix_engine<ET>::operator ()(index_type i, index_type j) const
 {
     return (*mp_other)(j, i);
 }
 
 template<class ET> inline
-constexpr typename tr_matrix_engine<ET>::element_type const*
+constexpr typename tr_matrix_engine<ET>::const_pointer
 tr_matrix_engine<ET>::data() const noexcept
 {
     return mp_other->data();

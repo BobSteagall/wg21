@@ -12,6 +12,10 @@ class fs_matrix_engine_tst
   public:
     using engine_category = STD_LA::mutable_matrix_engine_tag;
     using element_type    = T;
+    using reference       = T&;
+    using pointer         = T*;
+    using const_reference = T const&;
+    using const_pointer   = T const*;
     using index_type      = int_fast32_t;
     using size_type       = int_fast32_t;
     using size_tuple      = std::tuple<size_type, size_type>;
@@ -32,7 +36,7 @@ class fs_matrix_engine_tst
     constexpr fs_matrix_engine_tst&     operator =(fs_matrix_engine_tst&&) = default;
     constexpr fs_matrix_engine_tst&     operator =(fs_matrix_engine_tst const&) = default;
 
-    constexpr T             operator ()(index_type i, index_type j) const;
+    constexpr T const&      operator ()(index_type i, index_type j) const;
     constexpr T const*      data() const noexcept;
 
     constexpr size_type     columns() const noexcept;
@@ -54,7 +58,7 @@ class fs_matrix_engine_tst
 };
 
 template<class T, int32_t R, int32_t C> inline
-constexpr T
+constexpr T const&
 fs_matrix_engine_tst<T,R,C>::operator ()(index_type i, index_type j) const
 {
     return ma_elems[i*C + j];

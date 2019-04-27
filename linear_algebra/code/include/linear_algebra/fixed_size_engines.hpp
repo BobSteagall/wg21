@@ -22,6 +22,10 @@ class fs_vector_engine
   public:
     using engine_category = mutable_vector_engine_tag;
     using element_type    = T;
+    using reference       = T&;
+    using pointer         = T*;
+    using const_reference = T const&;
+    using const_pointer   = T const*;
     using index_type      = int_fast32_t;
     using size_type       = int_fast32_t;
 
@@ -41,14 +45,14 @@ class fs_vector_engine
     constexpr fs_vector_engine&     operator =(fs_vector_engine&&) = default;
     constexpr fs_vector_engine&     operator =(fs_vector_engine const&) = default;
 
-    constexpr T         operator ()(index_type i) const;
-    constexpr T const*  data() const noexcept;
+    constexpr const_reference   operator ()(index_type i) const;
+    constexpr const_pointer     data() const noexcept;
 
     constexpr size_type capacity() const noexcept;
     constexpr size_type elements() const noexcept;
 
-    constexpr T&    operator ()(index_type i);
-    constexpr T*    data() noexcept;
+    constexpr reference     operator ()(index_type i);
+    constexpr pointer       data() noexcept;
 
     constexpr void  swap_elements(index_type i, index_type j);
 
@@ -67,14 +71,14 @@ fs_vector_engine<T,N>::fs_vector_engine()
 }
 
 template<class T, int32_t N> inline
-constexpr T
+constexpr typename fs_vector_engine<T,N>::const_reference
 fs_vector_engine<T,N>::operator ()(index_type i) const
 {
     return ma_elems[i];
 }
 
 template<class T, int32_t N> inline
-constexpr T const*
+constexpr typename fs_vector_engine<T,N>::const_pointer
 fs_vector_engine<T,N>::data() const noexcept
 {
     return &ma_elems[0];
@@ -95,14 +99,14 @@ fs_vector_engine<T,N>::elements() const noexcept
 }
 
 template<class T, int32_t N> inline
-constexpr T&
+constexpr typename fs_vector_engine<T,N>::reference
 fs_vector_engine<T,N>::operator ()(index_type i)
 {
     return ma_elems[i];
 }
 
 template<class T, int32_t N> inline
-constexpr T*
+constexpr typename fs_vector_engine<T,N>::pointer
 fs_vector_engine<T,N>::data() noexcept
 {
     return &ma_elems[0];
@@ -129,6 +133,10 @@ class fs_matrix_engine
   public:
     using engine_category = mutable_matrix_engine_tag;
     using element_type    = T;
+    using reference       = T&;
+    using pointer         = T*;
+    using const_reference = T const&;
+    using const_pointer   = T const*;
     using index_type      = int_fast32_t;
     using size_type       = int_fast32_t;
     using size_tuple      = tuple<size_type, size_type>;
@@ -149,8 +157,8 @@ class fs_matrix_engine
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine&&) = default;
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine const&) = default;
 
-    constexpr T             operator ()(index_type i, index_type j) const;
-    constexpr T const*      data() const noexcept;
+    constexpr const_reference   operator ()(index_type i, index_type j) const;
+    constexpr const_pointer     data() const noexcept;
 
     constexpr size_type     columns() const noexcept;
     constexpr size_type     rows() const noexcept;
@@ -160,8 +168,8 @@ class fs_matrix_engine
     constexpr size_type     row_capacity() const noexcept;
     constexpr size_tuple    capacity() const noexcept;
 
-    constexpr T&    operator ()(index_type i, index_type j);
-    constexpr T*    data() noexcept;
+    constexpr reference     operator ()(index_type i, index_type j);
+    constexpr pointer       data() noexcept;
 
     constexpr void  assign(fs_matrix_engine const& rhs);
     constexpr void  swap(fs_matrix_engine& rhs);
@@ -184,14 +192,14 @@ fs_matrix_engine<T,R,C>::fs_matrix_engine()
 }
 
 template<class T, int32_t R, int32_t C> inline
-constexpr T
+constexpr typename fs_matrix_engine<T,R,C>::const_reference
 fs_matrix_engine<T,R,C>::operator ()(index_type i, index_type j) const
 {
     return ma_elems[i*C + j];
 }
 
 template<class T, int32_t R, int32_t C> inline
-constexpr T const*
+constexpr typename fs_matrix_engine<T,R,C>::const_pointer
 fs_matrix_engine<T,R,C>::data() const noexcept
 {
     return &ma_elems[0];
@@ -240,14 +248,14 @@ fs_matrix_engine<T,R,C>::capacity() const noexcept
 }
 
 template<class T, int32_t R, int32_t C> inline
-constexpr T&
+constexpr typename fs_matrix_engine<T,R,C>::reference
 fs_matrix_engine<T,R,C>::operator ()(index_type i, index_type j)
 {
     return ma_elems[i*C + j];
 }
 
 template<class T, int32_t R, int32_t C> inline
-constexpr T*
+constexpr typename fs_matrix_engine<T,R,C>::pointer
 fs_matrix_engine<T,R,C>::data() noexcept
 {
     return &ma_elems[0];

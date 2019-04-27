@@ -21,6 +21,10 @@ class matrix
   public:
     using engine_type     = ET;
     using element_type    = typename engine_type::element_type;
+    using reference       = typename engine_type::reference;
+    using pointer         = typename engine_type::pointer;
+    using const_reference = typename engine_type::const_reference;
+    using const_pointer   = typename engine_type::const_pointer;
     using index_type      = typename engine_type::index_type;
     using size_type       = typename engine_type::size_type;
     using size_tuple      = typename engine_type::size_tuple;
@@ -59,8 +63,8 @@ class matrix
 
     //- Const element access.
     //
-    element_type        operator ()(index_type i, index_type j) const;
-    element_type const* data() const noexcept;
+    const_reference     operator ()(index_type i, index_type j) const;
+    const_pointer       data() const noexcept;
 
     //- Accessors.
     //
@@ -79,8 +83,8 @@ class matrix
 
     //- Mutable element access.
     //
-    element_type&   operator ()(size_type i, size_type j);
-    element_type*   data() noexcept;
+    reference   operator ()(index_type i, index_type j);
+    pointer     data() noexcept;
 
     //- Assignment.
     //
@@ -181,14 +185,14 @@ matrix<ET,OT>::operator =(matrix<ET2, OT2> const& rhs)
 }
 
 template<class ET, class OT> inline
-typename matrix<ET,OT>::element_type
+typename matrix<ET,OT>::const_reference
 matrix<ET,OT>::operator ()(index_type i, index_type j) const
 {
     return m_engine(i, j);
 }
 
 template<class ET, class OT> inline
-typename matrix<ET,OT>::element_type const*
+typename matrix<ET,OT>::const_pointer
 matrix<ET,OT>::data() const noexcept
 {
     return m_engine.data();
@@ -258,14 +262,14 @@ matrix<ET,OT>::h() const
 }
 
 template<class ET, class OT> inline
-typename matrix<ET,OT>::element_type&
-matrix<ET,OT>::operator ()(size_type i, size_type j)
+typename matrix<ET,OT>::reference
+matrix<ET,OT>::operator ()(index_type i, index_type j)
 {
     return m_engine(i, j);
 }
 
 template<class ET, class OT> inline
-typename matrix<ET,OT>::element_type*
+typename matrix<ET,OT>::pointer
 matrix<ET,OT>::data() noexcept
 {
     return m_engine.data();
