@@ -8,6 +8,37 @@
 #define LINEAR_ALGEBRA_VIEW_BASED_ENGINES_HPP_DEFINED
 
 namespace STD_LA {
+template<class ET>
+class dense_vector_view_engine
+{
+  public:
+    using engine_type     = ET;
+    using engine_category = const_matrix_engine_tag;
+    using element_type    = typename engine_type::element_type;
+    using reference       = typename engine_type::const_reference;
+    using pointer         = typename engine_type::const_pointer;
+    using const_reference = typename engine_type::const_reference;
+    using const_pointer   = typename engine_type::const_pointer;
+    using index_type      = typename engine_type::index_type;
+    using size_type       = typename engine_type::size_type;
+
+    using is_fixed_size   = typename engine_type::is_fixed_size;
+    using is_resizable    = false_type;
+
+    using is_column_major = typename engine_type::is_row_major;
+    using is_dense        = typename engine_type::is_dense;
+    using is_rectangular  = typename engine_type::is_rectangular;
+    using is_row_major    = typename engine_type::is_column_major;
+
+  public:
+
+  private:
+    engine_type const*  mp_other;  //- For exposition; pointer to actual engine
+    element_type const* mp_base;
+    index_type          m_stride;
+};
+
+
 //==================================================================================================
 //  Matrix transpose engine, meant to act as an rvalue-ish "view" in expressions, in order to
 //  prevent unnecessary allocation and element copying.
