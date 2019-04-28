@@ -22,10 +22,11 @@ set(Includes
     include/linear_algebra/negation_traits_impl.hpp
     include/linear_algebra/number_traits.hpp
     include/linear_algebra/operation_traits.hpp
+    include/linear_algebra/row_column_views.hpp
     include/linear_algebra/subtraction_traits.hpp
     include/linear_algebra/subtraction_traits_impl.hpp
+    include/linear_algebra/transpose_views.hpp
     include/linear_algebra/vector.hpp
-    include/linear_algebra/view_based_engines.hpp
 
     test/test_new_arithmetic.hpp
     test/test_new_engine.hpp

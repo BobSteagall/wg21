@@ -24,6 +24,9 @@ class dr_vector_engine
     using pointer         = typename allocator_traits<AT>::pointer;
     using const_reference = T const&;
     using const_pointer   = typename allocator_traits<AT>::const_pointer;
+    using iterator        = detail::vector_iterator<dr_vector_engine>;
+    using const_iterator  = detail::vector_const_iterator<dr_vector_engine>;
+    using difference_type = ptrdiff_t;
     using index_type      = ptrdiff_t;
     using size_type       = ptrdiff_t;
 
@@ -46,24 +49,26 @@ class dr_vector_engine
     dr_vector_engine& operator =(dr_vector_engine&&);
     dr_vector_engine& operator =(dr_vector_engine const&);
 
-    const_reference     operator ()(index_type i) const;
-    const_pointer       data() const noexcept;
+    const_reference operator ()(index_type i) const;
+    const_pointer   data() const noexcept;
+    const_iterator  begin() const noexcept;
+    const_iterator  end() const noexcept;
 
-    size_type   elements() const noexcept;
-    size_type   capacity() const noexcept;
+    size_type       elements() const noexcept;
+    size_type       capacity() const noexcept;
+
 
     reference   operator ()(index_type i);
     pointer     data() noexcept;
+    iterator    begin() noexcept;
+    iterator    end() noexcept;
 
-    void    reserve(size_type elem_cap);
-    void    resize(size_type elems);
-    void    resize(size_type elems, size_type elem_cap);
-
-    void    swap_elements(index_type i, index_type j);
+    void        reserve(size_type elem_cap);
+    void        resize(size_type elems);
+    void        resize(size_type elems, size_type elem_cap);
+    void        swap_elements(index_type i, index_type j);
 
   private:
-    using pointer = typename allocator_traits<AT>::pointer;
-
     pointer     mp_elems;       //- For exposition; data buffer
     size_type   m_elems;
     size_type   m_elemcap;
@@ -122,6 +127,20 @@ dr_vector_engine<T,AT>::data() const noexcept
 }
 
 template<class T, class AT> inline
+typename dr_vector_engine<T,AT>::const_iterator
+dr_vector_engine<T,AT>::begin() const noexcept
+{
+    return const_iterator(this, 0, m_elemcap);
+}
+
+template<class T, class AT> inline
+typename dr_vector_engine<T,AT>::const_iterator
+dr_vector_engine<T,AT>::end() const noexcept
+{
+    return const_iterator(this, m_elemcap, m_elemcap);
+}
+
+template<class T, class AT> inline
 typename dr_vector_engine<T,AT>::size_type
 dr_vector_engine<T,AT>::elements() const noexcept
 {
@@ -147,6 +166,20 @@ typename dr_vector_engine<T,AT>::pointer
 dr_vector_engine<T,AT>::data() noexcept
 {
     return &mp_elems[0];
+}
+
+template<class T, class AT> inline
+typename dr_vector_engine<T,AT>::iterator
+dr_vector_engine<T,AT>::begin() noexcept
+{
+    return iterator(this, 0, m_elemcap);
+}
+
+template<class T, class AT> inline
+typename dr_vector_engine<T,AT>::iterator
+dr_vector_engine<T,AT>::end() noexcept
+{
+    return iterator(this, m_elemcap, m_elemcap);
 }
 
 template<class T, class AT> inline
@@ -186,6 +219,7 @@ class dr_matrix_engine
     using pointer         = typename allocator_traits<AT>::pointer;
     using const_reference = T const&;
     using const_pointer   = typename allocator_traits<AT>::const_pointer;
+    using difference_type = ptrdiff_t;
     using index_type      = ptrdiff_t;
     using size_type       = ptrdiff_t;
     using size_tuple      = tuple<size_type, size_type>;
@@ -197,6 +231,10 @@ class dr_matrix_engine
     using is_dense        = true_type;
     using is_rectangular  = true_type;
     using is_row_major    = true_type;
+
+    using column_view_type    = matrix_column_view<dr_matrix_engine>;
+    using row_view_type       = matrix_row_view<dr_matrix_engine>;
+    using transpose_view_type = matrix_transpose_view<dr_matrix_engine>;
 
   public:
     ~dr_matrix_engine();
@@ -232,8 +270,6 @@ class dr_matrix_engine
     void    swap_rows(index_type r1, index_type r2);
 
   private:
-    using pointer = typename allocator_traits<AT>::pointer;
-
     pointer     mp_elems;       //- For exposition; data buffer
     size_type   m_rows;
     size_type   m_cols;

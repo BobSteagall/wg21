@@ -16,6 +16,7 @@ class fs_matrix_engine_tst
     using pointer         = T*;
     using const_reference = T const&;
     using const_pointer   = T const*;
+    using difference_type = int_fast32_t;
     using index_type      = int_fast32_t;
     using size_type       = int_fast32_t;
     using size_tuple      = std::tuple<size_type, size_type>;
@@ -27,6 +28,10 @@ class fs_matrix_engine_tst
     using is_dense        = std::true_type;
     using is_rectangular  = std::true_type;
     using is_row_major    = std::true_type;
+
+    using column_view_type    = STD_LA::matrix_column_view<fs_matrix_engine_tst>;
+    using row_view_type       = STD_LA::matrix_row_view<fs_matrix_engine_tst>;
+    using transpose_view_type = STD_LA::matrix_transpose_view<fs_matrix_engine_tst>;
 
   public:
     constexpr fs_matrix_engine_tst() = default;

@@ -459,8 +459,8 @@ struct engine_sub_traits_tst<OT,
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct engine_sub_traits_tst<OT,
-                             STD_LA::tr_matrix_engine<fs_matrix_engine_tst<T1, R1, C1>>,
-                             STD_LA::tr_matrix_engine<fs_matrix_engine_tst<T2, R2, C2>>>
+                             STD_LA::matrix_transpose_view<fs_matrix_engine_tst<T1, R1, C1>>,
+                             STD_LA::matrix_transpose_view<fs_matrix_engine_tst<T2, R2, C2>>>
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);

@@ -14,6 +14,8 @@ USING_STD
 
 //- Some tags for specifying how engines should behave.
 //
+using scalar_engine_tag           = integral_constant<int, 0>;
+
 using const_vector_engine_tag     = integral_constant<int, 1>;
 using mutable_vector_engine_tag   = integral_constant<int, 2>;
 using resizable_vector_engine_tag = integral_constant<int, 3>;
@@ -77,7 +79,7 @@ template<class T, int32_t N>            class fs_vector_engine;
 template<class T, int32_t R, int32_t C> class fs_matrix_engine;
 template<class T, class AT>             class dr_vector_engine;
 template<class T, class AT>             class dr_matrix_engine;
-template<class ET>                      class tr_matrix_engine;
+template<class ET>                      class matrix_transpose_view;
 
 //- Primary mathematical object types.
 //

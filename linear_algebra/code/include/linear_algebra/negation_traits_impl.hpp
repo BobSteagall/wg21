@@ -26,8 +26,7 @@ matrix_negation_traits<OT, vector<ET1, OT1>>::negate(vector<ET1, OT1> const& v1)
 		vr.resize(v1.elements());
 	}
 
-	transform(v1.data(), v1.data() + v1.elements(), vr.data(),
-		[](auto val) {return -val; });
+	transform(v1.begin(), v1.end(), vr.begin(), [](auto val){ return -val; });
 
 	return vr;
 }
@@ -40,10 +39,23 @@ matrix_negation_traits<OT, matrix<ET1, OT1>>::negate(matrix<ET1, OT1> const& m1)
 {
     PrintOperandTypes<result_type>("negation_traits", m1);
 
-	result_type		mr;
-	const auto		rows = m1.rows();
-	const auto		columns = m1.columns();
+	result_type		mr{};                           //- Braces here to avoid C4701 from MSVC
+	auto const      rows = m1.rows();
+	auto const      columns = m1.columns();
 
+	if constexpr (result_requires_resize(mr))
+	{
+		mr.resize(rows, columns);
+	}
+
+	for (auto i = 0;  i < rows;  ++i)
+    {
+		for (auto j = 0;  j <  columns;  ++j)
+        {
+			mr(i, j) = -m1(i, j);
+        }
+    }
+/*
 	if constexpr (result_requires_resize(mr))
 	{
 		mr.resize(rows, columns);
@@ -57,7 +69,7 @@ matrix_negation_traits<OT, matrix<ET1, OT1>>::negate(matrix<ET1, OT1> const& m1)
 		transform(m1.data(), m1.data() + (rows * columns), mr.data(),
 			[](auto val) {return -val; });
 	}
-
+*/
 	return mr;
 }
 

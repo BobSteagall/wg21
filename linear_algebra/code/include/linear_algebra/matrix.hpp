@@ -28,7 +28,10 @@ class matrix
     using index_type      = typename engine_type::index_type;
     using size_type       = typename engine_type::size_type;
     using size_tuple      = typename engine_type::size_tuple;
-    using transpose_type  = matrix<tr_matrix_engine<engine_type>, OT>;
+
+    using column_type     = vector<matrix_column_view<engine_type>, OT>;
+    using row_type        = vector<matrix_row_view<engine_type>, OT>;
+    using transpose_type  = matrix<matrix_transpose_view<engine_type>, OT>;
     using hermitian_type  = conditional_t<is_complex_v<element_type>, matrix, transpose_type>;
 
     using is_column_major = typename engine_type::is_column_major;
@@ -64,7 +67,6 @@ class matrix
     //- Const element access.
     //
     const_reference     operator ()(index_type i, index_type j) const;
-    const_pointer       data() const noexcept;
 
     //- Accessors.
     //
@@ -76,15 +78,16 @@ class matrix
     size_type   row_capacity() const noexcept;
     size_tuple  capacity() const noexcept;
 
-    //- Transpose and Hermitian.
+    //- Column view, row view, transpose view, and Hermitian.
     //
+    column_type     column(index_type j) const;
+    row_type        row(index_type i) const;
     transpose_type  t() const;
     hermitian_type  h() const;
 
     //- Mutable element access.
     //
     reference   operator ()(index_type i, index_type j);
-    pointer     data() noexcept;
 
     //- Assignment.
     //
@@ -192,13 +195,6 @@ matrix<ET,OT>::operator ()(index_type i, index_type j) const
 }
 
 template<class ET, class OT> inline
-typename matrix<ET,OT>::const_pointer
-matrix<ET,OT>::data() const noexcept
-{
-    return m_engine.data();
-}
-
-template<class ET, class OT> inline
 typename matrix<ET,OT>::size_type
 matrix<ET,OT>::columns() const noexcept
 {
@@ -241,6 +237,20 @@ matrix<ET,OT>::capacity() const noexcept
 }
 
 template<class ET, class OT> inline
+typename matrix<ET,OT>::column_type
+matrix<ET,OT>::column(index_type j) const
+{
+    return column_type(m_engine, j, detail::row_column_tag());
+}
+
+template<class ET, class OT> inline
+typename matrix<ET,OT>::row_type
+matrix<ET,OT>::row(index_type i) const
+{
+    return row_type(m_engine, i, detail::row_column_tag());
+}
+
+template<class ET, class OT> inline
 typename matrix<ET,OT>::transpose_type
 matrix<ET,OT>::t() const
 {
@@ -266,13 +276,6 @@ typename matrix<ET,OT>::reference
 matrix<ET,OT>::operator ()(index_type i, index_type j)
 {
     return m_engine(i, j);
-}
-
-template<class ET, class OT> inline
-typename matrix<ET,OT>::pointer
-matrix<ET,OT>::data() noexcept
-{
-    return m_engine.data();
 }
 
 template<class ET, class OT>

@@ -26,6 +26,9 @@ class fs_vector_engine
     using pointer         = T*;
     using const_reference = T const&;
     using const_pointer   = T const*;
+    using iterator        = detail::vector_iterator<fs_vector_engine>;
+    using const_iterator  = detail::vector_const_iterator<fs_vector_engine>;
+    using difference_type = int_fast32_t;
     using index_type      = int_fast32_t;
     using size_type       = int_fast32_t;
 
@@ -47,12 +50,16 @@ class fs_vector_engine
 
     constexpr const_reference   operator ()(index_type i) const;
     constexpr const_pointer     data() const noexcept;
+    constexpr const_iterator    begin() const noexcept;
+    constexpr const_iterator    end() const noexcept;
 
-    constexpr size_type capacity() const noexcept;
-    constexpr size_type elements() const noexcept;
+    constexpr size_type     capacity() const noexcept;
+    constexpr size_type     elements() const noexcept;
 
     constexpr reference     operator ()(index_type i);
     constexpr pointer       data() noexcept;
+    constexpr iterator      begin() noexcept;
+    constexpr iterator      end() noexcept;
 
     constexpr void  swap_elements(index_type i, index_type j);
 
@@ -85,6 +92,20 @@ fs_vector_engine<T,N>::data() const noexcept
 }
 
 template<class T, int32_t N> inline
+constexpr typename fs_vector_engine<T,N>::const_iterator
+fs_vector_engine<T,N>::begin() const noexcept
+{
+    return const_iterator(this, 0, N);
+}
+
+template<class T, int32_t N> inline
+constexpr typename fs_vector_engine<T,N>::const_iterator
+fs_vector_engine<T,N>::end() const noexcept
+{
+    return const_iterator(this, N, N);
+}
+
+template<class T, int32_t N> inline
 constexpr typename fs_vector_engine<T,N>::size_type
 fs_vector_engine<T,N>::capacity() const noexcept
 {
@@ -113,6 +134,20 @@ fs_vector_engine<T,N>::data() noexcept
 }
 
 template<class T, int32_t N> inline
+constexpr typename fs_vector_engine<T,N>::iterator
+fs_vector_engine<T,N>::begin() noexcept
+{
+    return iterator(this, 0, N);
+}
+
+template<class T, int32_t N> inline
+constexpr typename fs_vector_engine<T,N>::iterator
+fs_vector_engine<T,N>::end() noexcept
+{
+    return iterator(this, N, N);
+}
+
+template<class T, int32_t N> inline
 constexpr void
 fs_vector_engine<T,N>::swap_elements(index_type i, index_type j)
 {
@@ -137,6 +172,7 @@ class fs_matrix_engine
     using pointer         = T*;
     using const_reference = T const&;
     using const_pointer   = T const*;
+    using difference_type = int_fast32_t;
     using index_type      = int_fast32_t;
     using size_type       = int_fast32_t;
     using size_tuple      = tuple<size_type, size_type>;
@@ -148,6 +184,10 @@ class fs_matrix_engine
     using is_dense        = true_type;
     using is_rectangular  = true_type;
     using is_row_major    = true_type;
+
+    using column_view_type    = matrix_column_view<fs_matrix_engine>;
+    using row_view_type       = matrix_row_view<fs_matrix_engine>;
+    using transpose_view_type = matrix_transpose_view<fs_matrix_engine>;
 
   public:
     constexpr fs_matrix_engine();
