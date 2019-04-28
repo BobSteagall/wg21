@@ -11,6 +11,36 @@
 namespace STD_LA {
 namespace detail {
 
+struct row_column_tag {};
+
+//--------------------------------------------------------------------------------------------------
+//- Internally-used tag type to facilitate distinguishing elements from vectors/matrices.
+//
+template<class T>
+struct element_tag
+{
+    using engine_category = scalar_engine_tag;
+};
+
+//--------------------------------------------------------------------------------------------------
+//- Internally-used constexpr variables for describe an engine's category.
+//
+template<class ET>
+constexpr bool  is_scalar_engine_v = (ET::engine_category::value == scalar_engine_tag::value);
+
+template<class ET>
+constexpr bool  is_vector_engine_v =  (ET::engine_category::value >= const_vector_engine_tag::value)
+                                   && (ET::engine_category::value <  const_matrix_engine_tag::value);
+
+template<typename ET>
+constexpr bool  is_matrix_engine_v = (ET::engine_category::value >= const_matrix_engine_tag::value);
+
+
+template<class ET1, class ET2>
+constexpr bool  engines_match_v =  (is_vector_engine_v<ET1> && is_vector_engine_v<ET2>)
+                                || (is_matrix_engine_v<ET1> && is_matrix_engine_v<ET2>);
+
+
 //--------------------------------------------------------------------------------------------------
 //- Tests to determine if an engine has mutable element indexing.
 //

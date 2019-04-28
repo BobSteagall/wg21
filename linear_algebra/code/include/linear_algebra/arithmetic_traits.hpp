@@ -42,31 +42,6 @@ template<class A1, class T1>
 using rebind_alloc_t = typename allocator_traits<A1>::template rebind_alloc<T1>;
 
 
-//--------------------------------------------------------------------------------------------------
-//- Internally-used tag type to facilitate distinguishing elements from vectors/matrices.
-//
-template<class T>
-struct element_tag
-{
-    using engine_category = integral_constant<int, 0>;
-};
-
-//--------------------------------------------------------------------------------------------------
-//- Internally-used constexpr variables for describe an engine's category.
-//
-template<class ET>
-constexpr bool  is_scalar_engine_v = (ET::engine_category::value == element_tag<ET>::engine_category::value);
-
-template<class ET>
-constexpr bool  is_vector_engine_v = (ET::engine_category::value < const_matrix_engine_tag::value);
-
-template<typename ET>
-constexpr bool  is_matrix_engine_v = (ET::engine_category::value >= const_matrix_engine_tag::value);
-
-template<class ET1, class ET2>
-constexpr bool  engines_match_v = (is_vector_engine_v<ET1> && is_vector_engine_v<ET2>) ||
-                                  (is_matrix_engine_v<ET1> && is_matrix_engine_v<ET2>);
-
 }       //- detail namespace
 
 template<class ET, class OT> inline
@@ -74,7 +49,7 @@ constexpr bool
 result_requires_resize(vector<ET, OT> const&)
 {
 	return vector<ET, OT>::engine_type::is_resizable::value == true &&
-		vector<ET, OT>::engine_type::is_fixed_size::value == false;
+           vector<ET, OT>::engine_type::is_fixed_size::value == false;
 }
 
 template<class ET, class OT> inline
@@ -82,7 +57,7 @@ constexpr bool
 result_requires_resize(matrix<ET, OT> const&)
 {
 	return matrix<ET, OT>::engine_type::is_resizable::value == true &&
-		matrix<ET, OT>::engine_type::is_fixed_size::value == false;
+           matrix<ET, OT>::engine_type::is_fixed_size::value == false;
 }
 
 template<class ET, class OT> inline

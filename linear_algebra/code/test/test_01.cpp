@@ -386,8 +386,8 @@ void t02()
     dr_matrix_engine<double>       de22;
     dr_matrix_engine<cx_double>    de23;
 
-    tr_matrix_engine<fs_matrix_engine<cx_double, 3, 3>>  te2(e23);
-    tr_matrix_engine<dr_matrix_engine<cx_double>>        te3(de23);
+    matrix_transpose_view<fs_matrix_engine<cx_double, 3, 3>>  te2(e23);
+    matrix_transpose_view<dr_matrix_engine<cx_double>>        te3(de23);
 
 #ifndef ENFORCE_COMPLEX_OPERAND_HOMOGENEITY
     matrix_element_promotion_t<int32_t, cx_double>     v1 = 0;

@@ -317,19 +317,19 @@ struct matrix_subtraction_engine_traits
 //- General transpose cases for matrices.
 //
 template<class OT, class ET1, class ET2>
-struct matrix_subtraction_engine_traits<OT, tr_matrix_engine<ET1>, ET2>
+struct matrix_subtraction_engine_traits<OT, matrix_transpose_view<ET1>, ET2>
 {
     using engine_type = typename matrix_subtraction_engine_traits<OT, ET1, ET2>::engine_type;
 };
 
 template<class OT, class ET1, class ET2>
-struct matrix_subtraction_engine_traits<OT, ET1, tr_matrix_engine<ET2>>
+struct matrix_subtraction_engine_traits<OT, ET1, matrix_transpose_view<ET2>>
 {
     using engine_type = typename matrix_subtraction_engine_traits<OT, ET1, ET2>::engine_type;
 };
 
 template<class OT, class ET1, class ET2>
-struct matrix_subtraction_engine_traits<OT, tr_matrix_engine<ET1>, tr_matrix_engine<ET2>>
+struct matrix_subtraction_engine_traits<OT, matrix_transpose_view<ET1>, matrix_transpose_view<ET2>>
 {
     using engine_type = typename matrix_subtraction_engine_traits<OT, ET1, ET2>::engine_type;
 };
@@ -400,7 +400,7 @@ struct matrix_subtraction_engine_traits<OT,
 template<class OT, class T1, class A1, class T2, class A2>
 struct matrix_subtraction_engine_traits<OT,
                                         dr_matrix_engine<T1, A1>,
-                                        tr_matrix_engine<dr_matrix_engine<T2, A2>>>
+                                        matrix_transpose_view<dr_matrix_engine<T2, A2>>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
@@ -409,7 +409,7 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, class A1, class T2, class A2>
 struct matrix_subtraction_engine_traits<OT,
-                                        tr_matrix_engine<dr_matrix_engine<T1, A1>>,
+                                        matrix_transpose_view<dr_matrix_engine<T1, A1>>,
                                         dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
@@ -419,8 +419,8 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, class A1, class T2, class A2>
 struct matrix_subtraction_engine_traits<OT,
-                                        tr_matrix_engine<dr_matrix_engine<T1, A1>>,
-                                        tr_matrix_engine<dr_matrix_engine<T2, A2>>>
+                                        matrix_transpose_view<dr_matrix_engine<T1, A1>>,
+                                        matrix_transpose_view<dr_matrix_engine<T2, A2>>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
@@ -443,7 +443,7 @@ struct matrix_subtraction_engine_traits<OT,
 template<class OT, class T1, class A1, class T2, int32_t R2, int32_t C2>
 struct matrix_subtraction_engine_traits<OT,
                                         dr_matrix_engine<T1, A1>,
-                                        tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
+                                        matrix_transpose_view<fs_matrix_engine<T2, R2, C2>>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
@@ -452,7 +452,7 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, class A1, class T2, int32_t R2, int32_t C2>
 struct matrix_subtraction_engine_traits<OT,
-                                        tr_matrix_engine<dr_matrix_engine<T1, A1>>,
+                                        matrix_transpose_view<dr_matrix_engine<T1, A1>>,
                                         fs_matrix_engine<T2, R2, C2>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
@@ -462,8 +462,8 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, class A1, class T2, int32_t R2, int32_t C2>
 struct matrix_subtraction_engine_traits<OT,
-                                        tr_matrix_engine<dr_matrix_engine<T1, A1>>,
-                                        tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
+                                        matrix_transpose_view<dr_matrix_engine<T1, A1>>,
+                                        matrix_transpose_view<fs_matrix_engine<T2, R2, C2>>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
@@ -486,7 +486,7 @@ struct matrix_subtraction_engine_traits<OT,
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, class A2>
 struct matrix_subtraction_engine_traits<OT,
                                         fs_matrix_engine<T1, R1, C1>,
-                                        tr_matrix_engine<dr_matrix_engine<T2, A2>>>
+                                        matrix_transpose_view<dr_matrix_engine<T2, A2>>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
@@ -495,7 +495,7 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, class A2>
 struct matrix_subtraction_engine_traits<OT,
-                                        tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
+                                        matrix_transpose_view<fs_matrix_engine<T1, R1, C1>>,
                                         dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
@@ -505,8 +505,8 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, class A2>
 struct matrix_subtraction_engine_traits<OT,
-                                        tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
-                                        tr_matrix_engine<dr_matrix_engine<T2, A2>>>
+                                        matrix_transpose_view<fs_matrix_engine<T1, R1, C1>>,
+                                        matrix_transpose_view<dr_matrix_engine<T2, A2>>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
@@ -529,7 +529,7 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_subtraction_engine_traits<OT,
-                                        tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
+                                        matrix_transpose_view<fs_matrix_engine<T1, R1, C1>>,
                                         fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == C2);
@@ -541,7 +541,7 @@ struct matrix_subtraction_engine_traits<OT,
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_subtraction_engine_traits<OT,
                                         fs_matrix_engine<T1, R1, C1>,
-                                        tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
+                                        matrix_transpose_view<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
@@ -551,8 +551,8 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
 struct matrix_subtraction_engine_traits<OT,
-                                        tr_matrix_engine<fs_matrix_engine<T1, R1, C1>>,
-                                        tr_matrix_engine<fs_matrix_engine<T2, R2, C2>>>
+                                        matrix_transpose_view<fs_matrix_engine<T1, R1, C1>>,
+                                        matrix_transpose_view<fs_matrix_engine<T2, R2, C2>>>
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);

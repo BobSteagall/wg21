@@ -27,8 +27,7 @@ matrix_addition_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>::add
         vr.resize(v1.elements());
     }
 
-    transform(v1.data(), v1.data() + v1.elements(), v2.data(), vr.data(),
-              [](auto lhs, auto rhs) {return lhs + rhs; });
+    transform(v1.begin(), v1.end(), v2.begin(), vr.begin(), [](auto lhs, auto rhs) { return lhs + rhs; });
 
     return vr;
 }
@@ -42,10 +41,24 @@ matrix_addition_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
 {
     PrintOperandTypes<result_type>("addition_traits", m1, m2);
 
-	result_type		mr;
-	const auto		rows = m1.rows();
-	const auto		columns = m1.columns();
+	result_type		mr{};                           //- Braces here to avoid C4701 from MSVC
+	auto const      rows = m1.rows();
+	auto const      columns = m1.columns();
 
+	if constexpr (result_requires_resize(mr))
+	{
+		mr.resize(rows, columns);
+    }
+
+	for (auto i = 0;  i < rows;  ++i)
+    {
+		for (auto j = 0;  j < columns;  ++j)
+        {
+			mr(i, j) = m1(i, j) + m2(i, j);
+        }
+    }
+
+/*
 	if constexpr (result_requires_resize(mr))
 	{
 		mr.resize(rows, columns);
@@ -59,6 +72,7 @@ matrix_addition_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
 		transform(m1.data(), m1.data() + (rows * columns), m2.data(), mr.data(),
 			[](auto lhs, auto rhs) {return lhs + rhs; });
 	}
+*/
 
 	return mr;
 }

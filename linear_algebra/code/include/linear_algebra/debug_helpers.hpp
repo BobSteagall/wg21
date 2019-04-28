@@ -185,7 +185,7 @@ Print(matrix<ET, OT> const& m, char const* pname = nullptr)
     cout << endl << "matrix: " << ((pname) ? pname : "<anon>") << endl;
     cout << "  size: " << m.rows() << "x" << m.columns() << endl;
     cout << "  capy: " << m.row_capacity() << "x" << m.column_capacity() << endl;
-    cout << "  addr: " << m.data() << endl;
+    cout << "  addr: " << &m(0, 0) << endl;
     cout << "  -----" << endl;
 
     for (index_type i = 0;  i < m.rows();  ++i)
@@ -201,7 +201,38 @@ Print(matrix<ET, OT> const& m, char const* pname = nullptr)
     }
 }
 
-#define PRINT_MATRIX(M)     Print(M, #M)
+template<class ET, class OT>
+void
+Print(vector<ET, OT> const& v, char const* pname = nullptr)
+{
+    using index_type = typename vector<ET, OT>::index_type;
+
+    cout << endl << "vector: " << ((pname) ? pname : "<anon>") << endl;
+    cout << "  size: " << v.elements() << endl;
+    cout << "  capy: " << v.capacity() << endl;
+    cout << "  -----" << endl;
+
+    cout << right << setw(4) << setprecision(3) << (double) v(0);
+
+    for (index_type i = 1;  i < v.elements();  ++i)
+    {
+            cout << right << setw(6) << setprecision(3) << (double) v(i);
+    }
+    cout << endl;
+
+    auto    iter = v.begin();
+    auto    last = v.end();
+
+    cout << right << setw(4) << setprecision(3) << (double) *iter;
+
+    for (++iter;  iter != last;  ++iter)
+    {
+            cout << right << setw(6) << setprecision(3) << (double) *iter;
+    }
+    cout << endl;
+}
+
+#define PRINT(X)    Print(X, #X)
 
 }   //- STD_LA namespace
 

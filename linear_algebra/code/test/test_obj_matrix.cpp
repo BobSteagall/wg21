@@ -32,56 +32,89 @@ FillMatrix(STD_LA::matrix<ET, OT>& m)
 
 void t000()
 {
+    PRINT_FNAME();
+
     drm_double  m1;
 
     FillMatrix(m1);
-    PRINT_MATRIX(m1);
+    PRINT(m1);
 
     m1.resize(3, 3);
     FillMatrix(m1);
-    PRINT_MATRIX(m1);
+    PRINT(m1);
 
     m1.reserve(6, 6);
-    PRINT_MATRIX(m1);
+    PRINT(m1);
 
     m1.resize(4, 4);
-    PRINT_MATRIX(m1);
+    PRINT(m1);
 
     drm_double  m2(m1);
-    PRINT_MATRIX(m2);
+    PRINT(m2);
 
     drm_double  m3(std::move(m1));
-    PRINT_MATRIX(m1);
-    PRINT_MATRIX(m3);
+    PRINT(m1);
+    PRINT(m3);
     FillMatrix(m3);
     m3.resize(6, 6);
-    PRINT_MATRIX(m3);
+    PRINT(m3);
 
     fsm_double_35  fm1, fm2, fm3;
     FillMatrix(fm1);
-    PRINT_MATRIX(fm1);
+    PRINT(fm1);
 
     m1 = fm1;
-    PRINT_MATRIX(m1);
+    PRINT(m1);
     fm2 = fm1;
-    PRINT_MATRIX(fm2);
+    PRINT(fm2);
     fm3 = m1;
-    PRINT_MATRIX(fm3);
+    PRINT(fm3);
 
-    PRINT_MATRIX(fm3.t());
+    PRINT(fm3.t());
 
     fsm_double_35   fm4;
     fsm_float_35    fm5;
 
-    PRINT_MATRIX(fm4);
+    PRINT(fm4);
     FillMatrix(fm5);
-    PRINT_MATRIX(fm5);
+    PRINT(fm5);
     fm4 = fm5;
-    PRINT_MATRIX(fm4);
+    PRINT(fm4);
 
     //  fm4 = fm5.t();              fails on static_assert, as expected
     //  fsm_double_36   fm6(fm4);   fails on static_assert, as expected
 }
+
+void t001()
+{
+    PRINT_FNAME();
+
+    drm_double  m1(4, 5);
+
+    FillMatrix(m1);
+    PRINT(m1);
+    PRINT(m1.t());
+    PRINT(m1.column(1));
+    PRINT(m1.row(1));
+    PRINT(m1.t().column(1));
+    PRINT(m1.t().row(1));
+    PRINT(m1.t().t().column(1));
+    PRINT(m1.t().t().row(1));
+
+    std::cout << "\n================\n";
+
+    PRINT(m1.column(0));
+    PRINT(m1.column(1));
+    PRINT(m1.column(2));
+    PRINT(m1.column(3));
+    PRINT(m1.column(4));
+
+    PRINT(m1.row(0));
+    PRINT(m1.row(1));
+    PRINT(m1.row(2));
+    PRINT(m1.row(3));
+}
+
 
 void
 TestGroup00()
@@ -89,4 +122,5 @@ TestGroup00()
     PRINT_FNAME();
 
     t000();
+    t001();
 }
