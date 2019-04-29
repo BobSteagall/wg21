@@ -63,52 +63,81 @@ class dr_vector_engine
     iterator    begin() noexcept;
     iterator    end() noexcept;
 
+    void        assign(dr_vector_engine const& rhs);
     void        reserve(size_type elem_cap);
     void        resize(size_type elems);
     void        resize(size_type elems, size_type elem_cap);
+    void        swap(dr_vector_engine& rhs) noexcept;
     void        swap_elements(index_type i, index_type j);
 
   private:
     pointer     mp_elems;       //- For exposition; data buffer
     size_type   m_elems;
     size_type   m_elemcap;
+
+    void    alloc_new(size_type elems, size_type cap);
+    void    check_capacity(size_type cap);
+    void    check_size(size_type elems);
+    void    reshape(size_type elems, size_type cap);
 };
 
 template<class T, class AT> inline
 dr_vector_engine<T,AT>::~dr_vector_engine()
-{}
+{
+    delete [] mp_elems;
+}
 
 template<class T, class AT> inline
 dr_vector_engine<T,AT>::dr_vector_engine()
-{}
+:   mp_elems(nullptr)
+{
+    alloc_new(1, 1);
+}
 
 template<class T, class AT> inline
-dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine&&) noexcept
-{}
+dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine&& rhs) noexcept
+:   mp_elems(nullptr)
+{
+    alloc_new(1, 1);
+    rhs.swap(*this);
+}
 
 template<class T, class AT> inline
-dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine const&)
-{}
+dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine const& rhs)
+:   mp_elems(nullptr)
+{
+    assign(rhs);
+}
 
 template<class T, class AT> inline
-dr_vector_engine<T,AT>::dr_vector_engine(size_type)
-{}
+dr_vector_engine<T,AT>::dr_vector_engine(size_type elems)
+:   mp_elems(nullptr)
+{
+    alloc_new(elems, elems);
+}
 
 template<class T, class AT> inline
-dr_vector_engine<T,AT>::dr_vector_engine(size_type, size_type)
-{}
+dr_vector_engine<T,AT>::dr_vector_engine(size_type elems, size_type cap)
+:   mp_elems(nullptr)
+{
+    alloc_new(elems, cap);
+}
 
 template<class T, class AT> inline
 dr_vector_engine<T,AT>&
-dr_vector_engine<T,AT>::operator =(dr_vector_engine&&)
+dr_vector_engine<T,AT>::operator =(dr_vector_engine&& rhs)
 {
+    dr_vector_engine    tmp;
+    tmp.swap(rhs);
+    tmp.swap(*this);
     return *this;
 }
 
 template<class T, class AT> inline
 dr_vector_engine<T,AT>&
-dr_vector_engine<T,AT>::operator =(dr_vector_engine const&)
+dr_vector_engine<T,AT>::operator =(dr_vector_engine const& rhs)
 {
+    assign(rhs);
     return *this;
 }
 
@@ -182,6 +211,18 @@ dr_vector_engine<T,AT>::end() noexcept
     return iterator(this, m_elemcap, m_elemcap);
 }
 
+template<class T, class AT>
+void
+dr_vector_engine<T,AT>::assign(dr_vector_engine const& rhs)
+{
+    if (&rhs != this)
+    {
+        dr_vector_engine    tmp(rhs.m_elems, rhs.m_elemcap);
+        copy(rhs.data(), rhs.data() + rhs.m_elemcap, tmp.data());
+        tmp.swap(*this);
+    }
+}
+
 template<class T, class AT> inline
 void
 dr_vector_engine<T,AT>::reserve(size_type)
@@ -199,9 +240,77 @@ dr_vector_engine<T,AT>::resize(size_type, size_type)
 
 template<class T, class AT> inline
 void
+dr_vector_engine<T,AT>::swap(dr_vector_engine& other) noexcept
+{
+    if (&other != this)
+    {
+        std::swap(mp_elems,  other.mp_elems);
+        std::swap(m_elems,   other.m_elems);
+        std::swap(m_elemcap, other.m_elemcap);
+    }
+}
+
+template<class T, class AT> inline
+void
 dr_vector_engine<T,AT>::swap_elements(index_type i, index_type j)
 {
     std::swap(mp_elems[i], mp_elems[j]);
+}
+
+template<class T, class AT>
+void
+dr_vector_engine<T,AT>::alloc_new(size_type elems, size_type cap)
+{
+    check_size(elems);
+    check_capacity(cap);
+
+    m_elems   = elems;
+    m_elemcap = max(elems, cap);
+    mp_elems  = new T[m_elemcap]();
+}
+
+template<class T, class AT>
+void
+dr_vector_engine<T,AT>::check_capacity(size_type cap)
+{
+    if (cap < 1)
+    {
+        throw runtime_error("invalid capacity");
+    }
+}
+
+template<class T, class AT>
+void
+dr_vector_engine<T,AT>::check_size(size_type elems)
+{
+    if (elems < 1)
+    {
+        throw runtime_error("invalid size");
+    }
+}
+
+template<class T, class AT>
+void
+dr_vector_engine<T,AT>::reshape(size_type elems, size_type cap)
+{
+    if (elems > m_elemcap  ||  cap > m_elemcap)
+    {
+        dr_vector_engine    tmp(elems, cap);
+        index_type const    dst_elems = min(elems, m_elems);
+
+        for (index_type i = 0;  i < dst_elems;  ++i)
+        {
+            tmp(i) = (*this)(i);
+        }
+        tmp.swap(*this);
+    }
+    else
+    {
+        check_size(elems);
+        check_capacity(cap);
+        m_elems   = elems;
+        m_elemcap = max(cap, m_elemcap);
+    }
 }
 
 
