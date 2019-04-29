@@ -59,73 +59,73 @@ class matrix
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr matrix(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 
-    constexpr matrix&     operator =(matrix&&) noexcept = default;
-    constexpr matrix&     operator =(matrix const&) = default;
+    constexpr matrix&       operator =(matrix&&) noexcept = default;
+    constexpr matrix&       operator =(matrix const&) = default;
     template<class ET2, class OT2>
-    constexpr matrix&     operator =(matrix<ET2, OT2> const& rhs);
+    constexpr matrix&       operator =(matrix<ET2, OT2> const& rhs);
 
     //- Const element access.
     //
-    constexpr const_reference     operator ()(index_type i, index_type j) const;
+    constexpr const_reference   operator ()(index_type i, index_type j) const;
 
     //- Accessors.
     //
-    constexpr size_type   columns() const noexcept;
-    constexpr size_type   rows() const noexcept;
-    constexpr size_tuple    size() const noexcept;
+    constexpr size_type         columns() const noexcept;
+    constexpr size_type         rows() const noexcept;
+    constexpr size_tuple        size() const noexcept;
 
-    constexpr size_type   column_capacity() const noexcept;
-    constexpr size_type   row_capacity() const noexcept;
-    constexpr size_tuple  capacity() const noexcept;
+    constexpr size_type         column_capacity() const noexcept;
+    constexpr size_type         row_capacity() const noexcept;
+    constexpr size_tuple        capacity() const noexcept;
 
     //- Column view, row view, transpose view, and Hermitian.
     //
-    constexpr column_type     column(index_type j) const;
-    constexpr row_type        row(index_type i) const;
-    constexpr transpose_type  t() const;
-    constexpr hermitian_type  h() const;
+    constexpr column_type       column(index_type j) const;
+    constexpr row_type          row(index_type i) const;
+    constexpr transpose_type    t() const;
+    constexpr hermitian_type    h() const;
 
     //- Mutable element access.
     //
-    constexpr reference   operator ()(index_type i, index_type j);
+    constexpr reference     operator ()(index_type i, index_type j);
 
     //- Assignment.
     //
-    constexpr void    assign(matrix&& rhs);
-    constexpr void    assign(matrix const& rhs);
+    constexpr void      assign(matrix&& rhs);
+    constexpr void      assign(matrix const& rhs);
     template<class ET2, class OT2>
-    constexpr void  assign(matrix<ET2, OT2> const& rhs);
+    constexpr void      assign(matrix<ET2, OT2> const& rhs);
 
     //- Change capacity.
     //
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void    reserve(size_tuple cap);
+    constexpr void      reserve(size_tuple cap);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void    reserve(size_type rowcap, size_type colcap);
+    constexpr void      reserve(size_type rowcap, size_type colcap);
 
     //- Change size.
     //
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void    resize(size_tuple size);
+    constexpr void      resize(size_tuple size);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void    resize(size_type rows, size_type cols);
+    constexpr void      resize(size_type rows, size_type cols);
 
     //- Change size and capacity in one shot.
     //
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void    resize(size_tuple size, size_tuple cap);
+    constexpr void      resize(size_tuple size, size_tuple cap);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void    resize(size_type rows, size_type cols, size_type rowcap, size_type colcap);
+    constexpr void      resize(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 
     //- Swapping operations.
     //
 
     template<class ET2 = ET, detail::enable_if_mutable<ET, ET2> = true>
-    constexpr void    swap(matrix& rhs);
+    constexpr void      swap(matrix& rhs);
     template<class ET2 = ET, detail::enable_if_mutable<ET, ET2> = true>
-    constexpr void    swap_columns(index_type i, index_type j);
+    constexpr void      swap_columns(index_type i, index_type j);
     template<class ET2 = ET, detail::enable_if_mutable<ET, ET2> = true>
-    constexpr void    swap_rows(index_type i, index_type j);
+    constexpr void      swap_rows(index_type i, index_type j);
 
   private:
     template<class ET2, class OT2> friend class matrix;

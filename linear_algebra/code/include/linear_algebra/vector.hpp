@@ -82,6 +82,13 @@ class vector
     constexpr iterator      begin();
     constexpr iterator      end();
 
+    //- Assignment.
+    //
+    constexpr void      assign(vector&& rhs);
+    constexpr void      assign(vector const& rhs);
+    template<class ET2, class OT2>
+    constexpr void      assign(vector<ET2, OT2> const& rhs);
+
     //- Change capacity.
     //
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
@@ -233,6 +240,48 @@ constexpr typename vector<ET,OT>::iterator
 vector<ET,OT>::end()
 {
     return m_engine.end();
+}
+
+template<class ET, class OT>
+constexpr void
+vector<ET,OT>::assign(vector&& rhs)
+{
+    m_engine.assign(std::move(rhs.m_engine));
+}
+
+template<class ET, class OT>
+constexpr void
+vector<ET,OT>::assign(vector const& rhs)
+{
+    m_engine.assign(rhs.m_engine);
+}
+
+template<class ET, class OT>
+template<class ET2, class OT2>
+constexpr void
+vector<ET,OT>::assign(vector<ET2, OT2> const& rhs)
+{
+    if constexpr (detail::is_fixed_size_engine_v<ET>)
+    {
+        if constexpr (detail::is_fixed_size_engine_v<ET2>)
+        {
+            static_assert(detail::engine_size_v<ET> == detail::engine_size_v<ET2>);
+        }
+        else
+        {
+            if (elements() != rhs.elements())
+            {
+                throw runtime_error("size mismatch on assignment to fixed-size matrix");
+            }
+        }
+        copy_elements(rhs);
+    }
+    else
+    {
+        vector  tmp(rhs.elements());
+        tmp.copy_elements(rhs);
+        tmp.swap(*this);
+    }
 }
 
 template<class ET, class OT>
