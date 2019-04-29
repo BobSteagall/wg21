@@ -17,18 +17,20 @@ namespace STD_LA {
 template<class T, int32_t N>
 class fs_vector_engine
 {
+    static_assert(is_matrix_element_v<T>);
     static_assert(N >= 1);
 
   public:
     using engine_category = mutable_vector_engine_tag;
     using element_type    = T;
+    using value_type      = T;
     using reference       = T&;
     using pointer         = T*;
     using const_reference = T const&;
     using const_pointer   = T const*;
     using iterator        = detail::vector_iterator<fs_vector_engine>;
     using const_iterator  = detail::vector_const_iterator<fs_vector_engine>;
-    using difference_type = int_fast32_t;
+    using difference_type = ptrdiff_t;
     using index_type      = int_fast32_t;
     using size_type       = int_fast32_t;
 
@@ -42,38 +44,41 @@ class fs_vector_engine
 
   public:
     constexpr fs_vector_engine();
-    constexpr fs_vector_engine(fs_vector_engine&&) = default;
+    constexpr fs_vector_engine(fs_vector_engine&&) noexcept = default;
     constexpr fs_vector_engine(fs_vector_engine const&) = default;
 
-    constexpr fs_vector_engine&     operator =(fs_vector_engine&&) = default;
+    constexpr fs_vector_engine&     operator =(fs_vector_engine&&) noexcept = default;
     constexpr fs_vector_engine&     operator =(fs_vector_engine const&) = default;
 
     constexpr const_reference   operator ()(index_type i) const;
-    constexpr const_pointer     data() const noexcept;
     constexpr const_iterator    begin() const noexcept;
     constexpr const_iterator    end() const noexcept;
 
     constexpr size_type     capacity() const noexcept;
-    constexpr size_type     elements() const noexcept;
+    constexpr index_type    elements() const noexcept;
+    constexpr size_type     size() const noexcept;
 
     constexpr reference     operator ()(index_type i);
-    constexpr pointer       data() noexcept;
     constexpr iterator      begin() noexcept;
     constexpr iterator      end() noexcept;
 
-    constexpr void  swap_elements(index_type i, index_type j);
+    constexpr void  swap(fs_vector_engine& rhs) noexcept;
+    constexpr void  swap_elements(index_type i, index_type j) noexcept;
 
   private:
-    T       ma_elems[N];      //- For exposition; data buffer
+    T   ma_elems[N];
 };
 
-template<class T, int32_t N> inline
+template<class T, int32_t N>
 constexpr
 fs_vector_engine<T,N>::fs_vector_engine()
 {
     if constexpr (is_arithmetic_v<T>)
     {
-        for (auto& elem : ma_elems) elem = static_cast<T>(0);
+        for (auto& elem : ma_elems) 
+        {
+            elem = static_cast<T>(0);
+        }
     }
 }
 
@@ -82,13 +87,6 @@ constexpr typename fs_vector_engine<T,N>::const_reference
 fs_vector_engine<T,N>::operator ()(index_type i) const
 {
     return ma_elems[i];
-}
-
-template<class T, int32_t N> inline
-constexpr typename fs_vector_engine<T,N>::const_pointer
-fs_vector_engine<T,N>::data() const noexcept
-{
-    return &ma_elems[0];
 }
 
 template<class T, int32_t N> inline
@@ -113,8 +111,15 @@ fs_vector_engine<T,N>::capacity() const noexcept
 }
 
 template<class T, int32_t N> inline
-constexpr typename fs_vector_engine<T,N>::size_type
+constexpr typename fs_vector_engine<T,N>::index_type
 fs_vector_engine<T,N>::elements() const noexcept
+{
+    return N;
+}
+
+template<class T, int32_t N> inline
+constexpr typename fs_vector_engine<T,N>::size_type
+fs_vector_engine<T,N>::size() const noexcept
 {
     return N;
 }
@@ -124,13 +129,6 @@ constexpr typename fs_vector_engine<T,N>::reference
 fs_vector_engine<T,N>::operator ()(index_type i)
 {
     return ma_elems[i];
-}
-
-template<class T, int32_t N> inline
-constexpr typename fs_vector_engine<T,N>::pointer
-fs_vector_engine<T,N>::data() noexcept
-{
-    return &ma_elems[0];
 }
 
 template<class T, int32_t N> inline
@@ -149,7 +147,20 @@ fs_vector_engine<T,N>::end() noexcept
 
 template<class T, int32_t N> inline
 constexpr void
-fs_vector_engine<T,N>::swap_elements(index_type i, index_type j)
+fs_vector_engine<T,N>::swap(fs_vector_engine& rhs) noexcept
+{
+    if (&rhs != this)
+    {
+        for (index_type i = 0;  i < N;  ++i)
+        {
+            std::swap(ma_elems[i], rhs.ma_elems[i]);
+        }
+    }
+}
+
+template<class T, int32_t N> inline
+constexpr void
+fs_vector_engine<T,N>::swap_elements(index_type i, index_type j) noexcept
 {
     std::swap(ma_elems[i], ma_elems[j]);
 }
@@ -162,17 +173,19 @@ fs_vector_engine<T,N>::swap_elements(index_type i, index_type j)
 template<class T, int32_t R, int32_t C>
 class fs_matrix_engine
 {
+    static_assert(is_matrix_element_v<T>);
     static_assert(R >= 1);
     static_assert(C >= 1);
 
   public:
     using engine_category = mutable_matrix_engine_tag;
     using element_type    = T;
+    using value_type      = T;
     using reference       = T&;
     using pointer         = T*;
     using const_reference = T const&;
     using const_pointer   = T const*;
-    using difference_type = int_fast32_t;
+    using difference_type = ptrdiff_t;
     using index_type      = int_fast32_t;
     using size_type       = int_fast32_t;
     using size_tuple      = tuple<size_type, size_type>;
@@ -191,17 +204,16 @@ class fs_matrix_engine
 
   public:
     constexpr fs_matrix_engine();
-    constexpr fs_matrix_engine(fs_matrix_engine&&) = default;
+    constexpr fs_matrix_engine(fs_matrix_engine&&) noexcept = default;
     constexpr fs_matrix_engine(fs_matrix_engine const&) = default;
 
-    constexpr fs_matrix_engine&     operator =(fs_matrix_engine&&) = default;
+    constexpr fs_matrix_engine&     operator =(fs_matrix_engine&&) noexcept = default;
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine const&) = default;
 
     constexpr const_reference   operator ()(index_type i, index_type j) const;
-    constexpr const_pointer     data() const noexcept;
 
-    constexpr size_type     columns() const noexcept;
-    constexpr size_type     rows() const noexcept;
+    constexpr index_type    columns() const noexcept;
+    constexpr index_type    rows() const noexcept;
     constexpr size_tuple    size() const noexcept;
 
     constexpr size_type     column_capacity() const noexcept;
@@ -209,15 +221,17 @@ class fs_matrix_engine
     constexpr size_tuple    capacity() const noexcept;
 
     constexpr reference     operator ()(index_type i, index_type j);
-    constexpr pointer       data() noexcept;
 
-    constexpr void  assign(fs_matrix_engine const& rhs);
-    constexpr void  swap(fs_matrix_engine& rhs);
-    constexpr void  swap_columns(index_type j1, index_type j2);
-    constexpr void  swap_rows(index_type i1, index_type i2);
+    constexpr void      assign(fs_matrix_engine const& rhs);
+    template<class ET2>
+    constexpr void      assign(ET2 const& rhs);
+
+    constexpr void      swap(fs_matrix_engine& rhs) noexcept;
+    constexpr void      swap_columns(index_type j1, index_type j2) noexcept;
+    constexpr void      swap_rows(index_type i1, index_type i2) noexcept;
 
   private:
-    T       ma_elems[R*C];      //- For exposition; data buffer
+    T   ma_elems[R*C];
 };
 
 template<class T, int32_t R, int32_t C> inline
@@ -227,7 +241,10 @@ fs_matrix_engine<T,R,C>::fs_matrix_engine()
 {
     if constexpr (is_arithmetic_v<T>)
     {
-        for (auto& elem : ma_elems) elem = static_cast<T>(0);
+        for (auto& elem : ma_elems) 
+        {
+            elem = static_cast<T>(0);
+        }
     }
 }
 
@@ -239,21 +256,14 @@ fs_matrix_engine<T,R,C>::operator ()(index_type i, index_type j) const
 }
 
 template<class T, int32_t R, int32_t C> inline
-constexpr typename fs_matrix_engine<T,R,C>::const_pointer
-fs_matrix_engine<T,R,C>::data() const noexcept
-{
-    return &ma_elems[0];
-}
-
-template<class T, int32_t R, int32_t C> inline
-constexpr typename fs_matrix_engine<T,R,C>::size_type
+constexpr typename fs_matrix_engine<T,R,C>::index_type
 fs_matrix_engine<T,R,C>::columns() const noexcept
 {
     return C;
 }
 
 template<class T, int32_t R, int32_t C> inline
-constexpr typename fs_matrix_engine<T,R,C>::size_type
+constexpr typename fs_matrix_engine<T,R,C>::index_type
 fs_matrix_engine<T,R,C>::rows() const noexcept
 {
     return R;
@@ -295,28 +305,57 @@ fs_matrix_engine<T,R,C>::operator ()(index_type i, index_type j)
 }
 
 template<class T, int32_t R, int32_t C> inline
-constexpr typename fs_matrix_engine<T,R,C>::pointer
-fs_matrix_engine<T,R,C>::data() noexcept
-{
-    return &ma_elems[0];
-}
-
-template<class T, int32_t R, int32_t C> inline
 constexpr void
 fs_matrix_engine<T,R,C>::assign(fs_matrix_engine const& rhs)
 {
-    if (&rhs != this)
+    if (&rhs != this) return;
+
+    for (index_type i = 0;  i < R*C;  ++i)
     {
-        for (index_type i = 0;  i < R*C;  ++i)
+        ma_elems[i] = rhs.ma_elems[i];
+    }
+}
+
+template<class T, int32_t R, int32_t C> 
+template<class ET2> inline
+constexpr void
+fs_matrix_engine<T,R,C>::assign(ET2 const& rhs)
+{
+    using src_index_type = typename ET2::index_type;
+
+    if (rhs.size() != size()) 
+    {
+        throw runtime_error("invalid size");
+    }
+
+    if constexpr(is_same_v<index_type, src_index_type>)
+    {
+        for (index_type i = 0;  i < rows();  ++i)
         {
-            ma_elems[i] = rhs.ma_elems[i];
+            for (index_type j = 0;  j < columns();  ++j)
+            {
+                (*this)(i, j) = rhs(i, j);
+            }
+        }
+    }
+    else
+    {
+        src_index_type  si, sj;
+        index_type      di, dj;
+
+        for (di = 0, si = 0;  di < rows();  ++di, ++si)
+        {
+            for (dj = 0, sj = 0;  dj < columns();  ++dj, ++sj)
+            {
+                (*this)(di, dj) = rhs(si, sj);
+            }
         }
     }
 }
 
 template<class T, int32_t R, int32_t C> inline
 constexpr void
-fs_matrix_engine<T,R,C>::swap(fs_matrix_engine& rhs)
+fs_matrix_engine<T,R,C>::swap(fs_matrix_engine& rhs) noexcept
 {
     if (&rhs != this)
     {
@@ -329,7 +368,7 @@ fs_matrix_engine<T,R,C>::swap(fs_matrix_engine& rhs)
 
 template<class T, int32_t R, int32_t C> inline
 constexpr void
-fs_matrix_engine<T,R,C>::swap_columns(index_type j1, index_type j2)
+fs_matrix_engine<T,R,C>::swap_columns(index_type j1, index_type j2) noexcept
 {
     if (j1 != j2)
     {
@@ -342,7 +381,7 @@ fs_matrix_engine<T,R,C>::swap_columns(index_type j1, index_type j2)
 
 template<class T, int32_t R, int32_t C> inline
 constexpr void
-fs_matrix_engine<T,R,C>::swap_rows(index_type i1, index_type i2)
+fs_matrix_engine<T,R,C>::swap_rows(index_type i1, index_type i2) noexcept
 {
     if (i1 != i2)
     {
