@@ -8,39 +8,23 @@ using fsd_mat_engine_35 = STD_LA::fs_matrix_engine<double, 3, 5>;
 using drd_mat_engine    = STD_LA::dr_matrix_engine<double, std::allocator<double>>;
 
 using drm_double    = STD_LA::dyn_matrix<double>;
+using drv_double    = STD_LA::dyn_vector<double>;
+
 using fsm_double_35 = STD_LA::fs_matrix<double, 3, 5>;
 using fsm_float_35  = STD_LA::fs_matrix<float, 3, 5>;
 using fsm_double_36 = STD_LA::fs_matrix<double, 3, 6>;
-
-template<class ET, class OT>
-void
-FillMatrix(STD_LA::matrix<ET, OT>& m)
-{
-    using index_type   = typename STD_LA::matrix<ET, OT>::index_type;
-    using element_type = typename STD_LA::matrix<ET, OT>::element_type;
-
-    element_type    x = 1;
-
-    for (index_type i = 0;  i < m.rows();  ++i)
-    {
-        for (index_type j = 0;  j < m.columns();  ++j)
-        {
-            m(i, j) = x;  x = x + 1;
-        }
-    }
-}
 
 void t000()
 {
     PRINT_FNAME();
 
-    drm_double  m1;
+    drm_double  m1; //(4, 4);
 
-    FillMatrix(m1);
+    Fill(m1);
     PRINT(m1);
 
     m1.resize(3, 3);
-    FillMatrix(m1);
+    Fill(m1);
     PRINT(m1);
 
     m1.reserve(6, 6);
@@ -55,12 +39,12 @@ void t000()
     drm_double  m3(std::move(m1));
     PRINT(m1);
     PRINT(m3);
-    FillMatrix(m3);
+    Fill(m3);
     m3.resize(6, 6);
     PRINT(m3);
 
     fsm_double_35  fm1, fm2, fm3;
-    FillMatrix(fm1);
+    Fill(fm1);
     PRINT(fm1);
 
     m1 = fm1;
@@ -76,7 +60,7 @@ void t000()
     fsm_float_35    fm5;
 
     PRINT(fm4);
-    FillMatrix(fm5);
+    Fill(fm5);
     PRINT(fm5);
     fm4 = fm5;
     PRINT(fm4);
@@ -89,9 +73,9 @@ void t001()
 {
     PRINT_FNAME();
 
-    drm_double  m1(4, 5);
+    drm_double  m1(4, 5), m2;
 
-    FillMatrix(m1);
+    Fill(m1);
     PRINT(m1);
     PRINT(m1.t());
     PRINT(m1.column(1));
@@ -113,6 +97,24 @@ void t001()
     PRINT(m1.row(1));
     PRINT(m1.row(2));
     PRINT(m1.row(3));
+
+    PRINT(m1);
+    m1.swap_columns(1, 3);
+    PRINT(m1);
+    m1.swap_rows(0, 2);
+    PRINT(m1);
+
+    m2 = m1;
+    m2.swap_rows(0, 2);
+    m2.swap_columns(1, 3);
+    PRINT(m2);
+
+    drv_double  v1;
+
+    v1 = m2.row(1);
+    PRINT(v1);
+    v1 = m2.column(2);
+    PRINT(v1);
 }
 
 

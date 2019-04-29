@@ -22,6 +22,7 @@ class matrix_column_view
     using engine_type     = ET;
     using engine_category = const_vector_engine_tag;
     using element_type    = typename engine_type::element_type;
+    using value_type      = typename engine_type::value_type;
     using reference       = typename engine_type::const_reference;
     using pointer         = typename engine_type::const_pointer;
     using const_reference = typename engine_type::const_reference;
@@ -43,10 +44,10 @@ class matrix_column_view
   public:
     constexpr matrix_column_view();
     constexpr matrix_column_view(engine_type const& eng, index_type col);
-    constexpr matrix_column_view(matrix_column_view&&) = default;
+    constexpr matrix_column_view(matrix_column_view&&) noexcept = default;
     constexpr matrix_column_view(matrix_column_view const&) = default;
 
-    constexpr matrix_column_view&   operator =(matrix_column_view&&) = default;
+    constexpr matrix_column_view&   operator =(matrix_column_view&&) noexcept = default;
     constexpr matrix_column_view&   operator =(matrix_column_view const&) = default;
 
     constexpr const_reference   operator ()(index_type i) const;
@@ -134,6 +135,7 @@ class matrix_row_view
     using engine_type     = ET;
     using engine_category = const_vector_engine_tag;
     using element_type    = typename engine_type::element_type;
+    using value_type      = typename engine_type::value_type;
     using reference       = typename engine_type::const_reference;
     using pointer         = typename engine_type::const_pointer;
     using const_reference = typename engine_type::const_reference;
@@ -155,10 +157,10 @@ class matrix_row_view
   public:
     constexpr matrix_row_view();
     constexpr matrix_row_view(engine_type const& eng, index_type row);
-    constexpr matrix_row_view(matrix_row_view&&) = default;
+    constexpr matrix_row_view(matrix_row_view&&) noexcept = default;
     constexpr matrix_row_view(matrix_row_view const&) = default;
 
-    constexpr matrix_row_view&  operator =(matrix_row_view&&) = default;
+    constexpr matrix_row_view&  operator =(matrix_row_view&&) noexcept = default;
     constexpr matrix_row_view&  operator =(matrix_row_view const&) = default;
 
     constexpr const_reference   operator ()(index_type j) const;

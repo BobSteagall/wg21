@@ -120,8 +120,8 @@ struct test_add_op_traits_nct
 #endif
 
 #define ASSERT_A_ADD_B_EQ_C(A, B, C)    \
-    EXEC_A_ADD_B(A, B)                  \
-    static_assert(std::is_same_v<decltype(std::declval<A>() + std::declval<B>()), C>)
+    static_assert(std::is_same_v<decltype(std::declval<A>() + std::declval<B>()), C>)   \
+    EXEC_A_ADD_B(A, B)
 
 
 //--------------------------------------------------------------------------------------------------
@@ -413,10 +413,6 @@ void t102()
     ASSERT_A_ADD_B_EQ_C(drv_new_num,  drv_float,       drv_new_num);
     ASSERT_A_ADD_B_EQ_C(drv_new_num,  drv_double,      drv_new_num);
     ASSERT_A_ADD_B_EQ_C(drv_new_num,  drv_new_num,     drv_new_num);
-
-    drv_float   vf;
-
-    vf.resize(32);
 }
 
 

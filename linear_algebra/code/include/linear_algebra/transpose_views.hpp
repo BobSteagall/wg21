@@ -22,6 +22,7 @@ class matrix_transpose_view
     using engine_type     = ET;
     using engine_category = const_matrix_engine_tag;
     using element_type    = typename engine_type::element_type;
+    using value_type      = typename engine_type::value_type;
     using reference       = typename engine_type::const_reference;
     using pointer         = typename engine_type::const_pointer;
     using const_reference = typename engine_type::const_reference;
@@ -46,10 +47,10 @@ class matrix_transpose_view
   public:
     constexpr matrix_transpose_view();
     constexpr matrix_transpose_view(engine_type const& eng);
-    constexpr matrix_transpose_view(matrix_transpose_view&&) = default;
+    constexpr matrix_transpose_view(matrix_transpose_view&&) noexcept = default;
     constexpr matrix_transpose_view(matrix_transpose_view const&) = default;
 
-    constexpr matrix_transpose_view&    operator =(matrix_transpose_view&&) = default;
+    constexpr matrix_transpose_view&    operator =(matrix_transpose_view&&) noexcept = default;
     constexpr matrix_transpose_view&    operator =(matrix_transpose_view const&) = default;
 
     constexpr const_reference   operator ()(index_type i, index_type j) const;
@@ -66,7 +67,7 @@ class matrix_transpose_view
     constexpr void  assign(matrix_transpose_view const& rhs);
 
   private:
-    engine_type const*  mp_other;  //- For exposition; pointer to actual engine
+    engine_type const*  mp_other;
 };
 
 template<class ET> inline 

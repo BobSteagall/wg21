@@ -22,7 +22,7 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, T2>::multiply
 {
     PrintOperandTypes<result_type>("multiplication_traits (v*s)", v1, s2);
 
-	result_type     vr;
+	result_type     vr{};
 
 	if constexpr (result_requires_resize(vr))
 	{
@@ -44,7 +44,7 @@ matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>::multiply
 {
     PrintOperandTypes<result_type>("multiplication_traits (s*v)", s1, v2);
 
-	result_type     vr;
+	result_type     vr{};
 
 	if constexpr (result_requires_resize(vr))
 	{
@@ -66,7 +66,7 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>::multiply
 {
     PrintOperandTypes<result_type>("multiplication_traits (m*s)", m1, s2);
 
-	result_type		mr;
+	result_type		mr{};
 	auto const      rows = m1.rows();
 	auto const      columns = m1.columns();
 
@@ -74,7 +74,7 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>::multiply
 	{
 		mr.resize(rows, columns);
     }
-	
+
 	for (auto i = 0;  i < rows;  ++i)
     {
 		for (auto j = 0;  j < columns;  ++j)
@@ -111,7 +111,7 @@ matrix_multiplication_traits<OTR, T1, matrix<ET2, OT2>>::multiply
 {
     PrintOperandTypes<result_type>("multiplication_traits (s*m)", s1, m2);
 
-	result_type		mr;
+	result_type		mr{};
 	const auto		rows = m2.rows();
 	const auto		columns = m2.columns();
 
@@ -166,12 +166,7 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, vector<ET2, OT2>>::multiply
 {
     PrintOperandTypes<result_type>("multiplication_traits (m*v) ", m1, v2);
 
-    using dst_elem_t   = typename result_type::element_type;
-    using dst_index_t  = typename result_type::index_type;
-    using src1_index_t = typename matrix<ET1, OT1>::index_type;
-    using src2_index_t = typename vector<ET2, OT2>::index_type;
-
-	result_type     vr;
+	result_type     vr{};
 
 	if constexpr (result_requires_resize(vr))
 	{

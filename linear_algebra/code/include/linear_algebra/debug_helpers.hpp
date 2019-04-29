@@ -19,15 +19,11 @@
 namespace STD_LA {
 USING_STD
 
-#define EXEC_OP_TEST_OUTPUT
-
-/*
-constexpr string_view type_name() [with T = vector<dr_vector_engine<double, allocator<double> >, matrix_operation_traits>; string_view = basic_string_view<char>]
- */
+//#define EXEC_OP_TEST_OUTPUT
 
 template <class T>
 constexpr string_view
-type_name()                //- Thanks to Howard Hinnant for this!
+type_name()                //- From StackOverflow...
 {
     using namespace std;
 #ifdef __clang__
@@ -185,7 +181,6 @@ Print(matrix<ET, OT> const& m, char const* pname = nullptr)
     cout << endl << "matrix: " << ((pname) ? pname : "<anon>") << endl;
     cout << "  size: " << m.rows() << "x" << m.columns() << endl;
     cout << "  capy: " << m.row_capacity() << "x" << m.column_capacity() << endl;
-    cout << "  addr: " << &m(0, 0) << endl;
     cout << "  -----" << endl;
 
     for (index_type i = 0;  i < m.rows();  ++i)
@@ -233,6 +228,39 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
 }
 
 #define PRINT(X)    Print(X, #X)
+
+template<class ET, class OT>
+void
+Fill(vector<ET, OT>& v)
+{
+    using index_type   = typename vector<ET, OT>::index_type;
+    using element_type = typename vector<ET, OT>::element_type;
+
+    element_type    x = 1;
+
+    for (index_type i = 0;  i < v.elements();  ++i)
+    {
+         v(i) = x;  x = x + 1;
+    }
+}
+
+template<class ET, class OT>
+void
+Fill(matrix<ET, OT>& m)
+{
+    using index_type   = typename STD_LA::matrix<ET, OT>::index_type;
+    using element_type = typename STD_LA::matrix<ET, OT>::element_type;
+
+    element_type    x = 1;
+
+    for (index_type i = 0;  i < m.rows();  ++i)
+    {
+        for (index_type j = 0;  j < m.columns();  ++j)
+        {
+            m(i, j) = x;  x = x + 1;
+        }
+    }
+}
 
 }   //- STD_LA namespace
 
