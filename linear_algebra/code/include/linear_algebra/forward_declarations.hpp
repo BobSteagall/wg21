@@ -51,6 +51,11 @@ template<class T, int32_t R, int32_t C> class fs_matrix_engine;
 template<class T, class AT>             class dr_vector_engine;
 template<class T, class AT>             class dr_matrix_engine;
 
+//- The default element promotion, engine promotion, and arithmetic operation traits for
+//  the four basic arithmetic operations.
+//
+struct matrix_operation_traits;
+
 //- Primary math object types.
 //
 template<class ET, class OT=matrix_operation_traits> class vector;
