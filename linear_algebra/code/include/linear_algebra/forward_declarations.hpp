@@ -41,6 +41,21 @@ template<class T>   struct is_matrix_element;
 
 struct default_matrix_operations {};
 
+//- Basic linear algebra engine types.
+//
+template<class ET>                      class matrix_column_view;
+template<class ET>                      class matrix_row_view;
+template<class ET>                      class matrix_transpose_view;
+template<class T, int32_t N>            class fs_vector_engine;
+template<class T, int32_t R, int32_t C> class fs_matrix_engine;
+template<class T, class AT>             class dr_vector_engine;
+template<class T, class AT>             class dr_matrix_engine;
+
+//- Primary math object types.
+//
+template<class ET, class OT=matrix_operation_traits> class vector;
+template<class ET, class OT=matrix_operation_traits> class matrix;
+
 //- Math object element promotion traits, per arithmetical operation.
 //
 template<class T1>              struct matrix_negation_element_traits;
@@ -72,19 +87,6 @@ struct matrix_operation_traits;
 //  Note that this traits class is a customization point.
 //
 template<class T1, class T2>    struct matrix_operation_traits_selector;
-
-//- Basic linear algebra math object engine types.
-//
-template<class T, int32_t N>            class fs_vector_engine;
-template<class T, int32_t R, int32_t C> class fs_matrix_engine;
-template<class T, class AT>             class dr_vector_engine;
-template<class T, class AT>             class dr_matrix_engine;
-template<class ET>                      class matrix_transpose_view;
-
-//- Primary mathematical object types.
-//
-template<class ET, class OT=matrix_operation_traits> class vector;
-template<class ET, class OT=matrix_operation_traits> class matrix;
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_FORWARD_DECLARATIONS_HPP_DEFINED
