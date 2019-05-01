@@ -115,8 +115,52 @@ void t001()
     PRINT(v1);
     v1 = m2.column(2);
     PRINT(v1);
+
+    constexpr fsm_double_35     fsm;
+    constexpr double            d = fsm(1,1);
 }
 
+/*
+constexpr void swap(T& a, T& b) noexcept(see below );
+
+Remark: This function shall not participate in overload resolution unless is_move_constructible_v<T>
+is true and is_move_assignable_v<T> is true. The expression inside noexcept is equivalent to:
+    is_nothrow_move_constructible_v<T> && is_nothrow_move_assignable_v<T>
+*/
+
+template<class T>
+static constexpr bool  is_movable_v =  std::is_move_constructible_v<T> 
+                                    && std::is_move_assignable_v<T>;
+
+template<class T>
+static constexpr bool  is_nothrow_movable_v =  std::is_nothrow_move_constructible_v<T> 
+                                            && std::is_nothrow_move_assignable_v<T>;
+
+template<class T>
+constexpr std::enable_if_t<is_movable_v<T>, void>
+cswap(T& t0, T& t1) noexcept(is_nothrow_movable_v<T>)
+{
+    T   t2(std::move(t0));
+    t0 = std::move(t1);
+    t1 = std::move(t2);
+}
+
+constexpr double t002()
+{
+    fsm_double_35   fsm;
+
+//    fsm.swap_columns(1, 2);
+//    fsm.swap_rows(2, 3);
+
+    double    d1 = fsm(1,2);
+    double    d2 = 16.0;
+
+    cswap(d1, d2);
+
+    return d1;
+}
+
+constexpr double cd = t002();
 
 void
 TestGroup00()
