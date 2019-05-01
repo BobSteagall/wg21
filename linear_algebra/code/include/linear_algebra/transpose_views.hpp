@@ -54,7 +54,6 @@ class matrix_transpose_view
     constexpr matrix_transpose_view&    operator =(matrix_transpose_view const&) = default;
 
     constexpr const_reference   operator ()(index_type i, index_type j) const;
-    constexpr const_pointer     data() const noexcept;
 
     constexpr size_type     columns() const noexcept;
     constexpr size_type     rows() const noexcept;
@@ -86,13 +85,6 @@ constexpr typename matrix_transpose_view<ET>::const_reference
 matrix_transpose_view<ET>::operator ()(index_type i, index_type j) const
 {
     return (*mp_other)(j, i);
-}
-
-template<class ET> inline
-constexpr typename matrix_transpose_view<ET>::const_pointer
-matrix_transpose_view<ET>::data() const noexcept
-{
-    return mp_other->data();
 }
 
 template<class ET> inline
