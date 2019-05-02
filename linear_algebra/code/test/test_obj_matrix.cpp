@@ -121,6 +121,8 @@ void t001()
     constexpr double            d = fsm(1,1);
 
     PRINT(fsm);
+
+    //drm_double  mx = {1.0, 1.0, 1.0, 1.0};
 }
 
 
