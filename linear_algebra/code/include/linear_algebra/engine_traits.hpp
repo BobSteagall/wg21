@@ -79,6 +79,12 @@ constexpr bool  is_fixed_size_engine_v = ET::is_fixed_size::value;
 template<class ET>
 constexpr auto  engine_size_v = ET().size();
 
+//------
+//
+template<class ET1, class ET2>
+using enable_if_fixed_size = enable_if_t<is_same_v<ET1, ET2> && is_fixed_size_engine_v<ET1>, bool>;
+
+
 
 //--------------------------------------------------------------------------------------------------
 //- Temporary replacement for std::swap (which is constexpr in C++20)
