@@ -79,7 +79,28 @@ constexpr bool  is_fixed_size_engine_v = ET::is_fixed_size::value;
 template<class ET>
 constexpr auto  engine_size_v = ET().size();
 
-}       //- detail namespace
 
+//--------------------------------------------------------------------------------------------------
+//- Temporary replacement for std::swap (which is constexpr in C++20)
+//
+template<class T>
+static constexpr bool   is_movable_v =  std::is_move_constructible_v<T> 
+                                     && std::is_move_assignable_v<T>;
+
+template<class T>
+static constexpr bool   is_nothrow_movable_v =  std::is_nothrow_move_constructible_v<T> 
+                                             && std::is_nothrow_move_assignable_v<T>;
+
+template<class T> inline 
+constexpr std::enable_if_t<is_movable_v<T>, void>
+la_swap(T& t0, T& t1) noexcept(is_nothrow_movable_v<T>)
+{
+    T   t2(std::move(t0));
+    t0 = std::move(t1);
+    t1 = std::move(t2);
+}
+
+
+}       //- detail namespace
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_ENGINE_TRAITS_HPP_DEFINED

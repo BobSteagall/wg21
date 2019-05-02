@@ -44,6 +44,8 @@ class fs_vector_engine
 
   public:
     constexpr fs_vector_engine();
+    template<class U>
+    constexpr fs_vector_engine(initializer_list<U> list);
     constexpr fs_vector_engine(fs_vector_engine&&) noexcept = default;
     constexpr fs_vector_engine(fs_vector_engine const&) = default;
 
@@ -78,6 +80,33 @@ fs_vector_engine<T,N>::fs_vector_engine()
         for (auto& elem : ma_elems) 
         {
             elem = static_cast<T>(0);
+        }
+    }
+}
+
+template<class T, int32_t N> 
+template<class U>
+constexpr
+fs_vector_engine<T,N>::fs_vector_engine(initializer_list<U> list)
+:   ma_elems()
+{
+    size_t  total = (size_t)(N);
+    size_t  count = min(total, list.size());
+    auto    iter  = list.begin();
+
+    for (size_t i = 0;  i < count;  ++i, ++iter)
+    {
+        ma_elems[i] = static_cast<T>( *iter);
+    }
+
+    if constexpr (is_arithmetic_v<T>)
+    {
+        if (count < total)
+        {
+            for (size_t i = count;  i < total;  ++i) 
+            {
+                ma_elems[i] = static_cast<T>(0);
+            }
         }
     }
 }
@@ -153,7 +182,7 @@ fs_vector_engine<T,N>::swap(fs_vector_engine& rhs) noexcept
     {
         for (index_type i = 0;  i < N;  ++i)
         {
-            std::swap(ma_elems[i], rhs.ma_elems[i]);
+            detail::la_swap(ma_elems[i], rhs.ma_elems[i]);
         }
     }
 }
@@ -162,7 +191,7 @@ template<class T, int32_t N> inline
 constexpr void
 fs_vector_engine<T,N>::swap_elements(index_type i, index_type j) noexcept
 {
-    std::swap(ma_elems[i], ma_elems[j]);
+    detail::la_swap(ma_elems[i], ma_elems[j]);
 }
 
 
@@ -204,6 +233,8 @@ class fs_matrix_engine
 
   public:
     constexpr fs_matrix_engine();
+    template<class U>
+    constexpr fs_matrix_engine(initializer_list<U> list);
     constexpr fs_matrix_engine(fs_matrix_engine&&) noexcept = default;
     constexpr fs_matrix_engine(fs_matrix_engine const&) = default;
 
@@ -244,6 +275,33 @@ fs_matrix_engine<T,R,C>::fs_matrix_engine()
         for (auto& elem : ma_elems) 
         {
             elem = static_cast<T>(0);
+        }
+    }
+}
+
+template<class T, int32_t R, int32_t C> 
+template<class U> inline
+constexpr
+fs_matrix_engine<T,R,C>::fs_matrix_engine(initializer_list<U> list)
+:   ma_elems()
+{
+    size_t  total = (size_t)(R*C);
+    size_t  count = min(total, list.size());
+    auto    iter  = list.begin();
+
+    for (size_t i = 0;  i < count;  ++i, ++iter)
+    {
+        ma_elems[i] = static_cast<T>( *iter);
+    }
+
+    if constexpr (is_arithmetic_v<T>)
+    {
+        if (count < total)
+        {
+            for (size_t i = count;  i < total;  ++i) 
+            {
+                ma_elems[i] = static_cast<T>(0);
+            }
         }
     }
 }
@@ -361,7 +419,7 @@ fs_matrix_engine<T,R,C>::swap(fs_matrix_engine& rhs) noexcept
     {
         for (index_type i = 0;  i < R*C;  ++i)
         {
-            std::swap(ma_elems[i], rhs.ma_elems[i]);
+            detail::la_swap(ma_elems[i], rhs.ma_elems[i]);
         }
     }
 }
@@ -374,7 +432,7 @@ fs_matrix_engine<T,R,C>::swap_columns(index_type j1, index_type j2) noexcept
     {
         for (index_type i = 0;  i < R;  ++i)
         {
-            std::swap(ma_elems[i*C + j1], ma_elems[i*C + j2]);
+            detail::la_swap(ma_elems[i*C + j1], ma_elems[i*C + j2]);
         }
     }
 }
@@ -387,7 +445,7 @@ fs_matrix_engine<T,R,C>::swap_rows(index_type i1, index_type i2) noexcept
     {
         for (index_type j = 0;  j < C;  ++j)
         {
-            std::swap(ma_elems[i1*C + j], ma_elems[i2*C + j]);
+            detail::la_swap(ma_elems[i1*C + j], ma_elems[i2*C + j]);
         }
     }
 }

@@ -194,7 +194,7 @@ fs_matrix_engine_tst<T,R,C>::swap(fs_matrix_engine_tst& rhs) noexcept
     {
         for (index_type i = 0;  i < R*C;  ++i)
         {
-            std::swap(ma_elems[i], rhs.ma_elems[i]);
+            detail::la_swap(ma_elems[i], rhs.ma_elems[i]);
         }
     }
 }
@@ -207,7 +207,7 @@ fs_matrix_engine_tst<T,R,C>::swap_columns(index_type j1, index_type j2)
     {
         for (index_type i = 0;  i < R;  ++i)
         {
-            std::swap(ma_elems[i*C + j1], ma_elems[i*C + j2]);
+            detail::la_swap(ma_elems[i*C + j1], ma_elems[i*C + j2]);
         }
     }
 }
@@ -220,7 +220,7 @@ fs_matrix_engine_tst<T,R,C>::swap_rows(index_type i1, index_type i2)
     {
         for (index_type j = 0;  j < C;  ++j)
         {
-            std::swap(ma_elems[i1*C + j], ma_elems[i2*C + j]);
+            detail::la_swap(ma_elems[i1*C + j], ma_elems[i2*C + j]);
         }
     }
 }

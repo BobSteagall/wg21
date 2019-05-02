@@ -10,6 +10,7 @@ using drd_mat_engine    = STD_LA::dr_matrix_engine<double, std::allocator<double
 using drm_double    = STD_LA::dyn_matrix<double>;
 using drv_double    = STD_LA::dyn_vector<double>;
 
+using fsv_double_5  = STD_LA::fs_vector<double, 5>;
 using fsm_double_35 = STD_LA::fs_matrix<double, 3, 5>;
 using fsm_float_35  = STD_LA::fs_matrix<float, 3, 5>;
 using fsm_double_36 = STD_LA::fs_matrix<double, 3, 6>;
@@ -116,55 +117,45 @@ void t001()
     v1 = m2.column(2);
     PRINT(v1);
 
-    constexpr fsm_double_35     fsm;
+    constexpr fsm_double_35     fsm = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
     constexpr double            d = fsm(1,1);
+
+    PRINT(fsm);
 }
 
-/*
-constexpr void swap(T& a, T& b) noexcept(see below );
-
-Remark: This function shall not participate in overload resolution unless is_move_constructible_v<T>
-is true and is_move_assignable_v<T> is true. The expression inside noexcept is equivalent to:
-    is_nothrow_move_constructible_v<T> && is_nothrow_move_assignable_v<T>
-*/
-
-template<class T>
-static constexpr bool  is_movable_v =  std::is_move_constructible_v<T> 
-                                    && std::is_move_assignable_v<T>;
-
-template<class T>
-static constexpr bool  is_nothrow_movable_v =  std::is_nothrow_move_constructible_v<T> 
-                                            && std::is_nothrow_move_assignable_v<T>;
-
-template<class T>
-constexpr std::enable_if_t<is_movable_v<T>, void>
-cswap(T& t0, T& t1) noexcept(is_nothrow_movable_v<T>)
-{
-    T   t2(std::move(t0));
-    t0 = std::move(t1);
-    t1 = std::move(t2);
-}
 
 constexpr double t002()
 {
-    fsm_double_35   fsm;
+    fsm_double_35   fsm  = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+    fsm_double_35   fsm2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
-//    fsm.swap_columns(1, 2);
-//    fsm.swap_rows(2, 3);
+    fsv_double_5    fsv  = {11, 12, 13, 14, 15};
+    fsv_double_5    fsv2 = {11, 12, 13};
+
+    fsm.swap_columns(1, 3);
+    fsm.swap_rows(0, 2);
 
     double    d1 = fsm(1,2);
-    double    d2 = 16.0;
+    double    d2 = fsv(3);
 
-    cswap(d1, d2);
+    STD_LA::detail::la_swap(d1, d2);
 
-    return d1;
+    return d2;
 }
 
-constexpr double cd = t002();
+constexpr double t003()
+{
+    double d = t002();
+    return d;
+}
+
+constexpr double cd = t003();
 
 void
 TestGroup00()
 {
+    double x = t002();
+
     PRINT_FNAME();
 
     t000();
