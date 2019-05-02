@@ -51,6 +51,8 @@ class vector
     template<class ET2, class OT2>
     constexpr vector(vector<ET2, OT2> const& src);
 
+    template<class U>
+    constexpr vector(initializer_list<U> list);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr vector(size_type elems);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
@@ -126,6 +128,13 @@ template<class ET, class OT> inline
 constexpr
 vector<ET,OT>::vector()
 :   m_engine()
+{}
+
+template<class ET, class OT>
+template<class U>
+constexpr
+vector<ET,OT>::vector(initializer_list<U> list)
+:   m_engine(forward<initializer_list<U>>(list))
 {}
 
 template<class ET, class OT>

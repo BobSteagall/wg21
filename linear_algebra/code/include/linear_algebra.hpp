@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <algorithm>
 #include <complex>
+#include <initializer_list>
 #include <memory>
 #include <numeric>
 #include <tuple>

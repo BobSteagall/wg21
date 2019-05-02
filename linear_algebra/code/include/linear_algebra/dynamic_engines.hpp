@@ -105,6 +105,8 @@ class dr_vector_engine
   public:
     ~dr_vector_engine() noexcept;
     dr_vector_engine();
+    template<class U>
+    constexpr dr_vector_engine(initializer_list<U> list);
     dr_vector_engine(dr_vector_engine&&) noexcept;
     dr_vector_engine(dr_vector_engine const&);
     dr_vector_engine(size_type elems);
@@ -159,6 +161,25 @@ dr_vector_engine<T,AT>::dr_vector_engine()
 ,   m_elemcap(0)
 ,   m_alloc()
 {}
+
+template<class T, class AT> 
+template<class U>
+constexpr
+dr_vector_engine<T,AT>::dr_vector_engine(initializer_list<U> list)
+:   mp_elems(nullptr)
+,   m_elems(0)
+,   m_elemcap(0)
+,   m_alloc()
+{
+    alloc_new((size_type) list.size(), (size_type) list.size());
+
+    auto    iter = list.begin();
+
+    for (size_t i = 0;  i < list.size();  ++i, ++iter)
+    {
+        mp_elems[i] = static_cast<T>( *iter);
+    }
+}
 
 template<class T, class AT> inline
 dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine&& rhs) noexcept
@@ -348,9 +369,9 @@ dr_vector_engine<T,AT>::swap(dr_vector_engine& other) noexcept
 {
     if (&other != this)
     {
-        std::swap(mp_elems,  other.mp_elems);
-        std::swap(m_elems,   other.m_elems);
-        std::swap(m_elemcap, other.m_elemcap);
+        detail::la_swap(mp_elems,  other.mp_elems);
+        detail::la_swap(m_elems,   other.m_elems);
+        detail::la_swap(m_elemcap, other.m_elemcap);
     }
 }
 
@@ -358,7 +379,7 @@ template<class T, class AT> inline
 void
 dr_vector_engine<T,AT>::swap_elements(index_type i, index_type j)
 {
-    std::swap(mp_elems[i], mp_elems[j]);
+    detail::la_swap(mp_elems[i], mp_elems[j]);
 }
 
 template<class T, class AT>
@@ -722,11 +743,11 @@ dr_matrix_engine<T,AT>::swap(dr_matrix_engine& other) noexcept
 {
     if (&other != this)
     {
-        std::swap(mp_elems, other.mp_elems);
-        std::swap(m_rows,   other.m_rows);
-        std::swap(m_cols,   other.m_cols);
-        std::swap(m_rowcap, other.m_rowcap);
-        std::swap(m_colcap, other.m_colcap);
+        detail::la_swap(mp_elems, other.mp_elems);
+        detail::la_swap(m_rows,   other.m_rows);
+        detail::la_swap(m_cols,   other.m_cols);
+        detail::la_swap(m_rowcap, other.m_rowcap);
+        detail::la_swap(m_colcap, other.m_colcap);
     }
 }
 
@@ -738,7 +759,7 @@ dr_matrix_engine<T,AT>::swap_columns(index_type c1, index_type c2)
     {
         for (index_type i = 0;  i < m_rows;  ++i)
         {
-            std::swap(mp_elems[i*m_colcap + c1], mp_elems[i*m_colcap + c2]);
+            detail::la_swap(mp_elems[i*m_colcap + c1], mp_elems[i*m_colcap + c2]);
         }
     }
 }
@@ -751,7 +772,7 @@ dr_matrix_engine<T,AT>::swap_rows(index_type r1, index_type r2)
     {
         for (index_type j = 0;  j < m_cols;  ++j)
         {
-            std::swap(mp_elems[r1*m_colcap + j], mp_elems[r2*m_colcap + j]);
+            detail::la_swap(mp_elems[r1*m_colcap + j], mp_elems[r2*m_colcap + j]);
         }
     }
 }

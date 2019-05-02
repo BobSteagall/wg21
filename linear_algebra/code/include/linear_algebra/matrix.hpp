@@ -48,8 +48,10 @@ class matrix
     constexpr matrix(matrix&&) noexcept = default;
     constexpr matrix(matrix const&) = default;
 
+    template<class U>
+    constexpr matrix(initializer_list<U> list);
     template<class ET2, class OT2>
-    matrix(matrix<ET2, OT2> const& src);
+    constexpr matrix(matrix<ET2, OT2> const& src);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr matrix(size_tuple size);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
@@ -138,7 +140,15 @@ class matrix
 };
 
 template<class ET, class OT>
+template<class U>
+constexpr
+matrix<ET,OT>::matrix(initializer_list<U> list)
+:   m_engine(forward<initializer_list<U>>(list))
+{}
+
+template<class ET, class OT>
 template<class ET2, class OT2>
+constexpr
 matrix<ET,OT>::matrix(matrix<ET2, OT2> const& rhs)
 :   m_engine()
 {
