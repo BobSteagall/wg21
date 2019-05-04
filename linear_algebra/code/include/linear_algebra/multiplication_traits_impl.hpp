@@ -44,16 +44,7 @@ matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>::multiply
 {
     PrintOperandTypes<result_type>("multiplication_traits (s*v)", s1, v2);
 
-	result_type     vr{};
-
-	if constexpr (result_requires_resize(vr))
-	{
-		vr.resize(v2.elements());
-	}
-
-	transform(v2.begin(), v2.end(), vr.begin(), [&](auto val) { return val * s1; });
-
-	return vr;
+	return v2 * s1; //Exploit commutativity...
 }
 
 //---------------
@@ -111,38 +102,7 @@ matrix_multiplication_traits<OTR, T1, matrix<ET2, OT2>>::multiply
 {
     PrintOperandTypes<result_type>("multiplication_traits (s*m)", s1, m2);
 
-	result_type		mr{};
-	const auto		rows = m2.rows();
-	const auto		columns = m2.columns();
-
-	if constexpr (result_requires_resize(mr))
-	{
-		mr.resize(rows, columns);
-	}
-
-	for (auto i = 0;  i < rows;  ++i)
-    {
-		for (auto j = 0;  j < columns;  ++j)
-        {
-			mr(i, j) = m2(i, j) * s1;		// Safe because the resize means that mr capacity = size for rows and columns.
-        }
-    }
-/*
-	if constexpr (result_requires_resize(mr))
-	{
-		mr.resize(rows, columns);
-		auto data = mr.data();
-		for (auto i = 0; i < columns; ++i)
-			for (auto j = 0; j < rows; ++j)
-				* data++ = m2(i, j) * s1;		// Safe because the resize means that mr capacity = size for rows and columns.
-	}
-	else
-	{
-		transform(m2.data(), m2.data() + (rows * columns), mr.data(),
-			[&](auto val) {return val * s1; });
-	}
-*/
-	return mr;
+	return m2 * s1; //Exploit commutativity...
 }
 
 //- vector*vector
@@ -153,7 +113,8 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>::multiply
 (vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2) -> result_type
 {
     PrintOperandTypes<result_type>("multiplication_traits (v*v)", v1, v2);
-    return std::inner_product(v1.begin(), v1.end(), v2.begin(), result_type(0));
+
+	return std::inner_product(v1.begin(), v1.end(), v2.begin(), result_type(0));
 }
 
 //---------------
@@ -167,15 +128,24 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, vector<ET2, OT2>>::multiply
     PrintOperandTypes<result_type>("multiplication_traits (m*v) ", m1, v2);
 
 	result_type     vr{};
+	auto const      rows = m1.rows();
+	auto const      columns = m1.columns();
 
 	if constexpr (result_requires_resize(vr))
 	{
-		vr.resize(v2.elements());
+		vr.resize(rows);
 	}
 
-/*
-    vr(e) = std::inner_product(&m1(e, 0), &m1(e, m1.columns()), v2.data(), typename result_type::element_type(0));
-*/
+	for (auto i = 0; i < rows; ++i)
+	{
+		typename result_type::element_type e(0);
+		for (auto j = 0; j < columns; ++j)
+		{
+			e += m1(i, j) * v2(j);
+		}
+		vr(i) = e;
+	}
+
 	return vr;
 }
 
@@ -185,10 +155,32 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, vector<ET2, OT2>>::multiply
 template<class OTR, class ET1, class OT1, class ET2, class OT2>
 inline auto
 matrix_multiplication_traits<OTR, vector<ET1, OT1>, matrix<ET2, OT2>>::multiply
-(vector<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2) -> result_type
+(vector<ET1, OT1> const& v1, matrix<ET2, OT2> const& m2) -> result_type
 {
-    PrintOperandTypes<result_type>("multiplication_traits (v*m)", m1, m2);
-    return result_type();
+    PrintOperandTypes<result_type>("multiplication_traits (v*m)", v1, m2);
+
+	// In fact, v*m = m(trans) * v, so we could reuse the m*v function
+
+	result_type     vr{};
+	auto const      rows = m2.rows();
+	auto const      columns = m2.columns();
+
+	if constexpr (result_requires_resize(vr))
+	{
+		vr.resize(columns);
+	}
+
+	for (auto i = 0; i < columns; ++i)
+	{
+		typename result_type::element_type e(0);
+		for (auto j = 0; j < rows; ++j)
+		{
+			e += m2(i, j) * v1(j);
+		}
+		vr(i) = e;
+	}
+
+	return vr;
 }
 
 //---------------
@@ -200,7 +192,32 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::multiply
 (matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2) -> result_type
 {
     PrintOperandTypes<result_type>("multiplication_traits (m*m)", m1, m2);
-    return result_type();
+
+	result_type		mr{};
+	auto const      result_rows = m1.rows();
+	auto const      result_columns = m2.columns();
+
+	if constexpr (result_requires_resize(mr))
+	{
+		mr.resize(result_rows, result_columns);
+	}
+
+	for (auto i = 0; i < result_rows; ++i)
+	{
+		for (auto j = 0; j < result_columns; ++j)
+		{
+			typename result_type::element_type e(0);
+			for (auto k = 0; k < m2.rows(); ++k)
+			{
+				auto x = m1(i, k);
+				auto y = m2(k, j);
+				e += x * y;
+			}
+			mr(i, j) = e;
+		}
+	}
+
+	return mr;
 }
 
 }       //- STD_LA namespace

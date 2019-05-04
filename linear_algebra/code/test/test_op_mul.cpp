@@ -926,6 +926,16 @@ void t410()
     ASSERT_A_MUL_B_EQ_C(fsm_double_tst_57,  fsm_double_tst_79,  fsm_double_tst_59);
 }
 
+void t411()
+{
+	PRINT_FNAME();
+
+	STD_LA::matrix<STD_LA::fs_matrix_engine<int, 3, 2>, test_mul_op_traits_tst> lhs{ 1, 2, 3, 4, 5, 6 };
+	STD_LA::matrix<STD_LA::fs_matrix_engine<int, 2, 3>, test_mul_op_traits_tst> rhs{ 4, 5, 6, 7, 8, 9 };
+
+	auto r = lhs * rhs;
+}
+
 void
 TestGroup40()
 {
@@ -942,4 +952,5 @@ TestGroup40()
     t408();
     t409();
     t410();
+	t411();
 }
