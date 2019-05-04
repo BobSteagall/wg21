@@ -147,7 +147,7 @@ constexpr double t002()
 
 constexpr double t003()
 {
-    double d = t002();
+    constexpr double d = t002();
     return d;
 }
 
@@ -156,7 +156,7 @@ constexpr double cd = t003();
 void
 TestGroup00()
 {
-    double x = t002();
+    constexpr double x = t002();
 
     PRINT_FNAME();
 
