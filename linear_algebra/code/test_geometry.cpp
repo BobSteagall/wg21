@@ -137,12 +137,14 @@ private:
 	float   ma_elems[4];
 };
 
-//- Primary math object types.
-//
 template<>
-using float2 = class STD_LA::vector<STD_LA::float2_engine, STD_LA::matrix_operation_traits>;	// 2D vector of floats
-template<>
-using float22 = class STD_LA::matrix<STD_LA::float22_engine, STD_LA::matrix_operation_traits>;	// 2D matrix of floats
+struct matrix_addition_engine_traits<STD_LA::matrix_operation_traits, float2_engine, float2_engine>
+{
+	using element_type_1 = float;
+	using element_type_2 = float;
+	using element_type   = float;
+	using engine_type    = float2_engine;
+};
 
 template<>
 inline auto
@@ -154,7 +156,7 @@ matrix_addition_traits<matrix_operation_traits, vector<float2_engine, matrix_ope
 	return result_type{ v1(0) + v2(0), v1(1) + v2(1) };
 }
 
-}
+} // STD_LA
 
 void
 TestGroup50()
