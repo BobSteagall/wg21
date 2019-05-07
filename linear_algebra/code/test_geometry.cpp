@@ -137,6 +137,8 @@ private:
 	float   ma_elems[4];
 };
 
+// Addition - vector
+
 template<>
 struct matrix_addition_engine_traits<STD_LA::matrix_operation_traits, float2_engine, float2_engine>
 {
@@ -146,6 +148,122 @@ struct matrix_addition_engine_traits<STD_LA::matrix_operation_traits, float2_eng
 	using engine_type    = float2_engine;
 };
 
+// Addition - matrix
+
+template<>
+struct matrix_addition_engine_traits<STD_LA::matrix_operation_traits, float22_engine, float22_engine>
+{
+	using element_type_1 = float;
+	using element_type_2 = float;
+	using element_type   = float;
+	using engine_type    = float22_engine;
+};
+
+// Subtraction - vector
+
+template<>
+struct matrix_subtraction_engine_traits<STD_LA::matrix_operation_traits, float2_engine, float2_engine>
+{
+	using element_type_1 = float;
+	using element_type_2 = float;
+	using element_type   = float;
+	using engine_type    = float2_engine;
+};
+
+// Subtraction - vector
+
+template<>
+struct matrix_subtraction_engine_traits<STD_LA::matrix_operation_traits, float22_engine, float22_engine>
+{
+	using element_type_1 = float;
+	using element_type_2 = float;
+	using element_type   = float;
+	using engine_type    = float22_engine;
+};
+
+// Negation - vector
+
+template<>
+struct matrix_negation_engine_traits<STD_LA::matrix_operation_traits, float2_engine>
+{
+	using element_type = float;
+	using engine_type  = float2_engine;
+};
+
+// Negation - matrix
+
+template<>
+struct matrix_negation_engine_traits<STD_LA::matrix_operation_traits, float22_engine>
+{
+	using element_type = float;
+	using engine_type  = float22_engine;
+};
+
+// Multiplication - vector * scalar
+
+template<>
+struct matrix_multiplication_engine_traits<STD_LA::matrix_operation_traits, float2_engine, float>
+{
+	using element_type = float;
+	using engine_type  = float2_engine;
+};
+
+// Multiplication - matrix * scalar
+
+template<>
+struct matrix_multiplication_engine_traits<STD_LA::matrix_operation_traits, float22_engine, float>
+{
+	using element_type = float;
+	using engine_type  = float22_engine;
+};
+
+// Multiplication - scalar * vector
+
+template<>
+struct matrix_multiplication_engine_traits<STD_LA::matrix_operation_traits, float, float2_engine>
+{
+	using element_type = float;
+	using engine_type  = float2_engine;
+};
+
+// Multiplication - scalar * matrix
+
+template<>
+struct matrix_multiplication_engine_traits<STD_LA::matrix_operation_traits, float, float22_engine>
+{
+	using element_type = float;
+	using engine_type  = float22_engine;
+};
+
+// Multiplication - vector * matrix
+
+template<>
+struct matrix_multiplication_engine_traits<STD_LA::matrix_operation_traits, float2_engine, float22_engine>
+{
+	using element_type = float;
+	using engine_type  = float22_engine;
+};
+
+// Multiplication - matrix * vector
+
+template<>
+struct matrix_multiplication_engine_traits<STD_LA::matrix_operation_traits, float22_engine, float2_engine>
+{
+	using element_type = float;
+	using engine_type  = float22_engine;
+};
+
+// Multiplication - matrix * matrix
+
+template<>
+struct matrix_multiplication_engine_traits<STD_LA::matrix_operation_traits, float22_engine, float22_engine>
+{
+	using element_type = float;
+	using engine_type  = float22_engine;
+};
+
+// Implementation
+
 template<>
 inline auto
 matrix_addition_traits<matrix_operation_traits, vector<float2_engine, matrix_operation_traits>, vector<float2_engine, matrix_operation_traits>>::add
@@ -154,6 +272,56 @@ matrix_addition_traits<matrix_operation_traits, vector<float2_engine, matrix_ope
 	PrintOperandTypes<result_type>("float2 addition_traits", v1, v2);
 
 	return result_type{ v1(0) + v2(0), v1(1) + v2(1) };
+}
+
+template<>
+inline auto
+matrix_addition_traits<matrix_operation_traits, matrix<float22_engine, matrix_operation_traits>, matrix<float22_engine, matrix_operation_traits>>::add
+(matrix<float22_engine, matrix_operation_traits> const& m1, matrix<float22_engine, matrix_operation_traits> const& m2) -> result_type
+{
+	PrintOperandTypes<result_type>("float22 addition_traits", m1, m2);
+
+	return result_type{ m1(0, 0) + m2(0, 0), m1(0, 1) + m2(0, 1), m1(1, 0) + m2(1, 0), m1(1, 1) + m2(1, 1) };
+}
+
+template<>
+inline auto
+matrix_subtraction_traits<matrix_operation_traits, vector<float2_engine, matrix_operation_traits>, vector<float2_engine, matrix_operation_traits>>::subtract
+(vector<float2_engine, matrix_operation_traits> const& v1, vector<float2_engine, matrix_operation_traits> const& v2) -> result_type
+{
+	PrintOperandTypes<result_type>("float2 subtraction_traits", v1, v2);
+
+	return result_type{ v1(0) - v2(0), v1(1) - v2(1) };
+}
+
+template<>
+inline auto
+matrix_subtraction_traits<matrix_operation_traits, matrix<float22_engine, matrix_operation_traits>, matrix<float22_engine, matrix_operation_traits>>::subtract
+(matrix<float22_engine, matrix_operation_traits> const& m1, matrix<float22_engine, matrix_operation_traits> const& m2) -> result_type
+{
+	PrintOperandTypes<result_type>("float22 subtraction_traits", m1, m2);
+
+	return result_type{ m1(0, 0) - m2(0, 0), m1(0, 1) - m2(0, 1), m1(1, 0) - m2(1, 0), m1(1, 1) - m2(1, 1) };
+}
+
+template<>
+inline auto
+matrix_negation_traits<matrix_operation_traits, vector<float2_engine, matrix_operation_traits>>::negate
+(vector<float2_engine, matrix_operation_traits> const& v) -> result_type
+{
+	PrintOperandTypes<result_type>("float2 negation_traits", v);
+
+	return result_type{ -v(0), -v(1) };
+}
+
+template<>
+inline auto
+matrix_negation_traits<matrix_operation_traits, matrix<float22_engine, matrix_operation_traits>>::negate
+(matrix<float22_engine, matrix_operation_traits> const& m) -> result_type
+{
+	PrintOperandTypes<result_type>("float22 negation_traits", m);
+
+	return result_type{ -m(0, 0), -m(0, 1), -m(1, 0), -m(1, 1) };
 }
 
 } // STD_LA
