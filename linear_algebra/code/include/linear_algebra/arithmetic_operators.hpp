@@ -162,7 +162,7 @@ operator *(S1 const& s1, matrix<ET2, OT2> const& m2)
 //- vector*vector
 //
 template<class ET1, class OT1, class ET2, class OT2>
-inline auto
+constexpr inline auto
 operator *(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2)
 {
     using op_traits  = matrix_operation_traits_selector_t<OT1, OT2>;

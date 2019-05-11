@@ -127,7 +127,13 @@
     <ClCompile Include="test\test_obj_matrix.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
-    <ClCompile Include="test_geometry.cpp">
+    <ClCompile Include="test_geometry_2.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_geometry_3.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_geometry_4.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
   </ItemGroup>
