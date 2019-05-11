@@ -169,7 +169,7 @@ struct matrix_addition_engine_traits<matrix_operation_traits, float2_engine, flo
 };
 
 template<>
-inline auto
+auto
 matrix_addition_traits<matrix_operation_traits, vector<float2_engine>, vector<float2_engine>>::add
 (vector<float2_engine> const& v1, vector<float2_engine> const& v2) -> result_type
 {
@@ -190,7 +190,7 @@ struct matrix_addition_engine_traits<matrix_operation_traits, float22_engine, fl
 };
 
 template<>
-inline auto
+auto
 matrix_addition_traits<matrix_operation_traits, matrix<float22_engine>, matrix<float22_engine>>::add
 (matrix<float22_engine> const& m1, matrix<float22_engine> const& m2) -> result_type
 {
@@ -211,7 +211,7 @@ struct matrix_subtraction_engine_traits<matrix_operation_traits, float2_engine, 
 };
 
 template<>
-inline auto
+auto
 matrix_subtraction_traits<matrix_operation_traits, vector<float2_engine>, vector<float2_engine>>::subtract
 (vector<float2_engine> const& v1, vector<float2_engine> const& v2) -> result_type
 {
@@ -232,7 +232,7 @@ struct matrix_subtraction_engine_traits<matrix_operation_traits, float22_engine,
 };
 
 template<>
-inline auto
+auto
 matrix_subtraction_traits<matrix_operation_traits, matrix<float22_engine>, matrix<float22_engine>>::subtract
 (matrix<float22_engine> const& m1, matrix<float22_engine> const& m2) -> result_type
 {
@@ -251,7 +251,7 @@ struct matrix_negation_engine_traits<matrix_operation_traits, float2_engine>
 };
 
 template<>
-inline auto
+auto
 matrix_negation_traits<matrix_operation_traits, vector<float2_engine>>::negate
 (vector<float2_engine> const& v) -> result_type
 {
@@ -270,7 +270,7 @@ struct matrix_negation_engine_traits<matrix_operation_traits, float22_engine>
 };
 
 template<>
-inline auto
+auto
 matrix_negation_traits<matrix_operation_traits, matrix<float22_engine>>::negate
 (matrix<float22_engine> const& m) -> result_type
 {
@@ -289,7 +289,7 @@ struct matrix_multiplication_engine_traits<matrix_operation_traits, float2_engin
 };
 
 template<>
-inline auto
+auto
 matrix_multiplication_traits<matrix_operation_traits, vector<float2_engine>, float>::multiply
 (vector<float2_engine> const& v, float const& s) -> result_type
 {
@@ -308,7 +308,7 @@ struct matrix_multiplication_engine_traits<matrix_operation_traits, float22_engi
 };
 
 template<>
-inline auto
+auto
 matrix_multiplication_traits<matrix_operation_traits, matrix<float22_engine>, float>::multiply
 (matrix<float22_engine> const& m, float const& s) -> result_type
 {
@@ -327,13 +327,13 @@ struct matrix_multiplication_engine_traits<matrix_operation_traits, detail::elem
 };
 
 template<>
-inline auto
+auto
 matrix_multiplication_traits<matrix_operation_traits, float, vector<float2_engine>>::multiply
 (float const& s, vector<float2_engine> const& v) -> result_type
 {
 	PrintOperandTypes<result_type>("float2 multiplication_traits (s*v)", s, v);
 
-	return result_type{ s * v(0), s * v(1) };
+	return v * s;
 }
 
 // Multiplication - scalar * matrix
@@ -346,19 +346,19 @@ struct matrix_multiplication_engine_traits<matrix_operation_traits, detail::elem
 };
 
 template<>
-inline auto
+auto
 matrix_multiplication_traits<matrix_operation_traits, float, matrix<float22_engine>>::multiply
 (float const& s, matrix<float22_engine> const& m) -> result_type
 {
 	PrintOperandTypes<result_type>("float22 multiplication_traits (s*m)", s, m);
 
-	return result_type{ s * m(0, 0), s * m(0, 1), s * m(1, 0), s * m(1, 1) };
+	return m * s;
 }
 
 // Multiplication - vector * vector
 
 template<>
-inline auto
+auto
 matrix_multiplication_traits<matrix_operation_traits, vector<float2_engine>, vector<float2_engine>>::multiply
 (vector<float2_engine> const& v1, vector<float2_engine> const& v2) -> result_type
 {
@@ -377,7 +377,7 @@ struct matrix_multiplication_engine_traits<matrix_operation_traits, float2_engin
 };
 
 template<>
-inline auto
+auto
 matrix_multiplication_traits<matrix_operation_traits, vector<float2_engine>, matrix<float22_engine>>::multiply
 (vector<float2_engine> const& v, matrix<float22_engine> const& m) -> result_type
 {
@@ -396,7 +396,7 @@ struct matrix_multiplication_engine_traits<matrix_operation_traits, float22_engi
 };
 
 template<>
-inline auto
+auto
 matrix_multiplication_traits<matrix_operation_traits, matrix<float22_engine>, vector<float2_engine>>::multiply
 (matrix<float22_engine> const& m, vector<float2_engine> const& v) -> result_type
 {
@@ -415,7 +415,7 @@ struct matrix_multiplication_engine_traits<matrix_operation_traits, float22_engi
 };
 
 template<>
-inline auto
+auto
 matrix_multiplication_traits<matrix_operation_traits, matrix<float22_engine>, matrix<float22_engine>>::multiply
 (matrix<float22_engine> const& m1, matrix<float22_engine> const& m2) -> result_type
 {
@@ -427,15 +427,16 @@ matrix_multiplication_traits<matrix_operation_traits, matrix<float22_engine>, ma
 
 } // STD_LA
 
+STD_LA::vector<STD_LA::float2_engine> v1{ 0.0f, 1.1f };
+STD_LA::vector<STD_LA::float2_engine> v2{ 2.2f, 3.3f };
+STD_LA::matrix<STD_LA::float22_engine> m1{ 4.4f, 5.5f, 6.6f, 7.7f };
+STD_LA::matrix<STD_LA::float22_engine> m2{ 8.8f, 9.9f, 10.1f, 11.11f };
+
 void
-TestGroup50()
+TestGroup501()
 {
 	PRINT_FNAME();
 
-	STD_LA::vector<STD_LA::float2_engine> v1{ 0.0f, 1.1f };
-	STD_LA::vector<STD_LA::float2_engine> v2{ 2.2f, 3.3f };
-	STD_LA::matrix<STD_LA::float22_engine> m1{ 4.4f, 5.5f, 6.6f, 7.7f };
-	STD_LA::matrix<STD_LA::float22_engine> m2{ 8.8f, 9.9f, 10.1f, 11.11f };
 
 	auto v3 = v1 + v2;
 	auto m3 = m1 + m2;
@@ -451,4 +452,16 @@ TestGroup50()
 	auto v9 = v1 * m1;
 	auto v10 = m2 * v2;
 	auto m8 = m1 * m2;
+}
+
+void TestGroup502()
+{
+	std::cout << v1 * v2 << "\n";
+}
+
+void
+TestGroup50()
+{
+	TestGroup501();
+	TestGroup502();
 }
