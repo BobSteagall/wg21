@@ -42,7 +42,21 @@ Abstract: This document proposes an interface specification for a set of fundame
       SG14/SG19 session.
     </td>
   </tr>
+  <tr>
+    <td style="text-align: center;"> R2 </td>
+    <td>
+      Update for pre-Cologne mailing; includes feedback from Kona and monthly
+      conference calls.
+    </td>
+  </tr>
 </table>
+
+## Open Issues
+
+1.  Concept-ification of math types.
+1.  Use of boolean `true`/`false` vs. `std::true_type`/`std::false_type` for nested
+property predicates in math types.
+1.  Re-visit one-vector-type vs. two-vector-type approach.
 
 # Introduction
 
@@ -82,33 +96,32 @@ every portion of the library’s computational infrastructure.
 With these high-level user requirements in mind, in this paper we propose 
 an interface specification intended to achieve the following goals:
 
-1. To provide a set of vocabulary types for representing the 
-mathematical objects and operations that are relevant to linear
-algebra;
+1. To provide a set of vocabulary types for representing the mathematical 
+ objects and operations that are relevant to linear algebra;
 
 1. To provide a public interface for linear algebra operations that is
-intuitive, teachable, and mimics the expressiveness of mathematical
-notation to the greatest *reasonable* extent;
+   intuitive, teachable, and mimics the expressiveness of mathematical
+   notation to the greatest *reasonable* extent;
 
 1. To exhibit out-of-the-box performance in the neighborhood of that 
-of that exhibited by an equivalent sequence of function calls to a more 
-traditional linear algebra library, such as *LAPACK*, *Blaze*, *Eigen*, etc.;
+   of that exhibited by an equivalent sequence of function calls to a more 
+   traditional linear algebra library, such as *LAPACK*, *Blaze*, *Eigen*, etc.;
 
 1. To provide a set of building blocks that manage the source,
-ownership, lifetime, layout, and access of the memory required to
-represent the linear algebra vocabulary types, with the requirement
-that some of these building blocks are also suitable for (eventually)
-representing other interesting mathematical entities, such as quaternions, 
-octonions, and tensors;
+   ownership, lifetime, layout, and access of the memory required to
+   represent the linear algebra vocabulary types, with the requirement
+   that some of these building blocks are also suitable for (eventually)
+   representing other interesting mathematical entities, such as quaternions, 
+   octonions, and tensors;
 
 1. To provide straightforward facilities and techniques for
-customization that enable users to optimize performance for their
-specific problem domain on their specific hardware; and,
+   customization that enable users to optimize performance for their
+   specific problem domain on their specific hardware; and,
 
 1. To provide a *reasonable* level of granularity for customization so 
-that developers only have to implement a minimum set of types and 
-functions to integrate their performance enhancements with the rest of
-the linear algebra facilities described here.
+   that developers only have to implement a minimum set of types and 
+   functions to integrate their performance enhancements with the rest of
+   the linear algebra facilities described here.
 
 # Definitions
 
