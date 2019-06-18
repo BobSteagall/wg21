@@ -54,7 +54,7 @@ struct number_traits<complex<T>> : public number_traits<T>
 //--------------------------------------------------------------------------------------------------
 //
 template<class T>
-struct is_field : public bool_constant<number_traits<T>::is_field::value>
+struct is_field : public number_traits<T>::is_field //bool_constant<number_traits<T>::is_field::value>
 {};
 
 template<class T>

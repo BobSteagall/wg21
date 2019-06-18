@@ -56,9 +56,9 @@ class fs_vector_engine
     constexpr const_iterator    begin() const noexcept;
     constexpr const_iterator    end() const noexcept;
 
-    constexpr size_type     capacity() const noexcept;
-    constexpr index_type    elements() const noexcept;
-    constexpr size_type     size() const noexcept;
+    static constexpr size_type  capacity() noexcept;
+    static constexpr index_type elements() noexcept;
+    static constexpr size_type  size() noexcept;
 
     constexpr reference     operator ()(index_type i);
     constexpr iterator      begin() noexcept;
@@ -134,21 +134,21 @@ fs_vector_engine<T,N>::end() const noexcept
 
 template<class T, int32_t N> inline
 constexpr typename fs_vector_engine<T,N>::size_type
-fs_vector_engine<T,N>::capacity() const noexcept
+fs_vector_engine<T,N>::capacity() noexcept
 {
     return N;
 }
 
 template<class T, int32_t N> inline
 constexpr typename fs_vector_engine<T,N>::index_type
-fs_vector_engine<T,N>::elements() const noexcept
+fs_vector_engine<T,N>::elements() noexcept
 {
     return N;
 }
 
 template<class T, int32_t N> inline
 constexpr typename fs_vector_engine<T,N>::size_type
-fs_vector_engine<T,N>::size() const noexcept
+fs_vector_engine<T,N>::size() noexcept
 {
     return N;
 }
