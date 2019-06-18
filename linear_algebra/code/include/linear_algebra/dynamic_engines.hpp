@@ -134,7 +134,7 @@ class dr_vector_engine
     void    resize(size_type elems);
     void    resize(size_type elems, size_type cap);
     void    swap(dr_vector_engine& rhs) noexcept;
-    void    swap_elements(index_type i, index_type j);
+    void    swap_elements(index_type i, index_type j) noexcept;
 
   private:
     pointer     mp_elems;
@@ -377,7 +377,7 @@ dr_vector_engine<T,AT>::swap(dr_vector_engine& other) noexcept
 
 template<class T, class AT> inline
 void
-dr_vector_engine<T,AT>::swap_elements(index_type i, index_type j)
+dr_vector_engine<T,AT>::swap_elements(index_type i, index_type j) noexcept
 {
     detail::la_swap(mp_elems[i], mp_elems[j]);
 }
@@ -504,8 +504,8 @@ class dr_matrix_engine
     void    resize(size_type rows, size_type cols);
     void    resize(size_type rows, size_type cols, size_type rowcap, size_type colcap);
     void    swap(dr_matrix_engine& other) noexcept;
-    void    swap_columns(index_type c1, index_type c2);
-    void    swap_rows(index_type r1, index_type r2);
+    void    swap_columns(index_type c1, index_type c2) noexcept;
+    void    swap_rows(index_type r1, index_type r2) noexcept;
 
   private:
     pointer         mp_elems;       //- For exposition; data buffer
@@ -753,7 +753,7 @@ dr_matrix_engine<T,AT>::swap(dr_matrix_engine& other) noexcept
 
 template<class T, class AT>
 void
-dr_matrix_engine<T,AT>::swap_columns(index_type c1, index_type c2)
+dr_matrix_engine<T,AT>::swap_columns(index_type c1, index_type c2) noexcept
 {
     if (c1 != c2)
     {
@@ -766,7 +766,7 @@ dr_matrix_engine<T,AT>::swap_columns(index_type c1, index_type c2)
 
 template<class T, class AT>
 void
-dr_matrix_engine<T,AT>::swap_rows(index_type r1, index_type r2)
+dr_matrix_engine<T,AT>::swap_rows(index_type r1, index_type r2) noexcept
 {
     if (r1 != r2)
     {

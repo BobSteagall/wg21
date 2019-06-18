@@ -850,12 +850,12 @@ using matrix_multiplication_traits_t = detail::multiplication_traits_t<OT, OP1, 
 //---------------
 //- vector*scalar
 //
-template<class OTR, class ET1, class OT1, class T2>
-struct matrix_multiplication_traits<OTR, vector<ET1, OT1>, T2>
+template<class OT, class ET1, class OT1, class T2>
+struct matrix_multiplication_traits<OT, vector<ET1, OT1>, T2>
 {
     using scalar_type = detail::element_tag<T2>;
-    using engine_type = matrix_multiplication_engine_t<OTR, ET1, scalar_type>;
-    using op_traits   = OTR;
+    using engine_type = matrix_multiplication_engine_t<OT, ET1, scalar_type>;
+    using op_traits   = OT;
     using result_type = vector<engine_type, op_traits>;
 
     static result_type  multiply(vector<ET1, OT1> const& v1, T2 const& s2);
@@ -864,12 +864,12 @@ struct matrix_multiplication_traits<OTR, vector<ET1, OT1>, T2>
 //---------------
 //- scalar*vector
 //
-template<class OTR, class T1, class ET2, class OT2>
-struct matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>
+template<class OT, class T1, class ET2, class OT2>
+struct matrix_multiplication_traits<OT, T1, vector<ET2, OT2>>
 {
     using scalar_type = detail::element_tag<T1>;
-    using engine_type = matrix_multiplication_engine_t<OTR, scalar_type, ET2>;
-    using op_traits   = OTR;
+    using engine_type = matrix_multiplication_engine_t<OT, scalar_type, ET2>;
+    using op_traits   = OT;
     using result_type = vector<engine_type, op_traits>;
 
     static result_type  multiply(T1 const& s1, vector<ET2, OT2> const& v2);
@@ -878,12 +878,12 @@ struct matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>
 //---------------
 //- matrix*scalar
 //
-template<class OTR, class ET1, class OT1, class T2>
-struct matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>
+template<class OT, class ET1, class OT1, class T2>
+struct matrix_multiplication_traits<OT, matrix<ET1, OT1>, T2>
 {
     using scalar_type = detail::element_tag<T2>;
-    using engine_type = matrix_multiplication_engine_t<OTR, ET1, scalar_type>;
-    using op_traits   = OTR;
+    using engine_type = matrix_multiplication_engine_t<OT, ET1, scalar_type>;
+    using op_traits   = OT;
     using result_type = matrix<engine_type, op_traits>;
 
     static result_type  multiply(matrix<ET1, OT1> const& m1, T2 const& s2);
@@ -892,12 +892,12 @@ struct matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>
 //---------------
 //- scalar*matrix
 //
-template<class OTR, class T1, class ET2, class OT2>
-struct matrix_multiplication_traits<OTR, T1, matrix<ET2, OT2>>
+template<class OT, class T1, class ET2, class OT2>
+struct matrix_multiplication_traits<OT, T1, matrix<ET2, OT2>>
 {
     using scalar_type = detail::element_tag<T1>;
-    using engine_type = matrix_multiplication_engine_t<OTR, scalar_type, ET2>;
-    using op_traits   = OTR;
+    using engine_type = matrix_multiplication_engine_t<OT, scalar_type, ET2>;
+    using op_traits   = OT;
     using result_type = matrix<engine_type, op_traits>;
 
     static result_type  multiply(T1 const& s1, matrix<ET2, OT2> const& m2);
@@ -906,13 +906,13 @@ struct matrix_multiplication_traits<OTR, T1, matrix<ET2, OT2>>
 //---------------
 //- vector*vector
 //
-template<class OTR, class ET1, class OT1, class ET2, class OT2>
-struct matrix_multiplication_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>
+template<class OT, class ET1, class OT1, class ET2, class OT2>
+struct matrix_multiplication_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>
 {
     //- Note that this specialization returns a scalar, and therefore does not compute an
     //  engine type.
     //
-    using op_traits   = OTR;
+    using op_traits   = OT;
     using elem_type_1 = typename vector<ET1, OT1>::element_type;
     using elem_type_2 = typename vector<ET2, OT2>::element_type;
     using result_type = matrix_multiplication_element_t<op_traits, elem_type_1, elem_type_2>;
@@ -923,11 +923,11 @@ struct matrix_multiplication_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>
 //---------------
 //- matrix*vector
 //
-template<class OTR, class ET1, class OT1, class ET2, class OT2>
-struct matrix_multiplication_traits<OTR, matrix<ET1, OT1>, vector<ET2, OT2>>
+template<class OT, class ET1, class OT1, class ET2, class OT2>
+struct matrix_multiplication_traits<OT, matrix<ET1, OT1>, vector<ET2, OT2>>
 {
-    using engine_type = matrix_multiplication_engine_t<OTR, ET1, ET2>;
-    using op_traits   = OTR;
+    using engine_type = matrix_multiplication_engine_t<OT, ET1, ET2>;
+    using op_traits   = OT;
     using result_type = vector<engine_type, op_traits>;
 
     static result_type  multiply(matrix<ET1, OT1> const& m1, vector<ET2, OT2> const& m2);
@@ -936,11 +936,11 @@ struct matrix_multiplication_traits<OTR, matrix<ET1, OT1>, vector<ET2, OT2>>
 //---------------
 //- vector*matrix
 //
-template<class OTR, class ET1, class OT1, class ET2, class OT2>
-struct matrix_multiplication_traits<OTR, vector<ET1, OT1>, matrix<ET2, OT2>>
+template<class OT, class ET1, class OT1, class ET2, class OT2>
+struct matrix_multiplication_traits<OT, vector<ET1, OT1>, matrix<ET2, OT2>>
 {
-    using engine_type = matrix_multiplication_engine_t<OTR, ET1, ET2>;
-    using op_traits   = OTR;
+    using engine_type = matrix_multiplication_engine_t<OT, ET1, ET2>;
+    using op_traits   = OT;
     using result_type = vector<engine_type, op_traits>;
 
     static result_type  multiply(vector<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
@@ -949,11 +949,11 @@ struct matrix_multiplication_traits<OTR, vector<ET1, OT1>, matrix<ET2, OT2>>
 //---------------
 //- matrix*matrix
 //
-template<class OTR, class ET1, class OT1, class ET2, class OT2>
-struct matrix_multiplication_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>
+template<class OT, class ET1, class OT1, class ET2, class OT2>
+struct matrix_multiplication_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>
 {
-    using engine_type = matrix_multiplication_engine_t<OTR, ET1, ET2>;
-    using op_traits   = OTR;
+    using engine_type = matrix_multiplication_engine_t<OT, ET1, ET2>;
+    using op_traits   = OT;
     using result_type = matrix<engine_type, op_traits>;
 
     static result_type  multiply(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);

@@ -93,5 +93,65 @@ struct matrix_operation_traits;
 //
 template<class T1, class T2>    struct matrix_operation_traits_selector;
 
+//- Addition operators
+//
+template<class ET1, class OT1, class ET2, class OT2>
+auto  operator +(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
+
+template<class ET1, class OT1, class ET2, class OT2>
+auto  operator +(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
+
+//- Subtraction operators
+//
+template<class ET1, class OT1, class ET2, class OT2>
+auto  operator -(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
+
+template<class ET1, class OT1, class ET2, class OT2>
+auto  operator -(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
+
+//- Negation operators
+//
+template<class ET1, class OT1>
+auto  operator -(vector<ET1, OT1> const& v1);
+
+template<class ET1, class OT1, class ET2, class OT2>
+auto  operator -(matrix<ET1, OT1> const& m1);
+
+//- Vector*Scalar multiplication operators
+//
+template<class ET1, class OT1, class S2>
+auto  operator *(vector<ET1, OT1> const& v1, S2 const& s2);
+
+template<class S1, class ET2, class OT2>
+auto    operator *(S1 const& s1, vector<ET2, OT2> const& v2);
+
+//- Matrix*Scalar multiplication operators
+//
+template<class ET1, class OT1, class S2>
+auto  operator *(matrix<ET1, OT1> const& m1, S2 const& s2);
+
+template<class S1, class ET2, class OT2>
+auto  operator *(S1 const& s1, matrix<ET2, OT2> const& m2);
+
+//- Vector*Matrix multiplication operators
+//
+template<class ET1, class OT1, class ET2, class OT2>
+auto  operator *(vector<ET1, OT1> const& v1, matrix<ET2, OT2> const& m2);
+
+//- Matrix*Vector multiplication operators
+//
+template<class ET1, class OT1, class ET2, class OT2>
+auto  operator *(matrix<ET1, OT1> const& m1, vector<ET2, OT2> const& v2);
+
+//- Vector*Vector multiplication operators
+//
+template<class ET1, class OT1, class ET2, class OT2> 
+auto  operator *(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
+
+//- Matrix*Matrix multiplication operators
+//
+template<class ET1, class OT1, class ET2, class OT2>
+auto  operator *(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
+
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_FORWARD_DECLARATIONS_HPP_DEFINED
