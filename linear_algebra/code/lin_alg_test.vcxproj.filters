@@ -5,62 +5,136 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
+    <Filter Include="Test Files">
+      <UniqueIdentifier>{8a6a177f-bddc-4e52-8394-835ffeb7291e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface Headers">
+      <UniqueIdentifier>{d983a94d-1b7f-4c43-bbaf-feb32ee50fa3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Implementation Headers">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="matrix.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="test\test_new_arithmetic.hpp">
+      <Filter>Test Files</Filter>
     </ClInclude>
-    <ClInclude Include="linear_algebra.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="test\test_new_engine.hpp">
+      <Filter>Test Files</Filter>
     </ClInclude>
-    <ClInclude Include="matrix_element_traits.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="test\test_new_number.hpp">
+      <Filter>Test Files</Filter>
     </ClInclude>
-    <ClInclude Include="matrix_engine_traits.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\linear_algebra.hpp">
+      <Filter>Interface Headers</Filter>
     </ClInclude>
-    <ClInclude Include="matrix_operators.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\linear_algebra\dynamic_engines.hpp">
+      <Filter>Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="matrix_engines.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\linear_algebra\matrix.hpp">
+      <Filter>Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="matrix_arithmetic_traits.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\linear_algebra\arithmetic_traits.hpp">
+      <Filter>Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="matrix_operator_traits.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\linear_algebra\fixed_size_engines.hpp">
+      <Filter>Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="matrix_fwd.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\linear_algebra\arithmetic_operators.hpp">
+      <Filter>Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="test_new_number.hpp">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="include\linear_algebra\vector.hpp">
+      <Filter>Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="matrix_test_impl.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\linear_algebra\forward_declarations.hpp">
+      <Filter>Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="test_new_engine.hpp">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="include\linear_algebra\library_aliases.hpp">
+      <Filter>Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="test_new_arithmetic.hpp">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="include\linear_algebra\helper_traits.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\debug_helpers.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\engine_traits.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\number_traits.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\operation_traits.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\addition_traits.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\subtraction_traits.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\negation_traits.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\multiplication_traits.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\addition_traits_impl.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\subtraction_traits_impl.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\negation_traits_impl.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\multiplication_traits_impl.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\row_column_views.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\transpose_views.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\vector_iterators.hpp">
+      <Filter>Implementation Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test_01.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="test\test_01.cpp">
+      <Filter>Test Files</Filter>
     </ClCompile>
-    <ClCompile Include="test_02.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="test\test_02.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\test_main.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\test_op_add.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\test_op_sub.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\test_op_neg.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\test_op_mul.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\test_obj_matrix.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_geometry_2.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_geometry_3.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_geometry_4.cpp">
+      <Filter>Test Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
