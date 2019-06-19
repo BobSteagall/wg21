@@ -16,7 +16,7 @@ Status: WD
 !Audience: SG14, SG6, LEWG
 Group: WG21
 TR: http://wg21.link/P1385
-ED: https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/P1385R1.html
+ED: https://github.com/BobSteagall/wg21/blob/master/linear_algebra/papers/P1385R2.html
 !Previous version: [http://wg21.link/P1385R1](http://wg21.link/P1385R1)
 !Strawman implementation: [https://github.com/BobSteagall/wg21/tree/master/linear_algebra/code](https://github.com/BobSteagall/wg21/tree/master/linear_algebra/code)
 Markup Shorthands: markdown yes
@@ -72,10 +72,19 @@ Abstract: This document proposes a set of fundamental linear algebra types and f
 
 ## Open issues
 
-1.  Concept-ification of math types.
-1.  Use of boolean `true`/`false` vs. `std::true_type`/`std::false_type` for 
+1.  Explore how to specify concepts for numerical types.
+1.  Explore use of boolean `true`/`false` vs. `std::true_type`/`std::false_type` for 
 nested property predicates in math types.
-1.  Re-visit one-vector-type vs. two-vector-type approach.
+1.  Explore use of `mdspan` as a component for implementation.
+1.  Explore interface designs to support distributed/parallel/multithreaded 
+arithmetic.
+1.  Explore value-based and expression-based approaches to the arithmetic 
+operators.
+1.  Re-visit one-vector vs. two-vector approach.
+1.  Add type requirements tables.
+1.  Add a Gor table.
+1.  Develop tutorial materials and examples.
+
 
 # Introduction
 
@@ -90,6 +99,7 @@ for C++23.
 
 This paper should be read after P1166, in which we describe a high-level 
 set of expectations for what a linear algebra library should contain.
+
 
 # Goals
 
@@ -142,6 +152,7 @@ an interface specification intended to achieve the following goals:
    functions to integrate their performance enhancements with the rest of
    the linear algebra facilities described here.
 
+
 # Definitions
 
 When discussing linear algebra and related topics for a proposal such as
@@ -154,6 +165,7 @@ but confusingly similar, meanings to C++ programmers.
 In the following sections we provide definitions for relevant
 mathematical concepts, C++ type design concepts, and describe how 
 this proposal employs those overloaded terms in various contexts.
+
 
 ## Mathematical terms
 
@@ -243,6 +255,7 @@ symmetric matrix in order to compute the eigenvalues and eigenvectors
 of that matrix; this is often performed when solving problems involving 
 linear dynamic systems.
 
+
 ## Terms pertaining to C++ types
 
 The following are terms used in this proposal that describe various
@@ -308,6 +321,7 @@ and column sizes and capacities may be changed at run time.
 This section describes how we use certain overloaded terms in this proposal 
 and in future works.
 
+
 ### Matrix
 
 The term *matrix* is frequently used by C++ programmers to mean a
@@ -326,6 +340,7 @@ template that implements the mathematical object. We sometimes use
 and text below to generically refer to a `matrix`,
 `row_vector`, or `column_vector` object.
 
+
 ### Vector
 
 Likewise, many C++ programmers incorrectly use the term *vector* as a
@@ -339,6 +354,7 @@ monospaced font) are the C++ class templates implementing those mathematical
 objects, respectively. We sometimes use `MathObj` (in monospaced font) in
 some of the component code interface code and test below to generically 
 refer to a `row_vector`, `column_vector`, or `matrix` object.
+
 
 ### Dimension
 
@@ -355,6 +371,7 @@ rotation matrix used by a game engine is two-dimensional data structure
 composed of three-dimensional row and column vectors. A vector describing 
 an electric field is an example of a one-dimensional data structure that
 implemented as a three-dimensional column vector.
+
 
 ### Rank
 
@@ -373,6 +390,7 @@ We avoid using the term *rank* in this proposal in the context of linear
 algebra, except as a quantity that might result from performing certain
 decompositions wherein the mathematical rank of a matrix is computed.
 
+
 # Scope
 
 We contend that the best approach for standardizing a set of linear
@@ -385,6 +403,7 @@ a reasonable, basic level of functionality.
 Higher-level functionality can be specified in terms of the interfaces
 described here, and we encourage succession papers to explore this
 possibility.
+
 
 ## Functional requirements
 
@@ -406,6 +425,7 @@ row/column vectors;
 
 + Well-defined facilities for creating and integrating custom arithmetic 
 operations.
+
 
 ## Considered but excluded
 
@@ -470,12 +490,14 @@ the linear algebra components. Liskov substitutability would not be
 possible, and therefore quaternions and octonions should be implemented
 as a set of types distinct from the linear algebra types.
 
+
 # Design aspects
 
 The following describe several important aspects of the problem domain
 affecting the design of the proposed interface. Importantly, these
 aspects are orthogonal, and are addressable through judicious
 combinations of template parameters and implementation type design.
+
 
 ## Memory source
 
@@ -498,6 +520,7 @@ has a lifetime greater than that of the *MathObj*.
 + Elements reside collectively in a set of buffers distributed across
 multiple machines.
 
+
 ## Addressing model
 
 It is also possible that the memory used by a *MathObj* might be
@@ -515,6 +538,7 @@ require first mapping that resource into the local address space,
 perhaps by copying over the network or by some magic sequence of RPC
 invocations.
 
+
 ## Memory ownership
 
 The next important questions pertain to memory ownership. Should the
@@ -524,6 +548,7 @@ is responsible for performing the deallocation?
 A *MathObj* might own the memory in which it stores its elements, or it
 might employ some non-owning view type, like `mdspan`, to manipulate
 elements owned by some other object.
+
 
 ## Capacity and resizability
 
@@ -540,6 +565,7 @@ and always of the same size. In this case, the size and capacity are
 equal, and there is no need for a *MathObj* to maintain or manage excess
 capacity.
 
+
 ## Element layout
 
 There are many ways to arrange the elements of a matrix in memory, the
@@ -552,6 +578,7 @@ well-known for many years, and libraries like LAPACK in the hands of a
 knowledgeable user can use them to implement code that is optimal in
 both time and space.
 
+
 ## Element access and indexing
 
 In keeping with the goal of supporting a natural syntax, and in analogy
@@ -559,10 +586,6 @@ with the indexing operations provided by the random-access standard
 library containers, it seems reasonable to provide both const and
 non-const indexing for reading and writing individual elements.
 
-However, support for element indexing raises an important question:
-should *MathObj*s employ 1-based indexing or 0-based indexing? 1-based
-indexing is the convention used in mathematical notation (and Fortran),
-whereas 0-based indexing is “the C++ way.”
 
 ## Element type
 
@@ -573,6 +596,7 @@ not be precluded from use in a standard linear algebra library. It is
 possible that individual elements of a *MathObj* may allocate memory,
 and therefore an implementation cannot assume that element types have
 trivial constructors or destructors.
+
 
 ## Mixed-element-type expressions
 
@@ -591,6 +615,7 @@ For example, just as the result of multiplying a `float` by a
 `double` is a `double`, the result multiplying a matrix-of-`float`
 by a matrix-of-`double` should be a matrix-of-`double`. We call the
 process of determining the resulting element type *element promotion*.
+
 
 ## Mixed-engine expressions
 
@@ -619,6 +644,7 @@ a fixed-size matrix and a dynamically-resizable matrix.  Although size
 checking must be performed at run time, the resulting engine might be
 specified as fixed-size.
 
+
 ## Arithmetic customization
 
 In pursuit of optimal performance, developers may want to customize
@@ -645,6 +671,7 @@ customizations.  We call the process of determining which of those two
 customizations to employ when performing the actual arithmetic operations
 *operation traits promotion*.
 
+
 ## Linear algebra and `constexpr`
 
 The fundamental set of operations for linear algebra can all be
@@ -659,6 +686,7 @@ allowing customizations to defer to them in `constexpr` evaluations
 while taking the customization’s notionally superior run-time path in
 alternate situations.
 
+
 # Interface description
 
 In this section, we describe the various types, operators, and functions
@@ -667,6 +695,7 @@ descriptions below are by no means ready for wording; rather, they are
 intended to foster further discussions and refinements, and to serve
 as a guide for hardy souls attempting to build implementations from this
 specification.
+
 
 ## Overview
 
@@ -692,10 +721,10 @@ types.  The proposed traits class template `std::math::number_traits` is
 one of two suggested customization points.
   
 + **Element promotion traits** determine the resulting element type of an
-  arithmetic operation involving two _elements_. 
+  arithmetic operation involving two *elements*. 
 
 + **Engine promotion traits** determine the resulting engine type of an
-arithmetic operation involving _matrix_ and/or _vector_ objects.  As part 
+arithmetic operation involving *matrix* and/or *vector* objects.  As part 
 of that process, this traits type uses the element promotion traits to 
 determine the element type of the resulting engine.
 
@@ -749,6 +778,16 @@ a fixed-size matrix.
 
 + Parameter names `R`, `R1`, and `R2` represent the number of rows in
 a fixed-size matrix.
+
+
+## `std::math` namespace
+
+We propose adding the new namespace `std::math` to the standard library to
+contain the linear algebra facilities described in this paper.  There are
+two reasons for this: first, in order to group a related set of mathematical
+facilities in a meaningful and orderly fashion; and second, to distinguish
+the mathematical vector type described in this proposal, `std::math::vector`, 
+from the general-purpose container `std::vector`.
 
 
 ## Header `<linear_algebra>` synopsis
@@ -928,6 +967,7 @@ using fs_matrix = matrix<fs_matrix_engine<T, R, C>, matrix_operation_traits>;
 }
 ~~~~
 
+
 ## Numeric traits
 
 ### `number_traits<T>`
@@ -953,7 +993,7 @@ struct number_traits<complex<T>> : public number_traits<T> {};
 ### `is_complex<T>`
 
 Traits type `is_complex<T>` indicates whether its template paramater `T` 
-is of type `std::complex<V>` for some (presumable) numeric type `V`.  A 
+is of type `std::complex<V>` for some (presumably) numeric type `V`.  A 
 possible implementation might be:
 
 ~~~~
@@ -1018,9 +1058,9 @@ template<class T> struct is_matrix_element;
 
 The purpose of this type is to constrain the set of element types used to 
 instantiate a *MathObj* to those types which fulfill at least the requirements
-of  non-commutative rings.  For now, the constraint is handled viavia static 
-assertion; we expect this to change as concepts are developend and integrated
-into the library.
+of  non-commutative rings.  For now, the constraint is imposed via static 
+assertion; we expect this to change as appropriate concepts are developed 
+and integrated into the library.
 
 ## Engine Types
 
@@ -1034,8 +1074,8 @@ whether or not they are resizable, whether or not their memory layout is
 row-major, and a 2-tuple for describing sizes and capacities.
 
 It is important to note that an engine's resource management duties are 
-primarily related to storage.  To that end, an engine may own and control 
-the lifetime of the storage it manages, or it may be non-owning and represent 
+primarily related to storage.  To that end, an engine may own the storage 
+it manages and control its lifetime, or it may be non-owning and represent 
 a view of storage owned by some other object.
 
 One can also imagine engines that manage resources related to execution. 
@@ -1269,9 +1309,9 @@ class fs_vector_engine
     constexpr void  swap(fs_vector_engine& rhs) noexcept;
     constexpr void  swap_elements(index_type i, index_type j) noexcept;
 };
-
-
 ~~~~
+
+
 ### `fs_matrix_engine<T, R, C>`
 
 Class template `fs_matrix_engine<T, R, C>` implements a fixed-size, 
@@ -1284,9 +1324,6 @@ and swapping rows.
 template<class T, size_t R, size_t C>
 class fs_matrix_engine
 {
-    static_assert(R >= 1);
-    static_assert(C >= 1);
-
   public:
     using engine_category = mutable_matrix_engine_tag;
     using element_type    = T;
@@ -1738,7 +1775,7 @@ class matrix
 
 Class `matrix_operation_traits` is a traits-style template parameter to 
 `vector` and `matrix`.  Its purpose is to associate sets of element promotion
-traits, engine promotion traits, and arithmetic traits with a `MathObj` so 
+traits, engine promotion traits, and arithmetic traits with a *MathObj* so 
 that those traits may be conveyed into an arithmetic operator.
 
 ~~~~
@@ -1789,9 +1826,9 @@ struct matrix_operation_traits
 ~~~~
 
 This traits type is a customization point.  Users may override the default 
-functionality provided therein by creating their operation traits class in 
-their namespace, and defining only those members necessary to implement the 
-desired custom behavior.
+functionality it provides by creating a custom operation traits class in 
+their own namespace, and defining only those members necessary to implement 
+the desired custom behavior.
 
 ### `matrix_operation_traits_selector<OT1, OT2>` 
 
@@ -1850,8 +1887,7 @@ traits type for determining the element type of the *MathObj* instance
 resulting from negating a given *MathObj* instance.
 
 Alias template `matrix_negation_element_t<OT, T1, T2>` is used by the library 
-to return the nested type `OT::element_negation_traits<T1>`; if this type is
-not present in `OT`, then `matrix_negation_element_traits<T1>` is returned.
+to return the nested type `OT::element_negation_traits<T1>`.
 
 ~~~~
 template<class T1>
@@ -1872,9 +1908,7 @@ default traits type for determining the element type of a *MathObj* instance
 resulting from the addition of two other *MathOb* instances.
 
 Alias template `matrix_addition_element_t<OT, T1, T2>` is used by the library 
-to obtain the nested type `OT::element_addition_traits<T1, T2>`; if this type 
-is not present in `OT`, then `matrix_addition_element_traits<T1, T2>` is 
-returned.
+to obtain the nested type `OT::element_addition_traits<T1, T2>`.
 
 ~~~~
 template<class T1, class T2>
@@ -1895,9 +1929,7 @@ default traits type for determining the element type of a *MathObj* instance
 resulting from the subtraction of two other *MathOb* instances.
 
 Alias template `matrix_subtraction_element_t<OT, T1, T2>` is used by the 
-library to obtain the nested type `OT::element_subtraction_traits<T1, T2>`; 
-if this type is not present in `OT`, then 
-`matrix_subtraction_element_traits<T1, T2>` is returned.
+library to obtain the nested type `OT::element_subtraction_traits<T1, T2>`.
 
 ~~~~
 template<class T1, class T2>
@@ -1918,9 +1950,7 @@ default traits type for determining the element type of a *MathObj* instance
 resulting from the multiplication of two other *MathOb* instances.
 
 Alias template `matrix_multiplication_element_t<OT, T1, T2>` is used by the 
-library to obtain the nested type `OT::element_multiplication_traits<T1, T2>`; 
-if this type is not present in `OT`, then 
-`matrix_multiplication_element_traits<T1, T2>` is returned.
+library to obtain the nested type `OT::element_multiplication_traits<T1, T2>`.
 
 ~~~~
 template<class T1, class T2>
@@ -2690,7 +2720,7 @@ class fs_matrix_engine_tst
 ~~~~
 
 For each arithmetic operation in which you expect the new engine type to 
-be involved, you will need to provide a specialization (full or partial) 
+be involved, you will need to provide a specialization 
 of the engine promotion traits for that operation.  For example, let's 
 assume that you're only interested in addition operations involving two 
 operands having the new engine type, or where one operand has the standard 
@@ -2743,11 +2773,7 @@ struct add_op_traits_tst
 ~~~~
 
 As we can see, these custom promotion traits dictate the resulting engine type 
-for these particular cases. Another option is that the result engine type 
-be `fs_matrix_engine`; yet another option is that the return engine type
-be some other type, like an expression engine.
-
-Resulting usage might look like this:
+for these particular cases.  Resulting usage might look like this:
 
 ~~~~
 matrix<fs_matrix_engine<float, 2, 3>, matrix_operation_traits>              m1;
@@ -2776,6 +2802,7 @@ auto    mr4 = m1 + m3;
 Note that this example also assumes that an addition operation involving a 
 fixed-size matrix and a dynamically-resizable matrix, or two 
 dynamically-resizable matrices results in a dynamically-resizable matrix.
+
 
 ## Customizing an arithmetic operation
 
