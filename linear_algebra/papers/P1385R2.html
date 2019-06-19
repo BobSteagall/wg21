@@ -1233,7 +1233,7 @@ Possible extra rowspan handling
 <style>
 	@media screen and (min-width: 78em) {
 		body:not(.toc-inline) #toc {
-			width: 29em;
+			width: 30em;
 		}
 
 		body:not(.toc-inline) {
@@ -1450,7 +1450,7 @@ pre .property::before, pre .property::after {
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">[linear.algebra]R2<br>A proposal to add linear algebra support to the C++ standard library</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Working Draft, <time class="dt-updated" datetime="2019-06-18">2019-06-18</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Working Draft, <time class="dt-updated" datetime="2019-06-19">2019-06-19</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1587,8 +1587,9 @@ pre .property::before, pre .property::after {
      <a href="#customization"><span class="secno">7</span> <span class="content">Customization</span></a>
      <ol class="toc">
       <li><a href="#integrating-a-new-element-type"><span class="secno">7.1</span> <span class="content">Integrating a new element type</span></a>
-      <li><a href="#integrating-a-new-engine-type"><span class="secno">7.2</span> <span class="content">Integrating a new engine type</span></a>
-      <li><a href="#customizing-an-arithmetic-operation"><span class="secno">7.3</span> <span class="content">Customizing an arithmetic operation</span></a>
+      <li><a href="#custom-element-promotion"><span class="secno">7.2</span> <span class="content">Custom element promotion</span></a>
+      <li><a href="#integrating-a-new-engine-type"><span class="secno">7.3</span> <span class="content">Integrating a new engine type</span></a>
+      <li><a href="#customizing-an-arithmetic-operation"><span class="secno">7.4</span> <span class="content">Customizing an arithmetic operation</span></a>
      </ol>
     <li>
      <a href="#meeting-feedback"><span class="secno">8</span> <span class="content">Meeting feedback</span></a>
@@ -1814,8 +1815,8 @@ required to access an element of that array. The <strong>rank</strong> of an
 array is a synonym for its dimension.</p>
     <li data-md>
      <p>This proposal uses the term <strong>MathObj</strong> to refer generically to one
-of the C++ types described herein representing matrices and vectors. These 
-are the public-facing types developers will use in their code.</p>
+of the C++ types described herein representing matrices and vectors (i.e., <code class="highlight"><c- n>matrix</c-></code> and <code class="highlight"><c- n>vector</c-></code>). These are the public-facing types developers will 
+use in their code.</p>
     <li data-md>
      <p>An <strong>engine</strong> is an implementation type that manages the resources
 associated with a <em>MathObj</em> instance.  This includes, at a minumum, the 
@@ -2143,8 +2144,8 @@ specification.</p>
    <ol>
     <li data-md>
      <p><strong>Engines</strong>, which are implementation types that manage the resources
-associated with a <em>MothObj</em> instance, memory ownership and lifetime, and 
-element access; and,</p>
+associated with a <em>MothObj</em> instance, including memory ownership and lifetime, 
+as well as element access; and,</p>
     <li data-md>
      <p><strong>MathObjs</strong>, which provide a unified interface intended to model a
 corresponding mathematical abstraction (vector, matrix);</p>
@@ -2159,16 +2160,16 @@ are several such traits types:</p>
    <ul>
     <li data-md>
      <p><strong>Numeric traits</strong> specify and test the properties of matrix element
-types.  The proposed class template <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>math</c-><c- o>::</c-><c- n>number_traits</c-></code> is one of 
-two planned customization points.</p>
+types.  The proposed traits class template <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>math</c-><c- o>::</c-><c- n>number_traits</c-></code> is 
+one of two suggested customization points.</p>
     <li data-md>
-     <p><strong>Element promotion traits</strong> determine the resulting element type an
-  _element_ arithmetic operation.</p>
+     <p><strong>Element promotion traits</strong> determine the resulting element type of an
+  arithmetic operation involving two _elements_.</p>
     <li data-md>
      <p><strong>Engine promotion traits</strong> determine the resulting engine type of an
-_matrix_ arithmetic operation.  As part of that process, this traits
-type uses the element promotion traits to determine the element type of 
-the resulting engine.</p>
+arithmetic operation involving _matrix_ and/or _vector_ objects.  As part 
+of that process, this traits type uses the element promotion traits to 
+determine the element type of the resulting engine.</p>
     <li data-md>
      <p><strong>Arithmetic traits</strong> determine the type and value of a <em>MathObj</em> resulting from an arithmetical operation.  As part of that process, 
 this traits type uses the engine promotion traits to determine the 
@@ -2188,12 +2189,13 @@ In the case where each operand has the same operation traits, the decision
 simple.  However, it is possible that the operands may be instantiated
 with different operation traits types, and so the operator uses the
 operation selector traits to decide whic operation traits type to use 
-for computing its result.  The proposed class <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>math</c-><c- o>::</c-><c- n>matrix_operation_traits</c-></code> is the second of two suggested customization points.</p>
+for computing its result.  The proposed traits class <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>math</c-><c- o>::</c-><c- n>matrix_operation_traits</c-></code> is the second of two suggested 
+customization points.</p>
    </ul>
    <p>The following sections describe the building blocks in more detail,
 starting at the lowest level, and working upward in order of dependency.</p>
-   <p><strong>A quick note on template parameter nomeclature:</strong> To avoid excessive
-visual noise in the code shown in the remaining sections of this paper, 
+   <p><strong>A note on template parameter nomeclature:</strong> To avoid excessive
+visual noise in the code shown in the subsequent sections of this paper, 
 we use the following abbeviation-based naming conventions for template 
 parameters:</p>
    <ul>
@@ -2207,7 +2209,7 @@ parameters:</p>
      <p>Parameter names <code class="highlight"><c- n>OP</c-></code>, <code class="highlight"><c- n>OP1</c-></code>, and <code class="highlight"><c- n>OP2</c-></code> represent the operand types
 deduced by an arithmetic operator.</p>
     <li data-md>
-     <p>Parameter name <code class="highlight"><c- n>AT</c-></code> represents an allocator type.</p>
+     <p>Parameter names <code class="highlight"><c- n>AT</c-></code>, <code class="highlight"><c- n>AT1</c-></code>, and <code class="highlight"><c- n>AT2</c-></code> represent allocator types.</p>
     <li data-md>
      <p>Parameter names <code class="highlight"><c- n>N</c-></code>, <code class="highlight"><c- n>N1</c-></code>, and <code class="highlight"><c- n>N2</c-></code> represent the number of elements
 in a fixed-size vector.</p>
@@ -2354,22 +2356,22 @@ a fixed-size matrix.</p>
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>S1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT2</c-><c- o>></c->
 <c- k>auto</c->  <c- k>operator</c-> <c- o>*</c-><c- p>(</c-><c- n>S1</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>s1</c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m2</c-><c- p>);</c->
 
-<c- c1>//- Vector*Matrix multiplication operators</c->
+<c- c1>//- Vector*Matrix multiplication operator</c->
 <c- c1>//</c->
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT2</c-><c- o>></c->
 <c- k>auto</c->  <c- k>operator</c-> <c- o>*</c-><c- p>(</c-><c- n>vector</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>v1</c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m2</c-><c- p>);</c->
  
-<c- c1>//- Matrix*Vector multiplication operators</c->
+<c- c1>//- Matrix*Vector multiplication operator</c->
 <c- c1>//</c->
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT2</c-><c- o>></c->
 <c- k>auto</c->  <c- k>operator</c-> <c- o>*</c-><c- p>(</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m1</c-><c- p>,</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>v2</c-><c- p>);</c->
 
-<c- c1>//- Vector*Vector multiplication operators</c->
+<c- c1>//- Vector*Vector multiplication operator</c->
 <c- c1>//</c->
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT2</c-><c- o>></c-> 
 <c- k>auto</c->  <c- k>operator</c-> <c- o>*</c-><c- p>(</c-><c- n>vector</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>v1</c-><c- p>,</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>v2</c-><c- p>);</c->
 
-<c- c1>//- Matrix*Matrix multiplication operators</c->
+<c- c1>//- Matrix*Matrix multiplication operator</c->
 <c- c1>//</c->
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT2</c-><c- o>></c->
 <c- k>auto</c->  <c- k>operator</c-> <c- o>*</c-><c- p>(</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m1</c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m2</c-><c- p>);</c->
@@ -2395,7 +2397,8 @@ a fixed-size matrix.</p>
    <h3 class="heading settled" data-level="6.3" id="numeric-traits"><span class="secno">6.3. </span><span class="content">Numeric traits</span><a class="self-link" href="#numeric-traits"></a></h3>
    <h4 class="heading settled" data-level="6.3.1" id="number_traitst"><span class="secno">6.3.1. </span><span class="content"><code class="highlight"><c- n>number_traits</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code></span><a class="self-link" href="#number_traitst"></a></h4>
    <p>Traits type <code class="highlight"><c- n>number_traits</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code> specifies certain properties of numeric types.
-It is a customization point intended to be specialized by the user.</p>
+It is a customization point intended to be specialized by the user when a new 
+user-defined type is to be used with the library.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- o>></c->
 <c- k>struct</c-> <c- n>number_traits</c->
 <c- p>{</c->
@@ -2408,8 +2411,8 @@ It is a customization point intended to be specialized by the user.</p>
 <c- k>struct</c-> <c- n>number_traits</c-><c- o>&lt;</c-><c- n>complex</c-><c- o>&lt;</c-><c- n>T</c-><c- o>>></c-> <c- o>:</c-> <c- k>public</c-> <c- n>number_traits</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-> <c- p>{};</c->
 </pre>
    <h4 class="heading settled" data-level="6.3.2" id="is_complext"><span class="secno">6.3.2. </span><span class="content"><code class="highlight"><c- n>is_complex</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code></span><a class="self-link" href="#is_complext"></a></h4>
-   <p>Traits type <code class="highlight"><c- n>is_complex</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code> indicates whether its template paramater <code class="highlight"><c- n>T</c-></code> is of type <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>complex</c-><c- o>&lt;</c-><c- n>V</c-><c- o>></c-></code> for some numeric type <code class="highlight"><c- n>V</c-></code>.  A possible 
-implementation might be:</p>
+   <p>Traits type <code class="highlight"><c- n>is_complex</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code> indicates whether its template paramater <code class="highlight"><c- n>T</c-></code> is of type <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>complex</c-><c- o>&lt;</c-><c- n>V</c-><c- o>></c-></code> for some (presumable) numeric type <code class="highlight"><c- n>V</c-></code>.  A 
+possible implementation might be:</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- o>></c->
 <c- k>struct</c-> <c- nl>is_complex</c-> <c- p>:</c-> <c- k>public</c-> <c- n>false_type</c->
 <c- p>{};</c->
@@ -2420,21 +2423,20 @@ implementation might be:</p>
 </pre>
    <h4 class="heading settled" data-level="6.3.3" id="is_fieldt"><span class="secno">6.3.3. </span><span class="content"><code class="highlight"><c- n>is_field</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code></span><a class="self-link" href="#is_fieldt"></a></h4>
    <p>Traits <code class="highlight"><c- n>is_field</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code> type indicates whether its template parameter <code class="highlight"><c- n>T</c-></code> is
-a type that models a mathematical field.  It is expected that <code class="highlight"><c- n>is_field</c-></code> will be implemented in terms of <code class="highlight"><c- n>number_traits</c-></code>, perhaps as follows:</p>
+a type that models a mathematical field.  This proposal expects that <code class="highlight"><c- n>is_field</c-></code> will be implemented in terms of <code class="highlight"><c- n>number_traits</c-></code>, perhaps as follows:</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- o>></c->
 <c- k>struct</c-> <c- nl>is_field</c-> <c- p>:</c-> <c- k>public</c-> <c- n>number_traits</c-><c- o>&lt;</c-><c- n>T</c-><c- o>>::</c-><c- n>is_field</c->
 <c- p>{};</c->
 </pre>
    <h4 class="heading settled" data-level="6.3.4" id="is_ringt"><span class="secno">6.3.4. </span><span class="content"><code class="highlight"><c- n>is_ring</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code></span><a class="self-link" href="#is_ringt"></a></h4>
    <p>Traits type <code class="highlight"><c- n>is_ring</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code> indicates whether its template paremater <code class="highlight"><c- n>T</c-></code> is
-a type that models a mathemetical ring.  It is expected that <code class="highlight"><c- n>is_ring</c-></code> will be implemented in terms of <code class="highlight"><c- n>number_traits</c-></code>, perhaps as follows:</p>
+a type that models a mathematical ring.  This proposal expects that <code class="highlight"><c- n>is_ring</c-></code> will be implemented in terms of <code class="highlight"><c- n>number_traits</c-></code>, perhaps as follows:</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- o>></c->
 <c- k>struct</c-> <c- nl>is_ring</c-> <c- p>:</c-> <c- k>public</c-> <c- n>number_traits</c-><c- o>&lt;</c-><c- n>T</c-><c- o>>::</c-><c- n>is_ring</c->
 <c- p>{};</c->
 </pre>
    <h4 class="heading settled" data-level="6.3.5" id="is_nc_ringt"><span class="secno">6.3.5. </span><span class="content"><code class="highlight"><c- n>is_nc_ring</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code></span><a class="self-link" href="#is_nc_ringt"></a></h4>
-   <p>Traits type <code class="highlight"><c- n>is_nc_ring</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code> indicates whether its template parameter <code class="highlight"><c- n>T</c-></code> is a type that models a mathemetical non-commutative ring.  It is expected 
-that <code class="highlight"><c- n>is_nc_ring</c-></code> will be implemented in terms of <code class="highlight"><c- n>number_traits</c-></code>, perhaps
+   <p>Traits type <code class="highlight"><c- n>is_nc_ring</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code> indicates whether its template parameter <code class="highlight"><c- n>T</c-></code> is a type that models a non-commutative ring.  This proposal expects that <code class="highlight"><c- n>is_nc_ring</c-></code> will be implemented in terms of <code class="highlight"><c- n>number_traits</c-></code>, perhaps
 as follows:</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- o>></c->
 <c- k>struct</c-> <c- nl>is_nc_ring</c-> <c- p>:</c-> <c- k>public</c-> <c- n>number_traits</c-><c- o>&lt;</c-><c- n>T</c-><c- o>>::</c-><c- n>is_nc_ring</c->
@@ -2445,21 +2447,29 @@ as follows:</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- o>></c-> <c- k>struct</c-> <c- n>is_matrix_element</c-><c- p>;</c->
 </pre>
    <p>The purpose of this type is to constrain the set of element types used to
-instantiate a <em>MathObj</em> to those types which are non-commutative rings.</p>
+instantiate a <em>MathObj</em> to those types which fulfill at least the requirements
+of  non-commutative rings.  For now, the constraint is handled viavia static 
+assertion; we expect this to change as concepts are developend and integrated
+into the library.</p>
    <h3 class="heading settled" data-level="6.4" id="engine-types"><span class="secno">6.4. </span><span class="content">Engine Types</span><a class="self-link" href="#engine-types"></a></h3>
    <p>The over-arching purpose of the engine types is to perform resource
-management on behalf of an associated <em>MathObj</em> instance.  At a minimum,
-all of the engine types provide a basic interface for const element
-indexing, row and column sizes, and row and column capacities. They also
-export public type aliases which specify their element type, whether or 
-not they are dense, whether or not they are rectangular, whether or not 
-they are resizable, whether or not their memory layout is row-major, and 
-a 2-tuple for describing sizes and capacities.</p>
-   <p>One can imagine engines that also manage resources related to execution.</p>
+management on behalf of an associated, owning <em>MathObj</em> instance.  At a 
+minimum, all of the engine types provide a basic interface for const element
+indexing, determining row and column sizes, and determining row and column 
+capacities. They also export public type aliases which specify their element 
+type, whether or not they are dense, whether or not they are rectangular, 
+whether or not they are resizable, whether or not their memory layout is 
+row-major, and a 2-tuple for describing sizes and capacities.</p>
+   <p>It is important to note that an engine’s resource management duties are
+primarily related to storage.  To that end, an engine may own and control 
+the lifetime of the storage it manages, or it may be non-owning and represent 
+a view of storage owned by some other object.</p>
+   <p>One can also imagine engines that manage resources related to execution.
+This is an area of ongoing work and not yet addressed in this proposal.</p>
    <h4 class="heading settled" data-level="6.4.1" id="matrix_column_viewet"><span class="secno">6.4.1. </span><span class="content"><code class="highlight"><c- n>matrix_column_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_column_viewet"></a></h4>
-   <p>Class template <code class="highlight"><c- n>matrix_column_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code> implements a non-owning, const
-view type that provides the basic vector engine interface.  Its purpose is 
-to provide a view of single column of a <code class="highlight"><c- n>matrix</c-></code> object.</p>
+   <p>Class template <code class="highlight"><c- n>matrix_column_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code> implements an engine that is a
+non-owning, const view type implementing the basic vector engine interface.  
+Its purpose is to provide a view of single column of a <code class="highlight"><c- n>matrix</c-></code> object.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>ET</c-><c- o>></c->
 <c- k>class</c-> <c- nc>matrix_column_view</c->
 <c- p>{</c->
@@ -2505,9 +2515,9 @@ to provide a view of single column of a <code class="highlight"><c- n>matrix</c-
 <c- p>};</c->
 </pre>
    <h4 class="heading settled" data-level="6.4.2" id="matrix_row_viewet"><span class="secno">6.4.2. </span><span class="content"><code class="highlight"><c- n>matrix_row_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_row_viewet"></a></h4>
-   <p>Class template <code class="highlight"><c- n>matrix_row_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code> implements a non-owning, const view
-type that provides the basic vector engine interface.  Its purpose is 
-to provide a view of single row of a <code class="highlight"><c- n>matrix</c-></code> object.</p>
+   <p>Class template <code class="highlight"><c- n>matrix_row_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code> implements an engine that is a
+non-owning, const view type implementing the basic vector engine interface.  
+Its purpose is to provide a view of single row of a <code class="highlight"><c- n>matrix</c-></code> object.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>ET</c-><c- o>></c->
 <c- k>class</c-> <c- nc>matrix_row_view</c->
 <c- p>{</c->
@@ -2553,14 +2563,13 @@ to provide a view of single row of a <code class="highlight"><c- n>matrix</c-></
 <c- p>};</c->
 </pre>
    <h4 class="heading settled" data-level="6.4.3" id="matrix_transpose_viewet"><span class="secno">6.4.3. </span><span class="content"><code class="highlight"><c- n>matrix_transpose_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_transpose_viewet"></a></h4>
-   <p>Class template <code class="highlight"><c- n>matrix_transpose_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code> implements a non-owning, const
-view type that provides the basic matrix engine interface.  Its purpose is
-to provide a view of a <code class="highlight"><c- n>matrix</c-></code> object that is the transpose of the <code class="highlight"><c- n>matrix</c-></code>.</p>
+   <p>Class template <code class="highlight"><c- n>matrix_transpose_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code> implements an engine that is a
+non-owning, const view type implementing the basic matrix engine interface.  
+Its purpose is to provide a view of a <code class="highlight"><c- n>matrix</c-></code> object that is the transpose 
+of the <code class="highlight"><c- n>matrix</c-></code>.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>ET</c-><c- o>></c->
 <c- k>class</c-> <c- nc>matrix_transpose_view</c->
 <c- p>{</c->
-    <c- k>static_assert</c-><c- p>(</c-><c- n>detail</c-><c- o>::</c-><c- n>is_matrix_engine_v</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-><c- p>);</c->
-
   <c- k>public</c-><c- o>:</c->
     <c- k>using</c-> <c- n>engine_type</c->     <c- o>=</c-> <c- n>ET</c-><c- p>;</c->
     <c- k>using</c-> <c- n>engine_category</c-> <c- o>=</c-> <c- n>const_matrix_engine_tag</c-><c- p>;</c->
@@ -2611,13 +2620,12 @@ to provide a view of a <code class="highlight"><c- n>matrix</c-></code> object t
 </pre>
    <h4 class="heading settled" data-level="6.4.4" id="fs_vector_enginet-n"><span class="secno">6.4.4. </span><span class="content"><code class="highlight"><c- n>fs_vector_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>N</c-><c- o>></c-></code></span><a class="self-link" href="#fs_vector_enginet-n"></a></h4>
    <p>Class template <code class="highlight"><c- n>fs_vector_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>N</c-><c- o>></c-></code> implements a fixed-size, fixed-capacity
-vector engine for vectors having <code class="highlight"><c- n>N</c-></code> elements.  In addition to the basic vector 
+engine for vectors having <code class="highlight"><c- n>N</c-></code> elements.  In addition to the basic vector 
 engine interface, it provides member functions for mutable element indexing,
 swapping engine contents, and swapping individual elements.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>N</c-><c- o>></c->
 <c- k>class</c-> <c- nc>fs_vector_engine</c->
 <c- p>{</c->
-    <c- k>static_assert</c-><c- p>(</c-><c- n>is_matrix_element_v</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>);</c->
     <c- k>static_assert</c-><c- p>(</c-><c- n>N</c-> <c- o>>=</c-> <c- mi>1</c-><c- p>);</c->
 
   <c- k>public</c-><c- o>:</c->
@@ -2670,14 +2678,13 @@ swapping engine contents, and swapping individual elements.</p>
 </pre>
    <h4 class="heading settled" data-level="6.4.5" id="fs_matrix_enginet-r-c"><span class="secno">6.4.5. </span><span class="content"><code class="highlight"><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>R</c-><c- p>,</c-> <c- n>C</c-><c- o>></c-></code></span><a class="self-link" href="#fs_matrix_enginet-r-c"></a></h4>
    <p>Class template <code class="highlight"><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>R</c-><c- p>,</c-> <c- n>C</c-><c- o>></c-></code> implements a fixed-size,
-fixed-capacity matrix engine for matrices having <code class="highlight"><c- n>R</c-></code> rows and <code class="highlight"><c- n>C</c-></code> columns. 
-In addition to the basic engine interface, it provides member functions for 
-mutable element indexing, swapping engine contents, swapping columns, and 
-swapping rows.</p>
+fixed-capacity engine for matrices having <code class="highlight"><c- n>R</c-></code> rows and <code class="highlight"><c- n>C</c-></code> columns. 
+In addition to the basic engine interface, it provides member functions 
+for mutable element indexing, swapping engine contents, swapping columns, 
+and swapping rows.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>R</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>C</c-><c- o>></c->
 <c- k>class</c-> <c- nc>fs_matrix_engine</c->
 <c- p>{</c->
-    <c- k>static_assert</c-><c- p>(</c-><c- n>is_matrix_element_v</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-><c- p>);</c->
     <c- k>static_assert</c-><c- p>(</c-><c- n>R</c-> <c- o>>=</c-> <c- mi>1</c-><c- p>);</c->
     <c- k>static_assert</c-><c- p>(</c-><c- n>C</c-> <c- o>>=</c-> <c- mi>1</c-><c- p>);</c->
 
@@ -2738,10 +2745,11 @@ swapping rows.</p>
 <c- p>};</c->
 </pre>
    <h4 class="heading settled" data-level="6.4.6" id="dr_vector_enginet-at"><span class="secno">6.4.6. </span><span class="content"><code class="highlight"><c- n>dr_vector_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>AT</c-><c- o>></c-></code></span><a class="self-link" href="#dr_vector_enginet-at"></a></h4>
-   <p>Class template <code class="highlight"><c- n>dr_vector_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>AT</c-><c- o>></c-></code> implements a vector engine whose
-sizes and capacities can be changed at runtime. In addition to the basic
-engine interface, it provides member functions for mutable element indexing, 
-swapping engine contents, swapping individual elements, and resizing.</p>
+   <p>Class template <code class="highlight"><c- n>dr_vector_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>AT</c-><c- o>></c-></code> implements an engine for vectors
+whose sizes and capacities can be changed at runtime. In addition to the 
+basic engine interface, it provides member functions for mutable element 
+indexing, swapping engine contents, swapping individual elements, and 
+resizing.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- p>,</c-> <c- k>class</c-> <c- nc>AT</c-><c- o>=</c-><c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- n>T</c-><c- o>>></c->
 <c- k>class</c-> <c- nc>dr_vector_engine</c->
 <c- p>{</c->
@@ -2806,10 +2814,11 @@ swapping engine contents, swapping individual elements, and resizing.</p>
 <c- p>};</c->
 </pre>
    <h4 class="heading settled" data-level="6.4.7" id="dr_matrix_enginet-at"><span class="secno">6.4.7. </span><span class="content"><code class="highlight"><c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>AT</c-><c- o>></c-></code></span><a class="self-link" href="#dr_matrix_enginet-at"></a></h4>
-   <p>Class template <code class="highlight"><c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>AT</c-><c- o>></c-></code> implements an engine whose
-sizes and capacities can be changed at runtime.  In addition to the basic 
-engine interface, it provides member functions for mutable element indexing, 
-swapping engine contents, swapping columns, swapping rows, and resizing.</p>
+   <p>Class template <code class="highlight"><c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>AT</c-><c- o>></c-></code> implements an engine for matrices
+whose sizes and capacities can be changed at runtime.  In addition to the 
+basic engine interface, it provides member functions for mutable element 
+indexing, swapping engine contents, swapping columns, swapping rows, and 
+resizing.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- p>,</c-> <c- k>class</c-> <c- nc>AT</c-><c- o>=</c-><c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- n>T</c-><c- o>>></c->
 <c- k>class</c-> <c- nc>dr_matrix_engine</c->
 <c- p>{</c->
@@ -3103,8 +3112,9 @@ engine type provides dynamic resizing, then this class will as well.</p>
 </pre>
    <h3 class="heading settled" data-level="6.6" id="operation-traits"><span class="secno">6.6. </span><span class="content">Operation traits</span><a class="self-link" href="#operation-traits"></a></h3>
    <h4 class="heading settled" data-level="6.6.1" id="matrix_operation_traits"><span class="secno">6.6.1. </span><span class="content"><code class="highlight"><c- n>matrix_operation_traits</c-></code></span><a class="self-link" href="#matrix_operation_traits"></a></h4>
-   <p>Class <code class="highlight"><c- n>matrix_operation_traits</c-></code> is a traits-style template parameter to <code class="highlight"><c- n>vector</c-></code> and <code class="highlight"><c- n>matrix</c-></code>.  Its purpose is to associate a set of traits with
-a <code class="highlight"><c- n>MathObj</c-></code> so that those traits may be conveyed into an arithmetic operator.</p>
+   <p>Class <code class="highlight"><c- n>matrix_operation_traits</c-></code> is a traits-style template parameter to <code class="highlight"><c- n>vector</c-></code> and <code class="highlight"><c- n>matrix</c-></code>.  Its purpose is to associate sets of element promotion
+traits, engine promotion traits, and arithmetic traits with a <code class="highlight"><c- n>MathObj</c-></code> so 
+that those traits may be conveyed into an arithmetic operator.</p>
 <pre class="highlight"><c- k>struct</c-> <c- n>matrix_operation_traits</c->
 <c- p>{</c->
     <c- c1>//- Default element promotion traits.</c->
@@ -3150,10 +3160,15 @@ a <code class="highlight"><c- n>MathObj</c-></code> so that those traits may be 
     <c- k>using</c-> <c- n>multiplication_traits</c-> <c- o>=</c-> <c- n>matrix_multiplication_traits</c-><c- o>&lt;</c-><c- n>OTR</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-><c- p>;</c->
 <c- p>};</c->
 </pre>
+   <p>This traits type is a customization point.  Users may override the default
+functionality provided therein by creating their operation traits class in 
+their namespace, and defining only those members necessary to implement the 
+desired custom behavior.</p>
    <h4 class="heading settled" data-level="6.6.2" id="matrix_operation_traits_selectorot1-ot2"><span class="secno">6.6.2. </span><span class="content"><code class="highlight"><c- n>matrix_operation_traits_selector</c-><c- o>&lt;</c-><c- n>OT1</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_operation_traits_selectorot1-ot2"></a></h4>
    <p>Class template <code class="highlight"><c- n>matrix_operation_traits_selector</c-><c- o>&lt;</c-><c- n>OT1</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-></code> is used by the
-arithmetic operators to select a specific operation traits type that will
-be used to perform an arithmetic operation.</p>
+binary arithmetic operators to select the operation traits type to used in
+performing an arithmetic operation.  The selection is based on the operation 
+traits types of the two operands.</p>
 <pre class="highlight"><c- c1>//- Primary template and expected specializations.</c->
 <c- c1>//</c->
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
@@ -3186,16 +3201,18 @@ be used to perform an arithmetic operation.</p>
 <c- c1>//- Convenience alias.</c->
 <c- c1>//</c->
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
-<c- k>using</c-> <c- n>matrix_operation_traits_selector_t</c-> <c- o>=</c-> <c- k>typename</c-> <c- n>matrix_operation_traits_selector</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-><c- n>T2</c-><c- o>>::</c-><c- n>traits_type</c-><c- p>;</c->
+<c- k>using</c-> <c- n>matrix_operation_traits_selector_t</c-> <c- o>=</c-> <c- k>typename</c-> <c- n>matrix_operation_traits_selector</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>>::</c-><c- n>traits_type</c-><c- p>;</c->
 </pre>
    <h3 class="heading settled" data-level="6.7" id="element-promotion-traits"><span class="secno">6.7. </span><span class="content">Element promotion traits</span><a class="self-link" href="#element-promotion-traits"></a></h3>
    <p>Element promotion traits are used by the library to determine the resulting
-element type in an binary expression involving engines with possibly two 
-different element types.</p>
+element type of an arithmetical expression having one or two <em>MathObj</em> operands.</p>
    <h4 class="heading settled" data-level="6.7.1" id="matrix_negation_element_traitst1"><span class="secno">6.7.1. </span><span class="content"><code class="highlight"><c- n>matrix_negation_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_negation_element_traitst1"></a></h4>
-   <p>Class template <code class="highlight"><c- n>matrix_negation_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- o>></c-></code> implements a traits
-type that determines the appropriate result type of an elementwise negation
-operation involving a <em>MathObj</em> element type.</p>
+   <p>Class template <code class="highlight"><c- n>matrix_negation_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- o>></c-></code> implements the default
+traits type for determining the element type of the <em>MathObj</em> instance
+resulting from negating a given <em>MathObj</em> instance.</p>
+   <p>Alias template <code class="highlight"><c- n>matrix_negation_element_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> is used by the library
+to return the nested type <code class="highlight"><c- n>OT</c-><c- o>::</c-><c- n>element_negation_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- o>></c-></code>; if this type is
+not present in <code class="highlight"><c- n>OT</c-></code>, then <code class="highlight"><c- n>matrix_negation_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- o>></c-></code> is returned.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_negation_element_traits</c->
 <c- p>{</c->
@@ -3206,9 +3223,13 @@ operation involving a <em>MathObj</em> element type.</p>
 <c- k>using</c-> <c- n>matrix_negation_element_t</c-> <c- o>=</c-> <c- p>...;</c->          <c- c1>//- Implementation-defined</c->
 </pre>
    <h4 class="heading settled" data-level="6.7.2" id="matrix_addition_element_traitst1-t2"><span class="secno">6.7.2. </span><span class="content"><code class="highlight"><c- n>matrix_addition_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_addition_element_traitst1-t2"></a></h4>
-   <p>Class template <code class="highlight"><c- n>matrix_addition_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> implements a traits
-type that determines the appropriate result type of an elementwise addition 
-operation involving two (possibly different) element types.</p>
+   <p>Class template <code class="highlight"><c- n>matrix_addition_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> implements the
+default traits type for determining the element type of a <em>MathObj</em> instance 
+resulting from the addition of two other <em>MathOb</em> instances.</p>
+   <p>Alias template <code class="highlight"><c- n>matrix_addition_element_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> is used by the library
+to obtain the nested type <code class="highlight"><c- n>OT</c-><c- o>::</c-><c- n>element_addition_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code>; if this type 
+is not present in <code class="highlight"><c- n>OT</c-></code>, then <code class="highlight"><c- n>matrix_addition_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> is 
+returned.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_addition_element_traits</c->
 <c- p>{</c->
@@ -3219,9 +3240,12 @@ operation involving two (possibly different) element types.</p>
 <c- k>using</c-> <c- n>matrix_addition_element_t</c-> <c- o>=</c-> <c- p>...;</c->          <c- c1>//- Implementation-defined</c->
 </pre>
    <h4 class="heading settled" data-level="6.7.3" id="matrix_subtraction_element_traitst1-t2"><span class="secno">6.7.3. </span><span class="content"><code class="highlight"><c- n>matrix_subtraction_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_subtraction_element_traitst1-t2"></a></h4>
-   <p>Class template <code class="highlight"><c- n>matrix_subtraction_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> implements a traits
-type that determines the appropriate result type of an elementwise subtraction 
-operation involving two (possibly different) element types.</p>
+   <p>Class template <code class="highlight"><c- n>matrix_subtraction_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> implements the
+default traits type for determining the element type of a <em>MathObj</em> instance 
+resulting from the subtraction of two other <em>MathOb</em> instances.</p>
+   <p>Alias template <code class="highlight"><c- n>matrix_subtraction_element_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> is used by the
+library to obtain the nested type <code class="highlight"><c- n>OT</c-><c- o>::</c-><c- n>element_subtraction_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code>; 
+if this type is not present in <code class="highlight"><c- n>OT</c-></code>, then <code class="highlight"><c- n>matrix_subtraction_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> is returned.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_subtraction_element_traits</c->
 <c- p>{</c->
@@ -3232,9 +3256,12 @@ operation involving two (possibly different) element types.</p>
 <c- k>using</c-> <c- n>matrix_subtraction_element_t</c-> <c- o>=</c-> <c- p>...;</c->       <c- c1>//- Implementation-defined</c->
 </pre>
    <h4 class="heading settled" data-level="6.7.4" id="matrix_multiplication_element_traitst1-t2"><span class="secno">6.7.4. </span><span class="content"><code class="highlight"><c- n>matrix_multiplication_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_multiplication_element_traitst1-t2"></a></h4>
-   <p>Class template <code class="highlight"><c- n>matrix_multiplication_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> implements a traits
-type that determines the appropriate result type of an elementwise multiplication 
-operation involving two (possibly different) element types.</p>
+   <p>Class template <code class="highlight"><c- n>matrix_multiplication_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> implements the
+default traits type for determining the element type of a <em>MathObj</em> instance 
+resulting from the multiplication of two other <em>MathOb</em> instances.</p>
+   <p>Alias template <code class="highlight"><c- n>matrix_multiplication_element_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> is used by the
+library to obtain the nested type <code class="highlight"><c- n>OT</c-><c- o>::</c-><c- n>element_multiplication_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code>; 
+if this type is not present in <code class="highlight"><c- n>OT</c-></code>, then <code class="highlight"><c- n>matrix_multiplication_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> is returned.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_multiplication_element_traits</c->
 <c- p>{</c->
@@ -3250,6 +3277,8 @@ the resulting engine types in an arithmetical expression.</p>
    <h4 class="heading settled" data-level="6.8.1" id="matrix_negation_engine_traitsot-et1"><span class="secno">6.8.1. </span><span class="content"><code class="highlight"><c- n>matrix_negation_engine_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_negation_engine_traitsot-et1"></a></h4>
    <p>Class template <code class="highlight"><c- n>matrix_negation_engine_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- o>></c-></code> implements a traits
 type that determines the resulting engine type when negating a <em>MathObj</em>.</p>
+   <p>Alias template <code class="highlight"><c- n>matrix_negation_engine_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- o>></c-></code> is used by the library
+to obtain the nested type <code class="highlight"><c- n>OT</c-><c- o>::</c-><c- n>engine_negation_traits</c-><c- o>&lt;</c-><c- n>ET1</c-><c- o>></c-></code>.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_negation_engine_traits</c->
 <c- p>{</c->
@@ -3265,6 +3294,8 @@ type that determines the resulting engine type when negating a <em>MathObj</em>.
    <p>Class template <code class="highlight"><c- n>matrix_addition_engine_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-></code> implements a
 traits type that determines the resulting engine type when adding two
 compatible <em>MathObj</em>s.</p>
+   <p>Alias template <code class="highlight"><c- n>matrix_addition_engine_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-></code> is used by the library
+to obtain the nested type <code class="highlight"><c- n>OT</c-><c- o>::</c-><c- n>element_addition_traits</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-></code>.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_addition_engine_traits</c->
 <c- p>{</c->
@@ -3282,6 +3313,8 @@ compatible <em>MathObj</em>s.</p>
    <p>Class template <code class="highlight"><c- n>matrix_subtraction_engine_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-></code> implements a
 traits type that determines the resulting engine type when subtracting two
 compatible <em>MathObj</em>s.</p>
+   <p>Alias template <code class="highlight"><c- n>matrix_subtraction_engine_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-></code> is used by the library
+to obtain the nested type <code class="highlight"><c- n>OT</c-><c- o>::</c-><c- n>element_subtraction_traits</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-></code>.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_subtraction_engine_traits</c->
 <c- p>{</c->
@@ -3299,12 +3332,14 @@ compatible <em>MathObj</em>s.</p>
    <p>Class template <code class="highlight"><c- n>matrix_multiplication_engine_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-></code> implements a
 traits type that determines the resulting engine type when multiplying two
 compatible <em>MathObj</em>s.</p>
+   <p>Alias template <code class="highlight"><c- n>matrix_multiplication_engine_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-></code> is used by the
+library to obtain the nested type <code class="highlight"><c- n>OT</c-><c- o>::</c-><c- n>element_multiplication_traits</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-></code>.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_multiplication_engine_traits</c->
 <c- p>{</c->
     <c- k>using</c-> <c- n>element_type</c-> <c- o>=</c-> <c- n>matrix_multiplication_element_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c->
-                                                           <c- k>typename</c-> <c- n>ET1</c-><c- o>::</c-><c- n>element_type</c-><c- p>,</c-> 
-                                                           <c- k>typename</c-> <c- n>ET2</c-><c- o>::</c-><c- n>element_type</c-><c- o>></c-><c- p>;</c->
+                                                         <c- k>typename</c-> <c- n>ET1</c-><c- o>::</c-><c- n>element_type</c-><c- p>,</c-> 
+                                                         <c- k>typename</c-> <c- n>ET2</c-><c- o>::</c-><c- n>element_type</c-><c- o>></c-><c- p>;</c->
 
     <c- k>using</c-> <c- n>engine_type</c->  <c- o>=</c-> <c- p>...;</c->                   <c- c1>//- Implementation-defined.</c->
 <c- p>};</c->
@@ -3314,15 +3349,15 @@ compatible <em>MathObj</em>s.</p>
 </pre>
    <h3 class="heading settled" data-level="6.9" id="arithmetic-traits"><span class="secno">6.9. </span><span class="content">Arithmetic traits</span><a class="self-link" href="#arithmetic-traits"></a></h3>
    <p>This section defines a set of arithmetic traits types for negation,
-addition, subtraction, and multiplication. The purpose of these traits 
-types is threefold:</p>
+addition, subtraction, and multiplication. The purpose of each of these 
+traits types is threefold:</p>
    <ol>
     <li data-md>
      <p>to determine the element type of the resulting <em>MathObj</em>;</p>
     <li data-md>
      <p>to determine the engine type of the resulting <em>MathObj</em>; and</p>
     <li data-md>
-     <p>to carry out the arithmetical operation and return the result.</p>
+     <p>to carry out the arithmetical operation and return its result.</p>
    </ol>
    <p>The idea here is that arithmetic operators (described below) simply forward
 to the appropriate traits type, which does the heavy lifting.</p>
@@ -3332,12 +3367,14 @@ type that performs the negation of a <em>MathObj</em> and returns the result
 in another <em>MathObj</em> having an implementation-defined engine type.
 There are two partial specializations to support the two overloaded 
 negation operators described below.</p>
+   <p>Alias template <code class="highlight"><c- n>matrix_negation_traits_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- o>></c-></code> is used by the library
+to obtain the nested type <code class="highlight"><c- n>OT</c-><c- o>::</c-><c- n>negation_traits</c-><c- o>&lt;</c-><c- n>OP1</c-><c- o>></c-></code>.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_negation_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>>></c->
 <c- p>{</c->
-    <c- k>using</c-> <c- n>engine_type</c->    <c- o>=</c-> <c- n>matrix_negation_engine_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>op_traits_type</c-> <c- o>=</c-> <c- n>OT</c-><c- p>;</c->
-    <c- k>using</c-> <c- n>result_type</c->    <c- o>=</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>op_traits_type</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- n>matrix_negation_engine_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>op_traits</c->   <c- o>=</c-> <c- n>OT</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>result_type</c-> <c- o>=</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>op_traits</c-><c- o>></c-><c- p>;</c->
 
     <c- k>static</c-> <c- n>result_type</c->  <c- nf>negate</c-><c- p>(</c-><c- n>vector</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>v1</c-><c- p>);</c->
 <c- p>};</c->
@@ -3345,9 +3382,9 @@ negation operators described below.</p>
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_negation_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>>></c->
 <c- p>{</c->
-    <c- k>using</c-> <c- n>engine_type</c->    <c- o>=</c-> <c- n>matrix_negation_engine_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>op_traits_type</c-> <c- o>=</c-> <c- n>OT</c-><c- p>;</c->
-    <c- k>using</c-> <c- n>result_type</c->    <c- o>=</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>op_traits_type</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- n>matrix_negation_engine_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>op_traits</c->   <c- o>=</c-> <c- n>OT</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>result_type</c-> <c- o>=</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>op_traits</c-><c- o>></c-><c- p>;</c->
 
     <c- k>static</c-> <c- n>result_type</c->  <c- nf>negate</c-><c- p>(</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m1</c-><c- p>);</c->
 <c- p>};</c->
@@ -3361,22 +3398,30 @@ traits type that performs the addition of two compatible <em>MathObj</em>s and
 returns the result in a <em>MathObj</em> having an implementation-defined engine 
 type.  There are two partial specializations to support the two overloaded 
 addition operators described below.</p>
-<pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OP1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OP2</c-><c- o>></c->
-<c- k>using</c-> <c- n>matrix_addition_traits_t</c-> <c- o>=</c-> <c- n>detail</c-><c- o>::</c-><c- n>addition_traits_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-><c- p>;</c->
-
-
-<c- c1>//- The standard addition traits type provides the default mechanism for computing the result</c->
-<c- c1>//  of a matrix/matrix or vector/vector addition.</c->
-<c- c1>//</c->
-<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT2</c-><c- o>></c->
+   <p>Alias template <code class="highlight"><c- n>matrix_addition_traits_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-></code> is used by the
+library to obtain the nested type <code class="highlight"><c- n>OT</c-><c- o>::</c-><c- n>addition_traits</c-><c- o>&lt;</c-><c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-></code>.</p>
+<pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_addition_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-><c- p>,</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>>></c->
 <c- p>{</c->
-    <c- k>using</c-> <c- n>engine_type</c->    <c- o>=</c-> <c- n>matrix_addition_engine_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>op_traits_type</c-> <c- o>=</c-> <c- n>OT</c-><c- p>;</c->
-    <c- k>using</c-> <c- n>result_type</c->    <c- o>=</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>op_traits_type</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- n>matrix_addition_engine_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>op_traits</c->   <c- o>=</c-> <c- n>OT</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>result_type</c-> <c- o>=</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>op_traits</c-><c- o>></c-><c- p>;</c->
 
     <c- k>static</c-> <c- n>result_type</c->  <c- nf>add</c-><c- p>(</c-><c- n>vector</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>v1</c-><c- p>,</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>v2</c-><c- p>);</c->
 <c- p>};</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT2</c-><c- o>></c->
+<c- k>struct</c-> <c- n>matrix_addition_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>>></c->
+<c- p>{</c->
+    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- n>matrix_addition_engine_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>op_traits</c->   <c- o>=</c-> <c- n>OT</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>result_type</c-> <c- o>=</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>op_traits</c-><c- o>></c-><c- p>;</c->
+
+    <c- k>static</c-> <c- n>result_type</c->  <c- nf>add</c-><c- p>(</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m1</c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m2</c-><c- p>);</c->
+<c- p>};</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OP1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OP2</c-><c- o>></c->
+<c- k>using</c-> <c- n>matrix_addition_traits_t</c-> <c- o>=</c-> <c- n>detail</c-><c- o>::</c-><c- n>addition_traits_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-><c- p>;</c->
 </pre>
    <h4 class="heading settled" data-level="6.9.3" id="matrix_subtraction_traitsot-op1-op2"><span class="secno">6.9.3. </span><span class="content"><code class="highlight"><c- n>matrix_subtraction_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_subtraction_traitsot-op1-op2"></a></h4>
    <p>Class template <code class="highlight"><c- n>matrix_subtraction_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-></code> is an arithmetic
@@ -3384,24 +3429,26 @@ traits type that performs the subtraction of two compatible <em>MathObj</em>s an
 returns the result in a <em>MathObj</em> having an implementation-defined engine 
 type.  There are two partial specializations to support the two overloaded 
 subtraction operators described below.</p>
+   <p>Alias template <code class="highlight"><c- n>matrix_subtraction_traits_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-></code> is used by the
+library to obtain the nested type <code class="highlight"><c- n>OT</c-><c- o>::</c-><c- n>subtraction_traits</c-><c- o>&lt;</c-><c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-></code>.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_subtraction_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-><c- p>,</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>>></c->
 <c- p>{</c->
-    <c- k>using</c-> <c- n>engine_type</c->    <c- o>=</c-> <c- n>matrix_subtraction_engine_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>op_traits_type</c-> <c- o>=</c-> <c- n>OT</c-><c- p>;</c->
-    <c- k>using</c-> <c- n>result_type</c->    <c- o>=</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>op_traits_type</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- n>matrix_subtraction_engine_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>op_traits</c->   <c- o>=</c-> <c- n>OT</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>result_type</c-> <c- o>=</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>op_traits</c-><c- o>></c-><c- p>;</c->
 
     <c- k>static</c-> <c- n>result_type</c->  <c- nf>subtract</c-><c- p>(</c-><c- n>vector</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>v1</c-><c- p>,</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>v2</c-><c- p>);</c->
 <c- p>};</c->
 
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT2</c-><c- o>></c->
-<c- k>struct</c-> <c- n>matrix_addition_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>>></c->
+<c- k>struct</c-> <c- n>matrix_subtraction_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>>></c->
 <c- p>{</c->
-    <c- k>using</c-> <c- n>engine_type</c->    <c- o>=</c-> <c- n>matrix_addition_engine_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>op_traits_type</c-> <c- o>=</c-> <c- n>OT</c-><c- p>;</c->
-    <c- k>using</c-> <c- n>result_type</c->    <c- o>=</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>op_traits_type</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- n>matrix_subtraction_engine_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>op_traits</c->   <c- o>=</c-> <c- n>OT</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>result_type</c-> <c- o>=</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>op_traits</c-><c- o>></c-><c- p>;</c->
 
-    <c- k>static</c-> <c- n>result_type</c->  <c- nf>add</c-><c- p>(</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m1</c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m2</c-><c- p>);</c->
+    <c- k>static</c-> <c- n>result_type</c->  <c- nf>subtract</c-><c- p>(</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m1</c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m2</c-><c- p>);</c->
 <c- p>};</c->
 
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OP1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OP2</c-><c- o>></c->
@@ -3413,6 +3460,8 @@ traits type that performs the multiplication of two compatible <em>MathObj</em>s
 and returns the result in a <em>MathObj</em> having an implementation-defined 
 engine type.  There are eight partial specializations to support the eight 
 binary multiplication operators described below.</p>
+   <p>Alias template <code class="highlight"><c- n>matrix_multiplication_traits_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-></code> is used by the
+library to obtain the nested type <code class="highlight"><c- n>OT</c-><c- o>::</c-><c- n>multiplication_traits</c-><c- o>&lt;</c-><c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-></code>.</p>
 <pre class="highlight"><c- c1>//- vector*scalar</c->
 <c- c1>//</c->
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
@@ -3515,6 +3564,9 @@ binary multiplication operators described below.</p>
 
     <c- k>static</c-> <c- n>result_type</c->  <c- nf>multiply</c-><c- p>(</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m1</c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m2</c-><c- p>);</c->
 <c- p>};</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OP1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OP2</c-><c- o>></c->
+<c- k>using</c-> <c- n>matrix_multiplication_traits_t</c-> <c- o>=</c-> <c- p>...;</c->     <c- c1>//- Implementation-defined</c->
 </pre>
    <h3 class="heading settled" data-level="6.10" id="arithmetic-operators"><span class="secno">6.10. </span><span class="content">Arithmetic operators</span><a class="self-link" href="#arithmetic-operators"></a></h3>
    <p>The arithmetic operators provide syntax that mimics common mathematical
@@ -3780,19 +3832,62 @@ that you provide, then all that is required for the library to accept <code clas
    <p>By stating that <code class="highlight"><c- n>new_num</c-></code> models at least a non-commutative ring, and by
 ensuring that its arithmetic operators functions as promised, the library’s 
 traits types will allow compiliation to succeed.</p>
-   <h3 class="heading settled" data-level="7.2" id="integrating-a-new-engine-type"><span class="secno">7.2. </span><span class="content">Integrating a new engine type</span><a class="self-link" href="#integrating-a-new-engine-type"></a></h3>
-   <p>Suppose that you want to create a custom fixed-size matrix engine that is
+   <h3 class="heading settled" data-level="7.2" id="custom-element-promotion"><span class="secno">7.2. </span><span class="content">Custom element promotion</span><a class="self-link" href="#custom-element-promotion"></a></h3>
+   <p>Suppose that you want the result of adding two <code class="highlight"><c- b>float</c-></code> elements to be <code class="highlight"><c- b>double</c-></code>.  Then you would create the following custom types in your 
+namespace:</p>
+<pre class="highlight"><c- c1>//- Base template for custom element promotion</c->
+<c- c1>//</c->
+<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
+<c- k>struct</c-> <c- n>element_add_traits_tst</c-><c- p>;</c->
+
+<c- c1>//- Promote any float/float addition to double.</c->
+<c- c1>//</c->
+<c- k>template</c-><c- o>&lt;></c->
+<c- k>struct</c-> <c- n>element_add_traits_tst</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- b>float</c-><c- o>></c->
+<c- p>{</c->
+    <c- k>using</c-> <c- n>element_type</c-> <c- o>=</c-> <c- b>double</c-><c- p>;</c->
+<c- p>};</c->
+
+<c- c1>//- Custom operation traits.</c->
+<c- c1>//</c->
+<c- k>struct</c-> <c- n>test_add_op_traits_tst</c->
+<c- p>{</c->
+     <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
+     <c- k>using</c-> <c- n>element_addition_traits</c-> <c- o>=</c-> <c- n>element_add_traits_tst</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-><c- p>;</c->
+<c- p>};</c->
+</pre>
+   <p>The new operation traits could be used like this:</p>
+<pre class="highlight"><c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- mi>2</c-><c- p>,</c-> <c- mi>3</c-><c- o>></c-><c- p>,</c-> <c- n>add_op_traits_tst</c-><c- o>></c->                    <c- n>m1</c-><c- p>;</c->
+
+<c- n>matrix</c-><c- o>&lt;</c-><c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- n>allocator</c-><c- o>&lt;</c-><c- b>float</c-><c- o>>></c-><c- p>,</c-> <c- n>add_op_traits_tst</c-><c- o>></c->        <c- n>m2</c-><c- p>(</c-><c- mi>2</c-><c- p>,</c-> <c- mi>3</c-><c- p>);</c->
+
+<c- n>matrix</c-><c- o>&lt;</c-><c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- n>allocator</c-><c- o>&lt;</c-><c- b>float</c-><c- o>>></c-><c- p>,</c-> <c- n>matrix_operation_traits</c-><c- o>></c->  <c- n>m3</c-><c- p>(</c-><c- mi>2</c-><c- p>,</c-> <c- mi>3</c-><c- p>);</c->
+
+<c- c1>//- mr1 --> matrix&lt;fs_matrix_engine&lt;double, 2, 3>, add_op_traits_tst></c->
+<c- c1>//</c->
+<c- k>auto</c-> <c- n>mr1</c-> <c- o>=</c-> <c- n>m1</c-> <c- o>+</c-> <c- n>m1</c-><c- p>;</c->
+
+<c- c1>//- mr2 --> matrix&lt;dr_matrix_engine&lt;double, allocator&lt;double>>, add_op_traits_tst></c->
+<c- c1>//</c->
+<c- k>auto</c-> <c- n>mr2</c-> <c- o>=</c-> <c- n>m1</c-> <c- o>+</c-> <c- n>m2</c-><c- p>;</c->
+
+<c- c1>//- mr3 --> matrix&lt;dr_matrix_engine&lt;double, allocator&lt;double>>, add_op_traits_tst></c->
+<c- c1>//</c->
+<c- k>auto</c-> <c- n>mr3</c-> <c- o>=</c-> <c- n>m1</c-> <c- o>+</c-> <c- n>m3</c-><c- p>;</c->
+</pre>
+   <p>Note that this example assumes that an addition operation involving a fixed-size
+matrix and a dynamically-resizable matrix, or two dynamically-resizable matrices
+results in a dynamically-resizable matrix.</p>
+   <h3 class="heading settled" data-level="7.3" id="integrating-a-new-engine-type"><span class="secno">7.3. </span><span class="content">Integrating a new engine type</span><a class="self-link" href="#integrating-a-new-engine-type"></a></h3>
+   <p>Suppose that you want to add a custom fixed-size matrix engine that is
 somehow different from <code class="highlight"><c- n>fs_matrix_engine</c-></code>; perhaps it is instrumented in
 some way for debugging, or uses fixed-size storage that is external to
 the engine object.  It might look like this:</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>R</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>C</c-><c- o>></c->
 <c- k>class</c-> <c- nc>fs_matrix_engine_tst</c->
 <c- p>{</c->
-    <c- k>static_assert</c-><c- p>(</c-><c- n>R</c-> <c- o>>=</c-> <c- mi>1</c-><c- p>);</c->
-    <c- k>static_assert</c-><c- p>(</c-><c- n>C</c-> <c- o>>=</c-> <c- mi>1</c-><c- p>);</c->
-
   <c- k>public</c-><c- o>:</c->
-    <c- k>using</c-> <c- n>engine_category</c-> <c- o>=</c-> <c- n>STD_LA</c-><c- o>::</c-><c- n>mutable_matrix_engine_tag</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>engine_category</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>math</c-><c- o>::</c-><c- n>mutable_matrix_engine_tag</c-><c- p>;</c->
     <c- k>using</c-> <c- n>element_type</c->    <c- o>=</c-> <c- n>T</c-><c- p>;</c->
     <c- k>using</c-> <c- n>value_type</c->      <c- o>=</c-> <c- n>T</c-><c- p>;</c->
     <c- k>using</c-> <c- n>reference</c->       <c- o>=</c-> <c- n>T</c-><c- o>&amp;</c-><c- p>;</c->
@@ -3812,9 +3907,9 @@ the engine object.  It might look like this:</p>
     <c- k>using</c-> <c- n>is_rectangular</c->  <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>true_type</c-><c- p>;</c->
     <c- k>using</c-> <c- n>is_row_major</c->    <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>true_type</c-><c- p>;</c->
 
-    <c- k>using</c-> <c- n>column_view_type</c->    <c- o>=</c-> <c- n>STD_LA</c-><c- o>::</c-><c- n>matrix_column_view</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>row_view_type</c->       <c- o>=</c-> <c- n>STD_LA</c-><c- o>::</c-><c- n>matrix_row_view</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>transpose_view_type</c-> <c- o>=</c-> <c- n>STD_LA</c-><c- o>::</c-><c- n>matrix_transpose_view</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>column_view_type</c->    <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>math</c-><c- o>::</c-><c- n>matrix_column_view</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>row_view_type</c->       <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>math</c-><c- o>::</c-><c- n>matrix_row_view</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>transpose_view_type</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>math</c-><c- o>::</c-><c- n>matrix_transpose_view</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>></c-><c- p>;</c->
 
   <c- k>public</c-><c- o>:</c->
     <c- k>constexpr</c-> <c- n>fs_matrix_engine_tst</c-><c- p>();</c->
@@ -3855,119 +3950,131 @@ assume that you’re only interested in addition operations involving two
 operands having the new engine type, or where one operand has the standard 
 fixed-size engine and the other has the new engine.  Then your engine 
 promotion traits might look like this:</p>
-<pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Rows1</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Cols1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Rows2</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Cols2</c-><c- o>></c->
-<c- k>struct</c-> <c- n>matrix_addition_engine_promotion</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>Rows1</c-><c- p>,</c-> <c- n>Cols1</c-><c- o>></c-><c- p>,</c-> 
-                                        <c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>Rows2</c-><c- p>,</c-> <c- n>Cols2</c-><c- o>>></c->
+<pre class="highlight"><c- c1>//- Goal: Create a new fixed-size engine type and use it in arithmetic expressions.</c->
+<c- c1>//</c->
+<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- o>></c->
+<c- k>struct</c-> <c- n>engine_add_traits_tst</c-><c- p>;</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>R1</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>C1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>R2</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>C2</c-><c- o>></c->
+<c- k>struct</c-> <c- n>engine_add_traits_tst</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c->
+                             <c- n>fs_matrix_engine_tst</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>R1</c-><c- p>,</c-> <c- n>C1</c-><c- o>></c-><c- p>,</c->
+                             <c- n>fs_matrix_engine_tst</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>R2</c-><c- p>,</c-> <c- n>C2</c-><c- o>>></c->
 <c- p>{</c->
-    <c- k>static_assert</c-><c- p>(</c-><c- n>Rows1</c-> <c- o>==</c-> <c- n>Rows2</c-><c- p>);</c->
-    <c- k>static_assert</c-><c- p>(</c-><c- n>Cols1</c-> <c- o>==</c-> <c- n>Cols2</c-><c- p>);</c->
-    <c- k>using</c-> <c- n>element_type</c-> <c- o>=</c-> <c- n>matrix_element_promotion_t</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>engine_type</c->  <c- o>=</c-> <c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>element_type</c-><c- p>,</c-> <c- n>Rows1</c-><c- p>,</c-> <c- n>Cols1</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>element_type</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>math</c-><c- o>::</c-><c- n>matrix_addition_element_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>engine_type</c->  <c- o>=</c-> <c- n>fs_matrix_engine_tst</c-><c- o>&lt;</c-><c- n>element_type</c-><c- p>,</c-> <c- n>R1</c-><c- p>,</c-> <c- n>C1</c-><c- o>></c-><c- p>;</c->
 <c- p>};</c->
 
-<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Rows1</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Cols1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Rows2</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Cols2</c-><c- o>></c->
-<c- k>struct</c-> <c- n>matrix_addition_engine_promotion</c-><c- o>&lt;</c-><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>Rows1</c-><c- p>,</c-> <c- n>Cols1</c-><c- o>></c-><c- p>,</c-> 
-                                        <c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>Rows2</c-><c- p>,</c-> <c- n>Cols2</c-><c- o>>></c->
+<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>R1</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>C1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>R2</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>C2</c-><c- o>></c->
+<c- k>struct</c-> <c- n>engine_add_traits_tst</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c->
+                             <c- n>fs_matrix_engine_tst</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>R1</c-><c- p>,</c-> <c- n>C1</c-><c- o>></c-><c- p>,</c->
+                             <c- n>std</c-><c- o>::</c-><c- n>math</c-><c- o>::</c-><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>R2</c-><c- p>,</c-> <c- n>C2</c-><c- o>>></c->
 <c- p>{</c->
-    <c- k>static_assert</c-><c- p>(</c-><c- n>Rows1</c-> <c- o>==</c-> <c- n>Rows2</c-><c- p>);</c->
-    <c- k>static_assert</c-><c- p>(</c-><c- n>Cols1</c-> <c- o>==</c-> <c- n>Cols2</c-><c- p>);</c->
-    <c- k>using</c-> <c- n>element_type</c-> <c- o>=</c-> <c- n>matrix_element_promotion_t</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>engine_type</c->  <c- o>=</c-> <c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>element_type</c-><c- p>,</c-> <c- n>Rows1</c-><c- p>,</c-> <c- n>Cols1</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>element_type</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>math</c-><c- o>::</c-><c- n>matrix_addition_element_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>engine_type</c->  <c- o>=</c-> <c- n>fs_matrix_engine_tst</c-><c- o>&lt;</c-><c- n>element_type</c-><c- p>,</c-> <c- n>R1</c-><c- p>,</c-> <c- n>C1</c-><c- o>></c-><c- p>;</c->
 <c- p>};</c->
 
-<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Rows1</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Cols1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Rows2</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Cols2</c-><c- o>></c->
-<c- k>struct</c-> <c- n>matrix_addition_engine_promotion</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>Rows1</c-><c- p>,</c-> <c- n>Cols1</c-><c- o>></c-><c- p>,</c-> 
-                                        <c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>Rows2</c-><c- p>,</c-> <c- n>Cols2</c-><c- o>>></c->
+<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>R1</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>C1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>R2</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>C2</c-><c- o>></c->
+<c- k>struct</c-> <c- n>engine_add_traits_tst</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c->
+                             <c- n>std</c-><c- o>::</c-><c- n>math</c-><c- o>::</c-><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>R1</c-><c- p>,</c-> <c- n>C1</c-><c- o>></c-><c- p>,</c->
+                             <c- n>fs_matrix_engine_tst</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>R2</c-><c- p>,</c-> <c- n>C2</c-><c- o>>></c->
 <c- p>{</c->
-    <c- k>static_assert</c-><c- p>(</c-><c- n>Rows1</c-> <c- o>==</c-> <c- n>Rows2</c-><c- p>);</c->
-    <c- k>static_assert</c-><c- p>(</c-><c- n>Cols1</c-> <c- o>==</c-> <c- n>Cols2</c-><c- p>);</c->
-    <c- k>using</c-> <c- n>element_type</c-> <c- o>=</c-> <c- n>matrix_element_promotion_t</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>engine_type</c->  <c- o>=</c-> <c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>element_type</c-><c- p>,</c-> <c- n>Rows1</c-><c- p>,</c-> <c- n>Cols1</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>element_type</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>math</c-><c- o>::</c-><c- n>matrix_addition_element_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>engine_type</c->   <c- o>=</c-> <c- n>fs_matrix_engine_tst</c-><c- o>&lt;</c-><c- n>element_type</c-><c- p>,</c-> <c- n>R1</c-><c- p>,</c-> <c- n>C1</c-><c- o>></c-><c- p>;</c->
+<c- p>};</c->
+
+<c- c1>//- This is a custom operation traits type!</c->
+<c- c1>//</c->
+<c- k>struct</c-> <c- n>add_op_traits_tst</c->
+<c- p>{</c->
+    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
+    <c- k>using</c-> <c- n>element_addition_traits</c-> <c- o>=</c-> <c- n>element_add_traits_tst</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-><c- p>;</c->
+
+    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
+    <c- k>using</c-> <c- n>engine_addition_traits</c-> <c- o>=</c-> <c- n>engine_add_traits_tst</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-><c- p>;</c->
 <c- p>};</c->
 </pre>
-   <p>As we can see, these promotion traits dictate the result engine type to
-be the new engine type. Another option is that the result engine type 
+   <p>As we can see, these custom promotion traits dictate the resulting engine type
+for these particular cases. Another option is that the result engine type 
 be <code class="highlight"><c- n>fs_matrix_engine</c-></code>; yet another option is that the return engine type
 be some other type, like an expression engine.</p>
-   <p>What about performing the computation?  If the default implementation of
-the addition arithmetic traits understands how to perform the addition 
-operation, then you are done.</p>
-   <p>However, if the default addition traits don’t understand how to use the
-new engine type, then you will also have to write specializations of the 
-corresponding addition traits types.  That might look something like this:</p>
-<pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Rows</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Cols</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OpTraitsR</c-><c- o>></c->
-<c- k>struct</c-> <c- n>matrix_addition_traits</c-><c- o>&lt;</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>></c-><c- p>,</c-> <c- n>OpTraitsR</c-><c- o>></c-><c- p>,</c-> 
-                              <c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>></c-><c- p>,</c-> <c- n>OpTraitsR</c-><c- o>></c-><c- p>,</c-> 
-                              <c- n>OpTraitsR</c-><c- o>></c->
+   <p>Resulting usage might look like this:</p>
+<pre class="highlight"><c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- mi>2</c-><c- p>,</c-> <c- mi>3</c-><c- o>></c-><c- p>,</c-> <c- n>matrix_operation_traits</c-><c- o>></c->              <c- n>m1</c-><c- p>;</c->
+
+<c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- mi>2</c-><c- p>,</c-> <c- mi>3</c-><c- o>></c-><c- p>,</c-> <c- n>add_op_traits_tst</c-><c- o>></c->                <c- n>m2</c-><c- p>;</c->
+
+<c- n>matrix</c-><c- o>&lt;</c-><c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- n>allocator</c-><c- o>&lt;</c-><c- b>float</c-><c- o>>></c-><c- p>,</c-> <c- n>matrix_operation_traits</c-><c- o>></c->  <c- n>m3</c-><c- p>(</c-><c- mi>2</c-><c- p>,</c-> <c- mi>3</c-><c- p>);</c->
+
+<c- c1>//- mr1 --> matrix&lt;fs_matrix_engine&lt;float, 2, 3>, matrix_operation_traits></c->
+<c- c1>//</c->
+<c- k>auto</c->    <c- n>mr1</c-> <c- o>=</c-> <c- n>m1</c-> <c- o>+</c-> <c- n>m1</c-><c- p>;</c->
+
+<c- c1>//- mr2 --> matrix&lt;fs_matrix_engine_tst&lt;double, 2, 3>, add_op_traits_tst></c->
+<c- c1>//</c->
+<c- k>auto</c->    <c- n>mr2</c-> <c- o>=</c-> <c- n>m2</c-> <c- o>+</c-> <c- n>m2</c-><c- p>;</c->
+
+<c- c1>//- mr3 --> matrix&lt;fs_matrix_engine_tst&lt;double, 2, 3>, add_op_traits_tst></c->
+<c- c1>//</c->
+<c- k>auto</c->    <c- n>mr3</c-> <c- o>=</c-> <c- n>m1</c-> <c- o>+</c-> <c- n>m2</c-><c- p>;</c->
+
+<c- c1>//- mr4 --> matrix&lt;dr_matrix_engine&lt;double, allocator&lt;double>>, add_op_traits_tst></c->
+<c- c1>//</c->
+<c- k>auto</c->    <c- n>mr4</c-> <c- o>=</c-> <c- n>m1</c-> <c- o>+</c-> <c- n>m3</c-><c- p>;</c->
+</pre>
+   <p>Note that this example also assumes that an addition operation involving a
+fixed-size matrix and a dynamically-resizable matrix, or two 
+dynamically-resizable matrices results in a dynamically-resizable matrix.</p>
+   <h3 class="heading settled" data-level="7.4" id="customizing-an-arithmetic-operation"><span class="secno">7.4. </span><span class="content">Customizing an arithmetic operation</span><a class="self-link" href="#customizing-an-arithmetic-operation"></a></h3>
+   <p>Suppose that you want to specialize the addition function for the addition of
+two matrices that employ the custom engine above and whose sizes happen to be
+3x4.</p>
+<pre class="highlight"><c- c1>//- Goal: Call a specialized addition function for addition of fixed-size matrix objects</c->
+<c- c1>// using the fixed-size test engine and having size 3x4.</c->
+<c- c1>//</c->
+<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OP1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OP2</c-><c- o>></c->
+<c- k>struct</c-> <c- n>addition_traits_tst</c-><c- p>;</c->
+
+<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- o>></c->
+<c- k>struct</c-> <c- n>addition_traits_tst</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c->
+                           <c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- mi>3</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-><c- p>,</c-> <c- n>OT</c-><c- o>></c-><c- p>,</c->
+                           <c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- mi>3</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-><c- p>,</c-> <c- n>OT</c-><c- o>>></c->
 <c- p>{</c->
-    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- n>matrix_addition_engine_t</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>></c-><c- p>,</c-> 
-                                                 <c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>op_traits</c->   <c- o>=</c-> <c- n>OpTraitsR</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>op_traits</c-> <c- o>=</c-> <c- n>OT</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- n>fs_matrix_engine_tst</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- mi>3</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-><c- p>;</c->
     <c- k>using</c-> <c- n>result_type</c-> <c- o>=</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>op_traits</c-><c- o>></c-><c- p>;</c->
 
-    <c- k>static</c-> <c- n>result_type</c->  <c- nf>add</c-><c- p>(</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>></c-><c- p>,</c-> <c- n>OpTraitsR</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m1</c-><c- p>,</c-> 
-                            <c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>></c-><c- p>,</c-> <c- n>OpTraitsR</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m2</c-><c- p>);</c->
+    <c- k>static</c-> <c- n>result_type</c->  <c- nf>add</c-><c- p>(</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- mi>3</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-><c- p>,</c-> <c- n>OT</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m1</c-><c- p>,</c->
+                            <c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- mi>3</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-><c- p>,</c-> <c- n>OT</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m2</c-><c- p>);</c->
 <c- p>};</c->
 
-<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Rows</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Cols</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OpTraitsR</c-><c- o>></c->
-<c- k>struct</c-> <c- n>matrix_addition_traits</c-><c- o>&lt;</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>></c-><c- p>,</c-> <c- n>OpTraitsR</c-><c- o>></c-><c- p>,</c-> 
-                              <c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>></c-><c- p>,</c-> <c- n>OpTraitsR</c-><c- o>></c-><c- p>,</c-> 
-                              <c- n>OpTraitsR</c-><c- o>></c->
+<c- c1>//- This is a custom operation traits type!</c->
+<c- c1>//</c->
+<c- k>struct</c-> <c- n>test_add_op_traits_tst</c->
 <c- p>{</c->
-    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- n>matrix_addition_engine_t</c-><c- o>&lt;</c-><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>></c-><c- p>,</c-> 
-                                                 <c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>op_traits</c->   <c- o>=</c-> <c- n>OpTraitsR</c-><c- p>;</c->
-    <c- k>using</c-> <c- n>result_type</c-> <c- o>=</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>op_traits</c-><c- o>></c-><c- p>;</c->
+    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
+    <c- k>using</c-> <c- n>element_addition_traits</c-> <c- o>=</c-> <c- n>element_add_traits_tst</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-><c- p>;</c->
 
-    <c- k>static</c-> <c- n>result_type</c->  <c- nf>add</c-><c- p>(</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>></c-><c- p>,</c-> <c- n>OpTraitsR</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m1</c-><c- p>,</c-> 
-                            <c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>></c-><c- p>,</c-> <c- n>OpTraitsR</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m2</c-><c- p>);</c->
-<c- p>};</c->
+    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- o>></c->
+    <c- k>using</c-> <c- n>engine_addition_traits</c-> <c- o>=</c-> <c- n>engine_add_traits_tst</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-><c- p>;</c->
 
-<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Rows</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Cols</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OpTraitsR</c-><c- o>></c->
-<c- k>struct</c-> <c- n>matrix_addition_traits</c-><c- o>&lt;</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>></c-><c- p>,</c-> <c- n>OpTraitsR</c-><c- o>></c-><c- p>,</c-> 
-                              <c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>></c-><c- p>,</c-> <c- n>OpTraitsR</c-><c- o>></c-><c- p>,</c-> 
-                              <c- n>OpTraitsR</c-><c- o>></c->
-<c- p>{</c->
-    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- n>matrix_addition_engine_t</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>></c-><c- p>,</c-> 
-                                                 <c- n>fs_matrix_engine_</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>op_traits</c->   <c- o>=</c-> <c- n>OpTraitsR</c-><c- p>;</c->
-    <c- k>using</c-> <c- n>result_type</c-> <c- o>=</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>op_traits</c-><c- o>></c-><c- p>;</c->
-
-    <c- k>static</c-> <c- n>result_type</c->  <c- nf>add</c-><c- p>(</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>></c-><c- p>,</c-> <c- n>OpTraitsR</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m1</c-><c- p>,</c-> 
-                            <c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_TST</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>Rows</c-><c- p>,</c-> <c- n>Cols</c-><c- o>></c-><c- p>,</c-> <c- n>OpTraitsR</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m2</c-><c- p>);</c->
+    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OP1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OP2</c-><c- o>></c->
+    <c- k>using</c-> <c- n>addition_traits</c-> <c- o>=</c-> <c- n>addition_traits_tst</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-><c- p>;</c->
 <c- p>};</c->
 </pre>
-   <p>Note that namespace qualifiers which should actually appear in the above
-code have been ommitted in the interest of brevity.</p>
-   <h3 class="heading settled" data-level="7.3" id="customizing-an-arithmetic-operation"><span class="secno">7.3. </span><span class="content">Customizing an arithmetic operation</span><a class="self-link" href="#customizing-an-arithmetic-operation"></a></h3>
-   <p>Suppose that you are working on a game engine, and you are interested in
-experimenting with different algorithms for performing affine transforms
-on spatial vectors.  To do this, you might be using fixed-size 4 x 4 matrices
-and fixed size column vectors of size 4 x 1.  To test your new algorithm(s),
-you could specialize the multiplication traits, which might look like this:</p>
-<pre class="highlight"><c- k>template</c-><c- o>&lt;></c->
-<c- k>struct</c-> <c- n>matrix_multiplication_traits</c-><c- o>&lt;</c-><c- n>fs_matrix</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- mi>4</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-><c- p>,</c-> 
-                                    <c- n>fs_column_vector</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-><c- p>,</c-> 
-                                    <c- n>default_matrix_operator_traits</c-><c- o>></c->
-<c- p>{</c->
-    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- n>matrix_multiplication_engine_t</c-><c- o>&lt;</c-><c- n>fs_matrix</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- mi>4</c-><c- p>,</c-> <c- mi>4</c-><c- o>>::</c-><c- n>engine_type</c-><c- p>,</c-> 
-                                                       <c- n>fs_column_vector</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- mi>4</c-><c- o>>::</c-><c- n>engine_type</c-><c- o>></c-><c- p>;</c->
+   <p>Actual usage might look like this:</p>
+<pre class="highlight"><c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- mi>3</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-><c- p>,</c-> <c- n>add_op_traits_tst</c-><c- o>></c->    <c- n>m1</c-><c- p>;</c->
+<c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- mi>3</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-><c- p>,</c-> <c- n>add_op_traits_tst</c-><c- o>></c->   <c- n>m2</c-><c- p>;</c->
 
-    <c- k>using</c-> <c- n>result_type</c-> <c- o>=</c-> <c- n>column_vector</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>default_matrix_operator_traits</c-><c- o>></c-><c- p>;</c->
+<c- c1>//- mr1 --> matrix&lt;fs_matrix_engine_tst&lt;double, 3, 4>, add_op_traits_tst></c->
+<c- c1>//</c->
+<c- k>auto</c->    <c- n>mr1</c-> <c- o>=</c-> <c- n>m1</c-> <c- o>+</c-> <c- n>m1</c-><c- p>;</c->    <c- c1>//- Calls matrix_addition_traits::add()</c->
 
-    <c- k>static</c-> <c- n>result_type</c->  <c- nf>multiply</c-><c- p>(</c-><c- n>fs_matrix</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- mi>4</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m1</c-><c- p>,</c-> 
-                                 <c- n>fs_column_vector</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>cv2</c-><c- p>);</c->
-<c- p>};</c->
-</pre>
-   <p>With this specialization visible, the following code would call the new,
-specialized <code class="highlight"><c- n>multiply</c-><c- p>()</c-></code> member function, and thus employ your new algorithm:</p>
-<pre class="highlight"><c- b>void</c-> <c- nf>f</c-><c- p>()</c->
-<c- p>{</c->
-    <c- n>fs_matrix</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- mi>4</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c->      <c- n>m1</c-><c- p>;</c->
-    <c- n>fs_column_vector</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c->  <c- n>cv1</c-><c- p>,</c-> <c- n>cvr</c-><c- p>;</c->
+<c- c1>//- mr2 --> matrix&lt;fs_matrix_engine_tst&lt;double, 3, 4>, add_op_traits_tst></c->
+<c- c1>//</c->
+<c- k>auto</c->    <c- n>mr2</c-> <c- o>=</c-> <c- n>m1</c-> <c- o>+</c-> <c- n>m2</c-><c- p>;</c->    <c- c1>//- Calls matrix_addition_traits::add()</c->
 
-    <c- n>cvr</c-> <c- o>=</c-> <c- n>m1</c-> <c- o>*</c-> <c- n>cv1</c-><c- p>;</c->
-<c- p>}</c->
+<c- c1>//- mr3 --> matrix&lt;fs_matrix_engine_tst&lt;double, 3, 4>, add_op_traits_tst></c->
+<c- c1>//</c->
+<c- k>auto</c->    <c- n>mr3</c-> <c- o>=</c-> <c- n>m2</c-> <c- o>+</c-> <c- n>m2</c-><c- p>;</c->    <c- c1>//- Calls matrix_addition_traits_tst::add()</c->
 </pre>
    <h2 class="heading settled" data-level="8" id="meeting-feedback"><span class="secno">8. </span><span class="content">Meeting feedback</span><a class="self-link" href="#meeting-feedback"></a></h2>
    <h3 class="heading settled" data-level="8.1" id="kona"><span class="secno">8.1. </span><span class="content">Kona</span><a class="self-link" href="#kona"></a></h3>
