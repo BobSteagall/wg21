@@ -149,14 +149,14 @@ fs_matrix_engine_tst<T,R,C>::assign(fs_matrix_engine_tst const& rhs)
     }
 }
 
-template<class T, int32_t R, int32_t C> 
+template<class T, int32_t R, int32_t C>
 template<class ET2> inline
 constexpr void
 fs_matrix_engine_tst<T,R,C>::assign(ET2 const& rhs)
 {
     using src_index_type = typename ET2::index_type;
 
-    if (rhs.size() != size()) 
+    if (rhs.size() != size())
     {
         throw std::runtime_error("invalid size");
     }
@@ -194,7 +194,7 @@ fs_matrix_engine_tst<T,R,C>::swap(fs_matrix_engine_tst& rhs) noexcept
     {
         for (index_type i = 0;  i < R*C;  ++i)
         {
-            detail::la_swap(ma_elems[i], rhs.ma_elems[i]);
+            STD_LA::detail::la_swap(ma_elems[i], rhs.ma_elems[i]);
         }
     }
 }
@@ -207,7 +207,7 @@ fs_matrix_engine_tst<T,R,C>::swap_columns(index_type j1, index_type j2)
     {
         for (index_type i = 0;  i < R;  ++i)
         {
-            detail::la_swap(ma_elems[i*C + j1], ma_elems[i*C + j2]);
+            STD_LA::detail::la_swap(ma_elems[i*C + j1], ma_elems[i*C + j2]);
         }
     }
 }
@@ -220,7 +220,7 @@ fs_matrix_engine_tst<T,R,C>::swap_rows(index_type i1, index_type i2)
     {
         for (index_type j = 0;  j < C;  ++j)
         {
-            detail::la_swap(ma_elems[i1*C + j], ma_elems[i2*C + j]);
+            STD_LA::detail::la_swap(ma_elems[i1*C + j], ma_elems[i2*C + j]);
         }
     }
 }
