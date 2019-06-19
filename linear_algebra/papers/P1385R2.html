@@ -1233,11 +1233,11 @@ Possible extra rowspan handling
 <style>
 	@media screen and (min-width: 78em) {
 		body:not(.toc-inline) #toc {
-			width: 30em;
+			width: 29em;
 		}
 
 		body:not(.toc-inline) {
-			padding-left: 34em;
+			padding-left: 33em;
 		}
 	}
 </style>
@@ -1488,7 +1488,7 @@ pre .property::before, pre .property::after {
      <a href="#definitions"><span class="secno">3</span> <span class="content">Definitions</span></a>
      <ol class="toc">
       <li><a href="#mathematical-terms"><span class="secno">3.1</span> <span class="content">Mathematical terms</span></a>
-      <li><a href="#terms-pertaining-to-c-types"><span class="secno">3.2</span> <span class="content">Terms Pertaining to C++ Types</span></a>
+      <li><a href="#terms-pertaining-to-c-types"><span class="secno">3.2</span> <span class="content">Terms pertaining to C++ types</span></a>
       <li>
        <a href="#overloaded-terms"><span class="secno">3.3</span> <span class="content">Overloaded terms</span></a>
        <ol class="toc">
@@ -1584,34 +1584,21 @@ pre .property::before, pre .property::after {
       <li><a href="#arithmetic-operators"><span class="secno">6.10</span> <span class="content">Arithmetic operators</span></a>
      </ol>
     <li>
-     <a href="#how-does-it-work"><span class="secno">7</span> <span class="content">How Does it Work?</span></a>
+     <a href="#customization"><span class="secno">7</span> <span class="content">Customization</span></a>
      <ol class="toc">
-      <li>
-       <a href="#in-more-detail"><span class="secno">7.1</span> <span class="content">In More Detail</span></a>
-       <ol class="toc">
-        <li><a href="#calling-an-operator"><span class="secno">7.1.1</span> <span class="content">Calling an Operator</span></a>
-        <li><a href="#selecting-the-operation-traits"><span class="secno">7.1.2</span> <span class="content">Selecting the operation traits</span></a>
-        <li><a href="#selecting-the-multiplication-traits"><span class="secno">7.1.3</span> <span class="content">Selecting the Multiplication Traits</span></a>
-        <li><a href="#selecting-the-engine-type"><span class="secno">7.1.4</span> <span class="content">Selecting the Engine Type</span></a>
-        <li><a href="#the-fully-instantiated-multiplication-traits"><span class="secno">7.1.5</span> <span class="content">The Fully Instantiated Multiplication Traits</span></a>
-       </ol>
+      <li><a href="#integrating-a-new-element-type"><span class="secno">7.1</span> <span class="content">Integrating a new element type</span></a>
+      <li><a href="#integrating-a-new-engine-type"><span class="secno">7.2</span> <span class="content">Integrating a new engine type</span></a>
+      <li><a href="#customizing-an-arithmetic-operation"><span class="secno">7.3</span> <span class="content">Customizing an arithmetic operation</span></a>
      </ol>
     <li>
-     <a href="#customization"><span class="secno">8</span> <span class="content">Customization</span></a>
-     <ol class="toc">
-      <li><a href="#integrating-a-new-element-type"><span class="secno">8.1</span> <span class="content">Integrating a New Element Type</span></a>
-      <li><a href="#integrating-a-new-engine-type"><span class="secno">8.2</span> <span class="content">Integrating a New Engine Type</span></a>
-      <li><a href="#customizing-an-arithmetic-operation"><span class="secno">8.3</span> <span class="content">Customizing an Arithmetic Operation</span></a>
-     </ol>
-    <li>
-     <a href="#meeting-feedback"><span class="secno">9</span> <span class="content">Meeting Feedback</span></a>
+     <a href="#meeting-feedback"><span class="secno">8</span> <span class="content">Meeting feedback</span></a>
      <ol class="toc">
       <li>
-       <a href="#kona"><span class="secno">9.1</span> <span class="content">Kona</span></a>
+       <a href="#kona"><span class="secno">8.1</span> <span class="content">Kona</span></a>
        <ol class="toc">
-        <li><a href="#lewg-i-polls-and-feedback-wednesday-2019-02-20"><span class="secno">9.1.1</span> <span class="content">LEWG(I) Polls and Feedback (Wednesday 2019-02-20)</span></a>
-        <li><a href="#feedback-from-joint-sg14-sg19-session-friday-2019-02-22"><span class="secno">9.1.2</span> <span class="content">Feedback From Joint SG14/SG19 Session (Friday 2019-02-22)</span></a>
-        <li><a href="#other-suggestions-gathered-at-the-meeting"><span class="secno">9.1.3</span> <span class="content">Other Suggestions Gathered at the Meeting</span></a>
+        <li><a href="#lewg-i-polls-and-feedback-wednesday-2019-02-20"><span class="secno">8.1.1</span> <span class="content">LEWG(I) Polls and Feedback (Wednesday 2019-02-20)</span></a>
+        <li><a href="#feedback-from-joint-sg14-sg19-session-friday-2019-02-22"><span class="secno">8.1.2</span> <span class="content">Feedback From Joint SG14/SG19 Session (Friday 2019-02-22)</span></a>
+        <li><a href="#other-suggestions-gathered-at-the-meeting"><span class="secno">8.1.3</span> <span class="content">Other Suggestions Gathered at the Meeting</span></a>
        </ol>
      </ol>
    </ol>
@@ -1809,7 +1796,7 @@ symmetric matrix in order to compute the eigenvalues and eigenvectors
 of that matrix; this is often performed when solving problems involving 
 linear dynamic systems.</p>
    </ol>
-   <h3 class="heading settled" data-level="3.2" id="terms-pertaining-to-c-types"><span class="secno">3.2. </span><span class="content">Terms Pertaining to C++ Types</span><a class="self-link" href="#terms-pertaining-to-c-types"></a></h3>
+   <h3 class="heading settled" data-level="3.2" id="terms-pertaining-to-c-types"><span class="secno">3.2. </span><span class="content">Terms pertaining to C++ types</span><a class="self-link" href="#terms-pertaining-to-c-types"></a></h3>
    <p>The following are terms used in this proposal that describe various
 aspects of how the mathematical concepts described above in Section 3.1
 might be implemented:</p>
@@ -2156,11 +2143,11 @@ specification.</p>
    <ol>
     <li data-md>
      <p><strong>Engines</strong>, which are implementation types that manage the resources
-associated with a <em>MothObj</em> instance, including memory ownership, memory
-management, and element access; and,</p>
+associated with a <em>MothObj</em> instance, memory ownership and lifetime, and 
+element access; and,</p>
     <li data-md>
      <p><strong>MathObjs</strong>, which provide a unified interface intended to model a
-corresponding mathematical abstraction (column/row vector, matrix);</p>
+corresponding mathematical abstraction (vector, matrix);</p>
     <li data-md>
      <p><strong>Operators</strong>, which provide the desired mathematical syntax and carry
 out the promised arithmetic.</p>
@@ -2207,7 +2194,7 @@ for computing its result.  The proposed class <code class="highlight"><c- n>std<
 starting at the lowest level, and working upward in order of dependency.</p>
    <p><strong>A quick note on template parameter nomeclature:</strong> To avoid excessive
 visual noise in the code shown in the remaining sections of this paper, 
-we employ the following abbeviation-based naming conventions for template 
+we use the following abbeviation-based naming conventions for template 
 parameters:</p>
    <ul>
     <li data-md>
@@ -2408,8 +2395,7 @@ a fixed-size matrix.</p>
    <h3 class="heading settled" data-level="6.3" id="numeric-traits"><span class="secno">6.3. </span><span class="content">Numeric traits</span><a class="self-link" href="#numeric-traits"></a></h3>
    <h4 class="heading settled" data-level="6.3.1" id="number_traitst"><span class="secno">6.3.1. </span><span class="content"><code class="highlight"><c- n>number_traits</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code></span><a class="self-link" href="#number_traitst"></a></h4>
    <p>Traits type <code class="highlight"><c- n>number_traits</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code> specifies certain properties of numeric types.
-It is a customization point intended to be partially/fully specializable by
-the user.</p>
+It is a customization point intended to be specialized by the user.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- o>></c->
 <c- k>struct</c-> <c- n>number_traits</c->
 <c- p>{</c->
@@ -2422,7 +2408,8 @@ the user.</p>
 <c- k>struct</c-> <c- n>number_traits</c-><c- o>&lt;</c-><c- n>complex</c-><c- o>&lt;</c-><c- n>T</c-><c- o>>></c-> <c- o>:</c-> <c- k>public</c-> <c- n>number_traits</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-> <c- p>{};</c->
 </pre>
    <h4 class="heading settled" data-level="6.3.2" id="is_complext"><span class="secno">6.3.2. </span><span class="content"><code class="highlight"><c- n>is_complex</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code></span><a class="self-link" href="#is_complext"></a></h4>
-   <p>Traits type <code class="highlight"><c- n>is_complex</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code> indicates whether its template paramater <code class="highlight"><c- n>T</c-></code> is of type <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>complex</c-><c- o>&lt;</c-><c- n>V</c-><c- o>></c-></code> for some type <code class="highlight"><c- n>V</c-></code>.</p>
+   <p>Traits type <code class="highlight"><c- n>is_complex</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code> indicates whether its template paramater <code class="highlight"><c- n>T</c-></code> is of type <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>complex</c-><c- o>&lt;</c-><c- n>V</c-><c- o>></c-></code> for some numeric type <code class="highlight"><c- n>V</c-></code>.  A possible 
+implementation might be:</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- o>></c->
 <c- k>struct</c-> <c- nl>is_complex</c-> <c- p>:</c-> <c- k>public</c-> <c- n>false_type</c->
 <c- p>{};</c->
@@ -2433,14 +2420,14 @@ the user.</p>
 </pre>
    <h4 class="heading settled" data-level="6.3.3" id="is_fieldt"><span class="secno">6.3.3. </span><span class="content"><code class="highlight"><c- n>is_field</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code></span><a class="self-link" href="#is_fieldt"></a></h4>
    <p>Traits <code class="highlight"><c- n>is_field</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code> type indicates whether its template parameter <code class="highlight"><c- n>T</c-></code> is
-a type that models a mathematical field.  It is expected that <code class="highlight"><c- n>is_field</c-></code> will be implemented in terms of <code class="highlight"><c- n>number_traits</c-></code>, perhaps as</p>
+a type that models a mathematical field.  It is expected that <code class="highlight"><c- n>is_field</c-></code> will be implemented in terms of <code class="highlight"><c- n>number_traits</c-></code>, perhaps as follows:</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- o>></c->
 <c- k>struct</c-> <c- nl>is_field</c-> <c- p>:</c-> <c- k>public</c-> <c- n>number_traits</c-><c- o>&lt;</c-><c- n>T</c-><c- o>>::</c-><c- n>is_field</c->
 <c- p>{};</c->
 </pre>
    <h4 class="heading settled" data-level="6.3.4" id="is_ringt"><span class="secno">6.3.4. </span><span class="content"><code class="highlight"><c- n>is_ring</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code></span><a class="self-link" href="#is_ringt"></a></h4>
    <p>Traits type <code class="highlight"><c- n>is_ring</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code> indicates whether its template paremater <code class="highlight"><c- n>T</c-></code> is
-a type that models a mathemetical ring.  It is expected that <code class="highlight"><c- n>is_ring</c-></code> will be implemented in terms of <code class="highlight"><c- n>number_traits</c-></code>, perhaps as</p>
+a type that models a mathemetical ring.  It is expected that <code class="highlight"><c- n>is_ring</c-></code> will be implemented in terms of <code class="highlight"><c- n>number_traits</c-></code>, perhaps as follows:</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- o>></c->
 <c- k>struct</c-> <c- nl>is_ring</c-> <c- p>:</c-> <c- k>public</c-> <c- n>number_traits</c-><c- o>&lt;</c-><c- n>T</c-><c- o>>::</c-><c- n>is_ring</c->
 <c- p>{};</c->
@@ -2448,7 +2435,7 @@ a type that models a mathemetical ring.  It is expected that <code class="highli
    <h4 class="heading settled" data-level="6.3.5" id="is_nc_ringt"><span class="secno">6.3.5. </span><span class="content"><code class="highlight"><c- n>is_nc_ring</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code></span><a class="self-link" href="#is_nc_ringt"></a></h4>
    <p>Traits type <code class="highlight"><c- n>is_nc_ring</c-><c- o>&lt;</c-><c- n>T</c-><c- o>></c-></code> indicates whether its template parameter <code class="highlight"><c- n>T</c-></code> is a type that models a mathemetical non-commutative ring.  It is expected 
 that <code class="highlight"><c- n>is_nc_ring</c-></code> will be implemented in terms of <code class="highlight"><c- n>number_traits</c-></code>, perhaps
-as</p>
+as follows:</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- o>></c->
 <c- k>struct</c-> <c- nl>is_nc_ring</c-> <c- p>:</c-> <c- k>public</c-> <c- n>number_traits</c-><c- o>&lt;</c-><c- n>T</c-><c- o>>::</c-><c- n>is_nc_ring</c->
 <c- p>{};</c->
@@ -2458,7 +2445,7 @@ as</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- o>></c-> <c- k>struct</c-> <c- n>is_matrix_element</c-><c- p>;</c->
 </pre>
    <p>The purpose of this type is to constrain the set of element types used to
-instantiate a MathObj to those which are non-commutative rings.</p>
+instantiate a <em>MathObj</em> to those types which are non-commutative rings.</p>
    <h3 class="heading settled" data-level="6.4" id="engine-types"><span class="secno">6.4. </span><span class="content">Engine Types</span><a class="self-link" href="#engine-types"></a></h3>
    <p>The over-arching purpose of the engine types is to perform resource
 management on behalf of an associated <em>MathObj</em> instance.  At a minimum,
@@ -2471,7 +2458,8 @@ a 2-tuple for describing sizes and capacities.</p>
    <p>One can imagine engines that also manage resources related to execution.</p>
    <h4 class="heading settled" data-level="6.4.1" id="matrix_column_viewet"><span class="secno">6.4.1. </span><span class="content"><code class="highlight"><c- n>matrix_column_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_column_viewet"></a></h4>
    <p>Class template <code class="highlight"><c- n>matrix_column_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code> implements a non-owning, const
-view type that provides the basic vector engine interface.</p>
+view type that provides the basic vector engine interface.  Its purpose is 
+to provide a view of single column of a <code class="highlight"><c- n>matrix</c-></code> object.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>ET</c-><c- o>></c->
 <c- k>class</c-> <c- nc>matrix_column_view</c->
 <c- p>{</c->
@@ -2517,8 +2505,9 @@ view type that provides the basic vector engine interface.</p>
 <c- p>};</c->
 </pre>
    <h4 class="heading settled" data-level="6.4.2" id="matrix_row_viewet"><span class="secno">6.4.2. </span><span class="content"><code class="highlight"><c- n>matrix_row_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_row_viewet"></a></h4>
-   <p>Class template <code class="highlight"><c- n>matrix_row_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code> implements a non-owning,
-const view type that provides the basic vector engine interface.</p>
+   <p>Class template <code class="highlight"><c- n>matrix_row_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code> implements a non-owning, const view
+type that provides the basic vector engine interface.  Its purpose is 
+to provide a view of single row of a <code class="highlight"><c- n>matrix</c-></code> object.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>ET</c-><c- o>></c->
 <c- k>class</c-> <c- nc>matrix_row_view</c->
 <c- p>{</c->
@@ -2565,9 +2554,8 @@ const view type that provides the basic vector engine interface.</p>
 </pre>
    <h4 class="heading settled" data-level="6.4.3" id="matrix_transpose_viewet"><span class="secno">6.4.3. </span><span class="content"><code class="highlight"><c- n>matrix_transpose_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_transpose_viewet"></a></h4>
    <p>Class template <code class="highlight"><c- n>matrix_transpose_view</c-><c- o>&lt;</c-><c- n>ET</c-><c- o>></c-></code> implements a non-owning, const
-view type that provides the basic matrix engine interface.  Its primary 
-anticipated use case is as the return value of the <code class="highlight"><c- n>t</c-><c- p>()</c-></code> (transpose) member 
-function of the <code class="highlight"><c- n>matrix</c-></code> type.</p>
+view type that provides the basic matrix engine interface.  Its purpose is
+to provide a view of a <code class="highlight"><c- n>matrix</c-></code> object that is the transpose of the <code class="highlight"><c- n>matrix</c-></code>.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>ET</c-><c- o>></c->
 <c- k>class</c-> <c- nc>matrix_transpose_view</c->
 <c- p>{</c->
@@ -2622,10 +2610,10 @@ function of the <code class="highlight"><c- n>matrix</c-></code> type.</p>
 <c- p>};</c->
 </pre>
    <h4 class="heading settled" data-level="6.4.4" id="fs_vector_enginet-n"><span class="secno">6.4.4. </span><span class="content"><code class="highlight"><c- n>fs_vector_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>N</c-><c- o>></c-></code></span><a class="self-link" href="#fs_vector_enginet-n"></a></h4>
-   <p>Class template <code class="highlight"><c- n>fs_vector_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>N</c-><c- o>></c-></code> implements a fixed-size,
-fixed-capacity engine for vectors having <code class="highlight"><c- n>N</c-></code> elements. In addition 
-to the basic engine interface, it provides member functions for 
-mutable element indexing and swapping rows and/or columns.</p>
+   <p>Class template <code class="highlight"><c- n>fs_vector_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>N</c-><c- o>></c-></code> implements a fixed-size, fixed-capacity
+vector engine for vectors having <code class="highlight"><c- n>N</c-></code> elements.  In addition to the basic vector 
+engine interface, it provides member functions for mutable element indexing,
+swapping engine contents, and swapping individual elements.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>N</c-><c- o>></c->
 <c- k>class</c-> <c- nc>fs_vector_engine</c->
 <c- p>{</c->
@@ -2682,9 +2670,10 @@ mutable element indexing and swapping rows and/or columns.</p>
 </pre>
    <h4 class="heading settled" data-level="6.4.5" id="fs_matrix_enginet-r-c"><span class="secno">6.4.5. </span><span class="content"><code class="highlight"><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>R</c-><c- p>,</c-> <c- n>C</c-><c- o>></c-></code></span><a class="self-link" href="#fs_matrix_enginet-r-c"></a></h4>
    <p>Class template <code class="highlight"><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>R</c-><c- p>,</c-> <c- n>C</c-><c- o>></c-></code> implements a fixed-size,
-fixed-capacity engine. In addition to the basic engine interface, it 
-provides member functions for mutable element indexing and swapping 
-rows and/or columns.</p>
+fixed-capacity matrix engine for matrices having <code class="highlight"><c- n>R</c-></code> rows and <code class="highlight"><c- n>C</c-></code> columns. 
+In addition to the basic engine interface, it provides member functions for 
+mutable element indexing, swapping engine contents, swapping columns, and 
+swapping rows.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>R</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>C</c-><c- o>></c->
 <c- k>class</c-> <c- nc>fs_matrix_engine</c->
 <c- p>{</c->
@@ -2749,10 +2738,10 @@ rows and/or columns.</p>
 <c- p>};</c->
 </pre>
    <h4 class="heading settled" data-level="6.4.6" id="dr_vector_enginet-at"><span class="secno">6.4.6. </span><span class="content"><code class="highlight"><c- n>dr_vector_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>AT</c-><c- o>></c-></code></span><a class="self-link" href="#dr_vector_enginet-at"></a></h4>
-   <p>Class template <code class="highlight"><c- n>dr_vector_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>AT</c-><c- o>></c-></code> implements an engine whose
+   <p>Class template <code class="highlight"><c- n>dr_vector_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>AT</c-><c- o>></c-></code> implements a vector engine whose
 sizes and capacities can be changed at runtime. In addition to the basic
-engine interface, it provides member functions for mutable element
-indexing, changing size and capacity, and swapping rows and/or columns.</p>
+engine interface, it provides member functions for mutable element indexing, 
+swapping engine contents, swapping individual elements, and resizing.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- p>,</c-> <c- k>class</c-> <c- nc>AT</c-><c- o>=</c-><c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- n>T</c-><c- o>>></c->
 <c- k>class</c-> <c- nc>dr_vector_engine</c->
 <c- p>{</c->
@@ -2818,9 +2807,9 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 </pre>
    <h4 class="heading settled" data-level="6.4.7" id="dr_matrix_enginet-at"><span class="secno">6.4.7. </span><span class="content"><code class="highlight"><c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>AT</c-><c- o>></c-></code></span><a class="self-link" href="#dr_matrix_enginet-at"></a></h4>
    <p>Class template <code class="highlight"><c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- n>T</c-><c- p>,</c-> <c- n>AT</c-><c- o>></c-></code> implements an engine whose
-sizes and capacities can be changed at runtime. In addition to the basic
-engine interface, it provides member functions for mutable element
-indexing, changing size and capacity, and swapping rows and/or columns.</p>
+sizes and capacities can be changed at runtime.  In addition to the basic 
+engine interface, it provides member functions for mutable element indexing, 
+swapping engine contents, swapping columns, swapping rows, and resizing.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- p>,</c-> <c- k>class</c-> <c- nc>AT</c-><c- o>=</c-><c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- n>T</c-><c- o>>></c->
 <c- k>class</c-> <c- nc>dr_matrix_engine</c->
 <c- p>{</c->
@@ -2889,6 +2878,10 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 </pre>
    <h3 class="heading settled" data-level="6.5" id="math-object-types"><span class="secno">6.5. </span><span class="content">Math object types</span><a class="self-link" href="#math-object-types"></a></h3>
    <h4 class="heading settled" data-level="6.5.1" id="vectoret-ot"><span class="secno">6.5.1. </span><span class="content"><code class="highlight"><c- n>vector</c-><c- o>&lt;</c-><c- n>ET</c-><c- p>,</c-> <c- n>OT</c-><c- o>></c-></code></span><a class="self-link" href="#vectoret-ot"></a></h4>
+   <p>Class template <code class="highlight"><c- n>vector</c-><c- o>&lt;</c-><c- n>ET</c-><c- p>,</c-> <c- n>OT</c-><c- o>></c-></code> represents a vector, with element type and
+resource management implemented by the engine type <code class="highlight"><c- n>ET</c-></code>, and arithmetic 
+operations specified by the operation traits type <code class="highlight"><c- n>OT</c-></code>.  If the underlying 
+engine type provides dynamic resizing, then this class will as well.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>ET</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT</c-><c- o>></c->
 <c- k>class</c-> <c- nc>vector</c->
 <c- p>{</c->
@@ -2990,6 +2983,10 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 <c- p>};</c->
 </pre>
    <h4 class="heading settled" data-level="6.5.2" id="matrixet-ot"><span class="secno">6.5.2. </span><span class="content"><code class="highlight"><c- n>matrix</c-><c- o>&lt;</c-><c- n>ET</c-><c- p>,</c-> <c- n>OT</c-><c- o>></c-></code></span><a class="self-link" href="#matrixet-ot"></a></h4>
+   <p>Class template <code class="highlight"><c- n>matrix</c-><c- o>&lt;</c-><c- n>ET</c-><c- p>,</c-> <c- n>OT</c-><c- o>></c-></code>represents a matrix, with element type
+and resource management implemented by the engine type <code class="highlight"><c- n>ET</c-></code>, and arithmetic 
+operations specified by the operation traits type <code class="highlight"><c- n>OT</c-></code>.  If the underlying 
+engine type provides dynamic resizing, then this class will as well.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>ET</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT</c-><c- o>></c->
 <c- k>class</c-> <c- nc>matrix</c->
 <c- p>{</c->
@@ -3106,6 +3103,8 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 </pre>
    <h3 class="heading settled" data-level="6.6" id="operation-traits"><span class="secno">6.6. </span><span class="content">Operation traits</span><a class="self-link" href="#operation-traits"></a></h3>
    <h4 class="heading settled" data-level="6.6.1" id="matrix_operation_traits"><span class="secno">6.6.1. </span><span class="content"><code class="highlight"><c- n>matrix_operation_traits</c-></code></span><a class="self-link" href="#matrix_operation_traits"></a></h4>
+   <p>Class <code class="highlight"><c- n>matrix_operation_traits</c-></code> is a traits-style template parameter to <code class="highlight"><c- n>vector</c-></code> and <code class="highlight"><c- n>matrix</c-></code>.  Its purpose is to associate a set of traits with
+a <code class="highlight"><c- n>MathObj</c-></code> so that those traits may be conveyed into an arithmetic operator.</p>
 <pre class="highlight"><c- k>struct</c-> <c- n>matrix_operation_traits</c->
 <c- p>{</c->
     <c- c1>//- Default element promotion traits.</c->
@@ -3152,6 +3151,9 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 <c- p>};</c->
 </pre>
    <h4 class="heading settled" data-level="6.6.2" id="matrix_operation_traits_selectorot1-ot2"><span class="secno">6.6.2. </span><span class="content"><code class="highlight"><c- n>matrix_operation_traits_selector</c-><c- o>&lt;</c-><c- n>OT1</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_operation_traits_selectorot1-ot2"></a></h4>
+   <p>Class template <code class="highlight"><c- n>matrix_operation_traits_selector</c-><c- o>&lt;</c-><c- n>OT1</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-></code> is used by the
+arithmetic operators to select a specific operation traits type that will
+be used to perform an arithmetic operation.</p>
 <pre class="highlight"><c- c1>//- Primary template and expected specializations.</c->
 <c- c1>//</c->
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
@@ -3187,7 +3189,13 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 <c- k>using</c-> <c- n>matrix_operation_traits_selector_t</c-> <c- o>=</c-> <c- k>typename</c-> <c- n>matrix_operation_traits_selector</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-><c- n>T2</c-><c- o>>::</c-><c- n>traits_type</c-><c- p>;</c->
 </pre>
    <h3 class="heading settled" data-level="6.7" id="element-promotion-traits"><span class="secno">6.7. </span><span class="content">Element promotion traits</span><a class="self-link" href="#element-promotion-traits"></a></h3>
+   <p>Element promotion traits are used by the library to determine the resulting
+element type in an binary expression involving engines with possibly two 
+different element types.</p>
    <h4 class="heading settled" data-level="6.7.1" id="matrix_negation_element_traitst1"><span class="secno">6.7.1. </span><span class="content"><code class="highlight"><c- n>matrix_negation_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_negation_element_traitst1"></a></h4>
+   <p>Class template <code class="highlight"><c- n>matrix_negation_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- o>></c-></code> implements a traits
+type that determines the appropriate result type of an elementwise negation
+operation involving a <em>MathObj</em> element type.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_negation_element_traits</c->
 <c- p>{</c->
@@ -3198,6 +3206,9 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 <c- k>using</c-> <c- n>matrix_negation_element_t</c-> <c- o>=</c-> <c- p>...;</c->          <c- c1>//- Implementation-defined</c->
 </pre>
    <h4 class="heading settled" data-level="6.7.2" id="matrix_addition_element_traitst1-t2"><span class="secno">6.7.2. </span><span class="content"><code class="highlight"><c- n>matrix_addition_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_addition_element_traitst1-t2"></a></h4>
+   <p>Class template <code class="highlight"><c- n>matrix_addition_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> implements a traits
+type that determines the appropriate result type of an elementwise addition 
+operation involving two (possibly different) element types.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_addition_element_traits</c->
 <c- p>{</c->
@@ -3208,6 +3219,9 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 <c- k>using</c-> <c- n>matrix_addition_element_t</c-> <c- o>=</c-> <c- p>...;</c->          <c- c1>//- Implementation-defined</c->
 </pre>
    <h4 class="heading settled" data-level="6.7.3" id="matrix_subtraction_element_traitst1-t2"><span class="secno">6.7.3. </span><span class="content"><code class="highlight"><c- n>matrix_subtraction_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_subtraction_element_traitst1-t2"></a></h4>
+   <p>Class template <code class="highlight"><c- n>matrix_subtraction_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> implements a traits
+type that determines the appropriate result type of an elementwise subtraction 
+operation involving two (possibly different) element types.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_subtraction_element_traits</c->
 <c- p>{</c->
@@ -3218,6 +3232,9 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 <c- k>using</c-> <c- n>matrix_subtraction_element_t</c-> <c- o>=</c-> <c- p>...;</c->       <c- c1>//- Implementation-defined</c->
 </pre>
    <h4 class="heading settled" data-level="6.7.4" id="matrix_multiplication_element_traitst1-t2"><span class="secno">6.7.4. </span><span class="content"><code class="highlight"><c- n>matrix_multiplication_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_multiplication_element_traitst1-t2"></a></h4>
+   <p>Class template <code class="highlight"><c- n>matrix_multiplication_element_traits</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-></code> implements a traits
+type that determines the appropriate result type of an elementwise multiplication 
+operation involving two (possibly different) element types.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_multiplication_element_traits</c->
 <c- p>{</c->
@@ -3228,7 +3245,11 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 <c- k>using</c-> <c- n>matrix_multiplication_element_t</c-> <c- o>=</c-> <c- p>...;</c->    <c- c1>//- Implementation-defined</c->
 </pre>
    <h3 class="heading settled" data-level="6.8" id="engine-promotion-traits"><span class="secno">6.8. </span><span class="content">Engine promotion traits</span><a class="self-link" href="#engine-promotion-traits"></a></h3>
+   <p>Engine promotion traits are used by the arithmetic traits to determine
+the resulting engine types in an arithmetical expression.</p>
    <h4 class="heading settled" data-level="6.8.1" id="matrix_negation_engine_traitsot-et1"><span class="secno">6.8.1. </span><span class="content"><code class="highlight"><c- n>matrix_negation_engine_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_negation_engine_traitsot-et1"></a></h4>
+   <p>Class template <code class="highlight"><c- n>matrix_negation_engine_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- o>></c-></code> implements a traits
+type that determines the resulting engine type when negating a <em>MathObj</em>.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_negation_engine_traits</c->
 <c- p>{</c->
@@ -3241,6 +3262,9 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 <c- k>using</c-> <c- n>matrix_negation_engine_t</c-> <c- o>=</c-> <c- p>...;</c->           <c- c1>//- Implementation-defined</c->
 </pre>
    <h4 class="heading settled" data-level="6.8.2" id="matrix_addition_engine_traitsot-et1-et2"><span class="secno">6.8.2. </span><span class="content"><code class="highlight"><c- n>matrix_addition_engine_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_addition_engine_traitsot-et1-et2"></a></h4>
+   <p>Class template <code class="highlight"><c- n>matrix_addition_engine_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-></code> implements a
+traits type that determines the resulting engine type when adding two
+compatible <em>MathObj</em>s.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_addition_engine_traits</c->
 <c- p>{</c->
@@ -3255,6 +3279,9 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 <c- k>using</c-> <c- n>matrix_addition_engine_t</c-> <c- o>=</c-> <c- n>detail</c-><c- o>::</c-><c- n>engine_add_type_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-><c- p>;</c->
 </pre>
    <h4 class="heading settled" data-level="6.8.3" id="matrix_subtraction_engine_traitsot-et1-et2"><span class="secno">6.8.3. </span><span class="content"><code class="highlight"><c- n>matrix_subtraction_engine_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_subtraction_engine_traitsot-et1-et2"></a></h4>
+   <p>Class template <code class="highlight"><c- n>matrix_subtraction_engine_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-></code> implements a
+traits type that determines the resulting engine type when subtracting two
+compatible <em>MathObj</em>s.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_subtraction_engine_traits</c->
 <c- p>{</c->
@@ -3269,6 +3296,9 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 <c- k>using</c-> <c- n>matrix_subtraction_engine_t</c-> <c- o>=</c-> <c- p>...;</c->        <c- c1>//- Implementation-defined</c->
 </pre>
    <h4 class="heading settled" data-level="6.8.4" id="matrix_multiplication_engine_traitsot-et1-et2"><span class="secno">6.8.4. </span><span class="content"><code class="highlight"><c- n>matrix_multiplication_engine_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_multiplication_engine_traitsot-et1-et2"></a></h4>
+   <p>Class template <code class="highlight"><c- n>matrix_multiplication_engine_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>ET1</c-><c- p>,</c-> <c- n>ET2</c-></code> implements a
+traits type that determines the resulting engine type when multiplying two
+compatible <em>MathObj</em>s.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_multiplication_engine_traits</c->
 <c- p>{</c->
@@ -3283,7 +3313,25 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 <c- k>using</c-> <c- n>matrix_multiplication_engine_t</c-> <c- o>=</c-> <c- p>...;</c->     <c- c1>//- Implementation-defined</c->
 </pre>
    <h3 class="heading settled" data-level="6.9" id="arithmetic-traits"><span class="secno">6.9. </span><span class="content">Arithmetic traits</span><a class="self-link" href="#arithmetic-traits"></a></h3>
+   <p>This section defines a set of arithmetic traits types for negation,
+addition, subtraction, and multiplication. The purpose of these traits 
+types is threefold:</p>
+   <ol>
+    <li data-md>
+     <p>to determine the element type of the resulting <em>MathObj</em>;</p>
+    <li data-md>
+     <p>to determine the engine type of the resulting <em>MathObj</em>; and</p>
+    <li data-md>
+     <p>to carry out the arithmetical operation and return the result.</p>
+   </ol>
+   <p>The idea here is that arithmetic operators (described below) simply forward
+to the appropriate traits type, which does the heavy lifting.</p>
    <h4 class="heading settled" data-level="6.9.1" id="matrix_negation_traitsot-op1"><span class="secno">6.9.1. </span><span class="content"><code class="highlight"><c- n>matrix_negation_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_negation_traitsot-op1"></a></h4>
+   <p>Class template <code class="highlight"><c- n>matrix_negation_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- o>></c-></code> is an arithmetic traits
+type that performs the negation of a <em>MathObj</em> and returns the result 
+in another <em>MathObj</em> having an implementation-defined engine type.
+There are two partial specializations to support the two overloaded 
+negation operators described below.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_negation_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>>></c->
 <c- p>{</c->
@@ -3308,6 +3356,11 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 <c- k>using</c-> <c- n>matrix_negation_traits_t</c-> <c- o>=</c-> <c- p>...;</c->       <c- c1>//- Implementation-defined</c->
 </pre>
    <h4 class="heading settled" data-level="6.9.2" id="matrix_addition_traitsot-op1-op2"><span class="secno">6.9.2. </span><span class="content"><code class="highlight"><c- n>matrix_addition_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_addition_traitsot-op1-op2"></a></h4>
+   <p>Class template <code class="highlight"><c- n>matrix_addition_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-></code> is an arithmetic
+traits type that performs the addition of two compatible <em>MathObj</em>s and 
+returns the result in a <em>MathObj</em> having an implementation-defined engine 
+type.  There are two partial specializations to support the two overloaded 
+addition operators described below.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OP1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OP2</c-><c- o>></c->
 <c- k>using</c-> <c- n>matrix_addition_traits_t</c-> <c- o>=</c-> <c- n>detail</c-><c- o>::</c-><c- n>addition_traits_t</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-><c- p>;</c->
 
@@ -3326,6 +3379,11 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 <c- p>};</c->
 </pre>
    <h4 class="heading settled" data-level="6.9.3" id="matrix_subtraction_traitsot-op1-op2"><span class="secno">6.9.3. </span><span class="content"><code class="highlight"><c- n>matrix_subtraction_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_subtraction_traitsot-op1-op2"></a></h4>
+   <p>Class template <code class="highlight"><c- n>matrix_subtraction_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-></code> is an arithmetic
+traits type that performs the subtraction of two compatible <em>MathObj</em>s and 
+returns the result in a <em>MathObj</em> having an implementation-defined engine 
+type.  There are two partial specializations to support the two overloaded 
+subtraction operators described below.</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_subtraction_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-><c- p>,</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>>></c->
 <c- p>{</c->
@@ -3350,6 +3408,11 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 <c- k>using</c-> <c- n>matrix_subtraction_traits_t</c-> <c- o>=</c-> <c- p>...;</c->        <c- c1>//- Implementation-defined</c->
 </pre>
    <h4 class="heading settled" data-level="6.9.4" id="matrix_multiplication_traitsot-op1-op2"><span class="secno">6.9.4. </span><span class="content"><code class="highlight"><c- n>matrix_multiplication_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-></code></span><a class="self-link" href="#matrix_multiplication_traitsot-op1-op2"></a></h4>
+   <p>Class template <code class="highlight"><c- n>matrix_multiplication_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>OP1</c-><c- p>,</c-> <c- n>OP2</c-><c- o>></c-></code> is an arithmetic
+traits type that performs the multiplication of two compatible <em>MathObj</em>s 
+and returns the result in a <em>MathObj</em> having an implementation-defined 
+engine type.  There are eight partial specializations to support the eight 
+binary multiplication operators described below.</p>
 <pre class="highlight"><c- c1>//- vector*scalar</c->
 <c- c1>//</c->
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
@@ -3363,7 +3426,7 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
     <c- k>static</c-> <c- n>result_type</c->  <c- nf>multiply</c-><c- p>(</c-><c- n>vector</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>v1</c-><c- p>,</c-> <c- n>T2</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>s2</c-><c- p>);</c->
 <c- p>};</c->
 
-<c- c1>//-------------—&lt;wbr>//- scalar*vector</c->
+<c- c1>//- scalar*vector</c->
 <c- c1>//</c->
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_multiplication_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>T1</c-><c- p>,</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>>></c->
@@ -3376,7 +3439,7 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
     <c- k>static</c-> <c- n>result_type</c->  <c- nf>multiply</c-><c- p>(</c-><c- n>T1</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>s1</c-><c- p>,</c-> <c- n>vector</c-><c- o>&lt;</c-><c- n>ET2</c-><c- p>,</c-> <c- n>OT2</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>v2</c-><c- p>);</c->
 <c- p>};</c->
 
-<c- c1>//-------------—&lt;wbr>//- matrix*scalar</c->
+<c- c1>//- matrix*scalar</c->
 <c- c1>//</c->
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>OT</c-><c- p>,</c-> <c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- o>></c->
 <c- k>struct</c-> <c- n>matrix_multiplication_traits</c-><c- o>&lt;</c-><c- n>OT</c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>ET1</c-><c- p>,</c-> <c- n>OT1</c-><c- o>></c-><c- p>,</c-> <c- n>T2</c-><c- o>></c->
@@ -3454,6 +3517,15 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
 <c- p>};</c->
 </pre>
    <h3 class="heading settled" data-level="6.10" id="arithmetic-operators"><span class="secno">6.10. </span><span class="content">Arithmetic operators</span><a class="self-link" href="#arithmetic-operators"></a></h3>
+   <p>The arithmetic operators provide syntax that mimics common mathematical
+notation, with computation executed by an arithmetic traits type 
+specified by one of the operands' operation traits template parameters.</p>
+   <p>Readers will note that the return types of the overloaded operators
+described below are left unspecified.  This is a deliberate choice so
+that implementers have the freedom to choose whatever default technique
+for evaluationg expressions they desire; for example, by returning 
+temporary objects, or by using expression templates, or perhaps by 
+some hybrid technique.</p>
 <pre class="highlight"><c- c1>//- Negation</c->
 <c- c1>//</c->
 <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>ET1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OT1</c-><c- o>></c->
@@ -3647,256 +3719,39 @@ indexing, changing size and capacity, and swapping rows and/or columns.</p>
     <c- k>return</c-> <c- n>mul_traits</c-><c- o>::</c-><c- n>multiply</c-><c- p>(</c-><c- n>m1</c-><c- p>,</c-> <c- n>m2</c-><c- p>);</c->
 <c- p>}</c->
 </pre>
-   <h2 class="heading settled" data-level="7" id="how-does-it-work"><span class="secno">7. </span><span class="content">How Does it Work?</span><a class="self-link" href="#how-does-it-work"></a></h2>
-   <p>The preceding sections described the various components comprising the
-interface, starting with the most basic, and proceeding in a bottom-up
-fashion.  While this is useful for understanding the static structure of
-the interface, it may help to look at how the interface works from a 
-top-down perspective in order to understand how the pieces work together.</p>
-   <p>Consider the following simple function:</p>
-<pre class="highlight"><c- b>void</c-> <c- nf>f</c-><c- p>()</c->
-<c- p>{</c->
-    <c- n>fs_matrix</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- mi>3</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c->     <c- n>fsmd</c-><c- p>;</c->         <c- c1>//- fixed-size matrix of double</c->
-    <c- n>dyn_matrix</c-><c- o>&lt;</c-><c- b>float</c-><c- o>></c->           <c- n>drmf</c-><c- p>(</c-><c- mi>4</c-><c- p>,</c-> <c- mi>5</c-><c- p>);</c->   <c- c1>//- dynamic matrix of float</c->
-
-    <c- k>auto</c->    <c- n>m1</c-> <c- o>=</c-> <c- n>fsmd</c-> <c- o>*</c-> <c- n>drmf</c-><c- p>;</c->   <c- c1>//- dyn_matrix&lt;double> of size 3x5</c->
-<c- p>}</c->
-</pre>
-   <p>One might reasonably ask: how does the library determine that <code class="highlight"><c- n>m1</c-></code> is a
-dynamically-resizable matrix of double, and how does it know how to 
-perform the requested multiplication?</p>
-   <p>At a high level, the process for determining the return type of the binary
-operators is as follows:</p>
-   <ol>
-    <li data-md>
-     <p>An operator, say multiplication, is invoked.</p>
-    <li data-md>
-     <p>The operator examines the operation traits types of its two operands,
-employing operation traits promotion to determine which of the two 
-it will use to perform the multiplication; this operation traits 
-type is also passed on as a template argument to the result type.</p>
-    <li data-md>
-     <p>The operator extracts the appropriate arithmetic traits type from the
-operation traits.</p>
-    <li data-md>
-     <p>The arithmetic traits examines the engine types of the two operands,
-employing engine promotion to determine the engine type of the result.</p>
-    <li data-md>
-     <p>The engine promotion traits examines the element types of the two
-operands, employing element promotion to determine the element type of
-the result.</p>
-    <li data-md>
-     <p>The element promotion traits determines a suitable element type that
-can contain the result of the arithmetic operation with little or no 
-loss of information.</p>
-    <li data-md>
-     <p>The engine promotion traits specifies the appropriate engine type
-parametrized in terms of the resulting element type and other types
-specific to that engine type.</p>
-    <li data-md>
-     <p>The arithmetic traits combines the engine type with the operation traits
-type to specify the actual <em>MathObj</em> return type.</p>
-    <li data-md>
-     <p>The arithmetic traits provides a static member function that implements
-the multiplication operation.</p>
-    <li data-md>
-     <p>The multiplication operator calls that function with the supplied operands
-and returns the result.</p>
-   </ol>
-   <h3 class="heading settled" data-level="7.1" id="in-more-detail"><span class="secno">7.1. </span><span class="content">In More Detail</span><a class="self-link" href="#in-more-detail"></a></h3>
-   <p>We describe the process in more detail in the following sections.  The reader
-may find it helpful to follow along by looking at the strawman implementation
-provided in the repo listed at the top of this document.</p>
-   <h4 class="heading settled" data-level="7.1.1" id="calling-an-operator"><span class="secno">7.1.1. </span><span class="content">Calling an Operator</span><a class="self-link" href="#calling-an-operator"></a></h4>
-   <p>Let’s begin by examining the the instantiation of matrix <code class="highlight"><c- n>m1</c-></code>, in which
-the binary multiplication operator is invoked with operands <code class="highlight"><c- n>fsmd</c-></code> and <code class="highlight"><c- n>drmf</c-></code>.  The implementation of that operator might look like the following:</p>
-<pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>Eng1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OpTraits1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>Eng2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OpTraits2</c-><c- o>></c->
-<c- kr>inline</c-> <c- k>auto</c->
-<c- k>operator</c-> <c- o>*</c-><c- p>(</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>Eng1</c-><c- p>,</c-> <c- n>OpTraits1</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m1</c-><c- p>,</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>Eng2</c-><c- p>,</c-> <c- n>OpTraits2</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m2</c-><c- p>)</c->
-<c- p>{</c->
-    <c- k>using</c-> <c- n>op_traits</c->  <c- o>=</c-> <c- n>matrix_operator_traits_promotion_t</c-><c- o>&lt;</c-><c- n>OpTraits1</c-><c- p>,</c-> <c- n>OpTraits2</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>op1_type</c->   <c- o>=</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>Eng1</c-><c- p>,</c-> <c- n>OpTraits1</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>op2_type</c->   <c- o>=</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>Eng2</c-><c- p>,</c-> <c- n>OpTraits2</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>mul_traits</c-> <c- o>=</c-> 
-        <c- k>typename</c-> <c- n>op_traits</c-><c- o>::</c-><c- k>template</c-> <c- n>multiplication_traits</c-><c- o>&lt;</c-><c- n>op1_type</c-><c- p>,</c-> <c- n>op2_type</c-><c- p>,</c-> <c- n>op_traits</c-><c- o>></c-><c- p>;</c->
-
-    <c- k>return</c-> <c- n>mul_traits</c-><c- o>::</c-><c- n>multiply</c-><c- p>(</c-><c- n>m1</c-><c- p>,</c-> <c- n>m2</c-><c- p>);</c->
-<c- p>}</c->
-</pre>
-   <p>The template parameters are deduced as:</p>
-<pre class="highlight"><c- n>Eng1</c->  <c- o>-->></c->  <c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- mi>3</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c->
-<c- n>OpTraits1</c->  <c- o>-->></c->  <c- n>default_matrix_operator_traits</c->
-<c- n>Eng2</c->  <c- o>-->></c->  <c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>float</c-><c- o>>></c->
-<c- n>OpTraits2</c->  <c- o>-->></c->  <c- n>default_matrix_operator_traits</c->
-</pre>
-   <h4 class="heading settled" data-level="7.1.2" id="selecting-the-operation-traits"><span class="secno">7.1.2. </span><span class="content">Selecting the operation traits</span><a class="self-link" href="#selecting-the-operation-traits"></a></h4>
-   <p>The resulting operation traits type is then determined by instantiating the
-alias template <code class="highlight"><c- n>matrix_operator_traits_promotion_t</c-></code> from Section 6.9 above:</p>
-<pre class="highlight"><c- n>op_traits</c->  <c- o>-->></c->  <c- n>matrix_operator_traits_promotion_t</c-><c- o>&lt;</c-><c- n>default_matrix_operator_traits</c-><c- p>,</c->
-                                                    <c- n>default_matrix_operator_traits</c-><c- o>></c->
-           <c- o>-->></c->  <c- n>matrix_operator_traits_promotion</c-><c- o>&lt;</c-><c- n>default_matrix_operator_traits</c-><c- p>,</c->
-                                                  <c- n>default_matrix_operator_traits</c-><c- o>>::</c-><c- n>alias_type</c->
-           <c- o>-->></c->  <c- n>default_matrix_operator_traits</c->
-</pre>
-   <p>Now that the operation traits are known, we also know the four corresponding
-arithmetic traits templates that will determine the resulting engine type 
-and perform the actual computational work.</p>
-   <p>The operand types are:</p>
-<pre class="highlight"><c- n>op1_type</c->  <c- o>-->></c->  <c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- mi>3</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-><c- p>,</c-> 
-                       <c- n>default_matrix_operator_traits</c-><c- o>></c->
-
-<c- n>op2_type</c->  <c- o>-->></c->  <c- n>matrix</c-><c- o>&lt;</c-><c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>float</c-><c- o>>></c-><c- p>,</c-> 
-                       <c- n>default_matrix_operator_traits</c-><c- o>></c->
-</pre>
-   <h4 class="heading settled" data-level="7.1.3" id="selecting-the-multiplication-traits"><span class="secno">7.1.3. </span><span class="content">Selecting the Multiplication Traits</span><a class="self-link" href="#selecting-the-multiplication-traits"></a></h4>
-   <p>Given the operand types and operation traits types, the multiplication
-traits type is then determined using them, per Section 6.8:</p>
-<pre class="highlight"><c- n>mul_traits</c->  <c- o>-->></c-> 
-    <c- n>default_matrix_operator_traits</c-><c- o>::</c->
-        <c- n>matrix_multiplication_traits</c-><c- o>&lt;</c->
-            <c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- mi>3</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-><c- p>,</c-> <c- n>default_matrix_operator_traits</c-><c- o>></c-><c- p>,</c->
-            <c- n>matrix</c-><c- o>&lt;</c-><c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>float</c-><c- o>>></c-><c- p>,</c-> 
-            <c- n>default_matrix_operator_traits</c-><c- o>></c->
-</pre>
-   <p>From Section 6.7.4 above, we can see that the appropriate multiplication
-traits partial specialization is:</p>
-<pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>Eng1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OpTraits1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>Eng2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OpTraits2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>OpTraitsR</c-><c- o>></c->
-<c- k>struct</c-> <c- n>matrix_multiplication_traits</c-><c- o>&lt;</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>Eng1</c-><c- p>,</c-> <c- n>OpTraits1</c-><c- o>></c-><c- p>,</c-> 
-                                    <c- n>matrix</c-><c- o>&lt;</c-><c- n>Eng2</c-><c- p>,</c-> <c- n>OpTraits2</c-><c- o>></c-><c- p>,</c-> 
-                                    <c- n>OpTraitsR</c-><c- o>></c->
-<c- p>{</c->
-    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- n>matrix_multiplication_engine_t</c-><c- o>&lt;</c-><c- n>Eng1</c-><c- p>,</c-> <c- n>Eng2</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>op_traits</c->   <c- o>=</c-> <c- n>OpTraitsR</c-><c- p>;</c->
-    <c- k>using</c-> <c- n>result_type</c-> <c- o>=</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>engine_type</c-><c- p>,</c-> <c- n>op_traits</c-><c- o>></c-><c- p>;</c->
-
-    <c- k>static</c-> <c- n>result_type</c->  <c- nf>multiply</c-><c- p>(</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>Eng1</c-><c- p>,</c-> <c- n>OpTraits1</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m1</c-><c- p>,</c-> 
-                                 <c- n>matrix</c-><c- o>&lt;</c-><c- n>Eng2</c-><c- p>,</c-> <c- n>OpTraits2</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m2</c-><c- p>);</c->
-<c- p>};</c->
-</pre>
-   <h4 class="heading settled" data-level="7.1.4" id="selecting-the-engine-type"><span class="secno">7.1.4. </span><span class="content">Selecting the Engine Type</span><a class="self-link" href="#selecting-the-engine-type"></a></h4>
-   <p>Now that we know the operation traits to be passed on to the resulting matrix,
-and which specialization will perform the multiplication, the next step in 
-the process is to determine the engine type of the result.  We know that 
-the template arguments to the multiplication traits are:</p>
-<pre class="highlight"><c- n>Eng1</c->       <c- o>-->></c->  <c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- mi>3</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c->
-<c- n>OpTraits1</c->  <c- o>-->></c->  <c- n>default_matrix_operator_traits</c->
-<c- n>Eng2</c->       <c- o>-->></c->  <c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>float</c-><c- o>>></c->
-<c- n>OpTraits2</c->  <c- o>-->></c->  <c- n>default_matrix_operator_traits</c->
-<c- n>OpTraitsR</c->  <c- o>-->></c->  <c- n>default_matrix_operator_traits</c->
-</pre>
-   <p>We use these to select the resulting engine type.  The instantiation of the
-alias template <code class="highlight"><c- n>matrix_multiplication_engine_t</c-></code> takes us to the  partial 
-specialization of engine promotion traits relevant to multiplication:</p>
-<pre class="highlight"><c- n>engine_type</c->  <c- o>-->></c->  <c- n>matrix_multiplication_engine_t</c-><c- o>&lt;</c->
-                       <c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- mi>3</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-><c- p>,</c->
-                       <c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>float</c-><c- o>>>></c->
-             <c- o>-->></c->  <c- n>matrix_multiplication_engine_promotion</c-><c- o>&lt;</c->
-                       <c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- mi>3</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-><c- p>,</c->
-                       <c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>float</c-><c- o>>>>::</c-><c- n>engine_type</c->
-</pre>
-   <p>From the example in Section 6.5.4 above, this partial specialization looks
-like the following:</p>
-<pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T1</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Rows1</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Cols1</c-><c- p>,</c-> <c- k>class</c-> <c- nc>T2</c-><c- p>,</c-> <c- k>class</c-> <c- nc>Alloc2</c-><c- o>></c->
-<c- k>struct</c-> <c- n>matrix_multiplication_engine_promotion</c-><c- o>&lt;</c-><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>Rows1</c-><c- p>,</c-> <c- n>Cols1</c-><c- o>></c-><c- p>,</c-> 
-                                              <c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- n>T2</c-><c- p>,</c-> <c- n>Alloc2</c-><c- o>>></c->
-<c- p>{</c->
-    <c- k>using</c-> <c- n>element_type</c-> <c- o>=</c-> <c- n>matrix_element_promotion_t</c-><c- o>&lt;</c-><c- n>T1</c-><c- p>,</c-> <c- n>T2</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>alloc_type</c->   <c- o>=</c-> 
-        <c- k>typename</c-> <c- n>std</c-><c- o>::</c-><c- n>allocator_traits</c-><c- o>&lt;</c-><c- n>Alloc2</c-><c- o>>::</c-><c- k>template</c-> <c- n>rebind_alloc</c-><c- o>&lt;</c-><c- n>element_type</c-><c- o>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>engine_type</c->  <c- o>=</c-> <c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- n>element_type</c-><c- p>,</c-> <c- n>alloc_type</c-><c- o>></c-><c- p>;</c->
-<c- p>};</c->
-</pre>
-   <p>We can see from the above that this example engine promotion traits will
-specify a dynamically resizable engine as the result type.  The template 
-arguments are:</p>
-<pre class="highlight"><c- n>T1</c->     <c- o>-->></c->  <c- b>double</c->
-<c- n>Rows1</c->  <c- o>-->></c->  <c- mi>3</c->
-<c- n>Cols1</c->  <c- o>-->></c->  <c- mi>4</c->
-<c- n>T2</c->     <c- o>-->></c->  <c- b>float</c->
-<c- n>Alloc2</c-> <c- o>-->></c->  <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>float</c-><c- o>></c->
-</pre>
-   <p>From these, we can determine the promoted element type.  The instantiation
-of template alias <code class="highlight"><c- n>matrix_element_promotion_t</c-></code> leads to:</p>
-<pre class="highlight"><c- n>element_type</c->  <c- o>-->></c->  <c- n>matrix_element_promotion_t</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- b>float</c-><c- o>></c->
-              <c- o>-->></c->  <c- n>matrix_element_promotion</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- b>float</c-><c- o>>::</c-><c- n>type</c->
-              <c- o>-->></c->  <c- b>double</c->
-</pre>
-   <p>We next use the rebinder facility from <code class="highlight"><c- n>std</c-><c- o>::</c-><c- n>allocator_traits</c-></code> to select
-the resulting allocator type:</p>
-<pre class="highlight"><c- n>alloc_type</c->  <c- o>-->></c->  <c- n>std</c-><c- o>::</c-><c- n>allocator_traits</c-><c- o>&lt;</c-><c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>float</c-><c- o>>>::</c-><c- n>rebind_alloc</c-><c- o>&lt;</c-><c- b>double</c-><c- o>></c->
-            <c- o>-->></c->  <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>double</c-><c- o>></c->
-</pre>
-   <p>These are then combined to yield the resulting engine type:</p>
-<pre class="highlight"><c- n>engine_type</c->  <c- o>-->></c->  <c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>double</c-><c- o>>></c->
-</pre>
-   <p>Now that we know the engine type, it is possible to determine the template
-arguments of the resulting matrix type.  Popping the instantiation stack 
-and returning to <code class="highlight"><c- n>matrix_multiplication_traits</c-></code>, we now know that:</p>
-<pre class="highlight"><c- n>engine_type</c->  <c- o>-->></c->  <c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>double</c-><c- o>>></c->
-<c- n>op_traits</c->    <c- o>-->></c->  <c- n>default_matrix_operator_traits</c->
-</pre>
-   <p>These now form the template arguments of resulting matrix type:</p>
-<pre class="highlight"><c- n>result_type</c->  <c- o>-->></c->  <c- n>matrix</c-><c- o>&lt;</c-><c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>double</c-><c- o>>></c-><c- p>,</c-> 
-                          <c- n>default_matrix_operator_traits</c-><c- o>></c->
-</pre>
-   <h4 class="heading settled" data-level="7.1.5" id="the-fully-instantiated-multiplication-traits"><span class="secno">7.1.5. </span><span class="content">The Fully Instantiated Multiplication Traits</span><a class="self-link" href="#the-fully-instantiated-multiplication-traits"></a></h4>
-   <p>So, after all of the preceding instantiations are done, the fully specialized
-matrix multiplication traits looks like this:</p>
-<pre class="highlight"><c- k>template</c-><c- o>&lt;></c->
-<c- k>struct</c-> <c- n>matrix_multiplication_traits</c-><c- o>&lt;</c->
-            <c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- mi>3</c-><c- p>,</c-> <c- mi>4</c-><c- o>></c-><c- p>,</c-> <c- n>default_matrix_operator_traits</c-><c- o>></c-><c- p>,</c->
-            <c- n>matrix</c-><c- o>&lt;</c-><c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>float</c-><c- o>>></c-><c- p>,</c-> 
-            <c- n>default_matrix_operator_traits</c-><c- o>></c->
-<c- p>{</c->
-    <c- k>using</c-> <c- n>engine_type</c-> <c- o>=</c-> <c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>double</c-><c- o>>></c-><c- p>;</c->
-    <c- k>using</c-> <c- n>op_traits</c->   <c- o>=</c-> <c- n>default_matrix_operator_traits</c-><c- p>;</c->
-    <c- k>using</c-> <c- n>result_type</c-> <c- o>=</c-> <c- n>matrix</c-><c- o>&lt;</c-><c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>double</c-><c- o>>></c-><c- p>,</c-> 
-                               <c- n>default_matrix_operator_traits</c-><c- o>></c-><c- p>;</c->
-
-    <c- k>static</c-> 
-    <c- n>matrix</c-><c- o>&lt;</c-><c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>double</c-><c- o>>></c-><c- p>,</c-> <c- n>default_matrix_operator_traits</c-><c- o>></c->  
-      <c- n>multiply</c-><c- p>(</c-><c- n>matrix</c-><c- o>&lt;</c-><c- n>fs_matrix_engine</c-><c- o>&lt;</c-><c- b>double</c-><c- p>,</c-><c- mi>3</c-><c- p>,</c-><c- mi>4</c-><c- o>></c-><c- p>,</c-> <c- n>default_matrix_operator_traits</c-><c- o>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m1</c-><c- p>,</c->
-               <c- n>matrix</c-><c- o>&lt;</c-><c- n>dr_matrix_engine</c-><c- o>&lt;</c-><c- b>float</c-><c- p>,</c-> <c- n>std</c-><c- o>::</c-><c- n>allocator</c-><c- o>&lt;</c-><c- b>float</c-><c- o>>></c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>m2</c-><c- p>);</c->
-<c- p>};</c->
-</pre>
-   <p>(NB: this not a user-supplied specialization; rather, it is inteded to
-represent what the compiler "sees" internally.)</p>
-   <p>Finally, the binary multiplication operator wraps the call to <code class="highlight"><c- n>mulitply</c-><c- p>()</c-></code>,
-returning the result as determined above.</p>
-   <h2 class="heading settled" data-level="8" id="customization"><span class="secno">8. </span><span class="content">Customization</span><a class="self-link" href="#customization"></a></h2>
-   <p>The library provides for three forms of customization: custom element types,
-custom engines, and custom arithmetical operations.  The following sections
-show examples of each.</p>
-   <h3 class="heading settled" data-level="8.1" id="integrating-a-new-element-type"><span class="secno">8.1. </span><span class="content">Integrating a New Element Type</span><a class="self-link" href="#integrating-a-new-element-type"></a></h3>
+   <h2 class="heading settled" data-level="7" id="customization"><span class="secno">7. </span><span class="content">Customization</span><a class="self-link" href="#customization"></a></h2>
+   <p>The library provides for several forms of customization: custom element types,
+custom element promotion, custom engines, and custom arithmetical operations.  
+The following sections show examples of each.</p>
+   <h3 class="heading settled" data-level="7.1" id="integrating-a-new-element-type"><span class="secno">7.1. </span><span class="content">Integrating a new element type</span><a class="self-link" href="#integrating-a-new-element-type"></a></h3>
    <p>Suppose that you have created a new type that models a real number in some
 way and you wish for that type to be used as a matrix element:</p>
-<pre class="highlight"><c- k>class</c-> <c- nc>NewNum</c-> 
+<pre class="highlight"><c- k>class</c-> <c- nc>new_num</c->
 <c- p>{</c->
   <c- k>public</c-><c- o>:</c->
-    <c- n>NewNum</c-><c- p>();</c->
-    <c- n>NewNum</c-><c- p>(</c-><c- n>NewNum</c-><c- o>&amp;&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
-    <c- n>NewNum</c-><c- p>(</c-><c- n>NewNum</c-> <c- k>const</c-><c- o>&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
-    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c->   <c- n>NewNum</c-><c- p>(</c-><c- n>U</c-> <c- n>other</c-><c- p>);</c->
+    <c- n>new_num</c-><c- p>();</c->
+    <c- n>new_num</c-><c- p>(</c-><c- n>new_num</c-><c- o>&amp;&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
+    <c- n>new_num</c-><c- p>(</c-><c- n>new_num</c-> <c- k>const</c-><c- o>&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
+    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c->   <c- n>new_num</c-><c- p>(</c-><c- n>U</c-> <c- n>other</c-><c- p>);</c->
 
-    <c- n>NewNum</c-><c- o>&amp;</c->     <c- k>operator</c-> <c- o>=</c-><c- p>(</c-><c- n>NewNum</c-><c- o>&amp;&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
-    <c- n>NewNum</c-><c- o>&amp;</c->     <c- k>operator</c-> <c- o>=</c-><c- p>(</c-><c- n>NewNum</c-> <c- k>const</c-><c- o>&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
-    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c->   <c- n>NewNum</c-><c- o>&amp;</c->     <c- k>operator</c-> <c- o>=</c-><c- p>(</c-><c- n>U</c-> <c- n>rhs</c-><c- p>);</c->
+    <c- n>new_num</c-><c- o>&amp;</c->    <c- k>operator</c-> <c- o>=</c-><c- p>(</c-><c- n>new_num</c-><c- o>&amp;&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
+    <c- n>new_num</c-><c- o>&amp;</c->    <c- k>operator</c-> <c- o>=</c-><c- p>(</c-><c- n>new_num</c-> <c- k>const</c-><c- o>&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
+    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c->   <c- n>new_num</c-><c- o>&amp;</c->    <c- k>operator</c-> <c- o>=</c-><c- p>(</c-><c- n>U</c-> <c- n>rhs</c-><c- p>);</c->
 
-    <c- n>NewNum</c->     <c- k>operator</c-> <c- o>-</c-><c- p>()</c-> <c- k>const</c-><c- p>;</c->
-    <c- n>NewNum</c->     <c- k>operator</c-> <c- o>+</c-><c- p>()</c-> <c- k>const</c-><c- p>;</c->
+    <c- n>new_num</c->     <c- k>operator</c-> <c- o>-</c-><c- p>()</c-> <c- k>const</c-><c- p>;</c->
+    <c- n>new_num</c->     <c- k>operator</c-> <c- o>+</c-><c- p>()</c-> <c- k>const</c-><c- p>;</c->
 
-    <c- n>NewNum</c-><c- o>&amp;</c->     <c- k>operator</c-> <c- o>+=</c-><c- p>(</c-><c- n>NewNum</c-> <c- n>rhs</c-><c- p>);</c->
-    <c- n>NewNum</c-><c- o>&amp;</c->     <c- k>operator</c-> <c- o>-=</c-><c- p>(</c-><c- n>NewNum</c-> <c- n>rhs</c-><c- p>);</c->
-    <c- n>NewNum</c-><c- o>&amp;</c->     <c- k>operator</c-> <c- o>*=</c-><c- p>(</c-><c- n>NewNum</c-> <c- n>rhs</c-><c- p>);</c->
-    <c- n>NewNum</c-><c- o>&amp;</c->     <c- k>operator</c-> <c- o>/=</c-><c- p>(</c-><c- n>NewNum</c-> <c- n>rhs</c-><c- p>);</c->
+    <c- n>new_num</c-><c- o>&amp;</c->    <c- k>operator</c-> <c- o>+=</c-><c- p>(</c-><c- n>new_num</c-> <c- n>rhs</c-><c- p>);</c->
+    <c- n>new_num</c-><c- o>&amp;</c->    <c- k>operator</c-> <c- o>-=</c-><c- p>(</c-><c- n>new_num</c-> <c- n>rhs</c-><c- p>);</c->
+    <c- n>new_num</c-><c- o>&amp;</c->    <c- k>operator</c-> <c- o>*=</c-><c- p>(</c-><c- n>new_num</c-> <c- n>rhs</c-><c- p>);</c->
+    <c- n>new_num</c-><c- o>&amp;</c->    <c- k>operator</c-> <c- o>/=</c-><c- p>(</c-><c- n>new_num</c-> <c- n>rhs</c-><c- p>);</c->
 
-    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c->   <c- n>NewNum</c-><c- o>&amp;</c->      <c- k>operator</c-> <c- o>+=</c-><c- p>(</c-><c- n>U</c-> <c- n>rhs</c-><c- p>);</c->
-    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c->   <c- n>NewNum</c-><c- o>&amp;</c->      <c- k>operator</c-> <c- o>-=</c-><c- p>(</c-><c- n>U</c-> <c- n>rhs</c-><c- p>);</c->
-    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c->   <c- n>NewNum</c-><c- o>&amp;</c->      <c- k>operator</c-> <c- o>*=</c-><c- p>(</c-><c- n>U</c-> <c- n>rhs</c-><c- p>);</c->
-    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c->   <c- n>NewNum</c-><c- o>&amp;</c->      <c- k>operator</c-> <c- o>/=</c-><c- p>(</c-><c- n>U</c-> <c- n>rhs</c-><c- p>);</c->
+    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c->   <c- n>new_num</c-><c- o>&amp;</c->    <c- k>operator</c-> <c- o>+=</c-><c- p>(</c-><c- n>U</c-> <c- n>rhs</c-><c- p>);</c->
+    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c->   <c- n>new_num</c-><c- o>&amp;</c->    <c- k>operator</c-> <c- o>-=</c-><c- p>(</c-><c- n>U</c-> <c- n>rhs</c-><c- p>);</c->
+    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c->   <c- n>new_num</c-><c- o>&amp;</c->    <c- k>operator</c-> <c- o>*=</c-><c- p>(</c-><c- n>U</c-> <c- n>rhs</c-><c- p>);</c->
+    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c->   <c- n>new_num</c-><c- o>&amp;</c->    <c- k>operator</c-> <c- o>/=</c-><c- p>(</c-><c- n>U</c-> <c- n>rhs</c-><c- p>);</c->
 
-  <c- k>private</c-><c- o>:</c->
-    <c- p>...</c->     <c- c1>//- implementation stuff</c->
+    <c- p>...</c->
 <c- p>};</c->
 
 <c- kr>inline</c-> <c- b>bool</c-> <c- k>operator</c-> <c- o>==</c-><c- p>(</c-><c- n>NewNum</c-> <c- n>lhs</c-><c- p>,</c-> <c- n>NewNum</c-> <c- n>rhs</c-><c- p>);</c->
@@ -3907,71 +3762,90 @@ way and you wish for that type to be used as a matrix element:</p>
 <c- p>...</c->
 <c- c1>//- other arithmetic operators...</c->
 <c- p>...</c->
-<c- kr>inline</c-> <c- b>bool</c-> <c- k>operator</c-> <c- o>*</c-><c- p>(</c-><c- n>NewNum</c-> <c- n>lhs</c-><c- p>,</c-> <c- n>NewNum</c-> <c- n>rhs</c-><c- p>);</c->
-<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c-> <c- kr>inline</c-> <c- b>bool</c-> <c- k>operator</c-> <c- o>*</c-><c- p>(</c-><c- n>NewNum</c-> <c- n>lhs</c-><c- p>,</c-> <c- n>U</c-> <c- n>rhs</c-><c- p>);</c->
-<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c-> <c- kr>inline</c-> <c- b>bool</c-> <c- k>operator</c-> <c- o>*</c-><c- p>(</c-><c- n>U</c-> <c- n>lhs</c-><c- p>,</c-> <c- n>NewNum</c-> <c- n>rhs</c-><c- p>);</c->
+                  <c- kr>inline</c-> <c- n>new_num</c-> <c- k>operator</c-> <c- o>*</c-><c- p>(</c-><c- n>new_num</c-> <c- n>lhs</c-><c- p>,</c-> <c- n>new_num</c-> <c- n>rhs</c-><c- p>);</c->
+<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c-> <c- kr>inline</c-> <c- n>new_num</c-> <c- k>operator</c-> <c- o>*</c-><c- p>(</c-><c- n>new_num</c-> <c- n>lhs</c-><c- p>,</c-> <c- n>U</c-> <c- n>rhs</c-><c- p>);</c->
+<c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>U</c-><c- o>></c-> <c- kr>inline</c-> <c- n>new_num</c-> <c- k>operator</c-> <c- o>*</c-><c- p>(</c-><c- n>U</c-> <c- n>lhs</c-><c- p>,</c-> <c- n>new_num</c-> <c- n>rhs</c-><c- p>);</c->
 </pre>
    <p>Assuming that this type works as intended, and that all arithmetic
 interactions with other types are handled the set of operator overloads 
-that you provide, then all that is required for the library to accept <code class="highlight"><c- n>NewNum</c-></code> as an element type is this:</p>
+that you provide, then all that is required for the library to accept <code class="highlight"><c- n>new_num</c-></code> as an element type is to create a specialization of <code class="highlight"><c- n>number_traits</c-></code>:</p>
 <pre class="highlight"><c- k>template</c-><c- o>&lt;></c->
-<c- k>struct</c-> <c- n>std</c-><c- o>::</c-><c- n>is_matrix_element</c-><c- o>&lt;</c-><c- n>NewNum</c-><c- o>></c-> <c- o>:</c-> <c- k>public</c-> <c- n>std</c-><c- o>::</c-><c- n>true_type</c->
-<c- p>{};</c->
+<c- k>struct</c-> <c- n>std</c-><c- o>::</c-><c- n>math</c-><c- o>::</c-><c- n>number_traits</c-><c- o>&lt;</c-><c- n>new_num</c-><c- o>></c->
+<c- p>{</c->
+    <c- k>using</c-> <c- n>is_field</c->    <c- o>=</c-> <c- n>true_type</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>is_nc_ring</c->  <c- o>=</c-> <c- n>true_type</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>is_ring</c->     <c- o>=</c-> <c- n>true_type</c-><c- p>;</c->
+<c- p>};</c->
 </pre>
-   <p>By stating that the type is a matrix element type, and by ensuring that its
-arithmetic operators functions as promised, the library’s traits types will
-allow compiliation to succeed.</p>
-   <p>However, if the default arithmetic traits do not understand how to use your
-new element type, then you will need to provide specializations of them as 
-well.</p>
-   <h3 class="heading settled" data-level="8.2" id="integrating-a-new-engine-type"><span class="secno">8.2. </span><span class="content">Integrating a New Engine Type</span><a class="self-link" href="#integrating-a-new-engine-type"></a></h3>
+   <p>By stating that <code class="highlight"><c- n>new_num</c-></code> models at least a non-commutative ring, and by
+ensuring that its arithmetic operators functions as promised, the library’s 
+traits types will allow compiliation to succeed.</p>
+   <h3 class="heading settled" data-level="7.2" id="integrating-a-new-engine-type"><span class="secno">7.2. </span><span class="content">Integrating a new engine type</span><a class="self-link" href="#integrating-a-new-engine-type"></a></h3>
    <p>Suppose that you want to create a custom fixed-size matrix engine that is
 somehow different from <code class="highlight"><c- n>fs_matrix_engine</c-></code>; perhaps it is instrumented in
 some way for debugging, or uses fixed-size storage that is external to
 the engine object.  It might look like this:</p>
-<pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Rows</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>Cols</c-><c- o>></c->
-<c- k>class</c-> <c- nc>fs_matrix_engine_TST</c->
+<pre class="highlight"><c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>T</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>R</c-><c- p>,</c-> <c- b>int32_t</c-> <c- n>C</c-><c- o>></c->
+<c- k>class</c-> <c- nc>fs_matrix_engine_tst</c->
 <c- p>{</c->
-    <c- k>static_assert</c-><c- p>(</c-><c- n>Rows</c-> <c- o>>=</c-> <c- mi>1</c-><c- p>);</c->
-    <c- k>static_assert</c-><c- p>(</c-><c- n>Cols</c-> <c- o>>=</c-> <c- mi>1</c-><c- p>);</c->
+    <c- k>static_assert</c-><c- p>(</c-><c- n>R</c-> <c- o>>=</c-> <c- mi>1</c-><c- p>);</c->
+    <c- k>static_assert</c-><c- p>(</c-><c- n>C</c-> <c- o>>=</c-> <c- mi>1</c-><c- p>);</c->
 
   <c- k>public</c-><c- o>:</c->
-    <c- k>using</c-> <c- n>element_type</c->   <c- o>=</c-> <c- n>T</c-><c- p>;</c->
-    <c- k>using</c-> <c- n>is_dense</c->       <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>true_type</c-><c- p>;</c->
-    <c- k>using</c-> <c- n>is_rectangular</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>true_type</c-><c- p>;</c->
-    <c- k>using</c-> <c- n>is_resizable</c->   <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>false_type</c-><c- p>;</c->
-    <c- k>using</c-> <c- n>is_row_major</c->   <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>true_type</c-><c- p>;</c->
-    <c- k>using</c-> <c- n>size_tuple</c->     <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- b>size_t</c-><c- p>,</c-> <c- b>size_t</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>engine_category</c-> <c- o>=</c-> <c- n>STD_LA</c-><c- o>::</c-><c- n>mutable_matrix_engine_tag</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>element_type</c->    <c- o>=</c-> <c- n>T</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>value_type</c->      <c- o>=</c-> <c- n>T</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>reference</c->       <c- o>=</c-> <c- n>T</c-><c- o>&amp;</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>pointer</c->         <c- o>=</c-> <c- n>T</c-><c- o>*</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>const_reference</c-> <c- o>=</c-> <c- n>T</c-> <c- k>const</c-><c- o>&amp;</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>const_pointer</c->   <c- o>=</c-> <c- n>T</c-> <c- k>const</c-><c- o>*</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>difference_type</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- b>ptrdiff_t</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>index_type</c->      <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- b>int_fast32_t</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>size_type</c->       <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- b>int_fast32_t</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>size_tuple</c->      <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>tuple</c-><c- o>&lt;</c-><c- n>size_type</c-><c- p>,</c-> <c- n>size_type</c-><c- o>></c-><c- p>;</c->
+
+    <c- k>using</c-> <c- n>is_fixed_size</c->   <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>true_type</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>is_resizable</c->    <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>false_type</c-><c- p>;</c->
+
+    <c- k>using</c-> <c- n>is_column_major</c-> <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>false_type</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>is_dense</c->        <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>true_type</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>is_rectangular</c->  <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>true_type</c-><c- p>;</c->
+    <c- k>using</c-> <c- n>is_row_major</c->    <c- o>=</c-> <c- n>std</c-><c- o>::</c-><c- n>true_type</c-><c- p>;</c->
+
+    <c- k>using</c-> <c- n>column_view_type</c->    <c- o>=</c-> <c- n>STD_LA</c-><c- o>::</c-><c- n>matrix_column_view</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>row_view_type</c->       <c- o>=</c-> <c- n>STD_LA</c-><c- o>::</c-><c- n>matrix_row_view</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>></c-><c- p>;</c->
+    <c- k>using</c-> <c- n>transpose_view_type</c-> <c- o>=</c-> <c- n>STD_LA</c-><c- o>::</c-><c- n>matrix_transpose_view</c-><c- o>&lt;</c-><c- n>fs_matrix_engine_tst</c-><c- o>></c-><c- p>;</c->
 
   <c- k>public</c-><c- o>:</c->
-    <c- n>fs_matrix_engine_TST</c-><c- p>()</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
-    <c- n>fs_matrix_engine_TST</c-><c- p>(</c-><c- n>fs_matrix_engine_TST</c-><c- o>&amp;&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
-    <c- n>fs_matrix_engine_TST</c-><c- p>(</c-><c- n>fs_matrix_engine_TST</c-> <c- k>const</c-><c- o>&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
+    <c- k>constexpr</c-> <c- n>fs_matrix_engine_tst</c-><c- p>();</c->
+    <c- k>constexpr</c-> <c- nf>fs_matrix_engine_tst</c-><c- p>(</c-><c- n>fs_matrix_engine_tst</c-><c- o>&amp;&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
+    <c- k>constexpr</c-> <c- nf>fs_matrix_engine_tst</c-><c- p>(</c-><c- n>fs_matrix_engine_tst</c-> <c- k>const</c-><c- o>&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
 
-    <c- n>fs_matrix_engine_TST</c-><c- o>&amp;</c->   <c- k>operator</c-> <c- o>=</c-><c- p>(</c-><c- n>fs_matrix_engine_TST</c-><c- o>&amp;&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
-    <c- n>fs_matrix_engine_TST</c-><c- o>&amp;</c->   <c- k>operator</c-> <c- o>=</c-><c- p>(</c-><c- n>fs_matrix_engine_TST</c-> <c- k>const</c-><c- o>&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
+    <c- k>constexpr</c-> <c- n>fs_matrix_engine_tst</c-><c- o>&amp;</c->     <c- k>operator</c-> <c- o>=</c-><c- p>(</c-><c- n>fs_matrix_engine_tst</c-><c- o>&amp;&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
+    <c- k>constexpr</c-> <c- n>fs_matrix_engine_tst</c-><c- o>&amp;</c->     <c- k>operator</c-> <c- o>=</c-><c- p>(</c-><c- n>fs_matrix_engine_tst</c-> <c- k>const</c-><c- o>&amp;</c-><c- p>)</c-> <c- o>=</c-> <c- k>default</c-><c- p>;</c->
 
-    <c- n>T</c->           <c- nf>operator</c-> <c- p>()(</c-><c- b>size_t</c-> <c- n>i</c-><c- p>)</c-> <c- k>const</c-><c- p>;</c->
-    <c- n>T</c->           <c- nf>operator</c-> <c- p>()(</c-><c- b>size_t</c-> <c- n>i</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>j</c-><c- p>)</c-> <c- k>const</c-><c- p>;</c->
-    <c- n>T</c-> <c- k>const</c-><c- o>*</c->    <c- nf>data</c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
+    <c- k>constexpr</c-> <c- n>const_reference</c->   <c- nf>operator</c-> <c- p>()(</c-><c- n>index_type</c-> <c- n>i</c-><c- p>,</c-> <c- n>index_type</c-> <c- n>j</c-><c- p>)</c-> <c- k>const</c-><c- p>;</c->
 
-    <c- b>size_t</c->      <c- nf>columns</c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
-    <c- b>size_t</c->      <c- nf>rows</c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
-    <c- n>size_tuple</c->  <c- nf>size</c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
+    <c- k>constexpr</c-> <c- n>index_type</c->    <c- nf>columns</c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
+    <c- k>constexpr</c-> <c- n>index_type</c->    <c- nf>rows</c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
+    <c- k>constexpr</c-> <c- n>size_tuple</c->    <c- nf>size</c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
 
-    <c- b>size_t</c->      <c- nf>column_capacity</c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
-    <c- b>size_t</c->      <c- nf>row_capacity</c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
-    <c- n>size_tuple</c->  <c- nf>capacity</c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
+    <c- k>constexpr</c-> <c- n>size_type</c->     <c- nf>column_capacity</c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
+    <c- k>constexpr</c-> <c- n>size_type</c->     <c- nf>row_capacity</c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
+    <c- k>constexpr</c-> <c- n>size_tuple</c->    <c- nf>capacity</c-><c- p>()</c-> <c- k>const</c-> <c- k>noexcept</c-><c- p>;</c->
 
-    <c- n>T</c-><c- o>&amp;</c->      <c- k>operator</c-> <c- p>()(</c-><c- b>size_t</c-> <c- n>i</c-><c- p>);</c->
-    <c- n>T</c-><c- o>&amp;</c->      <c- k>operator</c-> <c- p>()(</c-><c- b>size_t</c-> <c- n>i</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>j</c-><c- p>);</c->
-    <c- n>T</c-><c- o>*</c->      <c- nf>data</c-><c- p>()</c-> <c- k>noexcept</c-><c- p>;</c->
+    <c- k>constexpr</c-> <c- n>reference</c->     <c- nf>operator</c-> <c- p>()(</c-><c- n>index_type</c-> <c- n>i</c-><c- p>,</c-> <c- n>index_type</c-> <c- n>j</c-><c- p>);</c->
 
-    <c- b>void</c->    <c- nf>swap_columns</c-><c- p>(</c-><c- b>size_t</c-> <c- n>i</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>j</c-><c- p>);</c->
-    <c- b>void</c->    <c- nf>swap_rows</c-><c- p>(</c-><c- b>size_t</c-> <c- n>i</c-><c- p>,</c-> <c- b>size_t</c-> <c- n>j</c-><c- p>);</c->
+    <c- k>constexpr</c-> <c- b>void</c->      <c- nf>assign</c-><c- p>(</c-><c- n>fs_matrix_engine_tst</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>rhs</c-><c- p>);</c->
+    <c- k>template</c-><c- o>&lt;</c-><c- k>class</c-> <c- nc>ET2</c-><c- o>></c->
+    <c- k>constexpr</c-> <c- b>void</c->      <c- n>assign</c-><c- p>(</c-><c- n>ET2</c-> <c- k>const</c-><c- o>&amp;</c-> <c- n>rhs</c-><c- p>);</c->
+
+    <c- k>constexpr</c-> <c- b>void</c->      <c- nf>swap</c-><c- p>(</c-><c- n>fs_matrix_engine_tst</c-><c- o>&amp;</c-> <c- n>rhs</c-><c- p>)</c-> <c- k>noexcept</c-><c- p>;</c->
+    <c- k>constexpr</c-> <c- b>void</c->      <c- nf>swap_columns</c-><c- p>(</c-><c- n>index_type</c-> <c- n>j1</c-><c- p>,</c-> <c- n>index_type</c-> <c- n>j2</c-><c- p>);</c->
+    <c- k>constexpr</c-> <c- b>void</c->      <c- nf>swap_rows</c-><c- p>(</c-><c- n>index_type</c-> <c- n>i1</c-><c- p>,</c-> <c- n>index_type</c-> <c- n>i2</c-><c- p>);</c->
 
   <c- k>private</c-><c- o>:</c->
-    <c- p>...</c->     <c- c1>//- implementation stuff</c->
+    <c- p>...</c->         <c- c1>//- Implementation stuff</c->
 <c- p>};</c->
 </pre>
    <p>For each arithmetic operation in which you expect the new engine type to
@@ -4065,7 +3939,7 @@ corresponding addition traits types.  That might look something like this:</p>
 </pre>
    <p>Note that namespace qualifiers which should actually appear in the above
 code have been ommitted in the interest of brevity.</p>
-   <h3 class="heading settled" data-level="8.3" id="customizing-an-arithmetic-operation"><span class="secno">8.3. </span><span class="content">Customizing an Arithmetic Operation</span><a class="self-link" href="#customizing-an-arithmetic-operation"></a></h3>
+   <h3 class="heading settled" data-level="7.3" id="customizing-an-arithmetic-operation"><span class="secno">7.3. </span><span class="content">Customizing an arithmetic operation</span><a class="self-link" href="#customizing-an-arithmetic-operation"></a></h3>
    <p>Suppose that you are working on a game engine, and you are interested in
 experimenting with different algorithms for performing affine transforms
 on spatial vectors.  To do this, you might be using fixed-size 4 x 4 matrices
@@ -4095,13 +3969,13 @@ specialized <code class="highlight"><c- n>multiply</c-><c- p>()</c-></code> memb
     <c- n>cvr</c-> <c- o>=</c-> <c- n>m1</c-> <c- o>*</c-> <c- n>cv1</c-><c- p>;</c->
 <c- p>}</c->
 </pre>
-   <h2 class="heading settled" data-level="9" id="meeting-feedback"><span class="secno">9. </span><span class="content">Meeting Feedback</span><a class="self-link" href="#meeting-feedback"></a></h2>
-   <h3 class="heading settled" data-level="9.1" id="kona"><span class="secno">9.1. </span><span class="content">Kona</span><a class="self-link" href="#kona"></a></h3>
+   <h2 class="heading settled" data-level="8" id="meeting-feedback"><span class="secno">8. </span><span class="content">Meeting feedback</span><a class="self-link" href="#meeting-feedback"></a></h2>
+   <h3 class="heading settled" data-level="8.1" id="kona"><span class="secno">8.1. </span><span class="content">Kona</span><a class="self-link" href="#kona"></a></h3>
    <p>At the Kona 2019 meeting, draft version D1 of this paper was reviewed by
 LEWG(I) and a joint session of SG14 and SG19.  Both reviews were generally 
 positive, several good suggestions were made, and some polls regarding 
 future directions were taken.</p>
-   <h4 class="heading settled" data-level="9.1.1" id="lewg-i-polls-and-feedback-wednesday-2019-02-20"><span class="secno">9.1.1. </span><span class="content">LEWG(I) Polls and Feedback (Wednesday 2019-02-20)</span><a class="self-link" href="#lewg-i-polls-and-feedback-wednesday-2019-02-20"></a></h4>
+   <h4 class="heading settled" data-level="8.1.1" id="lewg-i-polls-and-feedback-wednesday-2019-02-20"><span class="secno">8.1.1. </span><span class="content">LEWG(I) Polls and Feedback (Wednesday 2019-02-20)</span><a class="self-link" href="#lewg-i-polls-and-feedback-wednesday-2019-02-20"></a></h4>
    <p>There were a few polls taken in this session:</p>
    <ol>
     <li data-md>
@@ -4130,7 +4004,7 @@ future directions were taken.</p>
      <p>Be careful of allowing specializations of traits types that are part of
   namespace <code class="highlight"><c- n>std</c-></code>; be consistent with other traits.</p>
    </ul>
-   <h4 class="heading settled" data-level="9.1.2" id="feedback-from-joint-sg14-sg19-session-friday-2019-02-22"><span class="secno">9.1.2. </span><span class="content">Feedback From Joint SG14/SG19 Session (Friday 2019-02-22)</span><a class="self-link" href="#feedback-from-joint-sg14-sg19-session-friday-2019-02-22"></a></h4>
+   <h4 class="heading settled" data-level="8.1.2" id="feedback-from-joint-sg14-sg19-session-friday-2019-02-22"><span class="secno">8.1.2. </span><span class="content">Feedback From Joint SG14/SG19 Session (Friday 2019-02-22)</span><a class="self-link" href="#feedback-from-joint-sg14-sg19-session-friday-2019-02-22"></a></h4>
    <ul>
     <li data-md>
      <p>Stick to 0-based indexing, for compatibility with current practice, and also
@@ -4145,7 +4019,7 @@ future directions were taken.</p>
   multiplication operator should return the inner product, and the outer
   product should be a named function.</p>
    </ul>
-   <h4 class="heading settled" data-level="9.1.3" id="other-suggestions-gathered-at-the-meeting"><span class="secno">9.1.3. </span><span class="content">Other Suggestions Gathered at the Meeting</span><a class="self-link" href="#other-suggestions-gathered-at-the-meeting"></a></h4>
+   <h4 class="heading settled" data-level="8.1.3" id="other-suggestions-gathered-at-the-meeting"><span class="secno">8.1.3. </span><span class="content">Other Suggestions Gathered at the Meeting</span><a class="self-link" href="#other-suggestions-gathered-at-the-meeting"></a></h4>
    <ul>
     <li data-md>
      <p>Experiment with executors for concurrent operations.</p>

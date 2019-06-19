@@ -1,11 +1,11 @@
 <style>
 	@media screen and (min-width: 78em) {
 		body:not(.toc-inline) #toc {
-			width: 30em;
+			width: 29em;
 		}
 
 		body:not(.toc-inline) {
-			padding-left: 34em;
+			padding-left: 33em;
 		}
 	}
 </style>
@@ -243,7 +243,7 @@ symmetric matrix in order to compute the eigenvalues and eigenvectors
 of that matrix; this is often performed when solving problems involving 
 linear dynamic systems.
 
-## Terms Pertaining to C++ Types
+## Terms pertaining to C++ types
 
 The following are terms used in this proposal that describe various
 aspects of how the mathematical concepts described above in Section 3.1
@@ -672,11 +672,11 @@ specification.
 At the highest level, the interface is divided into three broad categories:
 
 1. **Engines**, which are implementation types that manage the resources
-associated with a *MothObj* instance, including memory ownership, memory
-management, and element access; and, 
+associated with a *MothObj* instance, memory ownership and lifetime, and 
+element access; and, 
 
 1. **MathObjs**, which provide a unified interface intended to model a 
-corresponding mathematical abstraction (column/row vector, matrix);
+corresponding mathematical abstraction (vector, matrix);
 
 1. **Operators**, which provide the desired mathematical syntax and carry
 out the promised arithmetic.
@@ -725,7 +725,7 @@ starting at the lowest level, and working upward in order of dependency.
 
 **A quick note on template parameter nomeclature:** To avoid excessive 
 visual noise in the code shown in the remaining sections of this paper, 
-we employ the following abbeviation-based naming conventions for template 
+we use the following abbeviation-based naming conventions for template 
 parameters:
 
 + Parameter names `T`, `T1`, and `T2` represent element types. 
@@ -930,8 +930,7 @@ using fs_matrix = matrix<fs_matrix_engine<T, R, C>, matrix_operation_traits>;
 ### `number_traits<T>`
 
 Traits type `number_traits<T>` specifies certain properties of numeric types.
-It is a customization point intended to be partially/fully specializable by
-the user.
+It is a customization point intended to be specialized by the user.
 
 ~~~~
 template<class T>
@@ -949,7 +948,8 @@ struct number_traits<complex<T>> : public number_traits<T> {};
 ### `is_complex<T>`
 
 Traits type `is_complex<T>` indicates whether its template paramater `T` 
-is of type `std::complex<V>` for some type `V`.
+is of type `std::complex<V>` for some numeric type `V`.  A possible 
+implementation might be:
 
 ~~~~
 template<class T>
@@ -965,7 +965,7 @@ struct is_complex<complex<T>> : public true_type
 
 Traits `is_field<T>` type indicates whether its template parameter `T` is
 a type that models a mathematical field.  It is expected that `is_field`
-will be implemented in terms of `number_traits`, perhaps as
+will be implemented in terms of `number_traits`, perhaps as follows:
 
 ~~~~
 template<class T>
@@ -977,7 +977,7 @@ struct is_field : public number_traits<T>::is_field
 
 Traits type `is_ring<T>` indicates whether its template paremater `T` is
 a type that models a mathemetical ring.  It is expected that `is_ring`
-will be implemented in terms of `number_traits`, perhaps as
+will be implemented in terms of `number_traits`, perhaps as follows:
 
 ~~~~
 template<class T>
@@ -990,7 +990,7 @@ struct is_ring : public number_traits<T>::is_ring
 Traits type `is_nc_ring<T>` indicates whether its template parameter `T` 
 is a type that models a mathemetical non-commutative ring.  It is expected 
 that `is_nc_ring` will be implemented in terms of `number_traits`, perhaps
-as
+as follows:
 
 ~~~~
 template<class T>
@@ -1008,7 +1008,7 @@ template<class T> struct is_matrix_element;
 ~~~~
 
 The purpose of this type is to constrain the set of element types used to 
-instantiate a MathObj to those which are non-commutative rings.
+instantiate a *MathObj* to those types which are non-commutative rings.
 
 ## Engine Types
 
@@ -1026,7 +1026,8 @@ One can imagine engines that also manage resources related to execution.
 ### `matrix_column_view<ET>`
 
 Class template `matrix_column_view<ET>` implements a non-owning, const 
-view type that provides the basic vector engine interface.
+view type that provides the basic vector engine interface.  Its purpose is 
+to provide a view of single column of a `matrix` object.
 
 ~~~~
 template<class ET>
@@ -1076,8 +1077,9 @@ class matrix_column_view
 
 ### `matrix_row_view<ET>`
 
-Class template `matrix_row_view<ET>` implements a non-owning, 
-const view type that provides the basic vector engine interface.
+Class template `matrix_row_view<ET>` implements a non-owning, const view 
+type that provides the basic vector engine interface.  Its purpose is 
+to provide a view of single row of a `matrix` object.
 
 ~~~~
 template<class ET>
@@ -1128,9 +1130,9 @@ class matrix_row_view
 ### `matrix_transpose_view<ET>`
 
 Class template `matrix_transpose_view<ET>` implements a non-owning, const 
-view type that provides the basic matrix engine interface.  Its primary 
-anticipated use case is as the return value of the `t()` (transpose) member 
-function of the `matrix` type.
+view type that provides the basic matrix engine interface.  Its purpose is
+to provide a view of a `matrix` object that is the transpose of the 
+`matrix`.
 
 ~~~~
 template<class ET>
@@ -1189,10 +1191,10 @@ class matrix_transpose_view
 
 ### `fs_vector_engine<T, N>`
 
-Class template `fs_vector_engine<T, N>` implements a fixed-size, 
-fixed-capacity engine for vectors having `N` elements. In addition 
-to the basic engine interface, it provides member functions for 
-mutable element indexing and swapping rows and/or columns.
+Class template `fs_vector_engine<T, N>` implements a fixed-size, fixed-capacity 
+vector engine for vectors having `N` elements.  In addition to the basic vector 
+engine interface, it provides member functions for mutable element indexing,
+swapping engine contents, and swapping individual elements.
 
 ~~~~
 template<class T, int32_t N>
@@ -1253,9 +1255,10 @@ class fs_vector_engine
 ### `fs_matrix_engine<T, R, C>`
 
 Class template `fs_matrix_engine<T, R, C>` implements a fixed-size, 
-fixed-capacity engine. In addition to the basic engine interface, it 
-provides member functions for mutable element indexing and swapping 
-rows and/or columns.
+fixed-capacity matrix engine for matrices having `R` rows and `C` columns. 
+In addition to the basic engine interface, it provides member functions for 
+mutable element indexing, swapping engine contents, swapping columns, and 
+swapping rows.
 
 ~~~~
 template<class T, size_t R, size_t C>
@@ -1324,10 +1327,10 @@ class fs_matrix_engine
 
 ### `dr_vector_engine<T, AT>`
 
-Class template `dr_vector_engine<T, AT>` implements an engine whose
+Class template `dr_vector_engine<T, AT>` implements a vector engine whose
 sizes and capacities can be changed at runtime. In addition to the basic
-engine interface, it provides member functions for mutable element
-indexing, changing size and capacity, and swapping rows and/or columns.
+engine interface, it provides member functions for mutable element indexing, 
+swapping engine contents, swapping individual elements, and resizing.
 
 ~~~~
 template<class T, class AT=std::allocator<T>>
@@ -1397,9 +1400,9 @@ class dr_vector_engine
 ### `dr_matrix_engine<T, AT>`
 
 Class template `dr_matrix_engine<T, AT>` implements an engine whose
-sizes and capacities can be changed at runtime. In addition to the basic
-engine interface, it provides member functions for mutable element
-indexing, changing size and capacity, and swapping rows and/or columns.
+sizes and capacities can be changed at runtime.  In addition to the basic 
+engine interface, it provides member functions for mutable element indexing, 
+swapping engine contents, swapping columns, swapping rows, and resizing.
 
 ~~~~
 template<class T, class AT=std::allocator<T>>
@@ -1472,6 +1475,11 @@ class dr_matrix_engine
 ## Math object types
 
 ### `vector<ET, OT>` 
+
+Class template `vector<ET, OT>` represents a vector, with element type and 
+resource management implemented by the engine type `ET`, and arithmetic 
+operations specified by the operation traits type `OT`.  If the underlying 
+engine type provides dynamic resizing, then this class will as well. 
 
 ~~~~
 template<class ET, class OT>
@@ -1576,6 +1584,12 @@ class vector
 ~~~~
 
 ### `matrix<ET, OT>` 
+
+Class template `matrix<ET, OT>`represents a matrix, with element type 
+and resource management implemented by the engine type `ET`, and arithmetic 
+operations specified by the operation traits type `OT`.  If the underlying 
+engine type provides dynamic resizing, then this class will as well. 
+
 
 ~~~~
 template<class ET, class OT>
@@ -1697,6 +1711,10 @@ class matrix
 
 ### `matrix_operation_traits` 
 
+Class `matrix_operation_traits` is a traits-style template parameter to 
+`vector` and `matrix`.  Its purpose is to associate a set of traits with
+a `MathObj` so that those traits may be conveyed into an arithmetic operator.
+
 ~~~~
 struct matrix_operation_traits
 {
@@ -1746,6 +1764,10 @@ struct matrix_operation_traits
 
 ### `matrix_operation_traits_selector<OT1, OT2>` 
 
+Class template `matrix_operation_traits_selector<OT1, OT2>` is used by the
+arithmetic operators to select a specific operation traits type that will
+be used to perform an arithmetic operation.  
+
 ~~~~
 //- Primary template and expected specializations.
 //
@@ -1782,9 +1804,19 @@ template<class T1, class T2>
 using matrix_operation_traits_selector_t = typename matrix_operation_traits_selector<T1,T2>::traits_type;
 ~~~~
 
+
 ## Element promotion traits
 
+Element promotion traits are used by the library to determine the resulting 
+element type in an binary expression involving engines with possibly two 
+different element types.
+
+
 ### `matrix_negation_element_traits<T1>` 
+
+Class template `matrix_negation_element_traits<T1>` implements a traits
+type that determines the appropriate result type of an elementwise negation
+operation involving a *MathObj* element type.
 
 ~~~~
 template<class T1>
@@ -1797,7 +1829,12 @@ template<class OT, class T1>
 using matrix_negation_element_t = ...;          //- Implementation-defined
 ~~~~
 
+
 ### `matrix_addition_element_traits<T1, T2>` 
+
+Class template `matrix_addition_element_traits<T1, T2>` implements a traits
+type that determines the appropriate result type of an elementwise addition 
+operation involving two (possibly different) element types.
 
 ~~~~
 template<class T1, class T2>
@@ -1810,7 +1847,12 @@ template<class OT, class T1, class T2>
 using matrix_addition_element_t = ...;          //- Implementation-defined
 ~~~~
 
+
 ### `matrix_subtraction_element_traits<T1, T2>` 
+
+Class template `matrix_subtraction_element_traits<T1, T2>` implements a traits
+type that determines the appropriate result type of an elementwise subtraction 
+operation involving two (possibly different) element types.
 
 ~~~~
 template<class T1, class T2>
@@ -1823,7 +1865,12 @@ template<class OT, class T1, class T2>
 using matrix_subtraction_element_t = ...;       //- Implementation-defined
 ~~~~
 
+
 ### `matrix_multiplication_element_traits<T1, T2>` 
+
+Class template `matrix_multiplication_element_traits<T1, T2>` implements a traits
+type that determines the appropriate result type of an elementwise multiplication 
+operation involving two (possibly different) element types.
 
 ~~~~
 template<class T1, class T2>
@@ -1839,7 +1886,14 @@ using matrix_multiplication_element_t = ...;    //- Implementation-defined
 
 ## Engine promotion traits
 
+Engine promotion traits are used by the arithmetic traits to determine
+the resulting engine types in an arithmetical expression.
+
+
 ### `matrix_negation_engine_traits<OT, ET1>` 
+
+Class template `matrix_negation_engine_traits<OT, ET1>` implements a traits 
+type that determines the resulting engine type when negating a *MathObj*.
 
 ~~~~
 template<class OT, class ET1>
@@ -1854,7 +1908,12 @@ template<class OT, class ET1>
 using matrix_negation_engine_t = ...;           //- Implementation-defined
 ~~~~
 
+
 ### `matrix_addition_engine_traits<OT, ET1, ET2>` 
+
+Class template `matrix_addition_engine_traits<OT, ET1, ET2` implements a
+traits type that determines the resulting engine type when adding two
+compatible *MathObj*s.
 
 ~~~~
 template<class OT, class ET1, class ET2>
@@ -1874,6 +1933,10 @@ using matrix_addition_engine_t = detail::engine_add_type_t<OT, ET1, ET2>;
 
 ### `matrix_subtraction_engine_traits<OT, ET1, ET2>` 
 
+Class template `matrix_subtraction_engine_traits<OT, ET1, ET2` implements a
+traits type that determines the resulting engine type when subtracting two
+compatible *MathObj*s.
+
 ~~~~
 template<class OT, class ET1, class ET2>
 struct matrix_subtraction_engine_traits
@@ -1889,8 +1952,11 @@ template<class OT, class ET1, class ET2>
 using matrix_subtraction_engine_t = ...;        //- Implementation-defined
 ~~~~
 
-
 ### `matrix_multiplication_engine_traits<OT, ET1, ET2>` 
+
+Class template `matrix_multiplication_engine_traits<OT, ET1, ET2` implements a
+traits type that determines the resulting engine type when multiplying two
+compatible *MathObj*s.
 
 ~~~~
 template<class OT, class ET1, class ET2>
@@ -1907,9 +1973,30 @@ template<class OT, class ET1, class ET2>
 using matrix_multiplication_engine_t = ...;     //- Implementation-defined
 ~~~~
 
+
 ## Arithmetic traits
 
+This section defines a set of arithmetic traits types for negation, 
+addition, subtraction, and multiplication. The purpose of these traits 
+types is threefold:
+
+1. to determine the element type of the resulting *MathObj*;
+
+2. to determine the engine type of the resulting *MathObj*; and
+
+3. to carry out the arithmetical operation and return the result.
+
+The idea here is that arithmetic operators (described below) simply forward 
+to the appropriate traits type, which does the heavy lifting.
+
+
 ### `matrix_negation_traits<OT, OP1>` 
+
+Class template `matrix_negation_traits<OT, OP1>` is an arithmetic traits 
+type that performs the negation of a *MathObj* and returns the result 
+in another *MathObj* having an implementation-defined engine type.
+There are two partial specializations to support the two overloaded 
+negation operators described below.
 
 ~~~~
 template<class OT, class ET1, class OT1>
@@ -1936,7 +2023,14 @@ template<class OT, class OP1>
 using matrix_negation_traits_t = ...;       //- Implementation-defined
 ~~~~
 
+
 ### `matrix_addition_traits<OT, OP1, OP2>` 
+
+Class template `matrix_addition_traits<OT, OP1, OP2>` is an arithmetic 
+traits type that performs the addition of two compatible *MathObj*s and 
+returns the result in a *MathObj* having an implementation-defined engine 
+type.  There are two partial specializations to support the two overloaded 
+addition operators described below.
 
 ~~~~
 template<class OT, class OP1, class OP2>
@@ -1957,7 +2051,14 @@ struct matrix_addition_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>
 };
 ~~~~
 
+
 ### `matrix_subtraction_traits<OT, OP1, OP2>` 
+
+Class template `matrix_subtraction_traits<OT, OP1, OP2>` is an arithmetic 
+traits type that performs the subtraction of two compatible *MathObj*s and 
+returns the result in a *MathObj* having an implementation-defined engine 
+type.  There are two partial specializations to support the two overloaded 
+subtraction operators described below.
 
 ~~~~
 template<class OT, class ET1, class OT1, class ET2, class OT2>
@@ -1986,6 +2087,13 @@ using matrix_subtraction_traits_t = ...;        //- Implementation-defined
 
 
 ### `matrix_multiplication_traits<OT, OP1, OP2>` 
+
+Class template `matrix_multiplication_traits<OT, OP1, OP2>` is an arithmetic 
+traits type that performs the multiplication of two compatible *MathObj*s 
+and returns the result in a *MathObj* having an implementation-defined 
+engine type.  There are eight partial specializations to support the eight 
+binary multiplication operators described below.
+
 
 ~~~~
 //- vector*scalar
@@ -2093,6 +2201,17 @@ struct matrix_multiplication_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>
 ~~~~
 
 ## Arithmetic operators
+
+The arithmetic operators provide syntax that mimics common mathematical
+notation, with computation executed by an arithmetic traits type 
+specified by one of the operands' operation traits template parameters.
+
+Readers will note that the return types of the overloaded operators 
+described below are left unspecified.  This is a deliberate choice so
+that implementers have the freedom to choose whatever default technique
+for evaluationg expressions they desire; for example, by returning 
+temporary objects, or by using expression templates, or perhaps by 
+some hybrid technique.
 
 ~~~~
 //- Negation
@@ -2296,7 +2415,7 @@ The library provides for several forms of customization: custom element types,
 custom element promotion, custom engines, and custom arithmetical operations.  
 The following sections show examples of each.
 
-## Integrating a New Element Type
+## Integrating a new element type
 
 Suppose that you have created a new type that models a real number in some
 way and you wish for that type to be used as a matrix element:
@@ -2363,7 +2482,7 @@ By stating that `new_num` models at least a non-commutative ring, and by
 ensuring that its arithmetic operators functions as promised, the library's 
 traits types will allow compiliation to succeed.  
 
-## Integrating a New Engine Type
+## Integrating a new engine type
 
 Suppose that you want to create a custom fixed-size matrix engine that is
 somehow different from `fs_matrix_engine`; perhaps it is instrumented in
@@ -2535,7 +2654,7 @@ struct matrix_addition_traits<matrix<fs_matrix_engine_TST<T1, Rows, Cols>, OpTra
 Note that namespace qualifiers which should actually appear in the above 
 code have been ommitted in the interest of brevity.
 
-## Customizing an Arithmetic Operation
+## Customizing an arithmetic operation
 
 Suppose that you are working on a game engine, and you are interested in
 experimenting with different algorithms for performing affine transforms
@@ -2572,7 +2691,7 @@ void f()
 }
 ~~~~
 
-# Meeting Feedback
+# Meeting feedback
 
 ## Kona
 
