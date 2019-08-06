@@ -1,0 +1,440 @@
+Present:
+
+Bob Steagall
+Carter Edwards
+Hal Finkel
+Robert Douglas
+Li-Ta Lo, ollie@lanl.gov
+Brian Von Stralen
+Rene Rivera
+Damien Lebrun-Grandie
+Graham
+Mauro Bianco
+Mark Hoemmen (scribe)
+Daniel Garcia
+Michael Wong
+BS: Michael Wolf described this meeting as a friendly discussion, not for making decisions. He charged me to say there are two items on the agenda:
+
+Defining scope
+Observe that this is a big enough topic that we may want separate linear algebra phone calls, separate from SG14
+RR: Does this come out of SG14? / 13?
+
+BS: Given uncertain state of 2-D graphics post Jacksonville, Guy Davidson decided to try standardizing linear algebra as a smaller building block of graphics, but it's not connected to 2-D graphics in any process-based way. I volunteered to help him.
+
+Graham: Hopefully he was aware of nongraphics can of worms that is linear algebra.
+
+BS: Yes. Guy is a math person and is aware of non-graphics interest.
+
+BS: We could decide on a frequency and schedule for phone calls, and publish on reflector.
+
+Graham: Is there an SG14-specific reflector? I should sign up for it.
+
+BS: Yes.
+
+RR: I thought linear algebra was also discussed in numerics.
+
+BS: I'm not aware of that. There should perhaps be discussions of it there.
+
+HF: Numerics covers this case.
+
+Graham: Where is reflector?
+
+HF: Once there are proposals, numerics will want to look at them. I don't think numerics specifically looked at the matrix classes that were in the Graphics TS. I think it was also clear from discussions that, should such a thing move towards the standard, then the matrix stuff would have been separated off anyway, else one would have to include a graphics header to get a standard matrix class.
+
+MB: mdspan proposal can cover any kind of a 2-D array. Not sure about sparse cases, dense for sure.
+
+HF: nods
+
+RR: ... core proposals about matrices and comma operator [Isabella Muerte's proposal].
+
+MB: In some other meetings when were the special math functions being proposed, first and second reaction was implementors didn't want to get into trouble of implementing them, because they didn't want to have a scientist come to them and scold their rounding error. Linear algebra is not an easy topic; research still being done in algorithms and implementation. Not clear to me the focus / target / 80% of beneficiaries.
+
+RR: Definitely game developers.
+
+BS: When I was working on time series analysis of medical images, multiple regression. Supporting linear algebra needs of game and graphics, multiple regression, linear least squares. Very common problem, would serve a lot of domains.
+
+MH: Less controversy with matrix multiply than SVD.
+
+MB: With matrix multiply, people want to use n^3 vs. Strassen.
+
+RR: Game developers write their own, don't care about [accuracy]
+
+MB: Bitwise reproducibility ...
+
+MW: This is an informal meeting; no decisions can be made. Use this chance to discuss scope, design issues, frequency of meetings. Big topic, could be either in SG14 or not. SG14 meets on second Wed of every month, two hours. Could also do out of band and report in SG14 meetings. I'm only here to facilitate; BS will run the meeting.
+
+HF: Scope in terms of graphics and game development etc., and we were talking about relevance of BLAS interfaces ...
+
+BS: Not only in first telecon but in other discussions here, unless there's a compelling performance reason to pick a particular interface design over another, driven by performance, my feeling is we should concentrate on interface design. First define scope of problems users want to solve, then design interface, rather than quickly getting into implementation decisions.
+
+Graham: I'll agree with that. Interfaces we can standardize anyway. In this case, might be unique -- e.g., the worry of std library implementers not necessarily wanting to get into this domain, due to community concerns about reproducibility and performance. A bit unique, we have many vendors willing to give us high-performance BLAS libraries, absolutely not interested in providing us standard C++ library implementations, way more than they want to do. If we standardize in a way either to require ... we don't want to require people who want linear algebra in C++, to have to provide a full library implementation; conversely if we don't allow a way to hook in these specialized implementations, we'll exclude a swath of users.
+
+MH: [Explains analogy with Fortran matrix-matrix multiply intrinsics; low-level vs. high-level]
+
+RR: Game devs may want to replace those low-level...
+
+MH: Even the compiler might want to replace them.
+
+RR: Right.
+
+BS: I implemented a linear algebra library a while back for medical imaging. I wrote a high-level interface, and wrapped MKL, using a set of traits that one could specialize to provide different implementations of fundamental operations. That's like the approach Guy and I are working on for this paper. We want to give flexibility for sophisticated users to drop in services, while implementers would provide basic fundamental performance. Analogy with writing a custom allocator.
+
+Graham: Let's circle back to scope discussion.
+
+HF: You've wrapped various things, implemented traits ... lots of prior art in this space, e.g., Eigen, Boost microBLAS.
+
+MH: Even POOMA did [give ability to plug in different low-level implementation details], historically.
+
+BS: Strawman scope: basic matrix arithmetic, linear algebra 101 textbook operations, important transforms for multiple regressions or linear least squares, LU, Cholesky, SVD. A good design would let that serve needs of game developers and machine learning people.
+
+RR: Do we want to define scope in sense of linear algebra operations? That set alone would exclude game developers at this point, because you would need to add quaternions. Not sure if it helps us to be that fine-grained. We should start by talking about which fields and people we want to serve.
+
+HF: To make progress, -- we all represent different communities, so we should translate their interests into actual requirements. We should all figure out what those sets of things are, then discuss them and find overlap.
+
+Graham: To rephrase: in past few meetings, increasing pressure in community to talk about features in terms of basis -- minimal set of things that all / most communities need. Yes, collect requirements, then distill out of that a basis set.
+
+1: It's been a while when I looked at quaternions; are they just float vectors?
+
+RR: Yes, but if you don't call it quaternions, game developers get angry.
+
+1: I see.
+
+[discussion of quaternions]
+
+MH: [tensors want different interface]
+
+Graham: Or we could give them facilities to build up what they need....
+
+MH: Yes, e.g., they already use the BLAS....
+
+BS: Is it helpful to think of this in terms of groups of related mathematical operations, rather than communities. EVerybody knows what "matrix arithmetic" means. Then we say, we want to make tools for solving linear least-squares problems. Is that helpful for determining scope?
+
+HF,Graham: Yes.
+
+HF: I don't recommend generalizing based on classes of people rather than problems, as we'll always get that wrong. "Scientists need X" is not helpful.
+
+BS: Or helpful to think in terms of providing an interface that provides a clean way of doing all the operations that one would find, say, in LAPACK.
+
+Graham: My community would be thrilled with that approach, but not necessarily best for all here.
+
+MH: [That would be an LAPACK binding]
+
+BS: Just using LAPACK as a strawman set of capabilities, not necessarily actually the thing.
+
+CE: What you want to solve -- but also how you want to solve. Very large matrix? on a single thread? multithreaded? parallel? Or matrix operations on a lot of matrices, single threaded, multithreaded, in parallel? All the matrices with the same shape? In scope: What you're solving. Another axis: How you're solving. Can't neglect that.
+
+MB: Another axis: sparse or dense. For dense, we know what to do.
+
+Robert Douglas: Owning or nonowning? Expected to be fast, or go off to some server for a matrix that can't be represented on your machine? Heterogeneous types within your data?
+
+MW: I think this group can lead the pack and make sure this thing can live heterogeneously or homogeneously, possibly in parallel. ... have you discussed mdspan and how it fits in ?
+
+BS: Not yet.
+
+MW: I'll wait for that.
+
+BS: In correspondence with Guy, two obvious realms of irreducible: abstract and concrete. In abstract: Matrix, element, row and column vector. Well understood mathematical objects. Matrix arithmetic, transforms, decompositions. Abstract only in the sense that they transcend implementation. Concrete: element layout, e.g., dense, symmetric, banded. Storage stack-based or dynamically allocated. Sizes: compile-time or run-time? Resizable? Owning or not? Concurrency / parallelism. Five concrete, somewhat orthogonal axes.
+
+RD: Inspired by STL and Ranges, are there a set of matrix types optimized for different matrix properties, and a set of solvers that can work on common interface, rather than dilute....
+
+MH: This is totally appropriate for Krylov subspace methods; see e.g., "Templates for the solution of linear systems"; but for things like banded dense solves, the structure of the matrix is more tightly coupled to good algorithms for performance.
+
+RD: Similar problem for iterator categories in STL. Not every iterator category is appropriate for every container. Can provide more optimized algorithm by specializing on the iterator category, but don't have to.
+
+Graham: At this early stage, I'll ask MW a question: previous words from the Direction group, being careful from getting too specialized, solving domain-specific problems. How close are we skating to this; how much math can we talk about in the std?
+
+MW: I'm less worried about that, because we're crossing domains anyway: finance, HPC, educators, games, ... From Bjarne, make sure any C++ solution you're crafting solves at least two problems [and] crosses at least two domains. With linear algebra, that's a foregone conclusion. Failed / negative example: Transactional memory. Our solution was very specific to TM. Because block-based sync technique, did not apply well to thread-based or executor based, it didn't fly and probably never will, unless we slim it down.
+
+[Brian Von Stralen enters]
+
+Graham: We need to talk about it in a way common to all those domains, with our terminology.
+
+MW: Right.
+
+BS: Back to scope question: We talked about ways to decompose the problem ... fundamental linear algebra "stuff," problem space of linear least squares. Are there other problem spaces besides those two that we should consider for our scope?
+
+CE: Or can we layer the scope, peeling the onion back? ... e.g., BLAS has "levels" (level 1, level 2, level 3) My hypothesis is that lowest level is most general, higher level could be more specialized. Lowest level could be where to start with consensus.
+
+BS: I was thinking more along the lines of not necessarily doing all levels at once, but at what level up do we say that we are done? The higher level for which we shoot, the more complex the design.
+
+Graham: I think what CE is saying, is that we don't have to decide in advance at what level up to stop.
+
+CE: Stop once no consensus.
+
+HF: We need to have some idea of what set of problems we're solving, and then, decompose into pieces.
+
+BVS: Basic / minimum set of functionality that would be valuable enough to justify doing the work and get enthusiasm up past threshold.
+
+MB: The BLAS layers you (CE) were talking about were not software layers. Level 3 BLAS uses different algorithms; it does not use level 1 BLAS.
+
+BVS: You don't implement BLAS 3 in terms of BLAS 2.
+
+MH: [We should go back to the BLAS oral history, collected circa 2004. BLAS levels "cut through" the stack, but one could still implement algorithms in terms of lower levels, by analogy with iterator categories and standard algorithms.]
+
+Graham: How much are we talking about implementation at this point? Not, how are we going to implement these different levels, but the question is what they need to support.
+
+HF: Fine line; the interfaces "must support efficient implementation," so you must understand enough about implemention to know you aren't precluding efficient implementation. I have some users who would be happy with basic matrix arithmetic and entry access; I have some who want more than that. Definitely there are relatively easy to define independently useful subsets of functionality.
+
+CE: Look at investment going into dense matrix-matrix multiply...
+
+HF: Figuring out relationship to mdspan. If we have a basic matrix arithmetic; is mdspan ....
+
+[MH: we've looked at doing that with mdspan]
+
+[MH: describes ... templated BLAS and pain of wrapping BLAS with fortran mangling etc.]
+
+POLL: 8 people in room out of 13 have written templated BLAS wrappers.
+
+BVS: That doesn't mean we're all coauthors of a paper though ...
+
+BS: Trickiest problem is, once we've decided on fundamental set of linear algebra objects (matrix, row vector, column vector), whatever they are, defining the implementation behind them that can support these multiple orthogonal axes of concern that we have -- storage layout, source of memory, resizability, owning, concurrency/parallelism. That will be the hardest part of the design of the library. Getting that right will be driven by performance concerns....
+
+Graham: Question for room: Related to all things BS just listed, are there any we think we should not solve with allocators plus executors?
+
+BVS: I think, lacking the execution context, and/or the equivalent of HWLOC in the standard library that tells you memory affinity, doing dense linear algebra without portable way of discussing affinity is a nonstarter.
+
+CE: Only if you care about performance.
+
+BVS: I wouldn't even behind (?) the effort.
+
+Graham: With or without allocators and executors, we don't have that anyway.
+
+BVS: They will expect a BLAS 3 function to get near peak of machine. If they get 1% of peak -- if you don't get affinity right -- tile sizes wrong ... this might be the good example that justifies and drives execution context affinity design.
+
+MW: That's a good idea.
+
+MB: One sentence you said -- I don't completely agree -- languages that support matrix-matrix multiply don't necessarily wrap the BLAS and are not necessarily efficient, but people still use them.
+
+BVS: In terms of rapid prototyping.
+
+MB: I believe you need an efficient implementation, but am not sure you can provide an executor which is an abstract machine sophisticated enough to allow for that.
+
+RD: I would be reluctant to predicate this on having that facility, under the notion that those that are serious are already doing that, we just have to make sure the design we come up with here would not preclude doing that. Predicating this on having that would potentially sink this from getting in there.
+
+BVS: I would drop that then.
+
+RD: Calling "cpuset" is annoying ...
+
+BVS: Give somewhere as a place where good things can come and live; on-ramp good codes....
+
+RD: But we want to avoid a solution that spins up threads in the background....
+
+BVS: Executors....
+
+BS: Let's not forget needs of other end, small fixed size for graphics. Executors fixed size approach not applicable.
+
+MB: BLAS not even good for that.
+
+BS: Yes.
+
+CE: Does this mean batched? or just one problem at a time?
+
+BS: I'm thinking of rotation matrix to transform a large set of 3-D vectors.
+
+CE: You are doing a matrix operations a lot.
+
+BS: Yes, but I also care about the small case. I want to serve games and low latency, but also professors and grad students, want correct and accurate results.
+
+MH: We've found both batched and single-small-op useful.
+
+BVS: Good time; reproducible BLAS and IEEE floating-point getting ratified now, going into voting and being hammered out. There is possibility that grad student debugging their code could use specialization for reproducibility. They don't have to be stuck in Matlab; they can program compilable code and verify their work. The time seems to be right for "std::blas" ....
+
+RD: Topic change: For matrix applications to graphics, should we talk about interpolation? or do we punt on that?
+
+BS: Add to list of topics to ponder.
+
+Graham: "See if a paper materializes"
+
+[discussion of whether we should "seed the thunderclouds" to draw interest and get more papers and ideas]
+
+BS: Quaterions are representable as 4-element vector, but quaternion math is not vector math. Is quaternion math in scope of this? It's useful for games, and slurps....
+
+RD: We used quaternions in our medical imaging program, when I was rendering hearts.
+
+[MH: Would it make sense to treat quaternions as the entry type of a matrix or vector.]
+
+BVS: That is, is it like complex?
+
+CE: It is, in that respect?
+
+MH: Do you normally think of it that way?
+
+BS,CE: Yes.
+
+RR: We do sometimes operate on entries of a single quaternion, treating it as a vector.
+
+[Lawrence Crowl enters]
+
+BS: Next steps?
+
+CE: First step: fundamental representations, mdspan is supposed to be foundation by which you can do these things. Has layouts and submatrices / subspans. Next plugin layout for mdspan which covers the set of BLAS matrices. Use a "using" statement to alias something to "linear algebra - style matrix."
+
+[CE,MH: discussion of mdspan layout left vs Kokkos::View layout left -- mdspan needs to support strided layout left]
+
+BVS: Some type aliases to mdspan ... give you linear algebra.
+
+BS: You're not suggesting that you constrain storage representation to mdspan, are you?
+
+CE: How so? mdspan is nonowning. ...
+
+MW: Do we need a brief presentation of mdspan?
+
+RD: mdspan as a single underlying container, vs. possibly a variety. What limitations do you put on algorithms to understand ... container ... not saying mdspan is not a good structure to use, but ... [want to see whether it should be the right container].
+
+HF: Questions raised here are about flexibility of layout adapters.
+
+CE: span works with any continuous thing.
+
+RD: The standard algorithms work on more than just span; they work on many different containers. Can layer views with ranges etc. Would hesitate to define algorithms to work only on mdspan.
+
+HF: i.e., should define in terms of concepts,
+
+CE: Yes, then mdspan could be concrete version
+
+RD: e.g., different concepts, like delayed load, or expression template combination, ... I'm throwing out ad-hoc terms ... would welcome people to consider if there is anything missing. Don't want to exclude whole domains by constraining to mdspan.
+
+BVS: I think mdspan is existence enough that we don't have to be stalled. We can be so hung up on conceptualizing linear algebra, that we won't get concrete... it's OK to put a BLAS forward paper-wise, and afterwards abstract it, as opposed to starting abstract and then trying to see if it could be made concrete. I think we could build a spec out of mdspan.
+
+HF: We have a spec for mdspan; we know what the interface is. There's a trivial generalization, to say the algorithm just conforms to an interface [to which mdspan conforms]. LEWG would insist on us following the general design pattern of algorithms in the standard library, that we design to a concept, not a concrete implementation. If we decide not to do that, we would need a rationale.
+
+[MH: mdspan looks pretty abstract to us, but we don't want to exclude farther-out things that RD discussed]
+
+CE: Start with "matrix concept."
+
+RD: That would get people, at least to complain and stir up discussion.
+
+BVS: Shame them into participating.
+
+RD: By providing obviously wrong strawman.
+
+MW: We do that a lot.
+
+LC: Not necessarily intentionally.
+
+[haha]
+
+RD: I think it's a perfectly fine starting plan, to base something off mdspan, and flush out those concepts early on.
+
+BS: I've been conceptualizing those around engines; engines define element layout and storage format. Given my very incomplete understanding of mdspan, seems like mdspan could be a template parameter that provides / lets one create an "mdspan engine" for element layout and storage.
+
+CE: It's always nonowning
+
+MH: Depends on your pointer type [whether it is nonowning]!
+
+BVS: Its goal is to describe element layout
+
+MW: I want my matrix to be a wrapped data structure, not a set of pointers. I need mdspan for that. Wrapped data structure works better in SYCL.
+
+[MH: mdspan and engine overlap functionality; may want to refactor if you want to use mdspan]
+
+RD: Dimensions of mdspan: always compile-time or run-time?
+
+CE: Rank is always compile time; dimensions can be mixed (compile / run).
+
+[discussion of mdspan capabilities]
+
+MW: Please sign up to the SG14 Google Group. It's an open group; has over 800 members. Future announcements about this meeting and future discussions will be on SG14.
+
+LC: How much mail?
+
+[very little / a lot]???
+
+MW: Very technical discussion. Prefix all your discussions with "linear algebra".
+
+HERE IS THE LINK: https://groups.google.com/a/isocpp.org/forum/?fromgroups#!forum/sg14
+
+MH: I just joined the above group.
+
+MW: [Describes history of group.] Group is mostly about low latency. Monthly meetings 2nd Wed, 2-4 Eastern time, about 8 meetings a year. We run it like a regular SG, and also at CppCon face to face. Usually 50-60 people show up. Now I'm getting more requests to have face-to-face meetings. Starting in Kona, will meet [at WG21 meetings] face to face. I probably won't be able to chair it. Looks like I will start up a machine learning SG, SG20. I will have to chair that. We will probably start having regular chairing meetings, next 3-4 meetings. All my cochairs are mostly in Europe. Expect SG14 meetings moving forward in this capacity. ... In the past, SG14 has pushed forward proposals in C++17 like uninitialized memories (?). We're pushing number proposals like likely / unlikely [branch probability]. SG14 was original idea for incubator. For a long time, SG14 was the incubator group, not just for low latency. After a while, we broke out true incubators from SG14.
+
+MW: We should talk about frequency of meetings.
+
+BS: Does it make sense for us to have a call, with some to-be-determined frequency, jsut for linear algebra, outside of regular SG14 call.
+
+BVS: That's my vote. I don't want to be pulled into SG14 vortex.
+
+BS: Frequency? Once a month?
+
+BVS: Yes. I would probably hot-swap my spot with other people in my math group. I'm the C++ person but not the hard linear algebra user in my group; they know the requirements better than me. Early days will be requirements gathering and scope of work. When we get down to API designs, I could [contribute] more there. Once a month is the right frequency to keep momentum.
+
+MW: Could accelerate the meeting schedule as you get closer [to the paper deadline].
+
+BVS: Or small subgroups with tigher schedule.
+
+Graham: Once a month would mean at most two calls before the next mailing.
+
+MW: Would that be enough time to write any papers?
+
+BS: Complicated by holidays etc.
+
+Graham: Mailing is four weeks before the meeting. Three months between meeting and next mailing.
+
+MH: We don't have to do everything synchronously.
+
+RR: Depends on how much do you expect to get done initially.
+
+[discuss calendar]
+
+BS: Could we schedule three phone calls between now and next meeting?
+
+RD: Expect that we schedule the telecons now, nobody writes papers until after holidays, end up canceling one of the meetings
+
+BS: Some latency from the low-latency team [haha]
+
+RD: Nothing to stop us from canceling or handling [discussions] over e-mail.
+
+HF: I would recommend setting up doodle poll to set up time. We can always cancel meetings, but if they don't get on my calendar, then I can't join, because my calendar will fill up.
+
+Graham: I'm comfortable w/ a semiweekly [bimonthly, fortnightly] cadence, but don't want to push.
+
+BS: ACTION ITEM: I will volunteer to put up a Doodle poll for days of the week.
+
+MW: Book fortnightly, cancel every other meeting.
+
+MB: When you set a meeting time, please consider times friendly to European participants.
+
+MH: Could also start common documents to dump ideas.
+
+BS: I can resend link to Guy's repo with current state of his project and paper in progress. I have a repository where I keep my experimental stuff with strawman interface. I'll send a link to that to the group.
+
+BS: Any further topics?
+
+CE: On github site for mdspan, requests for expression templates with mdspan. We've told them that this would be add-on, not part of mdspan. If you're considering expression templates ...?
+
+BS: That's an implementers' decision. It's how you implement matrix arithmetic.
+
+CE: Did you think of that as in scope or out of scope?
+
+BS: I thought of it as out of scope.
+
+HF: The only thing in there in scope, is if you want to allow expression templates on types, you must be careful about how to specify return types.
+
+BVS: What Hal said. It does show up in interface. "Expression templates" means arithmetic operations generate new types. If you want to support that -- the new type can be the same type. That would be a valid implementation. Matrix + matrix is a new type.
+
+MH: Be careful of compile times.
+
+MW: How to manage conference calls? BlueGene? WebEx?
+
+HF: We can do BlueGene or Zoom?
+
+Graham: Let HF or myself know; we can set it up.
+
+HF: BlueGene and Zoom work on Windows, Linux, or Mac.
+
+DG: Zoom worked very well in premeeting.
+
+HF: Yes, good point.
+
+[discussion of telecons and chairs]
+
+MH: Where shall I put the minutes for this meeting?
+
+RR: There is an SG14 page on the wiki.
+
+MH: OK.
+
+CE: We should notify non-C++ linear algebra community.
+
+BVS: I'm sure Jim Demmel will have a suggestion of people who know C++ and could contribute. Jack Dongarra as well.
+
+BS: How many plan to be at Kona.
