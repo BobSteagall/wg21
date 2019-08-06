@@ -1,0 +1,330 @@
+
+
+1. Introductions
+
+
+Wong explains that the conversation is recorded to simplify note-taking; these
+notes are for internal use only
+
+Douglas makes his required disclaimer
+
+Patrice will be taking notes
+
+Wong will be taking care of listing participants (Thanks!)
+
+
+
+2. Administrivia
+
+
+Wong : we target first week of the Month...
+
+Steagall : first Wednesday of the Month at 20:00 UTC seemed most popular option
+
+Wong : let's be careful when conflicts occur with WG21 meetings
+
+Bryce : we should announce the meetings on the EXT mailing list
+
+Bryce : we should also add SG6
+
+Wong : SG19 too, but they don't have a reflector yet
+
+
+
+(we decide, at Wong's suggestion, to swap points 3 and 4)
+
+
+
+4. Discussion of tentative scope and goals for the LA-SIG (Linear Algebra SIG)
+
+Wong : do we need different dimensions?
+
+Searles : I'm concerned about multi-platform support
+
+Wong : do games need more than four dimensions?
+
+Searles : up to four is sufficient for us
+
+Matthieu : four dimensions is a tensor
+
+Nasos : we need arbitrary number of dimensions
+
+Steagall : I think we should distinguish rank and dimension, and have terms to distinguish them
+
+Bryce : I think we should use P0009 terminology
+
+Matthieu : it's not the consensus in the scientific community at all
+
+Nasos : the mdspan proposal is closer
+
+Wong : dynamic extent is dynamic rank
+
+Nasos : extent == size in Fortran
+
+Searles : are we going to support such things as Eigenvalues or will we stick to something simpler
+
+Steagall : scope is something we should determine. Our job is to define an interface than does not preclude important optimizations we need
+
+Steagall : we need to define the boundary / scope of that interface
+
+Bryce : from my perspective, I can't imagine standardizing something that's not general enough to serve the purpose of all stakeholders
+
+Wong : if we end up supporting three kinds of linear algebra, it will get confusing
+
+Bryce : we need to pick a good, reasonable starting point. A minimum viable product to build on
+
+Hammond : data structures and algorithms are two different directions to explore
+
+Hammond : we have to get data structures sorted out with good primitives before we get working on advanced mathematics
+
+Hammond : can mdspan deal with slices and subarrays?
+
+Bryce : yes
+
+Nasos : spares arrays and sparse matrices are important
+
+Bryce : mdspan is particularly well-suited for dense representations. It can do sparse, but we have less field experience with that. I'd prefer some mdspan experts to participate in the discussion before going further
+
+Bryce : sparse is important in the HPC world, but I'd be fine not addressing them in version 1
+
+Matthieu : sparse might be a different data structure
+
+Nasos : the moment you slice, you have a sparse container (discussion ensues)
+
+Matthieu : it could be seen as fancy indexing over a dense array; that makes it different from sparse algebra
+
+Wong : thanks, this gives us an idea of what we're doing
+
+Steagall : we're trying to elicit requirements. It's very useful
+
+Cem : I'd like to know where we stand on compile-time, and on SIMD. Some of these concerns are not compatible
+
+Bryce : I disagree, particularly with C++20
+
+(A short discussion ensues as to who could help this SIG. I did not get the chance to note it all, but Peter Gottschling and Niall Douglas were mentioned)
+
+Searles : such things as float size will need our scrutiny
+
+Wong : we'll get back to this issue later if there's time
+
+
+
+
+3. Presentation, review and discussion of papers
+
+
+
+3.1 D1166 (attached), Guy Davidson
+
+Davidson :
+
+- this paper is trying to establish what we need for a linear algebra library
+- first section states we should be able to use vectors and matrices of any type, not just fundamental types
+- in games, vectors and matrices can benefit from compile-time sizes in some domains
+- in general, dynamic size matrices are useful in many domains
+- sparse matrices can be nice if they interact with constexpr; they are often implemented with intrinsics
+
+Bryce : with C++20 constexpr, we have is_constant_evaluated() which helps with this
+
+Davidson :
+
+- in some domains, we have SIMD instruction available, not in others, so we want a customizable interface
+- put otherwise, we want interfaces that people can customize for their domains
+- we need a "done" point, a target at which point we can be confident that we are service 80% of use-cases
+- the library should be offering algorithms to do such things as decomposition
+- we have a wish list (section 4 of D1166)
+
+Hammond : I worked with people who did parallel Eigen solvers. This is where some of the type stuff comes in : we have "standard" back-ends we can wrap, but these solutions are for fixed sets of types and dimensions
+
+Hammond : some things such as Tensor SVD are still active areas of research and are not ready for standardization
+
+Davidson : I'm not suggesting we solve Tensor SVD in the library, but that the interface allows mixing with such a solution
+
+Hammond : is this working group closed to ISO experts or open?
+
+Wong : the point of a group such as this is to make experts collaborate regardless of affiliation
+
+Hammond : if we want to move into maths, we need mathematicians as customers
+
+Bryce : that's for the future
+
+Nasos : we can work for any type / architecture
+
+Cem : what kind of problems are not solved?
+
+Nasos gives some (could not take notes fast enough)
+
+Knott : we have to distinguish implementation from our work on the interface
+
+Bryce : bullet 7 (interface customizable and overloadable) does not convince me (gives some examples)
+
+Steagall : with respect to expression templates, we hope the decision to use them or not should rest on the implementers
+
+Bryce expresses discomfort with operator overloading in the standard library
+ 
+Steagall : if your goal is to have a set of types and expressions that mimic common mathematical notation, we'll need some operator overloading
+
+Hammond : are we targeting C-like maths or do we go for general types and concepts? Limiting the number of types can be helpful in going faster, further
+
+Cem : we can choose the back-end when we hit the assignment operator
+
+Nasos : a linear algebra library for C++ needs to work with arbitrary types
+
+Bryce : in version 1 or at some point?
+
+Nasos : my feeling is in version 1
+
+Wong : is there a way we could list features and separate them in version 1, 2, 3...?
+
+Bryce : version 1 should only be the most basic things that the following versions can be built on
+
+Bryce : we should target an operations library
+
+Dalton : it will still need to be customizable on the back-end
+
+Dalton : numerical stability is important
+
+Bryce : I agree that the back-end needs to be customizable, if only to benefit from what is already there
+
+Cem : I think Eigen has it right by letting client code decide whether computation is being run on the CPU or on a GPU
+
+Wong : I would like someone to work on the list of items in version 1
+
+Davidson : I will do it
+
+Searles : I'll help
+
+Wong : a shared Google Drive document could be a good idea here
+
+
+
+
+
+3.2 The Linear Algebra Prior Art paper (volunteer needed)
+
+Hammond : I don't think we could be exhaustive with prior art. It's a moving target
+
+Hoemme : 
+
+- I wrote this to help us avoid mistakes of the past
+- People in the past have also done inspiring things for us
+- I discuss so-called Object-Oriented Linear Algebra
+- I discuss efforts in benchmarking libraries
+- I discuss POOMA (a parallel version)
+- I discuss high-performance Fortran, and some reasons for its failure (hiding from users things they would have preferred to be able to customize)
+
+Nasos : do we want contravariance in C++?
+
+Hoemme : it depends on whether the library wants to represent distributions
+
+Ronan : we want to think about heterogeneous memory, but not in version 1
+
+Hoemme : in historical libraries, it's been done
+
+Nasos suggests we summarize the discussions from the first half of the meeting for Hoemme, who missed it
+
+Wong does so
+
+Wong : we'll only have another meeting (in January) to get paper ready for the pre-Kona 2019 mailing
+
+Wong : feedback on this paper?
+
+Hoemme : it's a work in progress. I welcome contributors
+
+Cem : don't POOMA and Blitz++ support multiple dimensions?
+
+Nasos : some libraries like Taco have interesting interfaces to look at if we seek something to mathematical notation in code
+
+Cem : there's a book called Matrix Computations that defines the basic operations. We could start from that
+
+Hammond : that book covers a subset of the problem domain, mostly. I'm not sure it's the right place to start
+
+Steagall comes back to the fact that we have different needs depending on the user, and will need a proper interface
+
+Hammomd suggests another book which seems closer to our needs in his eyes
+
+Discussions on the importance of customization follow
+
+Steagall : with regards to ease-of-use interfaces / numerical sophistication. A question I expect to see raised is teachability; we should try to keep this in mind
+
+Nasos : I agree. I see some notation in Python Numerics as inspiring
+
+
+
+
+Wong : I'd like to return to Guy (Davidson)'s paper
+
+On the wish list, item 1 :
+
+- Wong : we want to know if it's going to be parameterized
+- Steagall : do we allow arbitrary numerical types?
+- Cem : could we have a concept of a number?
+- Dalton : it's hard. The Ranges people are working on this
+- Nasos : I'd make sure addition and multiplication are
+- Hoemme : I'd like to know if they are thread-safe; if they do dynamic allocation; if they are allocator-aware; etc.
+- Searles : we don't want further standards to break the original
+- Dalton : I'm in favor of the paper's position
+- Hammond : array primitives can be defined on any type. I other cases such as SVD, it's less clear
+- Nasos : some things are algorithm-dependent more than type-dependent
+- Dalton : type promotion is an issue
+- Knott : Guy (Davidson), were you planning on presenting some of your CppCon material here?
+- Davidson : I can
+- Knott : it could be informative
+- Davison : I'll share my slides to the reflector
+- Marco : do we want fixed-size containers? Dynamic-size? Dynamic-rank?
+- Matthieu : we can use both
+- Nasos : can we change the number of dimensions dynamically?
+- Matthieu : for machine learning, definitely
+- Hammond : Fortran has RESHAPE which is useful
+- Steagall : does anthing beyond rank 2 count as linear algebra?
+- Hammond : definitely
+- Steagall : should be support it?
+- Hammond : definitely
+- Cem : in my library, we are trying to implement this
+- Reverdy : does mdspan have dynamic ranks?
+- Hoemme : I think the dimensions on the underlying fixed size are not stored; only the dynamic dimensions are
+
+On the wish list, item 2 :
+
+- Steagall : I think we've pretty much discussed this already
+
+On the wish list, item 3 :
+
+- Steagall : I think we should leave the return types unspecified to allow for expression templates
+- Nasos : we don't want to expose expression templates to user code
+- Steagall : that's the point of leaving it unspecified in the standard
+- Knott : we still need some concept for the return types
+- Nasos : will we use internals of matrices or return types for expression template details?
+- Steagall : it's a question I think should be left to implementors
+- Knott : debugging this sort of code is difficult
+- Hoemme : the representation of a matrix differs from the representation of an expression
+- Cem : could be provide two layers, one functional and one operator-based?
+- Steagall : do we want expressions to convert to matrices, to simplify passing return values from functions or operators as arguments to functions?
+
+
+Steagall : we need to move on to logistics
+
+Wong : next meeting would be on January 2nd
+
+Searles : do we have enough time for Kona?
+
+Wong reads the schedule
+
+Steagall : we'll be able to reconvene on the 1st week of February if you have updates
+
+Searles : do we continue this discussion next week in SG14?
+
+Wong : no, full plate there with a discussion on the difference between "embedded" and "hosted"
+
+Wong reminds people of the importance not to distribute the recording
+
+Patrice will send minutes to Wong and Steagall. Participants are welcome to verify if they were quoted appropriately
+
+Nasos : I see this as a big undertaking
+
+Wong : we have many major undertakings. This one could take two-three years before something surfaces
+
+Wong : if anyone wants to go to Kona, book your hotel now
+
+Steagall ends the call.
+
