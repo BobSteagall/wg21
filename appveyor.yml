@@ -1,0 +1,21 @@
+image:
+  - Visual Studio 2019
+
+clone_folder: c:\projects\wg21
+
+build_script:
+  # Switch into the working directory build folder
+  - cmd: cd c:\projects\wg21
+  - cmd: mkdir build
+  - cmd: cd build
+
+  - cmd: if "%platform%" == "x64" set cmake_platform=%platform%
+  - cmd: cmake -g "Visual Studio 15 2017" ../linear_algebra/code -DCMAKE_GENERATOR_PLATFORM=%cmake_platform%
+
+  # build it
+  - cmd: if "%platform%" == "x86" set msbuild_platform=Win32
+  - cmd: if "%platform%" == "x64" set msbuild_platform=%platform%
+  - cmd: msbuild wg21.sln /p:Configuration=%configuration% /toolsversion:16.0 /p:PlatformToolset=v142 /p:Platform=%msbuild_platform%
+
+test_script:
+  - if "%configuration%" == "Debug" ctest -C Debug
