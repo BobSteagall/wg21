@@ -48,6 +48,12 @@ include_directories(include test .)
 
 add_executable(la_test ${Sources} ${Includes})
 
+set_target_properties(la_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED YES
+    CXX_EXTENSIONS NO
+)
+
 set(CMAKE_VERBOSE_MAKEFILE 1)
 
 #if(CXX_COMPILER STREQUAL clang++)
