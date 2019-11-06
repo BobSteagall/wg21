@@ -1,7 +1,6 @@
 branches:
   only:
     - master
-    - dev_twon_appveyor
 
 image:
   - Visual Studio 2019
