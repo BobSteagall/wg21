@@ -100,37 +100,13 @@ set_target_properties(la_test PROPERTIES
     CXX_EXTENSIONS NO
 )
 
-# This should be passed in via the commmand line ("cmake --build ./ -v" or "cmake --build ./ -DCMAKE_VERBOSE_MAKEFILE=1")
-#set(CMAKE_VERBOSE_MAKEFILE 1)
-
-if(CXX_COMPILER STREQUAL clang++)
-    set(CMAKE_C_COMPILER   clang)
-    set(CMAKE_CXX_COMPILER clang++)
-else()
-    set(CMAKE_C_COMPILER   gcc)
-    set(CMAKE_CXX_COMPILER g++)
-endif()
-
 target_compile_options(la_test
     PRIVATE
         $<$<OR:$<CXX_COMPILER_ID:GNU>>:-Wall -pedantic -Wextra  -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable -fmax-errors=10>
-        $<$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Wall -pedantic -Wextra -Wno-unused-parameter -Wno§-unused-function>
+        $<$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function>
 )
 
-if(CMAKE_CXX_COMPILER STREQUAL clang++)
+# This should be passed in via the commmand line ("cmake --build ./ -v" or "cmake --build ./ -DCMAKE_VERBOSE_MAKEFILE=1")
+#set(CMAKE_VERBOSE_MAKEFILE 1)
 
-    set(CMAKE_C_FLAGS_DEBUG   "-g -Wall -pedantic -Wextra")
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -std=c++17")
 
-    set(CMAKE_C_FLAGS_RELEASE   "-O3 -march=westmere -Wall -pedantic -Wextra")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=westmere -std=c++17 -stdlib=libc++")
-
-elseif(CMAKE_CXX_COMPILER STREQUAL g++)
-
-    set(CMAKE_C_FLAGS_DEBUG   "-g -Wall -pedantic")
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -std=c++17 -Wall -pedantic -Wextra  -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable -fmax-errors=10")
-
-    set(CMAKE_C_FLAGS_RELEASE   "-O3 -march=westmere -Wall -pedantic")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=westmere -std=c++17 -Wall -pedantic -Wextra -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable -fmax-errors=10")
-
-endif()
