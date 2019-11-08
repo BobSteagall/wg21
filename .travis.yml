@@ -28,10 +28,10 @@ matrix:
       language: generic
       compiler: clang
 
-    # XCode 11.1
+    # XCode 11.2
     - env: COMPILER=clang++ BUILD_TYPE=Debug COVERAGE=1
       os: osx
-      osx_image: xcode11.1
+      osx_image: xcode11.2
       language: generic
       compiler: clang
 
@@ -80,29 +80,31 @@ matrix:
     # GCC on Linux
     ##########################################################################
 
-    # GCC 5
-    - env: COMPILER=g++-5 BUILD_TYPE=Debug 
-      addons: &gcc5
-        apt:
-          packages: g++-5
-          sources:
-            - ubuntu-toolchain-r-test
-
-    # GCC 6
-    - env: COMPILER=g++-6 BUILD_TYPE=Debug 
-      addons: &gcc6
-        apt:
-          packages: g++-6
-          sources:
-            - ubuntu-toolchain-r-test
-
     # GCC 7
-    - env: COMPILER=g++-7 BUILD_TYPE=Debug 
+    - env: COMPILER=g++-7 BUILD_TYPE=Debug
       addons: &gcc7
         apt:
           packages: g++-7
           sources:
-            - ubuntu-toolchain-r-test
+            - sourceline: 'ppa:ubuntu-toolchain-r/test'
+
+    # GCC 8
+    - env: COMPILER=g++-8 BUILD_TYPE=Debug
+      addons: &gcc8
+        apt:
+          packages:
+            - g++-8
+          sources:
+            - sourceline: 'ppa:ubuntu-toolchain-r/test'
+
+    # GCC 9
+    - env: COMPILER=g++-9 BUILD_TYPE=Debug
+      addons: &gcc9
+        apt:
+          packages:
+            - g++-9
+          sources:
+            - sourceline: 'ppa:ubuntu-toolchain-r/test'
 
 # Added following instructions from https://docs.travis-ci.com/user/installing-dependencies#Installing-Packages-with-the-APT-Addon
 before_install:
