@@ -56,6 +56,8 @@ matrix:
         apt:
           packages:
             - clang-8
+            - libstdc++-8-dev
+            - libc++abi-8-dev
           sources:
             - sourceline: 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main'
               key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
@@ -67,6 +69,8 @@ matrix:
         apt:
           packages:
             - clang-9
+            - libstdc++-9-dev
+            - libc++abi-9-dev
           sources:
             - sourceline: 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main'
               key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
