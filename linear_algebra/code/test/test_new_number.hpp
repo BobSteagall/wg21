@@ -3,7 +3,7 @@
 
 #ifdef __clang__
     #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wfloat-equal -Wdeprecated"
+    #pragma clang diagnostic ignored "-Wunused-comparison"
 #endif
 
 class new_num
