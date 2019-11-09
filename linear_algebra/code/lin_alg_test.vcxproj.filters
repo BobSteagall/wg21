@@ -53,9 +53,6 @@
     <ClInclude Include="include\linear_algebra\library_aliases.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="include\linear_algebra\helper_traits.hpp">
-      <Filter>Implementation Headers</Filter>
-    </ClInclude>
     <ClInclude Include="include\linear_algebra\debug_helpers.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
