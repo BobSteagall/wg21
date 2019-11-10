@@ -58,22 +58,6 @@ matrix_addition_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
         }
     }
 
-/*
-	if constexpr (result_requires_resize(mr))
-	{
-		mr.resize(rows, columns);
-		auto data = mr.data();
-		for (auto i = 0; i < columns; ++i)
-			for (auto j = 0; j < rows; ++j)
-				*data++ = m1(i, j) + m2(i, j);		// Safe because the resize means that mr capacity = size for rows and columns.
-	}
-	else
-	{
-		transform(m1.data(), m1.data() + (rows * columns), m2.data(), mr.data(),
-			[](auto lhs, auto rhs) {return lhs + rhs; });
-	}
-*/
-
 	return mr;
 }
 

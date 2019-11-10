@@ -74,21 +74,6 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>::multiply
         }
     }
 
-/*
-	if constexpr (result_requires_resize(mr))
-	{
-		mr.resize(rows, columns);
-		auto data = mr.data();
-		for (auto i = 0; i < columns; ++i)
-			for (auto j = 0; j < rows; ++j)
-				* data++ = m1(i, j) * s2;		// Safe because the resize means that mr capacity = size for rows and columns.
-	}
-	else
-	{
-		transform(m1.data(), m1.data() + (rows * columns), mr.data(),
-			[&](auto val) {return val * s2; });
-	}
-*/
 	return mr;
 }
 

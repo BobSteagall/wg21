@@ -398,12 +398,14 @@ fs_matrix_engine<T,R,C>::assign(ET2 const& rhs)
     }
     else
     {
-        src_index_type  si, sj;
-        index_type      di, dj;
+        src_index_type  si = 0;
+        src_index_type  sj = 0;
+        index_type      di = 0;
+        index_type      dj = 0;
 
-        for (di = 0, si = 0;  di < rows();  ++di, ++si)
+        for (;  di < rows();  ++di, ++si)
         {
-            for (dj = 0, sj = 0;  dj < columns();  ++dj, ++sj)
+            for (;  dj < columns();  ++dj, ++sj)
             {
                 (*this)(di, dj) = rhs(si, sj);
             }

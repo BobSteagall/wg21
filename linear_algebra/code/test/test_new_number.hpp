@@ -1,6 +1,11 @@
 #ifndef TEST_NEW_NUMBER_HPP_DEFINED
 #define TEST_NEW_NUMBER_HPP_DEFINED
 
+#ifdef __clang__
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wunused-comparison"
+#endif
+
 class new_num
 {
   public:
@@ -424,4 +429,7 @@ struct STD_LA::number_traits<new_num>
     using is_semiring = true_type;
 };
 
+#ifdef __clang__
+    #pragma clang diagnostic pop
+#endif
 #endif  //- TEST_NEW_NUMBER_HPP_DEFINED
