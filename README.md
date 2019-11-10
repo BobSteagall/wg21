@@ -25,7 +25,7 @@ cd <project root>
 mkdir build
 cd build
 
-cmake -G <generator> <configuration options> ../linear_algrbra/code
+cmake -G <generator> <configuration options> ../linear_algebra/code
 cmake --build ../
 ctest
 ```
@@ -39,5 +39,5 @@ mkdir build
 cd build
 
 cmake -G <generator> <configuration options> -DCMAKE_INSTALL_PREFIX=<install dir> ../
-cmake --build ../linear_algrbra/code --target install
+cmake --build ../linear_algebra/code --target install
 ```
