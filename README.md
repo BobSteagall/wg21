@@ -16,3 +16,28 @@ The linear algebra proposal is targeted for C++23.  Current compiler support is 
 * Ubuntu 18
   * GCC 8.x, 9.x
   * Clang 7.x, 8.x, 9.x 
+
+# Building Manually Via CMake
+
+The project can be build via CMake as follows:
+```bash
+cd <project root>
+mkdir build
+cd build
+
+cmake -G <generator> <configuration options> ../linear_algrbra/code
+cmake --build ../
+ctest
+```
+
+# Installing Via CMake
+
+Installing the project can be run as follows:
+```bash
+cd <project root>
+mkdir build
+cd build
+
+cmake -G <generator> <configuration options> -DCMAKE_INSTALL_PREFIX=<install dir> ../
+cmake --build ../linear_algrbra/code --target install
+```
