@@ -114,7 +114,7 @@ include(GNUInstallDirs)
 # Hierarchically copy headers to the install dir
 install (
     DIRECTORY
-        "${CMAKE_CURRENT_SOURCE_DIR}/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra"
     DESTINATION
         ${CMAKE_INSTALL_INCLUDEDIR}
     FILES_MATCHING PATTERN
