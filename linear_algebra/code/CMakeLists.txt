@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(wg21_linear_algebra)
+project(wg21_linear_algebra VERSION 0.0.1)
 
 include(CTest)
 
@@ -109,4 +109,53 @@ target_compile_options(la_test
 # This should be passed in via the commmand line ("cmake --build ./ -v" or "cmake --build ./ -DCMAKE_VERBOSE_MAKEFILE=1")
 #set(CMAKE_VERBOSE_MAKEFILE 1)
 
+include(GNUInstallDirs)
 
+# Hierarchically copy headers to the install dir
+install (
+    DIRECTORY
+        "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    DESTINATION
+        ${CMAKE_INSTALL_INCLUDEDIR}
+    FILES_MATCHING PATTERN
+        "*.hpp"
+)
+
+install(
+    TARGETS wg21_linear_algebra
+    DESTINATION lib/cmake/wg21_linear_algebra
+    EXPORT wg21_linear_algebra-target
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+install(
+    EXPORT wg21_linear_algebra-target
+    NAMESPACE wg21_linear_algebra::
+    #FILE wg21_linear_algebra-target.cmake
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/wg21_linear_algebra"
+)
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+    ${CMAKE_CURRENT_LIST_DIR}/wg21_linear_algebra-config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/wg21_linear_algebra-config.cmake
+    INSTALL_DESTINATION
+        "${CMAKE_INSTALL_LIBDIR}/cmake/wg21_linear_algebra"
+)
+
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/wg21_linear_algebra-version.cmake
+    VERSION ${PROPAGATE_CONST_VERSION}
+    COMPATIBILITY SameMajorVersion
+    ARCH_INDEPENDENT
+)
+
+install(
+    FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/wg21_linear_algebra-config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/wg21_linear_algebra-version.cmake
+    DESTINATION
+        "${CMAKE_INSTALL_LIBDIR}/cmake/wg21_linear_algebra"
+)
