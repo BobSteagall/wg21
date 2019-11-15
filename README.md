@@ -30,6 +30,12 @@ cmake --build ../
 ctest
 ```
 
+The following configuration options are available:
+
+| Name                | Possible Values | Description                             | Default Value |
+|---------------------|-----------------|-----------------------------------------|---------------|
+| `BUILD_TESTING`     | `ON`, `OFF`     | Build the test suite                    | `ON`          |
+
 # Installing Via CMake
 
 Installing the project can be run as follows:
@@ -40,4 +46,35 @@ cd build
 
 cmake -G <generator> <configuration options> -DCMAKE_INSTALL_PREFIX=<install dir> ../
 cmake --build ../linear_algebra/code --target install
+```
+
+# Packages
+
+The Linear Algebra library is available integration into your own project via your favorite package manager:
+
+## Conan
+
+To add the linear_algebra library to your project as a dependency, you need to add a remote to Conan to point the
+location of the library:
+```bash
+cd <project root>
+pip install conan
+
+conan remote add linear_algebra https://api.bintray.com/conan/twonington/public-conan
+```
+Once this is set you can add the linear_algebra dependency to you project via the following signature:
+```bash
+linear_algebra/0.0.1@public-conan/testing
+```
+Available versions of the Linear Algebra package can be search via Conan:
+```bash
+conan search linear_algebra
+```
+
+### Building the Conan package
+The linear_algebra project and package can be build locally via the Conan as such:
+```bash
+cd <project root>
+pip install conan
+conan create <project root> [--test-folder None]
 ```

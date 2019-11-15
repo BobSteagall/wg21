@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(wg21_linear_algebra VERSION 0.0.1)
 
-include(CTest)
-
 add_library(wg21_linear_algebra INTERFACE)
 target_include_directories(wg21_linear_algebra
     INTERFACE
@@ -65,46 +63,50 @@ target_compile_features(wg21_linear_algebra
         cxx_std_17
 )
 
-add_library(wg21_linear_algebra::wg21_linear_algebra ALIAS wg21_linear_algebra)
+if (BUILD_TESTING)
+    include(CTest)
+    add_library(wg21_linear_algebra::wg21_linear_algebra ALIAS wg21_linear_algebra)
 
-add_executable(la_test "")
+    add_executable(la_test "")
 
-target_include_directories(la_test
-    PRIVATE
-        test
-)
+    target_include_directories(la_test
+        PRIVATE
+            test
+    )
 
-target_sources(la_test
-    PRIVATE
-        test/test_new_arithmetic.hpp
-        test/test_new_engine.hpp
-        test/test_new_number.hpp
-        test/test_obj_matrix.cpp
-        test/test_op_add.cpp
-        test/test_op_mul.cpp
-        test/test_op_neg.cpp
-        test/test_op_sub.cpp
- #       test/test_01.cpp
- #       test/test_02.cpp
-        test/test_main.cpp
-)
+    target_sources(la_test
+        PRIVATE
+            test/test_new_arithmetic.hpp
+            test/test_new_engine.hpp
+            test/test_new_number.hpp
+            test/test_obj_matrix.cpp
+            test/test_op_add.cpp
+            test/test_op_mul.cpp
+            test/test_op_neg.cpp
+            test/test_op_sub.cpp
+     #       test/test_01.cpp
+     #       test/test_02.cpp
+            test/test_main.cpp
+    )
 
-target_link_libraries(la_test
-    PRIVATE
-        wg21_linear_algebra::wg21_linear_algebra
-)
+    target_link_libraries(la_test
+        PRIVATE
+            wg21_linear_algebra::wg21_linear_algebra
+    )
 
-set_target_properties(la_test PROPERTIES
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
-)
+    set_target_properties(la_test PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+    )
 
-target_compile_options(la_test
-    PRIVATE
-        $<$<OR:$<CXX_COMPILER_ID:GNU>>:-Wall -pedantic -Wextra  -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable -fmax-errors=10>
-        $<$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function>
-)
+    target_compile_options(la_test
+        PRIVATE
+            $<$<OR:$<CXX_COMPILER_ID:GNU>>:-Wall -pedantic -Wextra  -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable -fmax-errors=10>
+            $<$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function>
+    )
+
+endif(BUILD_TESTING)
 
 # This should be passed in via the commmand line ("cmake --build ./ -v" or "cmake --build ./ -DCMAKE_VERBOSE_MAKEFILE=1")
 #set(CMAKE_VERBOSE_MAKEFILE 1)
