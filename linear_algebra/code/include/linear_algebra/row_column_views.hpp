@@ -84,6 +84,8 @@ matrix_column_view<ET>::operator ()(index_type i) const
     return (*mp_other)(i, m_column);
 }
 
+
+
 template<class ET> inline 
 constexpr typename matrix_column_view<ET>::size_type
 matrix_column_view<ET>::capacity() const noexcept

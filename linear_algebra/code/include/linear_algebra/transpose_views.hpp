@@ -28,7 +28,6 @@ class matrix_transpose_view
     using const_reference = typename engine_type::const_reference;
     using const_pointer   = typename engine_type::const_pointer;
     using difference_type = typename engine_type::difference_type;
-    using index_type      = typename engine_type::index_type;
     using size_type       = typename engine_type::size_type;
     using size_tuple      = typename engine_type::size_tuple;
 
@@ -53,7 +52,7 @@ class matrix_transpose_view
     constexpr matrix_transpose_view&    operator =(matrix_transpose_view&&) noexcept = default;
     constexpr matrix_transpose_view&    operator =(matrix_transpose_view const&) = default;
 
-    constexpr const_reference   operator ()(index_type i, index_type j) const;
+    constexpr const_reference   operator ()(size_type i, size_type j) const;
 
     constexpr size_type     columns() const noexcept;
     constexpr size_type     rows() const noexcept;
@@ -82,7 +81,7 @@ matrix_transpose_view<ET>::matrix_transpose_view(engine_type const& eng)
 
 template<class ET> inline 
 constexpr typename matrix_transpose_view<ET>::const_reference
-matrix_transpose_view<ET>::operator ()(index_type i, index_type j) const
+matrix_transpose_view<ET>::operator ()(size_type i, size_type j) const
 {
     return (*mp_other)(j, i);
 }

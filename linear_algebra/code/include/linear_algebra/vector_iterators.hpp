@@ -31,7 +31,6 @@ class vector_iterator
     using const_reference = typename engine_type::const_reference;
     using const_pointer   = typename engine_type::const_pointer;
     using difference_type = typename engine_type::difference_type;
-    using index_type      = typename engine_type::index_type;
     using size_type       = typename engine_type::size_type;
 
     using iterator_category = std::random_access_iterator_tag;
@@ -48,7 +47,7 @@ class vector_iterator
 
     constexpr pointer           operator ->() const;
     constexpr reference         operator  *() const;
-    constexpr reference         operator [](index_type n) const;
+    constexpr reference         operator [](size_type n) const;
 
     constexpr difference_type   operator -(vector_iterator const& p) const;
     constexpr vector_iterator   operator -(difference_type n) const;
@@ -74,12 +73,12 @@ class vector_iterator
 
   private:
     engine_type*    mp_engine;
-    index_type      m_curr;
-    index_type      m_upper;
+    size_type      m_curr;
+    size_type      m_upper;
 
   private:
     constexpr vector_iterator(engine_type& eng);
-    constexpr vector_iterator(engine_type* eng, index_type curr, index_type upper);
+    constexpr vector_iterator(engine_type* eng, size_type curr, size_type upper);
 };
 
 template<class ET> inline
@@ -95,12 +94,12 @@ constexpr
 vector_iterator<ET>::vector_iterator(engine_type& eng)
 :   mp_engine(&eng)
 ,   m_curr(0)
-,   m_upper(static_cast<index_type>(eng.elements()))
+,   m_upper(static_cast<size_type>(eng.elements()))
 {}
 
 template<class ET> inline
 constexpr
-vector_iterator<ET>::vector_iterator(engine_type* p_eng, index_type curr, index_type upper)
+vector_iterator<ET>::vector_iterator(engine_type* p_eng, size_type curr, size_type upper)
 :   mp_engine(p_eng)
 ,   m_curr(curr)
 ,   m_upper(upper)
@@ -122,7 +121,7 @@ vector_iterator<ET>::operator *() const
 
 template<class ET> inline
 constexpr typename vector_iterator<ET>::reference
-vector_iterator<ET>::operator [](index_type n) const
+vector_iterator<ET>::operator [](size_type n) const
 {
     return (*mp_engine)(m_curr + n);
 }
@@ -276,7 +275,6 @@ class vector_const_iterator
     using const_reference = typename engine_type::const_reference;
     using const_pointer   = typename engine_type::const_pointer;
     using difference_type = typename engine_type::difference_type;
-    using index_type      = typename engine_type::index_type;
     using size_type       = typename engine_type::size_type;
 
     using iterator_category = std::random_access_iterator_tag;
@@ -293,7 +291,7 @@ class vector_const_iterator
 
     constexpr const_pointer             operator ->() const;
     constexpr const_reference           operator  *() const;
-    constexpr const_reference           operator [](index_type n) const;
+    constexpr const_reference           operator [](size_type n) const;
 
     constexpr difference_type           operator -(vector_const_iterator const& p) const;
     constexpr vector_const_iterator     operator -(difference_type n) const;
@@ -318,12 +316,12 @@ class vector_const_iterator
 
   private:
     engine_type const*  mp_engine;
-    index_type          m_curr;
-    index_type          m_upper;
+    size_type          m_curr;
+    size_type          m_upper;
 
   private:
     constexpr vector_const_iterator(engine_type const& eng);
-    constexpr vector_const_iterator(engine_type const* eng, index_type curr, index_type upper);
+    constexpr vector_const_iterator(engine_type const* eng, size_type curr, size_type upper);
     constexpr vector_const_iterator(vector_iterator<ET> const& p);
 };
 
@@ -340,13 +338,13 @@ constexpr
 vector_const_iterator<ET>::vector_const_iterator(engine_type const& eng)
 :   mp_engine(&eng)
 ,   m_curr(0)
-,   m_upper(static_cast<index_type>(eng.elements()))
+,   m_upper(static_cast<size_type>(eng.elements()))
 {}
 
 template<class ET> inline
 constexpr
 vector_const_iterator<ET>::vector_const_iterator
-(engine_type const* p_eng, index_type curr, index_type upper)
+(engine_type const* p_eng, size_type curr, size_type upper)
 :   mp_engine(p_eng)
 ,   m_curr(curr)
 ,   m_upper(upper)
@@ -376,7 +374,7 @@ vector_const_iterator<ET>::operator *() const
 
 template<class ET> inline
 constexpr typename vector_const_iterator<ET>::reference
-vector_const_iterator<ET>::operator [](index_type n) const
+vector_const_iterator<ET>::operator [](size_type n) const
 {
     return (*mp_engine)(m_curr + n);
 }

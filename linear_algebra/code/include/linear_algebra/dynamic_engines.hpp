@@ -15,7 +15,7 @@ namespace detail {
 //  Some private helper functions for allocating/deallocating the memory used by the dynamic
 //  vector and matrix engines defined below.  Note that all memory thus allocated is default-
 //  constructed.  This means that elements lying in (currently) unused capacity are also
-//  initialized.
+//  initialized.  This may or may not be what happens in the end.
 //--------------------------------------------------------------------------------------------------
 //
 template<class AT>
@@ -77,8 +77,6 @@ deallocate(AT& alloc, typename allocator_traits<AT>::pointer p_dst, size_t n) no
 template<class T, class AT>
 class dr_vector_engine
 {
-    static_assert(is_matrix_element_v<T>);
-
   public:
     using engine_category = resizable_vector_engine_tag;
     using element_type    = T;
@@ -91,8 +89,7 @@ class dr_vector_engine
     using iterator        = detail::vector_iterator<dr_vector_engine>;
     using const_iterator  = detail::vector_const_iterator<dr_vector_engine>;
     using difference_type = ptrdiff_t;
-    using index_type      = ptrdiff_t;
-    using size_type       = ptrdiff_t;
+    using size_type       = size_t;
 
     using is_fixed_size   = false_type;
     using is_resizable    = true_type;
@@ -115,14 +112,13 @@ class dr_vector_engine
     dr_vector_engine& operator =(dr_vector_engine&&) noexcept;
     dr_vector_engine& operator =(dr_vector_engine const&);
 
-    const_reference operator ()(index_type i) const;
+    const_reference operator ()(size_type i) const;
     const_iterator  begin() const noexcept;
     const_iterator  end() const noexcept;
-
     size_type       elements() const noexcept;
     size_type       capacity() const noexcept;
 
-    reference   operator ()(index_type i);
+    reference   operator ()(size_type i);
     iterator    begin() noexcept;
     iterator    end() noexcept;
 
@@ -134,7 +130,7 @@ class dr_vector_engine
     void    resize(size_type elems);
     void    resize(size_type elems, size_type cap);
     void    swap(dr_vector_engine& rhs) noexcept;
-    void    swap_elements(index_type i, index_type j) noexcept;
+    void    swap_elements(size_type i, size_type j) noexcept;
 
   private:
     pointer     mp_elems;
@@ -240,7 +236,7 @@ dr_vector_engine<T,AT>::operator =(dr_vector_engine const& rhs)
 
 template<class T, class AT> inline
 typename dr_vector_engine<T,AT>::const_reference
-dr_vector_engine<T,AT>::operator ()(index_type i) const
+dr_vector_engine<T,AT>::operator ()(size_type i) const
 {
     return mp_elems[i];
 }
@@ -275,7 +271,7 @@ dr_vector_engine<T,AT>::capacity() const noexcept
 
 template<class T, class AT> inline
 typename dr_vector_engine<T,AT>::reference
-dr_vector_engine<T,AT>::operator ()(index_type i)
+dr_vector_engine<T,AT>::operator ()(size_type i)
 {
     return mp_elems[i];
 }
@@ -316,22 +312,22 @@ void
 dr_vector_engine<T,AT>::assign(ET2 const& rhs)
 {
     static_assert(detail::is_vector_engine_v<ET2>);
-    using src_index_type = typename ET2::index_type;
+    using src_size_type = typename ET2::size_type;
 
-    index_type          elems = (index_type) rhs.elements();
+    size_type          elems = (size_type) rhs.elements();
     dr_vector_engine    tmp(elems);
 
-    if constexpr(is_same_v<index_type, src_index_type>)
+    if constexpr(is_same_v<size_type, src_size_type>)
     {
-        for (index_type i = 0;  i < elems;  ++i)
+        for (size_type i = 0;  i < elems;  ++i)
         {
             tmp(i) = rhs(i);
         }
     }
     else
     {
-        src_index_type  si;
-        index_type      di;
+        src_size_type  si;
+        size_type      di;
 
         for (di = 0, si = 0;  di < elems;  ++di, ++si)
         {
@@ -377,7 +373,7 @@ dr_vector_engine<T,AT>::swap(dr_vector_engine& other) noexcept
 
 template<class T, class AT> inline
 void
-dr_vector_engine<T,AT>::swap_elements(index_type i, index_type j) noexcept
+dr_vector_engine<T,AT>::swap_elements(size_type i, size_type j) noexcept
 {
     detail::la_swap(mp_elems[i], mp_elems[j]);
 }
@@ -422,9 +418,9 @@ dr_vector_engine<T,AT>::reshape(size_type elems, size_type cap)
     if (elems > m_elemcap  ||  cap > m_elemcap)
     {
         dr_vector_engine    tmp(elems, cap);
-        index_type const    dst_elems = min(elems, m_elems);
+        size_type const    dst_elems = min(elems, m_elems);
 
-        for (index_type i = 0;  i < dst_elems;  ++i)
+        for (size_type i = 0;  i < dst_elems;  ++i)
         {
             tmp.mp_elems[i] = mp_elems[i];
         }
@@ -445,8 +441,6 @@ dr_vector_engine<T,AT>::reshape(size_type elems, size_type cap)
 template<class T, class AT>
 class dr_matrix_engine
 {
-    static_assert(is_matrix_element_v<T>);
-
   public:
     using engine_category = resizable_matrix_engine_tag;
     using element_type    = T;
@@ -457,7 +451,7 @@ class dr_matrix_engine
     using const_reference = T const&;
     using const_pointer   = typename allocator_traits<AT>::const_pointer;
     using difference_type = ptrdiff_t;
-    using index_type      = ptrdiff_t;
+    using size_type      = ptrdiff_t;
     using size_type       = ptrdiff_t;
     using size_tuple      = tuple<size_type, size_type>;
 
@@ -484,7 +478,7 @@ class dr_matrix_engine
     dr_matrix_engine& operator =(dr_matrix_engine&&) noexcept;
     dr_matrix_engine& operator =(dr_matrix_engine const&);
 
-    const_reference     operator ()(index_type i, index_type j) const;
+    const_reference     operator ()(size_type i, size_type j) const;
 
     size_type   columns() const noexcept;
     size_type   rows() const noexcept;
@@ -494,7 +488,7 @@ class dr_matrix_engine
     size_type   row_capacity() const noexcept;
     size_tuple  capacity() const noexcept;
 
-    reference   operator ()(index_type i, index_type j);
+    reference   operator ()(size_type i, size_type j);
 
     void    assign(dr_matrix_engine const& rhs);
     template<class ET2>
@@ -504,8 +498,8 @@ class dr_matrix_engine
     void    resize(size_type rows, size_type cols);
     void    resize(size_type rows, size_type cols, size_type rowcap, size_type colcap);
     void    swap(dr_matrix_engine& other) noexcept;
-    void    swap_columns(index_type c1, index_type c2) noexcept;
-    void    swap_rows(index_type r1, index_type r2) noexcept;
+    void    swap_columns(size_type c1, size_type c2) noexcept;
+    void    swap_rows(size_type r1, size_type r2) noexcept;
 
   private:
     pointer         mp_elems;       //- For exposition; data buffer
@@ -606,7 +600,7 @@ dr_matrix_engine<T,AT>::operator =(dr_matrix_engine const& rhs)
 
 template<class T, class AT> inline
 typename dr_matrix_engine<T,AT>::const_reference
-dr_matrix_engine<T,AT>::operator ()(index_type i, index_type j) const
+dr_matrix_engine<T,AT>::operator ()(size_type i, size_type j) const
 {
     return mp_elems[i*m_colcap + j];
 }
@@ -655,7 +649,7 @@ dr_matrix_engine<T,AT>::capacity() const noexcept
 
 template<class T, class AT> inline
 typename dr_matrix_engine<T,AT>::reference
-dr_matrix_engine<T,AT>::operator ()(index_type i, index_type j)
+dr_matrix_engine<T,AT>::operator ()(size_type i, size_type j)
 {
     return mp_elems[i*m_colcap + j];
 }
@@ -684,17 +678,17 @@ void
 dr_matrix_engine<T,AT>::assign(ET2 const& rhs)
 {
     static_assert(detail::is_matrix_engine_v<ET2>);
-    using src_index_type = typename ET2::index_type;
+    using src_size_type = typename ET2::size_type;
 
-    index_type          rows = (index_type) rhs.rows();
-    index_type          cols = (index_type) rhs.columns();
+    size_type          rows = (size_type) rhs.rows();
+    size_type          cols = (size_type) rhs.columns();
     dr_matrix_engine    tmp(rows, cols);
 
-    if constexpr(is_same_v<index_type, src_index_type>)
+    if constexpr(is_same_v<size_type, src_size_type>)
     {
-        for (index_type i = 0;  i < rows;  ++i)
+        for (size_type i = 0;  i < rows;  ++i)
         {
-            for (index_type j = 0;  j < cols;  ++j)
+            for (size_type j = 0;  j < cols;  ++j)
             {
                 tmp(i, j) = rhs(i, j);
             }
@@ -702,8 +696,8 @@ dr_matrix_engine<T,AT>::assign(ET2 const& rhs)
     }
     else
     {
-        src_index_type  si, sj;
-        index_type      di, dj;
+        src_size_type  si, sj;
+        size_type      di, dj;
 
         for (di = 0, si = 0;  di < rows;  ++di, ++si)
         {
@@ -753,11 +747,11 @@ dr_matrix_engine<T,AT>::swap(dr_matrix_engine& other) noexcept
 
 template<class T, class AT>
 void
-dr_matrix_engine<T,AT>::swap_columns(index_type c1, index_type c2) noexcept
+dr_matrix_engine<T,AT>::swap_columns(size_type c1, size_type c2) noexcept
 {
     if (c1 != c2)
     {
-        for (index_type i = 0;  i < m_rows;  ++i)
+        for (size_type i = 0;  i < m_rows;  ++i)
         {
             detail::la_swap(mp_elems[i*m_colcap + c1], mp_elems[i*m_colcap + c2]);
         }
@@ -766,11 +760,11 @@ dr_matrix_engine<T,AT>::swap_columns(index_type c1, index_type c2) noexcept
 
 template<class T, class AT>
 void
-dr_matrix_engine<T,AT>::swap_rows(index_type r1, index_type r2) noexcept
+dr_matrix_engine<T,AT>::swap_rows(size_type r1, size_type r2) noexcept
 {
     if (r1 != r2)
     {
-        for (index_type j = 0;  j < m_cols;  ++j)
+        for (size_type j = 0;  j < m_cols;  ++j)
         {
             detail::la_swap(mp_elems[r1*m_colcap + j], mp_elems[r2*m_colcap + j]);
         }
@@ -820,12 +814,12 @@ dr_matrix_engine<T,AT>::reshape(size_type rows, size_type cols, size_type rowcap
     if (rows > m_rowcap  ||  cols > m_colcap   ||  rowcap > m_rowcap  ||  colcap > m_colcap)
     {
         dr_matrix_engine    tmp(rows, cols, rowcap, colcap);
-        index_type const    dst_rows = min(rows, m_rows);
-        index_type const    dst_cols = min(cols, m_cols);
+        size_type const    dst_rows = min(rows, m_rows);
+        size_type const    dst_cols = min(cols, m_cols);
 
-        for (index_type i = 0;  i < dst_rows;  ++i)
+        for (size_type i = 0;  i < dst_rows;  ++i)
         {
-            for (index_type j = 0;  j < dst_cols;  ++j)
+            for (size_type j = 0;  j < dst_cols;  ++j)
             {
                 tmp.mp_elems[i*m_colcap + j] = mp_elems[i*m_colcap + j];
             }

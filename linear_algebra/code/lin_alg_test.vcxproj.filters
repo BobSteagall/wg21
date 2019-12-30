@@ -89,13 +89,16 @@
     <ClInclude Include="include\linear_algebra\multiplication_traits_impl.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="include\linear_algebra\row_column_views.hpp">
-      <Filter>Implementation Headers</Filter>
-    </ClInclude>
     <ClInclude Include="include\linear_algebra\transpose_views.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="include\linear_algebra\vector_iterators.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\column_views.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\row_views.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
   </ItemGroup>

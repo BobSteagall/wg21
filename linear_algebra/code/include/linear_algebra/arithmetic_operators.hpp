@@ -103,8 +103,6 @@ template<class ET1, class OT1, class S2>
 inline auto
 operator *(vector<ET1, OT1> const& v1, S2 const& s2)
 {
-    static_assert(is_matrix_element_v<S2>);
-
     using op_traits  = OT1;
     using op1_type   = vector<ET1, OT1>;
     using op2_type   = S2;
@@ -117,8 +115,6 @@ template<class S1, class ET2, class OT2>
 inline auto
 operator *(S1 const& s1, vector<ET2, OT2> const& v2)
 {
-    static_assert(is_matrix_element_v<S1>);
-
     using op_traits  = OT2;
     using op1_type   = S1;
     using op2_type   = vector<ET2, OT2>;
@@ -134,8 +130,6 @@ template<class ET1, class OT1, class S2>
 inline auto
 operator *(matrix<ET1, OT1> const& m1, S2 const& s2)
 {
-    static_assert(is_matrix_element_v<S2>);
-
     using op_traits  = OT1;
     using op1_type   = matrix<ET1, OT1>;
     using op2_type   = S2;
@@ -148,8 +142,6 @@ template<class S1, class ET2, class OT2>
 inline auto
 operator *(S1 const& s1, matrix<ET2, OT2> const& m2)
 {
-    static_assert(is_matrix_element_v<S1>);
-
     using op_traits  = OT2;
     using op1_type   = S1;
     using op2_type   = matrix<ET2, OT2>;

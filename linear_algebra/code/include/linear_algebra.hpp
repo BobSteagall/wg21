@@ -17,7 +17,7 @@
 #include <tuple>
 #include <type_traits>
 
-//-------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 //- Namespace alternatives for testing and also for detecting/avoiding ADL issues.  Pick a pair
 //  and attempt to build.
 //
@@ -36,7 +36,8 @@
 #include "linear_algebra/number_traits.hpp"
 #include "linear_algebra/engine_traits.hpp"
 #include "linear_algebra/vector_iterators.hpp"
-#include "linear_algebra/row_column_views.hpp"
+#include "linear_algebra/column_views.hpp"
+#include "linear_algebra/row_views.hpp"
 #include "linear_algebra/transpose_views.hpp"
 #include "linear_algebra/dynamic_engines.hpp"
 #include "linear_algebra/fixed_size_engines.hpp"

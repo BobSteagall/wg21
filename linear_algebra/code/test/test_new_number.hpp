@@ -420,15 +420,6 @@ new_num_compile_test()
     f0 / p2;
 }
 
-template<>
-struct STD_LA::number_traits<new_num>
-{
-    using is_field    = true_type;
-    using is_nc_ring  = true_type;
-    using is_ring     = true_type;
-    using is_semiring = true_type;
-};
-
 #ifdef __clang__
     #pragma clang diagnostic pop
 #endif
