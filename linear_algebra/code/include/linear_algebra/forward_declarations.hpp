@@ -71,11 +71,6 @@ template<class OT, class OP1, class OP2>    struct matrix_addition_traits;
 template<class OT, class OP1, class OP2>    struct matrix_subtraction_traits;
 template<class OT, class OP1, class OP2>    struct matrix_multiplication_traits;
 
-//- The default element promotion, engine promotion, and arithmetic operation traits for
-//  the four basic arithmetic operations.
-//
-struct matrix_operation_traits;
-
 //- A traits type that chooses between two operation traits types in the binary arithmetic
 //  operators and free functions that act like binary operators (e.g., outer_product()).
 //  Note that this traits class is a customization point.

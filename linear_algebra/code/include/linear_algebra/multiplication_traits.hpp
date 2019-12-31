@@ -349,7 +349,7 @@ struct matrix_multiplication_engine_traits<OT, dr_vector_engine<T1, A1>, detail:
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, int32_t N1, class T2>
+template<class OT, class T1, size_t N1, class T2>
 struct matrix_multiplication_engine_traits<OT, fs_vector_engine<T1, N1>, detail::element_tag<T2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
@@ -367,7 +367,7 @@ struct matrix_multiplication_engine_traits<OT, detail::element_tag<T1>, dr_vecto
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, class T2, int32_t N2>
+template<class OT, class T1, class T2, size_t N2>
 struct matrix_multiplication_engine_traits<OT, detail::element_tag<T1>, fs_vector_engine<T2, N2>>
 {
     using element_type = matrix_multiplication_element_t<OT, T1, T2>;
@@ -402,7 +402,7 @@ struct matrix_multiplication_engine_traits<OT,
 //----------------------------
 //- fs_matrix_engine * scalar.
 //
-template<class OT, class T1, int32_t R1, int32_t C1, class T2>
+template<class OT, class T1, size_t R1, size_t C1, class T2>
 struct matrix_multiplication_engine_traits<OT,
                                            fs_matrix_engine<T1, R1, C1>,
                                            detail::element_tag<T2>>
@@ -411,7 +411,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = fs_matrix_engine<element_type, R1, C1>;
 };
 
-template<class OT, class T1, int32_t R1, int32_t C1, class T2>
+template<class OT, class T1, size_t R1, size_t C1, class T2>
 struct matrix_multiplication_engine_traits<OT,
                                            matrix_transpose_view<fs_matrix_engine<T1, R1, C1>>,
                                            detail::element_tag<T2>>
@@ -448,7 +448,7 @@ struct matrix_multiplication_engine_traits<OT,
 //----------------------------
 //- scalar * fs_matrix_engine.
 //
-template<class OT, class T1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, class T2, size_t R2, size_t C2>
 struct matrix_multiplication_engine_traits<OT,
                                            detail::element_tag<T1>,
                                            fs_matrix_engine<T2, R2, C2>>
@@ -457,7 +457,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = fs_matrix_engine<element_type, R2, C2>;
 };
 
-template<class OT, class T1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, class T2, size_t R2, size_t C2>
 struct matrix_multiplication_engine_traits<OT,
                                            detail::element_tag<T1>,
                                            matrix_transpose_view<fs_matrix_engine<T2, R2, C2>>>
@@ -495,7 +495,7 @@ struct matrix_multiplication_engine_traits<OT,
 //--------------------------------------
 //- dr_matrix_engine * fs_vector_engine.
 //
-template<class OT, class T1, class A1, class T2, int32_t N2>
+template<class OT, class T1, class A1, class T2, size_t N2>
 struct matrix_multiplication_engine_traits<OT,
                                            dr_matrix_engine<T1, A1>,
                                            fs_vector_engine<T2, N2>>
@@ -505,7 +505,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, class A1, class T2, int32_t N2>
+template<class OT, class T1, class A1, class T2, size_t N2>
 struct matrix_multiplication_engine_traits<OT,
                                            matrix_transpose_view<dr_matrix_engine<T1, A1>>,
                                            fs_vector_engine<T2, N2>>
@@ -518,7 +518,7 @@ struct matrix_multiplication_engine_traits<OT,
 //--------------------------------------
 //- fs_matrix_engine * dr_vector_engine.
 //
-template<class OT, class T1, int32_t R1, int32_t C1, class T2, class A2>
+template<class OT, class T1, size_t R1, size_t C1, class T2, class A2>
 struct matrix_multiplication_engine_traits<OT,
                                            fs_matrix_engine<T1, R1, C1>,
                                            dr_vector_engine<T2, A2>>
@@ -528,7 +528,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, int32_t R1, int32_t C1, class T2, class A2>
+template<class OT, class T1, size_t R1, size_t C1, class T2, class A2>
 struct matrix_multiplication_engine_traits<OT,
                                            matrix_transpose_view<fs_matrix_engine<T1, R1, C1>>,
                                            dr_vector_engine<T2, A2>>
@@ -541,7 +541,7 @@ struct matrix_multiplication_engine_traits<OT,
 //--------------------------------------
 //- fs_matrix_engine * fs_vector_engine.
 //
-template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t N2>
+template<class OT, class T1, size_t R1, size_t C1, class T2, size_t N2>
 struct matrix_multiplication_engine_traits<OT,
                                            fs_matrix_engine<T1, R1, C1>,
                                            fs_vector_engine<T2, N2>>
@@ -551,7 +551,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = fs_vector_engine<element_type, N2>;
 };
 
-template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t N2>
+template<class OT, class T1, size_t R1, size_t C1, class T2, size_t N2>
 struct matrix_multiplication_engine_traits<OT,
                                            matrix_transpose_view<fs_matrix_engine<T1, R1, C1>>,
                                            fs_vector_engine<T2, N2>>
@@ -591,7 +591,7 @@ struct matrix_multiplication_engine_traits<OT,
 //--------------------------------------
 //- dr_vector_engine * fs_matrix_engine.
 //
-template<class OT, class T1, class A1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, class A1, class T2, size_t R2, size_t C2>
 struct matrix_multiplication_engine_traits<OT,
                                            dr_vector_engine<T1, A1>,
                                            fs_matrix_engine<T2, R2, C2>>
@@ -601,7 +601,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, class A1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, class A1, class T2, size_t R2, size_t C2>
 struct matrix_multiplication_engine_traits<OT,
                                            dr_vector_engine<T1, A1>,
                                            matrix_transpose_view<fs_matrix_engine<T2, R2, C2>>>
@@ -614,7 +614,7 @@ struct matrix_multiplication_engine_traits<OT,
 //--------------------------------------
 //- fs_vector_engine * dr_matrix_engine.
 //
-template<class OT, class T1, int32_t N1, class T2, class A2>
+template<class OT, class T1, size_t N1, class T2, class A2>
 struct matrix_multiplication_engine_traits<OT,
                                            fs_vector_engine<T1, N1>,
                                            dr_matrix_engine<T2, A2>>
@@ -624,7 +624,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, int32_t N1, class T2, class A2>
+template<class OT, class T1, size_t N1, class T2, class A2>
 struct matrix_multiplication_engine_traits<OT,
                                            fs_vector_engine<T1, N1>,
                                            matrix_transpose_view<dr_matrix_engine<T2, A2>>>
@@ -637,7 +637,7 @@ struct matrix_multiplication_engine_traits<OT,
 //--------------------------------------
 //- fs_vector_engine * fs_matrix_engine.
 //
-template<class OT, class T1, int32_t N1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, size_t N1, class T2, size_t R2, size_t C2>
 struct matrix_multiplication_engine_traits<OT,
                                            fs_vector_engine<T1, N1>,
                                            fs_matrix_engine<T2, R2, C2>>
@@ -647,7 +647,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = fs_vector_engine<element_type, N1>;
 };
 
-template<class OT, class T1, int32_t N1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, size_t N1, class T2, size_t R2, size_t C2>
 struct matrix_multiplication_engine_traits<OT,
                                            fs_vector_engine<T1, N1>,
                                            matrix_transpose_view<fs_matrix_engine<T2, R2, C2>>>
@@ -707,7 +707,7 @@ struct matrix_multiplication_engine_traits<OT,
 //--------------------------------------
 //- dr_matrix_engine * fs_matrix_engine.
 //
-template<class OT, class T1, class A1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, class A1, class T2, size_t R2, size_t C2>
 struct matrix_multiplication_engine_traits<OT,
                                            dr_matrix_engine<T1, A1>,
                                            fs_matrix_engine<T2, R2, C2>>
@@ -717,7 +717,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, class A1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, class A1, class T2, size_t R2, size_t C2>
 struct matrix_multiplication_engine_traits<OT,
                                            dr_matrix_engine<T1, A1>,
                                            matrix_transpose_view<fs_matrix_engine<T2, R2, C2>>>
@@ -727,7 +727,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, class A1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, class A1, class T2, size_t R2, size_t C2>
 struct matrix_multiplication_engine_traits<OT,
                                            matrix_transpose_view<dr_matrix_engine<T1, A1>>,
                                            fs_matrix_engine<T2, R2, C2>>
@@ -737,7 +737,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, class A1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, class A1, class T2, size_t R2, size_t C2>
 struct matrix_multiplication_engine_traits<OT,
                                            matrix_transpose_view<dr_matrix_engine<T1, A1>>,
                                            matrix_transpose_view<fs_matrix_engine<T2, R2, C2>>>
@@ -750,7 +750,7 @@ struct matrix_multiplication_engine_traits<OT,
 //--------------------------------------
 //- fs_matrix_engine * dr_matrix_engine.
 //
-template<class OT, class T1, int32_t R1, int32_t C1, class T2, class A2>
+template<class OT, class T1, size_t R1, size_t C1, class T2, class A2>
 struct matrix_multiplication_engine_traits<OT,
                                            fs_matrix_engine<T1, R1, C1>,
                                            dr_matrix_engine<T2, A2>>
@@ -760,7 +760,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, int32_t R1, int32_t C1, class T2, class A2>
+template<class OT, class T1, size_t R1, size_t C1, class T2, class A2>
 struct matrix_multiplication_engine_traits<OT,
                                            fs_matrix_engine<T1, R1, C1>,
                                            matrix_transpose_view<dr_matrix_engine<T2, A2>>>
@@ -770,7 +770,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, int32_t R1, int32_t C1, class T2, class A2>
+template<class OT, class T1, size_t R1, size_t C1, class T2, class A2>
 struct matrix_multiplication_engine_traits<OT,
                                            matrix_transpose_view<fs_matrix_engine<T1, R1, C1>>,
                                            dr_matrix_engine<T2, A2>>
@@ -780,7 +780,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, int32_t R1, int32_t C1, class T2, class A2>
+template<class OT, class T1, size_t R1, size_t C1, class T2, class A2>
 struct matrix_multiplication_engine_traits<OT,
                                            matrix_transpose_view<fs_matrix_engine<T1, R1, C1>>,
                                            matrix_transpose_view<dr_matrix_engine<T2, A2>>>
@@ -793,7 +793,7 @@ struct matrix_multiplication_engine_traits<OT,
 //--------------------------------------
 //- fs_matrix_engine * fs_matrix_engine.
 //
-template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
 struct matrix_multiplication_engine_traits<OT,
                                            fs_matrix_engine<T1, R1, C1>,
                                            fs_matrix_engine<T2, R2, C2>>
@@ -803,7 +803,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = fs_matrix_engine<element_type, R1, C2>;
 };
 
-template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
 struct matrix_multiplication_engine_traits<OT,
                                            fs_matrix_engine<T1, R1, C1>,
                                            matrix_transpose_view<fs_matrix_engine<T2, R2, C2>>>
@@ -813,7 +813,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = fs_matrix_engine<element_type, R1, R2>;
 };
 
-template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
 struct matrix_multiplication_engine_traits<OT,
                                            matrix_transpose_view<fs_matrix_engine<T1, R1, C1>>,
                                            fs_matrix_engine<T2, R2, C2>>
@@ -823,7 +823,7 @@ struct matrix_multiplication_engine_traits<OT,
     using engine_type  = fs_matrix_engine<element_type, C1, C2>;
 };
 
-template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
 struct matrix_multiplication_engine_traits<OT,
                                            matrix_transpose_view<fs_matrix_engine<T1, R1, C1>>,
                                            matrix_transpose_view<fs_matrix_engine<T2, R2, C2>>>

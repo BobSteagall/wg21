@@ -27,7 +27,6 @@ public:
     using const_pointer   = typename engine_type::const_pointer;
     using iterator        = typename engine_type::iterator;
     using const_iterator  = typename engine_type::const_iterator;
-    using size_type      = typename engine_type::size_type;
     using size_type       = typename engine_type::size_type;
 
     using transpose_type  = vector const&;
@@ -71,7 +70,7 @@ public:
     //- Accessors.
     //
     constexpr size_type     capacity() const noexcept;
-    constexpr size_type    elements() const noexcept;
+    constexpr size_type     elements() const noexcept;
     constexpr size_type     size() const noexcept;
 
     //- Transpose and Hermitian.

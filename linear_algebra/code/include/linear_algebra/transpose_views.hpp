@@ -62,7 +62,8 @@ class matrix_transpose_view
     constexpr size_type     row_capacity() const noexcept;
     constexpr size_tuple    capacity() const noexcept;
 
-    constexpr void  assign(matrix_transpose_view const& rhs);
+    constexpr void      assign(matrix_transpose_view const& rhs);
+    constexpr void      swap(matrix_transpose_view& rhs);
 
   private:
     engine_type const*  mp_other;
@@ -133,6 +134,13 @@ constexpr void
 matrix_transpose_view<ET>::assign(matrix_transpose_view const& rhs)
 {
     mp_other == rhs.mp_other;
+}
+
+template<class ET> inline 
+constexpr void
+matrix_transpose_view<ET>::swap(matrix_transpose_view& rhs)
+{
+    std::swap(mp_other, rhs.mp_other);
 }
 
 }       //- STD_LA namespace

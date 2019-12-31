@@ -451,8 +451,7 @@ class dr_matrix_engine
     using const_reference = T const&;
     using const_pointer   = typename allocator_traits<AT>::const_pointer;
     using difference_type = ptrdiff_t;
-    using size_type      = ptrdiff_t;
-    using size_type       = ptrdiff_t;
+    using size_type       = size_t;
     using size_tuple      = tuple<size_type, size_type>;
 
     using is_fixed_size   = false_type;

@@ -25,7 +25,6 @@ class matrix
     using element_type    = typename engine_type::element_type;
     using reference       = typename engine_type::reference;
     using const_reference = typename engine_type::const_reference;
-    using size_type      = typename engine_type::size_type;
     using size_type       = typename engine_type::size_type;
     using size_tuple      = typename engine_type::size_tuple;
 

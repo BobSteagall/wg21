@@ -361,7 +361,7 @@ void t01()
 
     static_assert(is_matrix_element_v<double>);
     static_assert(is_matrix_element_v<std::complex<double>>);
-    static_assert(is_matrix_element_v<std::complex<int32_t>>);
+    static_assert(is_matrix_element_v<std::complex<size_t>>);
 
     static_assert(!is_matrix_element_v<std::string>);
     static_assert(!is_matrix_element_v<std::complex<std::string>>);
@@ -390,7 +390,7 @@ void t02()
     matrix_transpose_view<dr_matrix_engine<cx_double>>        te3(de23);
 
 #ifndef ENFORCE_COMPLEX_OPERAND_HOMOGENEITY
-    matrix_element_promotion_t<int32_t, cx_double>     v1 = 0;
+    matrix_element_promotion_t<size_t, cx_double>     v1 = 0;
     matrix_element_promotion_t<cx_float, double>       v2 = 0;
     matrix_element_promotion_t<double, cx_float>       v3 = 0;
     matrix_element_promotion_t<cx_float, cx_double>    v4 = 0;

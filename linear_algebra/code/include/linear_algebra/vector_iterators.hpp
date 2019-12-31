@@ -73,8 +73,8 @@ class vector_iterator
 
   private:
     engine_type*    mp_engine;
-    size_type      m_curr;
-    size_type      m_upper;
+    size_type       m_curr;
+    size_type       m_upper;
 
   private:
     constexpr vector_iterator(engine_type& eng);
@@ -316,8 +316,8 @@ class vector_const_iterator
 
   private:
     engine_type const*  mp_engine;
-    size_type          m_curr;
-    size_type          m_upper;
+    size_type           m_curr;
+    size_type           m_upper;
 
   private:
     constexpr vector_const_iterator(engine_type const& eng);

@@ -23,10 +23,10 @@ using dyn_matrix = matrix<dr_matrix_engine<T, A>>;
 
 //- Aliases for column_vector/row_vector/matrix objects based on fixed-size engines.
 //
-template<class T, int32_t N>
+template<class T, size_t N>
 using fs_vector = vector<fs_vector_engine<T, N>>;
 
-template<class T, int32_t R, int32_t C>
+template<class T, size_t R, size_t C>
 using fs_matrix = matrix<fs_matrix_engine<T, R, C>>;
 
 }       //- STD_LA namespace

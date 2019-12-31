@@ -340,7 +340,7 @@ struct matrix_negation_engine_traits<OT, dr_vector_engine<T1, A1>>
 //-------------------
 //- fs_vector_engine.
 //
-template<class OT, class T1, int32_t N1>
+template<class OT, class T1, size_t N1>
 struct matrix_negation_engine_traits<OT, fs_vector_engine<T1, N1>>
 {
     using element_type = matrix_negation_element_t<OT, T1>;
@@ -353,14 +353,14 @@ struct matrix_negation_engine_traits<OT, fs_vector_engine<T1, N1>>
 //
 //- dr_matrix_engine.
 //
-template<class OT, class T1, int32_t R1, int32_t C1>
+template<class OT, class T1, size_t R1, size_t C1>
 struct matrix_negation_engine_traits<OT, fs_matrix_engine<T1, R1, C1>>
 {
     using element_type = matrix_negation_element_t<OT, T1>;
     using engine_type  = fs_matrix_engine<T1, R1, C1>;
 };
 
-template<class OT, class T1, int32_t R1, int32_t C1>
+template<class OT, class T1, size_t R1, size_t C1>
 struct matrix_negation_engine_traits<OT, matrix_transpose_view<fs_matrix_engine<T1, R1, C1>>>
 {
     using element_type = matrix_negation_element_t<OT, T1>;

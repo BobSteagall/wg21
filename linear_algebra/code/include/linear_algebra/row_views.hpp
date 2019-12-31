@@ -27,8 +27,8 @@ class matrix_row_view
     using pointer         = typename engine_type::const_pointer;
     using const_reference = typename engine_type::const_reference;
     using const_pointer   = typename engine_type::const_pointer;
-    using iterator        = detail::vector_const_iterator<matrix_row_view>;
     using const_iterator  = detail::vector_const_iterator<matrix_row_view>;
+    using iterator        = const_iterator;
     using difference_type = typename engine_type::difference_type;
     using size_type       = typename engine_type::size_type;
 
@@ -56,10 +56,11 @@ class matrix_row_view
     constexpr size_type         elements() const noexcept;
 
     constexpr void      assign(matrix_row_view const& rhs);
+    constexpr void      swap(matrix_row_view& rhs);
 
   private:
     engine_type const*  mp_other;
-    size_type          m_row;
+    size_type           m_row;
 };
 
 template<class ET> inline 
@@ -117,6 +118,14 @@ matrix_row_view<ET>::assign(matrix_row_view const& rhs)
 {
     mp_other = rhs.mp_other;
     m_row    = rhs.m_row;
+}
+
+template<class ET> inline 
+constexpr void
+matrix_row_view<ET>::swap(matrix_row_view& rhs)
+{
+    std::swap(mp_other, rhs.mp_other);
+    std::swap(m_row, rhs.m_row);
 }
 
 }       //- STD_LA namespace
