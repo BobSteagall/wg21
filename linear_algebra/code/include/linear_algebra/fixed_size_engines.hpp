@@ -55,7 +55,7 @@ class fs_vector_engine
     constexpr const_iterator    end() const noexcept;
 
     static constexpr size_type  capacity() noexcept;
-    static constexpr size_type elements() noexcept;
+    static constexpr size_type  elements() noexcept;
     static constexpr size_type  size() noexcept;
 
     constexpr reference     operator ()(size_type i);
