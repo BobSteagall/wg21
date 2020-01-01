@@ -3,8 +3,10 @@ cmake-*
 tmp
 x64*
 x86*
+wg21*
 */x64*
 */x86*
+*/wg21*
 .idea
 .vs
 *.bak
