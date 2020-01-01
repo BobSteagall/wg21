@@ -106,7 +106,6 @@ la_swap(T& t0, T& t1) noexcept(is_nothrow_movable_v<T>)
     t1 = std::move(t2);
 }
 
-
 }       //- detail namespace
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_ENGINE_TRAITS_HPP_DEFINED
