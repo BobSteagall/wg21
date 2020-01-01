@@ -67,9 +67,15 @@
     <ClCompile Include="test\test_op_mul.cpp" />
     <ClCompile Include="test\test_op_neg.cpp" />
     <ClCompile Include="test\test_op_sub.cpp" />
-    <ClCompile Include="test_geometry_2.cpp" />
-    <ClCompile Include="test_geometry_3.cpp" />
-    <ClCompile Include="test_geometry_4.cpp" />
+    <ClCompile Include="test_geometry_2.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="test_geometry_3.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="test_geometry_4.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

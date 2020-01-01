@@ -31,17 +31,17 @@ class matrix_transpose_view
     using size_type       = typename engine_type::size_type;
     using size_tuple      = typename engine_type::size_tuple;
 
-    using is_fixed_size   = typename engine_type::is_fixed_size;
-    using is_resizable    = false_type;
-
-    using is_column_major = typename engine_type::is_row_major;
-    using is_dense        = typename engine_type::is_dense;
-    using is_rectangular  = typename engine_type::is_rectangular;
-    using is_row_major    = typename engine_type::is_column_major;
-
     using column_view_type    = matrix_column_view<matrix_transpose_view>;
     using row_view_type       = matrix_row_view<matrix_transpose_view>;
     using transpose_view_type = matrix_transpose_view<matrix_transpose_view>;
+
+    static constexpr bool   is_fixed_size   = engine_type::is_fixed_size;
+    static constexpr bool   is_resizable    = false;
+
+    static constexpr bool   is_column_major = engine_type::is_row_major;
+    static constexpr bool   is_dense        = engine_type::is_dense;
+    static constexpr bool   is_rectangular  = engine_type::is_rectangular;
+    static constexpr bool   is_row_major    = engine_type::is_column_major;
 
   public:
     constexpr matrix_transpose_view();

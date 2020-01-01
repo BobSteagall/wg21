@@ -32,13 +32,13 @@ public:
     using transpose_type  = vector const&;
     using hermitian_type  = conditional_t<is_complex_v<element_type>, vector, transpose_type>;
 
-    using is_fixed_size   = typename engine_type::is_fixed_size;
-    using is_resizable    = typename engine_type::is_resizable;
+    static constexpr bool   is_fixed_size   =  engine_type::is_fixed_size;
+    static constexpr bool   is_resizable    =  engine_type::is_resizable;
 
-    using is_column_major = typename engine_type::is_column_major;
-    using is_dense        = typename engine_type::is_dense;
-    using is_rectangular  = typename engine_type::is_rectangular;
-    using is_row_major    = typename engine_type::is_row_major;
+    static constexpr bool   is_column_major =  engine_type::is_column_major;
+    static constexpr bool   is_dense        =  engine_type::is_dense;
+    static constexpr bool   is_rectangular  =  engine_type::is_rectangular;
+    static constexpr bool   is_row_major    =  engine_type::is_row_major;
 
   public:
     ~vector() = default;

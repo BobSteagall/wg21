@@ -87,7 +87,7 @@ public:
 	using const_reference = float const&;
 	using const_pointer   = float const*;
 	using difference_type = ptrdiff_t;
-	using size_type      = int_fast32_t;
+	using size_type       = int_fast32_t;
 	using size_type       = int_fast32_t;
 	using size_tuple      = std::tuple<size_type, size_type>;
 

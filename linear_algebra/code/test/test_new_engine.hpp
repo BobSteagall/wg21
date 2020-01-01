@@ -25,13 +25,13 @@ class fs_matrix_engine_tst
     using size_type       = std::int_fast32_t;
     using size_tuple      = std::tuple<size_type, size_type>;
 
-    using is_fixed_size   = std::true_type;
-    using is_resizable    = std::false_type;
+    static constexpr bool   is_fixed_size   = true;
+    static constexpr bool   is_resizable    = false;
 
-    using is_column_major = std::false_type;
-    using is_dense        = std::true_type;
-    using is_rectangular  = std::true_type;
-    using is_row_major    = std::true_type;
+    static constexpr bool   is_column_major = false;
+    static constexpr bool   is_dense        = true;
+    static constexpr bool   is_rectangular  = true;
+    static constexpr bool   is_row_major    = true;
 
     using column_view_type    = STD_LA::matrix_column_view<fs_matrix_engine_tst>;
     using row_view_type       = STD_LA::matrix_row_view<fs_matrix_engine_tst>;

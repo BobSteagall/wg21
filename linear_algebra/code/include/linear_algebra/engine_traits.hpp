@@ -29,16 +29,16 @@ template<class ET>
 constexpr bool  is_scalar_engine_v = (ET::engine_category::value == scalar_engine_tag::value);
 
 template<class ET>
-constexpr bool  is_vector_engine_v =  (ET::engine_category::value >= const_vector_engine_tag::value)
-                                   && (ET::engine_category::value <  const_matrix_engine_tag::value);
+constexpr bool  is_vector_engine_v = (ET::engine_category::value >= const_vector_engine_tag::value) &&
+                                     (ET::engine_category::value <  const_matrix_engine_tag::value);
 
 template<typename ET>
 constexpr bool  is_matrix_engine_v = (ET::engine_category::value >= const_matrix_engine_tag::value);
 
 
 template<class ET1, class ET2>
-constexpr bool  engines_match_v =  (is_vector_engine_v<ET1> && is_vector_engine_v<ET2>)
-                                || (is_matrix_engine_v<ET1> && is_matrix_engine_v<ET2>);
+constexpr bool  engines_match_v = (is_vector_engine_v<ET1> && is_vector_engine_v<ET2>) ||
+                                  (is_matrix_engine_v<ET1> && is_matrix_engine_v<ET2>);
 
 
 //--------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ template<class ET>
 constexpr bool  has_resizable_tag_v = ET::engine_category::value >= resizable_matrix_engine_tag::value;
 
 template<class ET>
-constexpr bool  is_resizable_engine_v = ET::is_resizable::value;
+constexpr bool  is_resizable_engine_v = ET::is_resizable;
 
 //------
 //
@@ -74,7 +74,7 @@ using enable_if_resizable = enable_if_t<is_same_v<ET1, ET2> && is_resizable_engi
 //- Tests/facilites for fixed-size engines.
 //
 template<class ET>
-constexpr bool  is_fixed_size_engine_v = ET::is_fixed_size::value;
+constexpr bool  is_fixed_size_engine_v = ET::is_fixed_size;
 
 template<class ET>
 constexpr auto  engine_size_v = ET().size();
@@ -90,12 +90,12 @@ using enable_if_fixed_size = enable_if_t<is_same_v<ET1, ET2> && is_fixed_size_en
 //- Temporary replacement for std::swap (which is constexpr in C++20)
 //
 template<class T>
-static constexpr bool   is_movable_v =  std::is_move_constructible_v<T> 
-                                     && std::is_move_assignable_v<T>;
+static constexpr bool   is_movable_v = std::is_move_constructible_v<T> && 
+                                       std::is_move_assignable_v<T>;
 
 template<class T>
-static constexpr bool   is_nothrow_movable_v =  std::is_nothrow_move_constructible_v<T> 
-                                             && std::is_nothrow_move_assignable_v<T>;
+static constexpr bool   is_nothrow_movable_v =  std::is_nothrow_move_constructible_v<T> &&
+                                                std::is_nothrow_move_assignable_v<T>;
 
 template<class T> inline 
 constexpr std::enable_if_t<is_movable_v<T>, void>

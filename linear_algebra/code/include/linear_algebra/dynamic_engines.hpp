@@ -91,13 +91,13 @@ class dr_vector_engine
     using difference_type = ptrdiff_t;
     using size_type       = size_t;
 
-    using is_fixed_size   = false_type;
-    using is_resizable    = true_type;
+    static constexpr bool   is_fixed_size   = false;
+    static constexpr bool   is_resizable    = true;
 
-    using is_column_major = true_type;
-    using is_dense        = true_type;
-    using is_rectangular  = true_type;
-    using is_row_major    = true_type;
+    static constexpr bool   is_column_major = true;
+    static constexpr bool   is_dense        = true;
+    static constexpr bool   is_rectangular  = true;
+    static constexpr bool   is_row_major    = true;
 
   public:
     ~dr_vector_engine() noexcept;
@@ -454,13 +454,13 @@ class dr_matrix_engine
     using size_type       = size_t;
     using size_tuple      = tuple<size_type, size_type>;
 
-    using is_fixed_size   = false_type;
-    using is_resizable    = true_type;
+    static constexpr bool   is_fixed_size   = false;
+    static constexpr bool   is_resizable    = true;
 
-    using is_column_major = false_type;
-    using is_dense        = true_type;
-    using is_rectangular  = true_type;
-    using is_row_major    = true_type;
+    static constexpr bool   is_column_major = false;
+    static constexpr bool   is_dense        = true;
+    static constexpr bool   is_rectangular  = true;
+    static constexpr bool   is_row_major    = true;
 
     using column_view_type    = matrix_column_view<dr_matrix_engine>;
     using row_view_type       = matrix_row_view<dr_matrix_engine>;

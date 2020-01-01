@@ -32,13 +32,13 @@ class matrix_column_view
     using difference_type = typename engine_type::difference_type;
     using size_type       = typename engine_type::size_type;
 
-    using is_fixed_size   = typename engine_type::is_fixed_size;
-    using is_resizable    = false_type;
+    static constexpr bool   is_fixed_size   = engine_type::is_fixed_size;
+    static constexpr bool   is_resizable    = false;
 
-    using is_column_major = typename engine_type::is_row_major;
-    using is_dense        = typename engine_type::is_dense;
-    using is_rectangular  = typename engine_type::is_rectangular;
-    using is_row_major    = typename engine_type::is_column_major;
+    static constexpr bool   is_column_major = engine_type::is_column_major;
+    static constexpr bool   is_dense        = engine_type::is_dense;
+    static constexpr bool   is_rectangular  = engine_type::is_rectangular;
+    static constexpr bool   is_row_major    = engine_type::is_row_major;
 
   public:
     constexpr matrix_column_view();
@@ -63,65 +63,63 @@ class matrix_column_view
     size_type           m_column;
 };
 
-template<class ET> inline 
-constexpr
+template<class ET> constexpr 
 matrix_column_view<ET>::matrix_column_view()
 :   mp_other(nullptr)
 ,   m_column(0)
 {}
 
-template<class ET> inline 
-constexpr
+template<class ET> constexpr 
 matrix_column_view<ET>::matrix_column_view(engine_type const& eng, size_type col)
 :   mp_other(&eng)
 ,   m_column(col)
 {}
 
-template<class ET> inline 
-constexpr typename matrix_column_view<ET>::const_reference
+template<class ET> constexpr 
+typename matrix_column_view<ET>::const_reference
 matrix_column_view<ET>::operator ()(size_type i) const
 {
     return (*mp_other)(i, m_column);
 }
 
-template<class ET> inline 
-constexpr typename matrix_column_view<ET>::size_type
+template<class ET> constexpr 
+typename matrix_column_view<ET>::size_type
 matrix_column_view<ET>::capacity() const noexcept
 {
     return mp_other->rows();
 }
 
-template<class ET> inline 
-constexpr typename matrix_column_view<ET>::size_type
+template<class ET> constexpr 
+typename matrix_column_view<ET>::size_type
 matrix_column_view<ET>::elements() const noexcept
 {
     return mp_other->rows();
 }
 
-template<class ET> inline 
-constexpr typename matrix_column_view<ET>::const_iterator
+template<class ET> constexpr 
+typename matrix_column_view<ET>::const_iterator
 matrix_column_view<ET>::begin() const noexcept
 {
     return const_iterator(this, 0, mp_other->rows());
 }
 
-template<class ET> inline 
-constexpr typename matrix_column_view<ET>::const_iterator
+template<class ET> constexpr 
+typename matrix_column_view<ET>::const_iterator
 matrix_column_view<ET>::end() const noexcept
 {
     return const_iterator(this, mp_other->rows(), mp_other->rows());
 }
 
-template<class ET> inline 
-constexpr void
+template<class ET> constexpr 
+void
 matrix_column_view<ET>::assign(matrix_column_view const& rhs)
 {
     mp_other = rhs.mp_other;
     m_column = rhs.m_column;
 }
 
-template<class ET> inline 
-constexpr void
+template<class ET> constexpr 
+void
 matrix_column_view<ET>::swap(matrix_column_view& rhs)
 {
     std::swap(mp_other, rhs.mp_other);

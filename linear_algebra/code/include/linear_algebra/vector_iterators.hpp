@@ -69,6 +69,7 @@ class vector_iterator
   private:
     friend ET;
     template<class ET2>             friend class vector_const_iterator;
+    template<class ET2>             friend class vector_iterator;
     template<class ET2, class OT2>  friend class vector;
 
   private:
@@ -312,6 +313,8 @@ class vector_const_iterator
 
   private:
     friend ET;
+    template<class ET2>             friend class vector_const_iterator;
+    template<class ET2>             friend class vector_iterator;
     template<class ET2, class OT2>  friend class vector;
 
   private:

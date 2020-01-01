@@ -48,44 +48,44 @@ template<class ET, class OT> inline
 constexpr bool
 result_requires_resize(vector<ET, OT> const&)
 {
-	return vector<ET, OT>::engine_type::is_resizable::value == true &&
-           vector<ET, OT>::engine_type::is_fixed_size::value == false;
+	return vector<ET, OT>::engine_type::is_resizable == true &&
+           vector<ET, OT>::engine_type::is_fixed_size == false;
 }
 
 template<class ET, class OT> inline
 constexpr bool
 result_requires_resize(matrix<ET, OT> const&)
 {
-	return matrix<ET, OT>::engine_type::is_resizable::value == true &&
-           matrix<ET, OT>::engine_type::is_fixed_size::value == false;
+	return matrix<ET, OT>::engine_type::is_resizable == true &&
+           matrix<ET, OT>::engine_type::is_fixed_size == false;
 }
 
 template<class ET, class OT> inline
 constexpr bool
 is_fixed_size(vector<ET,OT> const&)
 {
-    return vector<ET,OT>::engine_type::is_fixed_size::value;
+    return vector<ET,OT>::engine_type::is_fixed_size;
 }
 
 template<class ET, class OT> inline
 constexpr bool
 is_fixed_size(matrix<ET,OT> const&)
 {
-    return matrix<ET,OT>::engine_type::is_fixed_size::value;
+    return matrix<ET,OT>::engine_type::is_fixed_size;
 }
 
 template<class ET, class OT> inline
 constexpr bool
 is_resizable(vector<ET,OT> const&)
 {
-    return vector<ET,OT>::engine_type::is_resizable::value;
+    return vector<ET,OT>::engine_type::is_resizable;
 }
 
 template<class ET, class OT> inline
 constexpr bool
 is_resizable(matrix<ET,OT> const&)
 {
-    return matrix<ET,OT>::engine_type::is_resizable::value;
+    return matrix<ET,OT>::engine_type::is_resizable;
 }
 
 }       //- STD_LA namespace
