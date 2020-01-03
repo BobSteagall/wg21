@@ -41,7 +41,7 @@ matrix_subtraction_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::subtract
 {
     PrintOperandTypes<result_type>("subtraction_traits", m1, m2);
 
-	result_type		mr{};                           //- Braces here to avoid C4701 from MSVC
+	result_type		mr{};                       //- Braces here to avoid C4701 from MSVC
 	auto const      rows = m1.rows();
 	auto const      columns = m1.columns();
 
@@ -50,28 +50,14 @@ matrix_subtraction_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::subtract
 		mr.resize(rows, columns);
     }
 
-	for (auto i = 0;  i < rows;  ++i)
+	for (typename result_type::size_type i = 0;  i < rows;  ++i)
     {
-		for (auto j = 0;  j < columns;  ++j)
+		for (typename result_type::size_type j = 0;  j < columns;  ++j)
         {
 			mr(i, j) = m1(i, j) - m2(i, j);
         }
     }
-/*
-	if constexpr (result_requires_resize(mr))
-	{
-		mr.resize(rows, columns);
-		auto data = mr.data();
-		for (auto i = 0; i < columns; ++i)
-			for (auto j = 0; j < rows; ++j)
-				*data++ = m1(i, j) - m2(i, j);		// Safe because the resize means that mr capacity = size for rows and columns.
-	}
-	else
-	{
-//		transform(m1.begin(), m1.data() + (rows * columns), m2.data(), mr.data(),
-//			[](auto lhs, auto rhs) {return lhs - rhs; });
-	}
-*/
+
 	return mr;
 }
 

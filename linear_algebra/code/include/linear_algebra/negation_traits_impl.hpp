@@ -48,28 +48,14 @@ matrix_negation_traits<OT, matrix<ET1, OT1>>::negate(matrix<ET1, OT1> const& m1)
 		mr.resize(rows, columns);
 	}
 
-	for (auto i = 0;  i < rows;  ++i)
+	for (typename result_type::size_type i = 0;  i < rows;  ++i)
     {
 		for (auto j = 0;  j <  columns;  ++j)
         {
 			mr(i, j) = -m1(i, j);
         }
     }
-/*
-	if constexpr (result_requires_resize(mr))
-	{
-		mr.resize(rows, columns);
-		auto data = mr.data();
-		for (auto i = 0; i < columns; ++i)
-			for (auto j = 0; j < rows; ++j)
-				*data++ = -m1(i, j);		// Safe because the resize means that mr capacity = size for rows and columns.
-	}
-	else
-	{
-		transform(m1.data(), m1.data() + (rows * columns), mr.data(),
-			[](auto val) {return -val; });
-	}
-*/
+
 	return mr;
 }
 

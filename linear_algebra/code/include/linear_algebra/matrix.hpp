@@ -61,10 +61,10 @@ class matrix
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr matrix(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 
-    constexpr matrix&       operator =(matrix&&) noexcept = default;
-    constexpr matrix&       operator =(matrix const&) = default;
+    constexpr matrix&   operator =(matrix&&) noexcept = default;
+    constexpr matrix&   operator =(matrix const&) = default;
     template<class ET2, class OT2>
-    constexpr matrix&       operator =(matrix<ET2, OT2> const& rhs);
+    constexpr matrix&   operator =(matrix<ET2, OT2> const& rhs);
 
     //- Const element access.
     //
@@ -72,8 +72,8 @@ class matrix
 
     //- Accessors.
     //
-    constexpr size_type    columns() const noexcept;
-    constexpr size_type    rows() const noexcept;
+    constexpr size_type     columns() const noexcept;
+    constexpr size_type     rows() const noexcept;
     constexpr size_tuple    size() const noexcept;
 
     constexpr size_type     column_capacity() const noexcept;
@@ -89,7 +89,7 @@ class matrix
 
     //- Mutable element access.
     //
-    constexpr reference     operator ()(size_type i, size_type j);
+    constexpr reference operator ()(size_type i, size_type j);
 
     //- Assignment.
     //

@@ -35,6 +35,7 @@
 #include "linear_algebra/forward_declarations.hpp"
 #include "linear_algebra/number_traits.hpp"
 #include "linear_algebra/engine_traits.hpp"
+#include "linear_algebra/arithmetic_traits.hpp"
 #include "linear_algebra/vector_iterators.hpp"
 #include "linear_algebra/column_views.hpp"
 #include "linear_algebra/row_views.hpp"

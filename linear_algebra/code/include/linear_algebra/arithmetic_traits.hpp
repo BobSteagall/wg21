@@ -44,45 +44,45 @@ using rebind_alloc_t = typename allocator_traits<A1>::template rebind_alloc<T1>;
 
 }       //- detail namespace
 
-template<class ET, class OT> inline
-constexpr bool
+template<class ET, class OT> constexpr 
+bool
 result_requires_resize(vector<ET, OT> const&)
 {
 	return vector<ET, OT>::engine_type::is_resizable == true &&
            vector<ET, OT>::engine_type::is_fixed_size == false;
 }
 
-template<class ET, class OT> inline
-constexpr bool
+template<class ET, class OT> constexpr 
+bool
 result_requires_resize(matrix<ET, OT> const&)
 {
 	return matrix<ET, OT>::engine_type::is_resizable == true &&
            matrix<ET, OT>::engine_type::is_fixed_size == false;
 }
 
-template<class ET, class OT> inline
-constexpr bool
+template<class ET, class OT> constexpr 
+bool
 is_fixed_size(vector<ET,OT> const&)
 {
     return vector<ET,OT>::engine_type::is_fixed_size;
 }
 
-template<class ET, class OT> inline
-constexpr bool
+template<class ET, class OT> constexpr 
+bool
 is_fixed_size(matrix<ET,OT> const&)
 {
     return matrix<ET,OT>::engine_type::is_fixed_size;
 }
 
-template<class ET, class OT> inline
-constexpr bool
+template<class ET, class OT> constexpr 
+bool
 is_resizable(vector<ET,OT> const&)
 {
     return vector<ET,OT>::engine_type::is_resizable;
 }
 
-template<class ET, class OT> inline
-constexpr bool
+template<class ET, class OT> constexpr 
+bool
 is_resizable(matrix<ET,OT> const&)
 {
     return matrix<ET,OT>::engine_type::is_resizable;

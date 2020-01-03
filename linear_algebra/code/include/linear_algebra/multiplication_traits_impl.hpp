@@ -66,9 +66,9 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>::multiply
 		mr.resize(rows, columns);
     }
 
-	for (auto i = 0;  i < rows;  ++i)
+	for (typename result_type::size_type i = 0;  i < rows;  ++i)
     {
-		for (auto j = 0;  j < columns;  ++j)
+		for (typename result_type::size_type j = 0;  j < columns;  ++j)
         {
 			mr(i, j) = m1(i, j) * s2;
         }
@@ -121,10 +121,11 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, vector<ET2, OT2>>::multiply
 		vr.resize(rows);
 	}
 
-	for (auto i = 0; i < rows; ++i)
+	for (typename result_type::size_type i = 0;  i < rows;  ++i)
 	{
 		typename result_type::element_type e(0);
-		for (auto j = 0; j < columns; ++j)
+
+		for (auto j = 0;  j < columns;  ++j)
 		{
 			e += m1(i, j) * v2(j);
 		}
@@ -155,10 +156,11 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, matrix<ET2, OT2>>::multiply
 		vr.resize(columns);
 	}
 
-	for (auto i = 0; i < columns; ++i)
+	for (typename result_type::size_type i = 0;  i < columns;  ++i)
 	{
 		typename result_type::element_type e(0);
-		for (auto j = 0; j < rows; ++j)
+
+		for (typename result_type::size_type j = 0;  j < rows;  ++j)
 		{
 			e += m2(i, j) * v1(j);
 		}
@@ -187,12 +189,13 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::multiply
 		mr.resize(result_rows, result_columns);
 	}
 
-	for (auto i = 0; i < result_rows; ++i)
+	for (typename result_type::size_type i = 0;  i < result_rows;  ++i)
 	{
-		for (auto j = 0; j < result_columns; ++j)
+		for (typename result_type::size_type j = 0;  j < result_columns;  ++j)
 		{
-			typename result_type::element_type e(0);
-			for (auto k = 0; k < m2.rows(); ++k)
+			typename result_type::element_type  e(0);
+
+			for (typename result_type::size_type k = 0;  k < m2.rows();  ++k)
 			{
 				auto x = m1(i, k);
 				auto y = m2(k, j);

@@ -22,7 +22,7 @@ class fs_matrix_engine_tst
     using const_reference = T const&;
     using const_pointer   = T const*;
     using difference_type = std::ptrdiff_t;
-    using size_type       = std::int_fast32_t;
+    using size_type       = std::int32_t;
     using size_tuple      = std::tuple<size_type, size_type>;
 
     static constexpr bool   is_fixed_size   = true;
@@ -47,8 +47,8 @@ class fs_matrix_engine_tst
 
     constexpr const_reference   operator ()(size_type i, size_type j) const;
 
-    constexpr size_type    columns() const noexcept;
-    constexpr size_type    rows() const noexcept;
+    constexpr size_type     columns() const noexcept;
+    constexpr size_type     rows() const noexcept;
     constexpr size_tuple    size() const noexcept;
 
     constexpr size_type     column_capacity() const noexcept;

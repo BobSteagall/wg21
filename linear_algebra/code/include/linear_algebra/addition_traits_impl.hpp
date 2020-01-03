@@ -50,9 +50,9 @@ matrix_addition_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
 		mr.resize(rows, columns);
     }
 
-	for (auto i = 0;  i < rows;  ++i)
+	for (typename result_type::size_type i = 0;  i < rows;  ++i)
     {
-		for (auto j = 0;  j < columns;  ++j)
+		for (typename result_type::size_type j = 0;  j < columns;  ++j)
         {
 			mr(i, j) = m1(i, j) + m2(i, j);
         }

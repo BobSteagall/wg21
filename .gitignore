@@ -1,4 +1,4 @@
-build-*
+build*
 cmake-*
 tmp
 x64*

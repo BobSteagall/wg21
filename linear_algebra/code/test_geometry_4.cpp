@@ -17,16 +17,15 @@ public:
 	using iterator        = detail::vector_iterator<float4_engine>;
 	using const_iterator  = detail::vector_const_iterator<float4_engine>;
 	using difference_type = ptrdiff_t;
-	using size_type      = int_fast32_t;
 	using size_type       = int_fast32_t;
 
-	using is_fixed_size   = true_type;
-	using is_resizable    = false_type;
+	static constexpr bool   is_fixed_size   = true;
+	static constexpr bool   is_resizable    = false;
 
-	using is_column_major = true_type;
-	using is_dense        = true_type;
-	using is_rectangular  = true_type;
-	using is_row_major    = true_type;
+	static constexpr bool   is_column_major = true;
+	static constexpr bool   is_dense        = true;
+	static constexpr bool   is_rectangular  = true;
+	static constexpr bool   is_row_major    = true;
 
 public:
 	constexpr float4_engine();
@@ -89,17 +88,16 @@ public:
 	using const_reference = float const&;
 	using const_pointer   = float const*;
 	using difference_type = ptrdiff_t;
-	using size_type      = int_fast32_t;
 	using size_type       = int_fast32_t;
 	using size_tuple      = std::tuple<size_type, size_type>;
 
-	using is_fixed_size   = true_type;
-	using is_resizable    = false_type;
+	static constexpr bool   is_fixed_size   = true;
+	static constexpr bool   is_resizable    = false;
 
-	using is_column_major = false_type;
-	using is_dense        = true_type;
-	using is_rectangular  = true_type;
-	using is_row_major    = true_type;
+	static constexpr bool   is_column_major = false;
+	static constexpr bool   is_dense        = true;
+	static constexpr bool   is_rectangular  = true;
+	static constexpr bool   is_row_major    = true;
 
 	using column_view_type    = matrix_column_view<float44_engine>;
 	using row_view_type       = matrix_row_view<float44_engine>;
@@ -117,8 +115,8 @@ public:
 
 	constexpr const_reference   operator ()(size_type i, size_type j) const;
 
-	constexpr size_type    columns() const noexcept;
-	constexpr size_type    rows() const noexcept;
+	constexpr size_type     columns() const noexcept;
+	constexpr size_type     rows() const noexcept;
 	constexpr size_tuple    size() const noexcept;
 
 	constexpr size_type     column_capacity() const noexcept;
