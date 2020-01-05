@@ -21,13 +21,13 @@ class vector
 public:
     using engine_type     = ET;
     using element_type    = typename engine_type::element_type;
-    using reference       = typename engine_type::reference;
-    using pointer         = typename engine_type::pointer;
+    using value_type      = typename engine_type::value_type;
+    using difference_type = typename engine_type::difference_type;
+    using index_type      = typename engine_type::index_type;
     using const_reference = typename engine_type::const_reference;
-    using const_pointer   = typename engine_type::const_pointer;
-    using iterator        = typename engine_type::iterator;
+    using reference       = typename engine_type::reference;
     using const_iterator  = typename engine_type::const_iterator;
-    using size_type       = typename engine_type::size_type;
+    using iterator        = typename engine_type::iterator;
 
     using transpose_type  = vector const&;
     using hermitian_type  = conditional_t<is_complex_v<element_type>, vector, transpose_type>;
@@ -52,9 +52,9 @@ public:
     template<class U>
     constexpr vector(initializer_list<U> list);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr vector(size_type elems);
+    constexpr vector(index_type elems);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr vector(size_type elems, size_type elemcap);
+    constexpr vector(index_type elems, index_type elemcap);
 
     constexpr vector& operator =(vector&&) noexcept = default;
     constexpr vector& operator =(vector const&) = default;
@@ -63,15 +63,16 @@ public:
 
     //- Const element access.
     //
-    constexpr const_reference   operator ()(size_type i) const;
+    constexpr const_reference   operator [](index_type i) const;
+    constexpr const_reference   operator ()(index_type i) const;
     constexpr const_iterator    begin() const noexcept;
     constexpr const_iterator    end() const noexcept;
 
     //- Accessors.
     //
-    constexpr size_type     capacity() const noexcept;
-    constexpr size_type     elements() const noexcept;
-    constexpr size_type     size() const noexcept;
+    constexpr index_type     capacity() const noexcept;
+    constexpr index_type     elements() const noexcept;
+    constexpr index_type     size() const noexcept;
 
     //- Transpose and Hermitian.
     //
@@ -80,7 +81,8 @@ public:
 
     //- Mutable element access.
     //
-    constexpr reference     operator ()(size_type i);
+    constexpr reference     operator [](index_type i);
+    constexpr reference     operator ()(index_type i);
     constexpr iterator      begin() noexcept;
     constexpr iterator      end() noexcept;
 
@@ -93,22 +95,22 @@ public:
     //- Change capacity.
     //
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void      reserve(size_type elemcap);
+    constexpr void      reserve(index_type elemcap);
 
     //- Change size.
     //
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void      resize(size_type elems);
+    constexpr void      resize(index_type elems);
 
     //- Change size and capacity in one shot.
     //
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void      resize(size_type elems, size_type elemcap);
+    constexpr void      resize(index_type elems, index_type elemcap);
 
     //- Element operations.
     //
     constexpr void      swap(vector& rhs) noexcept;
-    constexpr void      swap_elements(size_type i, size_type j) noexcept;
+    constexpr void      swap_elements(index_type i, index_type j) noexcept;
 
   private:
     template<class ET2, class OT2> friend class vector;
@@ -119,7 +121,7 @@ public:
 
   private:
     template<class ET2>
-    constexpr vector(ET2 const& eng, size_type idx, detail::row_column_tag);
+    constexpr vector(ET2 const& eng, index_type idx, detail::row_column_tag);
 };
 
 template<class ET, class OT> inline
@@ -144,21 +146,21 @@ vector<ET,OT>::vector(vector<ET2, OT2> const&)
 template<class ET, class OT>
 template<class ET2, detail::enable_if_resizable<ET, ET2>> inline
 constexpr
-vector<ET,OT>::vector(size_type elems)
+vector<ET,OT>::vector(index_type elems)
 :   m_engine(elems)
 {}
 
 template<class ET, class OT>
 template<class ET2, detail::enable_if_resizable<ET, ET2>> inline
 constexpr
-vector<ET,OT>::vector(size_type elems, size_type cap)
+vector<ET,OT>::vector(index_type elems, index_type cap)
 :   m_engine(elems, cap)
 {}
 
 template<class ET, class OT>
 template<class ET2> inline
 constexpr
-vector<ET,OT>::vector(ET2 const& eng, size_type idx, detail::row_column_tag)
+vector<ET,OT>::vector(ET2 const& eng, index_type idx, detail::row_column_tag)
 :   m_engine(eng, idx)
 {}
 
@@ -174,7 +176,14 @@ vector<ET,OT>::operator =(vector<ET2, OT2> const& rhs)
 
 template<class ET, class OT> inline
 constexpr typename vector<ET,OT>::const_reference
-vector<ET,OT>::operator ()(size_type i) const
+vector<ET,OT>::operator [](index_type i) const
+{
+    return m_engine(i);
+}
+
+template<class ET, class OT> inline
+constexpr typename vector<ET,OT>::const_reference
+vector<ET,OT>::operator ()(index_type i) const
 {
     return m_engine(i);
 }
@@ -194,21 +203,21 @@ vector<ET,OT>::end() const noexcept
 }
 
 template<class ET, class OT> inline
-constexpr typename vector<ET,OT>::size_type
+constexpr typename vector<ET,OT>::index_type
 vector<ET,OT>::capacity() const noexcept
 {
     return m_engine.capacity();
 }
 
 template<class ET, class OT> inline
-constexpr typename vector<ET,OT>::size_type
+constexpr typename vector<ET,OT>::index_type
 vector<ET,OT>::elements() const noexcept
 {
     return m_engine.elements();
 }
 
 template<class ET, class OT> inline
-constexpr typename vector<ET,OT>::size_type
+constexpr typename vector<ET,OT>::index_type
 vector<ET,OT>::size() const noexcept
 {
     return m_engine.elements();
@@ -237,7 +246,14 @@ vector<ET,OT>::h() const
 
 template<class ET, class OT> inline
 constexpr typename vector<ET,OT>::reference
-vector<ET,OT>::operator ()(size_type i)
+vector<ET,OT>::operator [](index_type i)
+{
+    return m_engine(i);
+}
+
+template<class ET, class OT> inline
+constexpr typename vector<ET,OT>::reference
+vector<ET,OT>::operator ()(index_type i)
 {
     return m_engine(i);
 }
@@ -274,7 +290,7 @@ vector<ET,OT>::assign(vector<ET2, OT2> const& rhs)
 template<class ET, class OT>
 template<class ET2, detail::enable_if_resizable<ET, ET2>> inline
 constexpr void
-vector<ET,OT>::reserve(size_type cap)
+vector<ET,OT>::reserve(index_type cap)
 {
     m_engine.reserve(cap);
 }
@@ -282,7 +298,7 @@ vector<ET,OT>::reserve(size_type cap)
 template<class ET, class OT>
 template<class ET2, detail::enable_if_resizable<ET, ET2>> inline
 constexpr void
-vector<ET,OT>::resize(size_type elems)
+vector<ET,OT>::resize(index_type elems)
 {
     m_engine.resize(elems);
 }
@@ -290,7 +306,7 @@ vector<ET,OT>::resize(size_type elems)
 template<class ET, class OT>
 template<class ET2, detail::enable_if_resizable<ET, ET2>> inline
 constexpr void
-vector<ET,OT>::resize(size_type elems, size_type cap)
+vector<ET,OT>::resize(index_type elems, index_type cap)
 {
     m_engine.resize(elems, cap);
 }
@@ -304,7 +320,7 @@ vector<ET,OT>::swap(vector& rhs) noexcept
 
 template<class ET, class OT> inline
 constexpr void
-vector<ET,OT>::swap_elements(size_type i, size_type j) noexcept
+vector<ET,OT>::swap_elements(index_type i, index_type j) noexcept
 {
     m_engine.swap_elements(i, j);
 }

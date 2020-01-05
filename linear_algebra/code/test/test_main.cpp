@@ -1,3 +1,5 @@
+#include <array>
+
 void TestGroup00();
 void TestGroup10();
 void TestGroup20();
@@ -17,6 +19,8 @@ int main()
 //	TestGroup50();
 //	TestGroup60();
 //	TestGroup70();
+
+    std::array<int const, 2>   ai{3, 5};
 
     return 0;
 }

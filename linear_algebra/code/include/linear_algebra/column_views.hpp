@@ -23,14 +23,14 @@ class matrix_column_view
     using engine_category = const_vector_engine_tag;
     using element_type    = typename engine_type::element_type;
     using value_type      = typename engine_type::value_type;
-    using reference       = typename engine_type::const_reference;
-    using pointer         = typename engine_type::const_pointer;
+    using difference_type = typename engine_type::difference_type;
+    using index_type      = typename engine_type::index_type;
     using const_reference = typename engine_type::const_reference;
+    using reference       = typename engine_type::const_reference;
     using const_pointer   = typename engine_type::const_pointer;
+    using pointer         = typename engine_type::const_pointer;
     using const_iterator  = detail::vector_const_iterator<matrix_column_view>;
     using iterator        = const_iterator;
-    using difference_type = typename engine_type::difference_type;
-    using size_type       = typename engine_type::size_type;
 
     static constexpr bool   is_fixed_size   = engine_type::is_fixed_size;
     static constexpr bool   is_resizable    = false;
@@ -42,25 +42,25 @@ class matrix_column_view
 
   public:
     constexpr matrix_column_view();
-    constexpr matrix_column_view(engine_type const& eng, size_type col);
+    constexpr matrix_column_view(engine_type const& eng, index_type col);
     constexpr matrix_column_view(matrix_column_view&&) noexcept = default;
     constexpr matrix_column_view(matrix_column_view const&) = default;
 
     constexpr matrix_column_view&   operator =(matrix_column_view&&) noexcept = default;
     constexpr matrix_column_view&   operator =(matrix_column_view const&) = default;
 
-    constexpr const_reference   operator ()(size_type i) const;
+    constexpr const_reference   operator ()(index_type i) const;
     constexpr const_iterator    begin() const noexcept;
     constexpr const_iterator    end() const noexcept;
-    constexpr size_type         capacity() const noexcept;
-    constexpr size_type         elements() const noexcept;
+    constexpr index_type        capacity() const noexcept;
+    constexpr index_type        elements() const noexcept;
 
     constexpr void      assign(matrix_column_view const& rhs);
     constexpr void      swap(matrix_column_view& rhs);
 
   private:
     engine_type const*  mp_other;
-    size_type           m_column;
+    index_type          m_column;
 };
 
 template<class ET> constexpr 
@@ -70,27 +70,27 @@ matrix_column_view<ET>::matrix_column_view()
 {}
 
 template<class ET> constexpr 
-matrix_column_view<ET>::matrix_column_view(engine_type const& eng, size_type col)
+matrix_column_view<ET>::matrix_column_view(engine_type const& eng, index_type col)
 :   mp_other(&eng)
 ,   m_column(col)
 {}
 
 template<class ET> constexpr 
 typename matrix_column_view<ET>::const_reference
-matrix_column_view<ET>::operator ()(size_type i) const
+matrix_column_view<ET>::operator ()(index_type i) const
 {
     return (*mp_other)(i, m_column);
 }
 
 template<class ET> constexpr 
-typename matrix_column_view<ET>::size_type
+typename matrix_column_view<ET>::index_type
 matrix_column_view<ET>::capacity() const noexcept
 {
     return mp_other->rows();
 }
 
 template<class ET> constexpr 
-typename matrix_column_view<ET>::size_type
+typename matrix_column_view<ET>::index_type
 matrix_column_view<ET>::elements() const noexcept
 {
     return mp_other->rows();

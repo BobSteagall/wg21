@@ -16,13 +16,13 @@ USING_STD
 //
 using scalar_engine_tag           = integral_constant<int, 0>;
 
-using const_vector_engine_tag     = integral_constant<int, 1>;
-using mutable_vector_engine_tag   = integral_constant<int, 2>;
-using resizable_vector_engine_tag = integral_constant<int, 3>;
+using const_vector_engine_tag     = integral_constant<int, 10>;
+using mutable_vector_engine_tag   = integral_constant<int, 11>;
+using resizable_vector_engine_tag = integral_constant<int, 12>;
 
-using const_matrix_engine_tag     = integral_constant<int, 4>;
-using mutable_matrix_engine_tag   = integral_constant<int, 5>;
-using resizable_matrix_engine_tag = integral_constant<int, 6>;
+using const_matrix_engine_tag     = integral_constant<int, 20>;
+using mutable_matrix_engine_tag   = integral_constant<int, 21>;
+using resizable_matrix_engine_tag = integral_constant<int, 21>;
 
 //- Traits for determining if a type is a complex number.
 //

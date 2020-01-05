@@ -59,7 +59,7 @@ result_requires_resize(matrix<ET, OT> const&)
 	return matrix<ET, OT>::engine_type::is_resizable == true &&
            matrix<ET, OT>::engine_type::is_fixed_size == false;
 }
-
+/*
 template<class ET, class OT> constexpr 
 bool
 is_fixed_size(vector<ET,OT> const&)
@@ -87,6 +87,6 @@ is_resizable(matrix<ET,OT> const&)
 {
     return matrix<ET,OT>::engine_type::is_resizable;
 }
-
+*/
 }       //- STD_LA namespace
 #endif  //- MATRIX_ARITHMETIC_TRAITS_HPP_DEFINED
