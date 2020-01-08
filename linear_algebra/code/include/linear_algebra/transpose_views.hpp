@@ -24,7 +24,7 @@ class matrix_transpose_view
     using element_type    = typename engine_type::element_type;
     using value_type      = typename engine_type::value_type;
     using difference_type = typename engine_type::difference_type;
-    using index_type      = typename engine_type::index_type;
+    using size_type       = typename engine_type::size_type;
     using size_tuple      = typename engine_type::size_tuple;
     using const_reference = typename engine_type::const_reference;
     using reference       = typename engine_type::const_reference;
@@ -35,14 +35,6 @@ class matrix_transpose_view
     using row_view_type       = matrix_row_view<matrix_transpose_view>;
     using transpose_view_type = matrix_transpose_view<matrix_transpose_view>;
 
-    static constexpr bool   is_fixed_size   = engine_type::is_fixed_size;
-    static constexpr bool   is_resizable    = false;
-
-    static constexpr bool   is_column_major = engine_type::is_row_major;
-    static constexpr bool   is_dense        = engine_type::is_dense;
-    static constexpr bool   is_rectangular  = engine_type::is_rectangular;
-    static constexpr bool   is_row_major    = engine_type::is_column_major;
-
   public:
     constexpr matrix_transpose_view();
     constexpr matrix_transpose_view(engine_type const& eng);
@@ -52,14 +44,14 @@ class matrix_transpose_view
     constexpr matrix_transpose_view&    operator =(matrix_transpose_view&&) noexcept = default;
     constexpr matrix_transpose_view&    operator =(matrix_transpose_view const&) = default;
 
-    constexpr const_reference   operator ()(index_type i, index_type j) const;
+    constexpr const_reference   operator ()(size_type i, size_type j) const;
 
-    constexpr index_type    columns() const noexcept;
-    constexpr index_type    rows() const noexcept;
+    constexpr size_type     columns() const noexcept;
+    constexpr size_type     rows() const noexcept;
     constexpr size_tuple    size() const noexcept;
 
-    constexpr index_type    column_capacity() const noexcept;
-    constexpr index_type    row_capacity() const noexcept;
+    constexpr size_type     column_capacity() const noexcept;
+    constexpr size_type     row_capacity() const noexcept;
     constexpr size_tuple    capacity() const noexcept;
 
     constexpr void      assign(matrix_transpose_view const& rhs);
@@ -81,20 +73,20 @@ matrix_transpose_view<ET>::matrix_transpose_view(engine_type const& eng)
 
 template<class ET> constexpr 
 typename matrix_transpose_view<ET>::const_reference
-matrix_transpose_view<ET>::operator ()(index_type i, index_type j) const
+matrix_transpose_view<ET>::operator ()(size_type i, size_type j) const
 {
     return (*mp_other)(j, i);
 }
 
 template<class ET> constexpr 
-typename matrix_transpose_view<ET>::index_type
+typename matrix_transpose_view<ET>::size_type
 matrix_transpose_view<ET>::columns() const noexcept
 {
     return mp_other->rows();
 }
 
 template<class ET> constexpr 
-typename matrix_transpose_view<ET>::index_type
+typename matrix_transpose_view<ET>::size_type
 matrix_transpose_view<ET>::rows() const noexcept
 {
     return mp_other->columns();
@@ -108,14 +100,14 @@ matrix_transpose_view<ET>::size() const noexcept
 }
 
 template<class ET> constexpr 
-typename matrix_transpose_view<ET>::index_type
+typename matrix_transpose_view<ET>::size_type
 matrix_transpose_view<ET>::column_capacity() const noexcept
 {
     return mp_other->row_capacity();
 }
 
 template<class ET> constexpr 
-typename matrix_transpose_view<ET>::index_type
+typename matrix_transpose_view<ET>::size_type
 matrix_transpose_view<ET>::row_capacity() const noexcept
 {
     return mp_other->column_capacity();

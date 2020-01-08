@@ -405,8 +405,8 @@ struct matrix_negation_traits<OT, vector<ET1, OT1>>
     using op_traits   = OT;
     using result_type = vector<engine_type, op_traits>;
 
-    using index_type_1 = typename vector<ET1, OT1>::index_type;
-    using index_type_r = typename result_type::index_type;
+    using size_type_1 = typename vector<ET1, OT1>::size_type;
+    using size_type_r = typename result_type::size_type;
 
     static result_type  negate(vector<ET1, OT1> const& v1);
 };
@@ -420,8 +420,8 @@ struct matrix_negation_traits<OT, matrix<ET1, OT1>>
     using op_traits   = OT;
     using result_type = matrix<engine_type, op_traits>;
 
-    using index_type_1 = typename matrix<ET1, OT1>::index_type;
-    using index_type_r = typename result_type::index_type;
+    using size_type_1 = typename matrix<ET1, OT1>::size_type;
+    using size_type_r = typename result_type::size_type;
 
     static result_type  negate(matrix<ET1, OT1> const& m1);
 };

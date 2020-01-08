@@ -80,7 +80,7 @@ void t001()
     PRINT(m1);
     PRINT(m1.t());
     PRINT(m1.column(1));
-    PRINT(m1.row(1));
+/*    PRINT(m1.row(1));
     PRINT(m1.t().column(1));
     PRINT(m1.t().row(1));
     PRINT(m1.t().t().column(1));
@@ -121,7 +121,7 @@ void t001()
     constexpr double            d = fsm(1,1);
 
     PRINT(fsm);
-
+*/
     //drm_double  mx = {1.0, 1.0, 1.0, 1.0};
 }
 

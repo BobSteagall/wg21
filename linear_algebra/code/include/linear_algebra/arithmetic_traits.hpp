@@ -5,8 +5,8 @@
 //              arithmetic traits types, public and private, to implement arithmetic operators.
 //==================================================================================================
 //
-#ifndef MATRIX_ARITHMETIC_TRAITS_HPP_DEFINED
-#define MATRIX_ARITHMETIC_TRAITS_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_ARITHMETIC_TRAITS_HPP_DEFINED
+#define LINEAR_ALGEBRA_ARITHMETIC_TRAITS_HPP_DEFINED
 
 namespace STD_LA {
 namespace detail {
@@ -48,16 +48,14 @@ template<class ET, class OT> constexpr
 bool
 result_requires_resize(vector<ET, OT> const&)
 {
-	return vector<ET, OT>::engine_type::is_resizable == true &&
-           vector<ET, OT>::engine_type::is_fixed_size == false;
+	return detail::is_resizable_engine_v<ET>;
 }
 
 template<class ET, class OT> constexpr 
 bool
 result_requires_resize(matrix<ET, OT> const&)
 {
-	return matrix<ET, OT>::engine_type::is_resizable == true &&
-           matrix<ET, OT>::engine_type::is_fixed_size == false;
+	return detail::is_resizable_engine_v<ET>;
 }
 /*
 template<class ET, class OT> constexpr 
@@ -89,4 +87,4 @@ is_resizable(matrix<ET,OT> const&)
 }
 */
 }       //- STD_LA namespace
-#endif  //- MATRIX_ARITHMETIC_TRAITS_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_ARITHMETIC_TRAITS_HPP_DEFINED

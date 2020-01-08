@@ -20,12 +20,12 @@ matrix_addition_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>::add
 {
     PrintOperandTypes<result_type>("addition_traits", v1, v2);
 
-    index_type_r const  elems = static_cast<index_type_r>(v1.elements());
+    size_type_r const   elems = static_cast<size_type_r>(v1.elements());
 
     result_type     vr;
-    index_type_r    ir;
-    index_type_1    i1;
-    index_type_2    i2;
+    size_type_r     ir;
+    size_type_1     i1;
+    size_type_2     i2;
 
     if constexpr (result_requires_resize(vr))
     {
@@ -49,13 +49,13 @@ matrix_addition_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
 {
     PrintOperandTypes<result_type>("addition_traits", m1, m2);
 
-    index_type_r const  rows = static_cast<index_type_r>(m1.rows());
-    index_type_r const  cols = static_cast<index_type_r>(m1.columns());
+    size_type_r const   rows = static_cast<size_type_r>(m1.rows());
+    size_type_r const   cols = static_cast<size_type_r>(m1.columns());
 
     result_type		mr;
-    index_type_r    ir, jr;
-    index_type_1    i1, j1;
-    index_type_2    i2, j2;
+    size_type_r     ir, jr;
+    size_type_1     i1, j1;
+    size_type_2     i2, j2;
 
 	if constexpr (result_requires_resize(mr))
 	{
