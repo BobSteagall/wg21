@@ -174,42 +174,34 @@ using view_category_t = typename view_tag_chooser<typename ET::engine_category, 
 template<class ET, class CAT>
 struct view_traits
 {
-    using traits_type = tag_traits<typename ET::engine_category>;
+    static constexpr bool   is_mutable = tag_traits<CAT>::is_mutable;
 
-    static constexpr bool   is_vector    = traits_type::is_vector;
-    static constexpr bool   is_matrix    = traits_type::is_matrix;
-    static constexpr bool   is_mutable   = traits_type::is_mutable;
-    static constexpr bool   is_resizable = traits_type::is_resizable;
-
-    using reference       = conditional_t<is_mutable, typename ET::reference, typename ET::const_reference>;
-    using const_reference = typename ET::const_reference;
-
-    using pointer       = conditional_t<is_mutable, typename ET::pointer, typename ET::const_pointer>;
-    using const_pointer = typename ET::const_pointer;
-
+    using referent  = conditional_t<is_mutable, remove_cv_t<ET>, remove_cv_t<ET> const>;
+    using reference = conditional_t<is_mutable, typename ET::reference, typename ET::const_reference>;
+    using pointer   = conditional_t<is_mutable, typename ET::pointer, typename ET::const_pointer>;
     template<class DET>
-    using iterator       = conditional_t<is_mutable, vector_iterator<DET>, vector_const_iterator<DET>>;
-    template<class DET>
-    using const_iterator = vector_const_iterator<DET>;
+    using iterator  = conditional_t<is_mutable, vector_iterator<DET>, vector_const_iterator<DET>>;
 };
+
+template<class ET, class CAT>
+using view_referent_t = typename view_traits<ET,CAT>::referent;
 
 template<class ET, class CAT>
 using view_reference_t = typename view_traits<ET,CAT>::reference;
 
 template<class ET, class CAT>
-using view_const_reference_t = typename view_traits<ET,CAT>::const_reference;
-
-template<class ET, class CAT>
 using view_pointer_t = typename view_traits<ET,CAT>::pointer;
-
-template<class ET, class CAT>
-using view_const_pointer_t = typename view_traits<ET,CAT>::const_pointer;
 
 template<class ET, class CAT, class DET>
 using view_iterator_t = typename view_traits<ET,CAT>::template iterator<DET>;
 
-template<class ET, class CAT, class DET>
-using view_const_iterator_t = typename view_traits<ET,CAT>::template const_iterator<DET>;
+template<class VTT> inline constexpr
+bool    is_vector_engine_tag = VTT::value >= const_vector_engine_tag::value &&
+                               VTT::value <= mutable_vector_engine_tag::value;
+
+template<class VTT> inline constexpr
+bool    is_matrix_engine_tag = VTT::value >= const_matrix_engine_tag::value &&
+                               VTT::value <= mutable_matrix_engine_tag::value;
 
 
 //--------------------------------------------------------------------------------------------------

@@ -23,37 +23,49 @@ class fs_vector_engine
     using engine_category = mutable_vector_engine_tag;
     using element_type    = T;
     using value_type      = remove_cv_t<T>;
+    using reference       = element_type&;
+    using const_reference = element_type const&;
+    using pointer         = element_type*;
+    using const_pointer   = element_type const*;
     using difference_type = ptrdiff_t;
     using size_type       = size_t;
-    using const_reference = element_type const&;
-    using reference       = element_type&;
-    using const_pointer   = element_type const*;
-    using pointer         = element_type*;
-    using const_iterator  = detail::vector_const_iterator<fs_vector_engine>;
     using iterator        = detail::vector_iterator<fs_vector_engine>;
+    using const_iterator  = detail::vector_const_iterator<fs_vector_engine>;
 
-  public:
+    //- Construct/copy/destroy
+    //
+    ~fs_vector_engine() noexcept = default;
+
     constexpr fs_vector_engine();
-    template<class U>
-    constexpr fs_vector_engine(initializer_list<U> list);
     constexpr fs_vector_engine(fs_vector_engine&&) noexcept = default;
     constexpr fs_vector_engine(fs_vector_engine const&) = default;
+    template<class U>
+    constexpr fs_vector_engine(initializer_list<U> list);
 
     constexpr fs_vector_engine&     operator =(fs_vector_engine&&) noexcept = default;
     constexpr fs_vector_engine&     operator =(fs_vector_engine const&) = default;
 
-    constexpr const_reference   operator ()(size_type i) const;
+    //- Iterators
+    //
+    constexpr iterator          begin() noexcept;
+    constexpr iterator          end() noexcept;
     constexpr const_iterator    begin() const noexcept;
     constexpr const_iterator    end() const noexcept;
+    constexpr const_iterator    cbegin() const noexcept;
+    constexpr const_iterator    cend() const noexcept;
 
+    //- Capacity
+    //
     static constexpr size_type  capacity() noexcept;
     static constexpr size_type  elements() noexcept;
-    static constexpr size_type  size() noexcept;
 
-    constexpr reference     operator ()(size_type i);
-    constexpr iterator      begin() noexcept;
-    constexpr iterator      end() noexcept;
+    //- Element access
+    //
+    constexpr reference         operator ()(size_type i);
+    constexpr const_reference   operator ()(size_type i) const;
 
+    //- Modifiers
+    //
     constexpr void  swap(fs_vector_engine& rhs) noexcept;
     constexpr void  swap_elements(size_type i, size_type j) noexcept;
 
@@ -61,6 +73,9 @@ class fs_vector_engine
     T   ma_elems[N];
 };
 
+//------------------------
+//- Construct/copy/destroy
+//
 template<class T, size_t N> constexpr
 fs_vector_engine<T,N>::fs_vector_engine()
 {
@@ -78,10 +93,10 @@ template<class U> constexpr
 fs_vector_engine<T,N>::fs_vector_engine(initializer_list<U> list)
 :   ma_elems()
 {
-    size_t   count = min(N, static_cast<size_t>(list.size()));
+    size_type   count = min<size_type>(N, list.size());
     auto        iter  = list.begin();
 
-    for (size_t i = 0;  i < count;  ++i, ++iter)
+    for (size_type i = 0;  i < count;  ++i, ++iter)
     {
         ma_elems[i] = static_cast<T>( *iter);
     }
@@ -90,7 +105,7 @@ fs_vector_engine<T,N>::fs_vector_engine(initializer_list<U> list)
     {
         if (count < N)
         {
-            for (size_t i = count;  i < N;  ++i) 
+            for (size_type i = count;  i < N;  ++i) 
             {
                 ma_elems[i] = static_cast<T>(0);
             }
@@ -98,11 +113,21 @@ fs_vector_engine<T,N>::fs_vector_engine(initializer_list<U> list)
     }
 }
 
+//-----------
+//- Iterators
+//
 template<class T, size_t N> inline constexpr 
-typename fs_vector_engine<T,N>::const_reference
-fs_vector_engine<T,N>::operator ()(size_type i) const
+typename fs_vector_engine<T,N>::iterator
+fs_vector_engine<T,N>::begin() noexcept
 {
-    return ma_elems[i];
+    return iterator(this, 0, N);
+}
+
+template<class T, size_t N> inline constexpr 
+typename fs_vector_engine<T,N>::iterator
+fs_vector_engine<T,N>::end() noexcept
+{
+    return iterator(this, N, N);
 }
 
 template<class T, size_t N> inline constexpr 
@@ -119,6 +144,9 @@ fs_vector_engine<T,N>::end() const noexcept
     return const_iterator(this, N, N);
 }
 
+//----------
+//- Capacity
+//
 template<class T, size_t N> inline constexpr 
 typename fs_vector_engine<T,N>::size_type
 fs_vector_engine<T,N>::capacity() noexcept
@@ -133,13 +161,9 @@ fs_vector_engine<T,N>::elements() noexcept
     return N;
 }
 
-template<class T, size_t N> inline constexpr 
-typename fs_vector_engine<T,N>::size_type
-fs_vector_engine<T,N>::size() noexcept
-{
-    return N;
-}
-
+//----------------
+//- Element access
+//
 template<class T, size_t N> inline constexpr 
 typename fs_vector_engine<T,N>::reference
 fs_vector_engine<T,N>::operator ()(size_type i)
@@ -148,19 +172,15 @@ fs_vector_engine<T,N>::operator ()(size_type i)
 }
 
 template<class T, size_t N> inline constexpr 
-typename fs_vector_engine<T,N>::iterator
-fs_vector_engine<T,N>::begin() noexcept
+typename fs_vector_engine<T,N>::const_reference
+fs_vector_engine<T,N>::operator ()(size_type i) const
 {
-    return iterator(this, 0, N);
+    return ma_elems[i];
 }
 
-template<class T, size_t N> inline constexpr 
-typename fs_vector_engine<T,N>::iterator
-fs_vector_engine<T,N>::end() noexcept
-{
-    return iterator(this, N, N);
-}
-
+//-----------
+//- Modifiers
+//
 template<class T, size_t N> inline constexpr 
 void
 fs_vector_engine<T,N>::swap(fs_vector_engine& rhs) noexcept
@@ -180,6 +200,10 @@ fs_vector_engine<T,N>::swap_elements(size_type i, size_type j) noexcept
 {
     detail::la_swap(ma_elems[i], ma_elems[j]);
 }
+
+//------------------------
+//- Private implementation
+//
 
 
 //==================================================================================================

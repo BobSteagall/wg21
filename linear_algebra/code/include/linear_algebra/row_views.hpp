@@ -13,111 +13,154 @@ namespace STD_LA {
 //  in order to prevent unnecessary allocation and element copying.
 //==================================================================================================
 //
-template<class ET>
+template<class ET, class VCT>
 class matrix_row_view
 {
     static_assert(detail::is_matrix_engine_v<ET>);
+    static_assert(detail::is_vector_engine_tag<VCT>);
 
   public:
-    using engine_type     = ET;
-    using engine_category = const_vector_engine_tag;
-    using element_type    = typename engine_type::element_type;
-    using value_type      = typename engine_type::value_type;
-    using difference_type = typename engine_type::difference_type;
-    using size_type       = typename engine_type::size_type;
-    using const_reference = typename engine_type::const_reference;
-    using reference       = typename engine_type::const_reference;
-    using const_pointer   = typename engine_type::const_pointer;
-    using pointer         = typename engine_type::const_pointer;
+    //- Types
+    //
+    using engine_category = VCT;
+    using element_type    = typename ET::element_type;
+    using value_type      = typename ET::value_type;
+    using pointer         = detail::view_pointer_t<ET, VCT>;
+    using const_pointer   = typename ET::const_pointer;
+    using reference       = detail::view_reference_t<ET, VCT>;
+    using const_reference = typename ET::const_reference;
+    using difference_type = typename ET::difference_type;
+    using size_type       = typename ET::size_type;
+    using iterator        = detail::view_iterator_t<ET, VCT, matrix_row_view>;
     using const_iterator  = detail::vector_const_iterator<matrix_row_view>;
-    using iterator        = const_iterator;
 
-  public:
-    constexpr matrix_row_view();
-    constexpr matrix_row_view(engine_type const& eng, size_type row);
+    //- Construct/copy/destroy
+    //
+    ~matrix_row_view() noexcept = default;
+
+    constexpr matrix_row_view() noexcept;
     constexpr matrix_row_view(matrix_row_view&&) noexcept = default;
     constexpr matrix_row_view(matrix_row_view const&) = default;
 
     constexpr matrix_row_view&  operator =(matrix_row_view&&) noexcept = default;
-    constexpr matrix_row_view&  operator =(matrix_row_view const&) = default;
+    constexpr matrix_row_view&  operator =(matrix_row_view const&) noexcept = default;
 
-    constexpr const_reference   operator ()(size_type j) const;
-    constexpr const_iterator    begin() const noexcept;
-    constexpr const_iterator    end() const noexcept;
+    //- Iterators
+    //
+    constexpr iterator          begin() const noexcept;
+    constexpr iterator          end() const noexcept;
+    constexpr const_iterator    cbegin() const noexcept;
+    constexpr const_iterator    cend() const noexcept;
 
-    constexpr size_type         capacity() const noexcept;
-    constexpr size_type         elements() const noexcept;
+    //- Capacity
+    //
+    constexpr size_type     capacity() const noexcept;
+    constexpr size_type     elements() const noexcept;
 
-    constexpr void      assign(matrix_row_view const& rhs);
+    //- Element access
+    //
+    constexpr reference     operator ()(size_type i) const;
+
+    //- Modifiers
+    //
     constexpr void      swap(matrix_row_view& rhs);
 
   private:
-    engine_type const*  mp_other;
-    size_type           m_row;
+    template<class ET2, class OT2>  friend class vector;
+    using referent_type = detail::view_referent_t<ET, VCT>;
+
+    referent_type*  mp_other;
+    size_type       m_row;
+
+    constexpr matrix_row_view(referent_type& eng, size_type row);
 };
 
-template<class ET> constexpr 
-matrix_row_view<ET>::matrix_row_view()
+//------------------------
+//- Construct/copy/destroy
+//
+template<class ET, class VCT> constexpr 
+matrix_row_view<ET, VCT>::matrix_row_view() noexcept
 :   mp_other(nullptr)
 ,   m_row(0)
 {}
 
-template<class ET> constexpr 
-matrix_row_view<ET>::matrix_row_view(engine_type const& eng, size_type row)
-:   mp_other(&eng)
-,   m_row(row)
-{}
-
-template<class ET> constexpr 
-typename matrix_row_view<ET>::const_reference
-matrix_row_view<ET>::operator ()(size_type j) const
+//-----------
+//- Iterators
+//
+template<class ET, class VCT> constexpr 
+typename matrix_row_view<ET, VCT>::iterator
+matrix_row_view<ET, VCT>::begin() const noexcept
 {
-    return (*mp_other)(m_row, j);
+    return iterator(this, 0, mp_other->columns());
 }
 
-template<class ET> constexpr 
-typename matrix_row_view<ET>::const_iterator
-matrix_row_view<ET>::begin() const noexcept
+template<class ET, class VCT> constexpr 
+typename matrix_row_view<ET, VCT>::iterator
+matrix_row_view<ET, VCT>::end() const noexcept
+{
+    return iterator(this, mp_other->columns(), mp_other->columns());
+}
+
+template<class ET, class VCT> constexpr 
+typename matrix_row_view<ET, VCT>::const_iterator
+matrix_row_view<ET, VCT>::cbegin() const noexcept
 {
     return const_iterator(this, 0, mp_other->columns());
 }
 
-template<class ET> constexpr 
-typename matrix_row_view<ET>::const_iterator
-matrix_row_view<ET>::end() const noexcept
+template<class ET, class VCT> constexpr 
+typename matrix_row_view<ET, VCT>::const_iterator
+matrix_row_view<ET, VCT>::cend() const noexcept
 {
     return const_iterator(this, mp_other->columns(), mp_other->columns());
 }
 
-template<class ET> constexpr 
-typename matrix_row_view<ET>::size_type
-matrix_row_view<ET>::capacity() const noexcept
+//----------
+//- Capacity
+//
+template<class ET, class VCT> constexpr 
+typename matrix_row_view<ET, VCT>::size_type
+matrix_row_view<ET, VCT>::capacity() const noexcept
 {
     return mp_other->columns();
 }
 
-template<class ET> constexpr 
-typename matrix_row_view<ET>::size_type
-matrix_row_view<ET>::elements() const noexcept
+template<class ET, class VCT> constexpr 
+typename matrix_row_view<ET, VCT>::size_type
+matrix_row_view<ET, VCT>::elements() const noexcept
 {
     return mp_other->columns();
 }
 
-template<class ET> constexpr 
-void
-matrix_row_view<ET>::assign(matrix_row_view const& rhs)
+//----------------
+//- Element access
+//
+template<class ET, class VCT> constexpr 
+typename matrix_row_view<ET, VCT>::reference
+matrix_row_view<ET, VCT>::operator ()(size_type j) const
 {
-    mp_other = rhs.mp_other;
-    m_row    = rhs.m_row;
+    return (*mp_other)(m_row, j);
 }
 
-template<class ET> constexpr 
+//-----------
+//- Modifiers
+//
+template<class ET, class VCT> constexpr 
 void
-matrix_row_view<ET>::swap(matrix_row_view& rhs)
+matrix_row_view<ET, VCT>::swap(matrix_row_view& rhs)
 {
     std::swap(mp_other, rhs.mp_other);
     std::swap(m_row, rhs.m_row);
 }
+
+//------------------------
+//- Private implementation
+//
+template<class ET, class VCT> constexpr 
+matrix_row_view<ET, VCT>::matrix_row_view(referent_type& eng, size_type row)
+:   mp_other(&eng)
+,   m_row(row)
+{}
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_ROW_VIEWS_HPP_DEFINED

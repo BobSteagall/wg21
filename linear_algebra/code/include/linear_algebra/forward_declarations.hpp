@@ -32,8 +32,8 @@ struct default_matrix_operations {};
 
 //- Basic linear algebra engine types.
 //
-template<class ET, class CAT>           class matrix_column_view;
-template<class ET>                      class matrix_row_view;
+template<class ET, class VCT>           class matrix_column_view;
+template<class ET, class VCT>           class matrix_row_view;
 template<class ET>                      class matrix_transpose_view;
 template<class T, size_t N>             class fs_vector_engine;
 template<class T, size_t R, size_t C>   class fs_matrix_engine;

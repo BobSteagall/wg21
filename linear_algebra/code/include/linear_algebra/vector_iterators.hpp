@@ -79,6 +79,7 @@ class vector_iterator
 
   private:
     constexpr vector_iterator(engine_type& eng);
+    constexpr vector_iterator(engine_type& eng, size_type curr, size_type upper);
     constexpr vector_iterator(engine_type* eng, size_type curr, size_type upper);
 };
 
@@ -100,10 +101,18 @@ vector_iterator<ET>::vector_iterator(engine_type& eng)
 
 template<class ET> inline
 constexpr
+vector_iterator<ET>::vector_iterator(engine_type& eng, size_type curr, size_type upper)
+    :   mp_engine(&eng)
+    ,   m_curr(curr)
+    ,   m_upper(upper)
+{}
+
+template<class ET> inline
+constexpr
 vector_iterator<ET>::vector_iterator(engine_type* p_eng, size_type curr, size_type upper)
-:   mp_engine(p_eng)
-,   m_curr(curr)
-,   m_upper(upper)
+    :   mp_engine(p_eng)
+    ,   m_curr(curr)
+    ,   m_upper(upper)
 {}
 
 template<class ET> inline

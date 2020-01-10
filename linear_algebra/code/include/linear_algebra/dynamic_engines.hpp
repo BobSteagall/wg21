@@ -78,46 +78,59 @@ template<class T, class AT>
 class dr_vector_engine
 {
   public:
+    //- Types
+    //
     using engine_category = resizable_vector_engine_tag;
     using element_type    = T;
     using value_type      = remove_cv_t<T>;
     using allocator_type  = AT;
-    using difference_type = size_t;
-    using size_type        = size_t;
-    using const_reference = element_type const&;
-    using reference       = element_type&;
-    using const_pointer   = typename allocator_traits<AT>::const_pointer;
     using pointer         = typename allocator_traits<AT>::pointer;
-    using const_iterator  = detail::vector_const_iterator<dr_vector_engine>;
+    using const_pointer   = typename allocator_traits<AT>::const_pointer;
+    using reference       = element_type&;
+    using const_reference = element_type const&;
+    using difference_type = size_t;
+    using size_type       = size_t;
     using iterator        = detail::vector_iterator<dr_vector_engine>;
+    using const_iterator  = detail::vector_const_iterator<dr_vector_engine>;
 
-  public:
+    //- Construct/copy/destroy
+    //
     ~dr_vector_engine() noexcept;
+
     dr_vector_engine();
-    template<class U>
-    constexpr dr_vector_engine(initializer_list<U> list);
     dr_vector_engine(dr_vector_engine&&) noexcept;
     dr_vector_engine(dr_vector_engine const&);
+    template<class U>
+    dr_vector_engine(initializer_list<U> list);
     dr_vector_engine(size_type elems);
     dr_vector_engine(size_type elems, size_type elem_cap);
 
-    dr_vector_engine&   operator =(dr_vector_engine&&) noexcept;
-    dr_vector_engine&   operator =(dr_vector_engine const&);
+    dr_vector_engine&   operator =(dr_vector_engine&& rhs) noexcept;
+    dr_vector_engine&   operator =(dr_vector_engine const& rhs);
     template<class ET2>
-    void    assign(ET2 const& rhs);
+    dr_vector_engine&   operator =(ET2 const& rhs);
 
-    const_reference operator ()(size_type i) const;
+    //- Iterators
+    //
+    iterator        begin() noexcept;
+    iterator        end() noexcept;
     const_iterator  begin() const noexcept;
     const_iterator  end() const noexcept;
-    size_type       elements() const noexcept;
+    const_iterator  cbegin() const noexcept;
+    const_iterator  cend() const noexcept;
+
+    //- Capacity
+    //
     size_type       capacity() const noexcept;
+    size_type       elements() const noexcept;
 
-    reference   operator ()(size_type i);
-    iterator    begin() noexcept;
-    iterator    end() noexcept;
+    //- Element access
+    //
+    reference       operator ()(size_type i);
+    const_reference operator ()(size_type i) const;
 
-    void    assign(dr_vector_engine const& rhs);
-
+    //- Modifiers
+    //
     void    reserve(size_type cap);
     void    resize(size_type elems);
     void    resize(size_type elems, size_type cap);
@@ -131,11 +144,17 @@ class dr_vector_engine
     allocator_type  m_alloc;
 
     void    alloc_new(size_type elems, size_type cap);
+    void    assign(dr_vector_engine const& rhs);
+    template<class ET2>
+    void    assign(ET2 const& rhs);
     void    check_capacity(size_type cap);
     void    check_size(size_type elems);
     void    reshape(size_type elems, size_type cap);
 };
 
+//------------------------
+//- Construct/copy/destroy
+//
 template<class T, class AT> inline
 dr_vector_engine<T,AT>::~dr_vector_engine() noexcept
 {
@@ -149,25 +168,6 @@ dr_vector_engine<T,AT>::dr_vector_engine()
 ,   m_elemcap(0)
 ,   m_alloc()
 {}
-
-template<class T, class AT> 
-template<class U>
-constexpr
-dr_vector_engine<T,AT>::dr_vector_engine(initializer_list<U> list)
-:   mp_elems(nullptr)
-,   m_elems(0)
-,   m_elemcap(0)
-,   m_alloc()
-{
-    alloc_new((size_type) list.size(), (size_type) list.size());
-
-    auto    iter = list.begin();
-
-    for (size_t i = 0;  i < list.size();  ++i, ++iter)
-    {
-        mp_elems[i] = static_cast<T>( *iter);
-    }
-}
 
 template<class T, class AT> inline
 dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine&& rhs) noexcept
@@ -186,6 +186,24 @@ dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine const& rhs)
 ,   m_alloc()
 {
     assign(rhs);
+}
+
+template<class T, class AT> 
+template<class U> 
+dr_vector_engine<T,AT>::dr_vector_engine(initializer_list<U> list)
+:   mp_elems(nullptr)
+,   m_elems(0)
+,   m_elemcap(0)
+,   m_alloc()
+{
+    alloc_new((size_type) list.size(), (size_type) list.size());
+
+    auto    iter = list.begin();
+
+    for (size_t i = 0;  i < list.size();  ++i, ++iter)
+    {
+        mp_elems[i] = static_cast<T>( *iter);
+    }
 }
 
 template<class T, class AT> inline
@@ -226,11 +244,30 @@ dr_vector_engine<T,AT>::operator =(dr_vector_engine const& rhs)
     return *this;
 }
 
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::const_reference
-dr_vector_engine<T,AT>::operator ()(size_type i) const
+template<class T, class AT> 
+template<class ET2> inline
+dr_vector_engine<T,AT>&
+dr_vector_engine<T,AT>::operator =(ET2 const& rhs)
 {
-    return mp_elems[i];
+    assign(rhs);
+    return *this;
+}
+
+//-----------
+//- Iterators
+//
+template<class T, class AT> inline
+typename dr_vector_engine<T,AT>::iterator
+dr_vector_engine<T,AT>::begin() noexcept
+{
+    return iterator(this, 0, m_elemcap);
+}
+
+template<class T, class AT> inline
+typename dr_vector_engine<T,AT>::iterator
+dr_vector_engine<T,AT>::end() noexcept
+{
+    return iterator(this, m_elemcap, m_elemcap);
 }
 
 template<class T, class AT> inline
@@ -248,12 +285,22 @@ dr_vector_engine<T,AT>::end() const noexcept
 }
 
 template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::size_type
-dr_vector_engine<T,AT>::elements() const noexcept
+typename dr_vector_engine<T,AT>::const_iterator
+dr_vector_engine<T,AT>::cbegin() const noexcept
 {
-    return m_elems;
+    return const_iterator(this, 0, m_elemcap);
 }
 
+template<class T, class AT> inline
+typename dr_vector_engine<T,AT>::const_iterator
+dr_vector_engine<T,AT>::cend() const noexcept
+{
+    return const_iterator(this, m_elemcap, m_elemcap);
+}
+
+//----------
+//- Capacity
+//
 template<class T, class AT> inline
 typename dr_vector_engine<T,AT>::size_type
 dr_vector_engine<T,AT>::capacity() const noexcept
@@ -262,6 +309,16 @@ dr_vector_engine<T,AT>::capacity() const noexcept
 }
 
 template<class T, class AT> inline
+typename dr_vector_engine<T,AT>::size_type
+dr_vector_engine<T,AT>::elements() const noexcept
+{
+    return m_elems;
+}
+
+//----------------
+//- Element access
+//
+template<class T, class AT> inline
 typename dr_vector_engine<T,AT>::reference
 dr_vector_engine<T,AT>::operator ()(size_type i)
 {
@@ -269,67 +326,15 @@ dr_vector_engine<T,AT>::operator ()(size_type i)
 }
 
 template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::iterator
-dr_vector_engine<T,AT>::begin() noexcept
+typename dr_vector_engine<T,AT>::const_reference
+dr_vector_engine<T,AT>::operator ()(size_type i) const
 {
-    return iterator(this, 0, m_elemcap);
+    return mp_elems[i];
 }
 
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::iterator
-dr_vector_engine<T,AT>::end() noexcept
-{
-    return iterator(this, m_elemcap, m_elemcap);
-}
-
-template<class T, class AT>
-void
-dr_vector_engine<T,AT>::assign(dr_vector_engine const& rhs)
-{
-    if (&rhs == this) return;
-
-    size_t      old_n = (size_t)(m_elemcap);
-    size_t      new_n = (size_t)(rhs.m_elemcap);
-    pointer     p_tmp = detail::allocate(m_alloc, new_n, rhs.mp_elems);
-
-    detail::deallocate(m_alloc, mp_elems, old_n);
-    mp_elems  = p_tmp;
-    m_elems   = rhs.m_elems;
-    m_elemcap = rhs.m_elemcap;
-}
-
-template<class T, class AT>
-template<class ET2>
-void
-dr_vector_engine<T,AT>::assign(ET2 const& rhs)
-{
-    static_assert(detail::is_vector_engine_v<ET2>);
-    using src_size_type = typename ET2::size_type;
-
-    size_type           elems = (size_type) rhs.elements();
-    dr_vector_engine    tmp(elems);
-
-    if constexpr(is_same_v<size_type, src_size_type>)
-    {
-        for (size_type i = 0;  i < elems;  ++i)
-        {
-            tmp(i) = rhs(i);
-        }
-    }
-    else
-    {
-        src_size_type  si;
-        size_type       di;
-
-        for (di = 0, si = 0;  di < elems;  ++di, ++si)
-        {
-            tmp(di) = rhs(si);
-        }
-    }
-
-    tmp.swap(*this);
-}
-
+//-----------
+//- Modifiers
+//
 template<class T, class AT> inline
 void
 dr_vector_engine<T,AT>::reserve(size_type cap)
@@ -370,6 +375,9 @@ dr_vector_engine<T,AT>::swap_elements(size_type i, size_type j) noexcept
     detail::la_swap(mp_elems[i], mp_elems[j]);
 }
 
+//------------------------
+//- Private implementation
+//
 template<class T, class AT>
 void
 dr_vector_engine<T,AT>::alloc_new(size_type new_size, size_type new_cap)
@@ -381,6 +389,54 @@ dr_vector_engine<T,AT>::alloc_new(size_type new_size, size_type new_cap)
     mp_elems  = detail::allocate(m_alloc, new_cap);
     m_elems   = new_size;
     m_elemcap = new_cap;
+}
+
+template<class T, class AT>
+void
+dr_vector_engine<T,AT>::assign(dr_vector_engine const& rhs)
+{
+    if (&rhs == this) return;
+
+    size_type   old_n = (size_type)(m_elemcap);
+    size_type   new_n = (size_type)(rhs.m_elemcap);
+    pointer     p_tmp = detail::allocate(m_alloc, new_n, rhs.mp_elems);
+
+    detail::deallocate(m_alloc, mp_elems, old_n);
+    mp_elems  = p_tmp;
+    m_elems   = rhs.m_elems;
+    m_elemcap = rhs.m_elemcap;
+}
+
+template<class T, class AT>
+template<class ET2>
+void
+dr_vector_engine<T,AT>::assign(ET2 const& rhs)
+{
+    static_assert(detail::is_vector_engine_v<ET2>);
+    using src_size_type = typename ET2::size_type;
+
+    size_type           elems = (size_type) rhs.elements();
+    dr_vector_engine    tmp(elems);
+
+    if constexpr(is_same_v<size_type, src_size_type>)
+    {
+        for (size_type i = 0;  i < elems;  ++i)
+        {
+            tmp(i) = rhs(i);
+        }
+    }
+    else
+    {
+        src_size_type  si;
+        size_type       di;
+
+        for (di = 0, si = 0;  di < elems;  ++di, ++si)
+        {
+            tmp(di) = rhs(si);
+        }
+    }
+
+    tmp.swap(*this);
 }
 
 template<class T, class AT>

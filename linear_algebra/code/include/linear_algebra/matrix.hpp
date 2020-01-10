@@ -19,24 +19,30 @@ template<class ET, class OT>
 class matrix
 {
     static_assert(detail::is_matrix_engine_v<ET>);
+    using vector_view_tag = detail::view_category_t<ET, mutable_vector_engine_tag>;
+    using matrix_view_tag = detail::view_category_t<ET, mutable_matrix_engine_tag>;
 
   public:
     using engine_type     = ET;
     using element_type    = typename engine_type::element_type;
     using value_type      = typename engine_type::value_type;
+    using reference       = typename engine_type::reference;
+    using const_reference = typename engine_type::const_reference;
+    using difference_type = typename engine_type::difference_type;
     using size_type       = typename engine_type::size_type;
     using size_tuple      = typename engine_type::size_tuple;
-    using const_reference = typename engine_type::const_reference;
-    using reference       = typename engine_type::reference;
 
+    using column_type       = vector<matrix_column_view<engine_type, vector_view_tag>, OT>;
     using const_column_type = vector<matrix_column_view<engine_type, const_vector_engine_tag>, OT>;
-    using column_type       = vector<matrix_column_view<engine_type, detail::view_category_t<ET, mutable_vector_engine_tag>>, OT>;
-    using row_type        = vector<matrix_row_view<engine_type>, OT>;
+    using row_type          = vector<matrix_row_view<engine_type, vector_view_tag>, OT>;
+    using const_row_type    = vector<matrix_row_view<engine_type, const_vector_engine_tag>, OT>;
+
     using transpose_type  = matrix<matrix_transpose_view<engine_type>, OT>;
     using hermitian_type  = conditional_t<is_complex_v<element_type>, matrix, transpose_type>;
 
   public:
-    ~matrix() = default;
+    ~matrix() noexcept = default;
+
     constexpr matrix() = default;
     constexpr matrix(matrix&&) noexcept = default;
     constexpr matrix(matrix const&) = default;
@@ -76,10 +82,12 @@ class matrix
 
     //- Column view, row view, transpose view, and Hermitian.
     //
-    constexpr const_column_type column(size_type j) const noexcept;
     constexpr column_type       column(size_type j) noexcept;
+    constexpr const_column_type column(size_type j) const noexcept;
 
-    constexpr row_type          row(size_type i) const noexcept;
+    constexpr row_type          row(size_type i) noexcept;
+    constexpr const_row_type    row(size_type i) const noexcept;
+
     constexpr transpose_type    t() const;
     constexpr hermitian_type    h() const;
 
@@ -251,9 +259,16 @@ matrix<ET,OT>::column(size_type j) noexcept
 
 template<class ET, class OT> inline constexpr 
 typename matrix<ET,OT>::row_type
-matrix<ET,OT>::row(size_type i) const noexcept
+matrix<ET,OT>::row(size_type i) noexcept
 {
     return row_type(m_engine, i, detail::row_or_column_tag());
+}
+
+template<class ET, class OT> inline constexpr 
+typename matrix<ET,OT>::const_row_type
+matrix<ET,OT>::row(size_type i) const noexcept
+{
+    return const_row_type(m_engine, i, detail::row_or_column_tag());
 }
 
 template<class ET, class OT> inline constexpr 
