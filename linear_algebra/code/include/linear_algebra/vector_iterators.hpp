@@ -28,10 +28,10 @@ class vector_iterator
     using value_type      = element_type;
     using difference_type = typename engine_type::difference_type;
     using size_type       = typename engine_type::size_type;
-    using const_reference = typename engine_type::const_reference;
     using reference       = typename engine_type::reference;
-    using const_pointer   = typename engine_type::const_pointer;
+    using const_reference = typename engine_type::const_reference;
     using pointer         = typename engine_type::pointer;
+    using const_pointer   = typename engine_type::const_pointer;
 
     using iterator_category = std::random_access_iterator_tag;
 

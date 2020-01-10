@@ -25,8 +25,10 @@ class fs_vector_engine
     using value_type      = remove_cv_t<T>;
     using difference_type = ptrdiff_t;
     using size_type       = size_t;
-    using const_reference = T const&;
-    using reference       = T&;
+    using const_reference = element_type const&;
+    using reference       = element_type&;
+    using const_pointer   = element_type const*;
+    using pointer         = element_type*;
     using const_iterator  = detail::vector_const_iterator<fs_vector_engine>;
     using iterator        = detail::vector_iterator<fs_vector_engine>;
 

@@ -29,8 +29,8 @@ class matrix
     using const_reference = typename engine_type::const_reference;
     using reference       = typename engine_type::reference;
 
-    using const_column_type = vector<matrix_column_view<engine_type const>, OT>;
-    using column_type     = vector<matrix_column_view<engine_type>, OT>;
+    using const_column_type = vector<matrix_column_view<engine_type, const_vector_engine_tag>, OT>;
+    using column_type       = vector<matrix_column_view<engine_type, detail::view_category_t<ET, mutable_vector_engine_tag>>, OT>;
     using row_type        = vector<matrix_row_view<engine_type>, OT>;
     using transpose_type  = matrix<matrix_transpose_view<engine_type>, OT>;
     using hermitian_type  = conditional_t<is_complex_v<element_type>, matrix, transpose_type>;
@@ -76,7 +76,9 @@ class matrix
 
     //- Column view, row view, transpose view, and Hermitian.
     //
-    constexpr const_column_type       column(size_type j) const noexcept;
+    constexpr const_column_type column(size_type j) const noexcept;
+    constexpr column_type       column(size_type j) noexcept;
+
     constexpr row_type          row(size_type i) const noexcept;
     constexpr transpose_type    t() const;
     constexpr hermitian_type    h() const;
@@ -237,14 +239,21 @@ template<class ET, class OT> inline constexpr
 typename matrix<ET,OT>::const_column_type
 matrix<ET,OT>::column(size_type j) const noexcept
 {
-    return const_column_type(m_engine, j, detail::row_column_tag());
+    return const_column_type(m_engine, j, detail::row_or_column_tag());
+}
+
+template<class ET, class OT> inline constexpr 
+typename matrix<ET,OT>::column_type
+matrix<ET,OT>::column(size_type j) noexcept
+{
+    return column_type(m_engine, j, detail::row_or_column_tag());
 }
 
 template<class ET, class OT> inline constexpr 
 typename matrix<ET,OT>::row_type
 matrix<ET,OT>::row(size_type i) const noexcept
 {
-    return row_type(m_engine, i, detail::row_column_tag());
+    return row_type(m_engine, i, detail::row_or_column_tag());
 }
 
 template<class ET, class OT> inline constexpr 

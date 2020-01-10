@@ -11,128 +11,206 @@
 namespace STD_LA {
 namespace detail {
 
-struct row_column_tag {};
+template<class ET>  class vector_iterator;
+template<class ET>  class vector_const_iterator;
 
+struct row_or_column_tag {};
+
+//==================================================================================================
+//  Traits type that specifies important properties of an engine, based on its tag.
+//==================================================================================================
+//
 template<class TAG>
 struct tag_traits;
 
 template<>
 struct tag_traits<const_vector_engine_tag>
 {
-    static constexpr bool   is_vector_engine = true;
-    static constexpr bool   is_matrix_engine = false;
-    static constexpr bool   is_mutable       = false;
-    static constexpr bool   is_resizable     = false;
+    static constexpr bool   is_vector    = true;
+    static constexpr bool   is_matrix    = false;
+    static constexpr bool   is_const     = true;
+    static constexpr bool   is_mutable   = false;
+    static constexpr bool   is_resizable = false;
 };
 
 template<>
 struct tag_traits<mutable_vector_engine_tag>
 {
-    static constexpr bool   is_vector_engine = true;
-    static constexpr bool   is_matrix_engine = false;
-    static constexpr bool   is_mutable       = true;
-    static constexpr bool   is_resizable     = false;
+    static constexpr bool   is_vector    = true;
+    static constexpr bool   is_matrix    = false;
+    static constexpr bool   is_const     = true;
+    static constexpr bool   is_mutable   = true;
+    static constexpr bool   is_resizable = false;
 };
 
 template<>
 struct tag_traits<resizable_vector_engine_tag>
 {
-    static constexpr bool   is_vector_engine = true;
-    static constexpr bool   is_matrix_engine = false;
-    static constexpr bool   is_mutable       = true;
-    static constexpr bool   is_resizable     = true;
+    static constexpr bool   is_vector    = true;
+    static constexpr bool   is_matrix    = false;
+    static constexpr bool   is_const     = true;
+    static constexpr bool   is_mutable   = true;
+    static constexpr bool   is_resizable = true;
 };
 
 template<>
 struct tag_traits<const_matrix_engine_tag>
 {
-    static constexpr bool   is_vector_engine = false;
-    static constexpr bool   is_matrix_engine = true;
-    static constexpr bool   is_mutable       = false;
-    static constexpr bool   is_resizable     = false;
+    static constexpr bool   is_vector    = false;
+    static constexpr bool   is_matrix    = true;
+    static constexpr bool   is_const     = true;
+    static constexpr bool   is_mutable   = false;
+    static constexpr bool   is_resizable = false;
 };
 
 template<>
 struct tag_traits<mutable_matrix_engine_tag>
 {
-    static constexpr bool   is_vector_engine = false;
-    static constexpr bool   is_matrix_engine = true;
-    static constexpr bool   is_mutable       = true;
-    static constexpr bool   is_resizable     = false;
+    static constexpr bool   is_vector    = false;
+    static constexpr bool   is_matrix    = true;
+    static constexpr bool   is_const     = true;
+    static constexpr bool   is_mutable   = true;
+    static constexpr bool   is_resizable = false;
 };
 
 template<>
 struct tag_traits<resizable_matrix_engine_tag>
 {
-    static constexpr bool   is_vector_engine = false;
-    static constexpr bool   is_matrix_engine = true;
-    static constexpr bool   is_mutable       = true;
-    static constexpr bool   is_resizable     = true;
+    static constexpr bool   is_vector    = false;
+    static constexpr bool   is_matrix    = true;
+    static constexpr bool   is_const     = true;
+    static constexpr bool   is_mutable   = true;
+    static constexpr bool   is_resizable = true;
 };
 
-template<bool is_vector, class ET> 
-struct vector_iterator_traits;
 
-template<class ET>
-struct vector_iterator_traits<true, ET>
+//==================================================================================================
+//  Traits type that chooses the correct tag for a view, given the tag of the engine type to be
+//  wrapped (ETT) and the desired tag type of the view (VTT).
+//==================================================================================================
+//
+template<class ETT, class VTT> struct view_tag_chooser;
+
+template<>
+struct view_tag_chooser<const_matrix_engine_tag, const_matrix_engine_tag>
 {
-    using const_iterator = typename ET::const_iterator;
-    using iterator       = typename ET::iterator;
+    using tag_type = const_matrix_engine_tag;
 };
 
-template<class ET>
-struct vector_iterator_traits<false, ET>
+template<>
+struct view_tag_chooser<const_matrix_engine_tag, mutable_matrix_engine_tag>
 {
-    using const_iterator = void;
-    using iterator       = void;
+    using tag_type = const_matrix_engine_tag;
 };
 
-template<bool is_vector, class ET>
-using iterator_of_t = typename vector_iterator_traits<is_vector, ET>::iterator;
+template<>
+struct view_tag_chooser<const_matrix_engine_tag, const_vector_engine_tag>
+{
+    using tag_type = const_vector_engine_tag;
+};
 
-template<bool is_vector, class ET>
-using const_iterator_of_t = typename vector_iterator_traits<is_vector, ET>::const_iterator;
+template<>
+struct view_tag_chooser<const_matrix_engine_tag, mutable_vector_engine_tag>
+{
+    using tag_type = const_vector_engine_tag;
+};
 
-template<class ET>
-struct matrix_view_traits
+//------
+//
+template<>
+struct view_tag_chooser<mutable_matrix_engine_tag, const_matrix_engine_tag>
+{
+    using tag_type = const_matrix_engine_tag;
+};
+
+template<>
+struct view_tag_chooser<mutable_matrix_engine_tag, mutable_matrix_engine_tag>
+{
+    using tag_type = mutable_matrix_engine_tag;
+};
+
+template<>
+struct view_tag_chooser<mutable_matrix_engine_tag, const_vector_engine_tag>
+{
+    using tag_type = const_vector_engine_tag;
+};
+
+template<>
+struct view_tag_chooser<mutable_matrix_engine_tag, mutable_vector_engine_tag>
+{
+    using tag_type = mutable_vector_engine_tag;
+};
+
+//------
+//
+template<>
+struct view_tag_chooser<resizable_matrix_engine_tag, const_matrix_engine_tag>
+{
+    using tag_type = const_matrix_engine_tag;
+};
+
+template<>
+struct view_tag_chooser<resizable_matrix_engine_tag, mutable_matrix_engine_tag>
+{
+    using tag_type = mutable_matrix_engine_tag;
+};
+
+template<>
+struct view_tag_chooser<resizable_matrix_engine_tag, const_vector_engine_tag>
+{
+    using tag_type = const_vector_engine_tag;
+};
+
+template<>
+struct view_tag_chooser<resizable_matrix_engine_tag, mutable_vector_engine_tag>
+{
+    using tag_type = mutable_vector_engine_tag;
+};
+
+template<class ET, class VTT>
+using view_category_t = typename view_tag_chooser<typename ET::engine_category, VTT>::tag_type;
+
+
+template<class ET, class CAT>
+struct view_traits
 {
     using traits_type = tag_traits<typename ET::engine_category>;
 
-    static constexpr bool   is_vector_engine = traits_type::is_vector_engine;
-    static constexpr bool   is_matrix_engine = traits_type::is_matrix_engine;
-    static constexpr bool   is_mutable       = traits_type::is_mutable;
-    static constexpr bool   is_resizable     = traits_type::is_resizable;
-
-    using vector_view_category = conditional_t<is_mutable, mutable_vector_engine_tag, const_vector_engine_tag>;
-    using matrix_view_category = conditional_t<is_mutable, mutable_matrix_engine_tag, const_matrix_engine_tag>;
+    static constexpr bool   is_vector    = traits_type::is_vector;
+    static constexpr bool   is_matrix    = traits_type::is_matrix;
+    static constexpr bool   is_mutable   = traits_type::is_mutable;
+    static constexpr bool   is_resizable = traits_type::is_resizable;
 
     using reference       = conditional_t<is_mutable, typename ET::reference, typename ET::const_reference>;
     using const_reference = typename ET::const_reference;
 
-    using mutable_iterator = iterator_of_t<is_vector_engine, ET>;
-    using const_iterator   = const_iterator_of_t<is_vector_engine, ET>;
-    using iterator         = conditional_t<is_mutable, mutable_iterator, const_iterator>;
+    using pointer       = conditional_t<is_mutable, typename ET::pointer, typename ET::const_pointer>;
+    using const_pointer = typename ET::const_pointer;
+
+    template<class DET>
+    using iterator       = conditional_t<is_mutable, vector_iterator<DET>, vector_const_iterator<DET>>;
+    template<class DET>
+    using const_iterator = vector_const_iterator<DET>;
 };
 
-template<class ET>
-struct matrix_view_traits<ET const>
-{
-    using traits_type = tag_traits<typename ET::engine_category>;
+template<class ET, class CAT>
+using view_reference_t = typename view_traits<ET,CAT>::reference;
 
-    static constexpr bool   is_vector_engine = traits_type::is_vector_engine;
-    static constexpr bool   is_matrix_engine = traits_type::is_matrix_engine;
-    static constexpr bool   is_mutable       = false;
-    static constexpr bool   is_resizable     = false;
+template<class ET, class CAT>
+using view_const_reference_t = typename view_traits<ET,CAT>::const_reference;
 
-    using vector_view_category = const_vector_engine_tag;
-    using matrix_view_category = const_matrix_engine_tag;
+template<class ET, class CAT>
+using view_pointer_t = typename view_traits<ET,CAT>::pointer;
 
-    using const_reference = typename ET::const_reference;
-    using reference       = typename ET::const_reference;
+template<class ET, class CAT>
+using view_const_pointer_t = typename view_traits<ET,CAT>::const_pointer;
 
-    using const_iterator = const_iterator_of_t<is_vector_engine, ET>;
-    using iterator       = const_iterator;
-};
+template<class ET, class CAT, class DET>
+using view_iterator_t = typename view_traits<ET,CAT>::template iterator<DET>;
+
+template<class ET, class CAT, class DET>
+using view_const_iterator_t = typename view_traits<ET,CAT>::template const_iterator<DET>;
+
 
 //--------------------------------------------------------------------------------------------------
 //- Internally-used tag type to facilitate distinguishing elements from vectors/matrices.
@@ -151,10 +229,10 @@ template<class ET> inline constexpr
 bool    is_scalar_engine_v = (ET::engine_category::value == scalar_engine_tag::value);
 
 template<class ET> inline constexpr 
-bool    is_vector_engine_v = matrix_view_traits<ET>::is_vector_engine;
+bool    is_vector_engine_v = tag_traits<typename ET::engine_category>::is_vector;
 
 template<typename ET> inline constexpr 
-bool    is_matrix_engine_v = matrix_view_traits<ET>::is_matrix_engine;
+bool    is_matrix_engine_v = tag_traits<typename ET::engine_category>::is_matrix;
 
 template<class ET1, class ET2> inline constexpr 
 bool    engines_match_v = (is_matrix_engine_v<ET1> == is_matrix_engine_v<ET2>);
@@ -164,7 +242,7 @@ bool    engines_match_v = (is_matrix_engine_v<ET1> == is_matrix_engine_v<ET2>);
 //- Tests to determine if an engine has mutable element indexing.
 //
 template<class ET> inline constexpr 
-bool    is_mutable_engine_v = matrix_view_traits<ET>::is_mutable;
+bool    is_mutable_engine_v = tag_traits<typename ET::engine_category>::is_mutable;
 
 template<class ET1, class ET2>
 using enable_if_mutable = enable_if_t<is_same_v<ET1, ET2> && is_mutable_engine_v<ET1>, bool>;
@@ -174,7 +252,7 @@ using enable_if_mutable = enable_if_t<is_same_v<ET1, ET2> && is_mutable_engine_v
 //- Tests to determine if an engine is resizable.
 //
 template<class ET> inline constexpr 
-bool    is_resizable_engine_v = matrix_view_traits<ET>::is_resizable;
+bool    is_resizable_engine_v = tag_traits<typename ET::engine_category>::is_resizable;
 
 template<class ET1, class ET2>
 using enable_if_resizable = enable_if_t<is_same_v<ET1, ET2> && is_resizable_engine_v<ET1>, bool>;
@@ -214,49 +292,6 @@ la_swap(T& t0, T& t1) noexcept(is_nothrow_movable_v<T>)
     t1 = std::move(t2);
 }
 
-template<class ET>
-using index_t = typename ET::size_type;
-
-template<class ET>
-using vector_view_reference_t = decltype(declval<ET>()(declval<typename ET::size_type>()));
-
-template<class ET>
-using matrix_view_reference_t = decltype(declval<ET>()(declval<typename ET::size_type>(),
-                                                       declval<typename ET::size_type>()));
-
-template<class ET>
-using vector_view_iterator_t = decltype(declval<ET>().begin());
-
-template<class ET>
-using matrix_view_iterator_t = decltype(declval<ET>().begin());
-/*
-template<class DST_TAG, class ET>
-struct dest_view_traits;
-
-template<class ET>
-struct dest_view_traits<const_vector_engine_tag, ET>
-{
-    using tag_type  = const_vector_engine_tag;
-    using reference = typename ET::const_reference;
-    using iterator  = typename ET::const_iterator;
-};
-
-template<class ET>
-struct dest_view_traits<mutable_vector_engine_tag, ET>
-{
-    using tag_type  = mutable_vector_engine_tag;
-    using reference = typename ET::reference;
-    using iterator  = typename ET::iterator;
-};
-
-template<class ET>
-struct dest_view_traits<resizable_vector_engine_tag, ET>
-{
-    using tag_type  = resizable_vector_engine_tag;
-    using reference = typename ET::reference;
-    using iterator  = typename ET::iterator;
-};
-*/
 }       //- detail namespace
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_ENGINE_TRAITS_HPP_DEFINED

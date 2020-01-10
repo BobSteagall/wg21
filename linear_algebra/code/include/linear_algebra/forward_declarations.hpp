@@ -14,15 +14,15 @@ USING_STD
 
 //- Some tags for specifying how engines should behave.
 //
-using scalar_engine_tag           = integral_constant<int, 0>;
+struct scalar_engine_tag           : public integral_constant<int, 0> {};
 
-using const_vector_engine_tag     = integral_constant<int, 1>;
-using mutable_vector_engine_tag   = integral_constant<int, 2>;
-using resizable_vector_engine_tag = integral_constant<int, 3>;
+struct const_vector_engine_tag     : public integral_constant<int, 1> {};
+struct mutable_vector_engine_tag   : public integral_constant<int, 2> {};
+struct resizable_vector_engine_tag : public integral_constant<int, 3> {};
 
-using const_matrix_engine_tag     = integral_constant<int, 5>;
-using mutable_matrix_engine_tag   = integral_constant<int, 7>;
-using resizable_matrix_engine_tag = integral_constant<int, 11>;
+struct const_matrix_engine_tag     : public integral_constant<int, 5> {};
+struct mutable_matrix_engine_tag   : public integral_constant<int, 7> {};
+struct resizable_matrix_engine_tag : public integral_constant<int, 11> {};
 
 //- Traits for determining if a type is a complex number.
 //
@@ -32,7 +32,7 @@ struct default_matrix_operations {};
 
 //- Basic linear algebra engine types.
 //
-template<class ET>                      class matrix_column_view;
+template<class ET, class CAT>           class matrix_column_view;
 template<class ET>                      class matrix_row_view;
 template<class ET>                      class matrix_transpose_view;
 template<class T, size_t N>             class fs_vector_engine;

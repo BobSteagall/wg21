@@ -35,8 +35,8 @@ int main()
     using MET = STD_LA::fs_matrix_engine<float,4,4>;
     using CET = STD_LA::fs_matrix_engine<float,4,4> const;
 
-    PRINT_TYPE(STD_LA::detail::matrix_view_reference_t<MET>);
-    PRINT_TYPE(STD_LA::detail::matrix_view_reference_t<CET>);
+//    PRINT_TYPE(STD_LA::detail::view_reference_t<MET>);
+//    PRINT_TYPE(STD_LA::detail::view_reference_t<CET>);
 
     return 0;
 }

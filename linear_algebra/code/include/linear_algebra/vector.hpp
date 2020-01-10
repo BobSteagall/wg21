@@ -112,8 +112,8 @@ public:
     engine_type     m_engine;
 
   private:
-    template<class ET2>
-    constexpr vector(ET2& eng, size_type idx, detail::row_column_tag);
+      template<class ET2>
+      constexpr vector(ET2&& eng, size_type idx, detail::row_or_column_tag);
 };
 
 template<class ET, class OT> inline
@@ -152,8 +152,8 @@ vector<ET,OT>::vector(size_type elems, size_type cap)
 template<class ET, class OT>
 template<class ET2> inline
 constexpr
-vector<ET,OT>::vector(ET2& eng, size_type idx, detail::row_column_tag)
-:   m_engine(eng, idx)
+vector<ET,OT>::vector(ET2&& eng, size_type idx, detail::row_or_column_tag)
+:   m_engine(std::forward<ET2>(eng), idx)
 {}
 
 template<class ET, class OT>
@@ -184,14 +184,14 @@ template<class ET, class OT> inline
 constexpr typename vector<ET,OT>::const_iterator
 vector<ET,OT>::begin() const noexcept
 {
-    return m_engine.begin();
+    return m_engine.cbegin();
 }
 
 template<class ET, class OT> inline
 constexpr typename vector<ET,OT>::const_iterator
 vector<ET,OT>::end() const noexcept
 {
-    return m_engine.end();
+    return m_engine.cend();
 }
 
 template<class ET, class OT> inline

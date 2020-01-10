@@ -22,7 +22,7 @@ class fs_matrix_engine_tst
     using const_reference = T const&;
     using const_pointer   = T const*;
     using difference_type = std::size_t;
-    using size_type        = std::int32_t;
+    using size_type       = std::uint32_t;
     using size_tuple      = std::tuple<size_type, size_type>;
 
     static constexpr bool   is_column_major = false;
@@ -30,9 +30,9 @@ class fs_matrix_engine_tst
     static constexpr bool   is_rectangular  = true;
     static constexpr bool   is_row_major    = true;
 
-    using column_view_type    = STD_LA::matrix_column_view<fs_matrix_engine_tst>;
-    using row_view_type       = STD_LA::matrix_row_view<fs_matrix_engine_tst>;
-    using transpose_view_type = STD_LA::matrix_transpose_view<fs_matrix_engine_tst>;
+//    using column_view_type    = STD_LA::matrix_column_view<fs_matrix_engine_tst>;
+//    using row_view_type       = STD_LA::matrix_row_view<fs_matrix_engine_tst>;
+//    using transpose_view_type = STD_LA::matrix_transpose_view<fs_matrix_engine_tst>;
 
   public:
     constexpr fs_matrix_engine_tst();
@@ -44,12 +44,12 @@ class fs_matrix_engine_tst
 
     constexpr const_reference   operator ()(size_type i, size_type j) const;
 
-    constexpr size_type      columns() const noexcept;
-    constexpr size_type      rows() const noexcept;
+    constexpr size_type     columns() const noexcept;
+    constexpr size_type     rows() const noexcept;
     constexpr size_tuple    size() const noexcept;
 
-    constexpr size_type      column_capacity() const noexcept;
-    constexpr size_type      row_capacity() const noexcept;
+    constexpr size_type     column_capacity() const noexcept;
+    constexpr size_type     row_capacity() const noexcept;
     constexpr size_tuple    capacity() const noexcept;
 
     constexpr reference     operator ()(size_type i, size_type j);

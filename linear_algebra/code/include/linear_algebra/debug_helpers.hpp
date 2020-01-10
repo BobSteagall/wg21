@@ -207,7 +207,7 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
     cout << "  capy: " << v.capacity() << endl;
     cout << "  -----" << endl;
 
-    cout << right << setw(4) << setprecision(3) << (double) v(0);
+    cout << "(idx) " << right << setw(4) << setprecision(3) << (double) v(0);
 
     for (size_type i = 1;  i < v.elements();  ++i)
     {
@@ -218,7 +218,7 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
     auto    iter = v.begin();
     auto    last = v.end();
 
-    cout << right << setw(4) << setprecision(3) << (double) *iter;
+    cout << "(itr) " << right << setw(4) << setprecision(3) << (double) *iter;
 
     for (++iter;  iter != last;  ++iter)
     {

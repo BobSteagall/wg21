@@ -31,9 +31,9 @@ class matrix_transpose_view
     using const_pointer   = typename engine_type::const_pointer;
     using pointer         = typename engine_type::const_pointer;
 
-    using column_view_type    = matrix_column_view<matrix_transpose_view>;
-    using row_view_type       = matrix_row_view<matrix_transpose_view>;
-    using transpose_view_type = matrix_transpose_view<matrix_transpose_view>;
+//    using column_view_type    = matrix_column_view<matrix_transpose_view>;
+//    using row_view_type       = matrix_row_view<matrix_transpose_view>;
+//    using transpose_view_type = matrix_transpose_view<matrix_transpose_view>;
 
   public:
     constexpr matrix_transpose_view();
