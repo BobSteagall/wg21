@@ -23,7 +23,11 @@ class matrix
     using vector_view_tag = detail::view_category_t<ET, writable_vector_engine_tag>;
     using matrix_view_tag = detail::view_category_t<ET, writable_matrix_engine_tag>;
 
+    static constexpr bool   has_cx_elem = detail::is_complex_v<typename ET::value_type>;
+
   public:
+    //- Types
+    //
     using engine_type     = ET;
     using element_type    = typename engine_type::element_type;
     using value_type      = typename engine_type::value_type;
@@ -41,9 +45,11 @@ class matrix
     using transpose_type       = matrix<matrix_transpose_engine<engine_type, matrix_view_tag>, OT>;
     using const_transpose_type = matrix<matrix_transpose_engine<engine_type, readable_matrix_engine_tag>, OT>;
 
-    using hermitian_type  = conditional_t<detail::is_complex_v<element_type>, matrix, transpose_type>;
+    using hermitian_type       = conditional_t<has_cx_elem, matrix, transpose_type>;
+    using const_hermitian_type = conditional_t<has_cx_elem, matrix, const_transpose_type>;
 
-  public:
+    //- Construct/copy/destroy
+    //
     ~matrix() noexcept = default;
 
     constexpr matrix() = default;
@@ -69,11 +75,7 @@ class matrix
     template<class ET2, class OT2>
     constexpr matrix&   operator =(matrix<ET2, OT2> const& rhs);
 
-    //- Const element access.
-    //
-    constexpr const_reference   operator ()(size_type i, size_type j) const;
-
-    //- Accessors.
+    //- Capacity
     //
     constexpr size_type     columns() const noexcept;
     constexpr size_type     rows() const noexcept;
@@ -83,49 +85,41 @@ class matrix
     constexpr size_type     row_capacity() const noexcept;
     constexpr size_tuple    capacity() const noexcept;
 
-    //- Column view, row view, transpose view, and Hermitian.
-    //
-    constexpr column_type       column(size_type j) noexcept;
-    constexpr const_column_type column(size_type j) const noexcept;
-
-    constexpr row_type          row(size_type i) noexcept;
-    constexpr const_row_type    row(size_type i) const noexcept;
-
-    constexpr const_transpose_type    t() const;
-    constexpr hermitian_type    h() const;
-
-    //- Mutable element access.
-    //
-    constexpr reference operator ()(size_type i, size_type j);
-
-    //- Assignment.
-    //
-    constexpr void      assign(matrix const& rhs);
-    template<class ET2, class OT2>
-    constexpr void      assign(matrix<ET2, OT2> const& rhs);
-
-    //- Change capacity.
-    //
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr void      reserve(size_tuple cap);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr void      reserve(size_type rowcap, size_type colcap);
 
-    //- Change size.
-    //
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr void      resize(size_tuple size);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr void      resize(size_type rows, size_type cols);
 
-    //- Change size and capacity in one shot.
-    //
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr void      resize(size_tuple size, size_tuple cap);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr void      resize(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 
-    //- Swapping operations.
+    //- Column view, row view, transpose view, and Hermitian.
+    //
+    constexpr reference             operator ()(size_type i, size_type j);
+    constexpr const_reference       operator ()(size_type i, size_type j) const;
+
+    constexpr column_type           column(size_type j) noexcept;
+    constexpr const_column_type     column(size_type j) const noexcept;
+    constexpr row_type              row(size_type i) noexcept;
+    constexpr const_row_type        row(size_type i) const noexcept;
+    constexpr transpose_type        t() noexcept;
+    constexpr const_transpose_type  t() const noexcept;
+    constexpr hermitian_type        h();
+    constexpr const_hermitian_type  h() const;
+
+    //- Data access
+    //
+    constexpr engine_type&          engine() noexcept;
+    constexpr engine_type const&    engine() const noexcept;
+
+    //- Modifiers
     //
     template<class ET2 = ET, detail::enable_if_mutable<ET, ET2> = true>
     constexpr void      swap(matrix& rhs) noexcept;
@@ -145,6 +139,9 @@ class matrix
     constexpr matrix(engine_type const& eng);
 };
 
+//------------------------
+//- Construct/copy/destroy
+//
 template<class ET, class OT>
 template<class U, class ET2, detail::enable_if_fixed_size<ET, ET2>> constexpr
 matrix<ET,OT>::matrix(initializer_list<U> list)
@@ -197,13 +194,9 @@ matrix<ET,OT>::operator =(matrix<ET2, OT2> const& rhs)
     return *this;
 }
 
-template<class ET, class OT> inline constexpr 
-typename matrix<ET,OT>::const_reference
-matrix<ET,OT>::operator ()(size_type i, size_type j) const
-{
-    return m_engine(i, j);
-}
-
+//----------
+//- Capacity
+//
 template<class ET, class OT> inline constexpr 
 typename matrix<ET,OT>::size_type
 matrix<ET,OT>::columns() const noexcept
@@ -244,77 +237,6 @@ typename matrix<ET,OT>::size_tuple
 matrix<ET,OT>::capacity() const noexcept
 {
     return size_tuple(m_engine.row_capacity(), m_engine.column_capacity());
-}
-
-template<class ET, class OT> inline constexpr 
-typename matrix<ET,OT>::const_column_type
-matrix<ET,OT>::column(size_type j) const noexcept
-{
-    return const_column_type(m_engine, j, detail::row_or_column_tag());
-}
-
-template<class ET, class OT> inline constexpr 
-typename matrix<ET,OT>::column_type
-matrix<ET,OT>::column(size_type j) noexcept
-{
-    return column_type(m_engine, j, detail::row_or_column_tag());
-}
-
-template<class ET, class OT> inline constexpr 
-typename matrix<ET,OT>::row_type
-matrix<ET,OT>::row(size_type i) noexcept
-{
-    return row_type(m_engine, i, detail::row_or_column_tag());
-}
-
-template<class ET, class OT> inline constexpr 
-typename matrix<ET,OT>::const_row_type
-matrix<ET,OT>::row(size_type i) const noexcept
-{
-    return const_row_type(m_engine, i, detail::row_or_column_tag());
-}
-
-template<class ET, class OT> inline constexpr 
-typename matrix<ET,OT>::const_transpose_type
-matrix<ET,OT>::t() const
-{
-    return const_transpose_type(m_engine);
-}
-
-template<class ET, class OT> inline constexpr 
-typename matrix<ET,OT>::hermitian_type
-matrix<ET,OT>::h() const
-{
-    if constexpr (detail::is_complex_v<element_type>)
-    {
-        return hermitian_type();
-    }
-    else
-    {
-        return hermitian_type(m_engine);
-    }
-}
-
-template<class ET, class OT> inline constexpr 
-typename matrix<ET,OT>::reference
-matrix<ET,OT>::operator ()(size_type i, size_type j)
-{
-    return m_engine(i, j);
-}
-
-template<class ET, class OT> inline constexpr 
-void
-matrix<ET,OT>::assign(matrix const& rhs)
-{
-    m_engine.assign(rhs.m_engine);
-}
-
-template<class ET, class OT>
-template<class ET2, class OT2> inline constexpr 
-void
-matrix<ET,OT>::assign(matrix<ET2, OT2> const& rhs)
-{
-    m_engine.assign(rhs.m_engine);
 }
 
 template<class ET, class OT>
@@ -365,6 +287,113 @@ matrix<ET,OT>::resize(size_type rows, size_type cols, size_type rowcap, size_typ
     m_engine.resize(rows, cols, rowcap, colcap);
 }
 
+//----------------
+//- Element access
+//
+template<class ET, class OT> inline constexpr 
+typename matrix<ET,OT>::reference
+matrix<ET,OT>::operator ()(size_type i, size_type j)
+{
+    return m_engine(i, j);
+}
+
+template<class ET, class OT> inline constexpr 
+typename matrix<ET,OT>::const_reference
+matrix<ET,OT>::operator ()(size_type i, size_type j) const
+{
+    return m_engine(i, j);
+}
+
+template<class ET, class OT> inline constexpr 
+typename matrix<ET,OT>::const_column_type
+matrix<ET,OT>::column(size_type j) const noexcept
+{
+    return const_column_type(m_engine, j, detail::row_or_column_tag());
+}
+
+template<class ET, class OT> inline constexpr 
+typename matrix<ET,OT>::column_type
+matrix<ET,OT>::column(size_type j) noexcept
+{
+    return column_type(m_engine, j, detail::row_or_column_tag());
+}
+
+template<class ET, class OT> inline constexpr 
+typename matrix<ET,OT>::row_type
+matrix<ET,OT>::row(size_type i) noexcept
+{
+    return row_type(m_engine, i, detail::row_or_column_tag());
+}
+
+template<class ET, class OT> inline constexpr 
+typename matrix<ET,OT>::const_row_type
+matrix<ET,OT>::row(size_type i) const noexcept
+{
+    return const_row_type(m_engine, i, detail::row_or_column_tag());
+}
+
+template<class ET, class OT> inline constexpr 
+typename matrix<ET,OT>::transpose_type
+matrix<ET,OT>::t() noexcept
+{
+    return transpose_type(m_engine);
+}
+
+template<class ET, class OT> inline constexpr 
+typename matrix<ET,OT>::const_transpose_type
+matrix<ET,OT>::t() const noexcept
+{
+    return const_transpose_type(m_engine);
+}
+
+template<class ET, class OT> inline constexpr 
+typename matrix<ET,OT>::hermitian_type
+matrix<ET,OT>::h() 
+{
+    if constexpr (detail::is_complex_v<element_type>)
+    {
+        return hermitian_type();
+    }
+    else
+    {
+        return hermitian_type(m_engine);
+    }
+}
+
+template<class ET, class OT> inline constexpr 
+typename matrix<ET,OT>::const_hermitian_type
+matrix<ET,OT>::h() const
+{
+    if constexpr (detail::is_complex_v<element_type>)
+    {
+        return const_hermitian_type();
+    }
+    else
+    {
+        return const_hermitian_type(m_engine);
+    }
+}
+
+//-------------
+//- Data access
+//
+template<class ET, class OT> constexpr 
+typename matrix<ET,OT>::engine_type&
+matrix<ET,OT>::engine() noexcept
+{
+    return m_engine;
+}
+
+template<class ET, class OT> constexpr 
+typename matrix<ET,OT>::engine_type const&
+matrix<ET,OT>::engine() const noexcept
+{
+    return m_engine;
+}
+
+//-----------
+//- Modifiers
+//
 template<class ET, class OT>
 template<class ET2, detail::enable_if_mutable<ET, ET2>> inline constexpr 
 void
@@ -389,7 +418,8 @@ matrix<ET,OT>::swap_rows(size_type r1, size_type r2) noexcept
     m_engine.swap_rows(r1, r2);
 }
 
-//--------
+//------------
+//- Comparison
 //
 template<class ET1, class OT1, class ET2, class OT2> 
 constexpr bool

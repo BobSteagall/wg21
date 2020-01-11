@@ -17,24 +17,26 @@ template<class ET, class OT>
 class vector
 {
     static_assert(detail::is_vector_engine_v<ET>);
+    static constexpr bool   has_cx_elem = detail::is_complex_v<typename ET::value_type>;
 
   public:
     //- Types
     //
-    using engine_type     = ET;
-    using element_type    = typename engine_type::element_type;
-    using value_type      = typename engine_type::value_type;
-    using difference_type = typename engine_type::difference_type;
-    using size_type       = typename engine_type::size_type;
-    using const_reference = typename engine_type::const_reference;
-    using reference       = typename engine_type::reference;
-    using const_iterator  = typename engine_type::const_iterator;
-    using iterator        = typename engine_type::iterator;
-
-    using transpose_type       = vector&;
-    using const_transpose_type = vector const&;
-    using hermitian_type       = conditional_t<detail::is_complex_v<element_type>, vector, transpose_type>;
-    using const_hermitian_type = conditional_t<detail::is_complex_v<element_type>, vector, const_transpose_type>;
+    using engine_type            = ET;
+    using element_type           = typename engine_type::element_type;
+    using value_type             = typename engine_type::value_type;
+    using difference_type        = typename engine_type::difference_type;
+    using size_type              = typename engine_type::size_type;
+    using reference              = typename engine_type::reference;
+    using const_reference        = typename engine_type::const_reference;
+    using iterator               = typename engine_type::iterator;
+    using const_iterator         = typename engine_type::const_iterator;
+    using reverse_iterator       = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+    using transpose_type         = vector&;
+    using const_transpose_type   = vector const&;
+    using hermitian_type         = conditional_t<has_cx_elem, vector, transpose_type>;
+    using const_hermitian_type   = conditional_t<has_cx_elem, vector, const_transpose_type>;
 
     //- Construct/copy/destroy
     //
@@ -61,11 +63,19 @@ class vector
     //- Iterators
     //
     constexpr iterator          begin() noexcept;
-    constexpr iterator          end() noexcept;
     constexpr const_iterator    begin() const noexcept;
+    constexpr iterator          end() noexcept;
     constexpr const_iterator    end() const noexcept;
-    constexpr const_iterator    cbegin() const noexcept;
-    constexpr const_iterator    cend() const noexcept;
+
+    constexpr reverse_iterator          rbegin() noexcept;
+    constexpr const_reverse_iterator    rbegin() const noexcept;
+    constexpr reverse_iterator          rend() noexcept;
+    constexpr const_reverse_iterator    rend() const noexcept;
+
+    constexpr const_iterator            cbegin() const noexcept;
+    constexpr const_iterator            cend() const noexcept;
+    constexpr const_reverse_iterator    crbegin() const noexcept;
+    constexpr const_reverse_iterator    crend() const noexcept;
 
     //- Capacity
     //
@@ -73,7 +83,14 @@ class vector
     constexpr size_type     elements() const noexcept;
     constexpr size_type     size() const noexcept;
 
-    //- Element access.
+    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    constexpr void      reserve(size_type elemcap);
+    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    constexpr void      resize(size_type elems);
+    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    constexpr void      resize(size_type elems, size_type elemcap);
+
+    //- Element access
     //
     constexpr reference         operator [](size_type i);
     constexpr reference         operator ()(size_type i);
@@ -85,16 +102,13 @@ class vector
     constexpr hermitian_type        h();
     constexpr const_hermitian_type  h() const;
 
+    //- Data access
+    //
+    constexpr engine_type&          engine() noexcept;
+    constexpr engine_type const&    engine() const noexcept;
+
     //- Modifiers
     //
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void      reserve(size_type elemcap);
-
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void      resize(size_type elems);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void      resize(size_type elems, size_type elemcap);
-
     constexpr void      swap(vector& rhs) noexcept;
     constexpr void      swap_elements(size_type i, size_type j) noexcept;
 
@@ -166,6 +180,13 @@ vector<ET,OT>::begin() noexcept
 }
 
 template<class ET, class OT> constexpr 
+typename vector<ET,OT>::const_iterator
+vector<ET,OT>::begin() const noexcept
+{
+    return m_engine.cbegin();
+}
+
+template<class ET, class OT> constexpr 
 typename vector<ET,OT>::iterator
 vector<ET,OT>::end() noexcept
 {
@@ -174,16 +195,37 @@ vector<ET,OT>::end() noexcept
 
 template<class ET, class OT> constexpr 
 typename vector<ET,OT>::const_iterator
-vector<ET,OT>::begin() const noexcept
-{
-    return m_engine.cbegin();
-}
-
-template<class ET, class OT> constexpr 
-typename vector<ET,OT>::const_iterator
 vector<ET,OT>::end() const noexcept
 {
     return m_engine.cend();
+}
+
+template<class ET, class OT> constexpr 
+typename vector<ET,OT>::reverse_iterator
+vector<ET,OT>::rbegin() noexcept
+{
+    return reverse_iterator(end());
+}
+
+template<class ET, class OT> constexpr 
+typename vector<ET,OT>::const_reverse_iterator
+vector<ET,OT>::rbegin() const noexcept
+{
+    return const_reverse_iterator(cend());
+}
+
+template<class ET, class OT> constexpr 
+typename vector<ET,OT>::reverse_iterator
+vector<ET,OT>::rend() noexcept
+{
+    return reverse_iterator(begin());
+}
+
+template<class ET, class OT> constexpr 
+typename vector<ET,OT>::const_reverse_iterator
+vector<ET,OT>::rend() const noexcept
+{
+    return const_reverse_iterator(cbegin());
 }
 
 template<class ET, class OT> constexpr 
@@ -222,6 +264,30 @@ typename vector<ET,OT>::size_type
 vector<ET,OT>::size() const noexcept
 {
     return m_engine.elements();
+}
+
+template<class ET, class OT>
+template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr 
+void
+vector<ET,OT>::reserve(size_type cap)
+{
+    m_engine.reserve(cap);
+}
+
+template<class ET, class OT>
+template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr 
+void
+vector<ET,OT>::resize(size_type elems)
+{
+    m_engine.resize(elems);
+}
+
+template<class ET, class OT>
+template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr 
+void
+vector<ET,OT>::resize(size_type elems, size_type cap)
+{
+    m_engine.resize(elems, cap);
 }
 
 //----------------
@@ -297,33 +363,26 @@ vector<ET,OT>::h() const
     }
 }
 
+//-------------
+//- Data access
+//
+template<class ET, class OT> constexpr 
+typename vector<ET,OT>::engine_type&
+vector<ET,OT>::engine() noexcept
+{
+    return m_engine;
+}
+
+template<class ET, class OT> constexpr 
+typename vector<ET,OT>::engine_type const&
+vector<ET,OT>::engine() const noexcept
+{
+    return m_engine;
+}
+
 //-----------
 //- Modifiers
 //
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr 
-void
-vector<ET,OT>::reserve(size_type cap)
-{
-    m_engine.reserve(cap);
-}
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr 
-void
-vector<ET,OT>::resize(size_type elems)
-{
-    m_engine.resize(elems);
-}
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr 
-void
-vector<ET,OT>::resize(size_type elems, size_type cap)
-{
-    m_engine.resize(elems, cap);
-}
-
 template<class ET, class OT> constexpr 
 void
 vector<ET,OT>::swap(vector& rhs) noexcept
