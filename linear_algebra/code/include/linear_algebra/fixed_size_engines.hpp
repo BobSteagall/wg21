@@ -20,7 +20,7 @@ class fs_vector_engine
     static_assert(N >= 1);
 
   public:
-    using engine_category = mutable_vector_engine_tag;
+    using engine_category = writable_vector_engine_tag;
     using element_type    = T;
     using value_type      = remove_cv_t<T>;
     using reference       = element_type&;
@@ -217,7 +217,7 @@ class fs_matrix_engine
     static_assert(C >= 1);
 
   public:
-    using engine_category = mutable_matrix_engine_tag;
+    using engine_category = writable_matrix_engine_tag;
     using element_type    = T;
     using value_type      = remove_cv_t<T>;
     using difference_type = ptrdiff_t;

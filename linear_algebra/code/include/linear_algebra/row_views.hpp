@@ -14,7 +14,7 @@ namespace STD_LA {
 //==================================================================================================
 //
 template<class ET, class VCT>
-class matrix_row_view
+class matrix_row_engine
 {
     static_assert(detail::is_matrix_engine_v<ET>);
     static_assert(detail::is_vector_engine_tag<VCT>);
@@ -31,19 +31,19 @@ class matrix_row_view
     using const_reference = typename ET::const_reference;
     using difference_type = typename ET::difference_type;
     using size_type       = typename ET::size_type;
-    using iterator        = detail::view_iterator_t<ET, VCT, matrix_row_view>;
-    using const_iterator  = detail::vector_const_iterator<matrix_row_view>;
+    using iterator        = detail::view_iterator_t<ET, VCT, matrix_row_engine>;
+    using const_iterator  = detail::vector_const_iterator<matrix_row_engine>;
 
     //- Construct/copy/destroy
     //
-    ~matrix_row_view() noexcept = default;
+    ~matrix_row_engine() noexcept = default;
 
-    constexpr matrix_row_view() noexcept;
-    constexpr matrix_row_view(matrix_row_view&&) noexcept = default;
-    constexpr matrix_row_view(matrix_row_view const&) = default;
+    constexpr matrix_row_engine() noexcept;
+    constexpr matrix_row_engine(matrix_row_engine&&) noexcept = default;
+    constexpr matrix_row_engine(matrix_row_engine const&) noexcept = default;
 
-    constexpr matrix_row_view&  operator =(matrix_row_view&&) noexcept = default;
-    constexpr matrix_row_view&  operator =(matrix_row_view const&) noexcept = default;
+    constexpr matrix_row_engine&    operator =(matrix_row_engine&&) noexcept = default;
+    constexpr matrix_row_engine&    operator =(matrix_row_engine const&) noexcept = default;
 
     //- Iterators
     //
@@ -63,7 +63,7 @@ class matrix_row_view
 
     //- Modifiers
     //
-    constexpr void      swap(matrix_row_view& rhs);
+    constexpr void      swap(matrix_row_engine& rhs);
 
   private:
     template<class ET2, class OT2>  friend class vector;
@@ -72,14 +72,14 @@ class matrix_row_view
     referent_type*  mp_other;
     size_type       m_row;
 
-    constexpr matrix_row_view(referent_type& eng, size_type row);
+    constexpr matrix_row_engine(referent_type& eng, size_type row);
 };
 
 //------------------------
 //- Construct/copy/destroy
 //
 template<class ET, class VCT> constexpr 
-matrix_row_view<ET, VCT>::matrix_row_view() noexcept
+matrix_row_engine<ET, VCT>::matrix_row_engine() noexcept
 :   mp_other(nullptr)
 ,   m_row(0)
 {}
@@ -88,29 +88,29 @@ matrix_row_view<ET, VCT>::matrix_row_view() noexcept
 //- Iterators
 //
 template<class ET, class VCT> constexpr 
-typename matrix_row_view<ET, VCT>::iterator
-matrix_row_view<ET, VCT>::begin() const noexcept
+typename matrix_row_engine<ET, VCT>::iterator
+matrix_row_engine<ET, VCT>::begin() const noexcept
 {
     return iterator(this, 0, mp_other->columns());
 }
 
 template<class ET, class VCT> constexpr 
-typename matrix_row_view<ET, VCT>::iterator
-matrix_row_view<ET, VCT>::end() const noexcept
+typename matrix_row_engine<ET, VCT>::iterator
+matrix_row_engine<ET, VCT>::end() const noexcept
 {
     return iterator(this, mp_other->columns(), mp_other->columns());
 }
 
 template<class ET, class VCT> constexpr 
-typename matrix_row_view<ET, VCT>::const_iterator
-matrix_row_view<ET, VCT>::cbegin() const noexcept
+typename matrix_row_engine<ET, VCT>::const_iterator
+matrix_row_engine<ET, VCT>::cbegin() const noexcept
 {
     return const_iterator(this, 0, mp_other->columns());
 }
 
 template<class ET, class VCT> constexpr 
-typename matrix_row_view<ET, VCT>::const_iterator
-matrix_row_view<ET, VCT>::cend() const noexcept
+typename matrix_row_engine<ET, VCT>::const_iterator
+matrix_row_engine<ET, VCT>::cend() const noexcept
 {
     return const_iterator(this, mp_other->columns(), mp_other->columns());
 }
@@ -119,15 +119,15 @@ matrix_row_view<ET, VCT>::cend() const noexcept
 //- Capacity
 //
 template<class ET, class VCT> constexpr 
-typename matrix_row_view<ET, VCT>::size_type
-matrix_row_view<ET, VCT>::capacity() const noexcept
+typename matrix_row_engine<ET, VCT>::size_type
+matrix_row_engine<ET, VCT>::capacity() const noexcept
 {
     return mp_other->columns();
 }
 
 template<class ET, class VCT> constexpr 
-typename matrix_row_view<ET, VCT>::size_type
-matrix_row_view<ET, VCT>::elements() const noexcept
+typename matrix_row_engine<ET, VCT>::size_type
+matrix_row_engine<ET, VCT>::elements() const noexcept
 {
     return mp_other->columns();
 }
@@ -136,8 +136,8 @@ matrix_row_view<ET, VCT>::elements() const noexcept
 //- Element access
 //
 template<class ET, class VCT> constexpr 
-typename matrix_row_view<ET, VCT>::reference
-matrix_row_view<ET, VCT>::operator ()(size_type j) const
+typename matrix_row_engine<ET, VCT>::reference
+matrix_row_engine<ET, VCT>::operator ()(size_type j) const
 {
     return (*mp_other)(m_row, j);
 }
@@ -147,7 +147,7 @@ matrix_row_view<ET, VCT>::operator ()(size_type j) const
 //
 template<class ET, class VCT> constexpr 
 void
-matrix_row_view<ET, VCT>::swap(matrix_row_view& rhs)
+matrix_row_engine<ET, VCT>::swap(matrix_row_engine& rhs)
 {
     std::swap(mp_other, rhs.mp_other);
     std::swap(m_row, rhs.m_row);
@@ -157,7 +157,7 @@ matrix_row_view<ET, VCT>::swap(matrix_row_view& rhs)
 //- Private implementation
 //
 template<class ET, class VCT> constexpr 
-matrix_row_view<ET, VCT>::matrix_row_view(referent_type& eng, size_type row)
+matrix_row_engine<ET, VCT>::matrix_row_engine(referent_type& eng, size_type row)
 :   mp_other(&eng)
 ,   m_row(row)
 {}

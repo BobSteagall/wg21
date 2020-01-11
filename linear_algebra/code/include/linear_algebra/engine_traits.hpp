@@ -24,22 +24,22 @@ template<class TAG>
 struct tag_traits;
 
 template<>
-struct tag_traits<const_vector_engine_tag>
+struct tag_traits<readable_vector_engine_tag>
 {
     static constexpr bool   is_vector    = true;
     static constexpr bool   is_matrix    = false;
-    static constexpr bool   is_const     = true;
-    static constexpr bool   is_mutable   = false;
+    static constexpr bool   is_readable  = true;
+    static constexpr bool   is_writable  = false;
     static constexpr bool   is_resizable = false;
 };
 
 template<>
-struct tag_traits<mutable_vector_engine_tag>
+struct tag_traits<writable_vector_engine_tag>
 {
     static constexpr bool   is_vector    = true;
     static constexpr bool   is_matrix    = false;
-    static constexpr bool   is_const     = true;
-    static constexpr bool   is_mutable   = true;
+    static constexpr bool   is_readable  = true;
+    static constexpr bool   is_writable  = true;
     static constexpr bool   is_resizable = false;
 };
 
@@ -48,28 +48,28 @@ struct tag_traits<resizable_vector_engine_tag>
 {
     static constexpr bool   is_vector    = true;
     static constexpr bool   is_matrix    = false;
-    static constexpr bool   is_const     = true;
-    static constexpr bool   is_mutable   = true;
+    static constexpr bool   is_readable  = true;
+    static constexpr bool   is_writable  = true;
     static constexpr bool   is_resizable = true;
 };
 
 template<>
-struct tag_traits<const_matrix_engine_tag>
+struct tag_traits<readable_matrix_engine_tag>
 {
     static constexpr bool   is_vector    = false;
     static constexpr bool   is_matrix    = true;
-    static constexpr bool   is_const     = true;
-    static constexpr bool   is_mutable   = false;
+    static constexpr bool   is_readable  = true;
+    static constexpr bool   is_writable  = false;
     static constexpr bool   is_resizable = false;
 };
 
 template<>
-struct tag_traits<mutable_matrix_engine_tag>
+struct tag_traits<writable_matrix_engine_tag>
 {
     static constexpr bool   is_vector    = false;
     static constexpr bool   is_matrix    = true;
-    static constexpr bool   is_const     = true;
-    static constexpr bool   is_mutable   = true;
+    static constexpr bool   is_readable  = true;
+    static constexpr bool   is_writable  = true;
     static constexpr bool   is_resizable = false;
 };
 
@@ -78,8 +78,8 @@ struct tag_traits<resizable_matrix_engine_tag>
 {
     static constexpr bool   is_vector    = false;
     static constexpr bool   is_matrix    = true;
-    static constexpr bool   is_const     = true;
-    static constexpr bool   is_mutable   = true;
+    static constexpr bool   is_readable  = true;
+    static constexpr bool   is_writable  = true;
     static constexpr bool   is_resizable = true;
 };
 
@@ -92,79 +92,79 @@ struct tag_traits<resizable_matrix_engine_tag>
 template<class ETT, class VTT> struct view_tag_chooser;
 
 template<>
-struct view_tag_chooser<const_matrix_engine_tag, const_matrix_engine_tag>
+struct view_tag_chooser<readable_matrix_engine_tag, readable_matrix_engine_tag>
 {
-    using tag_type = const_matrix_engine_tag;
+    using tag_type = readable_matrix_engine_tag;
 };
 
 template<>
-struct view_tag_chooser<const_matrix_engine_tag, mutable_matrix_engine_tag>
+struct view_tag_chooser<readable_matrix_engine_tag, writable_matrix_engine_tag>
 {
-    using tag_type = const_matrix_engine_tag;
+    using tag_type = readable_matrix_engine_tag;
 };
 
 template<>
-struct view_tag_chooser<const_matrix_engine_tag, const_vector_engine_tag>
+struct view_tag_chooser<readable_matrix_engine_tag, readable_vector_engine_tag>
 {
-    using tag_type = const_vector_engine_tag;
+    using tag_type = readable_vector_engine_tag;
 };
 
 template<>
-struct view_tag_chooser<const_matrix_engine_tag, mutable_vector_engine_tag>
+struct view_tag_chooser<readable_matrix_engine_tag, writable_vector_engine_tag>
 {
-    using tag_type = const_vector_engine_tag;
-};
-
-//------
-//
-template<>
-struct view_tag_chooser<mutable_matrix_engine_tag, const_matrix_engine_tag>
-{
-    using tag_type = const_matrix_engine_tag;
-};
-
-template<>
-struct view_tag_chooser<mutable_matrix_engine_tag, mutable_matrix_engine_tag>
-{
-    using tag_type = mutable_matrix_engine_tag;
-};
-
-template<>
-struct view_tag_chooser<mutable_matrix_engine_tag, const_vector_engine_tag>
-{
-    using tag_type = const_vector_engine_tag;
-};
-
-template<>
-struct view_tag_chooser<mutable_matrix_engine_tag, mutable_vector_engine_tag>
-{
-    using tag_type = mutable_vector_engine_tag;
+    using tag_type = readable_vector_engine_tag;
 };
 
 //------
 //
 template<>
-struct view_tag_chooser<resizable_matrix_engine_tag, const_matrix_engine_tag>
+struct view_tag_chooser<writable_matrix_engine_tag, readable_matrix_engine_tag>
 {
-    using tag_type = const_matrix_engine_tag;
+    using tag_type = readable_matrix_engine_tag;
 };
 
 template<>
-struct view_tag_chooser<resizable_matrix_engine_tag, mutable_matrix_engine_tag>
+struct view_tag_chooser<writable_matrix_engine_tag, writable_matrix_engine_tag>
 {
-    using tag_type = mutable_matrix_engine_tag;
+    using tag_type = writable_matrix_engine_tag;
 };
 
 template<>
-struct view_tag_chooser<resizable_matrix_engine_tag, const_vector_engine_tag>
+struct view_tag_chooser<writable_matrix_engine_tag, readable_vector_engine_tag>
 {
-    using tag_type = const_vector_engine_tag;
+    using tag_type = readable_vector_engine_tag;
 };
 
 template<>
-struct view_tag_chooser<resizable_matrix_engine_tag, mutable_vector_engine_tag>
+struct view_tag_chooser<writable_matrix_engine_tag, writable_vector_engine_tag>
 {
-    using tag_type = mutable_vector_engine_tag;
+    using tag_type = writable_vector_engine_tag;
+};
+
+//------
+//
+template<>
+struct view_tag_chooser<resizable_matrix_engine_tag, readable_matrix_engine_tag>
+{
+    using tag_type = readable_matrix_engine_tag;
+};
+
+template<>
+struct view_tag_chooser<resizable_matrix_engine_tag, writable_matrix_engine_tag>
+{
+    using tag_type = writable_matrix_engine_tag;
+};
+
+template<>
+struct view_tag_chooser<resizable_matrix_engine_tag, readable_vector_engine_tag>
+{
+    using tag_type = readable_vector_engine_tag;
+};
+
+template<>
+struct view_tag_chooser<resizable_matrix_engine_tag, writable_vector_engine_tag>
+{
+    using tag_type = writable_vector_engine_tag;
 };
 
 template<class ET, class VTT>
@@ -174,13 +174,14 @@ using view_category_t = typename view_tag_chooser<typename ET::engine_category, 
 template<class ET, class CAT>
 struct view_traits
 {
-    static constexpr bool   is_mutable = tag_traits<CAT>::is_mutable;
+    static constexpr bool   is_writable = tag_traits<CAT>::is_writable;
 
-    using referent  = conditional_t<is_mutable, remove_cv_t<ET>, remove_cv_t<ET> const>;
-    using reference = conditional_t<is_mutable, typename ET::reference, typename ET::const_reference>;
-    using pointer   = conditional_t<is_mutable, typename ET::pointer, typename ET::const_pointer>;
+    using referent  = conditional_t<is_writable, remove_cv_t<ET>, remove_cv_t<ET> const>;
+    using reference = conditional_t<is_writable, typename ET::reference, typename ET::const_reference>;
+    using pointer   = conditional_t<is_writable, typename ET::pointer, typename ET::const_pointer>;
+
     template<class DET>
-    using iterator  = conditional_t<is_mutable, vector_iterator<DET>, vector_const_iterator<DET>>;
+    using iterator  = conditional_t<is_writable, vector_iterator<DET>, vector_const_iterator<DET>>;
 };
 
 template<class ET, class CAT>
@@ -196,12 +197,12 @@ template<class ET, class CAT, class DET>
 using view_iterator_t = typename view_traits<ET,CAT>::template iterator<DET>;
 
 template<class VTT> inline constexpr
-bool    is_vector_engine_tag = VTT::value >= const_vector_engine_tag::value &&
-                               VTT::value <= mutable_vector_engine_tag::value;
+bool    is_vector_engine_tag = VTT::value >= readable_vector_engine_tag::value &&
+                               VTT::value <= writable_vector_engine_tag::value;
 
 template<class VTT> inline constexpr
-bool    is_matrix_engine_tag = VTT::value >= const_matrix_engine_tag::value &&
-                               VTT::value <= mutable_matrix_engine_tag::value;
+bool    is_matrix_engine_tag = VTT::value >= readable_matrix_engine_tag::value &&
+                               VTT::value <= writable_matrix_engine_tag::value;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -234,10 +235,10 @@ bool    engines_match_v = (is_matrix_engine_v<ET1> == is_matrix_engine_v<ET2>);
 //- Tests to determine if an engine has mutable element indexing.
 //
 template<class ET> inline constexpr 
-bool    is_mutable_engine_v = tag_traits<typename ET::engine_category>::is_mutable;
+bool    is_writable_engine_v = tag_traits<typename ET::engine_category>::is_writable;
 
 template<class ET1, class ET2>
-using enable_if_mutable = enable_if_t<is_same_v<ET1, ET2> && is_mutable_engine_v<ET1>, bool>;
+using enable_if_mutable = enable_if_t<is_same_v<ET1, ET2> && is_writable_engine_v<ET1>, bool>;
 
 
 //--------------------------------------------------------------------------------------------------

@@ -14,7 +14,7 @@ class fs_matrix_engine_tst
     static_assert(C >= 1);
 
   public:
-    using engine_category = STD_LA::mutable_matrix_engine_tag;
+    using engine_category = STD_LA::writable_matrix_engine_tag;
     using element_type    = T;
     using value_type      = T;
     using reference       = T&;
@@ -30,9 +30,9 @@ class fs_matrix_engine_tst
     static constexpr bool   is_rectangular  = true;
     static constexpr bool   is_row_major    = true;
 
-//    using column_view_type    = STD_LA::matrix_column_view<fs_matrix_engine_tst>;
-//    using row_view_type       = STD_LA::matrix_row_view<fs_matrix_engine_tst>;
-//    using transpose_view_type = STD_LA::matrix_transpose_view<fs_matrix_engine_tst>;
+//    using column_view_type    = STD_LA::matrix_column_engine<fs_matrix_engine_tst>;
+//    using row_view_type       = STD_LA::matrix_row_engine<fs_matrix_engine_tst>;
+//    using transpose_view_type = STD_LA::matrix_transpose_engine<fs_matrix_engine_tst>;
 
   public:
     constexpr fs_matrix_engine_tst();

@@ -16,34 +16,33 @@ USING_STD
 //
 struct scalar_engine_tag           : public integral_constant<int, 0> {};
 
-struct const_vector_engine_tag     : public integral_constant<int, 1> {};
-struct mutable_vector_engine_tag   : public integral_constant<int, 2> {};
+struct readable_vector_engine_tag  : public integral_constant<int, 1> {};
+struct writable_vector_engine_tag  : public integral_constant<int, 2> {};
 struct resizable_vector_engine_tag : public integral_constant<int, 3> {};
 
-struct const_matrix_engine_tag     : public integral_constant<int, 5> {};
-struct mutable_matrix_engine_tag   : public integral_constant<int, 7> {};
+struct readable_matrix_engine_tag  : public integral_constant<int, 5> {};
+struct writable_matrix_engine_tag  : public integral_constant<int, 7> {};
 struct resizable_matrix_engine_tag : public integral_constant<int, 11> {};
-
-//- Traits for determining if a type is a complex number.
-//
-template<class T>   struct is_complex;
-
-struct default_matrix_operations {};
 
 //- Basic linear algebra engine types.
 //
-template<class ET, class VCT>           class matrix_column_view;
-template<class ET, class VCT>           class matrix_row_view;
-template<class ET>                      class matrix_transpose_view;
 template<class T, size_t N>             class fs_vector_engine;
 template<class T, size_t R, size_t C>   class fs_matrix_engine;
 template<class T, class AT>             class dr_vector_engine;
 template<class T, class AT>             class dr_matrix_engine;
+template<class ET, class VCT>           class matrix_column_engine;
+template<class ET, class VCT>           class matrix_row_engine;
+template<class ET, class MCT>           class matrix_transpose_engine;
+template<class ET, class MCT>           class submatrix_engine;
 
 //- The default element promotion, engine promotion, and arithmetic operation traits for
 //  the four basic arithmetic operations.
 //
 struct matrix_operation_traits;
+
+//- TODO: remove this
+//
+struct default_matrix_operations {};
 
 //- Primary math object types.
 //

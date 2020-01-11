@@ -7,7 +7,7 @@ USING_STD
 class float3_engine
 {
 public:
-	using engine_category = mutable_vector_engine_tag;
+	using engine_category = writable_vector_engine_tag;
 	using element_type    = float;
 	using value_type      = float;
 	using reference       = float&;
@@ -79,7 +79,7 @@ float3_engine::operator ()(size_type i) const
 class float33_engine
 {
 public:
-	using engine_category = mutable_matrix_engine_tag;
+	using engine_category = writable_matrix_engine_tag;
 	using element_type    = float;
 	using value_type      = float;
 	using reference       = float&;
@@ -98,9 +98,9 @@ public:
 	static constexpr bool   is_rectangular  = true;
 	static constexpr bool   is_row_major    = true;
 
-	using column_view_type    = matrix_column_view<float33_engine>;
-	using row_view_type       = matrix_row_view<float33_engine>;
-	using transpose_view_type = matrix_transpose_view<float33_engine>;
+	using column_view_type    = matrix_column_engine<float33_engine>;
+	using row_view_type       = matrix_row_engine<float33_engine>;
+	using transpose_view_type = matrix_transpose_engine<float33_engine>;
 
 public:
 	constexpr float33_engine();

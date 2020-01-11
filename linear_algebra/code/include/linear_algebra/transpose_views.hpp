@@ -13,39 +13,39 @@ namespace STD_LA {
 //  prevent unnecessary allocation and element copying.
 //==================================================================================================
 //
-template<class ET>
-class matrix_transpose_view
+template<class ET, class MCT>
+class matrix_transpose_engine
 {
     static_assert(detail::is_matrix_engine_v<ET>);
+    static_assert(detail::is_matrix_engine_tag<MCT>);
 
   public:
-    using engine_type     = ET;
-    using engine_category = const_matrix_engine_tag;
-    using element_type    = typename engine_type::element_type;
-    using value_type      = typename engine_type::value_type;
-    using difference_type = typename engine_type::difference_type;
-    using size_type       = typename engine_type::size_type;
-    using size_tuple      = typename engine_type::size_tuple;
-    using const_reference = typename engine_type::const_reference;
-    using reference       = typename engine_type::const_reference;
-    using const_pointer   = typename engine_type::const_pointer;
-    using pointer         = typename engine_type::const_pointer;
+    //- Types
+    //
+    using engine_category = MCT;
+    using element_type    = typename ET::element_type;
+    using value_type      = typename ET::value_type;
+    using pointer         = detail::view_pointer_t<ET, MCT>;
+    using const_pointer   = typename ET::const_pointer;
+    using reference       = detail::view_reference_t<ET, MCT>;
+    using const_reference = typename ET::const_reference;
+    using difference_type = typename ET::difference_type;
+    using size_type       = typename ET::size_type;
+    using size_tuple      = typename ET::size_tuple;
 
-//    using column_view_type    = matrix_column_view<matrix_transpose_view>;
-//    using row_view_type       = matrix_row_view<matrix_transpose_view>;
-//    using transpose_view_type = matrix_transpose_view<matrix_transpose_view>;
+    //- Construct/copy/destroy
+    //
+    ~matrix_transpose_engine() noexcept = default;
 
-  public:
-    constexpr matrix_transpose_view();
-    constexpr matrix_transpose_view(engine_type const& eng);
-    constexpr matrix_transpose_view(matrix_transpose_view&&) noexcept = default;
-    constexpr matrix_transpose_view(matrix_transpose_view const&) = default;
+    constexpr matrix_transpose_engine();
+    constexpr matrix_transpose_engine(matrix_transpose_engine&&) noexcept = default;
+    constexpr matrix_transpose_engine(matrix_transpose_engine const&) = default;
 
-    constexpr matrix_transpose_view&    operator =(matrix_transpose_view&&) noexcept = default;
-    constexpr matrix_transpose_view&    operator =(matrix_transpose_view const&) = default;
+    constexpr matrix_transpose_engine&  operator =(matrix_transpose_engine&&) noexcept = default;
+    constexpr matrix_transpose_engine&  operator =(matrix_transpose_engine const&) = default;
 
-    constexpr const_reference   operator ()(size_type i, size_type j) const;
-
+    //- Capacity
+    //
     constexpr size_type     columns() const noexcept;
     constexpr size_type     rows() const noexcept;
     constexpr size_tuple    size() const noexcept;
@@ -54,85 +54,100 @@ class matrix_transpose_view
     constexpr size_type     row_capacity() const noexcept;
     constexpr size_tuple    capacity() const noexcept;
 
-    constexpr void      assign(matrix_transpose_view const& rhs);
-    constexpr void      swap(matrix_transpose_view& rhs);
+    //- Element access
+    //
+    constexpr reference     operator ()(size_type i, size_type j) const;
+
+    //- Modifiers
+    //
+    constexpr void      swap(matrix_transpose_engine& rhs);
 
   private:
-    engine_type const*  mp_other;
+    template<class ET2, class OT2>  friend class matrix;
+    using referent_type = detail::view_referent_t<ET, MCT>;
+
+    referent_type*      mp_other;
+
+    constexpr matrix_transpose_engine(referent_type& eng);
 };
 
-template<class ET> constexpr 
-matrix_transpose_view<ET>::matrix_transpose_view()
+//------------------------
+//- Construct/copy/destroy
+//
+template<class ET, class MCT> constexpr 
+matrix_transpose_engine<ET, MCT>::matrix_transpose_engine()
 :   mp_other(nullptr)
 {}
 
-template<class ET> constexpr
-matrix_transpose_view<ET>::matrix_transpose_view(engine_type const& eng)
-:   mp_other(&eng)
-{}
-
-template<class ET> constexpr 
-typename matrix_transpose_view<ET>::const_reference
-matrix_transpose_view<ET>::operator ()(size_type i, size_type j) const
-{
-    return (*mp_other)(j, i);
-}
-
-template<class ET> constexpr 
-typename matrix_transpose_view<ET>::size_type
-matrix_transpose_view<ET>::columns() const noexcept
+//----------
+//- Capacity
+//
+template<class ET, class MCT> constexpr 
+typename matrix_transpose_engine<ET, MCT>::size_type
+matrix_transpose_engine<ET, MCT>::columns() const noexcept
 {
     return mp_other->rows();
 }
 
-template<class ET> constexpr 
-typename matrix_transpose_view<ET>::size_type
-matrix_transpose_view<ET>::rows() const noexcept
+template<class ET, class MCT> constexpr 
+typename matrix_transpose_engine<ET, MCT>::size_type
+matrix_transpose_engine<ET, MCT>::rows() const noexcept
 {
     return mp_other->columns();
 }
 
-template<class ET> constexpr 
-typename matrix_transpose_view<ET>::size_tuple
-matrix_transpose_view<ET>::size() const noexcept
+template<class ET, class MCT> constexpr 
+typename matrix_transpose_engine<ET, MCT>::size_tuple
+matrix_transpose_engine<ET, MCT>::size() const noexcept
 {
     return size_tuple(mp_other->columns(), mp_other->rows());
 }
 
-template<class ET> constexpr 
-typename matrix_transpose_view<ET>::size_type
-matrix_transpose_view<ET>::column_capacity() const noexcept
+template<class ET, class MCT> constexpr 
+typename matrix_transpose_engine<ET, MCT>::size_type
+matrix_transpose_engine<ET, MCT>::column_capacity() const noexcept
 {
     return mp_other->row_capacity();
 }
 
-template<class ET> constexpr 
-typename matrix_transpose_view<ET>::size_type
-matrix_transpose_view<ET>::row_capacity() const noexcept
+template<class ET, class MCT> constexpr 
+typename matrix_transpose_engine<ET, MCT>::size_type
+matrix_transpose_engine<ET, MCT>::row_capacity() const noexcept
 {
     return mp_other->column_capacity();
 }
 
-template<class ET> constexpr 
-typename matrix_transpose_view<ET>::size_tuple
-matrix_transpose_view<ET>::capacity() const noexcept
+template<class ET, class MCT> constexpr 
+typename matrix_transpose_engine<ET, MCT>::size_tuple
+matrix_transpose_engine<ET, MCT>::capacity() const noexcept
 {
     return size_tuple(mp_other->column_capacity(), mp_other->row_capacity());
 }
 
-template<class ET> constexpr 
-void
-matrix_transpose_view<ET>::assign(matrix_transpose_view const& rhs)
+//----------------
+//- Element access
+//
+template<class ET, class MCT> constexpr 
+typename matrix_transpose_engine<ET, MCT>::reference
+matrix_transpose_engine<ET, MCT>::operator ()(size_type i, size_type j) const
 {
-    mp_other == rhs.mp_other;
+    return (*mp_other)(j, i);
 }
 
-template<class ET> constexpr 
+//-----------
+//- Modifiers
+//
+template<class ET, class MCT> constexpr 
 void
-matrix_transpose_view<ET>::swap(matrix_transpose_view& rhs)
+matrix_transpose_engine<ET, MCT>::swap(matrix_transpose_engine& rhs)
 {
     std::swap(mp_other, rhs.mp_other);
 }
+
+template<class ET, class MCT> constexpr
+matrix_transpose_engine<ET, MCT>::matrix_transpose_engine(referent_type& eng)
+:   mp_other(&eng)
+{}
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_TRANSPOSE_VIEWS_HPP_DEFINED

@@ -7,7 +7,7 @@ USING_STD
 class float2_engine
 {
 public:
-	using engine_category = mutable_vector_engine_tag;
+	using engine_category = writable_vector_engine_tag;
 	using element_type    = float;
 	using value_type      = float;
 	using reference       = float&;
@@ -78,7 +78,7 @@ float2_engine::operator ()(size_type i) const
 class float22_engine
 {
 public:
-	using engine_category = mutable_matrix_engine_tag;
+	using engine_category = writable_matrix_engine_tag;
 	using element_type    = float;
 	using value_type      = float;
 	using reference       = float&;
@@ -97,9 +97,9 @@ public:
 	static constexpr bool   is_rectangular  = true;
 	static constexpr bool   is_row_major    = true;
 
-	using column_view_type    = matrix_column_view<float22_engine>;
-	using row_view_type       = matrix_row_view<float22_engine>;
-	using transpose_view_type = matrix_transpose_view<float22_engine>;
+	using column_view_type    = matrix_column_engine<float22_engine>;
+	using row_view_type       = matrix_row_engine<float22_engine>;
+	using transpose_view_type = matrix_transpose_engine<float22_engine>;
 
 public:
 	constexpr float22_engine();
