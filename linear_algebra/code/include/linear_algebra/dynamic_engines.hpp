@@ -28,7 +28,7 @@ class dr_vector_engine
     using const_pointer   = typename allocator_traits<AT>::const_pointer;
     using reference       = element_type&;
     using const_reference = element_type const&;
-    using difference_type = size_t;
+    using difference_type = ptrdiff_t;
     using size_type       = size_t;
     using iterator        = detail::vector_iterator<dr_vector_engine>;
     using const_iterator  = detail::vector_const_iterator<dr_vector_engine>;
@@ -64,6 +64,10 @@ class dr_vector_engine
     size_type       capacity() const noexcept;
     size_type       elements() const noexcept;
 
+    void    reserve(size_type cap);
+    void    resize(size_type elems);
+    void    resize(size_type elems, size_type cap);
+
     //- Element access
     //
     reference       operator ()(size_type i);
@@ -71,9 +75,6 @@ class dr_vector_engine
 
     //- Modifiers
     //
-    void    reserve(size_type cap);
-    void    resize(size_type elems);
-    void    resize(size_type elems, size_type cap);
     void    swap(dr_vector_engine& rhs) noexcept;
     void    swap_elements(size_type i, size_type j) noexcept;
 
@@ -255,26 +256,6 @@ dr_vector_engine<T,AT>::elements() const noexcept
     return m_elems;
 }
 
-//----------------
-//- Element access
-//
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::reference
-dr_vector_engine<T,AT>::operator ()(size_type i)
-{
-    return mp_elems[i];
-}
-
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::const_reference
-dr_vector_engine<T,AT>::operator ()(size_type i) const
-{
-    return mp_elems[i];
-}
-
-//-----------
-//- Modifiers
-//
 template<class T, class AT> inline
 void
 dr_vector_engine<T,AT>::reserve(size_type cap)
@@ -296,6 +277,26 @@ dr_vector_engine<T,AT>::resize(size_type elems, size_type cap)
     reshape(elems, cap);
 }
 
+//----------------
+//- Element access
+//
+template<class T, class AT> inline
+typename dr_vector_engine<T,AT>::reference
+dr_vector_engine<T,AT>::operator ()(size_type i)
+{
+    return mp_elems[i];
+}
+
+template<class T, class AT> inline
+typename dr_vector_engine<T,AT>::const_reference
+dr_vector_engine<T,AT>::operator ()(size_type i) const
+{
+    return mp_elems[i];
+}
+
+//-----------
+//- Modifiers
+//
 template<class T, class AT> inline
 void
 dr_vector_engine<T,AT>::swap(dr_vector_engine& other) noexcept
@@ -430,20 +431,24 @@ template<class T, class AT>
 class dr_matrix_engine
 {
   public:
+    //- Types
+    //
     using engine_category = resizable_matrix_engine_tag;
     using element_type    = T;
     using value_type      = remove_cv_t<T>;
     using allocator_type  = AT;
-    using difference_type = size_t;
+    using pointer         = typename allocator_traits<AT>::pointer;
+    using const_pointer   = typename allocator_traits<AT>::const_pointer;
+    using reference       = element_type&;
+    using const_reference = element_type const&;
+    using difference_type = ptrdiff_t;
     using size_type       = size_t;
     using size_tuple      = tuple<size_type, size_type>;
-    using const_reference = element_type const&;
-    using reference       = element_type&;
-    using const_pointer   = typename allocator_traits<AT>::const_pointer;
-    using pointer         = typename allocator_traits<AT>::pointer;
 
-  public:
-    ~dr_matrix_engine();
+    //- Construct/copy/destroy
+    //
+    ~dr_matrix_engine() noexcept;
+
     dr_matrix_engine();
     dr_matrix_engine(dr_matrix_engine&& rhs) noexcept;
     dr_matrix_engine(dr_matrix_engine const& rhs);
@@ -455,8 +460,8 @@ class dr_matrix_engine
     template<class ET2>
     dr_matrix_engine&   operator =(ET2 const& rhs);
 
-    const_reference     operator ()(size_type i, size_type j) const;
-
+    //- Capacity
+    //
     size_type   columns() const noexcept;
     size_type   rows() const noexcept;
     size_tuple  size() const noexcept;
@@ -465,11 +470,17 @@ class dr_matrix_engine
     size_type   row_capacity() const noexcept;
     size_tuple  capacity() const noexcept;
 
-    reference   operator ()(size_type i, size_type j);
-
     void    reserve(size_type rowcap, size_type colcap);
     void    resize(size_type rows, size_type cols);
     void    resize(size_type rows, size_type cols, size_type rowcap, size_type colcap);
+
+    //- Element access
+    //
+    reference           operator ()(size_type i, size_type j);
+    const_reference     operator ()(size_type i, size_type j) const;
+
+    //- Modifiers
+    //
     void    swap(dr_matrix_engine& other) noexcept;
     void    swap_columns(size_type c1, size_type c2) noexcept;
     void    swap_rows(size_type r1, size_type r2) noexcept;
@@ -489,6 +500,9 @@ class dr_matrix_engine
     void    reshape(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 };
 
+//------------------------
+//- Construct/copy/destroy
+//
 template<class T, class AT>
 dr_matrix_engine<T,AT>::~dr_matrix_engine()
 {
@@ -600,13 +614,9 @@ dr_matrix_engine<T,AT>::operator =(ET2 const& rhs)
     return *this;
 }
 
-template<class T, class AT> inline
-typename dr_matrix_engine<T,AT>::const_reference
-dr_matrix_engine<T,AT>::operator ()(size_type i, size_type j) const
-{
-    return mp_elems[i*m_colcap + j];
-}
-
+//----------
+//- Capacity
+//
 template<class T, class AT> inline
 typename dr_matrix_engine<T,AT>::size_type
 dr_matrix_engine<T,AT>::columns() const noexcept
@@ -649,13 +659,6 @@ dr_matrix_engine<T,AT>::capacity() const noexcept
     return size_tuple(m_rowcap, m_colcap);
 }
 
-template<class T, class AT> inline
-typename dr_matrix_engine<T,AT>::reference
-dr_matrix_engine<T,AT>::operator ()(size_type i, size_type j)
-{
-    return mp_elems[i*m_colcap + j];
-}
-
 template<class T, class AT>
 void
 dr_matrix_engine<T,AT>::reserve(size_type rowcap, size_type colcap)
@@ -677,6 +680,26 @@ dr_matrix_engine<T,AT>::resize(size_type rows, size_type cols, size_type rowcap,
     reshape(rows, cols, rowcap, colcap);
 }
 
+//----------------
+//- Element access
+//
+template<class T, class AT> inline
+typename dr_matrix_engine<T,AT>::reference
+dr_matrix_engine<T,AT>::operator ()(size_type i, size_type j)
+{
+    return mp_elems[i*m_colcap + j];
+}
+
+template<class T, class AT> inline
+typename dr_matrix_engine<T,AT>::const_reference
+dr_matrix_engine<T,AT>::operator ()(size_type i, size_type j) const
+{
+    return mp_elems[i*m_colcap + j];
+}
+
+//-----------
+//- Modifiers
+//
 template<class T, class AT>
 void
 dr_matrix_engine<T,AT>::swap(dr_matrix_engine& other) noexcept
@@ -717,6 +740,9 @@ dr_matrix_engine<T,AT>::swap_rows(size_type r1, size_type r2) noexcept
     }
 }
 
+//------------------------
+//- Private implementation
+//
 template<class T, class AT>
 void
 dr_matrix_engine<T,AT>::alloc_new(size_type rows, size_type cols, size_type rowcap, size_type colcap)

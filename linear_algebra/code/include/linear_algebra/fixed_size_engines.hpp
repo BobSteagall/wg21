@@ -23,10 +23,10 @@ class fs_vector_engine
     using engine_category = writable_vector_engine_tag;
     using element_type    = T;
     using value_type      = remove_cv_t<T>;
-    using reference       = element_type&;
-    using const_reference = element_type const&;
     using pointer         = element_type*;
     using const_pointer   = element_type const*;
+    using reference       = element_type&;
+    using const_reference = element_type const&;
     using difference_type = ptrdiff_t;
     using size_type       = size_t;
     using iterator        = detail::vector_iterator<fs_vector_engine>;
@@ -213,18 +213,23 @@ class fs_matrix_engine
     static_assert(C >= 1);
 
   public:
+    //- Types
+    //
     using engine_category = writable_matrix_engine_tag;
     using element_type    = T;
     using value_type      = remove_cv_t<T>;
+    using pointer         = element_type*;
+    using const_pointer   = element_type const*;
+    using reference       = element_type&;
+    using const_reference = element_type const&;
     using difference_type = ptrdiff_t;
     using size_type       = size_t;
     using size_tuple      = tuple<size_type, size_type>;
-    using const_reference = element_type const&;
-    using reference       = element_type&;
-    using const_pointer   = element_type const*;
-    using pointer         = element_type*;
 
-  public:
+    //- Construct/copy/destroy
+    //
+    ~fs_matrix_engine() noexcept = default;
+
     constexpr fs_matrix_engine();
     template<class U>
     constexpr fs_matrix_engine(initializer_list<U> list);
@@ -236,8 +241,8 @@ class fs_matrix_engine
     template<class ET2>
     constexpr fs_matrix_engine&     operator =(ET2 const& rhs);
 
-    constexpr const_reference   operator ()(size_type i, size_type j) const;
-
+    //- Capacity
+    //
     constexpr size_type     columns() const noexcept;
     constexpr size_type     rows() const noexcept;
     constexpr size_tuple    size() const noexcept;
@@ -246,8 +251,13 @@ class fs_matrix_engine
     constexpr size_type     row_capacity() const noexcept;
     constexpr size_tuple    capacity() const noexcept;
 
-    constexpr reference     operator ()(size_type i, size_type j);
+    //- Element access
+    //
+    constexpr reference         operator ()(size_type i, size_type j);
+    constexpr const_reference   operator ()(size_type i, size_type j) const;
 
+    //- Modifiers
+    //
     constexpr void      swap(fs_matrix_engine& rhs) noexcept;
     constexpr void      swap_columns(size_type j1, size_type j2) noexcept;
     constexpr void      swap_rows(size_type i1, size_type i2) noexcept;
@@ -256,6 +266,9 @@ class fs_matrix_engine
     T   ma_elems[R*C];
 };
 
+//------------------------
+//- Construct/copy/destroy
+//
 template<class T, size_t R, size_t C> constexpr
 fs_matrix_engine<T,R,C>::fs_matrix_engine()
 :   ma_elems()
@@ -321,13 +334,9 @@ fs_matrix_engine<T,R,C>::operator =(ET2 const& rhs)
     return *this;
 }
 
-template<class T, size_t R, size_t C> constexpr 
-typename fs_matrix_engine<T,R,C>::const_reference
-fs_matrix_engine<T,R,C>::operator ()(size_type i, size_type j) const
-{
-    return ma_elems[i*C + j];
-}
-
+//----------
+//- Capacity
+//
 template<class T, size_t R, size_t C> constexpr 
 typename fs_matrix_engine<T,R,C>::size_type
 fs_matrix_engine<T,R,C>::columns() const noexcept
@@ -370,6 +379,9 @@ fs_matrix_engine<T,R,C>::capacity() const noexcept
     return size_tuple(R, C);
 }
 
+//----------------
+//- Element access
+//
 template<class T, size_t R, size_t C> constexpr 
 typename fs_matrix_engine<T,R,C>::reference
 fs_matrix_engine<T,R,C>::operator ()(size_type i, size_type j)
@@ -377,6 +389,16 @@ fs_matrix_engine<T,R,C>::operator ()(size_type i, size_type j)
     return ma_elems[i*C + j];
 }
 
+template<class T, size_t R, size_t C> constexpr 
+typename fs_matrix_engine<T,R,C>::const_reference
+fs_matrix_engine<T,R,C>::operator ()(size_type i, size_type j) const
+{
+    return ma_elems[i*C + j];
+}
+
+//-----------
+//- Modifiers
+//
 template<class T, size_t R, size_t C> constexpr 
 void
 fs_matrix_engine<T,R,C>::swap(fs_matrix_engine& rhs) noexcept

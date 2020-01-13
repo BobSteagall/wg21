@@ -12,7 +12,7 @@
 namespace STD_LA {
 USING_STD
 
-//- Some tags for specifying how engines should behave.
+//- Tags that specify how engines should behave.
 //
 struct scalar_engine_tag           : public integral_constant<int, 0> {};
 
@@ -24,17 +24,24 @@ struct readable_matrix_engine_tag  : public integral_constant<int, 5> {};
 struct writable_matrix_engine_tag  : public integral_constant<int, 7> {};
 struct resizable_matrix_engine_tag : public integral_constant<int, 11> {};
 
-//- Basic linear algebra engine types.
+//- Owning engines with dynamically-allocated external storage.
 //
-template<class T>                       struct scalar_engine;
+template<class T, class AT>     class dr_vector_engine;
+template<class T, class AT>     class dr_matrix_engine;
+
+//- Owning engines with fixed-size internal storage.
+//
 template<class T, size_t N>             class fs_vector_engine;
 template<class T, size_t R, size_t C>   class fs_matrix_engine;
-template<class T, class AT>             class dr_vector_engine;
-template<class T, class AT>             class dr_matrix_engine;
-template<class ET, class VCT>           class column_engine;
-template<class ET, class VCT>           class row_engine;
-template<class ET, class MCT>           class transpose_engine;
-template<class ET, class MCT>           class submatrix_engine;
+
+//- Non-owning, view-style engines.
+//
+template<class ET, class VCT>   class column_engine;
+template<class ET, class VCT>   class row_engine;
+template<class ET, class MCT>   class transpose_engine;
+template<class ET, class MCT>   class submatrix_engine;
+
+template<class T>   struct scalar_engine;
 
 //- The default element promotion, engine promotion, and arithmetic operation traits for
 //  the four basic arithmetic operations.
