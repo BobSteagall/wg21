@@ -31,8 +31,8 @@ class vector
     using size_type              = typename engine_type::size_type;
     using reference              = typename engine_type::reference;
     using const_reference        = typename engine_type::const_reference;
-    using iterator               = detail::engine_m_iter_t<has_eng_iter, ET>; //typename engine_type::iterator;
-    using const_iterator         = detail::engine_c_iter_t<has_eng_iter, ET>; //typename engine_type::const_iterator;
+    using iterator               = detail::engine_m_iter_t<has_eng_iter, ET>;
+    using const_iterator         = detail::engine_c_iter_t<has_eng_iter, ET>;
     using reverse_iterator       = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
@@ -122,8 +122,8 @@ class vector
 
     engine_type     m_engine;
 
-    template<class ET2, class ...ARGS>
-    constexpr vector(detail::special_ctor_tag, ET2&& eng, ARGS&& ...args);
+    template<class ET2, class... ARGS>
+    constexpr vector(detail::special_ctor_tag, ET2&& eng, ARGS&&... args);
 };
 
 //------------------------
@@ -160,7 +160,7 @@ vector<ET,OT>::vector(size_type elems, size_type cap)
 
 template<class ET, class OT>
 template<class ET2, class ...ARGS> constexpr
-vector<ET,OT>::vector(detail::special_ctor_tag, ET2&& eng, ARGS&& ...args)
+vector<ET,OT>::vector(detail::special_ctor_tag, ET2&& eng, ARGS&&... args)
 :   m_engine(std::forward<ET2>(eng), std::forward<ARGS>(args)...)
 {}
 

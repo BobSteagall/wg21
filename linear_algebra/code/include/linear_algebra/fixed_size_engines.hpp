@@ -252,10 +252,10 @@ class fs_matrix_engine
     ~fs_matrix_engine() noexcept = default;
 
     constexpr fs_matrix_engine();
-    template<class U>
-    constexpr fs_matrix_engine(initializer_list<U> list);
     constexpr fs_matrix_engine(fs_matrix_engine&&) noexcept = default;
     constexpr fs_matrix_engine(fs_matrix_engine const&) = default;
+    template<class U>
+    constexpr fs_matrix_engine(initializer_list<U> list);
 
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine&&) noexcept = default;
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine const&) = default;

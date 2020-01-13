@@ -138,8 +138,8 @@ class matrix
 
     engine_type     m_engine;
 
-    template<class ET2, class ...ARGS>
-    constexpr matrix(detail::special_ctor_tag, ET2&& eng, ARGS&& ...args);
+    template<class ET2, class... ARGS>
+    constexpr matrix(detail::special_ctor_tag, ET2&& eng, ARGS&&... args);
 };
 
 //------------------------
@@ -184,8 +184,8 @@ matrix<ET,OT>::matrix(size_type rows, size_type cols, size_type rowcap, size_typ
 {}
 
 template<class ET, class OT>
-template<class ET2, class ...ARGS> constexpr
-matrix<ET,OT>::matrix(detail::special_ctor_tag, ET2&& eng, ARGS&& ...args)
+template<class ET2, class... ARGS> constexpr
+matrix<ET,OT>::matrix(detail::special_ctor_tag, ET2&& eng, ARGS&&... args)
 :   m_engine(std::forward<ET2>(eng), std::forward<ARGS>(args)...)
 {}
 
