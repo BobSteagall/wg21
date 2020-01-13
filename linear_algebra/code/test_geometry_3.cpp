@@ -98,9 +98,9 @@ public:
 	static constexpr bool   is_rectangular  = true;
 	static constexpr bool   is_row_major    = true;
 
-	using column_view_type    = matrix_column_engine<float33_engine>;
-	using row_view_type       = matrix_row_engine<float33_engine>;
-	using transpose_view_type = matrix_transpose_engine<float33_engine>;
+	using column_view_type    = column_engine<float33_engine>;
+	using row_view_type       = row_engine<float33_engine>;
+	using transpose_view_type = transpose_engine<float33_engine>;
 
 public:
 	constexpr float33_engine();
@@ -292,7 +292,7 @@ matrix_negation_traits<matrix_operation_traits, matrix<float33_engine>>::negate
 // Multiplication - vector * scalar
 
 template<>
-struct matrix_multiplication_engine_traits<matrix_operation_traits, float3_engine, detail::element_tag<float>>
+struct matrix_multiplication_engine_traits<matrix_operation_traits, float3_engine, scalar_engine<float>>
 {
 	using element_type = float;
 	using engine_type  = float3_engine;
@@ -311,7 +311,7 @@ matrix_multiplication_traits<matrix_operation_traits, vector<float3_engine>, flo
 // Multiplication - matrix * scalar
 
 template<>
-struct matrix_multiplication_engine_traits<matrix_operation_traits, float33_engine, detail::element_tag<float>>
+struct matrix_multiplication_engine_traits<matrix_operation_traits, float33_engine, scalar_engine<float>>
 {
 	using element_type = float;
 	using engine_type  = float33_engine;
@@ -332,7 +332,7 @@ matrix_multiplication_traits<matrix_operation_traits, matrix<float33_engine>, fl
 // Multiplication - scalar * vector
 
 template<>
-struct matrix_multiplication_engine_traits<matrix_operation_traits, detail::element_tag<float>, float3_engine>
+struct matrix_multiplication_engine_traits<matrix_operation_traits, scalar_engine<float>, float3_engine>
 {
 	using element_type = float;
 	using engine_type  = float3_engine;
@@ -351,7 +351,7 @@ matrix_multiplication_traits<matrix_operation_traits, float, vector<float3_engin
 // Multiplication - scalar * matrix
 
 template<>
-struct matrix_multiplication_engine_traits<matrix_operation_traits, detail::element_tag<float>, float33_engine>
+struct matrix_multiplication_engine_traits<matrix_operation_traits, scalar_engine<float>, float33_engine>
 {
 	using element_type = float;
 	using engine_type  = float33_engine;

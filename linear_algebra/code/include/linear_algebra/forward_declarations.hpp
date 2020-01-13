@@ -26,13 +26,14 @@ struct resizable_matrix_engine_tag : public integral_constant<int, 11> {};
 
 //- Basic linear algebra engine types.
 //
+template<class T>                       struct scalar_engine;
 template<class T, size_t N>             class fs_vector_engine;
 template<class T, size_t R, size_t C>   class fs_matrix_engine;
 template<class T, class AT>             class dr_vector_engine;
 template<class T, class AT>             class dr_matrix_engine;
-template<class ET, class VCT>           class matrix_column_engine;
-template<class ET, class VCT>           class matrix_row_engine;
-template<class ET, class MCT>           class matrix_transpose_engine;
+template<class ET, class VCT>           class column_engine;
+template<class ET, class VCT>           class row_engine;
+template<class ET, class MCT>           class transpose_engine;
 template<class ET, class MCT>           class submatrix_engine;
 
 //- The default element promotion, engine promotion, and arithmetic operation traits for

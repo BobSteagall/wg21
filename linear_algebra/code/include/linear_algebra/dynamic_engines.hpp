@@ -10,68 +10,8 @@
 #define LINEAR_ALGEBRA_DYNAMIC_ENGINES_HPP_DEFINED
 
 namespace STD_LA {
-namespace detail {
-//--------------------------------------------------------------------------------------------------
-//  Some private helper functions for allocating/deallocating the memory used by the dynamic
-//  vector and matrix engines defined below.  Note that all memory thus allocated is default-
-//  constructed.  This means that elements lying in (currently) unused capacity are also
-//  initialized.  This may or may not be what happens in the end.
-//--------------------------------------------------------------------------------------------------
-//
-template<class AT>
-typename allocator_traits<AT>::pointer
-allocate(AT& alloc, size_t n)
-{
-    auto    p_dst = allocator_traits<AT>::allocate(alloc, n);
-
-    try
-    {
-        uninitialized_value_construct_n(p_dst, n);
-    }
-    catch (...)
-    {
-        allocator_traits<AT>::deallocate(alloc, p_dst, n);
-        throw;
-    }
-    return p_dst;
-}
-
-//------
-//
-template<class AT>
-typename allocator_traits<AT>::pointer
-allocate(AT& alloc, size_t n, typename allocator_traits<AT>::const_pointer p_src)
-{
-    auto    p_dst = allocator_traits<AT>::allocate(alloc, n);
-
-    try
-    {
-        uninitialized_copy_n(p_src, n, p_dst);
-    }
-    catch (...)
-    {
-        allocator_traits<AT>::deallocate(alloc, p_dst, n);
-        throw;
-    }
-    return p_dst;
-}
-
-//------
-//
-template<class AT>
-void
-deallocate(AT& alloc, typename allocator_traits<AT>::pointer p_dst, size_t n) noexcept
-{
-    if (p_dst != nullptr)
-    {
-        destroy_n(p_dst, n);
-        allocator_traits<AT>::deallocate(alloc, p_dst, n);
-    }
-}
-
-}   //- detail namespace
 //==================================================================================================
-//  Dynamically-resizable matrix engine.
+//  Dynamically-resizable vector engine.
 //==================================================================================================
 //
 template<class T, class AT>
@@ -412,7 +352,7 @@ template<class ET2>
 void
 dr_vector_engine<T,AT>::assign(ET2 const& rhs)
 {
-    static_assert(detail::is_vector_engine_v<ET2>);
+    static_assert(is_vector_engine_v<ET2>);
     using src_size_type = typename ET2::size_type;
 
     size_type           elems = (size_type) rhs.elements();
@@ -637,7 +577,7 @@ template<class ET2>
 dr_matrix_engine<T,AT>&
 dr_matrix_engine<T,AT>::operator =(ET2 const& rhs)
 {
-    static_assert(detail::is_matrix_engine_v<ET2>);
+    static_assert(is_matrix_engine_v<ET2>);
     using src_size_type = typename ET2::size_type;
 
     size_type           rows = (size_type) rhs.rows();

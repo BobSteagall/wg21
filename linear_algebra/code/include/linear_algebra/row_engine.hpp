@@ -1,23 +1,23 @@
 //==================================================================================================
-//  File:       row_views.hpp
+//  File:       row_engine.hpp
 //
-//  Summary:    This header defines engines that act as views of rows and columns.
+//  Summary:    This header defines an engine that acts as a "view" of a matrix row.
 //==================================================================================================
 //
-#ifndef LINEAR_ALGEBRA_ROW_VIEWS_HPP_DEFINED
-#define LINEAR_ALGEBRA_ROW_VIEWS_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_ROW_ENGINE_HPP_DEFINED
+#define LINEAR_ALGEBRA_ROW_ENGINE_HPP_DEFINED
 
 namespace STD_LA {
 //==================================================================================================
-//  Matrix row view engine, meant to act as an rvalue-ish "view" of a matrix row in expressions, 
-//  in order to prevent unnecessary allocation and element copying.
+//  Matrix row engine, meant to act as a "view" of a matrix row in expressions, in order to help 
+//  avoid unnecessary allocation and element copying.
 //==================================================================================================
 //
 template<class ET, class VCT>
-class matrix_row_engine
+class row_engine
 {
-    static_assert(detail::is_matrix_engine_v<ET>);
-    static_assert(detail::is_vector_engine_tag<VCT>);
+    static_assert(is_matrix_engine_v<ET>);
+    static_assert(is_vector_engine_tag<VCT>);
 
   public:
     //- Types
@@ -25,25 +25,25 @@ class matrix_row_engine
     using engine_category = VCT;
     using element_type    = typename ET::element_type;
     using value_type      = typename ET::value_type;
-    using pointer         = detail::view_pointer_t<ET, VCT>;
+    using pointer         = detail::noe_pointer_t<ET, VCT>;
     using const_pointer   = typename ET::const_pointer;
-    using reference       = detail::view_reference_t<ET, VCT>;
+    using reference       = detail::noe_reference_t<ET, VCT>;
     using const_reference = typename ET::const_reference;
     using difference_type = typename ET::difference_type;
     using size_type       = typename ET::size_type;
-    using iterator        = detail::view_iterator_t<ET, VCT, matrix_row_engine>;
-    using const_iterator  = detail::vector_const_iterator<matrix_row_engine>;
+    using iterator        = detail::noe_iterator_t<ET, VCT, row_engine>;
+    using const_iterator  = detail::vector_const_iterator<row_engine>;
 
     //- Construct/copy/destroy
     //
-    ~matrix_row_engine() noexcept = default;
+    ~row_engine() noexcept = default;
 
-    constexpr matrix_row_engine() noexcept;
-    constexpr matrix_row_engine(matrix_row_engine&&) noexcept = default;
-    constexpr matrix_row_engine(matrix_row_engine const&) noexcept = default;
+    constexpr row_engine() noexcept;
+    constexpr row_engine(row_engine&&) noexcept = default;
+    constexpr row_engine(row_engine const&) noexcept = default;
 
-    constexpr matrix_row_engine&    operator =(matrix_row_engine&&) noexcept = default;
-    constexpr matrix_row_engine&    operator =(matrix_row_engine const&) noexcept = default;
+    constexpr row_engine&   operator =(row_engine&&) noexcept = default;
+    constexpr row_engine&   operator =(row_engine const&) noexcept = default;
 
     //- Iterators
     //
@@ -63,23 +63,23 @@ class matrix_row_engine
 
     //- Modifiers
     //
-    constexpr void      swap(matrix_row_engine& rhs);
+    constexpr void      swap(row_engine& rhs);
 
   private:
     template<class ET2, class OT2>  friend class vector;
-    using referent_type = detail::view_referent_t<ET, VCT>;
+    using referent_type = detail::noe_referent_t<ET, VCT>;
 
     referent_type*  mp_other;
     size_type       m_row;
 
-    constexpr matrix_row_engine(referent_type& eng, size_type row);
+    constexpr row_engine(referent_type& eng, size_type row);
 };
 
 //------------------------
 //- Construct/copy/destroy
 //
 template<class ET, class VCT> constexpr 
-matrix_row_engine<ET, VCT>::matrix_row_engine() noexcept
+row_engine<ET, VCT>::row_engine() noexcept
 :   mp_other(nullptr)
 ,   m_row(0)
 {}
@@ -88,29 +88,29 @@ matrix_row_engine<ET, VCT>::matrix_row_engine() noexcept
 //- Iterators
 //
 template<class ET, class VCT> constexpr 
-typename matrix_row_engine<ET, VCT>::iterator
-matrix_row_engine<ET, VCT>::begin() const noexcept
+typename row_engine<ET, VCT>::iterator
+row_engine<ET, VCT>::begin() const noexcept
 {
     return iterator(this, 0, mp_other->columns());
 }
 
 template<class ET, class VCT> constexpr 
-typename matrix_row_engine<ET, VCT>::iterator
-matrix_row_engine<ET, VCT>::end() const noexcept
+typename row_engine<ET, VCT>::iterator
+row_engine<ET, VCT>::end() const noexcept
 {
     return iterator(this, mp_other->columns(), mp_other->columns());
 }
 
 template<class ET, class VCT> constexpr 
-typename matrix_row_engine<ET, VCT>::const_iterator
-matrix_row_engine<ET, VCT>::cbegin() const noexcept
+typename row_engine<ET, VCT>::const_iterator
+row_engine<ET, VCT>::cbegin() const noexcept
 {
     return const_iterator(this, 0, mp_other->columns());
 }
 
 template<class ET, class VCT> constexpr 
-typename matrix_row_engine<ET, VCT>::const_iterator
-matrix_row_engine<ET, VCT>::cend() const noexcept
+typename row_engine<ET, VCT>::const_iterator
+row_engine<ET, VCT>::cend() const noexcept
 {
     return const_iterator(this, mp_other->columns(), mp_other->columns());
 }
@@ -119,15 +119,15 @@ matrix_row_engine<ET, VCT>::cend() const noexcept
 //- Capacity
 //
 template<class ET, class VCT> constexpr 
-typename matrix_row_engine<ET, VCT>::size_type
-matrix_row_engine<ET, VCT>::capacity() const noexcept
+typename row_engine<ET, VCT>::size_type
+row_engine<ET, VCT>::capacity() const noexcept
 {
     return mp_other->columns();
 }
 
 template<class ET, class VCT> constexpr 
-typename matrix_row_engine<ET, VCT>::size_type
-matrix_row_engine<ET, VCT>::elements() const noexcept
+typename row_engine<ET, VCT>::size_type
+row_engine<ET, VCT>::elements() const noexcept
 {
     return mp_other->columns();
 }
@@ -136,8 +136,8 @@ matrix_row_engine<ET, VCT>::elements() const noexcept
 //- Element access
 //
 template<class ET, class VCT> constexpr 
-typename matrix_row_engine<ET, VCT>::reference
-matrix_row_engine<ET, VCT>::operator ()(size_type j) const
+typename row_engine<ET, VCT>::reference
+row_engine<ET, VCT>::operator ()(size_type j) const
 {
     return (*mp_other)(m_row, j);
 }
@@ -147,7 +147,7 @@ matrix_row_engine<ET, VCT>::operator ()(size_type j) const
 //
 template<class ET, class VCT> constexpr 
 void
-matrix_row_engine<ET, VCT>::swap(matrix_row_engine& rhs)
+row_engine<ET, VCT>::swap(row_engine& rhs)
 {
     std::swap(mp_other, rhs.mp_other);
     std::swap(m_row, rhs.m_row);
@@ -157,10 +157,10 @@ matrix_row_engine<ET, VCT>::swap(matrix_row_engine& rhs)
 //- Private implementation
 //
 template<class ET, class VCT> constexpr 
-matrix_row_engine<ET, VCT>::matrix_row_engine(referent_type& eng, size_type row)
+row_engine<ET, VCT>::row_engine(referent_type& eng, size_type row)
 :   mp_other(&eng)
 ,   m_row(row)
 {}
 
 }       //- STD_LA namespace
-#endif  //- LINEAR_ALGEBRA_ROW_VIEWS_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_ROW_ENGINE_HPP_DEFINED

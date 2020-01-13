@@ -309,7 +309,7 @@ struct matrix_subtraction_engine_traits
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
     using element_type   = matrix_subtraction_element_t<OT, element_type_1, element_type_2>;
-    using engine_type    = conditional_t<detail::is_matrix_engine_v<ET1>,
+    using engine_type    = conditional_t<is_matrix_engine_v<ET1>,
                                          dr_matrix_engine<element_type, allocator<element_type>>,
                                          dr_vector_engine<element_type, allocator<element_type>>>;
 };
@@ -317,21 +317,21 @@ struct matrix_subtraction_engine_traits
 //- General transpose cases for matrices.
 //
 template<class OT, class ET1, class MCT1, class ET2>
-struct matrix_subtraction_engine_traits<OT, matrix_transpose_engine<ET1, MCT1>, ET2>
+struct matrix_subtraction_engine_traits<OT, transpose_engine<ET1, MCT1>, ET2>
 {
     using engine_type = typename matrix_subtraction_engine_traits<OT, ET1, ET2>::engine_type;
 };
 
 template<class OT, class ET1, class ET2, class MCT2>
-struct matrix_subtraction_engine_traits<OT, ET1, matrix_transpose_engine<ET2, MCT2>>
+struct matrix_subtraction_engine_traits<OT, ET1, transpose_engine<ET2, MCT2>>
 {
     using engine_type = typename matrix_subtraction_engine_traits<OT, ET1, ET2>::engine_type;
 };
 
 template<class OT, class ET1, class MCT1, class ET2, class MCT2>
 struct matrix_subtraction_engine_traits<OT, 
-                                        matrix_transpose_engine<ET1, MCT1>, 
-                                        matrix_transpose_engine<ET2, MCT2>>
+                                        transpose_engine<ET1, MCT1>, 
+                                        transpose_engine<ET2, MCT2>>
 {
     using engine_type = typename matrix_subtraction_engine_traits<OT, ET1, ET2>::engine_type;
 };
@@ -402,7 +402,7 @@ struct matrix_subtraction_engine_traits<OT,
 template<class OT, class T1, class A1, class T2, class A2, class MCT2>
 struct matrix_subtraction_engine_traits<OT,
                                         dr_matrix_engine<T1, A1>,
-                                        matrix_transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
+                                        transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
@@ -411,7 +411,7 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, class A1, class MCT1, class T2, class A2>
 struct matrix_subtraction_engine_traits<OT,
-                                        matrix_transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
+                                        transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
                                         dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
@@ -421,8 +421,8 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, class A1, class MCT1, class T2, class A2, class MCT2>
 struct matrix_subtraction_engine_traits<OT,
-                                        matrix_transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
-                                        matrix_transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
+                                        transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
+                                        transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
@@ -445,7 +445,7 @@ struct matrix_subtraction_engine_traits<OT,
 template<class OT, class T1, class A1, class T2, size_t R2, size_t C2, class MCT2>
 struct matrix_subtraction_engine_traits<OT,
                                         dr_matrix_engine<T1, A1>,
-                                        matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
+                                        transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
@@ -454,7 +454,7 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, class A1, class MCT1, class T2, size_t R2, size_t C2>
 struct matrix_subtraction_engine_traits<OT,
-                                        matrix_transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
+                                        transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
                                         fs_matrix_engine<T2, R2, C2>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
@@ -464,8 +464,8 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, class A1, class MCT1, class T2, size_t R2, size_t C2, class MCT2>
 struct matrix_subtraction_engine_traits<OT,
-                                        matrix_transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
-                                        matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
+                                        transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
+                                        transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
@@ -488,7 +488,7 @@ struct matrix_subtraction_engine_traits<OT,
 template<class OT, class T1, size_t R1, size_t C1, class T2, class A2, class MCT2>
 struct matrix_subtraction_engine_traits<OT,
                                         fs_matrix_engine<T1, R1, C1>,
-                                        matrix_transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
+                                        transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
@@ -497,7 +497,7 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, size_t R1, size_t C1, class MCT1, class T2, class A2>
 struct matrix_subtraction_engine_traits<OT,
-                                        matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
+                                        transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
                                         dr_matrix_engine<T2, A2>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
@@ -507,8 +507,8 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, size_t R1, size_t C1, class MCT1, class T2, class A2, class MCT2>
 struct matrix_subtraction_engine_traits<OT,
-                                        matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
-                                        matrix_transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
+                                        transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
+                                        transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
 {
     using element_type = matrix_subtraction_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
@@ -531,7 +531,7 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, size_t R1, size_t C1, class MCT1,class T2, size_t R2, size_t C2>
 struct matrix_subtraction_engine_traits<OT,
-                                        matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
+                                        transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
                                         fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == C2);
@@ -543,7 +543,7 @@ struct matrix_subtraction_engine_traits<OT,
 template<class OT, class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2, class MCT2>
 struct matrix_subtraction_engine_traits<OT,
                                         fs_matrix_engine<T1, R1, C1>,
-                                        matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
+                                        transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
 {
     static_assert(R1 == C2);
     static_assert(C1 == R2);
@@ -553,8 +553,8 @@ struct matrix_subtraction_engine_traits<OT,
 
 template<class OT, class T1, size_t R1, size_t C1, class MCT1, class T2, size_t R2, size_t C2, class MCT2>
 struct matrix_subtraction_engine_traits<OT,
-                                        matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
-                                        matrix_transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
+                                        transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
+                                        transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);

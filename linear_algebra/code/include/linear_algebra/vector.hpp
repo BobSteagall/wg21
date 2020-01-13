@@ -16,8 +16,10 @@ namespace STD_LA {
 template<class ET, class OT>
 class vector
 {
-    static_assert(detail::is_vector_engine_v<ET>);
-    static constexpr bool   has_cx_elem = detail::is_complex_v<typename ET::value_type>;
+    static_assert(is_vector_engine_v<ET>);
+
+    static constexpr bool   has_cx_elem  = detail::is_complex_v<typename ET::value_type>;
+    static constexpr bool   has_eng_iter = detail::has_iteration_v<ET>;
 
   public:
     //- Types
@@ -29,10 +31,11 @@ class vector
     using size_type              = typename engine_type::size_type;
     using reference              = typename engine_type::reference;
     using const_reference        = typename engine_type::const_reference;
-    using iterator               = typename engine_type::iterator;
-    using const_iterator         = typename engine_type::const_iterator;
+    using iterator               = detail::engine_m_iter_t<has_eng_iter, ET>; //typename engine_type::iterator;
+    using const_iterator         = detail::engine_c_iter_t<has_eng_iter, ET>; //typename engine_type::const_iterator;
     using reverse_iterator       = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
     using transpose_type         = vector&;
     using const_transpose_type   = vector const&;
     using hermitian_type         = conditional_t<has_cx_elem, vector, transpose_type>;
@@ -176,28 +179,56 @@ template<class ET, class OT> constexpr
 typename vector<ET,OT>::iterator
 vector<ET,OT>::begin() noexcept
 {
-    return m_engine.begin();
+    if constexpr (has_eng_iter)
+    {
+        return m_engine.begin();
+    }
+    else
+    {
+        return iterator(m_engine, 0, m_engine.elements());
+    }
 }
 
 template<class ET, class OT> constexpr 
 typename vector<ET,OT>::const_iterator
 vector<ET,OT>::begin() const noexcept
 {
-    return m_engine.cbegin();
+    if constexpr (has_eng_iter)
+    {
+        return m_engine.cbegin();
+    }
+    else
+    {
+        return const_iterator(m_engine, 0, m_engine.elements());
+    }
 }
 
 template<class ET, class OT> constexpr 
 typename vector<ET,OT>::iterator
 vector<ET,OT>::end() noexcept
 {
-    return m_engine.end();
+    if constexpr (has_eng_iter)
+    {
+        return m_engine.end();
+    }
+    else
+    {
+        return iterator(m_engine, m_engine.elements(), m_engine.elements());
+    }
 }
 
 template<class ET, class OT> constexpr 
 typename vector<ET,OT>::const_iterator
 vector<ET,OT>::end() const noexcept
 {
-    return m_engine.cend();
+    if constexpr (has_eng_iter)
+    {
+        return m_engine.cend();
+    }
+    else
+    {
+        return const_iterator(m_engine, m_engine.elements(), m_engine.elements());
+    }
 }
 
 template<class ET, class OT> constexpr 
@@ -232,14 +263,28 @@ template<class ET, class OT> constexpr
 typename vector<ET,OT>::const_iterator
 vector<ET,OT>::cbegin() const noexcept
 {
-    return m_engine.cbegin();
+    if constexpr (has_eng_iter)
+    {
+        return m_engine.cbegin();
+    }
+    else
+    {
+        return const_iterator(m_engine, 0, m_engine.elements());
+    }
 }
 
 template<class ET, class OT> constexpr 
 typename vector<ET,OT>::const_iterator
 vector<ET,OT>::cend() const noexcept
 {
-    return m_engine.cend();
+    if constexpr (has_eng_iter)
+    {
+        return m_engine.cend();
+    }
+    else
+    {
+        return const_iterator(m_engine, m_engine.elements(), m_engine.elements());
+    }
 }
 
 //----------

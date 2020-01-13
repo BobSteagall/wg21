@@ -41,7 +41,8 @@ type_name()                //- From StackOverflow...
 #elif defined(_MSC_VER)
     string_view p = __FUNCSIG__;
     #if (_MSC_VER >= 1920)          //- VS 2019
-        return string_view(p.data() + 88, p.size() - 88 - 7);
+        return string_view(p.data() + 74, p.size() - 74 - 7);
+        //return string_view(p.data(), p.size());
     #elif (_MSC_VER >= 1910)        //- VS 2017
         return string_view(p.data() + 88, p.size() - 88 - 7);
     #else
@@ -63,6 +64,7 @@ clean_type_name(basic_string<C,T,A> tname)
     static basic_string<C,T,A> const   ns = MATRIX_STRINGIFY(STD_LA) "::";
     static basic_string<C,T,A> const   sl = "std::";
     static basic_string<C,T,A> const   aa = "> >";
+    static basic_string<C,T,A> const   tn = "type_name<";
 
     for (auto pos = string::npos;  (pos = tname.rfind(cl, pos)) != string::npos; )
     {
@@ -89,6 +91,10 @@ clean_type_name(basic_string<C,T,A> tname)
         tname.replace(pos, 3u, ">>");
     }
 
+    for (auto pos = string::npos;  (pos = tname.rfind(tn, pos)) != string::npos; )
+    {
+        tname.erase(pos, tn.size());
+    }
     return tname;
 }
 
@@ -140,6 +146,7 @@ get_type_name()
 {
     auto    view = type_name<T>();
     return clean_type_name(string(view.data(), view.size()));
+//    return string(view.data(), view.size());
 }
 
 template<class T>
@@ -225,6 +232,12 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
             cout << right << setw(6) << setprecision(3) << (double) *iter;
     }
     cout << endl;
+}
+
+inline void
+Print(bool b, char const* pname = nullptr)
+{
+    cout << endl << "bool: " << ((pname) ? pname : "<anon>") << b << endl;
 }
 
 #define PRINT(X)    Print(X, #X)

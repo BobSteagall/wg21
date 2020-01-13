@@ -24,8 +24,8 @@ template<class T>
 struct is_complex<complex<T>> : public true_type
 {};
 
-template<class T>
-constexpr bool  is_complex_v = is_complex<T>::value;
+template<class T> inline constexpr 
+bool    is_complex_v = is_complex<T>::value;
 
 }       //- detail namespace
 }       //- STD_LA namespace

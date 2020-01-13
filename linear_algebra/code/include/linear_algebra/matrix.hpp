@@ -18,10 +18,10 @@ namespace STD_LA {
 template<class ET, class OT>
 class matrix
 {
-    static_assert(detail::is_matrix_engine_v<ET>);
+    static_assert(is_matrix_engine_v<ET>);
 
-    using vector_view_tag = detail::view_category_t<ET, writable_vector_engine_tag>;
-    using matrix_view_tag = detail::view_category_t<ET, writable_matrix_engine_tag>;
+    using possibly_writable_vector_tag = detail::noe_category_t<ET, writable_vector_engine_tag>;
+    using possibly_writable_matrix_tag = detail::noe_category_t<ET, writable_matrix_engine_tag>;
 
     static constexpr bool   has_cx_elem = detail::is_complex_v<typename ET::value_type>;
 
@@ -37,14 +37,15 @@ class matrix
     using size_type       = typename engine_type::size_type;
     using size_tuple      = typename engine_type::size_tuple;
 
-    using column_type       = vector<matrix_column_engine<engine_type, vector_view_tag>, OT>;
-    using const_column_type = vector<matrix_column_engine<engine_type, readable_vector_engine_tag>, OT>;
-    using row_type          = vector<matrix_row_engine<engine_type, vector_view_tag>, OT>;
-    using const_row_type    = vector<matrix_row_engine<engine_type, readable_vector_engine_tag>, OT>;
+    using column_type       = vector<column_engine<engine_type, possibly_writable_vector_tag>, OT>;
+    using const_column_type = vector<column_engine<engine_type, readable_vector_engine_tag>, OT>;
+    using row_type          = vector<row_engine<engine_type, possibly_writable_vector_tag>, OT>;
+    using const_row_type    = vector<row_engine<engine_type, readable_vector_engine_tag>, OT>;
 
-    using transpose_type       = matrix<matrix_transpose_engine<engine_type, matrix_view_tag>, OT>;
-    using const_transpose_type = matrix<matrix_transpose_engine<engine_type, readable_matrix_engine_tag>, OT>;
-
+    using submatrix_type       = matrix<submatrix_engine<engine_type, possibly_writable_matrix_tag>, OT>;
+    using const_submatrix_type = matrix<submatrix_engine<engine_type, readable_matrix_engine_tag>, OT>;
+    using transpose_type       = matrix<transpose_engine<engine_type, possibly_writable_matrix_tag>, OT>;
+    using const_transpose_type = matrix<transpose_engine<engine_type, readable_matrix_engine_tag>, OT>;
     using hermitian_type       = conditional_t<has_cx_elem, matrix, transpose_type>;
     using const_hermitian_type = conditional_t<has_cx_elem, matrix, const_transpose_type>;
 
@@ -100,15 +101,19 @@ class matrix
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr void      resize(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 
-    //- Column view, row view, transpose view, and Hermitian.
+    //- Element access
     //
     constexpr reference             operator ()(size_type i, size_type j);
     constexpr const_reference       operator ()(size_type i, size_type j) const;
 
+    //- Columns, rows, submatrices, transposes, and the Hermitian
+    //
     constexpr column_type           column(size_type j) noexcept;
     constexpr const_column_type     column(size_type j) const noexcept;
     constexpr row_type              row(size_type i) noexcept;
     constexpr const_row_type        row(size_type i) const noexcept;
+    constexpr submatrix_type        submatrix(size_type ri, size_type rn, size_type ci, size_type cn) noexcept;
+    constexpr const_submatrix_type  submatrix(size_type ri, size_type rn, size_type ci, size_type cn) const noexcept;
     constexpr transpose_type        t() noexcept;
     constexpr const_transpose_type  t() const noexcept;
     constexpr hermitian_type        h();
@@ -121,11 +126,11 @@ class matrix
 
     //- Modifiers
     //
-    template<class ET2 = ET, detail::enable_if_mutable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
     constexpr void      swap(matrix& rhs) noexcept;
-    template<class ET2 = ET, detail::enable_if_mutable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
     constexpr void      swap_columns(size_type i, size_type j) noexcept;
-    template<class ET2 = ET, detail::enable_if_mutable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
     constexpr void      swap_rows(size_type i, size_type j) noexcept;
 
   private:
@@ -395,7 +400,7 @@ matrix<ET,OT>::engine() const noexcept
 //- Modifiers
 //
 template<class ET, class OT>
-template<class ET2, detail::enable_if_mutable<ET, ET2>> inline constexpr 
+template<class ET2, detail::enable_if_writable<ET, ET2>> inline constexpr 
 void
 matrix<ET,OT>::swap(matrix& rhs) noexcept
 {
@@ -403,7 +408,7 @@ matrix<ET,OT>::swap(matrix& rhs) noexcept
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_mutable<ET, ET2>> inline constexpr 
+template<class ET2, detail::enable_if_writable<ET, ET2>> inline constexpr 
 void
 matrix<ET,OT>::swap_columns(size_type c1, size_type c2) noexcept
 {
@@ -411,7 +416,7 @@ matrix<ET,OT>::swap_columns(size_type c1, size_type c2) noexcept
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_mutable<ET, ET2>> inline constexpr 
+template<class ET2, detail::enable_if_writable<ET, ET2>> inline constexpr 
 void
 matrix<ET,OT>::swap_rows(size_type r1, size_type r2) noexcept
 {

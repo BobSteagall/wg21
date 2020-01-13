@@ -30,9 +30,9 @@ class fs_matrix_engine_tst
     static constexpr bool   is_rectangular  = true;
     static constexpr bool   is_row_major    = true;
 
-//    using column_view_type    = STD_LA::matrix_column_engine<fs_matrix_engine_tst>;
-//    using row_view_type       = STD_LA::matrix_row_engine<fs_matrix_engine_tst>;
-//    using transpose_view_type = STD_LA::matrix_transpose_engine<fs_matrix_engine_tst>;
+//    using column_view_type    = STD_LA::column_engine<fs_matrix_engine_tst>;
+//    using row_view_type       = STD_LA::row_engine<fs_matrix_engine_tst>;
+//    using transpose_view_type = STD_LA::transpose_engine<fs_matrix_engine_tst>;
 
   public:
     constexpr fs_matrix_engine_tst();
