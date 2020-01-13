@@ -113,6 +113,7 @@ class vector
     //- Modifiers
     //
     constexpr void      swap(vector& rhs) noexcept;
+    template<class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
     constexpr void      swap_elements(size_type i, size_type j) noexcept;
 
   private:
@@ -121,8 +122,8 @@ class vector
 
     engine_type     m_engine;
 
-    template<class ET2>
-    constexpr vector(ET2&& eng, size_type idx, detail::row_or_column_tag);
+    template<class ET2, class ...ARGS>
+    constexpr vector(detail::special_ctor_tag, ET2&& eng, ARGS&& ...args);
 };
 
 //------------------------
@@ -158,9 +159,9 @@ vector<ET,OT>::vector(size_type elems, size_type cap)
 {}
 
 template<class ET, class OT>
-template<class ET2> constexpr
-vector<ET,OT>::vector(ET2&& eng, size_type idx, detail::row_or_column_tag)
-:   m_engine(std::forward<ET2>(eng), idx)
+template<class ET2, class ...ARGS> constexpr
+vector<ET,OT>::vector(detail::special_ctor_tag, ET2&& eng, ARGS&& ...args)
+:   m_engine(std::forward<ET2>(eng), std::forward<ARGS>(args)...)
 {}
 
 template<class ET, class OT>
@@ -435,7 +436,8 @@ vector<ET,OT>::swap(vector& rhs) noexcept
     m_engine.swap(rhs);
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT>
+template<class ET2, detail::enable_if_writable<ET, ET2>> constexpr 
 void
 vector<ET,OT>::swap_elements(size_type i, size_type j) noexcept
 {

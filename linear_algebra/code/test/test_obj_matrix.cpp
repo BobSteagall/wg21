@@ -138,6 +138,9 @@ void t001()
     constexpr double            d = fsm(1,1);
 
     PRINT(fsm);
+
+    auto    sm = fsm.submatrix(1, 2, 2, 3);
+    PRINT(sm);
     //drm_double  mx = {1.0, 1.0, 1.0, 1.0};
 }
 

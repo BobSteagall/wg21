@@ -66,9 +66,14 @@ class submatrix_engine
     template<class ET2, class OT2>  friend class matrix;
     using referent_type = detail::noe_referent_t<ET, MCT>;
 
-    referent_type*      mp_other;
+    referent_type*  mp_other;
+    size_type       m_row_start;
+    size_type       m_row_count;
+    size_type       m_col_start;
+    size_type       m_col_count;
 
-    constexpr submatrix_engine(referent_type& eng);
+    constexpr submatrix_engine(referent_type& eng, size_type ri, size_type rn, 
+                                                   size_type ci, size_type cn);
 };
 
 //------------------------
@@ -77,6 +82,10 @@ class submatrix_engine
 template<class ET, class MCT> constexpr 
 submatrix_engine<ET, MCT>::submatrix_engine()
 :   mp_other(nullptr)
+,   m_row_start(0)
+,   m_row_count(0)
+,   m_col_start(0)
+,   m_col_count(0)
 {}
 
 //----------
@@ -86,42 +95,42 @@ template<class ET, class MCT> constexpr
 typename submatrix_engine<ET, MCT>::size_type
 submatrix_engine<ET, MCT>::columns() const noexcept
 {
-    return mp_other->rows();
+    return m_col_count;
 }
 
 template<class ET, class MCT> constexpr 
 typename submatrix_engine<ET, MCT>::size_type
 submatrix_engine<ET, MCT>::rows() const noexcept
 {
-    return mp_other->columns();
+    return m_row_count;
 }
 
 template<class ET, class MCT> constexpr 
 typename submatrix_engine<ET, MCT>::size_tuple
 submatrix_engine<ET, MCT>::size() const noexcept
 {
-    return size_tuple(mp_other->columns(), mp_other->rows());
+    return size_tuple(m_row_count, m_col_count);
 }
 
 template<class ET, class MCT> constexpr 
 typename submatrix_engine<ET, MCT>::size_type
 submatrix_engine<ET, MCT>::column_capacity() const noexcept
 {
-    return mp_other->row_capacity();
+    return m_col_count;
 }
 
 template<class ET, class MCT> constexpr 
 typename submatrix_engine<ET, MCT>::size_type
 submatrix_engine<ET, MCT>::row_capacity() const noexcept
 {
-    return mp_other->column_capacity();
+    return m_row_count;
 }
 
 template<class ET, class MCT> constexpr 
 typename submatrix_engine<ET, MCT>::size_tuple
 submatrix_engine<ET, MCT>::capacity() const noexcept
 {
-    return size_tuple(mp_other->column_capacity(), mp_other->row_capacity());
+    return size_tuple(m_row_count, m_col_count);
 }
 
 //----------------
@@ -131,7 +140,7 @@ template<class ET, class MCT> constexpr
 typename submatrix_engine<ET, MCT>::reference
 submatrix_engine<ET, MCT>::operator ()(size_type i, size_type j) const
 {
-    return (*mp_other)(i, j);
+    return (*mp_other)(i + m_row_start, j + m_col_start);
 }
 
 //-----------
@@ -141,12 +150,24 @@ template<class ET, class MCT> constexpr
 void
 submatrix_engine<ET, MCT>::swap(submatrix_engine& rhs)
 {
-    std::swap(mp_other, rhs.mp_other);
+    if (&rhs != this)
+    {
+        std::swap(mp_other, rhs.mp_other);
+        std::swap(m_row_start, rhs.m_row_start);
+        std::swap(m_row_count, rhs.m_row_count);
+        std::swap(m_col_start, rhs.m_col_start);
+        std::swap(m_col_count, rhs.m_col_count);
+    }
 }
 
 template<class ET, class MCT> constexpr
-submatrix_engine<ET, MCT>::submatrix_engine(referent_type& eng)
+submatrix_engine<ET, MCT>::submatrix_engine
+(referent_type& eng, size_type ri, size_type rn, size_type ci, size_type cn)
 :   mp_other(&eng)
+,   m_row_start(ri)
+,   m_row_count(rn)
+,   m_col_start(ci)
+,   m_col_count(cn)
 {}
 
 }       //- STD_LA namespace

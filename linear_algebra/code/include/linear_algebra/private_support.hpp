@@ -14,7 +14,7 @@ namespace detail {
 template<class ET>  class vector_iterator;
 template<class ET>  class vector_const_iterator;
 
-struct row_or_column_tag {};
+struct special_ctor_tag {};
 
 //==================================================================================================
 //- Traits type to detect if a type is std::complex<T>.

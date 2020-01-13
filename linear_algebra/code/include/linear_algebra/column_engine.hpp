@@ -31,7 +31,8 @@ class column_engine
     using const_reference = typename ET::const_reference;
     using difference_type = typename ET::difference_type;
     using size_type       = typename ET::size_type;
-#ifdef USE_ENGINE_ITERATORS
+
+#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
     using iterator        = detail::noe_iterator_t<ET, VCT, column_engine>;
     using const_iterator  = detail::vector_const_iterator<column_engine>;
 #endif
@@ -47,7 +48,7 @@ class column_engine
     constexpr column_engine&    operator =(column_engine&&) noexcept = default;
     constexpr column_engine&    operator =(column_engine const&) noexcept = default;
 
-#ifdef USE_ENGINE_ITERATORS
+#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
     //- Iterators
     //
     constexpr iterator          begin() const noexcept;
@@ -88,7 +89,7 @@ column_engine<ET,VCT>::column_engine() noexcept
 ,   m_column(0)
 {}
 
-#ifdef USE_ENGINE_ITERATORS
+#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
 //-----------
 //- Iterators
 //

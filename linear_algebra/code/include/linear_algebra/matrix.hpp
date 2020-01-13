@@ -106,7 +106,7 @@ class matrix
     constexpr reference             operator ()(size_type i, size_type j);
     constexpr const_reference       operator ()(size_type i, size_type j) const;
 
-    //- Columns, rows, submatrices, transposes, and the Hermitian
+    //- Columns, rows, submatrices, and transposes
     //
     constexpr column_type           column(size_type j) noexcept;
     constexpr const_column_type     column(size_type j) const noexcept;
@@ -126,7 +126,6 @@ class matrix
 
     //- Modifiers
     //
-    template<class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
     constexpr void      swap(matrix& rhs) noexcept;
     template<class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
     constexpr void      swap_columns(size_type i, size_type j) noexcept;
@@ -137,11 +136,10 @@ class matrix
     template<class ET2, class OT2> friend class matrix;
     template<class ET2, class OT2> friend class vector;
 
-  private:
     engine_type     m_engine;
 
-  private:
-    constexpr matrix(engine_type const& eng);
+    template<class ET2, class ...ARGS>
+    constexpr matrix(detail::special_ctor_tag, ET2&& eng, ARGS&& ...args);
 };
 
 //------------------------
@@ -185,9 +183,10 @@ matrix<ET,OT>::matrix(size_type rows, size_type cols, size_type rowcap, size_typ
 :   m_engine(rows, cols, rowcap, colcap)
 {}
 
-template<class ET, class OT> constexpr 
-matrix<ET,OT>::matrix(engine_type const& eng)
-:   m_engine(eng)
+template<class ET, class OT>
+template<class ET2, class ...ARGS> constexpr
+matrix<ET,OT>::matrix(detail::special_ctor_tag, ET2&& eng, ARGS&& ...args)
+:   m_engine(std::forward<ET2>(eng), std::forward<ARGS>(args)...)
 {}
 
 template<class ET, class OT>
@@ -309,46 +308,62 @@ matrix<ET,OT>::operator ()(size_type i, size_type j) const
     return m_engine(i, j);
 }
 
+//- Columns, rows, submatrices, and transposes
+//
 template<class ET, class OT> inline constexpr 
 typename matrix<ET,OT>::const_column_type
 matrix<ET,OT>::column(size_type j) const noexcept
 {
-    return const_column_type(m_engine, j, detail::row_or_column_tag());
+    return const_column_type(detail::special_ctor_tag(), m_engine, j);
 }
 
 template<class ET, class OT> inline constexpr 
 typename matrix<ET,OT>::column_type
 matrix<ET,OT>::column(size_type j) noexcept
 {
-    return column_type(m_engine, j, detail::row_or_column_tag());
+    return column_type(detail::special_ctor_tag(), m_engine, j);
 }
 
 template<class ET, class OT> inline constexpr 
 typename matrix<ET,OT>::row_type
 matrix<ET,OT>::row(size_type i) noexcept
 {
-    return row_type(m_engine, i, detail::row_or_column_tag());
+    return row_type(detail::special_ctor_tag(), m_engine, i);
 }
 
 template<class ET, class OT> inline constexpr 
 typename matrix<ET,OT>::const_row_type
 matrix<ET,OT>::row(size_type i) const noexcept
 {
-    return const_row_type(m_engine, i, detail::row_or_column_tag());
+    return const_row_type(detail::special_ctor_tag(), m_engine, i);
+}
+
+template<class ET, class OT> inline constexpr 
+typename matrix<ET,OT>::submatrix_type
+matrix<ET,OT>::submatrix(size_type ri, size_type rn, size_type ci, size_type cn) noexcept
+{
+    return submatrix_type(detail::special_ctor_tag(), m_engine, ri, rn, ci, cn);
+}
+
+template<class ET, class OT> inline constexpr 
+typename matrix<ET,OT>::const_submatrix_type
+matrix<ET,OT>::submatrix(size_type ri, size_type rn, size_type ci, size_type cn) const noexcept
+{
+    return const_submatrix_type(detail::special_ctor_tag(), m_engine, ri, rn, ci, cn);
 }
 
 template<class ET, class OT> inline constexpr 
 typename matrix<ET,OT>::transpose_type
 matrix<ET,OT>::t() noexcept
 {
-    return transpose_type(m_engine);
+    return transpose_type(detail::special_ctor_tag(), m_engine);
 }
 
 template<class ET, class OT> inline constexpr 
 typename matrix<ET,OT>::const_transpose_type
 matrix<ET,OT>::t() const noexcept
 {
-    return const_transpose_type(m_engine);
+    return const_transpose_type(detail::special_ctor_tag(), m_engine);
 }
 
 template<class ET, class OT> inline constexpr 
@@ -361,7 +376,7 @@ matrix<ET,OT>::h()
     }
     else
     {
-        return hermitian_type(m_engine);
+        return hermitian_type(detail::special_ctor_tag(), m_engine);
     }
 }
 
@@ -375,7 +390,7 @@ matrix<ET,OT>::h() const
     }
     else
     {
-        return const_hermitian_type(m_engine);
+        return const_hermitian_type(detail::special_ctor_tag(), m_engine);
     }
 }
 
@@ -399,8 +414,7 @@ matrix<ET,OT>::engine() const noexcept
 //-----------
 //- Modifiers
 //
-template<class ET, class OT>
-template<class ET2, detail::enable_if_writable<ET, ET2>> inline constexpr 
+template<class ET, class OT> constexpr
 void
 matrix<ET,OT>::swap(matrix& rhs) noexcept
 {

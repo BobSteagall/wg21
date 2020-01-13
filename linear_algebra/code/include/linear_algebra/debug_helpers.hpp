@@ -42,7 +42,6 @@ type_name()                //- From StackOverflow...
     string_view p = __FUNCSIG__;
     #if (_MSC_VER >= 1920)          //- VS 2019
         return string_view(p.data() + 74, p.size() - 74 - 7);
-        //return string_view(p.data(), p.size());
     #elif (_MSC_VER >= 1910)        //- VS 2017
         return string_view(p.data() + 88, p.size() - 88 - 7);
     #else

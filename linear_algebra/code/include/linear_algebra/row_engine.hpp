@@ -31,8 +31,11 @@ class row_engine
     using const_reference = typename ET::const_reference;
     using difference_type = typename ET::difference_type;
     using size_type       = typename ET::size_type;
+
+#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
     using iterator        = detail::noe_iterator_t<ET, VCT, row_engine>;
     using const_iterator  = detail::vector_const_iterator<row_engine>;
+#endif
 
     //- Construct/copy/destroy
     //
@@ -45,12 +48,14 @@ class row_engine
     constexpr row_engine&   operator =(row_engine&&) noexcept = default;
     constexpr row_engine&   operator =(row_engine const&) noexcept = default;
 
+#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
     //- Iterators
     //
     constexpr iterator          begin() const noexcept;
     constexpr iterator          end() const noexcept;
     constexpr const_iterator    cbegin() const noexcept;
     constexpr const_iterator    cend() const noexcept;
+#endif
 
     //- Capacity
     //
@@ -84,6 +89,7 @@ row_engine<ET, VCT>::row_engine() noexcept
 ,   m_row(0)
 {}
 
+#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
 //-----------
 //- Iterators
 //
@@ -115,6 +121,7 @@ row_engine<ET, VCT>::cend() const noexcept
     return const_iterator(this, mp_other->columns(), mp_other->columns());
 }
 
+#endif
 //----------
 //- Capacity
 //
