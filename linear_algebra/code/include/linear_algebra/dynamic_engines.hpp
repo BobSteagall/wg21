@@ -503,8 +503,8 @@ class dr_matrix_engine
 //------------------------
 //- Construct/copy/destroy
 //
-template<class T, class AT>
-dr_matrix_engine<T,AT>::~dr_matrix_engine()
+template<class T, class AT> inline
+dr_matrix_engine<T,AT>::~dr_matrix_engine() noexcept
 {
     delete [] mp_elems;
 }
