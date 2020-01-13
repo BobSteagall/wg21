@@ -12,38 +12,45 @@
 namespace STD_LA {
 USING_STD
 
-//- Some tags for specifying how engines should behave.
+//- Tags that specify how engines should behave.
 //
-using scalar_engine_tag           = integral_constant<int, 0>;
+struct scalar_engine_tag           : public integral_constant<int, 0> {};
 
-using const_vector_engine_tag     = integral_constant<int, 1>;
-using mutable_vector_engine_tag   = integral_constant<int, 2>;
-using resizable_vector_engine_tag = integral_constant<int, 3>;
+struct readable_vector_engine_tag  : public integral_constant<int, 1> {};
+struct writable_vector_engine_tag  : public integral_constant<int, 2> {};
+struct resizable_vector_engine_tag : public integral_constant<int, 3> {};
 
-using const_matrix_engine_tag     = integral_constant<int, 4>;
-using mutable_matrix_engine_tag   = integral_constant<int, 5>;
-using resizable_matrix_engine_tag = integral_constant<int, 6>;
+struct readable_matrix_engine_tag  : public integral_constant<int, 5> {};
+struct writable_matrix_engine_tag  : public integral_constant<int, 7> {};
+struct resizable_matrix_engine_tag : public integral_constant<int, 11> {};
 
-//- Traits for determining if a type is a complex number.
+//- Owning engines with dynamically-allocated external storage.
 //
-template<class T>   struct is_complex;
+template<class T, class AT>     class dr_vector_engine;
+template<class T, class AT>     class dr_matrix_engine;
 
-struct default_matrix_operations {};
-
-//- Basic linear algebra engine types.
+//- Owning engines with fixed-size internal storage.
 //
-template<class ET>                      class matrix_column_view;
-template<class ET>                      class matrix_row_view;
-template<class ET>                      class matrix_transpose_view;
 template<class T, size_t N>             class fs_vector_engine;
 template<class T, size_t R, size_t C>   class fs_matrix_engine;
-template<class T, class AT>             class dr_vector_engine;
-template<class T, class AT>             class dr_matrix_engine;
+
+//- Non-owning, view-style engines.
+//
+template<class ET, class VCT>   class column_engine;
+template<class ET, class VCT>   class row_engine;
+template<class ET, class MCT>   class transpose_engine;
+template<class ET, class MCT>   class submatrix_engine;
+
+template<class T>   struct scalar_engine;
 
 //- The default element promotion, engine promotion, and arithmetic operation traits for
 //  the four basic arithmetic operations.
 //
 struct matrix_operation_traits;
+
+//- TODO: remove this
+//
+struct default_matrix_operations {};
 
 //- Primary math object types.
 //

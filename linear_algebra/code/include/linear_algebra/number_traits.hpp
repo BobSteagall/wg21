@@ -10,7 +10,7 @@
 #define LINEAR_ALGEBRA_NUMBER_TRAITS_HPP_DEFINED
 
 namespace STD_LA {
-
+namespace detail {
 //--------------------------------------------------------------------------------------------------
 //- New trait "is_complex<T>" to detect if a type is complex<T>.  Only here for now as a
 //  convenience, as it is being proposed in a separate paper.
@@ -24,8 +24,9 @@ template<class T>
 struct is_complex<complex<T>> : public true_type
 {};
 
-template<class T>
-constexpr bool  is_complex_v = is_complex<T>::value;
+template<class T> inline constexpr 
+bool    is_complex_v = is_complex<T>::value;
 
+}       //- detail namespace
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_NUMBER_TRAITS_HPP_DEFINED

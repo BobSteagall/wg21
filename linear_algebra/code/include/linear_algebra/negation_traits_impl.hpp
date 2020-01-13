@@ -19,16 +19,23 @@ matrix_negation_traits<OT, vector<ET1, OT1>>::negate(vector<ET1, OT1> const& v1)
 {
     PrintOperandTypes<result_type>("negation_traits", v1);
 
-	result_type     vr;
+    size_type_r const   elems = static_cast<size_type_r>(v1.elements());
 
-	if constexpr (result_requires_resize(vr))
-	{
-		vr.resize(v1.elements());
-	}
+    result_type     vr;
+    size_type_r     ir;
+    size_type_1     i1;
 
-	transform(v1.begin(), v1.end(), vr.begin(), [](auto val){ return -val; });
+    if constexpr (result_requires_resize(vr))
+    {
+        vr.resize(elems);
+    }
 
-	return vr;
+    for (ir = 0, i1 = 0;  ir < elems;  ++ir, ++i1)
+    {
+        vr(ir) = -v1(i1);
+    }
+
+    return vr;
 }
 
 //------
@@ -37,40 +44,27 @@ template<class OT, class ET1, class OT1>
 inline auto
 matrix_negation_traits<OT, matrix<ET1, OT1>>::negate(matrix<ET1, OT1> const& m1) -> result_type
 {
-    PrintOperandTypes<result_type>("negation_traits", m1);
+    size_type_r const  rows = static_cast<size_type_r>(m1.rows());
+    size_type_r const  cols = static_cast<size_type_r>(m1.columns());
 
-	result_type		mr{};                           //- Braces here to avoid C4701 from MSVC
-	auto const      rows = m1.rows();
-	auto const      columns = m1.columns();
+    result_type		mr;
+    size_type_r     ir, jr;
+    size_type_1     i1, j1;
 
-	if constexpr (result_requires_resize(mr))
-	{
-		mr.resize(rows, columns);
-	}
-
-	for (auto i = 0;  i < rows;  ++i)
+    if constexpr (result_requires_resize(mr))
     {
-		for (auto j = 0;  j <  columns;  ++j)
+        mr.resize(rows, cols);
+    }
+
+    for (ir = 0, i1 = 0;  ir < rows;  ++ir, ++i1)
+    {
+        for (jr = 0, j1 = 0;  jr < cols;  ++jr, ++j1)
         {
-			mr(i, j) = -m1(i, j);
+            mr(ir, jr) = -m1(i1, j1);
         }
     }
-/*
-	if constexpr (result_requires_resize(mr))
-	{
-		mr.resize(rows, columns);
-		auto data = mr.data();
-		for (auto i = 0; i < columns; ++i)
-			for (auto j = 0; j < rows; ++j)
-				*data++ = -m1(i, j);		// Safe because the resize means that mr capacity = size for rows and columns.
-	}
-	else
-	{
-		transform(m1.data(), m1.data() + (rows * columns), mr.data(),
-			[](auto val) {return -val; });
-	}
-*/
-	return mr;
+
+    return mr;
 }
 
 }       //- STD_LA namespace

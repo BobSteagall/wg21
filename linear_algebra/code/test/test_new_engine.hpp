@@ -14,28 +14,25 @@ class fs_matrix_engine_tst
     static_assert(C >= 1);
 
   public:
-    using engine_category = STD_LA::mutable_matrix_engine_tag;
+    using engine_category = STD_LA::writable_matrix_engine_tag;
     using element_type    = T;
     using value_type      = T;
     using reference       = T&;
     using pointer         = T*;
     using const_reference = T const&;
     using const_pointer   = T const*;
-    using difference_type = std::ptrdiff_t;
-    using size_type       = std::int_fast32_t;
+    using difference_type = std::size_t;
+    using size_type       = std::uint32_t;
     using size_tuple      = std::tuple<size_type, size_type>;
 
-    using is_fixed_size   = std::true_type;
-    using is_resizable    = std::false_type;
+    static constexpr bool   is_column_major = false;
+    static constexpr bool   is_dense        = true;
+    static constexpr bool   is_rectangular  = true;
+    static constexpr bool   is_row_major    = true;
 
-    using is_column_major = std::false_type;
-    using is_dense        = std::true_type;
-    using is_rectangular  = std::true_type;
-    using is_row_major    = std::true_type;
-
-    using column_view_type    = STD_LA::matrix_column_view<fs_matrix_engine_tst>;
-    using row_view_type       = STD_LA::matrix_row_view<fs_matrix_engine_tst>;
-    using transpose_view_type = STD_LA::matrix_transpose_view<fs_matrix_engine_tst>;
+//    using column_view_type    = STD_LA::column_engine<fs_matrix_engine_tst>;
+//    using row_view_type       = STD_LA::row_engine<fs_matrix_engine_tst>;
+//    using transpose_view_type = STD_LA::transpose_engine<fs_matrix_engine_tst>;
 
   public:
     constexpr fs_matrix_engine_tst();
@@ -47,8 +44,8 @@ class fs_matrix_engine_tst
 
     constexpr const_reference   operator ()(size_type i, size_type j) const;
 
-    constexpr size_type    columns() const noexcept;
-    constexpr size_type    rows() const noexcept;
+    constexpr size_type     columns() const noexcept;
+    constexpr size_type     rows() const noexcept;
     constexpr size_tuple    size() const noexcept;
 
     constexpr size_type     column_capacity() const noexcept;
@@ -174,8 +171,8 @@ fs_matrix_engine_tst<T,R,C>::assign(ET2 const& rhs)
     {
         src_size_type  si = 0;
         src_size_type  sj = 0;
-        size_type      di = 0;
-        size_type      dj = 0;
+        size_type       di = 0;
+        size_type       dj = 0;
 
         for (; di < rows(); ++di, ++si)
         {

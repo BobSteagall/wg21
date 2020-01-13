@@ -41,7 +41,7 @@ type_name()                //- From StackOverflow...
 #elif defined(_MSC_VER)
     string_view p = __FUNCSIG__;
     #if (_MSC_VER >= 1920)          //- VS 2019
-        return string_view(p.data() + 88, p.size() - 88 - 7);
+        return string_view(p.data() + 74, p.size() - 74 - 7);
     #elif (_MSC_VER >= 1910)        //- VS 2017
         return string_view(p.data() + 88, p.size() - 88 - 7);
     #else
@@ -63,6 +63,7 @@ clean_type_name(basic_string<C,T,A> tname)
     static basic_string<C,T,A> const   ns = MATRIX_STRINGIFY(STD_LA) "::";
     static basic_string<C,T,A> const   sl = "std::";
     static basic_string<C,T,A> const   aa = "> >";
+    static basic_string<C,T,A> const   tn = "type_name<";
 
     for (auto pos = string::npos;  (pos = tname.rfind(cl, pos)) != string::npos; )
     {
@@ -89,6 +90,10 @@ clean_type_name(basic_string<C,T,A> tname)
         tname.replace(pos, 3u, ">>");
     }
 
+    for (auto pos = string::npos;  (pos = tname.rfind(tn, pos)) != string::npos; )
+    {
+        tname.erase(pos, tn.size());
+    }
     return tname;
 }
 
@@ -140,6 +145,7 @@ get_type_name()
 {
     auto    view = type_name<T>();
     return clean_type_name(string(view.data(), view.size()));
+//    return string(view.data(), view.size());
 }
 
 template<class T>
@@ -169,7 +175,7 @@ PrintOperandTypes(string const& loc, O1 const& o1, O2 const& o2)
          << "  ret: " << get_type_name<RT>() << endl << endl;
 }
 
-#define PRINT_TYPE(T)       cout << #T << ": " << STD_LA::get_type_name<T>() << endl
+#define PRINT_TYPE(T)       std::cout << #T << ": " << STD_LA::get_type_name<T>() << std::endl
 
 
 template<class ET, class OT>
@@ -207,7 +213,7 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
     cout << "  capy: " << v.capacity() << endl;
     cout << "  -----" << endl;
 
-    cout << right << setw(4) << setprecision(3) << (double) v(0);
+    cout << "(idx) " << right << setw(4) << setprecision(3) << (double) v(0);
 
     for (size_type i = 1;  i < v.elements();  ++i)
     {
@@ -218,7 +224,7 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
     auto    iter = v.begin();
     auto    last = v.end();
 
-    cout << right << setw(4) << setprecision(3) << (double) *iter;
+    cout << "(itr) " << right << setw(4) << setprecision(3) << (double) *iter;
 
     for (++iter;  iter != last;  ++iter)
     {
@@ -227,13 +233,19 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
     cout << endl;
 }
 
+inline void
+Print(bool b, char const* pname = nullptr)
+{
+    cout << endl << "bool: " << ((pname) ? pname : "<anon>") << b << endl;
+}
+
 #define PRINT(X)    Print(X, #X)
 
 template<class ET, class OT>
 void
 Fill(vector<ET, OT>& v)
 {
-    using size_type   = typename vector<ET, OT>::size_type;
+    using size_type    = typename vector<ET, OT>::size_type;
     using element_type = typename vector<ET, OT>::element_type;
 
     element_type    x = 1;
@@ -248,7 +260,7 @@ template<class ET, class OT>
 void
 Fill(matrix<ET, OT>& m)
 {
-    using size_type   = typename STD_LA::matrix<ET, OT>::size_type;
+    using size_type    = typename STD_LA::matrix<ET, OT>::size_type;
     using element_type = typename STD_LA::matrix<ET, OT>::element_type;
 
     element_type    x = 1;
