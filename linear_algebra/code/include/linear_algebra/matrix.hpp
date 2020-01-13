@@ -78,6 +78,7 @@ class matrix
 
     //- Capacity
     //
+    static constexpr bool   is_resizable() noexcept;
     constexpr size_type     columns() const noexcept;
     constexpr size_type     rows() const noexcept;
     constexpr size_tuple    size() const noexcept;
@@ -201,6 +202,13 @@ matrix<ET,OT>::operator =(matrix<ET2, OT2> const& rhs)
 //----------
 //- Capacity
 //
+template<class ET, class OT> constexpr
+bool
+matrix<ET,OT>::is_resizable() noexcept
+{
+    return is_resizable_engine_v<ET>;
+}
+
 template<class ET, class OT> inline constexpr 
 typename matrix<ET,OT>::size_type
 matrix<ET,OT>::columns() const noexcept

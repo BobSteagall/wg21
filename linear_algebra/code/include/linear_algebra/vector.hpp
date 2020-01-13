@@ -82,6 +82,7 @@ class vector
 
     //- Capacity
     //
+    static constexpr bool   is_resizable() noexcept;
     constexpr size_type     capacity() const noexcept;
     constexpr size_type     elements() const noexcept;
     constexpr size_type     size() const noexcept;
@@ -291,6 +292,13 @@ vector<ET,OT>::cend() const noexcept
 //----------
 //- Capacity
 //
+template<class ET, class OT> constexpr
+bool
+vector<ET,OT>::is_resizable() noexcept
+{
+    return is_resizable_engine_v<ET>;
+}
+
 template<class ET, class OT> constexpr 
 typename vector<ET,OT>::size_type
 vector<ET,OT>::capacity() const noexcept

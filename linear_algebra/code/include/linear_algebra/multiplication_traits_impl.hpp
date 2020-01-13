@@ -28,7 +28,7 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, T2>::multiply
 	size_type_r    ir;
 	size_type_1    i1;
 
-	if constexpr (result_requires_resize(vr))
+	if constexpr (vr.is_resizable())
 	{
 		vr.resize(elems);
 	}
@@ -57,7 +57,7 @@ matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>::multiply
 	size_type_r     ir;
 	size_type_2     i2;
 
-	if constexpr (result_requires_resize(vr))
+	if constexpr (vr.is_resizable())
 	{
 		vr.resize(elems);
 	}
@@ -87,7 +87,7 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>::multiply
 	size_type_r    ir, jr;
 	size_type_1    i1, j1;
 
-	if constexpr (result_requires_resize(mr))
+	if constexpr (mr.is_resizable())
 	{
 		mr.resize(rows, cols);
 	}
@@ -120,7 +120,7 @@ matrix_multiplication_traits<OTR, T1, matrix<ET2, OT2>>::multiply
 	size_type_r    ir, jr;
 	size_type_2    i2, j2;
 
-	if constexpr (result_requires_resize(mr))
+	if constexpr (mr.is_resizable())
 	{
 		mr.resize(rows, cols);
 	}
@@ -178,7 +178,7 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, vector<ET2, OT2>>::multiply
 	size_type_1    i1, k1;
 	size_type_2    k2;
 
-	if constexpr (result_requires_resize(vr))
+	if constexpr (vr.is_resizable())
 	{
 		vr.resize(elems);
 	}
@@ -216,7 +216,7 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, matrix<ET2, OT2>>::multiply
 	size_type_1    k1;
 	size_type_2    k2, j2;
 
-	if constexpr (result_requires_resize(vr))
+	if constexpr (vr.is_resizable())
 	{
 		vr.resize(elems);
 	}
@@ -255,7 +255,7 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::multiply
 	size_type_1    i1, k1;
 	size_type_2    j2, k2;
 
-	if constexpr (result_requires_resize(mr))
+	if constexpr (mr.is_resizable())
 	{
 		mr.resize(rows, cols);
 	}

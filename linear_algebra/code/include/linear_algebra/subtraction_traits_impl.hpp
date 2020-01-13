@@ -27,7 +27,7 @@ matrix_subtraction_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>::subtract
     size_type_1     i1;
     size_type_2     i2;
 
-    if constexpr (result_requires_resize(vr))
+    if constexpr (vr.is_resizable())
     {
         vr.resize(elems);
     }
@@ -57,7 +57,7 @@ matrix_subtraction_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::subtract
     size_type_1     i1, j1;
     size_type_2     i2, j2;
 
-    if constexpr (result_requires_resize(mr))
+    if constexpr (mr.is_resizable())
     {
         mr.resize(rows, cols);
     }
