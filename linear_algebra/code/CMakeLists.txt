@@ -14,10 +14,9 @@ target_sources(wg21_linear_algebra
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/addition_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/addition_traits_impl.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/arithmetic_operators.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/arithmetic_traits.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/column_engine.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/debug_helpers.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/dynamic_engines.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/engine_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/fixed_size_engines.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/forward_declarations.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/library_aliases.hpp>
@@ -28,19 +27,20 @@ target_sources(wg21_linear_algebra
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/negation_traits_impl.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/number_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/operation_traits.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/row_column_views.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/private_support.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/public_support.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/row_engine.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/subtraction_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/subtraction_traits_impl.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/transpose_views.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/transpose_engine.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/vector.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/addition_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/addition_traits_impl.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/arithmetic_operators.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/arithmetic_traits.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/column_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/debug_helpers.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/dynamic_engines.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/engine_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/fixed_size_engines.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/forward_declarations.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/library_aliases.hpp>
@@ -51,10 +51,12 @@ target_sources(wg21_linear_algebra
         $<INSTALL_INTERFACE:include/linear_algebra/negation_traits_impl.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/number_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/operation_traits.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/row_column_views.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/private_support.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/public_support.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/row_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/subtraction_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/subtraction_traits_impl.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/transpose_views.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/transpose_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/vector.hpp>
 )
 

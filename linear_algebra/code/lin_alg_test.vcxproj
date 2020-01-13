@@ -22,13 +22,14 @@
     <ClInclude Include="include\linear_algebra.hpp" />
     <ClInclude Include="include\linear_algebra\addition_traits.hpp" />
     <ClInclude Include="include\linear_algebra\addition_traits_impl.hpp" />
+    <ClInclude Include="include\linear_algebra\column_engine.hpp" />
     <ClInclude Include="include\linear_algebra\debug_helpers.hpp" />
-    <ClInclude Include="include\linear_algebra\engine_traits.hpp" />
+    <ClInclude Include="include\linear_algebra\private_support.hpp" />
     <ClInclude Include="include\linear_algebra\dynamic_engines.hpp" />
     <ClInclude Include="include\linear_algebra\forward_declarations.hpp" />
     <ClInclude Include="include\linear_algebra\library_aliases.hpp" />
     <ClInclude Include="include\linear_algebra\matrix.hpp" />
-    <ClInclude Include="include\linear_algebra\arithmetic_traits.hpp" />
+    <ClInclude Include="include\linear_algebra\public_support.hpp" />
     <ClInclude Include="include\linear_algebra\fixed_size_engines.hpp" />
     <ClInclude Include="include\linear_algebra\arithmetic_operators.hpp" />
     <ClInclude Include="include\linear_algebra\multiplication_traits.hpp" />
@@ -37,10 +38,11 @@
     <ClInclude Include="include\linear_algebra\negation_traits_impl.hpp" />
     <ClInclude Include="include\linear_algebra\number_traits.hpp" />
     <ClInclude Include="include\linear_algebra\operation_traits.hpp" />
-    <ClInclude Include="include\linear_algebra\row_column_views.hpp" />
+    <ClInclude Include="include\linear_algebra\row_engine.hpp" />
+    <ClInclude Include="include\linear_algebra\submatrix_engine.hpp" />
     <ClInclude Include="include\linear_algebra\subtraction_traits.hpp" />
     <ClInclude Include="include\linear_algebra\subtraction_traits_impl.hpp" />
-    <ClInclude Include="include\linear_algebra\transpose_views.hpp" />
+    <ClInclude Include="include\linear_algebra\transpose_engine.hpp" />
     <ClInclude Include="include\linear_algebra\vector.hpp" />
     <ClInclude Include="include\linear_algebra\vector_iterators.hpp" />
     <ClInclude Include="test\test_new_arithmetic.hpp" />
@@ -66,9 +68,24 @@
     <ClCompile Include="test\test_op_mul.cpp" />
     <ClCompile Include="test\test_op_neg.cpp" />
     <ClCompile Include="test\test_op_sub.cpp" />
-    <ClCompile Include="test_geometry_2.cpp" />
-    <ClCompile Include="test_geometry_3.cpp" />
-    <ClCompile Include="test_geometry_4.cpp" />
+    <ClCompile Include="test_geometry_2.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="test_geometry_3.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="test_geometry_4.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

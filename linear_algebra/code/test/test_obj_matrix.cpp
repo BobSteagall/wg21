@@ -80,9 +80,26 @@ void t001()
     PRINT(m1);
     PRINT(m1.t());
     PRINT(m1.column(1));
+
     PRINT(m1.row(1));
     PRINT(m1.t().column(1));
+
+    auto    tc = m1.column(2);
+    PRINT_TYPE(decltype(tc));
+    PRINT(tc);
+    PRINT_TYPE(decltype(tc(2)));
+    tc(1) = 101;
+    PRINT(tc);
+
     PRINT(m1.t().row(1));
+
+    auto    tr = m1.row(2);
+    PRINT_TYPE(decltype(tr));
+    PRINT(tr);
+    PRINT_TYPE(decltype(tr(2)));
+    tr(3) = 101;
+    PRINT(tr);
+
     PRINT(m1.t().t().column(1));
     PRINT(m1.t().t().row(1));
 
@@ -122,6 +139,8 @@ void t001()
 
     PRINT(fsm);
 
+    auto    sm = fsm.submatrix(1, 2, 2, 3);
+    PRINT(sm);
     //drm_double  mx = {1.0, 1.0, 1.0, 1.0};
 }
 

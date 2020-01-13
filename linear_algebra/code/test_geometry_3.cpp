@@ -7,7 +7,7 @@ USING_STD
 class float3_engine
 {
 public:
-	using engine_category = mutable_vector_engine_tag;
+	using engine_category = writable_vector_engine_tag;
 	using element_type    = float;
 	using value_type      = float;
 	using reference       = float&;
@@ -16,17 +16,16 @@ public:
 	using const_pointer   = float const*;
 	using iterator        = detail::vector_iterator<float3_engine>;
 	using const_iterator  = detail::vector_const_iterator<float3_engine>;
-	using difference_type = ptrdiff_t;
-	using index_type      = int_fast32_t;
+	using difference_type = size_t;
 	using size_type       = int_fast32_t;
 
-	using is_fixed_size   = true_type;
-	using is_resizable    = false_type;
+	static constexpr bool   is_fixed_size   = true;
+	static constexpr bool   is_resizable    = false;
 
-	using is_column_major = true_type;
-	using is_dense        = true_type;
-	using is_rectangular  = true_type;
-	using is_row_major    = true_type;
+	static constexpr bool   is_column_major = true;
+	static constexpr bool   is_dense        = true;
+	static constexpr bool   is_rectangular  = true;
+	static constexpr bool   is_row_major    = true;
 
 public:
 	constexpr float3_engine();
@@ -40,20 +39,20 @@ public:
 	constexpr float3_engine& operator =(float3_engine&&) noexcept = default;
 	constexpr float3_engine& operator =(float3_engine const&) = default;
 
-	constexpr const_reference   operator ()(index_type i) const;
+	constexpr const_reference   operator ()(size_type i) const;
 	constexpr const_iterator    begin() const noexcept;
 	constexpr const_iterator    end() const noexcept;
 
 	constexpr size_type     capacity() const noexcept;
-	constexpr index_type    elements() const noexcept;
+	constexpr size_type     elements() const noexcept;
 	constexpr size_type     size() const noexcept;
 
-	constexpr reference     operator ()(index_type i);
+	constexpr reference     operator ()(size_type i);
 	constexpr iterator      begin() noexcept;
 	constexpr iterator      end() noexcept;
 
 	constexpr void  swap(float3_engine& rhs) noexcept;
-	constexpr void  swap_elements(index_type i, index_type j) noexcept;
+	constexpr void  swap_elements(size_type i, size_type j) noexcept;
 
 private:
 	float   ma_elems[3];
@@ -71,7 +70,7 @@ float3_engine::float3_engine(initializer_list<U> list)
 }
 
 constexpr typename float3_engine::const_reference
-float3_engine::operator ()(index_type i) const
+float3_engine::operator ()(size_type i) const
 {
 	assert(i < 3 && i >= 0);
 	return ma_elems[i];
@@ -80,29 +79,28 @@ float3_engine::operator ()(index_type i) const
 class float33_engine
 {
 public:
-	using engine_category = mutable_matrix_engine_tag;
+	using engine_category = writable_matrix_engine_tag;
 	using element_type    = float;
 	using value_type      = float;
 	using reference       = float&;
 	using pointer         = float*;
 	using const_reference = float const&;
 	using const_pointer   = float const*;
-	using difference_type = ptrdiff_t;
-	using index_type      = int_fast32_t;
+	using difference_type = size_t;
 	using size_type       = int_fast32_t;
 	using size_tuple      = std::tuple<size_type, size_type>;
 
-	using is_fixed_size   = true_type;
-	using is_resizable    = false_type;
+	static constexpr bool   is_fixed_size   = true;
+	static constexpr bool   is_resizable    = false;
 
-	using is_column_major = false_type;
-	using is_dense        = true_type;
-	using is_rectangular  = true_type;
-	using is_row_major    = true_type;
+	static constexpr bool   is_column_major = false;
+	static constexpr bool   is_dense        = true;
+	static constexpr bool   is_rectangular  = true;
+	static constexpr bool   is_row_major    = true;
 
-	using column_view_type    = matrix_column_view<float33_engine>;
-	using row_view_type       = matrix_row_view<float33_engine>;
-	using transpose_view_type = matrix_transpose_view<float33_engine>;
+	using column_view_type    = column_engine<float33_engine>;
+	using row_view_type       = row_engine<float33_engine>;
+	using transpose_view_type = transpose_engine<float33_engine>;
 
 public:
 	constexpr float33_engine();
@@ -114,25 +112,25 @@ public:
 	constexpr float33_engine& operator =(float33_engine&&) noexcept = default;
 	constexpr float33_engine& operator =(float33_engine const&) = default;
 
-	constexpr const_reference   operator ()(index_type i, index_type j) const;
+	constexpr const_reference   operator ()(size_type i, size_type j) const;
 
-	constexpr index_type    columns() const noexcept;
-	constexpr index_type    rows() const noexcept;
+	constexpr size_type     columns() const noexcept;
+	constexpr size_type     rows() const noexcept;
 	constexpr size_tuple    size() const noexcept;
 
 	constexpr size_type     column_capacity() const noexcept;
 	constexpr size_type     row_capacity() const noexcept;
 	constexpr size_tuple    capacity() const noexcept;
 
-	constexpr reference     operator ()(index_type i, index_type j);
+	constexpr reference     operator ()(size_type i, size_type j);
 
 	constexpr void      assign(float33_engine const& rhs);
 	template<class ET2>
 	constexpr void      assign(ET2 const& rhs);
 
 	constexpr void      swap(float33_engine& rhs) noexcept;
-	constexpr void      swap_columns(index_type j1, index_type j2) noexcept;
-	constexpr void      swap_rows(index_type i1, index_type i2) noexcept;
+	constexpr void      swap_columns(size_type j1, size_type j2) noexcept;
+	constexpr void      swap_rows(size_type i1, size_type i2) noexcept;
 
 private:
 	float   ma_elems[9];
@@ -156,7 +154,7 @@ float33_engine::float33_engine(initializer_list<U> list)
 }
 
 constexpr typename float33_engine::const_reference
-float33_engine::operator ()(index_type i, index_type j) const
+float33_engine::operator ()(size_type i, size_type j) const
 {
 	assert(i < 3 && i >= 0);
 	assert(j < 3 && j >= 0);
@@ -294,7 +292,7 @@ matrix_negation_traits<matrix_operation_traits, matrix<float33_engine>>::negate
 // Multiplication - vector * scalar
 
 template<>
-struct matrix_multiplication_engine_traits<matrix_operation_traits, float3_engine, detail::element_tag<float>>
+struct matrix_multiplication_engine_traits<matrix_operation_traits, float3_engine, scalar_engine<float>>
 {
 	using element_type = float;
 	using engine_type  = float3_engine;
@@ -313,7 +311,7 @@ matrix_multiplication_traits<matrix_operation_traits, vector<float3_engine>, flo
 // Multiplication - matrix * scalar
 
 template<>
-struct matrix_multiplication_engine_traits<matrix_operation_traits, float33_engine, detail::element_tag<float>>
+struct matrix_multiplication_engine_traits<matrix_operation_traits, float33_engine, scalar_engine<float>>
 {
 	using element_type = float;
 	using engine_type  = float33_engine;
@@ -334,7 +332,7 @@ matrix_multiplication_traits<matrix_operation_traits, matrix<float33_engine>, fl
 // Multiplication - scalar * vector
 
 template<>
-struct matrix_multiplication_engine_traits<matrix_operation_traits, detail::element_tag<float>, float3_engine>
+struct matrix_multiplication_engine_traits<matrix_operation_traits, scalar_engine<float>, float3_engine>
 {
 	using element_type = float;
 	using engine_type  = float3_engine;
@@ -353,7 +351,7 @@ matrix_multiplication_traits<matrix_operation_traits, float, vector<float3_engin
 // Multiplication - scalar * matrix
 
 template<>
-struct matrix_multiplication_engine_traits<matrix_operation_traits, detail::element_tag<float>, float33_engine>
+struct matrix_multiplication_engine_traits<matrix_operation_traits, scalar_engine<float>, float33_engine>
 {
 	using element_type = float;
 	using engine_type  = float33_engine;

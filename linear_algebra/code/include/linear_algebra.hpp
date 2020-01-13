@@ -17,29 +17,33 @@
 #include <tuple>
 #include <type_traits>
 
-//-------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 //- Namespace alternatives for testing and also for detecting/avoiding ADL issues.  Pick a pair
 //  and attempt to build.
 //
-#define STD_LA      la
-#define USING_STD   using namespace std;
+//#define STD_LA      la
+//#define USING_STD   using namespace std;
 
 //#define STD_LA      std
 //#define USING_STD
 
-//#define STD_LA  std::math
-//#define USING_STD
+#define STD_LA  std::experimental::math
+#define USING_STD
+
+//#define LA_USE_VECTOR_ENGINE_ITERATORS
 
 //- Implementation headers.
 //
 #include "linear_algebra/forward_declarations.hpp"
-#include "linear_algebra/number_traits.hpp"
-#include "linear_algebra/engine_traits.hpp"
+#include "linear_algebra/private_support.hpp"
+#include "linear_algebra/public_support.hpp"
 #include "linear_algebra/vector_iterators.hpp"
-#include "linear_algebra/row_column_views.hpp"
-#include "linear_algebra/transpose_views.hpp"
 #include "linear_algebra/dynamic_engines.hpp"
 #include "linear_algebra/fixed_size_engines.hpp"
+#include "linear_algebra/column_engine.hpp"
+#include "linear_algebra/row_engine.hpp"
+#include "linear_algebra/transpose_engine.hpp"
+#include "linear_algebra/submatrix_engine.hpp"
 #include "linear_algebra/vector.hpp"
 #include "linear_algebra/matrix.hpp"
 #include "linear_algebra/library_aliases.hpp"
@@ -50,7 +54,6 @@
 
 //- Some more implementation headers.
 //
-#include "linear_algebra/arithmetic_traits.hpp"
 #include "linear_algebra/addition_traits.hpp"
 #include "linear_algebra/addition_traits_impl.hpp"
 #include "linear_algebra/subtraction_traits.hpp"

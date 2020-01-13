@@ -435,7 +435,7 @@ struct element_sub_traits_tst<float, float>
 template<class OT, class ET1, class ET2>
 struct engine_sub_traits_tst;
 
-template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
 struct engine_sub_traits_tst<OT,
                              fs_matrix_engine_tst<T1, R1, C1>,
                              fs_matrix_engine_tst<T2, R2, C2>>
@@ -446,7 +446,7 @@ struct engine_sub_traits_tst<OT,
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
 };
 
-template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
 struct engine_sub_traits_tst<OT,
                              STD_LA::fs_matrix_engine<T1, R1, C1>,
                              STD_LA::fs_matrix_engine<T2, R2, C2>>
@@ -457,10 +457,10 @@ struct engine_sub_traits_tst<OT,
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
 };
 
-template<class OT, class T1, int32_t R1, int32_t C1, class T2, int32_t R2, int32_t C2>
+template<class OT, class T1, size_t R1, size_t C1, class MCT1, class T2, size_t R2, size_t C2, class MCT2>
 struct engine_sub_traits_tst<OT,
-                             STD_LA::matrix_transpose_view<fs_matrix_engine_tst<T1, R1, C1>>,
-                             STD_LA::matrix_transpose_view<fs_matrix_engine_tst<T2, R2, C2>>>
+                             STD_LA::transpose_engine<fs_matrix_engine_tst<T1, R1, C1>, MCT1>,
+                             STD_LA::transpose_engine<fs_matrix_engine_tst<T2, R2, C2>, MCT2>>
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
