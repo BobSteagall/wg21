@@ -8,26 +8,26 @@
 #ifndef LINEAR_ALGEBRA_HPP_DEFINED
 #define LINEAR_ALGEBRA_HPP_DEFINED
 
-//#define LA_USE_MDSPAN
+//- Some build options for dev/debug/test.
+//
+#define LA_USE_MDSPAN
 //#define LA_USE_VECTOR_ENGINE_ITERATORS
 
-//--------------------------------------------------------------------------------------------------
-//- Namespace alternatives for testing and also for detecting/avoiding ADL issues.  Pick a pair
+//- Namespace alternatives for testing and also for detecting  ADL issues.  Pick a pair
 //  and attempt to build.
 //
 //#define STD_LA      la
-//#define USING_STD   using namespace std;
+//#define USING_STD   using namespace std; using namespace std::experimental;
 
-//#define STD_LA      std
+//#define STD_LA      std::math
 //#define USING_STD
 
-#define STD_LA  std::experimental::math
-#define USING_STD
+#define STD_LA      std::experimental::math
+#define USING_STD   using namespace std::experimental;
 
-//------
-//
 #include <cstdint>
 #include <algorithm>
+#include <array>
 #include <complex>
 #include <initializer_list>
 #include <memory>
@@ -35,6 +35,9 @@
 #include <tuple>
 #include <type_traits>
 
+#ifdef _MSC_VER
+    #undef LA_USE_MDSPAN
+#endif
 #ifdef LA_USE_MDSPAN
     #include <mdspan>
 #endif
@@ -53,14 +56,9 @@
 #include "linear_algebra/submatrix_engine.hpp"
 #include "linear_algebra/vector.hpp"
 #include "linear_algebra/matrix.hpp"
-#include "linear_algebra/library_aliases.hpp"
 
-//- Some helpers for debugging/testing.  Not for production.
-//
-#include "linear_algebra/debug_helpers.hpp"
+#include "linear_algebra/debug_helpers.hpp"     //- helpers for debug/test.  Not for production.
 
-//- Some more implementation headers.
-//
 #include "linear_algebra/addition_traits.hpp"
 #include "linear_algebra/addition_traits_impl.hpp"
 #include "linear_algebra/subtraction_traits.hpp"
@@ -71,5 +69,6 @@
 #include "linear_algebra/multiplication_traits_impl.hpp"
 #include "linear_algebra/operation_traits.hpp"
 #include "linear_algebra/arithmetic_operators.hpp"
+#include "linear_algebra/library_aliases.hpp"
 
 #endif  //- LINEAR_ALGEBRA_HPP_DEFINED

@@ -24,6 +24,10 @@ struct readable_matrix_engine_tag  : public integral_constant<int, 5> {};
 struct writable_matrix_engine_tag  : public integral_constant<int, 7> {};
 struct resizable_matrix_engine_tag : public integral_constant<int, 11> {};
 
+struct owning_engine_tag    : public integral_constant<bool, true> {};
+struct nonowning_engine_tag : public integral_constant<bool, false> {};
+
+
 //- Owning engines with dynamically-allocated external storage.
 //
 template<class T, class AT>     class dr_vector_engine;
@@ -136,7 +140,7 @@ auto  operator *(matrix<ET1, OT1> const& m1, vector<ET2, OT2> const& v2);
 
 //- Vector*Vector multiplication operators
 //
-template<class ET1, class OT1, class ET2, class OT2> 
+template<class ET1, class OT1, class ET2, class OT2>
 auto  operator *(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
 
 //- Matrix*Matrix multiplication operators

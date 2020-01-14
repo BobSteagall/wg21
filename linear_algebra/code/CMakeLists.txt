@@ -7,6 +7,7 @@ add_library(wg21_linear_algebra INTERFACE)
 target_include_directories(wg21_linear_algebra
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/extsrc/mdspan/include/experimental>
         $<INSTALL_INTERFACE:include>
 )
 
@@ -27,7 +28,6 @@ target_sources(wg21_linear_algebra
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/multiplication_traits_impl.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/negation_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/negation_traits_impl.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/number_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/operation_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/private_support.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/public_support.hpp>
@@ -51,7 +51,6 @@ target_sources(wg21_linear_algebra
         $<INSTALL_INTERFACE:include/linear_algebra/multiplication_traits_impl.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/negation_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/negation_traits_impl.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/number_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/operation_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/private_support.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/public_support.hpp>

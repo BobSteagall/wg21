@@ -68,15 +68,17 @@ class dr_vector_engine
     //
     size_type       capacity() const noexcept;
     size_type       elements() const noexcept;
-
-    void    reserve(size_type cap);
-    void    resize(size_type elems);
-    void    resize(size_type elems, size_type cap);
+    void            reserve(size_type cap);
+    void            resize(size_type elems);
+    void            resize(size_type elems, size_type cap);
 
     //- Element access
     //
     reference       operator ()(size_type i);
     const_reference operator ()(size_type i) const;
+
+#ifdef LA_USE_MDSPAN
+#endif
 
     //- Modifiers
     //
@@ -134,8 +136,8 @@ dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine const& rhs)
     assign(rhs);
 }
 
-template<class T, class AT> 
-template<class U> 
+template<class T, class AT>
+template<class U>
 dr_vector_engine<T,AT>::dr_vector_engine(initializer_list<U> list)
 :   mp_elems(nullptr)
 ,   m_elems(0)
@@ -190,7 +192,7 @@ dr_vector_engine<T,AT>::operator =(dr_vector_engine const& rhs)
     return *this;
 }
 
-template<class T, class AT> 
+template<class T, class AT>
 template<class ET2> inline
 dr_vector_engine<T,AT>&
 dr_vector_engine<T,AT>::operator =(ET2 const& rhs)
@@ -452,6 +454,18 @@ class dr_matrix_engine
     using size_type       = size_t;
     using size_tuple      = tuple<size_type, size_type>;
 
+#ifdef LA_USE_MDSPAN
+  private:
+    using extents_type = extents<dynamic_extent, dynamic_extent>;
+    using strides_type = array<extents_type::index_type, 2>;
+    using layout_type  = layout_stride<dynamic_extent, dynamic_extent>;
+    using mapping_type = layout_type::template mapping<extents_type>;
+
+  public:
+    using span_type       = basic_mdspan<element_type, extents_type, layout_type>;
+    using const_span_type = basic_mdspan<element_type const, extents_type, layout_type>;
+#endif
+
     //- Construct/copy/destroy
     //
     ~dr_matrix_engine() noexcept;
@@ -477,14 +491,21 @@ class dr_matrix_engine
     size_type   row_capacity() const noexcept;
     size_tuple  capacity() const noexcept;
 
-    void    reserve(size_type rowcap, size_type colcap);
-    void    resize(size_type rows, size_type cols);
-    void    resize(size_type rows, size_type cols, size_type rowcap, size_type colcap);
+    void        reserve(size_type rowcap, size_type colcap);
+    void        resize(size_type rows, size_type cols);
+    void        resize(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 
     //- Element access
     //
-    reference           operator ()(size_type i, size_type j);
-    const_reference     operator ()(size_type i, size_type j) const;
+    reference       operator ()(size_type i, size_type j);
+    const_reference operator ()(size_type i, size_type j) const;
+
+#ifdef LA_USE_MDSPAN
+    //- Data access
+    //
+    span_type       span() noexcept;
+    const_span_type span() const noexcept;
+#endif
 
     //- Modifiers
     //
@@ -704,6 +725,33 @@ dr_matrix_engine<T,AT>::operator ()(size_type i, size_type j) const
     return mp_elems[i*m_colcap + j];
 }
 
+#ifdef LA_USE_MDSPAN
+//-------------
+//- Data access
+//
+template<class T, class AT> inline
+typename dr_matrix_engine<T,AT>::span_type
+dr_matrix_engine<T,AT>::span() noexcept
+{
+    extents_type    extents(m_rows, m_cols);
+    strides_type    strides{m_colcap, 1};
+    mapping_type    mapping(extents, strides);
+
+    return span_type(static_cast<element_type*>(mp_elems), mapping);
+}
+
+template<class T, class AT> inline
+typename dr_matrix_engine<T,AT>::const_span_type
+dr_matrix_engine<T,AT>::span() const noexcept
+{
+    extents_type    extents(m_rows, m_cols);
+    strides_type    strides{m_colcap, 1};
+    mapping_type    mapping(extents, strides);
+
+    return const_span_type(static_cast<element_type const*>(mp_elems), mapping);
+}
+
+#endif
 //-----------
 //- Modifiers
 //

@@ -1,7 +1,7 @@
 //==================================================================================================
 //  File:       submatrix_engine.hpp
 //
-//  Summary:    This header defines an engine that acts as a "view" of a portion of a matrix.
+//  Summary:    This header defines an engine that acts as a "view" of a subset of a matrix.
 //==================================================================================================
 //
 #ifndef LINEAR_ALGEBRA_SUBMATRIX_ENGINE_HPP_DEFINED
@@ -9,7 +9,7 @@
 
 namespace STD_LA {
 //==================================================================================================
-//  Sub-matrix engine, meant to act as a "view" of a portion of a matrix in expressions, in 
+//  Sub-matrix engine, meant to act as a "view" of a portion of a matrix in expressions, in
 //  order to help avoid unnecessary allocation and element copying.
 //==================================================================================================
 //
@@ -72,14 +72,14 @@ class submatrix_engine
     size_type       m_col_start;
     size_type       m_col_count;
 
-    constexpr submatrix_engine(referent_type& eng, size_type ri, size_type rn, 
+    constexpr submatrix_engine(referent_type& eng, size_type ri, size_type rn,
                                                    size_type ci, size_type cn);
 };
 
 //------------------------
 //- Construct/copy/destroy
 //
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 submatrix_engine<ET, MCT>::submatrix_engine()
 :   mp_other(nullptr)
 ,   m_row_start(0)
@@ -91,42 +91,42 @@ submatrix_engine<ET, MCT>::submatrix_engine()
 //----------
 //- Capacity
 //
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 typename submatrix_engine<ET, MCT>::size_type
 submatrix_engine<ET, MCT>::columns() const noexcept
 {
     return m_col_count;
 }
 
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 typename submatrix_engine<ET, MCT>::size_type
 submatrix_engine<ET, MCT>::rows() const noexcept
 {
     return m_row_count;
 }
 
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 typename submatrix_engine<ET, MCT>::size_tuple
 submatrix_engine<ET, MCT>::size() const noexcept
 {
     return size_tuple(m_row_count, m_col_count);
 }
 
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 typename submatrix_engine<ET, MCT>::size_type
 submatrix_engine<ET, MCT>::column_capacity() const noexcept
 {
     return m_col_count;
 }
 
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 typename submatrix_engine<ET, MCT>::size_type
 submatrix_engine<ET, MCT>::row_capacity() const noexcept
 {
     return m_row_count;
 }
 
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 typename submatrix_engine<ET, MCT>::size_tuple
 submatrix_engine<ET, MCT>::capacity() const noexcept
 {
@@ -136,7 +136,7 @@ submatrix_engine<ET, MCT>::capacity() const noexcept
 //----------------
 //- Element access
 //
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 typename submatrix_engine<ET, MCT>::reference
 submatrix_engine<ET, MCT>::operator ()(size_type i, size_type j) const
 {
@@ -146,7 +146,7 @@ submatrix_engine<ET, MCT>::operator ()(size_type i, size_type j) const
 //-----------
 //- Modifiers
 //
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 void
 submatrix_engine<ET, MCT>::swap(submatrix_engine& rhs)
 {

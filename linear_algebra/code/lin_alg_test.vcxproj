@@ -36,7 +36,6 @@
     <ClInclude Include="include\linear_algebra\multiplication_traits_impl.hpp" />
     <ClInclude Include="include\linear_algebra\negation_traits.hpp" />
     <ClInclude Include="include\linear_algebra\negation_traits_impl.hpp" />
-    <ClInclude Include="include\linear_algebra\number_traits.hpp" />
     <ClInclude Include="include\linear_algebra\operation_traits.hpp" />
     <ClInclude Include="include\linear_algebra\row_engine.hpp" />
     <ClInclude Include="include\linear_algebra\submatrix_engine.hpp" />
@@ -139,16 +138,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include;extsrc\mdspan\include\experimental</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include;extsrc\mdspan\include\experimental</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include;extsrc\mdspan\include\experimental</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include;extsrc\mdspan\include\experimental</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
