@@ -8,14 +8,8 @@
 #ifndef LINEAR_ALGEBRA_HPP_DEFINED
 #define LINEAR_ALGEBRA_HPP_DEFINED
 
-#include <cstdint>
-#include <algorithm>
-#include <complex>
-#include <initializer_list>
-#include <memory>
-#include <numeric>
-#include <tuple>
-#include <type_traits>
+//#define LA_USE_MDSPAN
+//#define LA_USE_VECTOR_ENGINE_ITERATORS
 
 //--------------------------------------------------------------------------------------------------
 //- Namespace alternatives for testing and also for detecting/avoiding ADL issues.  Pick a pair
@@ -30,7 +24,20 @@
 #define STD_LA  std::experimental::math
 #define USING_STD
 
-//#define LA_USE_VECTOR_ENGINE_ITERATORS
+//------
+//
+#include <cstdint>
+#include <algorithm>
+#include <complex>
+#include <initializer_list>
+#include <memory>
+#include <numeric>
+#include <tuple>
+#include <type_traits>
+
+#ifdef LA_USE_MDSPAN
+    #include <mdspan>
+#endif
 
 //- Implementation headers.
 //
