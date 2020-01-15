@@ -338,13 +338,74 @@ using engine_m_iter_t = typename get_engine_iter<HasIter, ET>::m_iter_type;
 template<bool HasIter, class ET>
 using engine_c_iter_t = typename get_engine_iter<HasIter, ET>::c_iter_type;
 
-
+#ifdef LA_USE_MDSPAN
 //==================================================================================================
-//  Traits type for choosing between three alternative traits-type parameters.  This is used
-//  extensively in the private implemenation when selecting arithmetic traits at compile time.
+//  Traits type for specifying an mdspan type on behalf of a non-owning engine.
 //==================================================================================================
 //
-//- Helper traits
+template<class T>
+struct noe_mdspan_traits;
+
+
+template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+struct noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
+{
+    using src_span_type = basic_mdspan<T, extents<X0, X1>, layout_right, A>;
+    using tr_span_type  = basic_mdspan<T, extents<X1, X0>, layout_right, A>;
+
+    static constexpr tr_span_type   tr_span(src_span_type const& s);
+};
+
+
+template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
+typename noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::tr_span_type
+noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::tr_span(src_span_type const& s)
+{
+    return tr_span_type(s.data());
+}
+
+
+using dyn_extents = extents<dynamic_extent, dynamic_extent>;
+using dyn_strides = array<typename dyn_extents::index_type, 2>;
+using dyn_layout  = layout_stride<dynamic_extent, dynamic_extent>;
+using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
+
+template<class T, class A>
+struct noe_mdspan_traits<basic_mdspan<T, dyn_extents, dyn_layout, A>>
+{
+    using src_span_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
+    using tr_span_type  = basic_mdspan<T, dyn_extents, dyn_layout, A>;
+
+    static constexpr tr_span_type   tr_span(src_span_type const& s);
+};
+
+template<class T, class A> constexpr
+typename noe_mdspan_traits<basic_mdspan<T, dyn_extents, dyn_layout, A>>::tr_span_type
+noe_mdspan_traits<basic_mdspan<T, dyn_extents, dyn_layout, A>>::tr_span(src_span_type const& s)
+{
+    dyn_extents     ext(s.extent(1), s.extent(0));
+    dyn_strides     str{s.stride(1), s.stride(0)};
+    dyn_mapping     map(ext, str);
+
+    return tr_span_type(s.data(), map);
+}
+
+
+template<class ST>
+using noe_mdspan_transpose_t = typename noe_mdspan_traits<ST>::tr_span_type;
+
+template<class ST> inline constexpr
+typename noe_mdspan_traits<ST>::tr_span_type
+noe_mdspan_transpose(ST const& s)
+{
+    return noe_mdspan_traits<ST>::tr_span(s);
+}
+
+#endif
+//==================================================================================================
+//  Traits type for choosing between three alternative traits-type parameters.  This is used
+//  extensively in the private implementation when selecting arithmetic traits at compile time.
+//==================================================================================================
 //
 template<class T1, class T2, class DEF>
 struct non_void_traits_chooser;

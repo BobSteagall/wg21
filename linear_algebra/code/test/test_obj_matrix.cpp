@@ -180,14 +180,50 @@ using namespace std::experimental::math;
 using std::array;
 
 namespace {
+void t002X(drm_double const& m1, fsm_double_36 const& m2)
+{
+#ifdef LA_USE_MDSPAN
+    auto&   eng = m1.engine();
+    auto    spn = eng.span();
+    PRINT(spn);
+    PRINT_TYPE(decltype(spn));
+
+    auto&   eng2 = m2.engine();
+    auto    spn2 = eng2.span();
+    PRINT(spn2);
+    PRINT_TYPE(decltype(spn2));
+
+    auto    tr3  = m1.t();
+    PRINT(tr3);
+    PRINT_TYPE(decltype(tr3));
+    PRINT_TYPE(typename decltype(tr3)::engine_type::span_type);
+    PRINT_TYPE(typename decltype(tr3)::engine_type::const_span_type);
+
+    auto&   eng3 = tr3.engine();
+    auto    spn3 = eng3.span();
+    PRINT(spn3);
+    PRINT_TYPE(decltype(spn3));
+
+    auto    tr4  = m2.t();
+    PRINT(tr4);
+    PRINT_TYPE(decltype(tr4));
+
+    auto&   eng4 = tr4.engine();
+    auto    spn4 = eng4.span();
+    PRINT(spn4);
+    PRINT_TYPE(decltype(spn4));
+
+#endif
+}
+
 void t001X()
 {
 #ifdef LA_USE_MDSPAN
-    drm_double  m(10, 13, 16, 19);
-    Fill(m);
-    PRINT(m);
+    drm_double  m1(10, 13, 16, 19);
+    Fill(m1);
+    PRINT(m1);
 
-    auto&   eng = m.engine();
+    auto&   eng = m1.engine();
     auto    spn = eng.span();
     PRINT(spn);
     PRINT_TYPE(decltype(spn));
@@ -201,13 +237,25 @@ void t001X()
     PRINT(spn2);
     PRINT_TYPE(decltype(spn2));
 
-    auto    tr3  = m.t();
+    auto    tr3  = m1.t();
     PRINT(tr3);
+    PRINT_TYPE(decltype(tr3));
 
     auto&   eng3 = tr3.engine();
     auto    spn3 = eng3.span();
     PRINT(spn3);
     PRINT_TYPE(decltype(spn3));
+
+    auto    tr4  = m2.t();
+    PRINT(tr4);
+    PRINT_TYPE(decltype(tr4));
+
+    auto&   eng4 = tr4.engine();
+    auto    spn4 = eng4.span();
+    PRINT(spn4);
+    PRINT_TYPE(decltype(spn4));
+
+    t002X(m1, m2);
 #endif
 }
 }

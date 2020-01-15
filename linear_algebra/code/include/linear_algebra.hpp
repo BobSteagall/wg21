@@ -10,7 +10,7 @@
 
 //- Some build options for dev/debug/test.
 //
-#define LA_USE_MDSPAN
+//#define LA_USE_MDSPAN
 //#define LA_USE_VECTOR_ENGINE_ITERATORS
 
 //- Namespace alternatives for testing and also for detecting  ADL issues.  Pick a pair

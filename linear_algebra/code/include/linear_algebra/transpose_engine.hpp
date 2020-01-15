@@ -19,16 +19,6 @@ class transpose_engine
     static_assert(is_matrix_engine_v<ET>);
     static_assert(is_matrix_engine_tag<MCT>);
 
-#ifdef LA_USE_MDSPAN
-    using src_spn_type = detail::noe_mdspan_t<ET, MCT>;
-    using src_extents  = typename src_spn_type::extents_type;
-    using extents_type = extents<src_extents::static_extent(1), src_extents::static_extent(0)>;
-    using strides_type = array<typename extents_type::index_type, 2>;
-    using layout_type  = layout_stride<src_extents::static_extent(1), src_extents::static_extent(0)>;
-    using mapping_type = typename layout_type::template mapping<extents_type>;
-    using idx_type     = typename extents_type::index_type;
-#endif
-
   public:
     //- Types
     //
@@ -44,8 +34,8 @@ class transpose_engine
     using size_tuple      = typename ET::size_tuple;
 
 #ifdef LA_USE_MDSPAN
-    using span_type       = basic_mdspan<element_type, extents_type, layout_type>;
-    using const_span_type = basic_mdspan<element_type const, extents_type, layout_type>;
+    using span_type       = detail::noe_mdspan_transpose_t<detail::noe_mdspan_t<ET, MCT>>;
+    using const_span_type = detail::noe_mdspan_transpose_t<typename ET::const_span_type>;
 #endif
 
     //- Construct/copy/destroy
@@ -163,19 +153,7 @@ template<class ET, class MCT> constexpr
 typename transpose_engine<ET, MCT>::span_type
 transpose_engine<ET, MCT>::span() const noexcept
 {
-    src_spn_type    src_span = mp_other->span();
-
-    if constexpr (src_span.is_strided())
-    {
-        extents_type    dst_extents(src_span.extent(1), src_span.extent(0));
-        strides_type    dst_strides{src_span.stride(1), src_span.stride(0)};
-        mapping_type    mapping(dst_extents, dst_strides);
-
-        return span_type(src_span.data(), mapping);
-    }
-    else
-    {
-    }
+    return detail::noe_mdspan_transpose(mp_other->span());
 }
 
 #endif
