@@ -401,6 +401,19 @@ noe_mdspan_transpose(ST const& s)
     return noe_mdspan_traits<ST>::tr_span(s);
 }
 
+template<class T, class ST> inline constexpr
+basic_mdspan<T, dyn_extents, dyn_layout>
+make_dyn_span(T* pdata, ST rows, ST cols, ST row_stride, ST col_stride = 1u)
+{
+    using idx_t = typename dyn_extents::index_type;
+
+    dyn_extents     extents(static_cast<idx_t>(rows), static_cast<idx_t>(cols));
+    dyn_strides     strides{static_cast<idx_t>(row_stride), static_cast<idx_t>(col_stride)};
+    dyn_mapping     mapping(extents, strides);
+
+    return basic_mdspan<T, dyn_extents, dyn_layout>(pdata, mapping);
+}
+
 #endif
 //==================================================================================================
 //  Traits type for choosing between three alternative traits-type parameters.  This is used
