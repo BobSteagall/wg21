@@ -233,6 +233,37 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
     cout << endl;
 }
 
+#ifdef LA_USE_MDSPAN
+template<class T, class X, class L, class A>
+void
+Print(basic_mdspan<T,X,L,A> const& s, char const* pname = nullptr)
+{
+    using index_type = ptrdiff_t;
+
+    if constexpr (s.rank() == 2)
+    {
+        cout << endl << "mdspan: " << ((pname) ? pname : "<anon>") << endl;
+        cout << "  size: " << s.extent(0) << "x" << s.extent(1) << endl;
+        cout << "  -----" << endl;
+
+    for (index_type i = 0;  i < s.extent(0);  ++i)
+    {
+        std::cout << std::right << std::setw(4) << std::setprecision(3) << (double) s(i, 0);
+
+        for (index_type j = 1;  j < s.extent(1);  ++j)
+        {
+             std::cout << std::right << std::setw(6) << std::setprecision(3) << (double) s(i, j);
+        }
+        cout << endl;
+    }
+    }
+    else if constexpr (s.rank() == 1)
+    {
+    }
+}
+
+#endif
+
 inline void
 Print(bool b, char const* pname = nullptr)
 {

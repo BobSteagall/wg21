@@ -34,6 +34,11 @@ class fs_matrix_engine_tst
 //    using row_view_type       = STD_LA::row_engine<fs_matrix_engine_tst>;
 //    using transpose_view_type = STD_LA::transpose_engine<fs_matrix_engine_tst>;
 
+#ifdef LA_USE_MDSPAN
+    using span_type       = typename STD_LA::fs_matrix_engine<T, R, C>::span_type;
+    using const_span_type = typename STD_LA::fs_matrix_engine<T, R, C>::const_span_type;
+#endif
+
   public:
     constexpr fs_matrix_engine_tst();
     constexpr fs_matrix_engine_tst(fs_matrix_engine_tst&&) = default;

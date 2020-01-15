@@ -37,6 +37,11 @@ class column_engine
     using const_iterator  = detail::vector_const_iterator<column_engine>;
 #endif
 
+#ifdef LA_USE_MDSPAN
+    using span_type       = void;
+    using const_span_type = void;
+#endif
+
     //- Construct/copy/destroy
     //
     ~column_engine() noexcept = default;
@@ -83,7 +88,7 @@ class column_engine
 //------------------------
 //- Construct/copy/destroy
 //
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 column_engine<ET,VCT>::column_engine() noexcept
 :   mp_other(nullptr)
 ,   m_column(0)
@@ -93,28 +98,28 @@ column_engine<ET,VCT>::column_engine() noexcept
 //-----------
 //- Iterators
 //
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 typename column_engine<ET,VCT>::iterator
 column_engine<ET,VCT>::begin() const noexcept
 {
     return iterator(this, 0, mp_other->rows());
 }
 
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 typename column_engine<ET,VCT>::iterator
 column_engine<ET,VCT>::end() const noexcept
 {
     return iterator(this, mp_other->rows(), mp_other->rows());
 }
 
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 typename column_engine<ET,VCT>::const_iterator
 column_engine<ET,VCT>::cbegin() const noexcept
 {
     return const_iterator(this, 0, mp_other->rows());
 }
 
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 typename column_engine<ET,VCT>::const_iterator
 column_engine<ET,VCT>::cend() const noexcept
 {
@@ -125,14 +130,14 @@ column_engine<ET,VCT>::cend() const noexcept
 //----------
 //- Capacity
 //
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 typename column_engine<ET,VCT>::size_type
 column_engine<ET,VCT>::capacity() const noexcept
 {
     return mp_other->rows();
 }
 
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 typename column_engine<ET,VCT>::size_type
 column_engine<ET,VCT>::elements() const noexcept
 {
@@ -142,7 +147,7 @@ column_engine<ET,VCT>::elements() const noexcept
 //----------------
 //- Element access
 //
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 typename column_engine<ET,VCT>::reference
 column_engine<ET,VCT>::operator ()(size_type i) const
 {
@@ -152,7 +157,7 @@ column_engine<ET,VCT>::operator ()(size_type i) const
 //-----------
 //- Modifiers
 //
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 void
 column_engine<ET,VCT>::swap(column_engine& rhs)
 {
@@ -163,7 +168,7 @@ column_engine<ET,VCT>::swap(column_engine& rhs)
 //------------------------
 //- Private implementation
 //
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 column_engine<ET,VCT>::column_engine(referent_type& eng, size_type col)
 :   mp_other(&eng)
 ,   m_column(col)

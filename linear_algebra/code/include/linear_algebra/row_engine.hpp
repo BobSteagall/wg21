@@ -9,7 +9,7 @@
 
 namespace STD_LA {
 //==================================================================================================
-//  Matrix row engine, meant to act as a "view" of a matrix row in expressions, in order to help 
+//  Matrix row engine, meant to act as a "view" of a matrix row in expressions, in order to help
 //  avoid unnecessary allocation and element copying.
 //==================================================================================================
 //
@@ -35,6 +35,11 @@ class row_engine
 #ifdef LA_USE_VECTOR_ENGINE_ITERATORS
     using iterator        = detail::noe_iterator_t<ET, VCT, row_engine>;
     using const_iterator  = detail::vector_const_iterator<row_engine>;
+#endif
+
+#ifdef LA_USE_MDSPAN
+    using span_type       = void;
+    using const_span_type = void;
 #endif
 
     //- Construct/copy/destroy
@@ -83,7 +88,7 @@ class row_engine
 //------------------------
 //- Construct/copy/destroy
 //
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 row_engine<ET, VCT>::row_engine() noexcept
 :   mp_other(nullptr)
 ,   m_row(0)
@@ -93,28 +98,28 @@ row_engine<ET, VCT>::row_engine() noexcept
 //-----------
 //- Iterators
 //
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 typename row_engine<ET, VCT>::iterator
 row_engine<ET, VCT>::begin() const noexcept
 {
     return iterator(this, 0, mp_other->columns());
 }
 
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 typename row_engine<ET, VCT>::iterator
 row_engine<ET, VCT>::end() const noexcept
 {
     return iterator(this, mp_other->columns(), mp_other->columns());
 }
 
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 typename row_engine<ET, VCT>::const_iterator
 row_engine<ET, VCT>::cbegin() const noexcept
 {
     return const_iterator(this, 0, mp_other->columns());
 }
 
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 typename row_engine<ET, VCT>::const_iterator
 row_engine<ET, VCT>::cend() const noexcept
 {
@@ -125,14 +130,14 @@ row_engine<ET, VCT>::cend() const noexcept
 //----------
 //- Capacity
 //
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 typename row_engine<ET, VCT>::size_type
 row_engine<ET, VCT>::capacity() const noexcept
 {
     return mp_other->columns();
 }
 
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 typename row_engine<ET, VCT>::size_type
 row_engine<ET, VCT>::elements() const noexcept
 {
@@ -142,7 +147,7 @@ row_engine<ET, VCT>::elements() const noexcept
 //----------------
 //- Element access
 //
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 typename row_engine<ET, VCT>::reference
 row_engine<ET, VCT>::operator ()(size_type j) const
 {
@@ -152,7 +157,7 @@ row_engine<ET, VCT>::operator ()(size_type j) const
 //-----------
 //- Modifiers
 //
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 void
 row_engine<ET, VCT>::swap(row_engine& rhs)
 {
@@ -163,7 +168,7 @@ row_engine<ET, VCT>::swap(row_engine& rhs)
 //------------------------
 //- Private implementation
 //
-template<class ET, class VCT> constexpr 
+template<class ET, class VCT> constexpr
 row_engine<ET, VCT>::row_engine(referent_type& eng, size_type row)
 :   mp_other(&eng)
 ,   m_row(row)

@@ -36,6 +36,11 @@ class dr_vector_engine
     using const_iterator  = detail::vector_const_iterator<dr_vector_engine>;
 #endif
 
+#ifdef LA_USE_MDSPAN
+    using span_type       = mdspan<element_type, dynamic_extent>;
+    using const_span_type = mdspan<element_type const, dynamic_extent>;
+#endif
+
     //- Construct/copy/destroy
     //
     ~dr_vector_engine() noexcept;
@@ -460,6 +465,7 @@ class dr_matrix_engine
     using strides_type = array<extents_type::index_type, 2>;
     using layout_type  = layout_stride<dynamic_extent, dynamic_extent>;
     using mapping_type = layout_type::template mapping<extents_type>;
+    using idx_type     = extents_type::index_type;
 
   public:
     using span_type       = basic_mdspan<element_type, extents_type, layout_type>;
@@ -733,8 +739,8 @@ template<class T, class AT> inline
 typename dr_matrix_engine<T,AT>::span_type
 dr_matrix_engine<T,AT>::span() noexcept
 {
-    extents_type    extents(m_rows, m_cols);
-    strides_type    strides{m_colcap, 1};
+    extents_type    extents(static_cast<idx_type>(m_rows), static_cast<idx_type>(m_cols));
+    strides_type    strides{static_cast<idx_type>(m_colcap), 1};
     mapping_type    mapping(extents, strides);
 
     return span_type(static_cast<element_type*>(mp_elems), mapping);
@@ -744,8 +750,8 @@ template<class T, class AT> inline
 typename dr_matrix_engine<T,AT>::const_span_type
 dr_matrix_engine<T,AT>::span() const noexcept
 {
-    extents_type    extents(m_rows, m_cols);
-    strides_type    strides{m_colcap, 1};
+    extents_type    extents(static_cast<idx_type>(m_rows), static_cast<idx_type>(m_cols));
+    strides_type    strides{static_cast<idx_type>(m_colcap), 1};
     mapping_type    mapping(extents, strides);
 
     return const_span_type(static_cast<element_type const*>(mp_elems), mapping);

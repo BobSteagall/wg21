@@ -33,6 +33,11 @@ class submatrix_engine
     using size_type       = typename ET::size_type;
     using size_tuple      = typename ET::size_tuple;
 
+#ifdef LA_USE_MDSPAN
+    using span_type       = void;
+    using const_span_type = void;
+#endif
+
     //- Construct/copy/destroy
     //
     ~submatrix_engine() noexcept = default;

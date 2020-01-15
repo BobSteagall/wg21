@@ -37,6 +37,7 @@ class fs_vector_engine
 
 #ifdef LA_USE_MDSPAN
     using span_type       = mdspan<element_type, N>;
+    using const_span_type = mdspan<element_type const, N>;
 #endif
 
     //- Construct/copy/destroy

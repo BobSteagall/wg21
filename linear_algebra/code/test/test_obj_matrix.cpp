@@ -183,48 +183,31 @@ namespace {
 void t001X()
 {
 #ifdef LA_USE_MDSPAN
-
-    using index_type = drm_double::engine_type::span_type::index_type;
-
     drm_double  m(10, 13, 16, 19);
-
     Fill(m);
     PRINT(m);
 
     auto&   eng = m.engine();
     auto    spn = eng.span();
-
-    for (index_type i = 0;  i < spn.extent(0);  ++i)
-    {
-        std::cout << std::right << std::setw(4) << std::setprecision(3) << (double) spn(i, 0);
-
-        for (index_type j = 1;  j < spn.extent(1);  ++j)
-        {
-             std::cout << std::right << std::setw(6) << std::setprecision(3) << (double) spn(i, j);
-        }
-        cout << endl;
-    }
-
+    PRINT(spn);
+    PRINT_TYPE(decltype(spn));
 
     fsm_double_36  m2;
-
     Fill(m2);
     PRINT(m2);
 
     auto&   eng2 = m2.engine();
     auto    spn2 = eng2.span();
+    PRINT(spn2);
+    PRINT_TYPE(decltype(spn2));
 
-    for (index_type i = 0;  i < spn2.extent(0);  ++i)
-    {
-        std::cout << std::right << std::setw(4) << std::setprecision(3) << (double) spn2(i, 0);
+    auto    tr3  = m.t();
+    PRINT(tr3);
 
-        for (index_type j = 1;  j < spn2.extent(1);  ++j)
-        {
-             std::cout << std::right << std::setw(6) << std::setprecision(3) << (double) spn2(i, j);
-        }
-        cout << endl;
-    }
-
+    auto&   eng3 = tr3.engine();
+    auto    spn3 = eng3.span();
+    PRINT(spn3);
+    PRINT_TYPE(decltype(spn3));
 #endif
 }
 }

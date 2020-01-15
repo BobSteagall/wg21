@@ -1,7 +1,7 @@
 //==================================================================================================
 //  File:       engine_traits.hpp
 //
-//  Summary:    This header defines several private traits types, alias templates, variable 
+//  Summary:    This header defines several private traits types, alias templates, variable
 //              templates, and functions that are used by the rest of this implementation.
 //==================================================================================================
 //
@@ -28,7 +28,7 @@ template<class T>
 struct is_complex<complex<T>> : public true_type
 {};
 
-template<class T>  constexpr 
+template<class T>  constexpr
 bool    is_complex_v = is_complex<T>::value;
 
 
@@ -116,28 +116,28 @@ struct tag_traits<resizable_matrix_engine_tag>
     static constexpr bool   is_resizable = true;
 };
 
-//- Variable templates used to determine important engine properties, based on the engine's 
+//- Variable templates used to determine important engine properties, based on the engine's
 //  category tag.
 //
-template<class ET> inline constexpr 
+template<class ET> inline constexpr
 bool    is_scalar_v = detail::tag_traits<typename ET::engine_category>::is_scalar;
 
-template<class ET> inline constexpr 
+template<class ET> inline constexpr
 bool    is_vector_v = detail::tag_traits<typename ET::engine_category>::is_vector;
 
-template<class ET> inline constexpr 
+template<class ET> inline constexpr
 bool    is_matrix_v = detail::tag_traits<typename ET::engine_category>::is_matrix;
 
-template<class ET> inline constexpr 
+template<class ET> inline constexpr
 bool    is_readable_v = detail::tag_traits<typename ET::engine_category>::is_readable;
 
-template<class ET> inline constexpr 
+template<class ET> inline constexpr
 bool    is_writable_v = detail::tag_traits<typename ET::engine_category>::is_writable;
 
-template<class ET> inline constexpr 
+template<class ET> inline constexpr
 bool    is_resizable_v = detail::tag_traits<typename ET::engine_category>::is_resizable;
 
-template<class ET1, class ET2> inline constexpr 
+template<class ET1, class ET2> inline constexpr
 bool    engines_match_v = (is_matrix_v<ET1> && is_matrix_v<ET2>) ||
                           (is_vector_v<ET1> && is_vector_v<ET2>) ||
                           (is_scalar_v<ET1> && is_scalar_v<ET2>)  ;
@@ -155,7 +155,7 @@ using enable_if_fixed_size = enable_if_t<is_same_v<ET1, ET2> && !is_resizable_v<
 
 
 //==================================================================================================
-//  Traits type that chooses the correct tag for a non-owning engine (NOE), given the tag of the 
+//  Traits type that chooses the correct tag for a non-owning engine (NOE), given the tag of the
 //  source engine type to be wrapped (ETT) and the desired tag type of the non-owning engine (VTT).
 //==================================================================================================
 //
@@ -244,8 +244,8 @@ using noe_category_t = typename noe_tag_chooser<typename ET::engine_category, VT
 
 
 //==================================================================================================
-//  Traits type that computes several of the nested type aliases that are used by the non-owning 
-//  engine (NOE) types defined in this implementation.  These nested types are determined from 
+//  Traits type that computes several of the nested type aliases that are used by the non-owning
+//  engine (NOE) types defined in this implementation.  These nested types are determined from
 //  the tag of the source engine type to be wrapped (ET) and the desired tag type of the resulting
 //  non-owning engine (CAT).  The type of 'iterator' is determined additionally by considering
 //  the destination engine type (DET).
@@ -260,17 +260,25 @@ struct noe_traits
     static constexpr bool   is_writable = tag_traits<CAT>::is_writable;
 
     using referent  = conditional_t<is_writable, remove_cv_t<ET>, remove_cv_t<ET> const>;
+    using element   = conditional_t<is_writable, typename ET::element_type, typename ET::element_type const>;
     using reference = conditional_t<is_writable, typename ET::reference, typename ET::const_reference>;
     using pointer   = conditional_t<is_writable, typename ET::pointer, typename ET::const_pointer>;
 
     template<class DET>
     using iterator  = conditional_t<is_writable, vector_iterator<DET>, vector_const_iterator<DET>>;
+
+#ifdef LA_USE_MDSPAN
+    using span_type = conditional_t<is_writable, typename ET::span_type, typename ET::const_span_type>;
+#endif
 };
 
 //- Alias template used as a convenience interface to noe_traits.
 //
 template<class ET, class CAT>
 using noe_referent_t = typename noe_traits<ET,CAT>::referent;
+
+template<class ET, class CAT>
+using noe_element_t = typename noe_traits<ET,CAT>::element;
 
 template<class ET, class CAT>
 using noe_reference_t = typename noe_traits<ET,CAT>::reference;
@@ -281,12 +289,17 @@ using noe_pointer_t = typename noe_traits<ET,CAT>::pointer;
 template<class ET, class CAT, class DET>
 using noe_iterator_t = typename noe_traits<ET,CAT>::template iterator<DET>;
 
+#ifdef LA_USE_MDSPAN
+template<class ET, class CAT>
+using noe_mdspan_t = typename noe_traits<ET,CAT>::span_type;
+#endif
+
 //- Detection trait and convenience alias template for determining whether an engine has
 //  iteration in its public interface.
 //
 template<typename T, typename = void>
-struct has_iteration 
-:   std::false_type 
+struct has_iteration
+:   std::false_type
 {};
 
 template<typename T>
@@ -294,7 +307,7 @@ struct has_iteration<T, std::void_t<decltype(std::declval<T>().begin()),
                                     decltype(std::declval<T>().end()),
                                     decltype(std::declval<T>().cbegin()),
                                     decltype(std::declval<T>().cend()) >>
-:   std::true_type 
+:   std::true_type
 {};
 
 template<class ET> inline constexpr
@@ -302,7 +315,7 @@ bool    has_iteration_v = has_iteration<ET>::value;
 
 //------
 //
-template<bool HasIter, class ET> 
+template<bool HasIter, class ET>
 struct get_engine_iter;
 
 template<class ET>
@@ -331,7 +344,7 @@ using engine_c_iter_t = typename get_engine_iter<HasIter, ET>::c_iter_type;
 //  extensively in the private implemenation when selecting arithmetic traits at compile time.
 //==================================================================================================
 //
-//- Helper traits 
+//- Helper traits
 //
 template<class T1, class T2, class DEF>
 struct non_void_traits_chooser;
@@ -419,14 +432,14 @@ using rebind_alloc_t = typename allocator_traits<A1>::template rebind_alloc<T1>;
 //- Temporary replacement for std::swap (which is constexpr in C++20)
 //==================================================================================================
 //
-template<class T> inline constexpr 
+template<class T> inline constexpr
 bool    is_movable_v = std::is_move_constructible_v<T> && std::is_move_assignable_v<T>;
 
-template<class T> inline constexpr 
-bool    is_nothrow_movable_v = std::is_nothrow_move_constructible_v<T> &&  
+template<class T> inline constexpr
+bool    is_nothrow_movable_v = std::is_nothrow_move_constructible_v<T> &&
                                std::is_nothrow_move_assignable_v<T>;
 
-template<class T> constexpr 
+template<class T> constexpr
 std::enable_if_t<is_movable_v<T>, void>
 la_swap(T& t0, T& t1) noexcept(is_nothrow_movable_v<T>)
 {
