@@ -343,19 +343,67 @@ using engine_c_iter_t = typename get_engine_iter<HasIter, ET>::c_iter_type;
 //  Traits type for specifying an mdspan type on behalf of a non-owning engine.
 //==================================================================================================
 //
+//- Some aliases to reduce verbosity below.
+//
+using dyn_mat_extents = extents<dynamic_extent, dynamic_extent>;
+using dyn_mat_strides = array<typename dyn_mat_extents::index_type, 2>;
+using dyn_mat_layout  = layout_stride<dynamic_extent, dynamic_extent>;
+using dyn_mat_mapping = typename dyn_mat_layout::template mapping<dyn_mat_extents>;
+
+using dyn_vec_extents = extents<dynamic_extent>;
+using dyn_vec_strides = array<typename dyn_vec_extents::index_type, 1>;
+using dyn_vec_layout  = layout_stride<dynamic_extent>;
+using dyn_vec_mapping = typename dyn_mat_layout::template mapping<dyn_vec_extents>;
+
+//- The actual traits type, with partial specializations below.
+//
 template<class T>
 struct noe_mdspan_traits;
 
-
+//- This partial specialization is used when the owning engine is fixed-size.
+//
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
 struct noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
 {
     using src_span_type = basic_mdspan<T, extents<X0, X1>, layout_right, A>;
+    using col_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
+    using row_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
+    using sub_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
     using tr_span_type  = basic_mdspan<T, extents<X1, X0>, layout_right, A>;
+    using index_type    = typename src_span_type::index_type;
 
+    static constexpr col_span_type  col_span(src_span_type const& s, index_type col);
+    static constexpr row_span_type  row_span(src_span_type const& s, index_type row);
+    static constexpr sub_span_type  sub_span(src_span_type const& s, index_type row, index_type col,
+                                                                     index_type rows, index_type cols);
     static constexpr tr_span_type   tr_span(src_span_type const& s);
 };
 
+
+template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
+typename noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::col_span_type
+noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::col_span
+(src_span_type const& s, index_type col)
+{
+    return subspan(s, all, col);
+}
+
+template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
+typename noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::row_span_type
+noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::row_span
+(src_span_type const& s, index_type row)
+{
+    return subspan(s, row, all);
+}
+
+template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
+typename noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::sub_span_type
+noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::sub_span
+(src_span_type const& s, index_type row, index_type row_count, index_type col, index_type col_count)
+{
+    using pair_t = pair<index_type, index_type>;
+    return subspan(s, pair_t(row, row + row_count), pair(col, col + col_count));
+}
 
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
 typename noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::tr_span_type
@@ -365,32 +413,106 @@ noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::tr_span(src_span_type
 }
 
 
-using dyn_extents = extents<dynamic_extent, dynamic_extent>;
-using dyn_strides = array<typename dyn_extents::index_type, 2>;
-using dyn_layout  = layout_stride<dynamic_extent, dynamic_extent>;
-using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
-
+//- This partial specialization is used when the owning engine is dynamic.
+//
 template<class T, class A>
-struct noe_mdspan_traits<basic_mdspan<T, dyn_extents, dyn_layout, A>>
+struct noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>
 {
-    using src_span_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
-    using tr_span_type  = basic_mdspan<T, dyn_extents, dyn_layout, A>;
+    using src_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
+    using col_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
+    using row_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
+    using sub_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
+    using tr_span_type  = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
+    using index_type    = typename src_span_type::index_type;
 
+    static constexpr col_span_type  col_span(src_span_type const& s, index_type col);
+    static constexpr row_span_type  row_span(src_span_type const& s, index_type row);
+    static constexpr sub_span_type  sub_span(src_span_type const& s, index_type row, index_type col,
+                                                                     index_type rows, index_type cols);
     static constexpr tr_span_type   tr_span(src_span_type const& s);
 };
 
 template<class T, class A> constexpr
-typename noe_mdspan_traits<basic_mdspan<T, dyn_extents, dyn_layout, A>>::tr_span_type
-noe_mdspan_traits<basic_mdspan<T, dyn_extents, dyn_layout, A>>::tr_span(src_span_type const& s)
+typename noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::col_span_type
+noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::col_span
+(src_span_type const& s, index_type col)
 {
-    dyn_extents     ext(s.extent(1), s.extent(0));
-    dyn_strides     str{s.stride(1), s.stride(0)};
-    dyn_mapping     map(ext, str);
+    return subspan(s, all, col);
+}
+
+template<class T, class A> constexpr
+typename noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::row_span_type
+noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::row_span
+(src_span_type const& s, index_type row)
+{
+    return subspan(s, row, all);
+}
+
+template<class T, class A> constexpr
+typename noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::sub_span_type
+noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::sub_span
+(src_span_type const& s, index_type row, index_type row_count, index_type col, index_type col_count)
+{
+    using pair_t = pair<index_type, index_type>;
+    return subspan(s, pair_t(row, row + row_count), pair(col, col + col_count));
+}
+
+template<class T, class A> constexpr
+typename noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::tr_span_type
+noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::tr_span(src_span_type const& s)
+{
+    dyn_mat_extents     ext(s.extent(1), s.extent(0));
+    dyn_mat_strides     str{s.stride(1), s.stride(0)};
+    dyn_mat_mapping     map(ext, str);
 
     return tr_span_type(s.data(), map);
 }
 
 
+//- Helper alias and function for column spans (generated by column engines).
+//
+template<class ST>
+using noe_mdspan_column_t = typename noe_mdspan_traits<ST>::col_span_type;
+
+template<class ST, class SZ> inline constexpr
+typename noe_mdspan_traits<ST>::col_span_type
+noe_mdspan_column(ST const& s, SZ col)
+{
+    using idx_t = typename noe_mdspan_traits<ST>::index_type;
+    return noe_mdspan_traits<ST>::col_span(s, static_cast<idx_t>(col));
+}
+
+//- Helper alias and function for row spans (generated by row engines).
+//
+template<class ST>
+using noe_mdspan_row_t = typename noe_mdspan_traits<ST>::row_span_type;
+
+template<class ST, class SZ> inline constexpr
+typename noe_mdspan_traits<ST>::row_span_type
+noe_mdspan_row(ST const& s, SZ row)
+{
+    using idx_t = typename noe_mdspan_traits<ST>::index_type;
+    return noe_mdspan_traits<ST>::row_span(s, static_cast<idx_t>(row));
+}
+
+//- Helper alias and function for submatrix spans (generated by submatrix engines).
+//
+template<class ST>
+using noe_mdspan_submatrix_t = typename noe_mdspan_traits<ST>::sub_span_type;
+
+template<class ST, class SZ> inline constexpr
+typename noe_mdspan_traits<ST>::sub_span_type
+noe_mdspan_submatrix(ST const& s, SZ row, SZ row_count, SZ col, SZ col_count)
+{
+    using idx_t = typename noe_mdspan_traits<ST>::index_type;
+
+    return noe_mdspan_traits<ST>::sub_span(s,
+                                           static_cast<idx_t>(row), static_cast<idx_t>(row_count),
+                                           static_cast<idx_t>(col), static_cast<idx_t>(col_count));
+}
+
+//- Helper alias and function for transpose spans (generated by transpose engines).
+//
 template<class ST>
 using noe_mdspan_transpose_t = typename noe_mdspan_traits<ST>::tr_span_type;
 
@@ -401,17 +523,19 @@ noe_mdspan_transpose(ST const& s)
     return noe_mdspan_traits<ST>::tr_span(s);
 }
 
+//- Helper function to build strided mdspan objects for matrices.
+//
 template<class T, class ST> inline constexpr
-basic_mdspan<T, dyn_extents, dyn_layout>
+basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>
 make_dyn_span(T* pdata, ST rows, ST cols, ST row_stride, ST col_stride = 1u)
 {
-    using idx_t = typename dyn_extents::index_type;
+    using idx_t = typename dyn_mat_extents::index_type;
 
-    dyn_extents     extents(static_cast<idx_t>(rows), static_cast<idx_t>(cols));
-    dyn_strides     strides{static_cast<idx_t>(row_stride), static_cast<idx_t>(col_stride)};
-    dyn_mapping     mapping(extents, strides);
+    dyn_mat_extents     extents(static_cast<idx_t>(rows), static_cast<idx_t>(cols));
+    dyn_mat_strides     strides{static_cast<idx_t>(row_stride), static_cast<idx_t>(col_stride)};
+    dyn_mat_mapping     mapping(extents, strides);
 
-    return basic_mdspan<T, dyn_extents, dyn_layout>(pdata, mapping);
+    return basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>(pdata, mapping);
 }
 
 #endif

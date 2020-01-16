@@ -34,8 +34,8 @@ class submatrix_engine
     using size_tuple      = typename ET::size_tuple;
 
 #ifdef LA_USE_MDSPAN
-    using span_type       = void;
-    using const_span_type = void;
+    using span_type       = detail::noe_mdspan_submatrix_t<detail::noe_mdspan_t<ET, MCT>>;
+    using const_span_type = detail::noe_mdspan_submatrix_t<typename ET::const_span_type>;
 #endif
 
     //- Construct/copy/destroy
@@ -63,9 +63,13 @@ class submatrix_engine
     //
     constexpr reference     operator ()(size_type i, size_type j) const;
 
+#ifdef LA_USE_MDSPAN
+    constexpr span_type     span() const noexcept;
+#endif
+
     //- Modifiers
     //
-    constexpr void      swap(submatrix_engine& rhs);
+    constexpr void          swap(submatrix_engine& rhs);
 
   private:
     template<class ET2, class OT2>  friend class matrix;
@@ -148,6 +152,17 @@ submatrix_engine<ET, MCT>::operator ()(size_type i, size_type j) const
     return (*mp_other)(i + m_row_start, j + m_col_start);
 }
 
+#ifdef LA_USE_MDSPAN
+
+template<class ET, class MCT> constexpr
+typename submatrix_engine<ET, MCT>::span_type
+submatrix_engine<ET, MCT>::span() const noexcept
+{
+    return detail::noe_mdspan_submatrix(mp_other->span(), m_row_start, m_row_count,
+                                                          m_col_start, m_col_count);
+}
+
+#endif
 //-----------
 //- Modifiers
 //

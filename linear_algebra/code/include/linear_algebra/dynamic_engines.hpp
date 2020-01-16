@@ -83,6 +83,8 @@ class dr_vector_engine
     const_reference operator ()(size_type i) const;
 
 #ifdef LA_USE_MDSPAN
+    span_type       span() noexcept;
+    const_span_type span() const noexcept;
 #endif
 
     //- Modifiers
@@ -308,6 +310,23 @@ dr_vector_engine<T,AT>::operator ()(size_type i) const
     return mp_elems[i];
 }
 
+#ifdef LA_USE_MDSPAN
+
+template<class T, class AT> inline
+typename dr_vector_engine<T,AT>::span_type
+dr_vector_engine<T,AT>::span() noexcept
+{
+    return span_type(static_cast<element_type*>(mp_elems), m_elems);
+}
+
+template<class T, class AT> inline
+typename dr_vector_engine<T,AT>::const_span_type
+dr_vector_engine<T,AT>::span() const noexcept
+{
+    return const_span_type(static_cast<element_type const*>(mp_elems), m_elems);
+}
+
+#endif
 //-----------
 //- Modifiers
 //
@@ -460,16 +479,8 @@ class dr_matrix_engine
     using size_tuple      = tuple<size_type, size_type>;
 
 #ifdef LA_USE_MDSPAN
-  private:
-    using extents_type = extents<dynamic_extent, dynamic_extent>;
-    using strides_type = array<extents_type::index_type, 2>;
-    using layout_type  = layout_stride<dynamic_extent, dynamic_extent>;
-    using mapping_type = layout_type::template mapping<extents_type>;
-    using idx_type     = extents_type::index_type;
-
-  public:
-    using span_type       = basic_mdspan<T, detail::dyn_extents, detail::dyn_layout>;
-    using const_span_type = basic_mdspan<T const, detail::dyn_extents, detail::dyn_layout>;
+    using span_type       = basic_mdspan<T, detail::dyn_mat_extents, detail::dyn_mat_layout>;
+    using const_span_type = basic_mdspan<T const, detail::dyn_mat_extents, detail::dyn_mat_layout>;
 #endif
 
     //- Construct/copy/destroy
@@ -507,8 +518,6 @@ class dr_matrix_engine
     const_reference operator ()(size_type i, size_type j) const;
 
 #ifdef LA_USE_MDSPAN
-    //- Data access
-    //
     span_type       span() noexcept;
     const_span_type span() const noexcept;
 #endif
@@ -732,9 +741,7 @@ dr_matrix_engine<T,AT>::operator ()(size_type i, size_type j) const
 }
 
 #ifdef LA_USE_MDSPAN
-//-------------
-//- Data access
-//
+
 template<class T, class AT> inline
 typename dr_matrix_engine<T,AT>::span_type
 dr_matrix_engine<T,AT>::span() noexcept

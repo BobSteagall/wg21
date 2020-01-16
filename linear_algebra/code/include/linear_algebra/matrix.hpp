@@ -49,7 +49,7 @@ class matrix
     using hermitian_type       = conditional_t<has_cx_elem, matrix, transpose_type>;
     using const_hermitian_type = conditional_t<has_cx_elem, matrix, const_transpose_type>;
 
-#ifdef LA_USE_MDSPAN_X
+#ifdef LA_USE_MDSPAN
     using span_type       = typename engine_type::span_type;
     using const_span_type = typename engine_type::const_span_type;
 #endif
@@ -112,8 +112,11 @@ class matrix
     constexpr reference             operator ()(size_type i, size_type j);
     constexpr const_reference       operator ()(size_type i, size_type j) const;
 
-    //- Columns, rows, submatrices, and transposes
-    //
+#ifdef LA_USE_MDSPAN
+    constexpr span_type             span() noexcept;
+    constexpr const_span_type       span() const noexcept;
+#endif
+
     constexpr column_type           column(size_type j) noexcept;
     constexpr const_column_type     column(size_type j) const noexcept;
     constexpr row_type              row(size_type i) noexcept;
@@ -321,8 +324,24 @@ matrix<ET,OT>::operator ()(size_type i, size_type j) const
     return m_engine(i, j);
 }
 
-//- Columns, rows, submatrices, and transposes
-//
+#ifdef LA_USE_MDSPAN
+
+template<class ET, class OT> inline constexpr
+typename matrix<ET,OT>::span_type
+matrix<ET,OT>::span() noexcept
+{
+    return m_engine.span();
+}
+
+template<class ET, class OT> inline constexpr
+typename matrix<ET,OT>::const_span_type
+matrix<ET,OT>::span() const noexcept
+{
+    return m_engine.span();
+}
+
+#endif
+
 template<class ET, class OT> inline constexpr
 typename matrix<ET,OT>::const_column_type
 matrix<ET,OT>::column(size_type j) const noexcept

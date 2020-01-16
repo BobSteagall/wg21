@@ -64,8 +64,6 @@ class transpose_engine
     constexpr reference     operator ()(size_type i, size_type j) const;
 
 #ifdef LA_USE_MDSPAN
-    //- Data access
-    //
     constexpr span_type     span() const noexcept;
 #endif
 
@@ -146,9 +144,7 @@ transpose_engine<ET, MCT>::operator ()(size_type i, size_type j) const
 }
 
 #ifdef LA_USE_MDSPAN
-//-------------
-//- Data access
-//
+
 template<class ET, class MCT> constexpr
 typename transpose_engine<ET, MCT>::span_type
 transpose_engine<ET, MCT>::span() const noexcept

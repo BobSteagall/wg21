@@ -74,6 +74,11 @@ class fs_vector_engine
     constexpr reference         operator ()(size_type i);
     constexpr const_reference   operator ()(size_type i) const;
 
+#ifdef LA_USE_MDSPAN
+    constexpr span_type         span() noexcept;
+    constexpr const_span_type   span() const noexcept;
+#endif
+
     //- Modifiers
     //
     constexpr void  swap(fs_vector_engine& rhs) noexcept;
@@ -204,6 +209,23 @@ fs_vector_engine<T,N>::operator ()(size_type i) const
     return ma_elems[i];
 }
 
+#ifdef LA_USE_MDSPAN
+
+template<class T, size_t N> constexpr
+typename fs_vector_engine<T,N>::span_type
+fs_vector_engine<T,N>::span() noexcept
+{
+    return span_type(&ma_elems[0]);
+}
+
+template<class T, size_t N> constexpr
+typename fs_vector_engine<T,N>::const_span_type
+fs_vector_engine<T,N>::span() const noexcept
+{
+    return const_span_type(&ma_elems[0]);
+}
+
+#endif
 //-----------
 //- Modifiers
 //
@@ -288,8 +310,6 @@ class fs_matrix_engine
     constexpr const_reference   operator ()(size_type i, size_type j) const;
 
 #ifdef LA_USE_MDSPAN
-    //- Data access
-    //
     constexpr span_type         span() noexcept;
     constexpr const_span_type   span() const noexcept;
 #endif
@@ -435,9 +455,7 @@ fs_matrix_engine<T,R,C>::operator ()(size_type i, size_type j) const
 }
 
 #ifdef LA_USE_MDSPAN
-//-------------
-//- Data access
-//
+
 template<class T, size_t R, size_t C> constexpr
 typename fs_matrix_engine<T,R,C>::span_type
 fs_matrix_engine<T,R,C>::span() noexcept

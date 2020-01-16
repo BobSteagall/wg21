@@ -38,8 +38,8 @@ class column_engine
 #endif
 
 #ifdef LA_USE_MDSPAN
-    using span_type       = void;
-    using const_span_type = void;
+    using span_type       = detail::noe_mdspan_column_t<detail::noe_mdspan_t<ET, VCT>>;
+    using const_span_type = detail::noe_mdspan_column_t<typename ET::const_span_type>;
 #endif
 
     //- Construct/copy/destroy
@@ -70,6 +70,10 @@ class column_engine
     //- Element access
     //
     constexpr reference     operator ()(size_type i) const;
+
+#ifdef LA_USE_MDSPAN
+    constexpr span_type     span() const noexcept;
+#endif
 
     //- Modifiers
     //
@@ -154,6 +158,16 @@ column_engine<ET,VCT>::operator ()(size_type i) const
     return (*mp_other)(i, m_column);
 }
 
+#ifdef LA_USE_MDSPAN
+
+template<class ET, class VCT> constexpr
+typename column_engine<ET,VCT>::span_type
+column_engine<ET,VCT>::span() const noexcept
+{
+    return detail::noe_mdspan_column(mp_other->span(), m_column);
+}
+
+#endif
 //-----------
 //- Modifiers
 //

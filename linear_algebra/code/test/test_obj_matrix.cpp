@@ -213,6 +213,39 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     PRINT(spn4);
     PRINT_TYPE(decltype(spn4));
 
+    auto    col1 = m1.column(1);
+    auto&   ceng1 = col1.engine();
+    PRINT(col1);
+    PRINT_TYPE(decltype(col1));
+
+    auto    cspn1 = ceng1.span();
+    PRINT(cspn1);
+    PRINT_TYPE(decltype(cspn1));
+
+    auto    row1 = m1.row(1);
+    auto&   reng1 = row1.engine();
+    PRINT(row1);
+    PRINT_TYPE(decltype(row1));
+
+    auto    rspn1 = reng1.span();
+    PRINT(rspn1);
+    PRINT_TYPE(decltype(rspn1));
+
+    auto    sub1 = m1.submatrix(2, 4, 3, 6);
+    PRINT(sub1);
+    PRINT_TYPE(decltype(sub1));
+
+    auto    sspn1 = sub1.span();
+    PRINT(sspn1);
+    PRINT_TYPE(decltype(sspn1));
+
+    auto    subtr1 = m1.submatrix(2,4,3,6).t();
+    PRINT(subtr1);
+    PRINT_TYPE(decltype(subtr1));
+
+    auto    subtrspn1 = subtr1.span();
+    PRINT(subtrspn1);
+    PRINT_TYPE(decltype(subtrspn1));
 #endif
 }
 
@@ -223,17 +256,15 @@ void t001X()
     Fill(m1);
     PRINT(m1);
 
-    auto&   eng = m1.engine();
-    auto    spn = eng.span();
-    PRINT(spn);
-    PRINT_TYPE(decltype(spn));
+    auto    spn1 = m1.span();
+    PRINT(spn1);
+    PRINT_TYPE(decltype(spn1));
 
     fsm_double_36  m2;
     Fill(m2);
     PRINT(m2);
 
-    auto&   eng2 = m2.engine();
-    auto    spn2 = eng2.span();
+    auto    spn2 = m2.span();
     PRINT(spn2);
     PRINT_TYPE(decltype(spn2));
 
@@ -241,8 +272,7 @@ void t001X()
     PRINT(tr3);
     PRINT_TYPE(decltype(tr3));
 
-    auto&   eng3 = tr3.engine();
-    auto    spn3 = eng3.span();
+    auto    spn3 = tr3.span();
     PRINT(spn3);
     PRINT_TYPE(decltype(spn3));
 
@@ -250,10 +280,33 @@ void t001X()
     PRINT(tr4);
     PRINT_TYPE(decltype(tr4));
 
-    auto&   eng4 = tr4.engine();
-    auto    spn4 = eng4.span();
+    auto    spn4 = tr4.span();
     PRINT(spn4);
     PRINT_TYPE(decltype(spn4));
+
+    auto    col1 = m1.column(1);
+    PRINT(col1);
+    PRINT_TYPE(decltype(col1));
+
+    auto    cspn1 = col1.span();
+    PRINT(cspn1);
+    PRINT_TYPE(decltype(cspn1));
+
+    auto    row1 = m1.row(1);
+    PRINT(row1);
+    PRINT_TYPE(decltype(row1));
+
+    auto    rspn1 = row1.span();
+    PRINT(rspn1);
+    PRINT_TYPE(decltype(rspn1));
+
+    auto    sub1 = m1.submatrix(2, 4, 3, 6);
+    PRINT(sub1);
+    PRINT_TYPE(decltype(sub1));
+
+    auto    sspn1 = sub1.span();
+    PRINT(sspn1);
+    PRINT_TYPE(decltype(sspn1));
 
     t002X(m1, m2);
 #endif
@@ -269,6 +322,6 @@ TestGroup00()
 
     t001X();
 
-    t000();
-    t001();
+//    t000();
+//    t001();
 }

@@ -41,6 +41,11 @@ class vector
     using hermitian_type         = conditional_t<has_cx_elem, vector, transpose_type>;
     using const_hermitian_type   = conditional_t<has_cx_elem, vector, const_transpose_type>;
 
+#ifdef LA_USE_MDSPAN
+    using span_type       = typename engine_type::span_type;
+    using const_span_type = typename engine_type::const_span_type;
+#endif
+
     //- Construct/copy/destroy
     //
     ~vector() = default;
@@ -96,10 +101,15 @@ class vector
 
     //- Element access
     //
-    constexpr reference         operator [](size_type i);
-    constexpr reference         operator ()(size_type i);
-    constexpr const_reference   operator [](size_type i) const;
-    constexpr const_reference   operator ()(size_type i) const;
+    constexpr reference             operator [](size_type i);
+    constexpr reference             operator ()(size_type i);
+    constexpr const_reference       operator [](size_type i) const;
+    constexpr const_reference       operator ()(size_type i) const;
+
+#ifdef LA_USE_MDSPAN
+    constexpr span_type             span() noexcept;
+    constexpr const_span_type       span() const noexcept;
+#endif
 
     constexpr transpose_type        t();
     constexpr const_transpose_type  t() const;
@@ -177,7 +187,7 @@ vector<ET,OT>::operator =(vector<ET2, OT2> const& rhs)
 //-----------
 //- Iterators
 //
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::iterator
 vector<ET,OT>::begin() noexcept
 {
@@ -191,7 +201,7 @@ vector<ET,OT>::begin() noexcept
     }
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::const_iterator
 vector<ET,OT>::begin() const noexcept
 {
@@ -205,7 +215,7 @@ vector<ET,OT>::begin() const noexcept
     }
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::iterator
 vector<ET,OT>::end() noexcept
 {
@@ -219,7 +229,7 @@ vector<ET,OT>::end() noexcept
     }
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::const_iterator
 vector<ET,OT>::end() const noexcept
 {
@@ -233,35 +243,35 @@ vector<ET,OT>::end() const noexcept
     }
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::reverse_iterator
 vector<ET,OT>::rbegin() noexcept
 {
     return reverse_iterator(end());
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::const_reverse_iterator
 vector<ET,OT>::rbegin() const noexcept
 {
     return const_reverse_iterator(cend());
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::reverse_iterator
 vector<ET,OT>::rend() noexcept
 {
     return reverse_iterator(begin());
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::const_reverse_iterator
 vector<ET,OT>::rend() const noexcept
 {
     return const_reverse_iterator(cbegin());
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::const_iterator
 vector<ET,OT>::cbegin() const noexcept
 {
@@ -275,7 +285,7 @@ vector<ET,OT>::cbegin() const noexcept
     }
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::const_iterator
 vector<ET,OT>::cend() const noexcept
 {
@@ -299,21 +309,21 @@ vector<ET,OT>::is_resizable() noexcept
     return is_resizable_engine_v<ET>;
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::size_type
 vector<ET,OT>::capacity() const noexcept
 {
     return m_engine.capacity();
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::size_type
 vector<ET,OT>::elements() const noexcept
 {
     return m_engine.elements();
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::size_type
 vector<ET,OT>::size() const noexcept
 {
@@ -321,7 +331,7 @@ vector<ET,OT>::size() const noexcept
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr 
+template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
 void
 vector<ET,OT>::reserve(size_type cap)
 {
@@ -329,7 +339,7 @@ vector<ET,OT>::reserve(size_type cap)
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr 
+template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
 void
 vector<ET,OT>::resize(size_type elems)
 {
@@ -337,7 +347,7 @@ vector<ET,OT>::resize(size_type elems)
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr 
+template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
 void
 vector<ET,OT>::resize(size_type elems, size_type cap)
 {
@@ -347,49 +357,67 @@ vector<ET,OT>::resize(size_type elems, size_type cap)
 //----------------
 //- Element access
 //
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::reference
 vector<ET,OT>::operator [](size_type i)
 {
     return m_engine(i);
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::reference
 vector<ET,OT>::operator ()(size_type i)
 {
     return m_engine(i);
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::const_reference
 vector<ET,OT>::operator [](size_type i) const
 {
     return m_engine(i);
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::const_reference
 vector<ET,OT>::operator ()(size_type i) const
 {
     return m_engine(i);
 }
 
-template<class ET, class OT> constexpr 
+#ifdef LA_USE_MDSPAN
+
+template<class ET, class OT> inline constexpr
+typename vector<ET,OT>::span_type
+vector<ET,OT>::span() noexcept
+{
+    return m_engine.span();
+}
+
+template<class ET, class OT> inline constexpr
+typename vector<ET,OT>::const_span_type
+vector<ET,OT>::span() const noexcept
+{
+    return m_engine.span();
+}
+
+#endif
+
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::transpose_type
 vector<ET,OT>::t()
 {
     return *this;
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::const_transpose_type
 vector<ET,OT>::t() const
 {
     return *this;
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::hermitian_type
 vector<ET,OT>::h()
 {
@@ -403,7 +431,7 @@ vector<ET,OT>::h()
     }
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::const_hermitian_type
 vector<ET,OT>::h() const
 {
@@ -420,14 +448,14 @@ vector<ET,OT>::h() const
 //-------------
 //- Data access
 //
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::engine_type&
 vector<ET,OT>::engine() noexcept
 {
     return m_engine;
 }
 
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 typename vector<ET,OT>::engine_type const&
 vector<ET,OT>::engine() const noexcept
 {
@@ -437,7 +465,7 @@ vector<ET,OT>::engine() const noexcept
 //-----------
 //- Modifiers
 //
-template<class ET, class OT> constexpr 
+template<class ET, class OT> constexpr
 void
 vector<ET,OT>::swap(vector& rhs) noexcept
 {
@@ -445,7 +473,7 @@ vector<ET,OT>::swap(vector& rhs) noexcept
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_writable<ET, ET2>> constexpr 
+template<class ET2, detail::enable_if_writable<ET, ET2>> constexpr
 void
 vector<ET,OT>::swap_elements(size_type i, size_type j) noexcept
 {
@@ -455,7 +483,7 @@ vector<ET,OT>::swap_elements(size_type i, size_type j) noexcept
 //------------
 //- Comparison
 //
-template<class ET1, class OT1, class ET2, class OT2> constexpr 
+template<class ET1, class OT1, class ET2, class OT2> constexpr
 bool
 operator ==(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2)
 {
@@ -474,7 +502,7 @@ operator ==(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2)
     return true;
 }
 
-template<class ET1, class OT1, class ET2, class OT2> constexpr 
+template<class ET1, class OT1, class ET2, class OT2> constexpr
 bool
 operator !=(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2)
 {

@@ -252,19 +252,30 @@ Print(basic_mdspan<T,X,L,A> const& s, char const* pname = nullptr)
         cout << "  size: " << s.extent(0) << "x" << s.extent(1) << endl;
         cout << "  -----" << endl;
 
-    for (index_type i = 0;  i < s.extent(0);  ++i)
-    {
-        std::cout << std::right << std::setw(4) << std::setprecision(3) << (double) s(i, 0);
-
-        for (index_type j = 1;  j < s.extent(1);  ++j)
+        for (index_type i = 0;  i < s.extent(0);  ++i)
         {
-             std::cout << std::right << std::setw(6) << std::setprecision(3) << (double) s(i, j);
+            std::cout << std::right << std::setw(4) << std::setprecision(3) << (double) s(i, 0);
+
+            for (index_type j = 1;  j < s.extent(1);  ++j)
+            {
+                 std::cout << std::right << std::setw(6) << std::setprecision(3) << (double) s(i, j);
+            }
+            cout << endl;
         }
-        cout << endl;
-    }
     }
     else if constexpr (s.rank() == 1)
     {
+        cout << endl << "mdspan: " << ((pname) ? pname : "<anon>") << endl;
+        cout << "  size: " << s.extent(0) << endl;
+        cout << "  -----" << endl;
+
+        cout << "(idx) " << right << setw(4) << setprecision(3) << (double) s(0);
+
+        for (index_type i = 1;  i < s.extent(0);  ++i)
+        {
+             std::cout << std::right << std::setw(6) << std::setprecision(3) << (double) s(i);
+        }
+        cout << endl;
     }
 }
 
