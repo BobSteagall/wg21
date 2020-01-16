@@ -183,13 +183,11 @@ namespace {
 void t002X(drm_double const& m1, fsm_double_36 const& m2)
 {
 #ifdef LA_USE_MDSPAN
-    auto&   eng = m1.engine();
-    auto    spn = eng.span();
+    auto    spn = m1.span();
     PRINT(spn);
     PRINT_TYPE(decltype(spn));
 
-    auto&   eng2 = m2.engine();
-    auto    spn2 = eng2.span();
+    auto    spn2 = m2.span();
     PRINT(spn2);
     PRINT_TYPE(decltype(spn2));
 
@@ -199,8 +197,7 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     PRINT_TYPE(typename decltype(tr3)::engine_type::span_type);
     PRINT_TYPE(typename decltype(tr3)::engine_type::const_span_type);
 
-    auto&   eng3 = tr3.engine();
-    auto    spn3 = eng3.span();
+    auto    spn3 = tr3.span();
     PRINT(spn3);
     PRINT_TYPE(decltype(spn3));
 
@@ -208,26 +205,23 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     PRINT(tr4);
     PRINT_TYPE(decltype(tr4));
 
-    auto&   eng4 = tr4.engine();
-    auto    spn4 = eng4.span();
+    auto    spn4 = tr4.span();
     PRINT(spn4);
     PRINT_TYPE(decltype(spn4));
 
     auto    col1 = m1.column(1);
-    auto&   ceng1 = col1.engine();
     PRINT(col1);
     PRINT_TYPE(decltype(col1));
 
-    auto    cspn1 = ceng1.span();
+    auto    cspn1 = col1.span();
     PRINT(cspn1);
     PRINT_TYPE(decltype(cspn1));
 
     auto    row1 = m1.row(1);
-    auto&   reng1 = row1.engine();
     PRINT(row1);
     PRINT_TYPE(decltype(row1));
 
-    auto    rspn1 = reng1.span();
+    auto    rspn1 = row1.span();
     PRINT(rspn1);
     PRINT_TYPE(decltype(rspn1));
 
@@ -309,6 +303,8 @@ void t001X()
     PRINT_TYPE(decltype(sspn1));
 
     t002X(m1, m2);
+
+//    static_assert(!std::is_same_v<double, double const>);
 #endif
 }
 }

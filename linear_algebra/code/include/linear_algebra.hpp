@@ -10,7 +10,7 @@
 
 //- Some build options for dev/debug/test.
 //
-//#define LA_USE_MDSPAN
+#define LA_USE_MDSPAN
 //#define LA_USE_VECTOR_ENGINE_ITERATORS
 
 //- Namespace alternatives for testing and also for detecting  ADL issues.  Pick a pair
@@ -35,11 +35,18 @@
 #include <tuple>
 #include <type_traits>
 
-#ifdef _MSC_VER
+#if defined _MSC_VER
     #undef LA_USE_MDSPAN
+#elif defined __GNUG__
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 #ifdef LA_USE_MDSPAN
     #include <mdspan>
+#endif
+#if defined _MSC_VER
+#elif defined __GNUG__
+    #pragma GCC diagnostic pop
 #endif
 
 //- Implementation headers.
