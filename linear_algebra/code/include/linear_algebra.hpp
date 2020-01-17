@@ -34,16 +34,27 @@
 #include <tuple>
 #include <type_traits>
 
+//- Disable some compiler warnings (noise) coming from mdspan.
+//
 #if defined _MSC_VER
     #undef LA_USE_MDSPAN
+#elif defined __clang__
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #elif defined __GNUG__
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
+
 #ifdef LA_USE_MDSPAN
     #include <experimental/mdspan>
 #endif
+
+//- Restore the compiler's diagnostic state.
+//
 #if defined _MSC_VER
+#elif defined __clang__
+    #pragma clang diagnostic pop
 #elif defined __GNUG__
     #pragma GCC diagnostic pop
 #endif
