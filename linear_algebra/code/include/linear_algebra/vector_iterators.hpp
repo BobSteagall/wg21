@@ -219,42 +219,42 @@ vector_iterator<ET>::less_than(vector_iterator const& p) const
     return mp_engine == p.mp_engine  &&  m_curr < p.m_curr;
 }
 
-template<class ET> constexpr 
+template<class ET> constexpr
 bool
 operator ==(vector_iterator<ET> const& lhs, vector_iterator<ET> const& rhs)
 {
     return lhs.equals(rhs);
 }
 
-template<class ET> constexpr 
+template<class ET> constexpr
 bool
 operator !=(vector_iterator<ET> const& lhs, vector_iterator<ET> const& rhs)
 {
     return !lhs.equals(rhs);
 }
 
-template<class ET> constexpr 
+template<class ET> constexpr
 bool
 operator <(vector_iterator<ET> const& lhs, vector_iterator<ET> const& rhs)
 {
     return lhs.less_than(rhs);
 }
 
-template<class ET> constexpr 
+template<class ET> constexpr
 bool
 operator <=(vector_iterator<ET> const& lhs, vector_iterator<ET> const& rhs)
 {
     return !lhs.greater_than(rhs);
 }
 
-template<class ET> constexpr 
+template<class ET> constexpr
 bool
 operator >(vector_iterator<ET> const& lhs, vector_iterator<ET> const& rhs)
 {
     return lhs.greater_than(rhs);
 }
 
-template<class ET> constexpr 
+template<class ET> constexpr
 bool
 operator >=(vector_iterator<ET> const& lhs, vector_iterator<ET> const& rhs)
 {
@@ -376,7 +376,7 @@ vector_const_iterator<ET>::operator ->() const
     return static_cast<pointer>(addressof((*mp_engine)(m_curr)));
 }
 
-template<class ET> constexpr 
+template<class ET> constexpr
 typename vector_const_iterator<ET>::reference
 vector_const_iterator<ET>::operator *() const
 {
@@ -397,7 +397,7 @@ vector_const_iterator<ET>::operator -(vector_const_iterator const& p) const
     return m_curr - p.m_curr;
 }
 
-template<class ET> constexpr 
+template<class ET> constexpr
 vector_const_iterator<ET>
 vector_const_iterator<ET>::operator -(difference_type n) const
 {

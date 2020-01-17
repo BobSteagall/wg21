@@ -30,11 +30,6 @@ class fs_vector_engine
     using difference_type = ptrdiff_t;
     using size_type       = size_t;
 
-#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
-    using iterator        = detail::vector_iterator<fs_vector_engine>;
-    using const_iterator  = detail::vector_const_iterator<fs_vector_engine>;
-#endif
-
 #ifdef LA_USE_MDSPAN
     using span_type       = mdspan<element_type, N>;
     using const_span_type = mdspan<element_type const, N>;
@@ -52,17 +47,6 @@ class fs_vector_engine
 
     constexpr fs_vector_engine&     operator =(fs_vector_engine&&) noexcept = default;
     constexpr fs_vector_engine&     operator =(fs_vector_engine const&) = default;
-
-#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
-    //- Iterators
-    //
-    constexpr iterator          begin() noexcept;
-    constexpr iterator          end() noexcept;
-    constexpr const_iterator    begin() const noexcept;
-    constexpr const_iterator    end() const noexcept;
-    constexpr const_iterator    cbegin() const noexcept;
-    constexpr const_iterator    cend() const noexcept;
-#endif
 
     //- Capacity
     //
@@ -128,53 +112,6 @@ fs_vector_engine<T,N>::fs_vector_engine(initializer_list<U> list)
     }
 }
 
-#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
-//-----------
-//- Iterators
-//
-template<class T, size_t N> constexpr
-typename fs_vector_engine<T,N>::iterator
-fs_vector_engine<T,N>::begin() noexcept
-{
-    return iterator(this, 0, N);
-}
-
-template<class T, size_t N> constexpr
-typename fs_vector_engine<T,N>::const_iterator
-fs_vector_engine<T,N>::begin() const noexcept
-{
-    return const_iterator(this, 0, N);
-}
-
-template<class T, size_t N> constexpr
-typename fs_vector_engine<T,N>::iterator
-fs_vector_engine<T,N>::end() noexcept
-{
-    return iterator(this, N, N);
-}
-
-template<class T, size_t N> constexpr
-typename fs_vector_engine<T,N>::const_iterator
-fs_vector_engine<T,N>::end() const noexcept
-{
-    return const_iterator(this, N, N);
-}
-
-template<class T, size_t N> constexpr
-typename fs_vector_engine<T,N>::const_iterator
-fs_vector_engine<T,N>::cbegin() const noexcept
-{
-    return const_iterator(this, 0, N);
-}
-
-template<class T, size_t N> constexpr
-typename fs_vector_engine<T,N>::const_iterator
-fs_vector_engine<T,N>::cend() const noexcept
-{
-    return const_iterator(this, N, N);
-}
-
-#endif
 //----------
 //- Capacity
 //

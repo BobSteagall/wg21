@@ -116,21 +116,21 @@ template<class ET, class MCT> constexpr
 typename transpose_engine<ET, MCT>::size_type
 transpose_engine<ET, MCT>::column_capacity() const noexcept
 {
-    return mp_other->row_capacity();
+    return mp_other->rows();
 }
 
 template<class ET, class MCT> constexpr
 typename transpose_engine<ET, MCT>::size_type
 transpose_engine<ET, MCT>::row_capacity() const noexcept
 {
-    return mp_other->column_capacity();
+    return mp_other->columns();
 }
 
 template<class ET, class MCT> constexpr
 typename transpose_engine<ET, MCT>::size_tuple
 transpose_engine<ET, MCT>::capacity() const noexcept
 {
-    return size_tuple(mp_other->column_capacity(), mp_other->row_capacity());
+    return size_tuple(mp_other->columns(), mp_other->rows());
 }
 
 //----------------

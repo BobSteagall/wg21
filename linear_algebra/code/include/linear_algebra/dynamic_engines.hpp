@@ -31,11 +31,6 @@ class dr_vector_engine
     using difference_type = ptrdiff_t;
     using size_type       = size_t;
 
-#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
-    using iterator        = detail::vector_iterator<dr_vector_engine>;
-    using const_iterator  = detail::vector_const_iterator<dr_vector_engine>;
-#endif
-
 #ifdef LA_USE_MDSPAN
     using span_type       = mdspan<element_type, dynamic_extent>;
     using const_span_type = mdspan<element_type const, dynamic_extent>;
@@ -57,17 +52,6 @@ class dr_vector_engine
     dr_vector_engine&   operator =(dr_vector_engine const& rhs);
     template<class ET2>
     dr_vector_engine&   operator =(ET2 const& rhs);
-
-#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
-    //- Iterators
-    //
-    iterator        begin() noexcept;
-    iterator        end() noexcept;
-    const_iterator  begin() const noexcept;
-    const_iterator  end() const noexcept;
-    const_iterator  cbegin() const noexcept;
-    const_iterator  cend() const noexcept;
-#endif
 
     //- Capacity
     //
@@ -208,53 +192,6 @@ dr_vector_engine<T,AT>::operator =(ET2 const& rhs)
     return *this;
 }
 
-#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
-//-----------
-//- Iterators
-//
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::iterator
-dr_vector_engine<T,AT>::begin() noexcept
-{
-    return iterator(this, 0, m_elemcap);
-}
-
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::iterator
-dr_vector_engine<T,AT>::end() noexcept
-{
-    return iterator(this, m_elemcap, m_elemcap);
-}
-
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::const_iterator
-dr_vector_engine<T,AT>::begin() const noexcept
-{
-    return const_iterator(this, 0, m_elemcap);
-}
-
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::const_iterator
-dr_vector_engine<T,AT>::end() const noexcept
-{
-    return const_iterator(this, m_elemcap, m_elemcap);
-}
-
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::const_iterator
-dr_vector_engine<T,AT>::cbegin() const noexcept
-{
-    return const_iterator(this, 0, m_elemcap);
-}
-
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::const_iterator
-dr_vector_engine<T,AT>::cend() const noexcept
-{
-    return const_iterator(this, m_elemcap, m_elemcap);
-}
-
-#endif
 //----------
 //- Capacity
 //

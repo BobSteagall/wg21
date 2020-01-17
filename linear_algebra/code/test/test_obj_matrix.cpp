@@ -183,10 +183,14 @@ namespace {
 void t002X(drm_double const& m1, fsm_double_36 const& m2)
 {
 #ifdef LA_USE_MDSPAN
-    auto    spn = m1.span();
-    PRINT(spn);
-    PRINT_TYPE(decltype(spn));
+    PRINT_FNAME();
+    PRINT(m1);
 
+    auto    spn1 = m1.span();
+    PRINT(spn1);
+    PRINT_TYPE(decltype(spn1));
+
+    PRINT(m2);
     auto    spn2 = m2.span();
     PRINT(spn2);
     PRINT_TYPE(decltype(spn2));
@@ -194,8 +198,6 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     auto    tr3  = m1.t();
     PRINT(tr3);
     PRINT_TYPE(decltype(tr3));
-    PRINT_TYPE(typename decltype(tr3)::engine_type::span_type);
-    PRINT_TYPE(typename decltype(tr3)::engine_type::const_span_type);
 
     auto    spn3 = tr3.span();
     PRINT(spn3);
@@ -232,20 +234,14 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     auto    sspn1 = sub1.span();
     PRINT(sspn1);
     PRINT_TYPE(decltype(sspn1));
-
-    auto    subtr1 = m1.submatrix(2,4,3,6).t();
-    PRINT(subtr1);
-    PRINT_TYPE(decltype(subtr1));
-
-    auto    subtrspn1 = subtr1.span();
-    PRINT(subtrspn1);
-    PRINT_TYPE(decltype(subtrspn1));
 #endif
 }
 
 void t001X()
 {
 #ifdef LA_USE_MDSPAN
+    PRINT_FNAME();
+
     drm_double  m1(10, 13, 16, 19);
     Fill(m1);
     PRINT(m1);

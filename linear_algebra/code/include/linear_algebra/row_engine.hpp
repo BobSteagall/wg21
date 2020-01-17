@@ -32,11 +32,6 @@ class row_engine
     using difference_type = typename ET::difference_type;
     using size_type       = typename ET::size_type;
 
-#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
-    using iterator        = detail::noe_iterator_t<ET, VCT, row_engine>;
-    using const_iterator  = detail::vector_const_iterator<row_engine>;
-#endif
-
 #ifdef LA_USE_MDSPAN
     using span_type       = detail::noe_mdspan_row_t<detail::noe_mdspan_t<ET, VCT>>;
     using const_span_type = detail::noe_mdspan_row_t<typename ET::const_span_type>;
@@ -52,15 +47,6 @@ class row_engine
 
     constexpr row_engine&   operator =(row_engine&&) noexcept = default;
     constexpr row_engine&   operator =(row_engine const&) noexcept = default;
-
-#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
-    //- Iterators
-    //
-    constexpr iterator          begin() const noexcept;
-    constexpr iterator          end() const noexcept;
-    constexpr const_iterator    cbegin() const noexcept;
-    constexpr const_iterator    cend() const noexcept;
-#endif
 
     //- Capacity
     //
@@ -98,39 +84,6 @@ row_engine<ET, VCT>::row_engine() noexcept
 ,   m_row(0)
 {}
 
-#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
-//-----------
-//- Iterators
-//
-template<class ET, class VCT> constexpr
-typename row_engine<ET, VCT>::iterator
-row_engine<ET, VCT>::begin() const noexcept
-{
-    return iterator(this, 0, mp_other->columns());
-}
-
-template<class ET, class VCT> constexpr
-typename row_engine<ET, VCT>::iterator
-row_engine<ET, VCT>::end() const noexcept
-{
-    return iterator(this, mp_other->columns(), mp_other->columns());
-}
-
-template<class ET, class VCT> constexpr
-typename row_engine<ET, VCT>::const_iterator
-row_engine<ET, VCT>::cbegin() const noexcept
-{
-    return const_iterator(this, 0, mp_other->columns());
-}
-
-template<class ET, class VCT> constexpr
-typename row_engine<ET, VCT>::const_iterator
-row_engine<ET, VCT>::cend() const noexcept
-{
-    return const_iterator(this, mp_other->columns(), mp_other->columns());
-}
-
-#endif
 //----------
 //- Capacity
 //
