@@ -8,8 +8,7 @@ FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git)
 FetchContent_GetProperties(mdspan)
 if(NOT mdspan_POPULATED)
     FetchContent_Populate(mdspan)
-    list(APPEND CMAKE_MODULE_PATH ${mdspan_SOURCE_DIR})
-    add_subdirectory(${mdspan_SOURCE_DIR})
+    add_subdirectory(${mdspan_SOURCE_DIR} ${mdspan_BINARY_DIR})
 endif()
 
 
