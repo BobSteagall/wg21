@@ -62,7 +62,7 @@ class matrix
     constexpr matrix(matrix&&) noexcept = default;
     constexpr matrix(matrix const&) = default;
 
-    template<class U, class ET2 = ET, detail::enable_if_fixed_size<ET, ET2> = true>
+    template<class U, class ET2 = ET, detail::enable_if_fixed_size<ET, ET2> = true, detail::enable_if_convertible<U, value_type> = true>
     constexpr matrix(initializer_list<U> list);
     template<class ET2, class OT2>
     constexpr matrix(matrix<ET2, OT2> const& src);
@@ -155,7 +155,8 @@ class matrix
 //- Construct/copy/destroy
 //
 template<class ET, class OT>
-template<class U, class ET2, detail::enable_if_fixed_size<ET, ET2>> constexpr
+template<class U, class ET2, detail::enable_if_fixed_size<ET, ET2>,
+                             detail::enable_if_convertible<U, typename ET::value_type>> constexpr
 matrix<ET,OT>::matrix(initializer_list<U> list)
 :   m_engine(forward<initializer_list<U>>(list))
 {}

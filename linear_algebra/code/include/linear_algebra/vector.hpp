@@ -108,9 +108,7 @@ template<class ET, class OT>
 class vector
 {
     static_assert(is_vector_engine_v<ET>);
-
     static constexpr bool   has_cx_elem  = detail::is_complex_v<typename ET::value_type>;
-    static constexpr bool   has_eng_iter = detail::has_iteration_v<ET>;
 
   public:
     //- Types
@@ -120,8 +118,8 @@ class vector
     using value_type           = typename engine_type::value_type;
     using difference_type      = typename engine_type::difference_type;
     using size_type            = typename engine_type::size_type;
-    using pointer              = typename engine_type::reference;
-    using const_pointer        = typename engine_type::const_reference;
+    using pointer              = typename engine_type::pointer;
+    using const_pointer        = typename engine_type::const_pointer;
     using reference            = typename engine_type::reference;
     using const_reference      = typename engine_type::const_reference;
     using transpose_type       = vector&;
@@ -144,7 +142,7 @@ class vector
     template<class ET2, class OT2>
     constexpr vector(vector<ET2, OT2> const& src);
 
-    template<class U>
+    template<class U, detail::enable_if_convertible<U, value_type> = true>
     constexpr vector(initializer_list<U> list);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr vector(size_type elems);
@@ -223,7 +221,7 @@ vector<ET,OT>::vector(vector<ET2, OT2> const& rhs)
 {}
 
 template<class ET, class OT>
-template<class U> constexpr
+template<class U, detail::enable_if_convertible<U, typename ET::value_type>> constexpr
 vector<ET,OT>::vector(initializer_list<U> list)
 :   m_engine(forward<initializer_list<U>>(list))
 {}

@@ -20,6 +20,8 @@ template<class VT>  class vector_const_iterator;
 template<class VT>
 class vector_iterator
 {
+    using engine_type       = typename VT::engine_type;
+
   public:
     using iterator_category = random_access_iterator_tag;
     using vector_type       = VT;
@@ -267,6 +269,8 @@ operator >=(vector_iterator<VT> const& lhs, vector_iterator<VT> const& rhs)
 template<class VT>
 class vector_const_iterator
 {
+    using engine_type       = typename VT::engine_type;
+
   public:
     using iterator_category = random_access_iterator_tag;
     using vector_type       = VT;

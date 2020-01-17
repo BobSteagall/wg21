@@ -310,6 +310,9 @@ TestGroup00()
 {
     constexpr double x = t002();
 
+    auto v = STD_LA::fs_vector<double, 3>{};
+    auto w{v};
+
     PRINT_FNAME();
 
     t001X();

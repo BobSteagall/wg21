@@ -16,6 +16,10 @@ template<class ET>  class vector_const_iterator;
 
 struct special_ctor_tag {};
 
+template<class ET1, class ET2>
+using enable_if_convertible = enable_if_t<is_convertible_v<ET1, ET2>, bool>;
+
+
 //==================================================================================================
 //- Traits type to detect if a type is std::complex<T>.
 //==================================================================================================
@@ -295,8 +299,9 @@ using noe_mdspan_t = typename noe_traits<ET,CAT>::span_type;
 #endif
 
 //- Detection trait and convenience alias template for determining whether an engine has
-//  iteration in its public interface.
+//  an iterator category tag in its public interface.
 //
+/*
 template<typename T, typename = void>
 struct has_iteration
 :   std::false_type
@@ -337,7 +342,7 @@ using engine_m_iter_t = typename get_engine_iter<HasIter, ET>::m_iter_type;
 
 template<bool HasIter, class ET>
 using engine_c_iter_t = typename get_engine_iter<HasIter, ET>::c_iter_type;
-
+*/
 #ifdef LA_USE_MDSPAN
 //==================================================================================================
 //  Traits type for specifying an mdspan type on behalf of a non-owning engine.

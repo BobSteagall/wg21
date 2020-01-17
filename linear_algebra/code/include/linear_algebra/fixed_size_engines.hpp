@@ -78,12 +78,9 @@ class fs_vector_engine
 template<class T, size_t N> constexpr
 fs_vector_engine<T,N>::fs_vector_engine()
 {
-    if constexpr (is_arithmetic_v<T>)
+    for (auto& elem : ma_elems)
     {
-        for (auto& elem : ma_elems)
-        {
-            elem = static_cast<T>(0);
-        }
+        elem = static_cast<T>(0);
     }
 }
 
@@ -100,14 +97,11 @@ fs_vector_engine<T,N>::fs_vector_engine(initializer_list<U> list)
         ma_elems[i] = static_cast<T>( *iter);
     }
 
-    if constexpr (is_arithmetic_v<T>)
+    if (count < N)
     {
-        if (count < N)
+        for (size_type i = count;  i < N;  ++i)
         {
-            for (size_type i = count;  i < N;  ++i)
-            {
-                ma_elems[i] = static_cast<T>(0);
-            }
+            ma_elems[i] = static_cast<T>(0);
         }
     }
 }
