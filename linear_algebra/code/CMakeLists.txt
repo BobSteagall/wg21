@@ -78,7 +78,6 @@ target_compile_features(wg21_linear_algebra
 target_compile_definitions(wg21_linear_algebra
     INTERFACE
         LA_USE_MDSPAN
-#        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:LA_USE_MDSPAN>
 )
 
 target_link_libraries(wg21_linear_algebra
