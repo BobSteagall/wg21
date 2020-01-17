@@ -42,7 +42,7 @@
     #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 #ifdef LA_USE_MDSPAN
-    #include <mdspan>
+    #include <experimental/mdspan>
 #endif
 #if defined _MSC_VER
 #elif defined __GNUG__

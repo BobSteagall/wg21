@@ -3,11 +3,20 @@ project(wg21_linear_algebra VERSION 0.0.1)
 
 option(BUILD_TESTING "flag to build tests" ON)
 
+include(FetchContent)
+FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git)
+FetchContent_GetProperties(mdspan)
+if(NOT mdspan_POPULATED)
+    FetchContent_Populate(mdspan)
+    list(APPEND CMAKE_MODULE_PATH ${mdspan_SOURCE_DIR})
+    add_subdirectory(${mdspan_SOURCE_DIR})
+endif()
+
+
 add_library(wg21_linear_algebra INTERFACE)
 target_include_directories(wg21_linear_algebra
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/extsrc/mdspan/include/experimental>
         $<INSTALL_INTERFACE:include>
 )
 
@@ -64,6 +73,16 @@ target_sources(wg21_linear_algebra
 target_compile_features(wg21_linear_algebra
     INTERFACE
         cxx_std_17
+)
+
+target_compile_definitions(wg21_linear_algebra
+    INTERFACE
+        LA_USE_MDSPAN
+)
+
+target_link_libraries(wg21_linear_algebra
+    INTERFACE
+        std::mdspan
 )
 
 if (BUILD_TESTING)
