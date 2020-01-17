@@ -39,7 +39,7 @@
     #undef LA_USE_MDSPAN
 #endif
 #ifdef LA_USE_MDSPAN
-    #include <mdspan>
+    #include <experimental/mdspan>
 #endif
 
 //- Implementation headers.
