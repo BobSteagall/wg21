@@ -227,8 +227,8 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
     }
     cout << endl;
 
-    auto    iter = v.begin();
-    auto    last = v.end();
+    auto    iter = cbegin(v);
+    auto    last = cend(v);
 
     cout << "(itr) " << right << setw(4) << setprecision(3) << (double) *iter;
 

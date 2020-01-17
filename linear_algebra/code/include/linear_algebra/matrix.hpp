@@ -28,19 +28,19 @@ class matrix
   public:
     //- Types
     //
-    using engine_type     = ET;
-    using element_type    = typename engine_type::element_type;
-    using value_type      = typename engine_type::value_type;
-    using reference       = typename engine_type::reference;
-    using const_reference = typename engine_type::const_reference;
-    using difference_type = typename engine_type::difference_type;
-    using size_type       = typename engine_type::size_type;
-    using size_tuple      = typename engine_type::size_tuple;
+    using engine_type          = ET;
+    using element_type         = typename engine_type::element_type;
+    using value_type           = typename engine_type::value_type;
+    using reference            = typename engine_type::reference;
+    using const_reference      = typename engine_type::const_reference;
+    using difference_type      = typename engine_type::difference_type;
+    using size_type            = typename engine_type::size_type;
+    using size_tuple           = typename engine_type::size_tuple;
 
-    using column_type       = vector<column_engine<engine_type, possibly_writable_vector_tag>, OT>;
-    using const_column_type = vector<column_engine<engine_type, readable_vector_engine_tag>, OT>;
-    using row_type          = vector<row_engine<engine_type, possibly_writable_vector_tag>, OT>;
-    using const_row_type    = vector<row_engine<engine_type, readable_vector_engine_tag>, OT>;
+    using column_type          = vector<column_engine<engine_type, possibly_writable_vector_tag>, OT>;
+    using const_column_type    = vector<column_engine<engine_type, readable_vector_engine_tag>, OT>;
+    using row_type             = vector<row_engine<engine_type, possibly_writable_vector_tag>, OT>;
+    using const_row_type       = vector<row_engine<engine_type, readable_vector_engine_tag>, OT>;
 
     using submatrix_type       = matrix<submatrix_engine<engine_type, possibly_writable_matrix_tag>, OT>;
     using const_submatrix_type = matrix<submatrix_engine<engine_type, readable_matrix_engine_tag>, OT>;
@@ -50,8 +50,8 @@ class matrix
     using const_hermitian_type = conditional_t<has_cx_elem, matrix, const_transpose_type>;
 
 #ifdef LA_USE_MDSPAN
-    using span_type       = typename engine_type::span_type;
-    using const_span_type = typename engine_type::const_span_type;
+    using span_type            = typename engine_type::span_type;
+    using const_span_type      = typename engine_type::const_span_type;
 #endif
 
     //- Construct/copy/destroy

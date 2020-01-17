@@ -9,6 +9,97 @@
 #define LINEAR_ALGEBRA_VECTOR_HPP_DEFINED
 
 namespace STD_LA {
+
+template<class ET, class OT> constexpr
+detail::vector_iterator<vector<ET, OT>>
+begin(vector<ET, OT>& v) noexcept
+{
+    return detail::vector_iterator<vector<ET, OT>>(v, 0, v.size());
+}
+
+template<class ET, class OT> constexpr
+detail::vector_iterator<vector<ET, OT>>
+end(vector<ET, OT>& v) noexcept
+{
+    return detail::vector_iterator<vector<ET, OT>>(v, v.size(), v.size());
+}
+
+
+template<class ET, class OT> constexpr
+detail::vector_const_iterator<vector<ET, OT>>
+begin(vector<ET, OT> const& v) noexcept
+{
+    return detail::vector_const_iterator<vector<ET, OT>>(v, 0, v.size());
+}
+
+template<class ET, class OT> constexpr
+detail::vector_const_iterator<vector<ET, OT>>
+end(vector<ET, OT>const & v) noexcept
+{
+    return detail::vector_const_iterator<vector<ET, OT>>(v, v.size(), v.size());
+}
+
+
+template<class ET, class OT> constexpr
+detail::vector_const_iterator<vector<ET, OT>>
+cbegin(vector<ET, OT> const& v) noexcept
+{
+    return detail::vector_const_iterator<vector<ET, OT>>(v, 0, v.size());
+}
+
+template<class ET, class OT> constexpr
+detail::vector_const_iterator<vector<ET, OT>>
+cend(vector<ET, OT>const & v) noexcept
+{
+    return detail::vector_const_iterator<vector<ET, OT>>(v, v.size(), v.size());
+}
+
+//- Reverse iterators.
+//
+template<class ET, class OT> constexpr
+reverse_iterator<detail::vector_iterator<vector<ET, OT>>>
+rbegin(vector<ET, OT>& v) noexcept
+{
+    return reverse_iterator<detail::vector_iterator<vector<ET, OT>>>(v, 0, v.size());
+}
+
+template<class ET, class OT> constexpr
+reverse_iterator<detail::vector_iterator<vector<ET, OT>>>
+rend(vector<ET, OT>& v) noexcept
+{
+    return reverse_iterator<detail::vector_iterator<vector<ET, OT>>>(v, v.size(), v.size());
+}
+
+
+template<class ET, class OT> constexpr
+reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>
+rbegin(vector<ET, OT> const& v) noexcept
+{
+    return reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>(v, 0, v.size());
+}
+
+template<class ET, class OT> constexpr
+reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>
+rend(vector<ET, OT>const & v) noexcept
+{
+    return reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>(v, v.size(), v.size());
+}
+
+
+template<class ET, class OT> constexpr
+reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>
+crbegin(vector<ET, OT> const& v) noexcept
+{
+    return reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>(v, 0, v.size());
+}
+
+template<class ET, class OT> constexpr
+reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>
+crend(vector<ET, OT>const & v) noexcept
+{
+    return reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>(v, v.size(), v.size());
+}
+
 //==================================================================================================
 //  A vector type parametrized by an engine type and operator traits.
 //==================================================================================================
@@ -24,26 +115,23 @@ class vector
   public:
     //- Types
     //
-    using engine_type            = ET;
-    using element_type           = typename engine_type::element_type;
-    using value_type             = typename engine_type::value_type;
-    using difference_type        = typename engine_type::difference_type;
-    using size_type              = typename engine_type::size_type;
-    using reference              = typename engine_type::reference;
-    using const_reference        = typename engine_type::const_reference;
-    using iterator               = detail::engine_m_iter_t<has_eng_iter, ET>;
-    using const_iterator         = detail::engine_c_iter_t<has_eng_iter, ET>;
-    using reverse_iterator       = std::reverse_iterator<iterator>;
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-
-    using transpose_type         = vector&;
-    using const_transpose_type   = vector const&;
-    using hermitian_type         = conditional_t<has_cx_elem, vector, transpose_type>;
-    using const_hermitian_type   = conditional_t<has_cx_elem, vector, const_transpose_type>;
+    using engine_type          = ET;
+    using element_type         = typename engine_type::element_type;
+    using value_type           = typename engine_type::value_type;
+    using difference_type      = typename engine_type::difference_type;
+    using size_type            = typename engine_type::size_type;
+    using pointer              = typename engine_type::reference;
+    using const_pointer        = typename engine_type::const_reference;
+    using reference            = typename engine_type::reference;
+    using const_reference      = typename engine_type::const_reference;
+    using transpose_type       = vector&;
+    using const_transpose_type = vector const&;
+    using hermitian_type       = conditional_t<has_cx_elem, vector, transpose_type>;
+    using const_hermitian_type = conditional_t<has_cx_elem, vector, const_transpose_type>;
 
 #ifdef LA_USE_MDSPAN
-    using span_type       = typename engine_type::span_type;
-    using const_span_type = typename engine_type::const_span_type;
+    using span_type            = typename engine_type::span_type;
+    using const_span_type      = typename engine_type::const_span_type;
 #endif
 
     //- Construct/copy/destroy
@@ -67,23 +155,6 @@ class vector
     constexpr vector& operator =(vector const&) = default;
     template<class ET2, class OT2>
     constexpr vector& operator =(vector<ET2, OT2> const& rhs);
-
-    //- Iterators
-    //
-    constexpr iterator          begin() noexcept;
-    constexpr const_iterator    begin() const noexcept;
-    constexpr iterator          end() noexcept;
-    constexpr const_iterator    end() const noexcept;
-
-    constexpr reverse_iterator          rbegin() noexcept;
-    constexpr const_reverse_iterator    rbegin() const noexcept;
-    constexpr reverse_iterator          rend() noexcept;
-    constexpr const_reverse_iterator    rend() const noexcept;
-
-    constexpr const_iterator            cbegin() const noexcept;
-    constexpr const_iterator            cend() const noexcept;
-    constexpr const_reverse_iterator    crbegin() const noexcept;
-    constexpr const_reverse_iterator    crend() const noexcept;
 
     //- Capacity
     //
@@ -182,121 +253,6 @@ vector<ET,OT>::operator =(vector<ET2, OT2> const& rhs)
 {
     m_engine = rhs.m_engine;
     return *this;
-}
-
-//-----------
-//- Iterators
-//
-template<class ET, class OT> constexpr
-typename vector<ET,OT>::iterator
-vector<ET,OT>::begin() noexcept
-{
-    if constexpr (has_eng_iter)
-    {
-        return m_engine.begin();
-    }
-    else
-    {
-        return iterator(m_engine, 0, m_engine.elements());
-    }
-}
-
-template<class ET, class OT> constexpr
-typename vector<ET,OT>::const_iterator
-vector<ET,OT>::begin() const noexcept
-{
-    if constexpr (has_eng_iter)
-    {
-        return m_engine.cbegin();
-    }
-    else
-    {
-        return const_iterator(m_engine, 0, m_engine.elements());
-    }
-}
-
-template<class ET, class OT> constexpr
-typename vector<ET,OT>::iterator
-vector<ET,OT>::end() noexcept
-{
-    if constexpr (has_eng_iter)
-    {
-        return m_engine.end();
-    }
-    else
-    {
-        return iterator(m_engine, m_engine.elements(), m_engine.elements());
-    }
-}
-
-template<class ET, class OT> constexpr
-typename vector<ET,OT>::const_iterator
-vector<ET,OT>::end() const noexcept
-{
-    if constexpr (has_eng_iter)
-    {
-        return m_engine.cend();
-    }
-    else
-    {
-        return const_iterator(m_engine, m_engine.elements(), m_engine.elements());
-    }
-}
-
-template<class ET, class OT> constexpr
-typename vector<ET,OT>::reverse_iterator
-vector<ET,OT>::rbegin() noexcept
-{
-    return reverse_iterator(end());
-}
-
-template<class ET, class OT> constexpr
-typename vector<ET,OT>::const_reverse_iterator
-vector<ET,OT>::rbegin() const noexcept
-{
-    return const_reverse_iterator(cend());
-}
-
-template<class ET, class OT> constexpr
-typename vector<ET,OT>::reverse_iterator
-vector<ET,OT>::rend() noexcept
-{
-    return reverse_iterator(begin());
-}
-
-template<class ET, class OT> constexpr
-typename vector<ET,OT>::const_reverse_iterator
-vector<ET,OT>::rend() const noexcept
-{
-    return const_reverse_iterator(cbegin());
-}
-
-template<class ET, class OT> constexpr
-typename vector<ET,OT>::const_iterator
-vector<ET,OT>::cbegin() const noexcept
-{
-    if constexpr (has_eng_iter)
-    {
-        return m_engine.cbegin();
-    }
-    else
-    {
-        return const_iterator(m_engine, 0, m_engine.elements());
-    }
-}
-
-template<class ET, class OT> constexpr
-typename vector<ET,OT>::const_iterator
-vector<ET,OT>::cend() const noexcept
-{
-    if constexpr (has_eng_iter)
-    {
-        return m_engine.cend();
-    }
-    else
-    {
-        return const_iterator(m_engine, m_engine.elements(), m_engine.elements());
-    }
 }
 
 //----------
