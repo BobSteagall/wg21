@@ -17,7 +17,6 @@ add_library(wg21_linear_algebra INTERFACE)
 target_include_directories(wg21_linear_algebra
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        #$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/extsrc/mdspan/include/experimental>
         $<INSTALL_INTERFACE:include>
 )
 
