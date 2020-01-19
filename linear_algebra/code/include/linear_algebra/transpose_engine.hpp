@@ -9,7 +9,7 @@
 
 namespace STD_LA {
 //==================================================================================================
-//  Matrix transpose engine, meant to act as a "view" of a matrix transpose in expressions, in 
+//  Matrix transpose engine, meant to act as a "view" of a matrix transpose in expressions, in
 //  order to help avoid unnecessary allocation and element copying.
 //==================================================================================================
 //
@@ -32,6 +32,11 @@ class transpose_engine
     using difference_type = typename ET::difference_type;
     using size_type       = typename ET::size_type;
     using size_tuple      = typename ET::size_tuple;
+
+#ifdef LA_USE_MDSPAN
+    using span_type       = detail::noe_mdspan_transpose_t<detail::noe_mdspan_t<ET, MCT>>;
+    using const_span_type = detail::noe_mdspan_transpose_t<detail::noe_const_mdspan_t<ET, MCT>>;
+#endif
 
     //- Construct/copy/destroy
     //
@@ -58,6 +63,10 @@ class transpose_engine
     //
     constexpr reference     operator ()(size_type i, size_type j) const;
 
+#ifdef LA_USE_MDSPAN
+    constexpr span_type     span() const noexcept;
+#endif
+
     //- Modifiers
     //
     constexpr void      swap(transpose_engine& rhs);
@@ -74,7 +83,7 @@ class transpose_engine
 //------------------------
 //- Construct/copy/destroy
 //
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 transpose_engine<ET, MCT>::transpose_engine()
 :   mp_other(nullptr)
 {}
@@ -82,62 +91,72 @@ transpose_engine<ET, MCT>::transpose_engine()
 //----------
 //- Capacity
 //
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 typename transpose_engine<ET, MCT>::size_type
 transpose_engine<ET, MCT>::columns() const noexcept
 {
     return mp_other->rows();
 }
 
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 typename transpose_engine<ET, MCT>::size_type
 transpose_engine<ET, MCT>::rows() const noexcept
 {
     return mp_other->columns();
 }
 
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 typename transpose_engine<ET, MCT>::size_tuple
 transpose_engine<ET, MCT>::size() const noexcept
 {
     return size_tuple(mp_other->columns(), mp_other->rows());
 }
 
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 typename transpose_engine<ET, MCT>::size_type
 transpose_engine<ET, MCT>::column_capacity() const noexcept
 {
-    return mp_other->row_capacity();
+    return mp_other->rows();
 }
 
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 typename transpose_engine<ET, MCT>::size_type
 transpose_engine<ET, MCT>::row_capacity() const noexcept
 {
-    return mp_other->column_capacity();
+    return mp_other->columns();
 }
 
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 typename transpose_engine<ET, MCT>::size_tuple
 transpose_engine<ET, MCT>::capacity() const noexcept
 {
-    return size_tuple(mp_other->column_capacity(), mp_other->row_capacity());
+    return size_tuple(mp_other->columns(), mp_other->rows());
 }
 
 //----------------
 //- Element access
 //
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 typename transpose_engine<ET, MCT>::reference
 transpose_engine<ET, MCT>::operator ()(size_type i, size_type j) const
 {
     return (*mp_other)(j, i);
 }
 
+#ifdef LA_USE_MDSPAN
+
+template<class ET, class MCT> constexpr
+typename transpose_engine<ET, MCT>::span_type
+transpose_engine<ET, MCT>::span() const noexcept
+{
+    return detail::noe_mdspan_transpose(mp_other->span());
+}
+
+#endif
 //-----------
 //- Modifiers
 //
-template<class ET, class MCT> constexpr 
+template<class ET, class MCT> constexpr
 void
 transpose_engine<ET, MCT>::swap(transpose_engine& rhs)
 {

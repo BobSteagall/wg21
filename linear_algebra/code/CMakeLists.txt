@@ -1,6 +1,17 @@
 cmake_minimum_required(VERSION 3.14)
 project(wg21_linear_algebra VERSION 0.0.1)
 
+option(BUILD_TESTING "flag to build tests" ON)
+
+include(FetchContent)
+FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git)
+FetchContent_GetProperties(mdspan)
+if(NOT mdspan_POPULATED)
+    FetchContent_Populate(mdspan)
+    add_subdirectory(${mdspan_SOURCE_DIR} ${mdspan_BINARY_DIR})
+endif()
+
+
 add_library(wg21_linear_algebra INTERFACE)
 target_include_directories(wg21_linear_algebra
     INTERFACE
@@ -25,7 +36,6 @@ target_sources(wg21_linear_algebra
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/multiplication_traits_impl.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/negation_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/negation_traits_impl.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/number_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/operation_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/private_support.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/public_support.hpp>
@@ -49,7 +59,6 @@ target_sources(wg21_linear_algebra
         $<INSTALL_INTERFACE:include/linear_algebra/multiplication_traits_impl.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/negation_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/negation_traits_impl.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/number_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/operation_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/private_support.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/public_support.hpp>
@@ -63,6 +72,16 @@ target_sources(wg21_linear_algebra
 target_compile_features(wg21_linear_algebra
     INTERFACE
         cxx_std_17
+)
+
+target_compile_definitions(wg21_linear_algebra
+    INTERFACE
+        LA_USE_MDSPAN
+)
+
+target_link_libraries(wg21_linear_algebra
+    INTERFACE
+        std::mdspan
 )
 
 if (BUILD_TESTING)

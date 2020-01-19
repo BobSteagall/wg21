@@ -105,6 +105,7 @@ clean_type_name(basic_string<C,T,A> tname)
 {
     static basic_string<C,T,A> const   ns = MATRIX_STRINGIFY(STD_LA) "::";
     static basic_string<C,T,A> const   sl = "std::";
+    static basic_string<C,T,A> const   ex = "experimental::";
     static basic_string<C,T,A> const   aa = "> >";
 
     for (auto pos = string::npos;  (pos = tname.rfind(ns, pos)) != string::npos; )
@@ -115,6 +116,11 @@ clean_type_name(basic_string<C,T,A> tname)
     for (auto pos = string::npos;  (pos = tname.rfind(sl, pos)) != string::npos; )
     {
         tname.erase(pos, sl.size());
+    }
+
+    for (auto pos = string::npos;  (pos = tname.rfind(ex, pos)) != string::npos; )
+    {
+        tname.erase(pos, ex.size());
     }
 
     for (auto pos = string::npos;  (pos = tname.rfind(aa, pos)) != string::npos; )
@@ -221,8 +227,8 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
     }
     cout << endl;
 
-    auto    iter = v.begin();
-    auto    last = v.end();
+    auto    iter = cbegin(v);
+    auto    last = cend(v);
 
     cout << "(itr) " << right << setw(4) << setprecision(3) << (double) *iter;
 
@@ -232,6 +238,51 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
     }
     cout << endl;
 }
+
+#ifdef LA_USE_MDSPAN
+
+template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+void
+Print(basic_mdspan<T, extents<X0, X1>, L, A> const& s, char const* pname = nullptr)
+{
+    using index_type = ptrdiff_t;
+
+    cout << endl << "mdspan: " << ((pname) ? pname : "<anon>") << endl;
+    cout << "  size: " << s.extent(0) << "x" << s.extent(1) << endl;
+    cout << "  -----" << endl;
+
+    for (index_type i = 0;  i < s.extent(0);  ++i)
+    {
+        std::cout << std::right << std::setw(4) << std::setprecision(3) << (double) s(i, 0);
+
+        for (index_type j = 1;  j < s.extent(1);  ++j)
+        {
+             std::cout << std::right << std::setw(6) << std::setprecision(3) << (double) s(i, j);
+        }
+        cout << endl;
+    }
+}
+
+template<class T, ptrdiff_t X0, class L, class A>
+void
+Print(basic_mdspan<T, extents<X0>, L, A> const& s, char const* pname = nullptr)
+{
+    using index_type = ptrdiff_t;
+
+    cout << endl << "mdspan: " << ((pname) ? pname : "<anon>") << endl;
+    cout << "  size: " << s.extent(0) << endl;
+    cout << "  -----" << endl;
+
+    cout << "(idx) " << right << setw(4) << setprecision(3) << (double) s(0);
+
+    for (index_type i = 1;  i < s.extent(0);  ++i)
+    {
+         std::cout << std::right << std::setw(6) << std::setprecision(3) << (double) s(i);
+    }
+    cout << endl;
+}
+
+#endif  //- LA_USE_MDSPAN
 
 inline void
 Print(bool b, char const* pname = nullptr)

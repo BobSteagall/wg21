@@ -304,7 +304,7 @@ using matrix_addition_engine_t = detail::engine_add_type_t<OT, ET1, ET2>;
 template<class OT, class ET1, class ET2>
 struct matrix_addition_engine_traits
 {
-    static_assert(detail::engines_match_v<ET1, ET2>);
+    static_assert(engines_are_similar_v<ET1, ET2>);
 
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
@@ -329,8 +329,8 @@ struct matrix_addition_engine_traits<OT, ET1, transpose_engine<ET2, MCT2>>
 };
 
 template<class OT, class ET1, class MCT1, class ET2, class MCT2>
-struct matrix_addition_engine_traits<OT, 
-                                     transpose_engine<ET1, MCT1>, 
+struct matrix_addition_engine_traits<OT,
+                                     transpose_engine<ET1, MCT1>,
                                      transpose_engine<ET2, MCT2>>
 {
     using engine_type = typename matrix_addition_engine_traits<OT, ET1, ET2>::engine_type;

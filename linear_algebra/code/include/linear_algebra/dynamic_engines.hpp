@@ -31,9 +31,9 @@ class dr_vector_engine
     using difference_type = ptrdiff_t;
     using size_type       = size_t;
 
-#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
-    using iterator        = detail::vector_iterator<dr_vector_engine>;
-    using const_iterator  = detail::vector_const_iterator<dr_vector_engine>;
+#ifdef LA_USE_MDSPAN
+    using span_type       = mdspan<element_type, dynamic_extent>;
+    using const_span_type = mdspan<element_type const, dynamic_extent>;
 #endif
 
     //- Construct/copy/destroy
@@ -53,30 +53,23 @@ class dr_vector_engine
     template<class ET2>
     dr_vector_engine&   operator =(ET2 const& rhs);
 
-#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
-    //- Iterators
-    //
-    iterator        begin() noexcept;
-    iterator        end() noexcept;
-    const_iterator  begin() const noexcept;
-    const_iterator  end() const noexcept;
-    const_iterator  cbegin() const noexcept;
-    const_iterator  cend() const noexcept;
-#endif
-
     //- Capacity
     //
     size_type       capacity() const noexcept;
     size_type       elements() const noexcept;
-
-    void    reserve(size_type cap);
-    void    resize(size_type elems);
-    void    resize(size_type elems, size_type cap);
+    void            reserve(size_type cap);
+    void            resize(size_type elems);
+    void            resize(size_type elems, size_type cap);
 
     //- Element access
     //
     reference       operator ()(size_type i);
     const_reference operator ()(size_type i) const;
+
+#ifdef LA_USE_MDSPAN
+    span_type       span() noexcept;
+    const_span_type span() const noexcept;
+#endif
 
     //- Modifiers
     //
@@ -134,8 +127,8 @@ dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine const& rhs)
     assign(rhs);
 }
 
-template<class T, class AT> 
-template<class U> 
+template<class T, class AT>
+template<class U>
 dr_vector_engine<T,AT>::dr_vector_engine(initializer_list<U> list)
 :   mp_elems(nullptr)
 ,   m_elems(0)
@@ -190,7 +183,7 @@ dr_vector_engine<T,AT>::operator =(dr_vector_engine const& rhs)
     return *this;
 }
 
-template<class T, class AT> 
+template<class T, class AT>
 template<class ET2> inline
 dr_vector_engine<T,AT>&
 dr_vector_engine<T,AT>::operator =(ET2 const& rhs)
@@ -199,53 +192,6 @@ dr_vector_engine<T,AT>::operator =(ET2 const& rhs)
     return *this;
 }
 
-#ifdef LA_USE_VECTOR_ENGINE_ITERATORS
-//-----------
-//- Iterators
-//
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::iterator
-dr_vector_engine<T,AT>::begin() noexcept
-{
-    return iterator(this, 0, m_elemcap);
-}
-
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::iterator
-dr_vector_engine<T,AT>::end() noexcept
-{
-    return iterator(this, m_elemcap, m_elemcap);
-}
-
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::const_iterator
-dr_vector_engine<T,AT>::begin() const noexcept
-{
-    return const_iterator(this, 0, m_elemcap);
-}
-
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::const_iterator
-dr_vector_engine<T,AT>::end() const noexcept
-{
-    return const_iterator(this, m_elemcap, m_elemcap);
-}
-
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::const_iterator
-dr_vector_engine<T,AT>::cbegin() const noexcept
-{
-    return const_iterator(this, 0, m_elemcap);
-}
-
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::const_iterator
-dr_vector_engine<T,AT>::cend() const noexcept
-{
-    return const_iterator(this, m_elemcap, m_elemcap);
-}
-
-#endif
 //----------
 //- Capacity
 //
@@ -301,6 +247,23 @@ dr_vector_engine<T,AT>::operator ()(size_type i) const
     return mp_elems[i];
 }
 
+#ifdef LA_USE_MDSPAN
+
+template<class T, class AT> inline
+typename dr_vector_engine<T,AT>::span_type
+dr_vector_engine<T,AT>::span() noexcept
+{
+    return span_type(static_cast<element_type*>(mp_elems), m_elems);
+}
+
+template<class T, class AT> inline
+typename dr_vector_engine<T,AT>::const_span_type
+dr_vector_engine<T,AT>::span() const noexcept
+{
+    return const_span_type(static_cast<element_type const*>(mp_elems), m_elems);
+}
+
+#endif
 //-----------
 //- Modifiers
 //
@@ -452,6 +415,11 @@ class dr_matrix_engine
     using size_type       = size_t;
     using size_tuple      = tuple<size_type, size_type>;
 
+#ifdef LA_USE_MDSPAN
+    using span_type       = basic_mdspan<T, detail::dyn_mat_extents, detail::dyn_mat_layout>;
+    using const_span_type = basic_mdspan<T const, detail::dyn_mat_extents, detail::dyn_mat_layout>;
+#endif
+
     //- Construct/copy/destroy
     //
     ~dr_matrix_engine() noexcept;
@@ -477,14 +445,19 @@ class dr_matrix_engine
     size_type   row_capacity() const noexcept;
     size_tuple  capacity() const noexcept;
 
-    void    reserve(size_type rowcap, size_type colcap);
-    void    resize(size_type rows, size_type cols);
-    void    resize(size_type rows, size_type cols, size_type rowcap, size_type colcap);
+    void        reserve(size_type rowcap, size_type colcap);
+    void        resize(size_type rows, size_type cols);
+    void        resize(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 
     //- Element access
     //
-    reference           operator ()(size_type i, size_type j);
-    const_reference     operator ()(size_type i, size_type j) const;
+    reference       operator ()(size_type i, size_type j);
+    const_reference operator ()(size_type i, size_type j) const;
+
+#ifdef LA_USE_MDSPAN
+    span_type       span() noexcept;
+    const_span_type span() const noexcept;
+#endif
 
     //- Modifiers
     //
@@ -704,6 +677,23 @@ dr_matrix_engine<T,AT>::operator ()(size_type i, size_type j) const
     return mp_elems[i*m_colcap + j];
 }
 
+#ifdef LA_USE_MDSPAN
+
+template<class T, class AT> inline
+typename dr_matrix_engine<T,AT>::span_type
+dr_matrix_engine<T,AT>::span() noexcept
+{
+    return detail::make_dyn_span(static_cast<element_type*>(mp_elems), m_rows, m_cols, m_colcap);
+}
+
+template<class T, class AT> inline
+typename dr_matrix_engine<T,AT>::const_span_type
+dr_matrix_engine<T,AT>::span() const noexcept
+{
+    return detail::make_dyn_span(static_cast<element_type const*>(mp_elems), m_rows, m_cols, m_colcap);
+}
+
+#endif
 //-----------
 //- Modifiers
 //

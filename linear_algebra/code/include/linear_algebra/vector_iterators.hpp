@@ -1,7 +1,7 @@
 //==================================================================================================
-//  File:       row_column_views.hpp
+//  File:       vector_iterators.hpp
 //
-//  Summary:    This header defines engines that act as views of rows and columns.
+//  Summary:    This header defines external iterator types for vectors.
 //==================================================================================================
 //
 #ifndef LINEAR_ALGEBRA_VECTOR_ITERATORS_HPP_DEFINED
@@ -10,34 +10,35 @@
 namespace STD_LA {
 namespace detail {
 
-template<class ET>  class vector_iterator;
-template<class ET>  class vector_const_iterator;
+template<class VT>  class vector_iterator;
+template<class VT>  class vector_const_iterator;
 
 //==================================================================================================
-//  Very simple mutable iterator for vector engines.
+//  Very simple mutable iterator for vectors.
 //==================================================================================================
 //
-template<class ET>
+template<class VT>
 class vector_iterator
 {
-    static_assert(is_vector_engine_v<ET>);
+    using engine_type       = typename VT::engine_type;
 
   public:
     using iterator_category = random_access_iterator_tag;
-    using engine_type       = ET;
-    using element_type      = typename engine_type::element_type;
+    using vector_type       = VT;
+    using element_type      = typename vector_type::element_type;
     using value_type        = remove_cv_t<element_type>;
-    using pointer           = typename engine_type::pointer;
-    using const_pointer     = typename engine_type::const_pointer;
-    using reference         = typename engine_type::reference;
-    using const_reference   = typename engine_type::const_reference;
-    using difference_type   = typename engine_type::difference_type;
-    using size_type         = typename engine_type::size_type;
+    using pointer           = typename vector_type::pointer;
+    using const_pointer     = typename vector_type::const_pointer;
+    using reference         = typename vector_type::reference;
+    using const_reference   = typename vector_type::const_reference;
+    using difference_type   = typename vector_type::difference_type;
+    using size_type         = typename vector_type::size_type;
 
   public:
     ~vector_iterator() noexcept = default;
 
     constexpr vector_iterator() noexcept;
+    constexpr vector_iterator(vector_type& vec, size_type curr, size_type upper);
     constexpr vector_iterator(vector_iterator&&) noexcept = default;
     constexpr vector_iterator(vector_iterator const&) noexcept = default;
 
@@ -66,197 +67,196 @@ class vector_iterator
     constexpr bool  less_than(vector_iterator const& p) const;
 
   private:
-    friend ET;
-    template<class ET2>             friend class vector_const_iterator;
-    template<class ET2>             friend class vector_iterator;
+    friend VT;
+    template<class VT2>             friend class vector_const_iterator;
+    template<class VT2>             friend class vector_iterator;
     template<class ET2, class OT2>  friend class STD_LA::vector;
 
   private:
-    engine_type*    mp_engine;
+    vector_type*    mp_vector;
     size_type       m_curr;
     size_type       m_upper;
 
   private:
-    constexpr vector_iterator(engine_type& eng);
-    constexpr vector_iterator(engine_type& eng, size_type curr, size_type upper);
-    constexpr vector_iterator(engine_type* eng, size_type curr, size_type upper);
+    constexpr vector_iterator(vector_type& vec);
+    constexpr vector_iterator(vector_type* vec, size_type curr, size_type upper);
 };
 
-template<class ET> constexpr
-vector_iterator<ET>::vector_iterator() noexcept
-:   mp_engine(nullptr)
+template<class VT> constexpr
+vector_iterator<VT>::vector_iterator() noexcept
+:   mp_vector(nullptr)
 ,   m_curr(0)
 ,   m_upper(0)
 {}
 
-template<class ET> constexpr
-vector_iterator<ET>::vector_iterator(engine_type& eng)
-:   mp_engine(&eng)
+template<class VT> constexpr
+vector_iterator<VT>::vector_iterator(vector_type& vec)
+:   mp_vector(&vec)
 ,   m_curr(0)
-,   m_upper(static_cast<size_type>(eng.elements()))
+,   m_upper(static_cast<size_type>(vec.elements()))
 {}
 
-template<class ET> constexpr
-vector_iterator<ET>::vector_iterator(engine_type& eng, size_type curr, size_type upper)
-:   mp_engine(&eng)
+template<class VT> constexpr
+vector_iterator<VT>::vector_iterator(vector_type& vec, size_type curr, size_type upper)
+:   mp_vector(&vec)
 ,   m_curr(curr)
 ,   m_upper(upper)
 {}
 
-template<class ET> constexpr
-vector_iterator<ET>::vector_iterator(engine_type* p_eng, size_type curr, size_type upper)
-:   mp_engine(p_eng)
+template<class VT> constexpr
+vector_iterator<VT>::vector_iterator(vector_type* p_eng, size_type curr, size_type upper)
+:   mp_vector(p_eng)
 ,   m_curr(curr)
 ,   m_upper(upper)
 {}
 
-template<class ET> constexpr
-typename vector_iterator<ET>::pointer
-vector_iterator<ET>::operator ->() const
+template<class VT> constexpr
+typename vector_iterator<VT>::pointer
+vector_iterator<VT>::operator ->() const
 {
-    return static_cast<pointer>(addressof((*mp_engine)(m_curr)));
+    return static_cast<pointer>(addressof((*mp_vector)(m_curr)));
 }
 
-template<class ET> constexpr
-typename vector_iterator<ET>::reference
-vector_iterator<ET>::operator *() const
+template<class VT> constexpr
+typename vector_iterator<VT>::reference
+vector_iterator<VT>::operator *() const
 {
-    return (*mp_engine)(m_curr);
+    return (*mp_vector)(m_curr);
 }
 
-template<class ET> constexpr
-typename vector_iterator<ET>::reference
-vector_iterator<ET>::operator [](size_type n) const
+template<class VT> constexpr
+typename vector_iterator<VT>::reference
+vector_iterator<VT>::operator [](size_type n) const
 {
-    return (*mp_engine)(m_curr + n);
+    return (*mp_vector)(m_curr + n);
 }
 
-template<class ET> constexpr
-typename vector_iterator<ET>::difference_type
-vector_iterator<ET>::operator -(vector_iterator const& p) const
+template<class VT> constexpr
+typename vector_iterator<VT>::difference_type
+vector_iterator<VT>::operator -(vector_iterator const& p) const
 {
     return m_curr - p.m_curr;
 }
 
-template<class ET> constexpr
-vector_iterator<ET>
-vector_iterator<ET>::operator -(difference_type n) const
+template<class VT> constexpr
+vector_iterator<VT>
+vector_iterator<VT>::operator -(difference_type n) const
 {
-    return vector_iterator(mp_engine, m_curr - n, m_upper);
+    return vector_iterator(mp_vector, m_curr - n, m_upper);
 }
 
-template<class ET> constexpr
-vector_iterator<ET>
-vector_iterator<ET>::operator +(difference_type n) const
+template<class VT> constexpr
+vector_iterator<VT>
+vector_iterator<VT>::operator +(difference_type n) const
 {
-    return vector_iterator(mp_engine, m_curr + n, m_upper);
+    return vector_iterator(mp_vector, m_curr + n, m_upper);
 }
 
-template<class ET> constexpr
-vector_iterator<ET>&
-vector_iterator<ET>::operator ++()
+template<class VT> constexpr
+vector_iterator<VT>&
+vector_iterator<VT>::operator ++()
 {
     ++m_curr;
     return *this;
 }
 
-template<class ET> constexpr
-vector_iterator<ET>
-vector_iterator<ET>::operator ++(int)
+template<class VT> constexpr
+vector_iterator<VT>
+vector_iterator<VT>::operator ++(int)
 {
-    return vector_iterator(mp_engine, m_curr + 1, m_upper);
+    return vector_iterator(mp_vector, m_curr + 1, m_upper);
 }
 
-template<class ET> constexpr
-vector_iterator<ET>&
-vector_iterator<ET>::operator --()
+template<class VT> constexpr
+vector_iterator<VT>&
+vector_iterator<VT>::operator --()
 {
     --m_curr;
     return *this;
 }
 
-template<class ET> constexpr
-vector_iterator<ET>
-vector_iterator<ET>::operator --(int)
+template<class VT> constexpr
+vector_iterator<VT>
+vector_iterator<VT>::operator --(int)
 {
-    return vector_iterator(mp_engine, m_curr - 1, m_upper);
+    return vector_iterator(mp_vector, m_curr - 1, m_upper);
 }
 
-template<class ET> constexpr
-vector_iterator<ET>&
-vector_iterator<ET>::operator +=(difference_type n)
+template<class VT> constexpr
+vector_iterator<VT>&
+vector_iterator<VT>::operator +=(difference_type n)
 {
     m_curr += n;
     return *this;
 }
 
-template<class ET> constexpr
-vector_iterator<ET>&
-vector_iterator<ET>::operator -=(difference_type n)
+template<class VT> constexpr
+vector_iterator<VT>&
+vector_iterator<VT>::operator -=(difference_type n)
 {
     m_curr -= n;
     return *this;
 }
 
-template<class ET> constexpr
+template<class VT> constexpr
 bool
-vector_iterator<ET>::equals(vector_iterator const& p) const
+vector_iterator<VT>::equals(vector_iterator const& p) const
 {
-    return mp_engine == p.mp_engine  &&  m_curr == p.m_curr;
+    return mp_vector == p.mp_vector  &&  m_curr == p.m_curr;
 }
 
-template<class ET> constexpr
+template<class VT> constexpr
 bool
-vector_iterator<ET>::greater_than(vector_iterator const& p) const
+vector_iterator<VT>::greater_than(vector_iterator const& p) const
 {
-    return mp_engine == p.mp_engine  &&  m_curr > p.m_curr;
+    return mp_vector == p.mp_vector  &&  m_curr > p.m_curr;
 }
 
-template<class ET> constexpr
+template<class VT> constexpr
 bool
-vector_iterator<ET>::less_than(vector_iterator const& p) const
+vector_iterator<VT>::less_than(vector_iterator const& p) const
 {
-    return mp_engine == p.mp_engine  &&  m_curr < p.m_curr;
+    return mp_vector == p.mp_vector  &&  m_curr < p.m_curr;
 }
 
-template<class ET> constexpr 
+template<class VT> constexpr
 bool
-operator ==(vector_iterator<ET> const& lhs, vector_iterator<ET> const& rhs)
+operator ==(vector_iterator<VT> const& lhs, vector_iterator<VT> const& rhs)
 {
     return lhs.equals(rhs);
 }
 
-template<class ET> constexpr 
+template<class VT> constexpr
 bool
-operator !=(vector_iterator<ET> const& lhs, vector_iterator<ET> const& rhs)
+operator !=(vector_iterator<VT> const& lhs, vector_iterator<VT> const& rhs)
 {
     return !lhs.equals(rhs);
 }
 
-template<class ET> constexpr 
+template<class VT> constexpr
 bool
-operator <(vector_iterator<ET> const& lhs, vector_iterator<ET> const& rhs)
+operator <(vector_iterator<VT> const& lhs, vector_iterator<VT> const& rhs)
 {
     return lhs.less_than(rhs);
 }
 
-template<class ET> constexpr 
+template<class VT> constexpr
 bool
-operator <=(vector_iterator<ET> const& lhs, vector_iterator<ET> const& rhs)
+operator <=(vector_iterator<VT> const& lhs, vector_iterator<VT> const& rhs)
 {
     return !lhs.greater_than(rhs);
 }
 
-template<class ET> constexpr 
+template<class VT> constexpr
 bool
-operator >(vector_iterator<ET> const& lhs, vector_iterator<ET> const& rhs)
+operator >(vector_iterator<VT> const& lhs, vector_iterator<VT> const& rhs)
 {
     return lhs.greater_than(rhs);
 }
 
-template<class ET> constexpr 
+template<class VT> constexpr
 bool
-operator >=(vector_iterator<ET> const& lhs, vector_iterator<ET> const& rhs)
+operator >=(vector_iterator<VT> const& lhs, vector_iterator<VT> const& rhs)
 {
     return !lhs.less_than(rhs);
 }
@@ -266,27 +266,28 @@ operator >=(vector_iterator<ET> const& lhs, vector_iterator<ET> const& rhs)
 // Very simple const iterator for vector engines.
 //==================================================================================================
 //
-template<class ET>
+template<class VT>
 class vector_const_iterator
 {
-    static_assert(is_vector_engine_v<ET>);
+    using engine_type       = typename VT::engine_type;
 
   public:
     using iterator_category = random_access_iterator_tag;
-    using engine_type       = ET;
-    using element_type      = typename engine_type::element_type;
+    using vector_type       = VT;
+    using element_type      = typename vector_type::element_type;
     using value_type        = remove_cv_t<element_type>;
-    using pointer           = typename engine_type::const_pointer;
-    using const_pointer     = typename engine_type::const_pointer;
-    using reference         = typename engine_type::const_reference;
-    using const_reference   = typename engine_type::const_reference;
-    using difference_type   = typename engine_type::difference_type;
-    using size_type         = typename engine_type::size_type;
+    using pointer           = typename vector_type::const_pointer;
+    using const_pointer     = typename vector_type::const_pointer;
+    using reference         = typename vector_type::const_reference;
+    using const_reference   = typename vector_type::const_reference;
+    using difference_type   = typename vector_type::difference_type;
+    using size_type         = typename vector_type::size_type;
 
   public:
     ~vector_const_iterator() noexcept = default;
 
     constexpr vector_const_iterator() noexcept;
+    constexpr vector_const_iterator(vector_type const& vec, size_type curr, size_type upper);
     constexpr vector_const_iterator(vector_const_iterator&&) noexcept = default;
     constexpr vector_const_iterator(vector_const_iterator const&) noexcept = default;
 
@@ -315,207 +316,206 @@ class vector_const_iterator
     constexpr bool  less_than(vector_const_iterator const& p) const;
 
   private:
-    friend ET;
-    template<class ET2>             friend class vector_const_iterator;
-    template<class ET2>             friend class vector_iterator;
+    friend VT;
+    template<class VT2>             friend class vector_const_iterator;
+    template<class VT2>             friend class vector_iterator;
     template<class ET2, class OT2>  friend class STD_LA::vector;
 
   private:
-    engine_type const*  mp_engine;
+    vector_type const*  mp_vector;
     size_type           m_curr;
     size_type           m_upper;
 
   private:
-    constexpr vector_const_iterator(engine_type const& eng);
-    constexpr vector_const_iterator(engine_type const& eng, size_type curr, size_type upper);
-    constexpr vector_const_iterator(engine_type const* eng, size_type curr, size_type upper);
-    constexpr vector_const_iterator(vector_iterator<ET> const& p);
+    constexpr vector_const_iterator(vector_type const& vec);
+    constexpr vector_const_iterator(vector_type const* vec, size_type curr, size_type upper);
+    constexpr vector_const_iterator(vector_iterator<VT> const& p);
 };
 
-template<class ET> constexpr
-vector_const_iterator<ET>::vector_const_iterator() noexcept
-:   mp_engine(nullptr)
+template<class VT> constexpr
+vector_const_iterator<VT>::vector_const_iterator() noexcept
+:   mp_vector(nullptr)
 ,   m_curr(0)
 ,   m_upper(0)
 {}
 
-template<class ET> constexpr
-vector_const_iterator<ET>::vector_const_iterator(engine_type const& eng)
-:   mp_engine(&eng)
+template<class VT> constexpr
+vector_const_iterator<VT>::vector_const_iterator(vector_type const& vec)
+:   mp_vector(&vec)
 ,   m_curr(0)
-,   m_upper(static_cast<size_type>(eng.elements()))
+,   m_upper(static_cast<size_type>(vec.elements()))
 {}
 
-template<class ET> constexpr
-vector_const_iterator<ET>::vector_const_iterator
-(engine_type const& eng, size_type curr, size_type upper)
-:   mp_engine(&eng)
+template<class VT> constexpr
+vector_const_iterator<VT>::vector_const_iterator
+(vector_type const& vec, size_type curr, size_type upper)
+:   mp_vector(&vec)
 ,   m_curr(curr)
 ,   m_upper(upper)
 {}
 
-template<class ET> constexpr
-vector_const_iterator<ET>::vector_const_iterator
-(engine_type const* p_eng, size_type curr, size_type upper)
-:   mp_engine(p_eng)
+template<class VT> constexpr
+vector_const_iterator<VT>::vector_const_iterator
+(vector_type const* p_eng, size_type curr, size_type upper)
+:   mp_vector(p_eng)
 ,   m_curr(curr)
 ,   m_upper(upper)
 {}
 
-template<class ET> constexpr
-vector_const_iterator<ET>::vector_const_iterator(vector_iterator<ET> const& p)
-:   mp_engine(p.mp_engine)
+template<class VT> constexpr
+vector_const_iterator<VT>::vector_const_iterator(vector_iterator<VT> const& p)
+:   mp_vector(p.mp_vector)
 ,   m_curr(p.m_curr)
 ,   m_upper(p.m_upper)
 {}
 
-template<class ET> constexpr
-typename vector_const_iterator<ET>::pointer
-vector_const_iterator<ET>::operator ->() const
+template<class VT> constexpr
+typename vector_const_iterator<VT>::pointer
+vector_const_iterator<VT>::operator ->() const
 {
-    return static_cast<pointer>(addressof((*mp_engine)(m_curr)));
+    return static_cast<pointer>(addressof((*mp_vector)(m_curr)));
 }
 
-template<class ET> constexpr 
-typename vector_const_iterator<ET>::reference
-vector_const_iterator<ET>::operator *() const
+template<class VT> constexpr
+typename vector_const_iterator<VT>::reference
+vector_const_iterator<VT>::operator *() const
 {
-    return (*mp_engine)(m_curr);
+    return (*mp_vector)(m_curr);
 }
 
-template<class ET> constexpr
-typename vector_const_iterator<ET>::reference
-vector_const_iterator<ET>::operator [](size_type n) const
+template<class VT> constexpr
+typename vector_const_iterator<VT>::reference
+vector_const_iterator<VT>::operator [](size_type n) const
 {
-    return (*mp_engine)(m_curr + n);
+    return (*mp_vector)(m_curr + n);
 }
 
-template<class ET> constexpr
-typename vector_const_iterator<ET>::difference_type
-vector_const_iterator<ET>::operator -(vector_const_iterator const& p) const
+template<class VT> constexpr
+typename vector_const_iterator<VT>::difference_type
+vector_const_iterator<VT>::operator -(vector_const_iterator const& p) const
 {
     return m_curr - p.m_curr;
 }
 
-template<class ET> constexpr 
-vector_const_iterator<ET>
-vector_const_iterator<ET>::operator -(difference_type n) const
+template<class VT> constexpr
+vector_const_iterator<VT>
+vector_const_iterator<VT>::operator -(difference_type n) const
 {
-    return vector_const_iterator(mp_engine, m_curr - n, m_upper);
+    return vector_const_iterator(mp_vector, m_curr - n, m_upper);
 }
 
-template<class ET> constexpr
-vector_const_iterator<ET>
-vector_const_iterator<ET>::operator +(difference_type n) const
+template<class VT> constexpr
+vector_const_iterator<VT>
+vector_const_iterator<VT>::operator +(difference_type n) const
 {
-    return vector_const_iterator(mp_engine, m_curr + n, m_upper);
+    return vector_const_iterator(mp_vector, m_curr + n, m_upper);
 }
 
-template<class ET> constexpr
-vector_const_iterator<ET>&
-vector_const_iterator<ET>::operator ++()
+template<class VT> constexpr
+vector_const_iterator<VT>&
+vector_const_iterator<VT>::operator ++()
 {
     ++m_curr;
     return *this;
 }
 
-template<class ET> constexpr
-vector_const_iterator<ET>
-vector_const_iterator<ET>::operator ++(int)
+template<class VT> constexpr
+vector_const_iterator<VT>
+vector_const_iterator<VT>::operator ++(int)
 {
-    return vector_const_iterator(mp_engine, m_curr + 1, m_upper);
+    return vector_const_iterator(mp_vector, m_curr + 1, m_upper);
 }
 
-template<class ET> constexpr
-vector_const_iterator<ET>&
-vector_const_iterator<ET>::operator --()
+template<class VT> constexpr
+vector_const_iterator<VT>&
+vector_const_iterator<VT>::operator --()
 {
     --m_curr;
     return *this;
 }
 
-template<class ET> constexpr
-vector_const_iterator<ET>
-vector_const_iterator<ET>::operator --(int)
+template<class VT> constexpr
+vector_const_iterator<VT>
+vector_const_iterator<VT>::operator --(int)
 {
-    return vector_const_iterator(mp_engine, m_curr - 1, m_upper);
+    return vector_const_iterator(mp_vector, m_curr - 1, m_upper);
 }
 
-template<class ET> constexpr
-vector_const_iterator<ET>&
-vector_const_iterator<ET>::operator +=(difference_type n)
+template<class VT> constexpr
+vector_const_iterator<VT>&
+vector_const_iterator<VT>::operator +=(difference_type n)
 {
     m_curr += n;
     return *this;
 }
 
-template<class ET> constexpr
-vector_const_iterator<ET>&
-vector_const_iterator<ET>::operator -=(difference_type n)
+template<class VT> constexpr
+vector_const_iterator<VT>&
+vector_const_iterator<VT>::operator -=(difference_type n)
 {
     m_curr -= n;
     return *this;
 }
 
-template<class ET> constexpr
+template<class VT> constexpr
 bool
-vector_const_iterator<ET>::equals(vector_const_iterator const& p) const
+vector_const_iterator<VT>::equals(vector_const_iterator const& p) const
 {
-    return mp_engine == p.mp_engine  &&  m_curr == p.m_curr;
+    return mp_vector == p.mp_vector  &&  m_curr == p.m_curr;
 }
 
-template<class ET> constexpr
+template<class VT> constexpr
 bool
-vector_const_iterator<ET>::greater_than(vector_const_iterator const& p) const
+vector_const_iterator<VT>::greater_than(vector_const_iterator const& p) const
 {
-    return mp_engine == p.mp_engine  &&  m_curr > p.m_curr;
+    return mp_vector == p.mp_vector  &&  m_curr > p.m_curr;
 }
 
-template<class ET> constexpr
+template<class VT> constexpr
 bool
-vector_const_iterator<ET>::less_than(vector_const_iterator const& p) const
+vector_const_iterator<VT>::less_than(vector_const_iterator const& p) const
 {
-    return mp_engine == p.mp_engine  &&  m_curr < p.m_curr;
+    return mp_vector == p.mp_vector  &&  m_curr < p.m_curr;
 }
 
-template<class ET> constexpr
+template<class VT> constexpr
 bool
-operator ==(vector_const_iterator<ET> const& lhs, vector_const_iterator<ET> const& rhs)
+operator ==(vector_const_iterator<VT> const& lhs, vector_const_iterator<VT> const& rhs)
 {
     return lhs.equals(rhs);
 }
 
-template<class ET> constexpr
+template<class VT> constexpr
 bool
-operator !=(vector_const_iterator<ET> const& lhs, vector_const_iterator<ET> const& rhs)
+operator !=(vector_const_iterator<VT> const& lhs, vector_const_iterator<VT> const& rhs)
 {
     return !lhs.equals(rhs);
 }
 
-template<class ET> constexpr
+template<class VT> constexpr
 bool
-operator <(vector_const_iterator<ET> const& lhs, vector_const_iterator<ET> const& rhs)
+operator <(vector_const_iterator<VT> const& lhs, vector_const_iterator<VT> const& rhs)
 {
     return lhs.less_than(rhs);
 }
 
-template<class ET> constexpr
+template<class VT> constexpr
 bool
-operator <=(vector_const_iterator<ET> const& lhs, vector_const_iterator<ET> const& rhs)
+operator <=(vector_const_iterator<VT> const& lhs, vector_const_iterator<VT> const& rhs)
 {
     return !lhs.greater_than(rhs);
 }
 
-template<class ET> constexpr
+template<class VT> constexpr
 bool
-operator >(vector_const_iterator<ET> const& lhs, vector_const_iterator<ET> const& rhs)
+operator >(vector_const_iterator<VT> const& lhs, vector_const_iterator<VT> const& rhs)
 {
     return lhs.greater_than(rhs);
 }
 
-template<class ET> constexpr
+template<class VT> constexpr
 bool
-operator >=(vector_const_iterator<ET> const& lhs, vector_const_iterator<ET> const& rhs)
+operator >=(vector_const_iterator<VT> const& lhs, vector_const_iterator<VT> const& rhs)
 {
     return !lhs.less_than(rhs);
 }
