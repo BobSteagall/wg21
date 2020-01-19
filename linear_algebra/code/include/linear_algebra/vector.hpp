@@ -180,7 +180,9 @@ class vector
     constexpr const_reference       operator ()(size_type i) const;
 
 #ifdef LA_USE_MDSPAN
+    template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
     constexpr span_type             span() noexcept;
+    template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
     constexpr const_span_type       span() const noexcept;
 #endif
 
@@ -345,14 +347,16 @@ vector<ET,OT>::operator ()(size_type i) const
 
 #ifdef LA_USE_MDSPAN
 
-template<class ET, class OT> inline constexpr
+template<class ET, class OT>
+template<class ET2, detail::enable_if_spannable<ET, ET2>> constexpr
 typename vector<ET,OT>::span_type
 vector<ET,OT>::span() noexcept
 {
     return m_engine.span();
 }
 
-template<class ET, class OT> inline constexpr
+template<class ET, class OT>
+template<class ET2, detail::enable_if_spannable<ET, ET2>> constexpr
 typename vector<ET,OT>::const_span_type
 vector<ET,OT>::span() const noexcept
 {

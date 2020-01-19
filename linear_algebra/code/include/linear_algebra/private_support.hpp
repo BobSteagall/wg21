@@ -2,7 +2,7 @@
 //  File:       private_support.hpp
 //
 //  Summary:    This header defines several private traits types, alias templates, variable
-//              templates, and functions that are used by the rest of this implementation.
+//              templates, and functions that support the rest of this implementation.
 //==================================================================================================
 //
 #ifndef LINEAR_ALGEBRA_IMPL_SUPPORT_HPP_DEFINED
@@ -14,7 +14,8 @@ namespace detail {
 struct special_ctor_tag {};
 
 //==================================================================================================
-//- Traits type to detect if a type is std::complex<T>.
+//  This simple traits type and corresponding alias template to used detect if a type is of
+//  the form std::complex<T>.
 //==================================================================================================
 //
 template<class T>
@@ -30,7 +31,8 @@ bool    is_complex_v = is_complex<T>::value;
 
 
 //==================================================================================================
-//  Traits type that specifies important properties of an engine, based on its tag.
+//  This traits type specifies important properties to be associated with an engine, based on a
+//  given tag type.  These properties are represented by boolean values.
 //==================================================================================================
 //
 template<class TAG>
@@ -113,8 +115,10 @@ struct engine_tag_traits<resizable_matrix_engine_tag>
     static constexpr bool   is_resizable = true;
 };
 
-//- Variable templates used to determine important engine properties, based on the engine's
-//  category tag.
+
+//- These variable templates are used as a shorthand to report important engine properties, using
+//  the engine_tag_traits type defined above.  They are used in the private implementation below,
+//  as well as by a corresponsing set of public variable templates (is_*_engine_v<ET>).
 //
 template<class ET> inline constexpr
 bool    is_scalar_v = detail::engine_tag_traits<typename ET::engine_category>::is_scalar;
@@ -139,10 +143,9 @@ bool    engines_match_v = (is_matrix_v<ET1> && is_matrix_v<ET2>) ||
                           (is_vector_v<ET1> && is_vector_v<ET2>) ||
                           (is_scalar_v<ET1> && is_scalar_v<ET2>)  ;
 
-template<class U, class ET> inline constexpr
-bool    conv_from_list_v = is_convertible_v<U, typename ET::value_type>;
 
-//- Alias templates used to enable various parts of the vector and matrix interfaces via SFINAE.
+//- These alias templates are used to enable/disable various parts of the vector and matrix public
+//  interfaces via SFINAE.
 //
 template<class ET1, class ET2>
 using enable_if_writable = enable_if_t<is_same_v<ET1, ET2> && is_writable_v<ET1>, bool>;
@@ -150,16 +153,144 @@ using enable_if_writable = enable_if_t<is_same_v<ET1, ET2> && is_writable_v<ET1>
 template<class ET1, class ET2>
 using enable_if_resizable = enable_if_t<is_same_v<ET1, ET2> && is_resizable_v<ET1>, bool>;
 
-template<class ET1, class ET2>
-using enable_if_fixed_size = enable_if_t<is_same_v<ET1, ET2> && !is_resizable_v<ET1>, bool>;
-
 template<class ET1, class ET2, class U>
-using enable_if_init_list_ok =
-        enable_if_t<is_same_v<ET1, ET2> && !is_resizable_v<ET1> && conv_from_list_v<U, ET1>, bool>;
+using enable_if_init_list_ok = enable_if_t<is_same_v<ET1, ET2> && !is_resizable_v<ET1> &&
+                                           is_convertible_v<U, typename ET1::value_type>, bool>;
 
 
+#ifdef LA_USE_MDSPAN
 //==================================================================================================
-//  Traits type that chooses the correct tag for a non-owning engine (NOE), given the tag of the
+//  The following are several detection idiom traits types, regular traits types, and alias
+//  templates for determining the type aliases span_type and const_span_type that should be
+//  with an engine's public interface.  There are exactly three mutually-exclusive possibilities,
+//  each based on the presence/absence of the type aliases:
+//    1. Both aliases are missing      --> associated aliases are void
+//    2. Both aliases are void         --> associated aliases are void
+//    3. Both aliases are basic_mdspan --> associated aliases are of the form basic_mdspan<T,X,L,A>
+//==================================================================================================
+//
+//- This detection idiom traits type and corresponding variable template are used to determine
+//  whether or not an engine has the nested type alias span_type in its public interface.
+//
+template<typename ET, typename = void>
+struct has_span_type
+:   public false_type
+{};
+
+template<typename ET>
+struct has_span_type<ET, std::void_t<typename ET::span_type>>
+:   public true_type
+{};
+
+template<class ET> inline constexpr
+bool    has_span_type_v = has_span_type<ET>::value;
+
+
+//- This detection idiom traits type and corresponding variable template are used to determine
+//  whether or not an engine has the nested type alias const_span_type in its public interface.
+//
+template<typename ET, typename = void>
+struct has_const_span_type
+:   public false_type
+{};
+
+template<typename ET>
+struct has_const_span_type<ET, std::void_t<typename ET::const_span_type>>
+:   public true_type
+{};
+
+template<class ET> inline constexpr
+bool    has_const_span_type_v = has_const_span_type<ET>::value;
+
+
+//- This traits type is used to determine whether or not two types have the correct forms as
+//  a pair of nested type aliases for mdspan; and if so, to express those types in its public
+//  interface.  Both types must be void, or both must be an instance of basic_mdspan.
+//
+template<typename SA0, typename SA1>
+struct extract_span_types
+:   public false_type
+{};
+
+template<>
+struct extract_span_types<void, void>
+:   public true_type
+{
+    using span_type       = void;
+    using const_span_type = void;
+};
+
+template<class T0, class X0, class L0, class A0, class T1, class X1, class L1, class A1>
+struct extract_span_types<basic_mdspan<T0, X0, L0, A0>, basic_mdspan<T1, X1, L1, A1>>
+:   public true_type
+{
+    using span_type       = basic_mdspan<T0, X0, L0, A0>;
+    using const_span_type = basic_mdspan<T1, X1, L1, A1>;
+};
+
+
+//- This traits type is used to determine the span_type and const_span_type aliases from an
+//  engine's public interface.  If both aliases are missing, then the results are both void.
+//  If both aliases are void, then the results are both void.  If both aliases are for instances
+//  of basic_mdspan, then the results are those aliases.  All other combinations are errors.
+//
+template<bool, bool, class ET>
+struct engine_span_types;
+
+template<class ET>
+struct engine_span_types<false, false, ET>
+:   public true_type
+{
+    using span_type       = void;
+    using const_span_type = void;
+};
+
+template<class ET>
+struct engine_span_types<false, true, ET>
+:   public false_type
+{};
+
+template<class ET>
+struct engine_span_types<true, false, ET>
+:   public false_type
+{};
+
+template<class ET>
+struct engine_span_types<true, true, ET>
+:   public extract_span_types<typename ET::span_type, typename ET::const_span_type>
+{};
+
+
+//- This alias template is used by vector and matrix in static_assert statements to ensure
+//  the nested type aliases span_type and const_span_type follow the rules outlined above.
+//
+template<class ET> inline constexpr
+bool    has_valid_span_alias_form_v =
+            engine_span_types<has_span_type_v<ET>, has_const_span_type_v<ET>, ET>::value;
+
+
+//- These alias templates are used by vector, matrix, and the non-owning engine traits defined
+//  below to determine the span_type and const_span_type aliases associated with an engine type.
+//
+template<class ET>
+using engine_span_t =
+        typename engine_span_types<has_span_type_v<ET>, has_const_span_type_v<ET>, ET>::span_type;
+
+template<class ET>
+using engine_const_span_t =
+        typename engine_span_types<has_span_type_v<ET>, has_const_span_type_v<ET>, ET>::const_span_type;
+
+
+//- This alias template is used by vector and matrix to SFINAE in/out the span() member function,
+//  based on the mdspan support provided by the underlying engine.
+//
+template<class ET1, class ET2>
+using enable_if_spannable = enable_if_t<is_same_v<ET1, ET2> && has_span_type_v<ET1>, bool>;
+
+
+#endif
+//==================================================================================================
+//  This traits type chooses the correct tag for a non-owning engine (NOE), given the tag of the
 //  source engine type to be wrapped (ETT) and the desired tag type of the non-owning engine (VTT).
 //==================================================================================================
 //
@@ -241,142 +372,16 @@ struct noe_tag_chooser<resizable_matrix_engine_tag, writable_vector_engine_tag>
     using tag_type = writable_vector_engine_tag;
 };
 
-//- Variable template used as a convenience interface to noe_tag_chooser.
+//- Alias template used as a convenience interface to noe_tag_chooser.
 //
 template<class ET, class VTT>
 using noe_category_t = typename noe_tag_chooser<typename ET::engine_category, VTT>::tag_type;
 
 
-#ifdef LA_USE_MDSPAN
 //==================================================================================================
-//- Detection idiom traits types and convenience alias templates for determining whether an engine
-//  has span_type and const_span_type aliases correctly specified in its public interface.  There
-//  are exactly three mutually-exclusive possibilities:
-//    1. Both aliases are missing      --> new span types are void
-//    2. Both aliases are void         --> new span types are void
-//    3. Both aliases are basic_mdspan --> new span types are some form of basic_mdspan<T,X,L,A>
-//==================================================================================================
-//
-//- This detection idiom traits type is used to determine whether or not an engine has the
-//  nested type alias span_type in its public interface.
-//
-template<typename ET, typename = void>
-struct has_span_type
-:   public false_type
-{};
-
-template<typename ET>
-struct has_span_type<ET, std::void_t<typename ET::span_type>>
-:   public true_type
-{};
-
-template<class ET> inline constexpr
-bool    has_span_type_v = has_span_type<ET>::value;
-
-
-//- This detection idiom traits type is used to determine whether or not an engine has the
-//  nested type alias const_span_type in its public interface.
-//
-template<typename ET, typename = void>
-struct has_const_span_type
-:   public false_type
-{};
-
-template<typename ET>
-struct has_const_span_type<ET, std::void_t<typename ET::const_span_type>>
-:   public true_type
-{};
-
-template<class ET> inline constexpr
-bool    has_const_span_type_v = has_const_span_type<ET>::value;
-
-
-//- This variable template is used to whether or not both span aliases are absent from an
-//  engine's public interface.
-//
-//template<class ET> inline constexpr
-//bool    has_no_span_aliases_v = !has_span_type<ET>::value  &&  !has_const_span_type<ET>::value;
-
-
-//- This simple traits type is used to determine whether or not two types are of the correct
-//  form as a pair of nested type aliases for mdspan(s).  That is, both are void, or both
-//  are basic_mdspan.
-//
-template<typename SA0, typename SA1>
-struct validate_mdspan_types
-:   public false_type
-{};
-
-template<>
-struct validate_mdspan_types<void, void>
-:   public true_type
-{
-    using span_type       = void;
-    using const_span_type = void;
-};
-
-template<class T0, class X0, class L0, class A0, class T1, class X1, class L1, class A1>
-struct validate_mdspan_types<basic_mdspan<T0, X0, L0, A0>, basic_mdspan<T1, X1, L1, A1>>
-:   public true_type
-{
-    using span_type       = basic_mdspan<T0, X0, L0, A0>;
-    using const_span_type = basic_mdspan<T1, X1, L1, A1>;
-};
-
-
-//- This traits type is used to extract the span_type and const_span_type aliases from an
-//  engine's public interface.  If both are missing, then both are set to void.
-//  both are set to void.
-//
-template<bool, bool, class ET>
-struct engine_span_types;
-
-template<class ET>
-struct engine_span_types<false, false, ET>
-:   public true_type
-{
-    using span_type       = void;
-    using const_span_type = void;
-};
-
-template<class ET>
-struct engine_span_types<false, true, ET>
-:   public false_type
-{};
-
-template<class ET>
-struct engine_span_types<true, false, ET>
-:   public false_type
-{};
-
-template<class ET>
-struct engine_span_types<true, true, ET>
-:   public validate_mdspan_types<typename ET::span_type, typename ET::const_span_type>
-{};
-
-
-template<class ET> inline constexpr
-bool    has_valid_span_alias_form_v =
-            engine_span_types<has_span_type_v<ET>, has_const_span_type_v<ET>, ET>::value;
-
-template<class ET>
-using engine_span_t =
-        typename engine_span_types<has_span_type_v<ET>, has_const_span_type_v<ET>, ET>::span_type;
-
-template<class ET>
-using engine_const_span_t =
-        typename engine_span_types<has_span_type_v<ET>, has_const_span_type_v<ET>, ET>::const_span_type;
-
-
-template<class ET1, class ET2>
-using enable_if_spannable = enable_if_t<is_same_v<ET1, ET2> && has_span_type_v<ET1>, bool>;
-
-
-#endif
-//==================================================================================================
-//  Traits type that computes several of the nested type aliases that are used by the non-owning
-//  engine (NOE) types defined in this implementation.  These nested types are determined from
-//  the tag of the source engine type to be wrapped (ET) and the desired tag type of the resulting
+//  This traits type computes several of the nested type aliases that are used by the non-owning
+//  engine (NOE) types defined in this implementation.  These nested types are determined by the
+//  tag type of the source engine type to be wrapped (ET) and the tag type of the resulting
 //  non-owning engine (NEWCAT).
 //
 //  This type (or some other compile-time computation like it) is necessary in order to determine
@@ -399,7 +404,7 @@ struct noe_traits
 #endif
 };
 
-//- Alias template used as a convenience interface to noe_traits.
+//- These alias templates provide a convenience interface to noe_traits.
 //
 template<class ET, class NEWCAT>
 using noe_referent_t = typename noe_traits<ET, NEWCAT>::referent;
@@ -444,7 +449,6 @@ using dyn_vec_mapping = typename dyn_mat_layout::template mapping<dyn_vec_extent
 template<class T>
 struct noe_mdspan_traits;
 
-
 //- This partial specialization is used when no span interface is desired.
 //
 template<>
@@ -457,8 +461,7 @@ struct noe_mdspan_traits<void>
     using tr_span_type  = void;
 };
 
-
-//- This partial specialization is used when the owning engine is fixed-size.
+//- This partial specialization is used when an owning engine is fixed-size.
 //
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
 struct noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
@@ -511,7 +514,7 @@ noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::tr_span(src_span_type
 }
 
 
-//- This partial specialization is used when the owning engine is dynamic.
+//- This partial specialization is used when an owning engine is dynamic.
 //
 template<class T, class A>
 struct noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>
@@ -567,7 +570,7 @@ noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::tr_span(
 }
 
 
-//- Helper alias and function for column spans (generated by column engines).
+//- Helper alias and function for column spans (needed by column engines).
 //
 template<class ST>
 using noe_mdspan_column_t = typename noe_mdspan_traits<ST>::col_span_type;
@@ -580,7 +583,7 @@ noe_mdspan_column(ST const& s, SZ col)
     return noe_mdspan_traits<ST>::col_span(s, static_cast<idx_t>(col));
 }
 
-//- Helper alias and function for row spans (generated by row engines).
+//- Helper alias and function for row spans (needed by row engines).
 //
 template<class ST>
 using noe_mdspan_row_t = typename noe_mdspan_traits<ST>::row_span_type;
@@ -593,7 +596,7 @@ noe_mdspan_row(ST const& s, SZ row)
     return noe_mdspan_traits<ST>::row_span(s, static_cast<idx_t>(row));
 }
 
-//- Helper alias and function for submatrix spans (generated by submatrix engines).
+//- Helper alias and function for submatrix spans (needed by submatrix engines).
 //
 template<class ST>
 using noe_mdspan_submatrix_t = typename noe_mdspan_traits<ST>::sub_span_type;
@@ -609,7 +612,7 @@ noe_mdspan_submatrix(ST const& s, SZ row, SZ row_count, SZ col, SZ col_count)
                                            static_cast<idx_t>(col), static_cast<idx_t>(col_count));
 }
 
-//- Helper alias and function for transpose spans (generated by transpose engines).
+//- Helper alias and function for transpose spans (needed by transpose engines).
 //
 template<class ST>
 using noe_mdspan_transpose_t = typename noe_mdspan_traits<ST>::tr_span_type;
@@ -639,7 +642,7 @@ make_dyn_span(T* pdata, ST rows, ST cols, ST row_stride, ST col_stride = 1u)
 #endif
 //==================================================================================================
 //  Traits type for choosing between three alternative traits-type parameters.  This is used
-//  extensively in the private implementation when selecting arithmetic traits at compile time.
+//  extensively in the private implementation for selecting arithmetic traits at compile time.
 //==================================================================================================
 //
 template<class T1, class T2, class DEF>
@@ -666,7 +669,7 @@ struct non_void_traits_chooser<void, void, DEF>
 
 //==================================================================================================
 //  Some private helper functions for allocating/deallocating the memory used by the dynamic
-//  vector and matrix engines defined elsewhere.  Note that all memory thus allocated is default-
+//  vector and matrix engines.  Note that in this implementation all allocated memory is default-
 //  constructed.  This means that elements lying in (currently) unused capacity are also
 //  initialized, which may or may not be what happens in the final version.
 //==================================================================================================
@@ -718,14 +721,14 @@ deallocate(AT& alloc, typename allocator_traits<AT>::pointer p_dst, size_t n) no
     }
 }
 
-//- Alias template used for convenience when rebinding allocators.
+//- Alias template used for rebinding allocators.
 //
 template<class A1, class T1>
 using rebind_alloc_t = typename allocator_traits<A1>::template rebind_alloc<T1>;
 
 
 //==================================================================================================
-//- Temporary replacement for std::swap (which is constexpr in C++20)
+//  Temporary replacement for std::swap (which is constexpr in C++20)
 //==================================================================================================
 //
 template<class T> inline constexpr

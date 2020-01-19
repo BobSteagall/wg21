@@ -24,9 +24,6 @@ struct readable_matrix_engine_tag  : public integral_constant<int, 5> {};
 struct writable_matrix_engine_tag  : public integral_constant<int, 7> {};
 struct resizable_matrix_engine_tag : public integral_constant<int, 11> {};
 
-struct owning_engine_tag    : public integral_constant<bool, true> {};
-struct nonowning_engine_tag : public integral_constant<bool, false> {};
-
 
 //- Owning engines with dynamically-allocated external storage.
 //
