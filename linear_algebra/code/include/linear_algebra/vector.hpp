@@ -108,6 +108,10 @@ template<class ET, class OT>
 class vector
 {
     static_assert(is_vector_engine_v<ET>);
+#ifdef LA_USE_MDSPAN
+    static_assert(detail::has_valid_span_alias_form_v<ET>);
+#endif
+
     static constexpr bool   has_cx_elem  = detail::is_complex_v<typename ET::value_type>;
 
   public:
@@ -128,8 +132,8 @@ class vector
     using const_hermitian_type = conditional_t<has_cx_elem, vector, const_transpose_type>;
 
 #ifdef LA_USE_MDSPAN
-    using span_type            = typename engine_type::span_type;
-    using const_span_type      = typename engine_type::const_span_type;
+    using span_type            = detail::engine_span_t<ET>;
+    using const_span_type      = detail::engine_const_span_t<ET>;
 #endif
 
     //- Construct/copy/destroy
@@ -142,7 +146,7 @@ class vector
     template<class ET2, class OT2>
     constexpr vector(vector<ET2, OT2> const& src);
 
-    template<class U, detail::enable_if_convertible<U, value_type> = true>
+    template<class U, class ET2 = ET, detail::enable_if_init_list_ok<ET, ET2, U> = true>
     constexpr vector(initializer_list<U> list);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr vector(size_type elems);
@@ -221,9 +225,9 @@ vector<ET,OT>::vector(vector<ET2, OT2> const& rhs)
 {}
 
 template<class ET, class OT>
-template<class U, detail::enable_if_convertible<U, typename ET::value_type>> constexpr
+template<class U, class ET2, detail::enable_if_init_list_ok<ET, ET2, U>> constexpr
 vector<ET,OT>::vector(initializer_list<U> list)
-:   m_engine(forward<initializer_list<U>>(list))
+:   m_engine(list)
 {}
 
 template<class ET, class OT>

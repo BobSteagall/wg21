@@ -13,9 +13,6 @@ namespace detail {
 
 struct special_ctor_tag {};
 
-template<class U, class T>
-using enable_if_convertible = enable_if_t<is_convertible_v<U, T>, bool>;
-
 //==================================================================================================
 //- Traits type to detect if a type is std::complex<T>.
 //==================================================================================================
@@ -142,6 +139,9 @@ bool    engines_match_v = (is_matrix_v<ET1> && is_matrix_v<ET2>) ||
                           (is_vector_v<ET1> && is_vector_v<ET2>) ||
                           (is_scalar_v<ET1> && is_scalar_v<ET2>)  ;
 
+template<class U, class ET> inline constexpr
+bool    conv_from_list_v = is_convertible_v<U, typename ET::value_type>;
+
 //- Alias templates used to enable various parts of the vector and matrix interfaces via SFINAE.
 //
 template<class ET1, class ET2>
@@ -152,6 +152,10 @@ using enable_if_resizable = enable_if_t<is_same_v<ET1, ET2> && is_resizable_v<ET
 
 template<class ET1, class ET2>
 using enable_if_fixed_size = enable_if_t<is_same_v<ET1, ET2> && !is_resizable_v<ET1>, bool>;
+
+template<class ET1, class ET2, class U>
+using enable_if_init_list_ok =
+        enable_if_t<is_same_v<ET1, ET2> && !is_resizable_v<ET1> && conv_from_list_v<U, ET1>, bool>;
 
 
 //==================================================================================================

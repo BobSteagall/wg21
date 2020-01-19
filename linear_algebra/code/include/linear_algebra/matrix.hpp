@@ -19,7 +19,9 @@ template<class ET, class OT>
 class matrix
 {
     static_assert(is_matrix_engine_v<ET>);
+#ifdef LA_USE_MDSPAN
     static_assert(detail::has_valid_span_alias_form_v<ET>);
+#endif
 
     using possibly_writable_vector_tag = detail::noe_category_t<ET, writable_vector_engine_tag>;
     using possibly_writable_matrix_tag = detail::noe_category_t<ET, writable_matrix_engine_tag>;
@@ -51,8 +53,6 @@ class matrix
     using const_hermitian_type = conditional_t<has_cx_elem, matrix, const_transpose_type>;
 
 #ifdef LA_USE_MDSPAN
-//    using span_type            = typename engine_type::span_type;
-//    using const_span_type      = typename engine_type::const_span_type;
     using span_type            = detail::engine_span_t<ET>;
     using const_span_type      = detail::engine_const_span_t<ET>;
 #endif
@@ -65,8 +65,7 @@ class matrix
     constexpr matrix(matrix&&) noexcept = default;
     constexpr matrix(matrix const&) = default;
 
-    template<class U, class ET2 = ET, detail::enable_if_fixed_size<ET, ET2> = true,
-                                      detail::enable_if_convertible<U, value_type> = true>
+    template<class U, class ET2 = ET, detail::enable_if_init_list_ok<ET, ET2, U> = true>
     constexpr matrix(initializer_list<U> list);
     template<class ET2, class OT2>
     constexpr matrix(matrix<ET2, OT2> const& src);
@@ -161,10 +160,9 @@ class matrix
 //- Construct/copy/destroy
 //
 template<class ET, class OT>
-template<class U, class ET2, detail::enable_if_fixed_size<ET, ET2>,
-                             detail::enable_if_convertible<U, typename ET::value_type>> constexpr
+template<class U, class ET2, detail::enable_if_init_list_ok<ET, ET2, U>> constexpr
 matrix<ET,OT>::matrix(initializer_list<U> list)
-:   m_engine(forward<initializer_list<U>>(list))
+:   m_engine(list)
 {}
 
 template<class ET, class OT>
