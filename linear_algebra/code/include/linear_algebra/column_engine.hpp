@@ -34,7 +34,7 @@ class column_engine
 
 #ifdef LA_USE_MDSPAN
     using span_type       = detail::noe_mdspan_column_t<detail::noe_mdspan_t<ET, VCT>>;
-    using const_span_type = detail::noe_mdspan_column_t<typename ET::const_span_type>;
+    using const_span_type = detail::noe_mdspan_column_t<detail::noe_const_mdspan_t<ET, VCT>>;
 #endif
 
     //- Construct/copy/destroy

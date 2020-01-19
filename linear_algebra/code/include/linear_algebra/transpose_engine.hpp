@@ -35,7 +35,7 @@ class transpose_engine
 
 #ifdef LA_USE_MDSPAN
     using span_type       = detail::noe_mdspan_transpose_t<detail::noe_mdspan_t<ET, MCT>>;
-    using const_span_type = detail::noe_mdspan_transpose_t<typename ET::const_span_type>;
+    using const_span_type = detail::noe_mdspan_transpose_t<detail::noe_const_mdspan_t<ET, MCT>>;
 #endif
 
     //- Construct/copy/destroy

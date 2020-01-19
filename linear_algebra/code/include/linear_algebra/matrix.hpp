@@ -19,11 +19,12 @@ template<class ET, class OT>
 class matrix
 {
     static_assert(is_matrix_engine_v<ET>);
+    static_assert(detail::has_valid_span_alias_form_v<ET>);
 
     using possibly_writable_vector_tag = detail::noe_category_t<ET, writable_vector_engine_tag>;
     using possibly_writable_matrix_tag = detail::noe_category_t<ET, writable_matrix_engine_tag>;
 
-    static constexpr bool   has_cx_elem = detail::is_complex_v<typename ET::value_type>;
+    static constexpr bool   has_cx_elem  = detail::is_complex_v<typename ET::value_type>;
 
   public:
     //- Types
@@ -50,8 +51,10 @@ class matrix
     using const_hermitian_type = conditional_t<has_cx_elem, matrix, const_transpose_type>;
 
 #ifdef LA_USE_MDSPAN
-    using span_type            = typename engine_type::span_type;
-    using const_span_type      = typename engine_type::const_span_type;
+//    using span_type            = typename engine_type::span_type;
+//    using const_span_type      = typename engine_type::const_span_type;
+    using span_type            = detail::engine_span_t<ET>;
+    using const_span_type      = detail::engine_const_span_t<ET>;
 #endif
 
     //- Construct/copy/destroy
@@ -62,7 +65,8 @@ class matrix
     constexpr matrix(matrix&&) noexcept = default;
     constexpr matrix(matrix const&) = default;
 
-    template<class U, class ET2 = ET, detail::enable_if_fixed_size<ET, ET2> = true, detail::enable_if_convertible<U, value_type> = true>
+    template<class U, class ET2 = ET, detail::enable_if_fixed_size<ET, ET2> = true,
+                                      detail::enable_if_convertible<U, value_type> = true>
     constexpr matrix(initializer_list<U> list);
     template<class ET2, class OT2>
     constexpr matrix(matrix<ET2, OT2> const& src);
@@ -113,7 +117,9 @@ class matrix
     constexpr const_reference       operator ()(size_type i, size_type j) const;
 
 #ifdef LA_USE_MDSPAN
+    template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
     constexpr span_type             span() noexcept;
+    template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
     constexpr const_span_type       span() const noexcept;
 #endif
 
@@ -327,14 +333,16 @@ matrix<ET,OT>::operator ()(size_type i, size_type j) const
 
 #ifdef LA_USE_MDSPAN
 
-template<class ET, class OT> inline constexpr
+template<class ET, class OT>
+template<class ET2, detail::enable_if_spannable<ET, ET2>> inline constexpr
 typename matrix<ET,OT>::span_type
 matrix<ET,OT>::span() noexcept
 {
     return m_engine.span();
 }
 
-template<class ET, class OT> inline constexpr
+template<class ET, class OT>
+template<class ET2, detail::enable_if_spannable<ET, ET2>> inline constexpr
 typename matrix<ET,OT>::const_span_type
 matrix<ET,OT>::span() const noexcept
 {
