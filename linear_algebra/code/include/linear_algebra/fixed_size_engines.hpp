@@ -42,6 +42,9 @@ class fs_vector_engine
     constexpr fs_vector_engine();
     constexpr fs_vector_engine(fs_vector_engine&&) noexcept = default;
     constexpr fs_vector_engine(fs_vector_engine const&) = default;
+    template<class T2, size_t N2>
+    constexpr fs_vector_engine(fs_vector_engine<T2, N2> const& src);
+
     template<class U>
     constexpr fs_vector_engine(initializer_list<U> list);
 
@@ -81,6 +84,27 @@ fs_vector_engine<T,N>::fs_vector_engine()
     for (auto& elem : ma_elems)
     {
         elem = static_cast<T>(0);
+    }
+}
+
+template<class T, size_t N>
+template<class T2, size_t N2> constexpr
+fs_vector_engine<T,N>::fs_vector_engine(fs_vector_engine<T2, N2> const& src)
+: ma_elems()
+{
+    size_type   count = min<size_type>(N, N2);
+
+    for (size_type i = 0;  i < count;  ++i)
+    {
+        ma_elems[i] = static_cast<T>(src(i));
+    }
+
+    if (count < N)
+    {
+        for (size_type i = count;  i < N;  ++i)
+        {
+            ma_elems[i] = static_cast<T>(0);
+        }
     }
 }
 
