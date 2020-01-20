@@ -41,8 +41,10 @@ class dr_vector_engine
     ~dr_vector_engine() noexcept;
 
     dr_vector_engine();
-    dr_vector_engine(dr_vector_engine&&) noexcept;
-    dr_vector_engine(dr_vector_engine const&);
+    dr_vector_engine(dr_vector_engine&& rhs) noexcept;
+    dr_vector_engine(dr_vector_engine const& rhs);
+    template<class ET2>
+    dr_vector_engine(ET2 const& rhs);
     template<class U>
     dr_vector_engine(initializer_list<U> list);
     dr_vector_engine(size_type elems);
@@ -110,19 +112,22 @@ dr_vector_engine<T,AT>::dr_vector_engine()
 
 template<class T, class AT> inline
 dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine&& rhs) noexcept
-:   mp_elems(nullptr)
-,   m_elems(0)
-,   m_elemcap(0)
+:   dr_vector_engine()
 {
     rhs.swap(*this);
 }
 
 template<class T, class AT> inline
 dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine const& rhs)
-:   mp_elems(nullptr)
-,   m_elems(0)
-,   m_elemcap(0)
-,   m_alloc()
+:   dr_vector_engine()
+{
+    assign(rhs);
+}
+
+template<class T, class AT>
+template<class ET2> inline
+dr_vector_engine<T,AT>::dr_vector_engine(ET2 const& rhs)
+:   dr_vector_engine()
 {
     assign(rhs);
 }
@@ -130,10 +135,7 @@ dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine const& rhs)
 template<class T, class AT>
 template<class U>
 dr_vector_engine<T,AT>::dr_vector_engine(initializer_list<U> list)
-:   mp_elems(nullptr)
-,   m_elems(0)
-,   m_elemcap(0)
-,   m_alloc()
+:   dr_vector_engine()
 {
     alloc_new((size_type) list.size(), (size_type) list.size());
 
@@ -141,26 +143,20 @@ dr_vector_engine<T,AT>::dr_vector_engine(initializer_list<U> list)
 
     for (size_t i = 0;  i < list.size();  ++i, ++iter)
     {
-        mp_elems[i] = static_cast<T>( *iter);
+        mp_elems[i] = static_cast<T>(*iter);
     }
 }
 
 template<class T, class AT> inline
 dr_vector_engine<T,AT>::dr_vector_engine(size_type elems)
-:   mp_elems(nullptr)
-,   m_elems(0)
-,   m_elemcap(0)
-,   m_alloc()
+:   dr_vector_engine()
 {
     alloc_new(elems, elems);
 }
 
 template<class T, class AT> inline
 dr_vector_engine<T,AT>::dr_vector_engine(size_type elems, size_type cap)
-:   mp_elems(nullptr)
-,   m_elems(0)
-,   m_elemcap(0)
-,   m_alloc()
+:   dr_vector_engine()
 {
     alloc_new(elems, cap);
 }
@@ -329,22 +325,12 @@ dr_vector_engine<T,AT>::assign(ET2 const& rhs)
     size_type           elems = (size_type) rhs.elements();
     dr_vector_engine    tmp(elems);
 
-    if constexpr(is_same_v<size_type, src_size_type>)
-    {
-        for (size_type i = 0;  i < elems;  ++i)
-        {
-            tmp(i) = rhs(i);
-        }
-    }
-    else
-    {
-        src_size_type  si;
-        size_type       di;
+    src_size_type   si;
+    size_type       di;
 
-        for (di = 0, si = 0;  di < elems;  ++di, ++si)
-        {
-            tmp(di) = rhs(si);
-        }
+    for (di = 0, si = 0;  di < elems;  ++di, ++si)
+    {
+        tmp(di) = rhs(si);
     }
 
     tmp.swap(*this);
@@ -377,7 +363,7 @@ dr_vector_engine<T,AT>::reshape(size_type elems, size_type cap)
     if (elems > m_elemcap  ||  cap > m_elemcap)
     {
         dr_vector_engine    tmp(elems, cap);
-        size_type const    dst_elems = min(elems, m_elems);
+        size_type const     dst_elems = min(elems, m_elems);
 
         for (size_type i = 0;  i < dst_elems;  ++i)
         {
@@ -427,6 +413,8 @@ class dr_matrix_engine
     dr_matrix_engine();
     dr_matrix_engine(dr_matrix_engine&& rhs) noexcept;
     dr_matrix_engine(dr_matrix_engine const& rhs);
+    template<class ET2>
+    dr_matrix_engine(ET2 const& rhs);
     dr_matrix_engine(size_type rows, size_type cols);
     dr_matrix_engine(size_type rows, size_type cols, size_type rowcap, size_type colcap);
 
@@ -475,6 +463,8 @@ class dr_matrix_engine
 
     void    alloc_new(size_type rows, size_type cols, size_type rowcap, size_type colcap);
     void    assign(dr_matrix_engine const& rhs);
+    template<class ET2>
+    void    assign(ET2 const& rhs);
     void    check_capacities(size_type rowcap, size_type colcap);
     void    check_sizes(size_type rows, size_type cols);
     void    reshape(size_type rows, size_type cols, size_type rowcap, size_type colcap);
@@ -501,36 +491,29 @@ dr_matrix_engine<T,AT>::dr_matrix_engine()
 
 template<class T, class AT>
 dr_matrix_engine<T,AT>::dr_matrix_engine(dr_matrix_engine&& rhs) noexcept
-:   mp_elems(nullptr)
-,   m_rows(0)
-,   m_cols(0)
-,   m_rowcap(0)
-,   m_colcap(0)
-,   m_alloc()
+:   dr_matrix_engine()
 {
     rhs.swap(*this);
 }
 
 template<class T, class AT>
 dr_matrix_engine<T,AT>::dr_matrix_engine(dr_matrix_engine const& rhs)
-:   mp_elems(nullptr)
-,   m_rows(0)
-,   m_cols(0)
-,   m_rowcap(0)
-,   m_colcap(0)
-,   m_alloc()
+:   dr_matrix_engine()
+{
+    assign(rhs);
+}
+
+template<class T, class AT>
+template<class ET2>
+dr_matrix_engine<T,AT>::dr_matrix_engine(ET2 const& rhs)
+:   dr_matrix_engine()
 {
     assign(rhs);
 }
 
 template<class T, class AT>
 dr_matrix_engine<T,AT>::dr_matrix_engine(size_type rows, size_type cols)
-:   mp_elems(nullptr)
-,   m_rows(0)
-,   m_cols(0)
-,   m_rowcap(0)
-,   m_colcap(0)
-,   m_alloc()
+:   dr_matrix_engine()
 {
     alloc_new(rows, cols, rows, cols);
 }
@@ -538,12 +521,7 @@ dr_matrix_engine<T,AT>::dr_matrix_engine(size_type rows, size_type cols)
 template<class T, class AT>
 dr_matrix_engine<T,AT>::dr_matrix_engine
 (size_type rows, size_type cols, size_type rowcap, size_type colcap)
-:   mp_elems(nullptr)
-,   m_rows(0)
-,   m_cols(0)
-,   m_rowcap(0)
-,   m_colcap(0)
-,   m_alloc()
+:   dr_matrix_engine()
 {
     alloc_new(rows, cols, rowcap, colcap);
 }
@@ -558,7 +536,7 @@ dr_matrix_engine<T,AT>::operator =(dr_matrix_engine&& rhs) noexcept
     return *this;
 }
 
-template<class T, class AT>
+template<class T, class AT> inline
 dr_matrix_engine<T,AT>&
 dr_matrix_engine<T,AT>::operator =(dr_matrix_engine const& rhs)
 {
@@ -567,30 +545,11 @@ dr_matrix_engine<T,AT>::operator =(dr_matrix_engine const& rhs)
 }
 
 template<class T, class AT>
-template<class ET2>
+template<class ET2> inline
 dr_matrix_engine<T,AT>&
 dr_matrix_engine<T,AT>::operator =(ET2 const& rhs)
 {
-    static_assert(is_matrix_engine_v<ET2>);
-    using src_size_type = typename ET2::size_type;
-
-    size_type           rows = (size_type) rhs.rows();
-    size_type           cols = (size_type) rhs.columns();
-    dr_matrix_engine    tmp(rows, cols);
-
-    src_size_type   si, sj;
-    size_type       di, dj;
-
-    for (di = 0, si = 0;  di < rows;  ++di, ++si)
-    {
-        for (dj = 0, sj = 0;  dj < cols;  ++dj, ++sj)
-        {
-            tmp(di, dj) = rhs(si, sj);
-        }
-    }
-
-    tmp.swap(*this);
-
+    assign(rhs);
     return *this;
 }
 
@@ -772,6 +731,32 @@ dr_matrix_engine<T,AT>::assign(dr_matrix_engine const& rhs)
     m_cols   = rhs.m_cols;
     m_rowcap = rhs.m_rowcap;
     m_colcap = rhs.m_colcap;
+}
+
+template<class T, class AT>
+template<class ET2>
+void
+dr_matrix_engine<T,AT>::assign(ET2 const& rhs)
+{
+    static_assert(is_matrix_engine_v<ET2>);
+    using src_size_type = typename ET2::size_type;
+
+    size_type           rows = (size_type) rhs.rows();
+    size_type           cols = (size_type) rhs.columns();
+    dr_matrix_engine    tmp(rows, cols);
+
+    src_size_type   si, sj;
+    size_type       di, dj;
+
+    for (di = 0, si = 0;  di < rows;  ++di, ++si)
+    {
+        for (dj = 0, sj = 0;  dj < cols;  ++dj, ++sj)
+        {
+            tmp(di, dj) = rhs(si, sj);
+        }
+    }
+
+    tmp.swap(*this);
 }
 
 template<class T, class AT>

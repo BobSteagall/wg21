@@ -12,7 +12,7 @@
 namespace STD_LA {
 USING_STD
 
-//- Tags that specify how engines should behave.
+//- Tags that specify how engines behave.
 //
 struct scalar_engine_tag           : public integral_constant<int, 0> {};
 
@@ -35,7 +35,7 @@ template<class T, class AT>     class dr_matrix_engine;
 template<class T, size_t N>             class fs_vector_engine;
 template<class T, size_t R, size_t C>   class fs_matrix_engine;
 
-//- Non-owning, view-style engines.
+//- Non-owning, view-style engines (NOEs).
 //
 template<class ET, class VCT>   class column_engine;
 template<class ET, class VCT>   class row_engine;

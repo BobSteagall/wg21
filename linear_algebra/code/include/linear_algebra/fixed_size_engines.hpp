@@ -302,6 +302,7 @@ template<class ET2> constexpr
 fs_matrix_engine<T,R,C>&
 fs_matrix_engine<T,R,C>::operator =(ET2 const& rhs)
 {
+    static_assert(is_matrix_engine_v<ET2>);
     using src_size_type = typename ET2::size_type;
 
     if (rhs.size() != size())

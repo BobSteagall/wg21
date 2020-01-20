@@ -28,7 +28,7 @@ type_name()                //- From StackOverflow...
     using namespace std;
 #ifdef __clang__
     string_view p = __PRETTY_FUNCTION__;
-    return string_view(p.data() + 34, p.size() - 34 - 1);
+    return string_view(p.data() + 59, p.size() - 59 - 1);
 #elif defined(__GNUC__)
     string_view p = __PRETTY_FUNCTION__;
     # if __cplusplus < 201402
