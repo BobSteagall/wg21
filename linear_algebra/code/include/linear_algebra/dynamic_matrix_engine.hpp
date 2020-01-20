@@ -1,384 +1,15 @@
 //==================================================================================================
-//  File:       dynamic_engines.hpp
+//  File:       dynamic_matrix_engine.hpp
 //
-//  Summary:    This header defines dynamically-resizable vector and matrix engines.  In this
-//              context, dynamically-resizable means that the row and column extents of such
-//              objects are set at run-time, and thus unknown at compile-time.
+//  Summary:    This header defines a dynamically-resizable vector engine.  In this context,
+//              dynamically-resizable means that the row and column extents of such objects
+//              are determined at run-time.
 //==================================================================================================
 //
-#ifndef LINEAR_ALGEBRA_DYNAMIC_ENGINES_HPP_DEFINED
-#define LINEAR_ALGEBRA_DYNAMIC_ENGINES_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_DYNAMIC_MATRIX_ENGINE_HPP_DEFINED
+#define LINEAR_ALGEBRA_DYNAMIC_MATRIX_ENGINE_HPP_DEFINED
 
 namespace STD_LA {
-//==================================================================================================
-//  Dynamically-resizable vector engine.
-//==================================================================================================
-//
-template<class T, class AT>
-class dr_vector_engine
-{
-  public:
-    //- Types
-    //
-    using engine_category = resizable_vector_engine_tag;
-    using element_type    = T;
-    using value_type      = remove_cv_t<T>;
-    using allocator_type  = AT;
-    using pointer         = typename allocator_traits<AT>::pointer;
-    using const_pointer   = typename allocator_traits<AT>::const_pointer;
-    using reference       = element_type&;
-    using const_reference = element_type const&;
-    using difference_type = ptrdiff_t;
-    using size_type       = size_t;
-
-#ifdef LA_USE_MDSPAN
-    using span_type       = mdspan<element_type, dynamic_extent>;
-    using const_span_type = mdspan<element_type const, dynamic_extent>;
-#endif
-
-    //- Construct/copy/destroy
-    //
-    ~dr_vector_engine() noexcept;
-
-    dr_vector_engine();
-    dr_vector_engine(dr_vector_engine&& rhs) noexcept;
-    dr_vector_engine(dr_vector_engine const& rhs);
-    template<class ET2>
-    dr_vector_engine(ET2 const& rhs);
-    template<class U>
-    dr_vector_engine(initializer_list<U> list);
-    dr_vector_engine(size_type elems);
-    dr_vector_engine(size_type elems, size_type elem_cap);
-
-    dr_vector_engine&   operator =(dr_vector_engine&& rhs) noexcept;
-    dr_vector_engine&   operator =(dr_vector_engine const& rhs);
-    template<class ET2>
-    dr_vector_engine&   operator =(ET2 const& rhs);
-
-    //- Capacity
-    //
-    size_type       capacity() const noexcept;
-    size_type       elements() const noexcept;
-    void            reserve(size_type cap);
-    void            resize(size_type elems);
-    void            resize(size_type elems, size_type cap);
-
-    //- Element access
-    //
-    reference       operator ()(size_type i);
-    const_reference operator ()(size_type i) const;
-
-#ifdef LA_USE_MDSPAN
-    span_type       span() noexcept;
-    const_span_type span() const noexcept;
-#endif
-
-    //- Modifiers
-    //
-    void    swap(dr_vector_engine& rhs) noexcept;
-    void    swap_elements(size_type i, size_type j) noexcept;
-
-  private:
-    pointer         mp_elems;
-    size_type       m_elems;
-    size_type       m_elemcap;
-    allocator_type  m_alloc;
-
-    void    alloc_new(size_type elems, size_type cap);
-    void    assign(dr_vector_engine const& rhs);
-    template<class ET2>
-    void    assign(ET2 const& rhs);
-    void    check_capacity(size_type cap);
-    void    check_size(size_type elems);
-    void    reshape(size_type elems, size_type cap);
-};
-
-//------------------------
-//- Construct/copy/destroy
-//
-template<class T, class AT> inline
-dr_vector_engine<T,AT>::~dr_vector_engine() noexcept
-{
-    detail::deallocate(m_alloc, mp_elems, m_elemcap);
-}
-
-template<class T, class AT> inline
-dr_vector_engine<T,AT>::dr_vector_engine()
-:   mp_elems(nullptr)
-,   m_elems(0)
-,   m_elemcap(0)
-,   m_alloc()
-{}
-
-template<class T, class AT> inline
-dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine&& rhs) noexcept
-:   dr_vector_engine()
-{
-    rhs.swap(*this);
-}
-
-template<class T, class AT> inline
-dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine const& rhs)
-:   dr_vector_engine()
-{
-    assign(rhs);
-}
-
-template<class T, class AT>
-template<class ET2> inline
-dr_vector_engine<T,AT>::dr_vector_engine(ET2 const& rhs)
-:   dr_vector_engine()
-{
-    assign(rhs);
-}
-
-template<class T, class AT>
-template<class U>
-dr_vector_engine<T,AT>::dr_vector_engine(initializer_list<U> list)
-:   dr_vector_engine()
-{
-    alloc_new((size_type) list.size(), (size_type) list.size());
-
-    auto    iter = list.begin();
-
-    for (size_t i = 0;  i < list.size();  ++i, ++iter)
-    {
-        mp_elems[i] = static_cast<T>(*iter);
-    }
-}
-
-template<class T, class AT> inline
-dr_vector_engine<T,AT>::dr_vector_engine(size_type elems)
-:   dr_vector_engine()
-{
-    alloc_new(elems, elems);
-}
-
-template<class T, class AT> inline
-dr_vector_engine<T,AT>::dr_vector_engine(size_type elems, size_type cap)
-:   dr_vector_engine()
-{
-    alloc_new(elems, cap);
-}
-
-template<class T, class AT> inline
-dr_vector_engine<T,AT>&
-dr_vector_engine<T,AT>::operator =(dr_vector_engine&& rhs) noexcept
-{
-    dr_vector_engine    tmp;
-    tmp.swap(rhs);
-    tmp.swap(*this);
-    return *this;
-}
-
-template<class T, class AT> inline
-dr_vector_engine<T,AT>&
-dr_vector_engine<T,AT>::operator =(dr_vector_engine const& rhs)
-{
-    assign(rhs);
-    return *this;
-}
-
-template<class T, class AT>
-template<class ET2> inline
-dr_vector_engine<T,AT>&
-dr_vector_engine<T,AT>::operator =(ET2 const& rhs)
-{
-    assign(rhs);
-    return *this;
-}
-
-//----------
-//- Capacity
-//
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::size_type
-dr_vector_engine<T,AT>::capacity() const noexcept
-{
-    return m_elemcap;
-}
-
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::size_type
-dr_vector_engine<T,AT>::elements() const noexcept
-{
-    return m_elems;
-}
-
-template<class T, class AT> inline
-void
-dr_vector_engine<T,AT>::reserve(size_type cap)
-{
-    reshape(m_elems, cap);
-}
-
-template<class T, class AT> inline
-void
-dr_vector_engine<T,AT>::resize(size_type elems)
-{
-    reshape(elems, m_elemcap);
-}
-
-template<class T, class AT> inline
-void
-dr_vector_engine<T,AT>::resize(size_type elems, size_type cap)
-{
-    reshape(elems, cap);
-}
-
-//----------------
-//- Element access
-//
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::reference
-dr_vector_engine<T,AT>::operator ()(size_type i)
-{
-    return mp_elems[i];
-}
-
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::const_reference
-dr_vector_engine<T,AT>::operator ()(size_type i) const
-{
-    return mp_elems[i];
-}
-
-#ifdef LA_USE_MDSPAN
-
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::span_type
-dr_vector_engine<T,AT>::span() noexcept
-{
-    return span_type(static_cast<element_type*>(mp_elems), m_elems);
-}
-
-template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::const_span_type
-dr_vector_engine<T,AT>::span() const noexcept
-{
-    return const_span_type(static_cast<element_type const*>(mp_elems), m_elems);
-}
-
-#endif
-//-----------
-//- Modifiers
-//
-template<class T, class AT> inline
-void
-dr_vector_engine<T,AT>::swap(dr_vector_engine& other) noexcept
-{
-    if (&other != this)
-    {
-        detail::la_swap(mp_elems,  other.mp_elems);
-        detail::la_swap(m_elems,   other.m_elems);
-        detail::la_swap(m_elemcap, other.m_elemcap);
-    }
-}
-
-template<class T, class AT> inline
-void
-dr_vector_engine<T,AT>::swap_elements(size_type i, size_type j) noexcept
-{
-    detail::la_swap(mp_elems[i], mp_elems[j]);
-}
-
-//------------------------
-//- Private implementation
-//
-template<class T, class AT>
-void
-dr_vector_engine<T,AT>::alloc_new(size_type new_size, size_type new_cap)
-{
-    check_size(new_size);
-    check_capacity(new_cap);
-
-    new_cap   = max(new_size, new_cap);
-    mp_elems  = detail::allocate(m_alloc, new_cap);
-    m_elems   = new_size;
-    m_elemcap = new_cap;
-}
-
-template<class T, class AT>
-void
-dr_vector_engine<T,AT>::assign(dr_vector_engine const& rhs)
-{
-    if (&rhs == this) return;
-
-    size_type   old_n = (size_type)(m_elemcap);
-    size_type   new_n = (size_type)(rhs.m_elemcap);
-    pointer     p_tmp = detail::allocate(m_alloc, new_n, rhs.mp_elems);
-
-    detail::deallocate(m_alloc, mp_elems, old_n);
-    mp_elems  = p_tmp;
-    m_elems   = rhs.m_elems;
-    m_elemcap = rhs.m_elemcap;
-}
-
-template<class T, class AT>
-template<class ET2>
-void
-dr_vector_engine<T,AT>::assign(ET2 const& rhs)
-{
-    static_assert(is_vector_engine_v<ET2>);
-    using src_size_type = typename ET2::size_type;
-
-    size_type           elems = (size_type) rhs.elements();
-    dr_vector_engine    tmp(elems);
-
-    src_size_type   si = 0;
-    size_type       di = 0;
-
-    for (;  di < elems;  ++di, ++si)
-    {
-        tmp(di) = rhs(si);
-    }
-
-    tmp.swap(*this);
-}
-
-template<class T, class AT>
-void
-dr_vector_engine<T,AT>::check_capacity(size_type cap)
-{
-    if (cap < 0)
-    {
-        throw runtime_error("invalid capacity");
-    }
-}
-
-template<class T, class AT>
-void
-dr_vector_engine<T,AT>::check_size(size_type elems)
-{
-    if (elems < 1)
-    {
-        throw runtime_error("invalid size");
-    }
-}
-
-template<class T, class AT>
-void
-dr_vector_engine<T,AT>::reshape(size_type elems, size_type cap)
-{
-    if (elems > m_elemcap  ||  cap > m_elemcap)
-    {
-        dr_vector_engine    tmp(elems, cap);
-        size_type const     dst_elems = min(elems, m_elems);
-
-        for (size_type i = 0;  i < dst_elems;  ++i)
-        {
-            tmp.mp_elems[i] = mp_elems[i];
-        }
-        tmp.swap(*this);
-    }
-    else
-    {
-        check_size(elems);
-        m_elems = elems;
-    }
-}
-
-
 //==================================================================================================
 //  Dynamically-resizable matrix engine.
 //==================================================================================================
@@ -413,10 +44,10 @@ class dr_matrix_engine
     dr_matrix_engine();
     dr_matrix_engine(dr_matrix_engine&& rhs) noexcept;
     dr_matrix_engine(dr_matrix_engine const& rhs);
-    template<class ET2>
-    dr_matrix_engine(ET2 const& rhs);
     dr_matrix_engine(size_type rows, size_type cols);
     dr_matrix_engine(size_type rows, size_type cols, size_type rowcap, size_type colcap);
+    template<class ET2>
+    dr_matrix_engine(ET2 const& rhs);
 
     dr_matrix_engine&   operator =(dr_matrix_engine&&) noexcept;
     dr_matrix_engine&   operator =(dr_matrix_engine const&);
@@ -504,14 +135,6 @@ dr_matrix_engine<T,AT>::dr_matrix_engine(dr_matrix_engine const& rhs)
 }
 
 template<class T, class AT>
-template<class ET2>
-dr_matrix_engine<T,AT>::dr_matrix_engine(ET2 const& rhs)
-:   dr_matrix_engine()
-{
-    assign(rhs);
-}
-
-template<class T, class AT>
 dr_matrix_engine<T,AT>::dr_matrix_engine(size_type rows, size_type cols)
 :   dr_matrix_engine()
 {
@@ -524,6 +147,14 @@ dr_matrix_engine<T,AT>::dr_matrix_engine
 :   dr_matrix_engine()
 {
     alloc_new(rows, cols, rowcap, colcap);
+}
+
+template<class T, class AT>
+template<class ET2>
+dr_matrix_engine<T,AT>::dr_matrix_engine(ET2 const& rhs)
+:   dr_matrix_engine()
+{
+    assign(rhs);
 }
 
 template<class T, class AT>
@@ -808,4 +439,4 @@ dr_matrix_engine<T,AT>::reshape(size_type rows, size_type cols, size_type rowcap
 }
 
 }       //- STD_LA namespace
-#endif  //- LINEAR_ALGEBRA_DYNAMIC_ENGINES_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_DYNAMIC_MATRIX_ENGINE_HPP_DEFINED

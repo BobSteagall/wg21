@@ -27,8 +27,10 @@ target_sources(wg21_linear_algebra
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/arithmetic_operators.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/column_engine.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/debug_helpers.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/dynamic_engines.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/fixed_size_engines.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/dynamic_vector_engine.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/dynamic_matrix_engine.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/fixed_size_vector_engine.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/fixed_size_matrix_engine.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/forward_declarations.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/library_aliases.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/matrix.hpp>
@@ -50,8 +52,10 @@ target_sources(wg21_linear_algebra
         $<INSTALL_INTERFACE:include/linear_algebra/arithmetic_operators.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/column_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/debug_helpers.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/dynamic_engines.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/fixed_size_engines.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/dynamic_vector_engine.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/dynamic_matrix_engine.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/fixed_size_vector_engine.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/fixed_size_matrix_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/forward_declarations.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/library_aliases.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/matrix.hpp>

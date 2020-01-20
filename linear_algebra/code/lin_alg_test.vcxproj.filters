@@ -29,13 +29,7 @@
     <ClInclude Include="include\linear_algebra.hpp">
       <Filter>Interface Headers</Filter>
     </ClInclude>
-    <ClInclude Include="include\linear_algebra\dynamic_engines.hpp">
-      <Filter>Implementation Headers</Filter>
-    </ClInclude>
     <ClInclude Include="include\linear_algebra\matrix.hpp">
-      <Filter>Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\linear_algebra\fixed_size_engines.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="include\linear_algebra\vector.hpp">
@@ -99,6 +93,18 @@
       <Filter>Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="include\linear_algebra\submatrix_engine.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\dynamic_matrix_engine.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\dynamic_vector_engine.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\fixed_size_matrix_engine.hpp">
+      <Filter>Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\linear_algebra\fixed_size_vector_engine.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
   </ItemGroup>

@@ -44,12 +44,19 @@ class fs_vector_engine
     constexpr fs_vector_engine(fs_vector_engine const&) = default;
     template<class T2, size_t N2>
     constexpr fs_vector_engine(fs_vector_engine<T2, N2> const& src);
-
-    template<class U>
-    constexpr fs_vector_engine(initializer_list<U> list);
+    template<class ET2>
+    constexpr fs_vector_engine(ET2 const& src);
+    template<class T2>
+    constexpr fs_vector_engine(initializer_list<T2> list);
 
     constexpr fs_vector_engine&     operator =(fs_vector_engine&&) noexcept = default;
     constexpr fs_vector_engine&     operator =(fs_vector_engine const&) = default;
+    template<class T2, size_t N2>
+    constexpr fs_vector_engine&     operator =(fs_vector_engine<T2, N2> const& rhs);
+    template<class ET2>
+    constexpr fs_vector_engine&     operator =(ET2 const& rhs);
+    template<class T2>
+    constexpr fs_vector_engine&     operator =(initializer_list<T2> list);
 
     //- Capacity
     //
@@ -72,7 +79,14 @@ class fs_vector_engine
     constexpr void  swap_elements(size_type i, size_type j) noexcept;
 
   private:
-    T   ma_elems[N];
+    array<T, N>     ma_elems;
+
+    template<class T2, size_t N2>
+    constexpr void  assign(fs_vector_engine<T2, N2> const& rhs);
+    template<class ET2>
+    constexpr void  assign(ET2 const& rhs);
+    template<class T2>
+    constexpr void  assign(initializer_list<T2> list);
 };
 
 //------------------------
@@ -80,54 +94,58 @@ class fs_vector_engine
 //
 template<class T, size_t N> constexpr
 fs_vector_engine<T,N>::fs_vector_engine()
+:   ma_elems()
+{}
+
+template<class T, size_t N>
+template<class T2, size_t N2> constexpr
+fs_vector_engine<T,N>::fs_vector_engine(fs_vector_engine<T2, N2> const& rhs)
+:   ma_elems()
 {
-    for (auto& elem : ma_elems)
-    {
-        elem = static_cast<T>(0);
-    }
+    assign(rhs);
+}
+
+template<class T, size_t N>
+template<class ET2> constexpr
+fs_vector_engine<T,N>::fs_vector_engine(ET2 const& rhs)
+:   ma_elems()
+{
+    assign(rhs);
+}
+
+template<class T, size_t N>
+template<class T2> constexpr
+fs_vector_engine<T,N>::fs_vector_engine(initializer_list<T2> list)
+:   ma_elems()
+{
+    assign(list);
 }
 
 template<class T, size_t N>
 template<class T2, size_t N2> constexpr
-fs_vector_engine<T,N>::fs_vector_engine(fs_vector_engine<T2, N2> const& src)
-: ma_elems()
+fs_vector_engine<T,N>&
+fs_vector_engine<T,N>::operator =(fs_vector_engine<T2,N2> const& rhs)
 {
-    size_type   count = min<size_type>(N, N2);
-
-    for (size_type i = 0;  i < count;  ++i)
-    {
-        ma_elems[i] = static_cast<T>(src(i));
-    }
-
-    if (count < N)
-    {
-        for (size_type i = count;  i < N;  ++i)
-        {
-            ma_elems[i] = static_cast<T>(0);
-        }
-    }
+    assign(rhs);
+    return *this;
 }
 
 template<class T, size_t N>
-template<class U> constexpr
-fs_vector_engine<T,N>::fs_vector_engine(initializer_list<U> list)
-:   ma_elems()
+template<class ET2> constexpr
+fs_vector_engine<T,N>&
+fs_vector_engine<T,N>::operator =(ET2 const& rhs)
 {
-    size_type   count = min<size_type>(N, list.size());
-    auto        iter  = list.begin();
+    assign(rhs);
+    return *this;
+}
 
-    for (size_type i = 0;  i < count;  ++i, ++iter)
-    {
-        ma_elems[i] = static_cast<T>( *iter);
-    }
-
-    if (count < N)
-    {
-        for (size_type i = count;  i < N;  ++i)
-        {
-            ma_elems[i] = static_cast<T>(0);
-        }
-    }
+template<class T, size_t N>
+template<class T2> constexpr
+fs_vector_engine<T,N>&
+fs_vector_engine<T,N>::operator =(initializer_list<T2> list)
+{
+    assign(list);
+    return *this;
 }
 
 //----------
@@ -204,6 +222,71 @@ fs_vector_engine<T,N>::swap_elements(size_type i, size_type j) noexcept
     detail::la_swap(ma_elems[i], ma_elems[j]);
 }
 
+//------------------------
+//- Private implementation
+//
+template<class T, size_t N>
+template<class T2, size_t N2> constexpr
+void
+fs_vector_engine<T,N>::assign(fs_vector_engine<T2,N2> const& rhs)
+{
+    static_assert(N2 == N);
+
+    for (size_type i = 0;  i < N;  ++i)
+    {
+        ma_elems[i] = static_cast<T>(rhs(i));
+    }
+}
+
+template<class T, size_t N>
+template<class ET2> constexpr
+void
+fs_vector_engine<T,N>::assign(ET2 const& rhs)
+{
+    static_assert(is_vector_engine_v<ET2>);
+    using src_size_type = typename ET2::size_type;
+
+    size_type       count = min<size_type>(N, static_cast<size_type>(rhs.elements()));
+    size_type       di = 0;
+    src_size_type   si = 0;
+
+    for (;  di < count;  ++di, ++si)
+    {
+        ma_elems[di] = static_cast<T>(rhs(si));
+    }
+
+    if (count < N)
+    {
+        for (;  di < N;  ++di)
+        {
+            ma_elems[di] = static_cast<T>(0);
+        }
+    }
+}
+
+template<class T, size_t N>
+template<class T2> constexpr
+void
+fs_vector_engine<T,N>::assign(initializer_list<T2> list)
+{
+    size_type   count = min<size_type>(N, static_cast<size_type>(list.size()));
+    size_type   di    = 0;
+    auto        iter  = list.begin();
+
+    for (;  di < count;  ++di, ++iter)
+    {
+        ma_elems[di] = static_cast<T>(*iter);
+    }
+
+    if (count < N)
+    {
+        for (;  di < N;  ++di)
+        {
+            ma_elems[di] = static_cast<T>(0);
+        }
+    }
+}
+
 
 //==================================================================================================
 //  Fixed-size, fixed-capacity matrix engine.
@@ -241,13 +324,21 @@ class fs_matrix_engine
     constexpr fs_matrix_engine();
     constexpr fs_matrix_engine(fs_matrix_engine&&) noexcept = default;
     constexpr fs_matrix_engine(fs_matrix_engine const&) = default;
-    template<class U>
-    constexpr fs_matrix_engine(initializer_list<U> list);
+    template<class T2, size_t R2, size_t C2>
+    constexpr fs_matrix_engine(fs_matrix_engine<T2, R2, C2> const& src);
+    template<class ET2>
+    constexpr fs_matrix_engine(ET2 const& src);
+    template<class T2>
+    constexpr fs_matrix_engine(initializer_list<T2> list);
 
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine&&) noexcept = default;
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine const&) = default;
+    template<class T2, size_t R2, size_t C2>
+    constexpr fs_matrix_engine&     operator =(fs_matrix_engine<T2, R2, C2> const& src);
     template<class ET2>
     constexpr fs_matrix_engine&     operator =(ET2 const& rhs);
+    template<class T2>
+    constexpr fs_matrix_engine&     operator =(initializer_list<T2> list);
 
     //- Capacity
     //
@@ -276,7 +367,18 @@ class fs_matrix_engine
     constexpr void      swap_rows(size_type i1, size_type i2) noexcept;
 
   private:
-    T   ma_elems[R*C];
+    template<class T2, size_t R2, size_t C2> friend class fs_matrix_engine;
+
+  private:
+    array<T, R*C>   ma_elems;
+
+  private:
+    template<class T2, size_t R2, size_t C2>
+    constexpr void  assign(fs_matrix_engine<T2, R2, C2> const& rhs);
+    template<class ET2>
+    constexpr void  assign(ET2 const& rhs);
+    template<class T2>
+    constexpr void  assign(initializer_list<T2> list);
 };
 
 //------------------------
@@ -285,40 +387,31 @@ class fs_matrix_engine
 template<class T, size_t R, size_t C> constexpr
 fs_matrix_engine<T,R,C>::fs_matrix_engine()
 :   ma_elems()
+{}
+
+template<class T, size_t R, size_t C>
+template<class ET2> constexpr
+fs_matrix_engine<T,R,C>::fs_matrix_engine(ET2 const& rhs)
+:   ma_elems()
 {
-    if constexpr (is_arithmetic_v<T>)
-    {
-        for (auto& elem : ma_elems)
-        {
-            elem = static_cast<T>(0);
-        }
-    }
+    assign(rhs);
 }
 
 template<class T, size_t R, size_t C>
-template<class U> constexpr
-fs_matrix_engine<T,R,C>::fs_matrix_engine(initializer_list<U> list)
+template<class T2> constexpr
+fs_matrix_engine<T,R,C>::fs_matrix_engine(initializer_list<T2> list)
 :   ma_elems()
 {
-    size_t const    total = R*C;
-    size_t const    count = std::min(total, (size_t) list.size());
-    auto            iter  = list.begin();
+    assign(list);
+}
 
-    for (size_t i = 0;  i < count;  ++i, ++iter)
-    {
-        ma_elems[i] = static_cast<T>(*iter);
-    }
-
-    if constexpr (is_arithmetic_v<T>)
-    {
-        if (count < total)
-        {
-            for (size_t i = count;  i < total;  ++i)
-            {
-                ma_elems[i] = static_cast<T>(0);
-            }
-        }
-    }
+template<class T, size_t R, size_t C>
+template<class T2, size_t R2, size_t C2> constexpr
+fs_matrix_engine<T,R,C>&
+fs_matrix_engine<T,R,C>::operator =(fs_matrix_engine<T2,R2,C2> const& rhs)
+{
+    assign(rhs);
+    return *this;
 }
 
 template<class T, size_t R, size_t C>
@@ -326,25 +419,16 @@ template<class ET2> constexpr
 fs_matrix_engine<T,R,C>&
 fs_matrix_engine<T,R,C>::operator =(ET2 const& rhs)
 {
-    static_assert(is_matrix_engine_v<ET2>);
-    using src_size_type = typename ET2::size_type;
+    assign(rhs);
+    return *this;
+}
 
-    if (rhs.size() != size())
-    {
-        throw runtime_error("invalid size");
-    }
-
-    src_size_type   si = 0, sj = 0;
-    size_type       di = 0, dj = 0;
-
-    for (;  di < rows();  ++di, ++si)
-    {
-        for (;  dj < columns();  ++dj, ++sj)
-        {
-            (*this)(di, dj) = rhs(si, sj);
-        }
-    }
-
+template<class T, size_t R, size_t C>
+template<class T2> constexpr
+fs_matrix_engine<T,R,C>&
+fs_matrix_engine<T,R,C>::operator =(initializer_list<T2> list)
+{
+    assign(list);
     return *this;
 }
 
@@ -466,6 +550,72 @@ fs_matrix_engine<T,R,C>::swap_rows(size_type i1, size_type i2) noexcept
         {
             detail::la_swap(ma_elems[i1*C + j], ma_elems[i2*C + j]);
         }
+    }
+}
+
+//------------------------
+//- Private implementation
+//
+template<class T, size_t R, size_t C>
+template<class T2, size_t R2, size_t C2> constexpr
+void
+fs_matrix_engine<T,R,C>::assign(fs_matrix_engine<T2,R2,C2> const& rhs)
+{
+    static_assert(R2 == R  &&  C2 == C);
+
+    for (size_type i = 0;  i < (R*C);  ++i)
+    {
+        ma_elems[i] = static_cast<T>(rhs.ma_elems[i]);
+    }
+}
+
+template<class T, size_t R, size_t C>
+template<class ET2> constexpr
+void
+fs_matrix_engine<T,R,C>::assign(ET2 const& rhs)
+{
+    static_assert(is_matrix_engine_v<ET2>);
+    using src_size_type = typename ET2::size_type;
+
+    if (rhs.size() != size())
+    {
+        throw runtime_error("invalid size");
+    }
+
+    src_size_type   si = 0, sj = 0;
+    size_type       di = 0, dj = 0;
+
+    for (;  di < R;  ++di, ++si)
+    {
+        for (;  dj < C;  ++dj, ++sj)
+        {
+            (*this)(di, dj) = rhs(si, sj);
+        }
+    }
+}
+
+template<class T, size_t R, size_t C>
+template<class T2> constexpr
+void
+fs_matrix_engine<T,R,C>::assign(initializer_list<T2> list)
+{
+    if (list.size() > (R*C))
+    {
+        throw runtime_error("invalid size");
+    }
+
+    size_type   count = min<size_type>(R*C, (size_t) list.size());
+    size_type   di    = 0;
+    auto        iter  = list.begin();
+
+    for (;  di < count;  ++di, ++iter)
+    {
+        ma_elems[di] = static_cast<T>(*iter);
+    }
+
+    for (;  di < (R*C);  ++di)
+    {
+        ma_elems[di] = static_cast<T>(0);
     }
 }
 
