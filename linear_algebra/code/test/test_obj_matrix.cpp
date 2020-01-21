@@ -148,10 +148,10 @@ void t001()
 constexpr double t002()
 {
     fsm_double_35   fsm  = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-    fsm_double_35   fsm2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    fsm_double_35   fsm2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0, 0, 0, 0, 0};
 
     fsv_double_5    fsv  = {11, 12, 13, 14, 15};
-    fsv_double_5    fsv2 = {11, 12, 13};
+    fsv_double_5    fsv2 = {11, 12, 13, 0, 0};
 
     fsm.swap_columns(1, 3);
     fsm.swap_rows(0, 2);
@@ -305,12 +305,21 @@ void t001X()
 }
 }
 
+template<class T>
+void tf(std::initializer_list<std::initializer_list<T>>)
+{}
+
 void
 TestGroup00()
 {
     constexpr double x = t002();
 
     PRINT_FNAME();
+
+    tf({{0, 1, 2}, {1, 2, 3}, {2, 3, 4}, {3, 4, 5}});
+    tf({{0, 1, 2}, {3, 4, 5}});
+
+//    PRINT_TYPE(decltype(tf));
 
     t001X();
 

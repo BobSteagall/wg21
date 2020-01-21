@@ -53,6 +53,8 @@ class dr_matrix_engine
     dr_matrix_engine&   operator =(dr_matrix_engine const&);
     template<class ET2>
     dr_matrix_engine&   operator =(ET2 const& rhs);
+    template<class T2>
+    dr_matrix_engine&   operator =(initializer_list<T2> rhs);
 
     //- Capacity
     //
@@ -179,6 +181,15 @@ template<class T, class AT>
 template<class ET2> inline
 dr_matrix_engine<T,AT>&
 dr_matrix_engine<T,AT>::operator =(ET2 const& rhs)
+{
+    assign(rhs);
+    return *this;
+}
+
+template<class T, class AT>
+template<class T2> inline
+dr_matrix_engine<T,AT>&
+dr_matrix_engine<T,AT>::operator =(initializer_list<T2> rhs)
 {
     assign(rhs);
     return *this;

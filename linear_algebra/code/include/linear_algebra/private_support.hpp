@@ -746,8 +746,7 @@ using rebind_alloc_t = typename allocator_traits<A1>::template rebind_alloc<T1>;
 
 
 //==================================================================================================
-//  The following is a temporary replacement for std::swap (which is constexpr in C++20) in order
-//  to create this implementation.
+//  The following is a temporary replacement for std::swap (which is constexpr in C++20).
 //==================================================================================================
 //
 template<class T> inline constexpr
@@ -764,6 +763,48 @@ la_swap(T& t0, T& t1) noexcept(is_nothrow_movable_v<T>)
     T   t2(std::move(t0));
     t0 = std::move(t1);
     t1 = std::move(t2);
+}
+
+
+//==================================================================================================
+//  These functions are used inside engine member functions to: A., cause a compile-time error
+//  when evaluated in a constexpr context; or, B., cause an exception to be thrown at run-time.
+//==================================================================================================
+//
+constexpr void
+check_source_engine_size(size_t ss, size_t ds)
+{
+    if (ss != ds)
+    {
+        throw runtime_error("source engine size does not match destination vector engine size");
+    }
+}
+
+constexpr void
+check_source_engine_size(size_t sr, size_t sc, size_t dr, size_t dc)
+{
+    if (sr != dr  ||  sc != dc)
+    {
+        throw runtime_error("source engine size does not match destination matrix engine size");
+    }
+}
+
+constexpr void
+check_source_init_list_size(size_t ls, size_t ds)
+{
+    if (ls != ds)
+    {
+        throw runtime_error("source initializer_list size does not match destination vector engine size");
+    }
+}
+
+constexpr void
+check_source_init_list_size(size_t ls, size_t dr, size_t dc)
+{
+    if (ls != (dr*dc))
+    {
+        throw runtime_error("source initializer_list size does not match destination matrix engine size");
+    }
 }
 
 }       //- detail namespace

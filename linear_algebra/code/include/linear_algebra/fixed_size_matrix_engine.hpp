@@ -302,15 +302,10 @@ void
 fs_matrix_engine<T,R,C>::assign(ET2 const& rhs)
 {
     static_assert(is_matrix_engine_v<ET2>);
-    using src_size_type = typename ET2::size_type;
+    detail::check_source_engine_size(rhs.rows(), rhs.columns(), R, C);
 
-    if ((static_cast<size_type>(rhs.rows()) != R) || (static_cast<size_type>(rhs.columns()) != C))
-    {
-        throw runtime_error("invalid size");
-    }
-
-    src_size_type   si = 0, sj = 0;
-    size_type       di = 0, dj = 0;
+    typename ET2::size_type     si = 0, sj = 0;
+    size_type                   di = 0, dj = 0;
 
     for (;  di < R;  ++di, ++si)
     {
@@ -326,23 +321,13 @@ template<class T2> constexpr
 void
 fs_matrix_engine<T,R,C>::assign(initializer_list<T2> rhs)
 {
-    if (rhs.size() > (R*C))
-    {
-        throw runtime_error("invalid size");
-    }
+    detail::check_source_init_list_size(rhs.size(), R, C);
 
-    size_type   count = min(R*C, rhs.size());
-    size_type   di    = 0;
-    auto        iter  = rhs.begin();
+    size_type   di = 0;
 
-    for (;  di < count;  ++di, ++iter)
+    for (auto const& el : rhs)
     {
-        ma_elems[di] = static_cast<T>(*iter);
-    }
-
-    for (;  di < (R*C);  ++di)
-    {
-        ma_elems[di] = static_cast<T>(0);
+        ma_elems[di++] = el;
     }
 }
 

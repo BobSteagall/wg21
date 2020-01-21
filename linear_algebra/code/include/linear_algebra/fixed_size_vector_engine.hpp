@@ -245,11 +245,7 @@ void
 fs_vector_engine<T,N>::assign(ET2 const& rhs)
 {
     static_assert(is_vector_engine_v<ET2>);
-
-    if (static_cast<size_type>(rhs.elements()) != elements())
-    {
-        throw runtime_error("invalid size");
-    }
+    detail::check_source_engine_size(rhs.elements(), N);
 
     size_type                   di = 0;
     typename ET2::size_type     si = 0;
@@ -265,10 +261,7 @@ template<class T2> constexpr
 void
 fs_vector_engine<T,N>::assign(initializer_list<T2> rhs)
 {
-    if (rhs.size() != N)
-    {
-        return;
-    }
+    detail::check_source_init_list_size(rhs.size(), N);
 
     size_type   di = 0;
 
