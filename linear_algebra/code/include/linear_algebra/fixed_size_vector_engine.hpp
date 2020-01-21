@@ -80,10 +80,8 @@ class fs_vector_engine
   private:
     template<class T2, size_t N2> friend class fs_vector_engine;
 
-  private:
     array<T, N>     ma_elems;
 
-  private:
     template<class T2, size_t N2>
     constexpr void  assign(fs_vector_engine<T2, N2> const& rhs);
     template<class ET2>
@@ -235,9 +233,9 @@ fs_vector_engine<T,N>::assign(fs_vector_engine<T2,N2> const& rhs)
 {
     static_assert(N2 == N);
 
-    for (size_type i = 0;  i < N;  ++i)
+    for (size_type di = 0;  di < N;  ++di)
     {
-        ma_elems[i] = static_cast<T>(rhs(i));
+        ma_elems[di] = static_cast<T>(rhs.ma_elems[di]);
     }
 }
 
@@ -247,19 +245,18 @@ void
 fs_vector_engine<T,N>::assign(ET2 const& rhs)
 {
     static_assert(is_vector_engine_v<ET2>);
-    using src_size_type = typename ET2::size_type;
 
     if (static_cast<size_type>(rhs.elements()) != elements())
     {
         throw runtime_error("invalid size");
     }
 
-    size_type       di = 0;
-    src_size_type   si = 0;
+    size_type                   di = 0;
+    typename ET2::size_type     si = 0;
 
     for (;  di < N;  ++di, ++si)
     {
-        ma_elems[di] = static_cast<T>(rhs.ma_elems[si]);
+        ma_elems[di] = static_cast<T>(rhs(si));
     }
 }
 
@@ -268,23 +265,16 @@ template<class T2> constexpr
 void
 fs_vector_engine<T,N>::assign(initializer_list<T2> rhs)
 {
-    if (rhs.size() > N)
+    if (rhs.size() != N)
     {
-        throw runtime_error("invalid size");
+        return;
     }
 
-    size_type   count = min(N, rhs.size());
-    size_type   di    = 0;
-    auto        iter  = rhs.begin();
+    size_type   di = 0;
 
-    for (;  di < count;  ++di, ++iter)
+    for (auto const& el : rhs)
     {
-        ma_elems[di] = static_cast<T>(*iter);
-    }
-
-    for (;  di < N;  ++di)
-    {
-        ma_elems[di] = static_cast<T>(0);
+        ma_elems[di++] = el;
     }
 }
 

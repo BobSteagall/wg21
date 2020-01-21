@@ -86,7 +86,6 @@ class dr_vector_engine
     size_type       m_elemcap;
     allocator_type  m_alloc;
 
-  private:
     void    alloc_new(size_type elems, size_type cap);
     void    assign(dr_vector_engine const& rhs);
     template<class ET2>

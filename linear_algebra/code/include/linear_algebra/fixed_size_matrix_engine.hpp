@@ -90,10 +90,8 @@ class fs_matrix_engine
   private:
     template<class T2, size_t R2, size_t C2> friend class fs_matrix_engine;
 
-  private:
     array<T, R*C>   ma_elems;
 
-  private:
     template<class T2, size_t R2, size_t C2>
     constexpr void  assign(fs_matrix_engine<T2, R2, C2> const& rhs);
     template<class ET2>
