@@ -146,21 +146,20 @@ class vector
 
     template<class ET2, class OT2>
     constexpr vector(vector<ET2, OT2> const& src);
-
-    template<class U, class ET2 = ET, detail::enable_if_init_list_ok<ET, ET2, U> = true>
+    template<class U, class ET2 = ET, detail::enable_if_initable<ET, ET2> = true>
     constexpr vector(initializer_list<U> list);
 
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr vector(size_type elems);
-
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr vector(size_type elems, size_type elemcap);
 
-    constexpr vector& operator =(vector&&) noexcept = default;
-    constexpr vector& operator =(vector const&) = default;
-
+    constexpr vector&   operator =(vector&&) noexcept = default;
+    constexpr vector&   operator =(vector const&) = default;
     template<class ET2, class OT2>
-    constexpr vector& operator =(vector<ET2, OT2> const& rhs);
+    constexpr vector&   operator =(vector<ET2, OT2> const& rhs);
+    template<class U, class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
+    constexpr vector&   operator =(initializer_list<U> list);
 
     //- Capacity
     //
@@ -231,7 +230,7 @@ vector<ET,OT>::vector(vector<ET2, OT2> const& rhs)
 {}
 
 template<class ET, class OT>
-template<class U, class ET2, detail::enable_if_init_list_ok<ET, ET2, U>> constexpr
+template<class U, class ET2, detail::enable_if_initable<ET, ET2>> constexpr
 vector<ET,OT>::vector(initializer_list<U> list)
 :   m_engine(list)
 {}
@@ -260,6 +259,15 @@ vector<ET,OT>&
 vector<ET,OT>::operator =(vector<ET2, OT2> const& rhs)
 {
     m_engine = rhs.m_engine;
+    return *this;
+}
+
+template<class ET, class OT>
+template<class U, class ET2, detail::enable_if_writable<ET, ET2>> constexpr
+vector<ET,OT>&
+vector<ET,OT>::operator =(initializer_list<U> rhs)
+{
+    m_engine = rhs;
     return *this;
 }
 

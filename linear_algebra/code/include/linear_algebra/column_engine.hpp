@@ -48,6 +48,11 @@ class column_engine
     constexpr column_engine&    operator =(column_engine&&) noexcept = default;
     constexpr column_engine&    operator =(column_engine const&) noexcept = default;
 
+    template<class ET2, detail::enable_if_convertible_engine<ET2, ET> = true>
+    constexpr column_engine&    operator =(ET2 const& rhs);
+    template<class U, detail::enable_if_writable<ET, ET> = true>
+    constexpr column_engine&    operator =(initializer_list<U> list);
+
     //- Capacity
     //
     constexpr size_type     capacity() const noexcept;
@@ -83,6 +88,26 @@ column_engine<ET,VCT>::column_engine() noexcept
 :   mp_other(nullptr)
 ,   m_column(0)
 {}
+
+template<class ET, class VCT>
+template<class ET2, detail::enable_if_convertible_engine<ET2, ET>> constexpr
+column_engine<ET,VCT>&
+column_engine<ET,VCT>::operator =(ET2 const& rhs)
+{
+    detail::check_source_engine_size(rhs, elements());
+    detail::assign_from_vector_engine(*this, rhs);
+    return *this;
+}
+
+template<class ET, class VCT>
+template<class U, detail::enable_if_writable<ET, ET>> constexpr
+column_engine<ET,VCT>&
+column_engine<ET,VCT>::operator =(initializer_list<U> rhs)
+{
+    detail::check_source_init_list(rhs, elements());
+    detail::assign_from_vector_list(*this, rhs);
+    return *this;
+}
 
 //----------
 //- Capacity

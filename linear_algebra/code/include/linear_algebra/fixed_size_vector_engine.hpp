@@ -19,7 +19,7 @@ class fs_vector_engine
     static_assert(N >= 1);
 
   public:
-    using engine_category = writable_vector_engine_tag;
+    using engine_category = initable_vector_engine_tag;
     using element_type    = T;
     using value_type      = remove_cv_t<T>;
     using pointer         = element_type*;
@@ -43,18 +43,18 @@ class fs_vector_engine
     constexpr fs_vector_engine(fs_vector_engine const&) = default;
     template<class T2, size_t N2>
     constexpr fs_vector_engine(fs_vector_engine<T2, N2> const& src);
-    template<class ET2>
+    template<class ET2, detail::enable_if_has_convertible_element<ET2,T> = true>
     constexpr fs_vector_engine(ET2 const& src);
-    template<class T2>
+    template<class T2, detail::enable_if_convertible_element<T2,T> = true>
     constexpr fs_vector_engine(initializer_list<T2> rhs);
 
     constexpr fs_vector_engine&     operator =(fs_vector_engine&&) noexcept = default;
     constexpr fs_vector_engine&     operator =(fs_vector_engine const&) = default;
     template<class T2, size_t N2>
     constexpr fs_vector_engine&     operator =(fs_vector_engine<T2, N2> const& rhs);
-    template<class ET2>
+    template<class ET2, detail::enable_if_has_convertible_element<ET2,T> = true>
     constexpr fs_vector_engine&     operator =(ET2 const& rhs);
-    template<class T2>
+    template<class T2, detail::enable_if_convertible_element<T2,T> = true>
     constexpr fs_vector_engine&     operator =(initializer_list<T2> rhs);
 
     //- Capacity
@@ -107,7 +107,7 @@ fs_vector_engine<T,N>::fs_vector_engine(fs_vector_engine<T2, N2> const& rhs)
 }
 
 template<class T, size_t N>
-template<class ET2> constexpr
+template<class ET2, detail::enable_if_has_convertible_element<ET2,T>> constexpr
 fs_vector_engine<T,N>::fs_vector_engine(ET2 const& rhs)
 :   ma_elems()
 {
@@ -115,7 +115,7 @@ fs_vector_engine<T,N>::fs_vector_engine(ET2 const& rhs)
 }
 
 template<class T, size_t N>
-template<class T2> constexpr
+template<class T2, detail::enable_if_convertible_element<T2,T>> constexpr
 fs_vector_engine<T,N>::fs_vector_engine(initializer_list<T2> rhs)
 :   ma_elems()
 {
@@ -132,7 +132,7 @@ fs_vector_engine<T,N>::operator =(fs_vector_engine<T2,N2> const& rhs)
 }
 
 template<class T, size_t N>
-template<class ET2> constexpr
+template<class ET2, detail::enable_if_has_convertible_element<ET2,T>> constexpr
 fs_vector_engine<T,N>&
 fs_vector_engine<T,N>::operator =(ET2 const& rhs)
 {
@@ -141,7 +141,7 @@ fs_vector_engine<T,N>::operator =(ET2 const& rhs)
 }
 
 template<class T, size_t N>
-template<class T2> constexpr
+template<class T2, detail::enable_if_convertible_element<T2,T>> constexpr
 fs_vector_engine<T,N>&
 fs_vector_engine<T,N>::operator =(initializer_list<T2> rhs)
 {
@@ -245,15 +245,8 @@ void
 fs_vector_engine<T,N>::assign(ET2 const& rhs)
 {
     static_assert(is_vector_engine_v<ET2>);
-    detail::check_source_engine_size(rhs.elements(), N);
-
-    size_type                   di = 0;
-    typename ET2::size_type     si = 0;
-
-    for (;  di < N;  ++di, ++si)
-    {
-        ma_elems[di] = static_cast<T>(rhs(si));
-    }
+    detail::check_source_engine_size(rhs, N);
+    detail::assign_from_vector_engine(*this, rhs);
 }
 
 template<class T, size_t N>
@@ -261,14 +254,8 @@ template<class T2> constexpr
 void
 fs_vector_engine<T,N>::assign(initializer_list<T2> rhs)
 {
-    detail::check_source_init_list_size(rhs.size(), N);
-
-    size_type   di = 0;
-
-    for (auto const& el : rhs)
-    {
-        ma_elems[di++] = el;
-    }
+    detail::check_source_init_list(rhs, N);
+    detail::assign_from_vector_list(*this, rhs);
 }
 
 }       //- STD_LA namespace

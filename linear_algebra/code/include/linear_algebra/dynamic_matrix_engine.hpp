@@ -46,15 +46,17 @@ class dr_matrix_engine
     dr_matrix_engine(dr_matrix_engine const& rhs);
     dr_matrix_engine(size_type rows, size_type cols);
     dr_matrix_engine(size_type rows, size_type cols, size_type rowcap, size_type colcap);
-    template<class ET2>
+    template<class ET2, detail::enable_if_has_convertible_element<ET2,T> = true>
     dr_matrix_engine(ET2 const& rhs);
+    template<class T2, detail::enable_if_convertible_element<T2,T> = true>
+    dr_matrix_engine(initializer_list<initializer_list<T2>> rhs);
 
     dr_matrix_engine&   operator =(dr_matrix_engine&&) noexcept;
     dr_matrix_engine&   operator =(dr_matrix_engine const&);
-    template<class ET2>
+    template<class ET2, detail::enable_if_has_convertible_element<ET2,T> = true>
     dr_matrix_engine&   operator =(ET2 const& rhs);
-    template<class T2>
-    dr_matrix_engine&   operator =(initializer_list<T2> rhs);
+    template<class T2, detail::enable_if_convertible_element<T2,T> = true>
+    dr_matrix_engine&   operator =(initializer_list<initializer_list<T2>> rhs);
 
     //- Capacity
     //
@@ -98,6 +100,8 @@ class dr_matrix_engine
     void    assign(dr_matrix_engine const& rhs);
     template<class ET2>
     void    assign(ET2 const& rhs);
+    template<class T2>
+    void    assign(initializer_list<initializer_list<T2>> rhs);
     void    check_capacities(size_type rowcap, size_type colcap);
     void    check_sizes(size_type rows, size_type cols);
     void    reshape(size_type rows, size_type cols, size_type rowcap, size_type colcap);
@@ -152,8 +156,16 @@ dr_matrix_engine<T,AT>::dr_matrix_engine
 }
 
 template<class T, class AT>
-template<class ET2>
+template<class ET2, detail::enable_if_has_convertible_element<ET2,T>>
 dr_matrix_engine<T,AT>::dr_matrix_engine(ET2 const& rhs)
+:   dr_matrix_engine()
+{
+    assign(rhs);
+}
+
+template<class T, class AT>
+template<class T2, detail::enable_if_convertible_element<T2,T>> inline
+dr_matrix_engine<T,AT>::dr_matrix_engine(initializer_list<initializer_list<T2>> rhs)
 :   dr_matrix_engine()
 {
     assign(rhs);
@@ -178,7 +190,7 @@ dr_matrix_engine<T,AT>::operator =(dr_matrix_engine const& rhs)
 }
 
 template<class T, class AT>
-template<class ET2> inline
+template<class ET2, detail::enable_if_has_convertible_element<ET2,T>> inline
 dr_matrix_engine<T,AT>&
 dr_matrix_engine<T,AT>::operator =(ET2 const& rhs)
 {
@@ -187,9 +199,9 @@ dr_matrix_engine<T,AT>::operator =(ET2 const& rhs)
 }
 
 template<class T, class AT>
-template<class T2> inline
+template<class T2, detail::enable_if_convertible_element<T2,T>> inline
 dr_matrix_engine<T,AT>&
-dr_matrix_engine<T,AT>::operator =(initializer_list<T2> rhs)
+dr_matrix_engine<T,AT>::operator =(initializer_list<initializer_list<T2>> rhs)
 {
     assign(rhs);
     return *this;
@@ -381,23 +393,27 @@ void
 dr_matrix_engine<T,AT>::assign(ET2 const& rhs)
 {
     static_assert(is_matrix_engine_v<ET2>);
-    using src_size_type = typename ET2::size_type;
 
-    size_type           rows = (size_type) rhs.rows();
-    size_type           cols = (size_type) rhs.columns();
+    typename ET2::size_type     rows = static_cast<size_type>(rhs.rows());
+    typename ET2::size_type     cols = static_cast<size_type>(rhs.columns());
+    dr_matrix_engine            tmp(rows, cols);
+
+    detail::assign_from_matrix_engine(tmp, rhs);
+    tmp.swap(*this);
+}
+
+template<class T, class AT>
+template<class T2>
+void
+dr_matrix_engine<T,AT>::assign(initializer_list<initializer_list<T2>> rhs)
+{
+    detail::check_source_init_list(rhs);
+
+    size_type const     rows = static_cast<size_type>(rhs.size());
+    size_type const     cols = static_cast<size_type>(rhs.begin()->size());
     dr_matrix_engine    tmp(rows, cols);
 
-    src_size_type   si = 0, sj = 0;
-    size_type       di = 0, dj = 0;
-
-    for (;  di < rows;  ++di, ++si)
-    {
-        for (;  dj < cols;  ++dj, ++sj)
-        {
-            tmp(di, dj) = rhs(si, sj);
-        }
-    }
-
+    detail::assign_from_matrix_list(tmp, rhs);
     tmp.swap(*this);
 }
 
@@ -427,7 +443,7 @@ dr_matrix_engine<T,AT>::reshape(size_type rows, size_type cols, size_type rowcap
 {
     if (rows > m_rowcap  ||  cols > m_colcap   ||  rowcap > m_rowcap  ||  colcap > m_colcap)
     {
-        dr_matrix_engine    tmp(rows, cols, rowcap, colcap);
+        dr_matrix_engine   tmp(rows, cols, rowcap, colcap);
         size_type const    dst_rows = min(rows, m_rows);
         size_type const    dst_cols = min(cols, m_cols);
 

@@ -12,7 +12,7 @@
 namespace STD_LA {
 //- This trivial class template is used to represent the presence of a scalar operand in an
 //  expression.  It is part of the public interface so that users wishing to create customized
-//  arithmetic operations can easily and reliably detect if an operand is a scalar.
+//  arithmetic operation traits can easily detect if an operand is a scalar.
 //
 template<class T>
 struct scalar_engine
@@ -59,6 +59,9 @@ template<class ET> inline constexpr
 bool    is_writable_engine_v = detail::is_writable_v<ET>;
 
 template<class ET> inline constexpr
+bool    is_initable_engine_v = detail::is_initable_v<ET>;
+
+template<class ET> inline constexpr
 bool    is_resizable_engine_v = detail::is_resizable_v<ET>;
 
 
@@ -67,6 +70,7 @@ bool    is_resizable_engine_v = detail::is_resizable_v<ET>;
 //
 template<class ET1, class ET2> inline constexpr
 bool    engines_are_similar_v = detail::engines_match_v<ET1, ET2>;
+
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_PUBLIC_SUPPORT_HPP_DEFINED

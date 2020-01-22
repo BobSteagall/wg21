@@ -930,10 +930,10 @@ void t411()
 {
 	PRINT_FNAME();
 
-	STD_LA::matrix<STD_LA::fs_matrix_engine<int, 3, 2>, test_mul_op_traits_tst> lhs{ 1, 2, 3, 4, 5, 6 };
-	STD_LA::matrix<STD_LA::fs_matrix_engine<int, 2, 3>, test_mul_op_traits_tst> rhs{ 4, 5, 6, 7, 8, 9 };
+//    STD_LA::matrix<STD_LA::fs_matrix_engine<int, 3, 2>, test_mul_op_traits_tst> lhs{ 1, 2, 3, 4, 5, 6 };
+//    STD_LA::matrix<STD_LA::fs_matrix_engine<int, 2, 3>, test_mul_op_traits_tst> rhs{ 4, 5, 6, 7, 8, 9 };
 
-	auto r = lhs * rhs;
+//	auto r = lhs * rhs;
 }
 
 void

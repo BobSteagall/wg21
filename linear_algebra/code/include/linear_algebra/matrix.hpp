@@ -65,15 +65,15 @@ class matrix
     constexpr matrix(matrix&&) noexcept = default;
     constexpr matrix(matrix const&) = default;
 
-    template<class U, class ET2 = ET, detail::enable_if_init_list_ok<ET, ET2, U> = true>
-    constexpr matrix(initializer_list<U> list);
     template<class ET2, class OT2>
     constexpr matrix(matrix<ET2, OT2> const& src);
+    template<class U, class ET2 = ET, detail::enable_if_initable<ET, ET2> = true>
+    constexpr matrix(initializer_list<initializer_list<U>> rhs);
+
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr matrix(size_tuple size);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr matrix(size_type rows, size_type cols);
-
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr matrix(size_tuple size, size_tuple cap);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
@@ -83,6 +83,8 @@ class matrix
     constexpr matrix&   operator =(matrix const&) = default;
     template<class ET2, class OT2>
     constexpr matrix&   operator =(matrix<ET2, OT2> const& rhs);
+    template<class U, class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
+    constexpr matrix&   operator =(initializer_list<initializer_list<U>> rhs);
 
     //- Capacity
     //
@@ -160,18 +162,18 @@ class matrix
 //- Construct/copy/destroy
 //
 template<class ET, class OT>
-template<class U, class ET2, detail::enable_if_init_list_ok<ET, ET2, U>> constexpr
-matrix<ET,OT>::matrix(initializer_list<U> list)
-:   m_engine(list)
-{}
-
-template<class ET, class OT>
 template<class ET2, class OT2> constexpr
 matrix<ET,OT>::matrix(matrix<ET2, OT2> const& rhs)
 :   m_engine()
 {
     assign(rhs);
 }
+
+template<class ET, class OT>
+template<class U, class ET2, detail::enable_if_initable<ET, ET2>> constexpr
+matrix<ET,OT>::matrix(initializer_list<initializer_list<U>> rhs)
+:   m_engine(rhs)
+{}
 
 template<class ET, class OT>
 template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
@@ -209,6 +211,15 @@ matrix<ET,OT>&
 matrix<ET,OT>::operator =(matrix<ET2, OT2> const& rhs)
 {
     m_engine = rhs.m_engine;
+    return *this;
+}
+
+template<class ET, class OT>
+template<class U, class ET2, detail::enable_if_writable<ET, ET2>> constexpr
+matrix<ET,OT>&
+matrix<ET,OT>::operator =(initializer_list<initializer_list<U>> rhs)
+{
+    m_engine = rhs;
     return *this;
 }
 

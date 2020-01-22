@@ -45,7 +45,7 @@ struct engine_tag_traits<scalar_engine_tag>
     static constexpr bool   is_vector    = false;
     static constexpr bool   is_matrix    = false;
     static constexpr bool   is_readable  = false;
-    static constexpr bool   is_writable  = false;
+    static constexpr bool   is_initable  = false;
     static constexpr bool   is_resizable = false;
 };
 
@@ -57,6 +57,7 @@ struct engine_tag_traits<readable_vector_engine_tag>
     static constexpr bool   is_matrix    = false;
     static constexpr bool   is_readable  = true;
     static constexpr bool   is_writable  = false;
+    static constexpr bool   is_initable  = false;
     static constexpr bool   is_resizable = false;
 };
 
@@ -68,6 +69,19 @@ struct engine_tag_traits<writable_vector_engine_tag>
     static constexpr bool   is_matrix    = false;
     static constexpr bool   is_readable  = true;
     static constexpr bool   is_writable  = true;
+    static constexpr bool   is_initable  = false;
+    static constexpr bool   is_resizable = false;
+};
+
+template<>
+struct engine_tag_traits<initable_vector_engine_tag>
+{
+    static constexpr bool   is_scalar    = false;
+    static constexpr bool   is_vector    = true;
+    static constexpr bool   is_matrix    = false;
+    static constexpr bool   is_readable  = true;
+    static constexpr bool   is_writable  = true;
+    static constexpr bool   is_initable  = true;
     static constexpr bool   is_resizable = false;
 };
 
@@ -79,6 +93,7 @@ struct engine_tag_traits<resizable_vector_engine_tag>
     static constexpr bool   is_matrix    = false;
     static constexpr bool   is_readable  = true;
     static constexpr bool   is_writable  = true;
+    static constexpr bool   is_initable  = true;
     static constexpr bool   is_resizable = true;
 };
 
@@ -90,6 +105,7 @@ struct engine_tag_traits<readable_matrix_engine_tag>
     static constexpr bool   is_matrix    = true;
     static constexpr bool   is_readable  = true;
     static constexpr bool   is_writable  = false;
+    static constexpr bool   is_initable  = false;
     static constexpr bool   is_resizable = false;
 };
 
@@ -101,6 +117,19 @@ struct engine_tag_traits<writable_matrix_engine_tag>
     static constexpr bool   is_matrix    = true;
     static constexpr bool   is_readable  = true;
     static constexpr bool   is_writable  = true;
+    static constexpr bool   is_initable  = false;
+    static constexpr bool   is_resizable = false;
+};
+
+template<>
+struct engine_tag_traits<initable_matrix_engine_tag>
+{
+    static constexpr bool   is_scalar    = false;
+    static constexpr bool   is_vector    = false;
+    static constexpr bool   is_matrix    = true;
+    static constexpr bool   is_readable  = true;
+    static constexpr bool   is_writable  = true;
+    static constexpr bool   is_initable  = true;
     static constexpr bool   is_resizable = false;
 };
 
@@ -112,6 +141,7 @@ struct engine_tag_traits<resizable_matrix_engine_tag>
     static constexpr bool   is_matrix    = true;
     static constexpr bool   is_readable  = true;
     static constexpr bool   is_writable  = true;
+    static constexpr bool   is_initable  = true;
     static constexpr bool   is_resizable = true;
 };
 
@@ -136,19 +166,36 @@ template<class ET> inline constexpr
 bool    is_writable_v = detail::engine_tag_traits<typename ET::engine_category>::is_writable;
 
 template<class ET> inline constexpr
+bool    is_initable_v = detail::engine_tag_traits<typename ET::engine_category>::is_initable;
+
+template<class ET> inline constexpr
 bool    is_resizable_v = detail::engine_tag_traits<typename ET::engine_category>::is_resizable;
 
 template<class ET1, class ET2> inline constexpr
 bool    engines_match_v = (is_matrix_v<ET1> && is_matrix_v<ET2>) ||
                           (is_vector_v<ET1> && is_vector_v<ET2>) ||
-                          (is_scalar_v<ET1> && is_scalar_v<ET2>)  ;
+                          (is_scalar_v<ET1> && is_scalar_v<ET2>);
 
 
 //- These alias templates are used by the vector and matrix class templates to enable/disable
 //  various parts of their public interfaces via SFINAE.
 //
+template<class T2, class T>
+using enable_if_convertible_element = enable_if_t<is_convertible_v<T2, T>, bool>;
+
+template<class ET2, class T>
+using enable_if_has_convertible_element =
+        enable_if_t<is_convertible_v<typename ET2::value_type, T>, bool>;
+
+template<class ET2, class ET>
+using enable_if_convertible_engine =
+        enable_if_t<is_convertible_v<typename ET2::element_type, typename ET::element_type>, bool>;
+
 template<class ET1, class ET2>
 using enable_if_writable = enable_if_t<is_same_v<ET1, ET2> && is_writable_v<ET1>, bool>;
+
+template<class ET1, class ET2>
+using enable_if_initable = enable_if_t<is_same_v<ET1, ET2> && is_initable_v<ET1>, bool>;
 
 template<class ET1, class ET2>
 using enable_if_resizable = enable_if_t<is_same_v<ET1, ET2> && is_resizable_v<ET1>, bool>;
@@ -343,6 +390,32 @@ struct noe_tag_chooser<writable_matrix_engine_tag, readable_vector_engine_tag>
 
 template<>
 struct noe_tag_chooser<writable_matrix_engine_tag, writable_vector_engine_tag>
+{
+    using tag_type = writable_vector_engine_tag;
+};
+
+//------
+//
+template<>
+struct noe_tag_chooser<initable_matrix_engine_tag, readable_matrix_engine_tag>
+{
+    using tag_type = readable_matrix_engine_tag;
+};
+
+template<>
+struct noe_tag_chooser<initable_matrix_engine_tag, writable_matrix_engine_tag>
+{
+    using tag_type = writable_matrix_engine_tag;
+};
+
+template<>
+struct noe_tag_chooser<initable_matrix_engine_tag, readable_vector_engine_tag>
+{
+    using tag_type = readable_vector_engine_tag;
+};
+
+template<>
+struct noe_tag_chooser<initable_matrix_engine_tag, writable_vector_engine_tag>
 {
     using tag_type = writable_vector_engine_tag;
 };
@@ -767,43 +840,157 @@ la_swap(T& t0, T& t1) noexcept(is_nothrow_movable_v<T>)
 
 
 //==================================================================================================
-//  These functions are used inside engine member functions to: A., cause a compile-time error
-//  when evaluated in a constexpr context; or, B., cause an exception to be thrown at run-time.
+//  These helper functions are used inside engine member functions to validate a source engine
+//  or initializer list prior to assignment to a destination engine.  If validation should fail,
+//  they will:
+//      A. cause a compile-time error when evaluated in a constexpr context; or,
+//      B. cause an exception to be thrown at run-time.
 //==================================================================================================
 //
-constexpr void
-check_source_engine_size(size_t ss, size_t ds)
+template<class ET, class ST> constexpr
+void
+check_source_engine_size(ET const& engine, ST elems)
 {
-    if (ss != ds)
+    if (engine.elements() != elems)
     {
         throw runtime_error("source engine size does not match destination vector engine size");
     }
 }
 
-constexpr void
-check_source_engine_size(size_t sr, size_t sc, size_t dr, size_t dc)
+template<class ET, class ST> constexpr
+void
+check_source_engine_size(ET const& engine, ST rows, ST cols)
 {
-    if (sr != dr  ||  sc != dc)
+    if (engine.rows() != rows  ||  engine.columns() != cols)
     {
         throw runtime_error("source engine size does not match destination matrix engine size");
     }
 }
 
-constexpr void
-check_source_init_list_size(size_t ls, size_t ds)
+
+template<class T, class ST> constexpr
+void
+check_source_init_list(initializer_list<T> list, ST elems)
 {
-    if (ls != ds)
+    if (list.size() != static_cast<size_t>(elems))
     {
-        throw runtime_error("source initializer_list size does not match destination vector engine size");
+        throw runtime_error("initializer_list size does not match vector engine size");
     }
 }
 
-constexpr void
-check_source_init_list_size(size_t ls, size_t dr, size_t dc)
+template<class T> constexpr
+void
+check_source_init_list(initializer_list<initializer_list<T>> list)
 {
-    if (ls != (dr*dc))
+    size_t  first_row_size = list.begin()->size();
+
+    for (auto const row : list)
     {
-        throw runtime_error("source initializer_list size does not match destination matrix engine size");
+        if (row.size() != first_row_size)
+        {
+            throw runtime_error("source 2-D initializer_list has invalid shape");
+        }
+    }
+}
+
+template<class T, class ST> constexpr
+void
+check_source_init_list(initializer_list<initializer_list<T>> list, ST rows, ST cols)
+{
+    size_t  first_row_size = list.begin()->size();
+
+    for (auto row : list)
+    {
+        if (row.size() != first_row_size)
+        {
+            throw runtime_error("source 2-D initializer_list has invalid shape");
+        }
+    }
+
+    if (list.size() != static_cast<size_t>(rows)  ||  first_row_size != static_cast<size_t>(cols))
+    {
+        throw runtime_error("source 2-D initializer_list size does not match destination matrix engine size");
+    }
+}
+
+//==================================================================================================
+//  These helper functions are used inside engine member functions to perform a generic assignment
+//  of elements to a destination engine from a source engine or initializer list.  No checking for
+//  compatible engine sizes is performed in these functions; it is assumed that the calling engine
+//  will have already done such checking.
+//==================================================================================================
+//
+template<class ET1, class ET2> constexpr
+void
+assign_from_vector_engine(ET1& dst, ET2 const& src)
+{
+    typename ET1::size_type     di = 0;
+    typename ET2::size_type     si = 0;
+    typename ET2::size_type     ni = src.elements();
+
+    for (;  si < ni;  ++di, ++si)
+    {
+        dst(di) = src(si);
+    }
+}
+
+template<class ET1, class ET2> constexpr
+void
+assign_from_matrix_engine(ET1& dst, ET2 const& src)
+{
+    typename ET1::size_type     di = 0;
+    typename ET1::size_type     dj = 0;
+    typename ET2::size_type     si = 0;
+    typename ET2::size_type     sj = 0;
+    typename ET2::size_type     ni = src.rows();
+    typename ET2::size_type     nj = src.columns();
+
+    for (;  si < ni;  ++di, ++si)
+    {
+        for (dj = 0, sj = 0;  sj < nj;  ++dj, ++sj)
+        {
+            dst(di, dj) = src(si, sj);
+        }
+    }
+}
+
+//------
+//
+template<class ET, class T> constexpr void
+assign_from_vector_list(ET& engine, initializer_list<T> rhs)
+{
+    using size_type = typename ET::size_type;
+    using elem_iter = decltype(rhs.begin());
+
+    size_type   di = 0;
+    size_type   dn = engine.elements();
+    elem_iter   ep = rhs.begin();
+
+    for (;  di < dn;  ++di, ++ep)
+    {
+        engine(di) = *ep;
+    }
+}
+
+template<class ET, class T> constexpr void
+assign_from_matrix_list(ET& engine, initializer_list<initializer_list<T>> rhs)
+{
+    using size_type = typename ET::size_type;
+    using row_iter  = decltype(rhs.begin());
+    using col_iter  = decltype(rhs.begin()->begin());
+
+    size_type   di = 0;
+    row_iter    rp = rhs.begin();
+
+    for (;  di < engine.rows();  ++di, ++rp)
+    {
+        size_type   dj = 0;
+        col_iter    cp = rp->begin();
+
+        for (;  dj < engine.columns();  ++dj, ++cp)
+        {
+            engine(di, dj) = *cp;
+        }
     }
 }
 

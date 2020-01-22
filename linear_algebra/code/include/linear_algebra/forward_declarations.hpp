@@ -18,11 +18,13 @@ struct scalar_engine_tag           : public integral_constant<int, 0> {};
 
 struct readable_vector_engine_tag  : public integral_constant<int, 1> {};
 struct writable_vector_engine_tag  : public integral_constant<int, 2> {};
-struct resizable_vector_engine_tag : public integral_constant<int, 3> {};
+struct initable_vector_engine_tag  : public integral_constant<int, 3> {};
+struct resizable_vector_engine_tag : public integral_constant<int, 5> {};
 
-struct readable_matrix_engine_tag  : public integral_constant<int, 5> {};
-struct writable_matrix_engine_tag  : public integral_constant<int, 7> {};
-struct resizable_matrix_engine_tag : public integral_constant<int, 11> {};
+struct readable_matrix_engine_tag  : public integral_constant<int, 7> {};
+struct writable_matrix_engine_tag  : public integral_constant<int, 11> {};
+struct initable_matrix_engine_tag  : public integral_constant<int, 13> {};
+struct resizable_matrix_engine_tag : public integral_constant<int, 17> {};
 
 
 //- Owning engines with dynamically-allocated external storage.

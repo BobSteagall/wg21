@@ -49,6 +49,11 @@ class submatrix_engine
     constexpr submatrix_engine&     operator =(submatrix_engine&&) noexcept = default;
     constexpr submatrix_engine&     operator =(submatrix_engine const&) = default;
 
+    template<class ET2, detail::enable_if_convertible_engine<ET2, ET> = true>
+    constexpr submatrix_engine&    operator =(ET2 const& rhs);
+    template<class U, detail::enable_if_writable<ET, ET> = true>
+    constexpr submatrix_engine&     operator =(initializer_list<initializer_list<U>> list);
+
     //- Capacity
     //
     constexpr size_type     columns() const noexcept;
@@ -96,6 +101,26 @@ submatrix_engine<ET, MCT>::submatrix_engine()
 ,   m_col_start(0)
 ,   m_col_count(0)
 {}
+
+template<class ET, class VCT>
+template<class ET2, detail::enable_if_convertible_engine<ET2, ET>> constexpr
+submatrix_engine<ET,VCT>&
+submatrix_engine<ET,VCT>::operator =(ET2 const& rhs)
+{
+    detail::check_source_engine_size(rhs, rows(), columns());
+    detail::assign_from_matrix_engine(*this, rhs);
+    return *this;
+}
+
+template<class ET, class VCT>
+template<class U, detail::enable_if_writable<ET, ET>> constexpr
+submatrix_engine<ET,VCT>&
+submatrix_engine<ET,VCT>::operator =(initializer_list<initializer_list<U>> rhs)
+{
+    detail::check_source_init_list(rhs, m_row_count, m_col_count);
+    detail::assign_from_matrix_list(*this, rhs);
+    return *this;
+}
 
 //----------
 //- Capacity

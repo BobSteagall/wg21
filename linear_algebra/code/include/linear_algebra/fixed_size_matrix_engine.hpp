@@ -22,7 +22,7 @@ class fs_matrix_engine
   public:
     //- Types
     //
-    using engine_category = writable_matrix_engine_tag;
+    using engine_category = initable_matrix_engine_tag;
     using element_type    = T;
     using value_type      = remove_cv_t<T>;
     using pointer         = element_type*;
@@ -47,19 +47,19 @@ class fs_matrix_engine
     constexpr fs_matrix_engine(fs_matrix_engine const&) = default;
     template<class T2, size_t R2, size_t C2>
     constexpr fs_matrix_engine(fs_matrix_engine<T2, R2, C2> const& rhs);
-    template<class ET2>
+    template<class ET2, detail::enable_if_has_convertible_element<ET2,T> = true>
     constexpr fs_matrix_engine(ET2 const& rhs);
-    template<class T2>
-    constexpr fs_matrix_engine(initializer_list<T2> rhs);
+    template<class T2, detail::enable_if_convertible_element<T2,T> = true>
+    constexpr fs_matrix_engine(initializer_list<initializer_list<T2>> rhs);
 
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine&&) noexcept = default;
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine const&) = default;
     template<class T2, size_t R2, size_t C2>
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine<T2, R2, C2> const& rhs);
-    template<class ET2>
+    template<class ET2, detail::enable_if_has_convertible_element<ET2,T> = true>
     constexpr fs_matrix_engine&     operator =(ET2 const& rhs);
-    template<class T2>
-    constexpr fs_matrix_engine&     operator =(initializer_list<T2> rhs);
+    template<class T2, detail::enable_if_convertible_element<T2,T> = true>
+    constexpr fs_matrix_engine&     operator =(initializer_list<initializer_list<T2>> rhs);
 
     //- Capacity
     //
@@ -97,7 +97,7 @@ class fs_matrix_engine
     template<class ET2>
     constexpr void  assign(ET2 const& rhs);
     template<class T2>
-    constexpr void  assign(initializer_list<T2> rhs);
+    constexpr void  assign(initializer_list<initializer_list<T2>> rhs);
 };
 
 //------------------------
@@ -117,7 +117,7 @@ fs_matrix_engine<T,R,C>::fs_matrix_engine(fs_matrix_engine<T2,R2,C2> const& rhs)
 }
 
 template<class T, size_t R, size_t C>
-template<class ET2> constexpr
+template<class ET2, detail::enable_if_has_convertible_element<ET2,T>> constexpr
 fs_matrix_engine<T,R,C>::fs_matrix_engine(ET2 const& rhs)
 :   ma_elems()
 {
@@ -125,8 +125,8 @@ fs_matrix_engine<T,R,C>::fs_matrix_engine(ET2 const& rhs)
 }
 
 template<class T, size_t R, size_t C>
-template<class T2> constexpr
-fs_matrix_engine<T,R,C>::fs_matrix_engine(initializer_list<T2> rhs)
+template<class T2, detail::enable_if_convertible_element<T2,T>> constexpr
+fs_matrix_engine<T,R,C>::fs_matrix_engine(initializer_list<initializer_list<T2>> rhs)
 :   ma_elems()
 {
     assign(rhs);
@@ -142,7 +142,7 @@ fs_matrix_engine<T,R,C>::operator =(fs_matrix_engine<T2,R2,C2> const& rhs)
 }
 
 template<class T, size_t R, size_t C>
-template<class ET2> constexpr
+template<class ET2, detail::enable_if_has_convertible_element<ET2,T>> constexpr
 fs_matrix_engine<T,R,C>&
 fs_matrix_engine<T,R,C>::operator =(ET2 const& rhs)
 {
@@ -151,9 +151,9 @@ fs_matrix_engine<T,R,C>::operator =(ET2 const& rhs)
 }
 
 template<class T, size_t R, size_t C>
-template<class T2> constexpr
+template<class T2, detail::enable_if_convertible_element<T2,T>> constexpr
 fs_matrix_engine<T,R,C>&
-fs_matrix_engine<T,R,C>::operator =(initializer_list<T2> rhs)
+fs_matrix_engine<T,R,C>::operator =(initializer_list<initializer_list<T2>> rhs)
 {
     assign(rhs);
     return *this;
@@ -302,33 +302,17 @@ void
 fs_matrix_engine<T,R,C>::assign(ET2 const& rhs)
 {
     static_assert(is_matrix_engine_v<ET2>);
-    detail::check_source_engine_size(rhs.rows(), rhs.columns(), R, C);
-
-    typename ET2::size_type     si = 0, sj = 0;
-    size_type                   di = 0, dj = 0;
-
-    for (;  di < R;  ++di, ++si)
-    {
-        for (;  dj < C;  ++dj, ++sj)
-        {
-            (*this)(di, dj) = rhs(si, sj);
-        }
-    }
+    detail::check_source_engine_size(rhs, R, C);
+    detail::assign_from_matrix_engine(*this, rhs);
 }
 
 template<class T, size_t R, size_t C>
 template<class T2> constexpr
 void
-fs_matrix_engine<T,R,C>::assign(initializer_list<T2> rhs)
+fs_matrix_engine<T,R,C>::assign(initializer_list<initializer_list<T2>> rhs)
 {
-    detail::check_source_init_list_size(rhs.size(), R, C);
-
-    size_type   di = 0;
-
-    for (auto const& el : rhs)
-    {
-        ma_elems[di++] = el;
-    }
+    detail::check_source_init_list(rhs, R, C);
+    detail::assign_from_matrix_list(*this, rhs);
 }
 
 }       //- STD_LA namespace

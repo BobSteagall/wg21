@@ -45,16 +45,16 @@ class dr_vector_engine
     dr_vector_engine(dr_vector_engine const& rhs);
     dr_vector_engine(size_type elems);
     dr_vector_engine(size_type elems, size_type elem_cap);
-    template<class ET2>
+    template<class ET2, detail::enable_if_has_convertible_element<ET2,T> = true>
     dr_vector_engine(ET2 const& rhs);
-    template<class T2>
+    template<class T2, detail::enable_if_convertible_element<T2,T> = true>
     dr_vector_engine(initializer_list<T2> rhs);
 
     dr_vector_engine&   operator =(dr_vector_engine&& rhs) noexcept;
     dr_vector_engine&   operator =(dr_vector_engine const& rhs);
-    template<class ET2>
+    template<class ET2, detail::enable_if_has_convertible_element<ET2,T> = true>
     dr_vector_engine&   operator =(ET2 const& rhs);
-    template<class T2>
+    template<class T2, detail::enable_if_convertible_element<T2,T> = true>
     dr_vector_engine&   operator =(initializer_list<T2> rhs);
 
     //- Capacity
@@ -143,7 +143,7 @@ dr_vector_engine<T,AT>::dr_vector_engine(size_type elems, size_type cap)
 }
 
 template<class T, class AT>
-template<class ET2> inline
+template<class ET2, detail::enable_if_has_convertible_element<ET2,T>> inline
 dr_vector_engine<T,AT>::dr_vector_engine(ET2 const& rhs)
 :   dr_vector_engine()
 {
@@ -151,8 +151,8 @@ dr_vector_engine<T,AT>::dr_vector_engine(ET2 const& rhs)
 }
 
 template<class T, class AT>
-template<class U>
-dr_vector_engine<T,AT>::dr_vector_engine(initializer_list<U> rhs)
+template<class T2, detail::enable_if_convertible_element<T2,T>>
+dr_vector_engine<T,AT>::dr_vector_engine(initializer_list<T2> rhs)
 :   dr_vector_engine()
 {
     assign(rhs);
@@ -177,7 +177,7 @@ dr_vector_engine<T,AT>::operator =(dr_vector_engine const& rhs)
 }
 
 template<class T, class AT>
-template<class ET2> inline
+template<class ET2, detail::enable_if_has_convertible_element<ET2,T>> inline
 dr_vector_engine<T,AT>&
 dr_vector_engine<T,AT>::operator =(ET2 const& rhs)
 {
@@ -186,7 +186,7 @@ dr_vector_engine<T,AT>::operator =(ET2 const& rhs)
 }
 
 template<class T, class AT>
-template<class T2> inline
+template<class T2, detail::enable_if_convertible_element<T2,T>> inline
 dr_vector_engine<T,AT>&
 dr_vector_engine<T,AT>::operator =(initializer_list<T2> rhs)
 {
@@ -326,19 +326,10 @@ void
 dr_vector_engine<T,AT>::assign(ET2 const& rhs)
 {
     static_assert(is_vector_engine_v<ET2>);
-    using src_size_type = typename ET2::size_type;
 
-    size_type           elems = (size_type) rhs.elements();
-    dr_vector_engine    tmp(elems);
+    dr_vector_engine    tmp(static_cast<size_type>(rhs.elements()));
 
-    src_size_type   si = 0;
-    size_type       di = 0;
-
-    for (;  di < elems;  ++di, ++si)
-    {
-        tmp(di) = rhs(si);
-    }
-
+    detail::assign_from_vector_engine(tmp, rhs);
     tmp.swap(*this);
 }
 
@@ -347,14 +338,10 @@ template<class T2>
 void
 dr_vector_engine<T,AT>::assign(initializer_list<T2> rhs)
 {
-    alloc_new((size_type) rhs.size(), (size_type) rhs.size());
+    dr_vector_engine    tmp(static_cast<size_type>(rhs.size()));
 
-    auto    iter = rhs.begin();
-
-    for (size_t i = 0;  i < rhs.size();  ++i, ++iter)
-    {
-        mp_elems[i] = static_cast<T>(*iter);
-    }
+    detail::assign_from_vector_list(tmp, rhs);
+    tmp.swap(*this);
 }
 
 template<class T, class AT>
