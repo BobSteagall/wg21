@@ -12,7 +12,7 @@
 namespace STD_LA {
 //- This trivial class template is used to represent the presence of a scalar operand in an
 //  expression.  It is part of the public interface so that users wishing to create customized
-//  arithmetic operation traits can easily detect if an operand is a scalar.
+//  arithmetic operation traits can easily detect when an operand is a scalar.
 //
 template<class T>
 struct scalar_engine

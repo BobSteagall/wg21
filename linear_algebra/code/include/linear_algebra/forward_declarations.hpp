@@ -26,6 +26,8 @@ struct writable_matrix_engine_tag  : public integral_constant<int, 11> {};
 struct initable_matrix_engine_tag  : public integral_constant<int, 13> {};
 struct resizable_matrix_engine_tag : public integral_constant<int, 17> {};
 
+struct column_tag {};
+struct row_tag {};
 
 //- Owning engines with dynamically-allocated external storage.
 //
@@ -41,8 +43,9 @@ template<class T, size_t R, size_t C>   class fs_matrix_engine;
 //
 template<class ET, class VCT>   class column_engine;
 template<class ET, class VCT>   class row_engine;
-template<class ET, class MCT>   class transpose_engine;
-template<class ET, class MCT>   class submatrix_engine;
+template<class ET, class VCT, class RCT>    class subvector_engine;
+template<class ET, class MCT>               class submatrix_engine;
+template<class ET, class MCT>               class transpose_engine;
 
 template<class T>   struct scalar_engine;
 

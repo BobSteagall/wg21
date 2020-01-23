@@ -40,10 +40,10 @@ class matrix
     using size_type            = typename engine_type::size_type;
     using size_tuple           = typename engine_type::size_tuple;
 
-    using column_type          = vector<column_engine<engine_type, possibly_writable_vector_tag>, OT>;
-    using const_column_type    = vector<column_engine<engine_type, readable_vector_engine_tag>, OT>;
-    using row_type             = vector<row_engine<engine_type, possibly_writable_vector_tag>, OT>;
-    using const_row_type       = vector<row_engine<engine_type, readable_vector_engine_tag>, OT>;
+    using column_type          = vector<subvector_engine<engine_type, possibly_writable_vector_tag, column_tag>, OT>;
+    using const_column_type    = vector<subvector_engine<engine_type, readable_vector_engine_tag, column_tag>, OT>;
+    using row_type             = vector<subvector_engine<engine_type, possibly_writable_vector_tag, row_tag>, OT>;
+    using const_row_type       = vector<subvector_engine<engine_type, readable_vector_engine_tag, row_tag>, OT>;
 
     using submatrix_type       = matrix<submatrix_engine<engine_type, possibly_writable_matrix_tag>, OT>;
     using const_submatrix_type = matrix<submatrix_engine<engine_type, readable_matrix_engine_tag>, OT>;

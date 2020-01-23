@@ -412,11 +412,11 @@ TestGroup00()
     constexpr int    i = t003X();
     int j = t003Y();
 
-    PRINT_FNAME();
+//    PRINT_FNAME();
 
 //    PRINT_TYPE(decltype(tf));
 
-//    t001X();
+    t001X();
 
 //    t000();
 //    t001();
