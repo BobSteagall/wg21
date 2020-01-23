@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 project(wg21_linear_algebra VERSION 0.0.1)
 
 option(BUILD_TESTING "flag to build tests" ON)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 include(FetchContent)
 FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git)
@@ -98,6 +99,7 @@ target_compile_definitions(wg21_linear_algebra
 target_link_libraries(wg21_linear_algebra
     INTERFACE
         std::mdspan
+        gtest
 )
 
 if (BUILD_TESTING)
@@ -132,6 +134,7 @@ if (BUILD_TESTING)
         PRIVATE
             wg21_linear_algebra
             gtest_main
+            gtest
     )
 
     set_target_properties(la_test PROPERTIES
