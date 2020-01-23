@@ -107,6 +107,9 @@
     <ClInclude Include="include\linear_algebra\fixed_size_vector_engine.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
+    <ClInclude Include="test\pch.h">
+      <Filter>Test Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\test_01.cpp">
@@ -142,5 +145,14 @@
     <ClCompile Include="test_geometry_4.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
+    <ClCompile Include="test\test.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\pch.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
