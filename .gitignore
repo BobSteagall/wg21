@@ -1,6 +1,7 @@
 build*
 cmake-*
 extsrc*
+packages/
 tmp
 x64*
 x86*

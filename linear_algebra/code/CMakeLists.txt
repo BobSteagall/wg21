@@ -6,11 +6,19 @@ option(BUILD_TESTING "flag to build tests" ON)
 include(FetchContent)
 FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git)
 FetchContent_GetProperties(mdspan)
+option(MDSPAN_ENABLE_CONCEPTS "" OFF)
 if(NOT mdspan_POPULATED)
     FetchContent_Populate(mdspan)
     add_subdirectory(${mdspan_SOURCE_DIR} ${mdspan_BINARY_DIR})
 endif()
 
+FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git)
+FetchContent_GetProperties(gtest)
+option(BUILD_GMOCK "" OFF)
+if(NOT gtest_POPULATED)
+    FetchContent_Populate(gtest)
+    add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
+endif()
 
 add_library(wg21_linear_algebra INTERFACE)
 target_include_directories(wg21_linear_algebra
@@ -42,6 +50,8 @@ target_sources(wg21_linear_algebra
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/private_support.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/public_support.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/row_engine.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/submatrix_engine.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/subvector_engine.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/subtraction_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/subtraction_traits_impl.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/transpose_engine.hpp>
@@ -67,6 +77,8 @@ target_sources(wg21_linear_algebra
         $<INSTALL_INTERFACE:include/linear_algebra/private_support.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/public_support.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/row_engine.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/subvector_engine.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/submatrix_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/subtraction_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/subtraction_traits_impl.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/transpose_engine.hpp>
@@ -97,6 +109,8 @@ if (BUILD_TESTING)
     target_include_directories(la_test
         PRIVATE
             test
+            gtest
+            ${gtest_SOURCE_DIR}/googletest/include
     )
 
     target_sources(la_test
@@ -116,7 +130,8 @@ if (BUILD_TESTING)
 
     target_link_libraries(la_test
         PRIVATE
-            wg21_linear_algebra::wg21_linear_algebra
+            wg21_linear_algebra
+            gtest_main
     )
 
     set_target_properties(la_test PROPERTIES
