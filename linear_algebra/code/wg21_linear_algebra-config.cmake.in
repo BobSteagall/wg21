@@ -8,7 +8,7 @@ if(NOT TARGET std::mdspan)
     include(${CMAKE_CURRENT_LIST_DIR}/../../../cmake/mdspanTargets.cmake)
 endif()
 
-if(NOT TARGET std::mdspan)
+if(NOT TARGET gtest)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../lib/cmake/GTest/")
     include(${CMAKE_CURRENT_LIST_DIR}/../../../lib/cmake/GTest/GTestConfig.cmake)
 endif()
