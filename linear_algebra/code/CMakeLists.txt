@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(wg21_linear_algebra VERSION 0.0.1)
 
-option(BUILD_TESTING "flag to build tests" ON)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 include(FetchContent)
@@ -11,14 +10,6 @@ option(MDSPAN_ENABLE_CONCEPTS "" OFF)
 if(NOT mdspan_POPULATED)
     FetchContent_Populate(mdspan)
     add_subdirectory(${mdspan_SOURCE_DIR} ${mdspan_BINARY_DIR})
-endif()
-
-FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git)
-FetchContent_GetProperties(gtest)
-option(BUILD_GMOCK "" OFF)
-if(NOT gtest_POPULATED)
-    FetchContent_Populate(gtest)
-    add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
 endif()
 
 add_library(wg21_linear_algebra INTERFACE)
@@ -102,10 +93,18 @@ target_link_libraries(wg21_linear_algebra
         std::mdspan
 )
 
-if (BUILD_TESTING)
-    include(CTest)
-    add_library(wg21_linear_algebra::wg21_linear_algebra ALIAS wg21_linear_algebra)
+include(CTest)
+if (${BUILD_TESTING})
 
+    FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git)
+    FetchContent_GetProperties(gtest)
+    option(BUILD_GMOCK "" OFF)
+    if(NOT gtest_POPULATED)
+        FetchContent_Populate(gtest)
+        add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
+    endif()
+
+    add_library(wg21_linear_algebra::wg21_linear_algebra ALIAS wg21_linear_algebra)
     add_executable(la_test "")
 
     target_include_directories(la_test
@@ -147,7 +146,7 @@ if (BUILD_TESTING)
             $<$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function>
     )
 
-endif(BUILD_TESTING)
+endif(${BUILD_TESTING})
 
 # This should be passed in via the commmand line ("cmake --build ./ -v" or "cmake --build ./ -DCMAKE_VERBOSE_MAKEFILE=1")
 #set(CMAKE_VERBOSE_MAKEFILE 1)
