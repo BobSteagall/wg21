@@ -22,6 +22,7 @@ if(NOT gtest_POPULATED)
 endif()
 
 add_library(wg21_linear_algebra INTERFACE)
+
 target_include_directories(wg21_linear_algebra
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -99,7 +100,6 @@ target_compile_definitions(wg21_linear_algebra
 target_link_libraries(wg21_linear_algebra
     INTERFACE
         std::mdspan
-        gtest
 )
 
 if (BUILD_TESTING)
@@ -111,8 +111,6 @@ if (BUILD_TESTING)
     target_include_directories(la_test
         PRIVATE
             test
-            gtest
-            ${gtest_SOURCE_DIR}/googletest/include
     )
 
     target_sources(la_test
