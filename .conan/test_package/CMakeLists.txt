@@ -7,6 +7,7 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
 find_package(wg21_linear_algebra REQUIRED)
+find_package(gtest REQUIRED)
 
 add_executable(test_linear_algebra
         ../../linear_algebra/code/test/test_new_arithmetic.hpp
@@ -22,4 +23,4 @@ add_executable(test_linear_algebra
         ../../linear_algebra/code/test/test_main.cpp
 )
 
-target_link_libraries(test_linear_algebra PRIVATE wg21_linear_algebra::wg21_linear_algebra gtest)
+target_link_libraries(test_linear_algebra PRIVATE wg21_linear_algebra::wg21_linear_algebra gtest_main gtest)
