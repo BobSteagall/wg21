@@ -13,6 +13,7 @@ wg21*
 .vs
 *.bak
 *.db
+*.kate-swp
 *.opendb
 *.sdf
 *.suo

@@ -22,4 +22,4 @@ add_executable(test_linear_algebra
         ../../linear_algebra/code/test/test_main.cpp
 )
 
-target_link_libraries(test_linear_algebra PRIVATE wg21_linear_algebra::wg21_linear_algebra)
+target_link_libraries(test_linear_algebra PRIVATE wg21_linear_algebra::wg21_linear_algebra gtest)
