@@ -535,11 +535,10 @@ struct noe_mdspan_traits;
 template<>
 struct noe_mdspan_traits<void>
 {
-    using src_span_type = void;
-    using col_span_type = void;
-    using row_span_type = void;
-    using sub_span_type = void;
-    using tr_span_type  = void;
+    using source_span_type    = void;
+    using subvector_span_type = void;
+    using submatrix_span_type = void;
+    using transpose_span_type = void;
 };
 
 
@@ -548,50 +547,50 @@ struct noe_mdspan_traits<void>
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
 struct noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
 {
-    using src_span_type = basic_mdspan<T, extents<X0, X1>, layout_right, A>;
-    using col_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
-    using row_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
-    using sub_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
-    using tr_span_type  = basic_mdspan<T, extents<X1, X0>, layout_right, A>;
-    using index_type    = typename src_span_type::index_type;
+    using source_span_type    = basic_mdspan<T, extents<X0, X1>, layout_right, A>;
+    using subvector_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
+    using submatrix_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
+    using transpose_span_type = basic_mdspan<T, extents<X1, X0>, layout_right, A>;
+    using index_type          = typename source_span_type::index_type;
 
-    static constexpr col_span_type  col_span(src_span_type const& s, index_type col);
-    static constexpr row_span_type  row_span(src_span_type const& s, index_type row);
-    static constexpr sub_span_type  sub_span(src_span_type const& s, index_type row, index_type col,
-                                                                     index_type rows, index_type cols);
-    static constexpr tr_span_type   tr_span(src_span_type const& s);
+    static constexpr subvector_span_type    col_span(source_span_type const& s, index_type col);
+    static constexpr subvector_span_type    row_span(source_span_type const& s, index_type row);
+    static constexpr submatrix_span_type    sub_span(source_span_type const& s,
+                                                     index_type row, index_type col,
+                                                     index_type rows, index_type cols);
+    static constexpr transpose_span_type    tr_span(source_span_type const& s);
 };
 
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
-typename noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::col_span_type
+typename noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::subvector_span_type
 noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::col_span
-(src_span_type const& s, index_type col)
+(source_span_type const& s, index_type col)
 {
     return subspan(s, all, col);
 }
 
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
-typename noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::row_span_type
+typename noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::subvector_span_type
 noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::row_span
-(src_span_type const& s, index_type row)
+(source_span_type const& s, index_type row)
 {
     return subspan(s, row, all);
 }
 
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
-typename noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::sub_span_type
+typename noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::submatrix_span_type
 noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::sub_span
-(src_span_type const& s, index_type row, index_type row_count, index_type col, index_type col_count)
+(source_span_type const& s, index_type row, index_type row_count, index_type col, index_type col_count)
 {
     using pair_t = pair<index_type, index_type>;
     return subspan(s, pair_t(row, row + row_count), pair(col, col + col_count));
 }
 
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
-typename noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::tr_span_type
-noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::tr_span(src_span_type const& s)
+typename noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::transpose_span_type
+noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::tr_span(source_span_type const& s)
 {
-    return tr_span_type(s.data());
+    return transpose_span_type(s.data());
 }
 
 
@@ -600,54 +599,54 @@ noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>::tr_span(src_span_type
 template<class T, class A>
 struct noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>
 {
-    using src_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
-    using col_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
-    using row_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
-    using sub_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
-    using tr_span_type  = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
-    using index_type    = typename src_span_type::index_type;
+    using source_span_type    = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
+    using subvector_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
+    using submatrix_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
+    using transpose_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
+    using index_type          = typename source_span_type::index_type;
 
-    static constexpr col_span_type  col_span(src_span_type const& s, index_type col);
-    static constexpr row_span_type  row_span(src_span_type const& s, index_type row);
-    static constexpr sub_span_type  sub_span(src_span_type const& s, index_type row, index_type col,
-                                                                     index_type rows, index_type cols);
-    static constexpr tr_span_type   tr_span(src_span_type const& s);
+    static constexpr subvector_span_type    col_span(source_span_type const& s, index_type col);
+    static constexpr subvector_span_type    row_span(source_span_type const& s, index_type row);
+    static constexpr submatrix_span_type    sub_span(source_span_type const& s,
+                                                     index_type row, index_type col,
+                                                     index_type rows, index_type cols);
+    static constexpr transpose_span_type    tr_span(source_span_type const& s);
 };
 
 template<class T, class A> constexpr
-typename noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::col_span_type
+typename noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::subvector_span_type
 noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::col_span
-(src_span_type const& s, index_type col)
+(source_span_type const& s, index_type col)
 {
     return subspan(s, all, col);
 }
 
 template<class T, class A> constexpr
-typename noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::row_span_type
+typename noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::subvector_span_type
 noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::row_span
-(src_span_type const& s, index_type row)
+(source_span_type const& s, index_type row)
 {
     return subspan(s, row, all);
 }
 
 template<class T, class A> constexpr
-typename noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::sub_span_type
+typename noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::submatrix_span_type
 noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::sub_span
-(src_span_type const& s, index_type row, index_type row_count, index_type col, index_type col_count)
+(source_span_type const& s, index_type row, index_type row_count, index_type col, index_type col_count)
 {
     using pair_t = pair<index_type, index_type>;
     return subspan(s, pair_t(row, row + row_count), pair(col, col + col_count));
 }
 
 template<class T, class A> constexpr
-typename noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::tr_span_type
-noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::tr_span(src_span_type const& s)
+typename noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::transpose_span_type
+noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::tr_span(source_span_type const& s)
 {
     dyn_mat_extents     ext(s.extent(1), s.extent(0));
     dyn_mat_strides     str{s.stride(1), s.stride(0)};
     dyn_mat_mapping     map(ext, str);
 
-    return tr_span_type(s.data(), map);
+    return transpose_span_type(s.data(), map);
 }
 
 
@@ -655,10 +654,10 @@ noe_mdspan_traits<basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>>::tr_span(
 //  spans (needed by column engines).
 //
 template<class ST>
-using noe_mdspan_column_t = typename noe_mdspan_traits<ST>::col_span_type;
+using noe_mdspan_subvector_t = typename noe_mdspan_traits<ST>::subvector_span_type;
 
 template<class ST, class SZ> inline constexpr
-typename noe_mdspan_traits<ST>::col_span_type
+typename noe_mdspan_traits<ST>::subvector_span_type
 noe_mdspan_column(ST const& s, SZ col)
 {
     using idx_t = typename noe_mdspan_traits<ST>::index_type;
@@ -673,7 +672,7 @@ template<class ST>
 using noe_mdspan_row_t = typename noe_mdspan_traits<ST>::row_span_type;
 
 template<class ST, class SZ> inline constexpr
-typename noe_mdspan_traits<ST>::row_span_type
+typename noe_mdspan_traits<ST>::subvector_span_type
 noe_mdspan_row(ST const& s, SZ row)
 {
     using idx_t = typename noe_mdspan_traits<ST>::index_type;
@@ -685,10 +684,10 @@ noe_mdspan_row(ST const& s, SZ row)
 //  spans (needed by submatrix engines).
 //
 template<class ST>
-using noe_mdspan_submatrix_t = typename noe_mdspan_traits<ST>::sub_span_type;
+using noe_mdspan_submatrix_t = typename noe_mdspan_traits<ST>::submatrix_span_type;
 
 template<class ST, class SZ> inline constexpr
-typename noe_mdspan_traits<ST>::sub_span_type
+typename noe_mdspan_traits<ST>::submatrix_span_type
 noe_mdspan_submatrix(ST const& s, SZ row, SZ row_count, SZ col, SZ col_count)
 {
     using idx_t = typename noe_mdspan_traits<ST>::index_type;
@@ -703,10 +702,10 @@ noe_mdspan_submatrix(ST const& s, SZ row, SZ row_count, SZ col, SZ col_count)
 //  spans (needed by transpose engines).
 //
 template<class ST>
-using noe_mdspan_transpose_t = typename noe_mdspan_traits<ST>::tr_span_type;
+using noe_mdspan_transpose_t = typename noe_mdspan_traits<ST>::transpose_span_type;
 
 template<class ST> inline constexpr
-typename noe_mdspan_traits<ST>::tr_span_type
+typename noe_mdspan_traits<ST>::transpose_span_type
 noe_mdspan_transpose(ST const& s)
 {
     return noe_mdspan_traits<ST>::tr_span(s);
