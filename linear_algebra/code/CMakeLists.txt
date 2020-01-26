@@ -147,6 +147,15 @@ if (${BUILD_TESTING})
             $<$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function>
     )
 
+    enable_testing()
+    include(GoogleTest)
+    gtest_discover_tests(la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DISCOVERY_TIMEOUT 30)
+    #set_tests_properties(la_test PROPERTIES TIMEOUT 10)
+    #[[add_test(
+            NAME la_test
+            COMMAND la_test
+            WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+    )#]]
 endif(${BUILD_TESTING})
 
 # This should be passed in via the commmand line ("cmake --build ./ -v" or "cmake --build ./ -DCMAKE_VERBOSE_MAKEFILE=1")
