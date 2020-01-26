@@ -33,8 +33,8 @@ class column_engine
     using size_type       = typename ET::size_type;
 
 #ifdef LA_USE_MDSPAN
-    using span_type       = detail::noe_mdspan_subvector_t<detail::noe_mdspan_t<ET, VCT>>;
-    using const_span_type = detail::noe_mdspan_subvector_t<detail::noe_const_mdspan_t<ET, VCT>>;
+    using span_type       = detail::noe_mdspan_rowcolumn_t<detail::noe_mdspan_t<ET, VCT>>;
+    using const_span_type = detail::noe_mdspan_rowcolumn_t<detail::noe_const_mdspan_t<ET, VCT>>;
 #endif
 
     //- Construct/copy/destroy

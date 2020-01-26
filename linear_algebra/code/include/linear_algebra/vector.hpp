@@ -111,7 +111,7 @@ class vector
 #ifdef LA_USE_MDSPAN
     static_assert(detail::has_valid_span_alias_form_v<ET>);
 #endif
-
+    using possibly_writable_vector_tag = detail::noe_category_t<ET, writable_vector_engine_tag>;
     static constexpr bool   has_cx_elem  = detail::is_complex_v<typename ET::value_type>;
 
   public:
@@ -126,6 +126,8 @@ class vector
     using const_pointer        = typename engine_type::const_pointer;
     using reference            = typename engine_type::reference;
     using const_reference      = typename engine_type::const_reference;
+    using subvector_type       = vector<subvector_engine<engine_type, possibly_writable_vector_tag>, OT>;
+    using const_subvector_type = vector<subvector_engine<engine_type, readable_vector_engine_tag>, OT>;
     using transpose_type       = vector&;
     using const_transpose_type = vector const&;
     using hermitian_type       = conditional_t<has_cx_elem, vector, transpose_type>;
@@ -189,6 +191,8 @@ class vector
     constexpr const_span_type       span() const noexcept;
 #endif
 
+    constexpr subvector_type        subvector(size_type i, size_type n) noexcept;
+    constexpr const_subvector_type  subvector(size_type i, size_type n) const noexcept;
     constexpr transpose_type        t();
     constexpr const_transpose_type  t() const;
     constexpr hermitian_type        h();
@@ -376,6 +380,20 @@ vector<ET,OT>::span() const noexcept
 }
 
 #endif
+
+template<class ET, class OT> constexpr
+typename vector<ET,OT>::subvector_type
+vector<ET,OT>::subvector(size_type i, size_type n) noexcept
+{
+    return subvector_type(*this, i, n);
+}
+
+template<class ET, class OT> constexpr
+typename vector<ET,OT>::const_subvector_type
+vector<ET,OT>::subvector(size_type i, size_type n) const noexcept
+{
+    return subvector_type(*this, i, n);
+}
 
 template<class ET, class OT> constexpr
 typename vector<ET,OT>::transpose_type

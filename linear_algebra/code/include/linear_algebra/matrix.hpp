@@ -22,10 +22,8 @@ class matrix
 #ifdef LA_USE_MDSPAN
     static_assert(detail::has_valid_span_alias_form_v<ET>);
 #endif
-
     using possibly_writable_vector_tag = detail::noe_category_t<ET, writable_vector_engine_tag>;
     using possibly_writable_matrix_tag = detail::noe_category_t<ET, writable_matrix_engine_tag>;
-
     static constexpr bool   has_cx_elem  = detail::is_complex_v<typename ET::value_type>;
 
   public:
@@ -40,11 +38,10 @@ class matrix
     using size_type            = typename engine_type::size_type;
     using size_tuple           = typename engine_type::size_tuple;
 
-    using column_type          = vector<subvector_engine<engine_type, possibly_writable_vector_tag, column_tag>, OT>;
-    using const_column_type    = vector<subvector_engine<engine_type, readable_vector_engine_tag, column_tag>, OT>;
-    using row_type             = vector<subvector_engine<engine_type, possibly_writable_vector_tag, row_tag>, OT>;
-    using const_row_type       = vector<subvector_engine<engine_type, readable_vector_engine_tag, row_tag>, OT>;
-
+    using column_type          = vector<column_engine<engine_type, possibly_writable_vector_tag>, OT>;
+    using const_column_type    = vector<column_engine<engine_type, readable_vector_engine_tag>, OT>;
+    using row_type             = vector<row_engine<engine_type, possibly_writable_vector_tag>, OT>;
+    using const_row_type       = vector<row_engine<engine_type, readable_vector_engine_tag>, OT>;
     using submatrix_type       = matrix<submatrix_engine<engine_type, possibly_writable_matrix_tag>, OT>;
     using const_submatrix_type = matrix<submatrix_engine<engine_type, readable_matrix_engine_tag>, OT>;
     using transpose_type       = matrix<transpose_engine<engine_type, possibly_writable_matrix_tag>, OT>;

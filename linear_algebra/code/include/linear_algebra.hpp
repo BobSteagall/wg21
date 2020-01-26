@@ -69,6 +69,8 @@
 #include "linear_algebra/fixed_size_vector_engine.hpp"
 #include "linear_algebra/fixed_size_matrix_engine.hpp"
 #include "linear_algebra/subvector_engine.hpp"
+#include "linear_algebra/column_engine.hpp"
+#include "linear_algebra/row_engine.hpp"
 #include "linear_algebra/submatrix_engine.hpp"
 #include "linear_algebra/transpose_engine.hpp"
 #include "linear_algebra/vector_iterators.hpp"
