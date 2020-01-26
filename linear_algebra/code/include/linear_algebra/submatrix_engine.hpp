@@ -50,7 +50,7 @@ class submatrix_engine
     constexpr submatrix_engine&     operator =(submatrix_engine const&) = default;
 
     template<class ET2, detail::enable_if_convertible_engine<ET2, ET> = true>
-    constexpr submatrix_engine&    operator =(ET2 const& rhs);
+    constexpr submatrix_engine&     operator =(ET2 const& rhs);
     template<class U, detail::enable_if_writable<ET, ET> = true>
     constexpr submatrix_engine&     operator =(initializer_list<initializer_list<U>> list);
 
