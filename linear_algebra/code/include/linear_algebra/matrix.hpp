@@ -114,13 +114,6 @@ class matrix
     constexpr reference             operator ()(size_type i, size_type j);
     constexpr const_reference       operator ()(size_type i, size_type j) const;
 
-#ifdef LA_USE_MDSPAN
-    template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
-    constexpr span_type             span() noexcept;
-    template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
-    constexpr const_span_type       span() const noexcept;
-#endif
-
     constexpr column_type           column(size_type j) noexcept;
     constexpr const_column_type     column(size_type j) const noexcept;
     constexpr row_type              row(size_type i) noexcept;
@@ -136,6 +129,13 @@ class matrix
     //
     constexpr engine_type&          engine() noexcept;
     constexpr engine_type const&    engine() const noexcept;
+
+#ifdef LA_USE_MDSPAN
+    template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
+    constexpr span_type             span() noexcept;
+    template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
+    constexpr const_span_type       span() const noexcept;
+#endif
 
     //- Modifiers
     //
@@ -337,26 +337,6 @@ matrix<ET,OT>::operator ()(size_type i, size_type j) const
     return m_engine(i, j);
 }
 
-#ifdef LA_USE_MDSPAN
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_spannable<ET, ET2>> inline constexpr
-typename matrix<ET,OT>::span_type
-matrix<ET,OT>::span() noexcept
-{
-    return m_engine.span();
-}
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_spannable<ET, ET2>> inline constexpr
-typename matrix<ET,OT>::const_span_type
-matrix<ET,OT>::span() const noexcept
-{
-    return m_engine.span();
-}
-
-#endif
-
 template<class ET, class OT> inline constexpr
 typename matrix<ET,OT>::const_column_type
 matrix<ET,OT>::column(size_type j) const noexcept
@@ -458,6 +438,26 @@ matrix<ET,OT>::engine() const noexcept
     return m_engine;
 }
 
+#ifdef LA_USE_MDSPAN
+
+template<class ET, class OT>
+template<class ET2, detail::enable_if_spannable<ET, ET2>> inline constexpr
+typename matrix<ET,OT>::span_type
+matrix<ET,OT>::span() noexcept
+{
+    return m_engine.span();
+}
+
+template<class ET, class OT>
+template<class ET2, detail::enable_if_spannable<ET, ET2>> inline constexpr
+typename matrix<ET,OT>::const_span_type
+matrix<ET,OT>::span() const noexcept
+{
+    return m_engine.span();
+}
+
+#endif
+
 //-----------
 //- Modifiers
 //
@@ -491,13 +491,26 @@ template<class ET1, class OT1, class ET2, class OT2>
 constexpr bool
 operator ==(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
 {
-    if (m1.size() != m2.size()) return false;
+    using lhs_size = typename ET1::size_type;
+    using rhs_size = typename ET2::size_type;
 
-    for (int i = 0;  i < m1.rows();  ++i)
+    lhs_size    i1 = 0;
+    lhs_size    j1 = 0;
+    lhs_size    r1 = m1.rows();
+    lhs_size    c1 = m1.columns();
+
+    rhs_size    i2 = 0;
+    rhs_size    j2 = 0;
+    rhs_size    r2 = m2.rows();
+    rhs_size    c2 = m2.columns();
+
+    if (r1 != static_cast<lhs_size>(r2)  ||  c1 != static_cast<lhs_size>(c2)) return false;
+
+    for (;  i1 < r1;  ++i1, ++i2)
     {
-        for (int j = 0;  j < m2.columns();  ++j)
+        for (;  j1 < c1;  ++j1, ++j2)
         {
-            if (m1(i, j) != m2(i, j)) return false;
+            if (m1(i1, j1) != m2(i2, j2)) return false;
         }
     }
     return true;
@@ -509,7 +522,6 @@ operator !=(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
 {
     return !(m1 == m2);
 }
-
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_MATRIX_HPP_DEFINED

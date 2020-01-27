@@ -76,6 +76,8 @@ class fs_matrix_engine
     constexpr reference         operator ()(size_type i, size_type j);
     constexpr const_reference   operator ()(size_type i, size_type j) const;
 
+    //- Data access
+    //
 #ifdef LA_USE_MDSPAN
     constexpr span_type         span() noexcept;
     constexpr const_span_type   span() const noexcept;
@@ -221,6 +223,9 @@ fs_matrix_engine<T,R,C>::operator ()(size_type i, size_type j) const
     return ma_elems[i*C + j];
 }
 
+//-------------
+//- Data access
+//
 #ifdef LA_USE_MDSPAN
 
 template<class T, size_t R, size_t C> constexpr

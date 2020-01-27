@@ -68,6 +68,8 @@ class submatrix_engine
     //
     constexpr reference     operator ()(size_type i, size_type j) const;
 
+    //- Data access
+    //
 #ifdef LA_USE_MDSPAN
     constexpr span_type     span() const noexcept;
 #endif
@@ -177,6 +179,9 @@ submatrix_engine<ET, MCT>::operator ()(size_type i, size_type j) const
     return (*mp_other)(i + m_row_start, j + m_col_start);
 }
 
+//-------------
+//- Data access
+//
 #ifdef LA_USE_MDSPAN
 
 template<class ET, class MCT> constexpr

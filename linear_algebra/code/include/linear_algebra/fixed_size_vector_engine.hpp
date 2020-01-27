@@ -67,6 +67,8 @@ class fs_vector_engine
     constexpr reference         operator ()(size_type i);
     constexpr const_reference   operator ()(size_type i) const;
 
+    //- Data access
+    //
 #ifdef LA_USE_MDSPAN
     constexpr span_type         span() noexcept;
     constexpr const_span_type   span() const noexcept;
@@ -183,6 +185,9 @@ fs_vector_engine<T,N>::operator ()(size_type i) const
     return ma_elems[i];
 }
 
+//-------------
+//- Data access
+//
 #ifdef LA_USE_MDSPAN
 
 template<class T, size_t N> constexpr

@@ -62,6 +62,8 @@ class row_engine
     //
     constexpr reference     operator ()(size_type i) const;
 
+    //- Data access
+    //
 #ifdef LA_USE_MDSPAN
     constexpr span_type     span() const noexcept;
 #endif
@@ -136,6 +138,9 @@ row_engine<ET, VCT>::operator ()(size_type j) const
     return (*mp_other)(m_row, j);
 }
 
+//-------------
+//- Data access
+//
 #ifdef LA_USE_MDSPAN
 
 template<class ET, class VCT> constexpr

@@ -239,6 +239,15 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     auto    sspn1 = sub1.span();
     PRINT(sspn1);
     PRINT_TYPE(decltype(sspn1));
+
+    PRINT(row1);
+    PRINT(rspn1);
+
+    auto    subrow1  = row1.subvector(2, 7);
+    PRINT(subrow1);
+    auto    sbrwspn1 = subrow1.span();
+    PRINT(sbrwspn1);
+
 #endif
 }
 

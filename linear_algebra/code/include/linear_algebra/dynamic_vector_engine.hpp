@@ -70,6 +70,8 @@ class dr_vector_engine
     reference       operator ()(size_type i);
     const_reference operator ()(size_type i) const;
 
+    //- Data access
+    //
 #ifdef LA_USE_MDSPAN
     span_type       span() noexcept;
     const_span_type span() const noexcept;
@@ -249,6 +251,9 @@ dr_vector_engine<T,AT>::operator ()(size_type i) const
     return mp_elems[i];
 }
 
+//-------------
+//- Data access
+//
 #ifdef LA_USE_MDSPAN
 
 template<class T, class AT> inline

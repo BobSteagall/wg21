@@ -33,8 +33,8 @@ class subvector_engine
     using size_type       = typename ET::size_type;
 
 #ifdef LA_USE_MDSPAN
-    using span_type       = detail::noe_mdspan_rowcolumn_t<detail::noe_mdspan_t<ET, VCT>>;
-    using const_span_type = detail::noe_mdspan_rowcolumn_t<detail::noe_const_mdspan_t<ET, VCT>>;
+    using span_type       = detail::noe_mdspan_subvector_t<detail::noe_mdspan_t<ET, VCT>>;
+    using const_span_type = detail::noe_mdspan_subvector_t<detail::noe_const_mdspan_t<ET, VCT>>;
 #endif
 
     //- Construct/copy/destroy
@@ -50,7 +50,7 @@ class subvector_engine
 
     template<class ET2, detail::enable_if_convertible_engine<ET2, ET> = true>
     constexpr subvector_engine&    operator =(ET2 const& rhs);
-    template<class U, detail::enable_if_writable<ET, ET> = true>
+    template<class U, class ET2 = ET, detail::enable_if_writable<ET2, ET> = true>
     constexpr subvector_engine&    operator =(initializer_list<U> list);
 
     //- Capacity
@@ -62,6 +62,8 @@ class subvector_engine
     //
     constexpr reference     operator ()(size_type i) const;
 
+    //- Data access
+    //
 #ifdef LA_USE_MDSPAN
     constexpr span_type     span() const noexcept;
 #endif
@@ -102,7 +104,7 @@ subvector_engine<ET,VCT>::operator =(ET2 const& rhs)
 }
 
 template<class ET, class VCT>
-template<class U, detail::enable_if_writable<ET, ET>> constexpr
+template<class U, class ET2, detail::enable_if_writable<ET2, ET>> constexpr
 subvector_engine<ET,VCT>&
 subvector_engine<ET,VCT>::operator =(initializer_list<U> rhs)
 {
@@ -138,13 +140,16 @@ subvector_engine<ET,VCT>::operator ()(size_type i) const
     return (*mp_other)(i + m_start);
 }
 
+//-------------
+//- Data access
+//
 #ifdef LA_USE_MDSPAN
 
 template<class ET, class VCT> constexpr
 typename subvector_engine<ET,VCT>::span_type
 subvector_engine<ET,VCT>::span() const noexcept
 {
-    return  {};//detail::noe_mdspan_column(mp_other->span(), m_fixed);
+    return detail::noe_mdspan_subvector(mp_other->span(), m_start, m_count);
 }
 
 #endif
