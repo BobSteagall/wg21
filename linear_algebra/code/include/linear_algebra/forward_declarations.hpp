@@ -12,7 +12,7 @@
 namespace STD_LA {
 USING_STD
 
-//- Tags that specify how engines behave.
+//- Engine category tags that specify the interfaces expressed by engine types.
 //
 struct scalar_engine_tag           : public integral_constant<int, 0> {};
 
@@ -38,11 +38,14 @@ template<class T, size_t R, size_t C>   class fs_matrix_engine;
 
 //- Non-owning, view-style engines (NOEs).
 //
-template<class ET, class VCT>   class subvector_engine;
-template<class ET, class VCT>   class column_engine;
-template<class ET, class VCT>   class row_engine;
-template<class ET, class MCT>   class submatrix_engine;
-template<class ET, class MCT>   class transpose_engine;
+struct subvector_view_tag {};
+struct column_view_tag {};
+struct row_view_tag {};
+struct submatrix_view_tag {};
+struct transpose_view_tag {};
+
+template<class ET, class VCT, class VFT>   class vector_view_engine;
+template<class ET, class MCT, class VFT>   class matrix_view_engine;
 
 template<class T>   struct scalar_engine;
 

@@ -100,7 +100,7 @@ template<class ET2, detail::enable_if_convertible_engine<ET2, ET>> constexpr
 transpose_engine<ET,VCT>&
 transpose_engine<ET,VCT>::operator =(ET2 const& rhs)
 {
-    detail::check_source_engine_size(rhs, rows(), columns());
+    detail::check_source_engine_size(rhs, mp_other->columns(), mp_other->rows());
     detail::assign_from_matrix_engine(*this, rhs);
     return *this;
 }
@@ -110,7 +110,7 @@ template<class U, detail::enable_if_writable<ET, ET>> constexpr
 transpose_engine<ET,VCT>&
 transpose_engine<ET,VCT>::operator =(initializer_list<initializer_list<U>> rhs)
 {
-    detail::check_source_init_list(rhs, rows(), columns());
+    detail::check_source_init_list(rhs, mp_other->columns(), mp_other->rows());
     detail::assign_from_matrix_list(*this, rhs);
     return *this;
 }
