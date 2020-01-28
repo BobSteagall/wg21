@@ -8,10 +8,6 @@
 #ifndef LINEAR_ALGEBRA_DEBUG_HELPERS_HPP_DEFINED
 #define LINEAR_ALGEBRA_DEBUG_HELPERS_HPP_DEFINED
 
-//-------------------------------------------------------------------------------------------------
-//  Helper functions and utilities for testing the interface; not part of the final proposal!
-//-------------------------------------------------------------------------------------------------
-//
 #include <iostream>
 #include <iomanip>
 #include <string_view>

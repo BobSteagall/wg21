@@ -24,6 +24,7 @@ class matrix
 #endif
     using possibly_writable_vector_tag = detail::noe_category_t<ET, writable_vector_engine_tag>;
     using possibly_writable_matrix_tag = detail::noe_category_t<ET, writable_matrix_engine_tag>;
+
     static constexpr bool   has_cx_elem  = detail::is_complex_v<typename ET::value_type>;
 
   public:

@@ -208,9 +208,9 @@ using enable_if_init_list_ok = enable_if_t<is_same_v<ET1, ET2> && !is_resizable_
 #ifdef LA_USE_MDSPAN
 //==================================================================================================
 //  The following are several detection idiom traits types, regular traits types, and alias
-//  templates for determining the type aliases 'span_type' and 'const_span_type' that should be
-//  with an engine's public interface.  There are exactly three mutually-exclusive possibilities,
-//  each based on the presence/absence of the type aliases:
+//  templates for determining the type aliases 'span_type' and 'const_span_type' that may be
+//  present in an engine's public interface.  There are exactly three mutually-exclusive
+//  possibilities, each based on the presence/absence of the type aliases:
 //    1. Both aliases are missing      --> associated aliases are void
 //    2. Both aliases are void         --> associated aliases are void
 //    3. Both aliases are basic_mdspan --> associated aliases are of the form basic_mdspan<T,X,L,A>
@@ -278,8 +278,8 @@ struct extract_span_types<basic_mdspan<T0, X0, L0, A0>, basic_mdspan<T1, X1, L1,
 
 //- This traits type is used to determine the span_type and const_span_type aliases from an
 //  engine's public interface.  If both aliases are missing, then the results are both void.
-//  If both aliases are void, then the results are both void.  If both aliases are for instances
-//  of basic_mdspan, then the results are those aliases.  All other combinations are errors.
+//  If both aliases are void, then the results are both void.  If both aliases refer to
+//  basic_mdspan, then the results are those aliases.  All other combinations are errors.
 //
 template<bool, bool, class ET>
 struct engine_span_types;
@@ -724,6 +724,7 @@ make_dyn_span(T* pdata, ST rows, ST cols, ST row_stride, ST col_stride = 1u)
 
     return basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>(pdata, mapping);
 }
+
 
 #endif
 //==================================================================================================
