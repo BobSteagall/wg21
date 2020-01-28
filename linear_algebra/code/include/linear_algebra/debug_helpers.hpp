@@ -8,10 +8,6 @@
 #ifndef LINEAR_ALGEBRA_DEBUG_HELPERS_HPP_DEFINED
 #define LINEAR_ALGEBRA_DEBUG_HELPERS_HPP_DEFINED
 
-//-------------------------------------------------------------------------------------------------
-//  Helper functions and utilities for testing the interface; not part of the final proposal!
-//-------------------------------------------------------------------------------------------------
-//
 #include <iostream>
 #include <iomanip>
 #include <string_view>
@@ -28,7 +24,7 @@ type_name()                //- From StackOverflow...
     using namespace std;
 #ifdef __clang__
     string_view p = __PRETTY_FUNCTION__;
-    return string_view(p.data() + 34, p.size() - 34 - 1);
+    return string_view(p.data() + 59, p.size() - 59 - 1);
 #elif defined(__GNUC__)
     string_view p = __PRETTY_FUNCTION__;
     # if __cplusplus < 201402
@@ -138,8 +134,8 @@ clean_type_name(basic_string<C,T,A> tname)
 inline void
 PrintFuncName(char const* name)
 {
-    cout << "********************************************************************************\n";
-    cout << "********************************************************************************\n";
+    cout << "--------------------------------------------------------------------------------\n";
+    cout << "--------------------------------------------------------------------------------\n";
     cout << "    In test function: " << name << endl;
 }
 

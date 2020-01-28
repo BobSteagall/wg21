@@ -1,18 +1,19 @@
 cmake_minimum_required(VERSION 3.14)
 project(wg21_linear_algebra VERSION 0.0.1)
 
-option(BUILD_TESTING "flag to build tests" ON)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 include(FetchContent)
 FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git)
 FetchContent_GetProperties(mdspan)
+option(MDSPAN_ENABLE_CONCEPTS "" OFF)
 if(NOT mdspan_POPULATED)
     FetchContent_Populate(mdspan)
     add_subdirectory(${mdspan_SOURCE_DIR} ${mdspan_BINARY_DIR})
 endif()
 
-
 add_library(wg21_linear_algebra INTERFACE)
+
 target_include_directories(wg21_linear_algebra
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -25,13 +26,15 @@ target_sources(wg21_linear_algebra
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/addition_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/addition_traits_impl.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/arithmetic_operators.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/column_engine.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/debug_helpers.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/dynamic_engines.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/fixed_size_engines.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/dynamic_vector_engine.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/dynamic_matrix_engine.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/fixed_size_vector_engine.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/fixed_size_matrix_engine.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/forward_declarations.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/library_aliases.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/matrix.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/matrix_view_engine.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/multiplication_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/multiplication_traits_impl.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/negation_traits.hpp>
@@ -39,22 +42,23 @@ target_sources(wg21_linear_algebra
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/operation_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/private_support.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/public_support.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/row_engine.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/subtraction_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/subtraction_traits_impl.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/transpose_engine.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/vector.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/vector_view_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/addition_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/addition_traits_impl.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/arithmetic_operators.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/column_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/debug_helpers.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/dynamic_engines.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/fixed_size_engines.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/dynamic_vector_engine.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/dynamic_matrix_engine.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/fixed_size_vector_engine.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/fixed_size_matrix_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/forward_declarations.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/library_aliases.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/matrix.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/matrix_view_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/multiplication_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/multiplication_traits_impl.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/negation_traits.hpp>
@@ -62,11 +66,10 @@ target_sources(wg21_linear_algebra
         $<INSTALL_INTERFACE:include/linear_algebra/operation_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/private_support.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/public_support.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/row_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/subtraction_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/subtraction_traits_impl.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/transpose_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/vector.hpp>
+        $<INSTALL_INTERFACE:include/linear_algebra/vector_view_engine.hpp>
 )
 
 target_compile_features(wg21_linear_algebra
@@ -84,10 +87,19 @@ target_link_libraries(wg21_linear_algebra
         std::mdspan
 )
 
-if (BUILD_TESTING)
-    include(CTest)
-    add_library(wg21_linear_algebra::wg21_linear_algebra ALIAS wg21_linear_algebra)
+include(CTest)
+if (${BUILD_TESTING})
 
+    FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git)
+    FetchContent_GetProperties(gtest)
+    option(BUILD_GMOCK "" OFF)
+    option(gtest_force_shared_crt "" ON)
+    if(NOT gtest_POPULATED)
+        FetchContent_Populate(gtest)
+        add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
+    endif()
+
+    add_library(wg21_linear_algebra::wg21_linear_algebra ALIAS wg21_linear_algebra)
     add_executable(la_test "")
 
     target_include_directories(la_test
@@ -112,7 +124,9 @@ if (BUILD_TESTING)
 
     target_link_libraries(la_test
         PRIVATE
-            wg21_linear_algebra::wg21_linear_algebra
+            wg21_linear_algebra
+            gtest_main
+            gtest
     )
 
     set_target_properties(la_test PROPERTIES
@@ -127,7 +141,16 @@ if (BUILD_TESTING)
             $<$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function>
     )
 
-endif(BUILD_TESTING)
+#    enable_testing()
+#    include(GoogleTest)
+#    gtest_discover_tests(la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DISCOVERY_TIMEOUT 30)
+    #set_tests_properties(la_test PROPERTIES TIMEOUT 10)
+    #[[add_test(
+            NAME la_test
+            COMMAND la_test
+            WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+    )#]]
+endif(${BUILD_TESTING})
 
 # This should be passed in via the commmand line ("cmake --build ./ -v" or "cmake --build ./ -DCMAKE_VERBOSE_MAKEFILE=1")
 #set(CMAKE_VERBOSE_MAKEFILE 1)

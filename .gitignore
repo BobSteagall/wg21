@@ -1,6 +1,7 @@
 build*
 cmake-*
 extsrc*
+packages/
 tmp
 x64*
 x86*
@@ -12,6 +13,7 @@ wg21*
 .vs
 *.bak
 *.db
+*.kate-swp
 *.opendb
 *.sdf
 *.suo

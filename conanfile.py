@@ -19,16 +19,15 @@ class LinearAlgebraConan(ConanFile):
         if self._cmake is None:
             self._cmake = CMake(self)
             self._cmake.definitions.update({
-                "BUILD_TESTING": False
+                "BUILD_TESTING": True
             })
             self._cmake.configure(source_folder=os.path.join("linear_algebra", "code"))
         return self._cmake
 
 
-    def package(self):
+    def build(self):
         self.cmake.build()
-        if self.options.build_testing:
-            self.cmake.test()
+        self.cmake.test()
 
     def package(self):
         self.cmake.install()

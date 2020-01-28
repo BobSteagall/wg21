@@ -1,5 +1,4 @@
-#include <array>
-#include <linear_algebra.hpp>
+#include <gtest/gtest.h>
 
 void TestGroup00();
 void TestGroup10();
@@ -10,8 +9,15 @@ void TestGroup50();
 void TestGroup60();
 void TestGroup70();
 
-int main()
+TEST(TestCaseName0, TestName0) {
+  EXPECT_EQ(1, 1);
+  EXPECT_TRUE(true);
+}
+
+int main(int argc, char** argv)
 {
+    ::testing::InitGoogleTest(&argc, argv);
+
     TestGroup00();
 //    TestGroup10();
 //    TestGroup20();
@@ -21,5 +27,5 @@ int main()
 //	TestGroup60();
 //	TestGroup70();
 
-    return 0;
+    return RUN_ALL_TESTS();
 }

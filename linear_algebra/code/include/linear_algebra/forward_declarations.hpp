@@ -12,18 +12,19 @@
 namespace STD_LA {
 USING_STD
 
-//- Tags that specify how engines should behave.
+//- Engine category tags that specify the interfaces expressed by engine types.
 //
 struct scalar_engine_tag           : public integral_constant<int, 0> {};
 
 struct readable_vector_engine_tag  : public integral_constant<int, 1> {};
 struct writable_vector_engine_tag  : public integral_constant<int, 2> {};
-struct resizable_vector_engine_tag : public integral_constant<int, 3> {};
+struct initable_vector_engine_tag  : public integral_constant<int, 3> {};
+struct resizable_vector_engine_tag : public integral_constant<int, 5> {};
 
-struct readable_matrix_engine_tag  : public integral_constant<int, 5> {};
-struct writable_matrix_engine_tag  : public integral_constant<int, 7> {};
-struct resizable_matrix_engine_tag : public integral_constant<int, 11> {};
-
+struct readable_matrix_engine_tag  : public integral_constant<int, 7> {};
+struct writable_matrix_engine_tag  : public integral_constant<int, 11> {};
+struct initable_matrix_engine_tag  : public integral_constant<int, 13> {};
+struct resizable_matrix_engine_tag : public integral_constant<int, 17> {};
 
 //- Owning engines with dynamically-allocated external storage.
 //
@@ -35,12 +36,16 @@ template<class T, class AT>     class dr_matrix_engine;
 template<class T, size_t N>             class fs_vector_engine;
 template<class T, size_t R, size_t C>   class fs_matrix_engine;
 
-//- Non-owning, view-style engines.
+//- Non-owning, view-style engines (NOEs).
 //
-template<class ET, class VCT>   class column_engine;
-template<class ET, class VCT>   class row_engine;
-template<class ET, class MCT>   class transpose_engine;
-template<class ET, class MCT>   class submatrix_engine;
+struct subvector_view_tag {};
+struct column_view_tag {};
+struct row_view_tag {};
+struct submatrix_view_tag {};
+struct transpose_view_tag {};
+
+template<class ET, class VCT, class VFT>   class vector_view_engine;
+template<class ET, class MCT, class VFT>   class matrix_view_engine;
 
 template<class T>   struct scalar_engine;
 

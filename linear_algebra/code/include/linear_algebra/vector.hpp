@@ -111,7 +111,7 @@ class vector
 #ifdef LA_USE_MDSPAN
     static_assert(detail::has_valid_span_alias_form_v<ET>);
 #endif
-
+    using possibly_writable_vector_tag = detail::noe_category_t<ET, writable_vector_engine_tag>;
     static constexpr bool   has_cx_elem  = detail::is_complex_v<typename ET::value_type>;
 
   public:
@@ -126,6 +126,8 @@ class vector
     using const_pointer        = typename engine_type::const_pointer;
     using reference            = typename engine_type::reference;
     using const_reference      = typename engine_type::const_reference;
+    using subvector_type       = vector<subvector_engine<engine_type, possibly_writable_vector_tag>, OT>;
+    using const_subvector_type = vector<subvector_engine<engine_type, readable_vector_engine_tag>, OT>;
     using transpose_type       = vector&;
     using const_transpose_type = vector const&;
     using hermitian_type       = conditional_t<has_cx_elem, vector, transpose_type>;
@@ -143,20 +145,23 @@ class vector
     constexpr vector();
     constexpr vector(vector&&) noexcept = default;
     constexpr vector(vector const&) = default;
+
     template<class ET2, class OT2>
     constexpr vector(vector<ET2, OT2> const& src);
-
-    template<class U, class ET2 = ET, detail::enable_if_init_list_ok<ET, ET2, U> = true>
+    template<class U, class ET2 = ET, detail::enable_if_initable<ET, ET2> = true>
     constexpr vector(initializer_list<U> list);
+
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr vector(size_type elems);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr vector(size_type elems, size_type elemcap);
 
-    constexpr vector& operator =(vector&&) noexcept = default;
-    constexpr vector& operator =(vector const&) = default;
+    constexpr vector&   operator =(vector&&) noexcept = default;
+    constexpr vector&   operator =(vector const&) = default;
     template<class ET2, class OT2>
-    constexpr vector& operator =(vector<ET2, OT2> const& rhs);
+    constexpr vector&   operator =(vector<ET2, OT2> const& rhs);
+    template<class U, class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
+    constexpr vector&   operator =(initializer_list<U> list);
 
     //- Capacity
     //
@@ -179,13 +184,8 @@ class vector
     constexpr const_reference       operator [](size_type i) const;
     constexpr const_reference       operator ()(size_type i) const;
 
-#ifdef LA_USE_MDSPAN
-    template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
-    constexpr span_type             span() noexcept;
-    template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
-    constexpr const_span_type       span() const noexcept;
-#endif
-
+    constexpr subvector_type        subvector(size_type i, size_type n) noexcept;
+    constexpr const_subvector_type  subvector(size_type i, size_type n) const noexcept;
     constexpr transpose_type        t();
     constexpr const_transpose_type  t() const;
     constexpr hermitian_type        h();
@@ -195,6 +195,13 @@ class vector
     //
     constexpr engine_type&          engine() noexcept;
     constexpr engine_type const&    engine() const noexcept;
+
+#ifdef LA_USE_MDSPAN
+    template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
+    constexpr span_type             span() noexcept;
+    template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
+    constexpr const_span_type       span() const noexcept;
+#endif
 
     //- Modifiers
     //
@@ -227,7 +234,7 @@ vector<ET,OT>::vector(vector<ET2, OT2> const& rhs)
 {}
 
 template<class ET, class OT>
-template<class U, class ET2, detail::enable_if_init_list_ok<ET, ET2, U>> constexpr
+template<class U, class ET2, detail::enable_if_initable<ET, ET2>> constexpr
 vector<ET,OT>::vector(initializer_list<U> list)
 :   m_engine(list)
 {}
@@ -256,6 +263,15 @@ vector<ET,OT>&
 vector<ET,OT>::operator =(vector<ET2, OT2> const& rhs)
 {
     m_engine = rhs.m_engine;
+    return *this;
+}
+
+template<class ET, class OT>
+template<class U, class ET2, detail::enable_if_writable<ET, ET2>> constexpr
+vector<ET,OT>&
+vector<ET,OT>::operator =(initializer_list<U> rhs)
+{
+    m_engine = rhs;
     return *this;
 }
 
@@ -345,25 +361,19 @@ vector<ET,OT>::operator ()(size_type i) const
     return m_engine(i);
 }
 
-#ifdef LA_USE_MDSPAN
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_spannable<ET, ET2>> constexpr
-typename vector<ET,OT>::span_type
-vector<ET,OT>::span() noexcept
+template<class ET, class OT> constexpr
+typename vector<ET,OT>::subvector_type
+vector<ET,OT>::subvector(size_type i, size_type n) noexcept
 {
-    return m_engine.span();
+    return subvector_type(detail::special_ctor_tag(), m_engine, i, n);
 }
 
-template<class ET, class OT>
-template<class ET2, detail::enable_if_spannable<ET, ET2>> constexpr
-typename vector<ET,OT>::const_span_type
-vector<ET,OT>::span() const noexcept
+template<class ET, class OT> constexpr
+typename vector<ET,OT>::const_subvector_type
+vector<ET,OT>::subvector(size_type i, size_type n) const noexcept
 {
-    return m_engine.span();
+    return const_subvector_type(detail::special_ctor_tag(), m_engine, i, n);
 }
-
-#endif
 
 template<class ET, class OT> constexpr
 typename vector<ET,OT>::transpose_type
@@ -424,6 +434,26 @@ vector<ET,OT>::engine() const noexcept
     return m_engine;
 }
 
+#ifdef LA_USE_MDSPAN
+
+template<class ET, class OT>
+template<class ET2, detail::enable_if_spannable<ET, ET2>> constexpr
+typename vector<ET,OT>::span_type
+vector<ET,OT>::span() noexcept
+{
+    return m_engine.span();
+}
+
+template<class ET, class OT>
+template<class ET2, detail::enable_if_spannable<ET, ET2>> constexpr
+typename vector<ET,OT>::const_span_type
+vector<ET,OT>::span() const noexcept
+{
+    return m_engine.span();
+}
+
+#endif
+
 //-----------
 //- Modifiers
 //
@@ -449,15 +479,18 @@ template<class ET1, class OT1, class ET2, class OT2> constexpr
 bool
 operator ==(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2)
 {
-    using size_type_1 = typename vector<ET1, OT1>::size_type;
-    using size_type_2 = typename vector<ET2, OT2>::size_type;
+    using lhs_size = typename ET1::size_type;
+    using rhs_size = typename ET2::size_type;
 
-    if (v1.size() != (size_type_1) v2.size()) return false;
+    lhs_size    i1 = 0;
+    lhs_size    e1 = v1.elements();
 
-    size_type_1     i1;
-    size_type_2     i2;
+    rhs_size    i2 = 0;
+    rhs_size    e2 = v2.elements();
 
-    for (i1 = 0, i2 = 0;  i1 < v1.size();  ++i1, ++i2)
+    if (e1 != static_cast<lhs_size>(e2)) return false;
+
+    for (;  i1 < e1;  ++i1, ++i2)
     {
         if (v1(i1) != v2(i2)) return false;
     }

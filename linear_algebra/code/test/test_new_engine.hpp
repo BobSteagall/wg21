@@ -21,14 +21,9 @@ class fs_matrix_engine_tst
     using pointer         = T*;
     using const_reference = T const&;
     using const_pointer   = T const*;
-    using difference_type = std::size_t;
+    using difference_type = std::int32_t;
     using size_type       = std::uint32_t;
     using size_tuple      = std::tuple<size_type, size_type>;
-
-    static constexpr bool   is_column_major = false;
-    static constexpr bool   is_dense        = true;
-    static constexpr bool   is_rectangular  = true;
-    static constexpr bool   is_row_major    = true;
 
 #ifdef LA_USE_MDSPAN
 //    using span_type       = typename STD_LA::fs_matrix_engine<T, R, C>::span_type;

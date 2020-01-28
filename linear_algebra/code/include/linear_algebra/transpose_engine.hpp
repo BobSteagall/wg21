@@ -49,6 +49,11 @@ class transpose_engine
     constexpr transpose_engine&     operator =(transpose_engine&&) noexcept = default;
     constexpr transpose_engine&     operator =(transpose_engine const&) = default;
 
+    template<class ET2, detail::enable_if_convertible_engine<ET2, ET> = true>
+    constexpr transpose_engine&     operator =(ET2 const& rhs);
+    template<class U, detail::enable_if_writable<ET, ET> = true>
+    constexpr transpose_engine&     operator =(initializer_list<initializer_list<U>> list);
+
     //- Capacity
     //
     constexpr size_type     columns() const noexcept;
@@ -63,6 +68,8 @@ class transpose_engine
     //
     constexpr reference     operator ()(size_type i, size_type j) const;
 
+    //- Data access
+    //
 #ifdef LA_USE_MDSPAN
     constexpr span_type     span() const noexcept;
 #endif
@@ -87,6 +94,26 @@ template<class ET, class MCT> constexpr
 transpose_engine<ET, MCT>::transpose_engine()
 :   mp_other(nullptr)
 {}
+
+template<class ET, class VCT>
+template<class ET2, detail::enable_if_convertible_engine<ET2, ET>> constexpr
+transpose_engine<ET,VCT>&
+transpose_engine<ET,VCT>::operator =(ET2 const& rhs)
+{
+    detail::check_source_engine_size(rhs, mp_other->columns(), mp_other->rows());
+    detail::assign_from_matrix_engine(*this, rhs);
+    return *this;
+}
+
+template<class ET, class VCT>
+template<class U, detail::enable_if_writable<ET, ET>> constexpr
+transpose_engine<ET,VCT>&
+transpose_engine<ET,VCT>::operator =(initializer_list<initializer_list<U>> rhs)
+{
+    detail::check_source_init_list(rhs, mp_other->columns(), mp_other->rows());
+    detail::assign_from_matrix_list(*this, rhs);
+    return *this;
+}
 
 //----------
 //- Capacity
@@ -143,6 +170,9 @@ transpose_engine<ET, MCT>::operator ()(size_type i, size_type j) const
     return (*mp_other)(j, i);
 }
 
+//-------------
+//- Data access
+//
 #ifdef LA_USE_MDSPAN
 
 template<class ET, class MCT> constexpr

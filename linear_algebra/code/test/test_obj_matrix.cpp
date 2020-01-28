@@ -14,6 +14,7 @@ using fsv_double_5  = STD_LA::fs_vector<double, 5>;
 using fsm_double_35 = STD_LA::fs_matrix<double, 3, 5>;
 using fsm_float_35  = STD_LA::fs_matrix<float, 3, 5>;
 using fsm_double_36 = STD_LA::fs_matrix<double, 3, 6>;
+using fsm_double_99 = STD_LA::fs_matrix<double, 9, 9>;
 
 void t000()
 {
@@ -133,25 +134,15 @@ void t001()
     PRINT(v1);
     v1 = m2.column(2);
     PRINT(v1);
-
-    constexpr fsm_double_35     fsm = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-    constexpr double            d = fsm(1,1);
-
-    PRINT(fsm);
-
-    auto    sm = fsm.submatrix(1, 2, 2, 3);
-    PRINT(sm);
-    //drm_double  mx = {1.0, 1.0, 1.0, 1.0};
 }
 
 
 constexpr double t002()
 {
-    fsm_double_35   fsm  = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-    fsm_double_35   fsm2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    fsm_double_35   fsm  = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}};
 
     fsv_double_5    fsv  = {11, 12, 13, 14, 15};
-    fsv_double_5    fsv2 = {11, 12, 13};
+    fsv_double_5    fsv2 = {11, 12, 13, 0, 0};
 
     fsm.swap_columns(1, 3);
     fsm.swap_rows(0, 2);
@@ -159,9 +150,23 @@ constexpr double t002()
     double    d1 = fsm(1,2);
     double    d2 = fsv(3);
 
+    fsm.column(2) = {0, 0, 0};
+    fsm.row(1)    = {17, 17, 17, 17, 17};
+
     STD_LA::detail::la_swap(d1, d2);
 
-    return d2;
+    fsm_double_35 const fsm2 = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}};
+
+//    fsm2.column(2) = {0, 0, 0};
+//    fsm2.row(1)    = {17, 17, 17, 17, 17};
+
+    fsm_double_99   fsm3;
+    fsm3.submatrix(1, 4, 3, 2) = {{1, 2}, {3, 4}, {5, 6}, {7, 8}};
+    fsm3.submatrix(1, 4, 3, 2).row(2) = {11, 11};
+
+    fsm.t().row(3) = {22, 23, 24};
+
+    return fsm3(1, 2);
 }
 
 constexpr double t003()
@@ -234,6 +239,15 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     auto    sspn1 = sub1.span();
     PRINT(sspn1);
     PRINT_TYPE(decltype(sspn1));
+
+    PRINT(row1);
+    PRINT(rspn1);
+
+    auto    subrow1  = row1.subvector(2, 7);
+    PRINT(subrow1);
+    auto    sbrwspn1 = subrow1.span();
+    PRINT(sbrwspn1);
+
 #endif
 }
 
@@ -305,15 +319,111 @@ void t001X()
 }
 }
 
+template<class T> constexpr void
+tf(std::initializer_list<std::initializer_list<T>> list)
+{
+    STD_LA::detail::check_source_init_list(list);
+}
+
+constexpr int
+t003X()
+{
+    tf({{0, 1, 2}, {1, 2, 3}, {2, 3, 4}, {3, 4, 5}});
+    tf({{0, 1, 2}, {3, 4, 5}});
+
+    STD_LA::detail::check_source_init_list({{0, 1, 2}, {3, 4, 5}});
+    STD_LA::detail::check_source_init_list({{0, 1, 2}, {3, 4, 5}}, 2, 3);
+
+    return 0;
+}
+
+int
+t003Y()
+{
+    tf({{0, 1, 2}, {1, 2, 3}, {2, 3, 4}, {3, 4, 5}});
+    tf({{0, 1, 2}, {3, 4, 5}});
+
+    STD_LA::detail::check_source_init_list({{0, 1, 2}, {3, 4, 5}});
+    STD_LA::detail::check_source_init_list({{0, 1, 2}, {3, 4, 5}}, 2, 3);
+//    STD_LA::detail::check_source_init_list({{0, 1, 2}, {3, 4, 5}}, 2, 4);
+
+    fsm_double_35   fsm  = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}};
+    fsv_double_5    fsv  = {11, 12, 13, 14, 15};
+
+    PRINT(fsm);
+    PRINT(fsv);
+
+    drm_double      drm  = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}};
+    drv_double      drv  = {11, 12, 13, 14, 15};
+
+    PRINT(drm);
+    PRINT(drv);
+
+    drm = {{11, 12, 13, 14, 15}, {6, 7, 8, 9, 10}, {1, 2, 3, 4, 5}};
+    PRINT(drm);
+    fsm = {{11, 12, 13, 14, 15}, {6, 7, 8, 9, 10}, {1, 2, 3, 4, 5}};
+    PRINT(fsm);
+
+    drv = {5, 4, 3, 2, 1};
+    PRINT(drv);
+    fsv = {5, 4, 3, 2, 1};
+    PRINT(fsv);
+
+    auto    fcv = fsm.column(2);
+    PRINT(fcv);
+    fcv = {6, 6, 6};
+    PRINT(fcv);
+    fsm.column(3) = {0, 0, 0};
+    PRINT(fsm);
+    fsm.row(2) = {8, 8, 8, 8, 8};
+    PRINT(fsm);
+
+    auto    dcv = drm.column(1);
+    PRINT(dcv);
+    dcv = {3, 3, 3};
+    PRINT(dcv);
+    PRINT(drm);
+    drm.column(3) = {0, 0, 0};
+    PRINT(drm);
+    drm.row(2) = {18, 18, 18, 18, 18};
+    PRINT(drm);
+
+    drm_double  drm2(10, 10);
+    PRINT(drm2);
+    drm2.submatrix(1, 4, 3, 2) = {{1, 2}, {3, 4}, {5, 6}, {7, 8}};
+    auto const& cdrm2 = drm2;
+    PRINT(cdrm2);
+
+    drm2.submatrix(1, 4, 3, 2).row(2) = {11, 11};
+    PRINT(drm2);
+
+    PRINT(fsm);
+    drm2.submatrix(6, fsm.rows(), 4, fsm.columns()) = fsm;
+    PRINT(drm2);
+
+    PRINT(fsm.t());
+    PRINT(fsm.t().row(1));
+
+    fsm.t().row(1) = {86, 87, 88};
+    PRINT(fsm.t());
+    PRINT(fsm);
+
+    fsm.column(0) = drm.column(1);
+    PRINT(fsm);
+
+    return 0;
+}
+
 void
 TestGroup00()
 {
     constexpr double x = t002();
+    constexpr int    i = t003X();
+    int j = t003Y();
 
-    auto v = STD_LA::fs_vector<double, 3>{};
-    auto w{v};
+//    PRINT_FNAME();
 
-    PRINT_FNAME();
+//    PRINT_TYPE(decltype(tf));
 
     t001X();
 

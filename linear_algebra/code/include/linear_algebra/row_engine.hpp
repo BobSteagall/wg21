@@ -33,8 +33,8 @@ class row_engine
     using size_type       = typename ET::size_type;
 
 #ifdef LA_USE_MDSPAN
-    using span_type       = detail::noe_mdspan_row_t<detail::noe_mdspan_t<ET, VCT>>;
-    using const_span_type = detail::noe_mdspan_row_t<detail::noe_const_mdspan_t<ET, VCT>>;
+    using span_type       = detail::noe_mdspan_rowcolumn_t<detail::noe_mdspan_t<ET, VCT>>;
+    using const_span_type = detail::noe_mdspan_rowcolumn_t<detail::noe_const_mdspan_t<ET, VCT>>;
 #endif
 
     //- Construct/copy/destroy
@@ -48,6 +48,11 @@ class row_engine
     constexpr row_engine&   operator =(row_engine&&) noexcept = default;
     constexpr row_engine&   operator =(row_engine const&) noexcept = default;
 
+    template<class ET2, detail::enable_if_convertible_engine<ET2, ET> = true>
+    constexpr row_engine&   operator =(ET2 const& rhs);
+    template<class U, detail::enable_if_writable<ET, ET> = true>
+    constexpr row_engine&   operator =(initializer_list<U> list);
+
     //- Capacity
     //
     constexpr size_type     capacity() const noexcept;
@@ -57,6 +62,8 @@ class row_engine
     //
     constexpr reference     operator ()(size_type i) const;
 
+    //- Data access
+    //
 #ifdef LA_USE_MDSPAN
     constexpr span_type     span() const noexcept;
 #endif
@@ -83,6 +90,26 @@ row_engine<ET, VCT>::row_engine() noexcept
 :   mp_other(nullptr)
 ,   m_row(0)
 {}
+
+template<class ET, class VCT>
+template<class ET2, detail::enable_if_convertible_engine<ET2, ET>> constexpr
+row_engine<ET,VCT>&
+row_engine<ET,VCT>::operator =(ET2 const& rhs)
+{
+    detail::check_source_engine_size(rhs, elements());
+    detail::assign_from_vector_engine(*this, rhs);
+    return *this;
+}
+
+template<class ET, class VCT>
+template<class U, detail::enable_if_writable<ET, ET>> constexpr
+row_engine<ET,VCT>&
+row_engine<ET,VCT>::operator =(initializer_list<U> rhs)
+{
+    detail::check_source_init_list(rhs, elements());
+    detail::assign_from_vector_list(*this, rhs);
+    return *this;
+}
 
 //----------
 //- Capacity
@@ -111,6 +138,9 @@ row_engine<ET, VCT>::operator ()(size_type j) const
     return (*mp_other)(m_row, j);
 }
 
+//-------------
+//- Data access
+//
 #ifdef LA_USE_MDSPAN
 
 template<class ET, class VCT> constexpr
