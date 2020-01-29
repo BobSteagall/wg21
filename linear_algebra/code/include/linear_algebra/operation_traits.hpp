@@ -102,25 +102,7 @@ struct matrix_operation_traits_selector<matrix_operation_traits, matrix_operatio
     using traits_type = matrix_operation_traits;
 };
 
-template<class T1>
-struct matrix_operation_traits_selector<T1, default_matrix_operations>
-{
-    using traits_type = T1;
-};
-
-template<class T1>
-struct matrix_operation_traits_selector<default_matrix_operations, T1>
-{
-    using traits_type = T1;
-};
-
-template<>
-struct matrix_operation_traits_selector<default_matrix_operations, default_matrix_operations>
-{
-    using traits_type = default_matrix_operations;
-};
-
-//- Alias interface to trait.
+//- Alias template interface to trait.
 //
 template<class T1, class T2>
 using matrix_operation_traits_selector_t = typename matrix_operation_traits_selector<T1,T2>::traits_type;

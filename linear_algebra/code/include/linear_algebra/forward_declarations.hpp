@@ -26,6 +26,10 @@ struct writable_matrix_engine_tag  : public integral_constant<int, 11> {};
 struct initable_matrix_engine_tag  : public integral_constant<int, 13> {};
 struct resizable_matrix_engine_tag : public integral_constant<int, 17> {};
 
+//- A trivial engine to represent a scalar operand.
+//
+template<class T>   struct scalar_engine;
+
 //- Owning engines with dynamically-allocated external storage.
 //
 template<class T, class AT>     class dr_vector_engine;
@@ -47,21 +51,51 @@ struct transpose_view_tag {};
 template<class ET, class VCT, class VFT>   class vector_view_engine;
 template<class ET, class MCT, class VFT>   class matrix_view_engine;
 
-template<class T>   struct scalar_engine;
+//- These are some convenience aliases, to make it easier for user-created operation traits.
+//
+template<class ET, class VCT>
+using subvector_engine = vector_view_engine<ET, VCT, subvector_view_tag>;
+
+template<class ET, class VCT>
+using column_engine = vector_view_engine<ET, VCT, column_view_tag>;
+
+template<class ET, class VCT>
+using row_engine = vector_view_engine<ET, VCT, row_view_tag>;
+
+template<class ET, class MCT>
+using submatrix_engine = matrix_view_engine<ET, MCT, submatrix_view_tag>;
+
+template<class ET, class MCT>
+using transpose_engine = matrix_view_engine<ET, MCT, transpose_view_tag>;
+
 
 //- The default element promotion, engine promotion, and arithmetic operation traits for
 //  the four basic arithmetic operations.
 //
 struct matrix_operation_traits;
 
-//- TODO: remove this
-//
-struct default_matrix_operations {};
-
 //- Primary math object types.
 //
 template<class ET, class OT=matrix_operation_traits> class vector;
 template<class ET, class OT=matrix_operation_traits> class matrix;
+
+//- Aliases for vector and matrix objects based on dynamic engines.
+//
+template<class T, class A = allocator<T>>
+using dyn_vector = vector<dr_vector_engine<T, A>>;
+
+template<class T, class A = allocator<T>>
+using dyn_matrix = matrix<dr_matrix_engine<T, A>>;
+
+
+//- Aliases for vector and matrix objects based on fixed-size engines.
+//
+template<class T, size_t N>
+using fs_vector = vector<fs_vector_engine<T, N>>;
+
+template<class T, size_t R, size_t C>
+using fs_matrix = matrix<fs_matrix_engine<T, R, C>>;
+
 
 //- Math object element promotion traits, per arithmetical operation.
 //

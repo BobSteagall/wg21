@@ -71,24 +71,5 @@ bool    is_resizable_engine_v = detail::is_resizable_v<ET>;
 template<class ET1, class ET2> inline constexpr
 bool    engines_are_similar_v = detail::engines_match_v<ET1, ET2>;
 
-
-//- These are some convenience aliases, to make it easier for user-created operation traits.
-//
-template<class ET, class VCT>
-using subvector_engine = vector_view_engine<ET, VCT, subvector_view_tag>;
-
-template<class ET, class VCT>
-using column_engine = vector_view_engine<ET, VCT, column_view_tag>;
-
-template<class ET, class VCT>
-using row_engine = vector_view_engine<ET, VCT, row_view_tag>;
-
-template<class ET, class MCT>
-using submatrix_engine = matrix_view_engine<ET, MCT, submatrix_view_tag>;
-
-template<class ET, class MCT>
-using transpose_engine = matrix_view_engine<ET, MCT, transpose_view_tag>;
-
-
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_PUBLIC_SUPPORT_HPP_DEFINED

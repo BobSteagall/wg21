@@ -32,7 +32,6 @@ target_sources(wg21_linear_algebra
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/fixed_size_vector_engine.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/fixed_size_matrix_engine.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/forward_declarations.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/library_aliases.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/matrix.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/matrix_view_engine.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/multiplication_traits.hpp>
@@ -56,7 +55,6 @@ target_sources(wg21_linear_algebra
         $<INSTALL_INTERFACE:include/linear_algebra/fixed_size_vector_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/fixed_size_matrix_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/forward_declarations.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/library_aliases.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/matrix.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/matrix_view_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/multiplication_traits.hpp>
@@ -109,14 +107,15 @@ if (${BUILD_TESTING})
 
     target_sources(la_test
         PRIVATE
+            test/test_common.hpp
             test/test_new_arithmetic.hpp
             test/test_new_engine.hpp
             test/test_new_number.hpp
             test/test_obj_matrix.cpp
-            test/test_op_add.cpp
-            test/test_op_mul.cpp
-            test/test_op_neg.cpp
-            test/test_op_sub.cpp
+        test/test_op_add_traits.cpp
+        test/test_op_mul_traits.cpp
+        test/test_op_neg_traits.cpp
+        test/test_op_sub_traits.cpp
      #       test/test_01.cpp
      #       test/test_02.cpp
             test/test_main.cpp
@@ -137,9 +136,12 @@ if (${BUILD_TESTING})
 
     target_compile_options(la_test
         PRIVATE
-            $<$<OR:$<CXX_COMPILER_ID:GNU>>:-Wall -pedantic -Wextra  -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable -fmax-errors=10>
-            $<$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function>
+            $<$<OR:$<CXX_COMPILER_ID:GNU>>:-Wall -pedantic -Wextra  -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable -Wno-unused-local-typedefs -fmax-errors=10>
+            $<$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function -Wno-unused-local-typedefs>
     )
+
+    include(CTest)
+    add_test(LA_TEST la_test COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/la_test" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 #    enable_testing()
 #    include(GoogleTest)
@@ -151,9 +153,6 @@ if (${BUILD_TESTING})
             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     )#]]
 endif(${BUILD_TESTING})
-
-# This should be passed in via the commmand line ("cmake --build ./ -v" or "cmake --build ./ -DCMAKE_VERBOSE_MAKEFILE=1")
-#set(CMAKE_VERBOSE_MAKEFILE 1)
 
 include(GNUInstallDirs)
 

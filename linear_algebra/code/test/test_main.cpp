@@ -19,10 +19,10 @@ int main(int argc, char** argv)
     ::testing::InitGoogleTest(&argc, argv);
 
     TestGroup00();
-//    TestGroup10();
-//    TestGroup20();
-//    TestGroup30();
-//	TestGroup40();
+    TestGroup10();
+    TestGroup20();
+    TestGroup30();
+	TestGroup40();
 //	TestGroup50();
 //	TestGroup60();
 //	TestGroup70();

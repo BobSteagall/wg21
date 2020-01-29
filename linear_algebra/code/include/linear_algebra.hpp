@@ -64,17 +64,17 @@
 #include "linear_algebra/forward_declarations.hpp"
 #include "linear_algebra/private_support.hpp"
 #include "linear_algebra/public_support.hpp"
-#include "linear_algebra/dynamic_vector_engine.hpp"
-#include "linear_algebra/dynamic_matrix_engine.hpp"
 #include "linear_algebra/fixed_size_vector_engine.hpp"
 #include "linear_algebra/fixed_size_matrix_engine.hpp"
+#include "linear_algebra/dynamic_vector_engine.hpp"
+#include "linear_algebra/dynamic_matrix_engine.hpp"
 #include "linear_algebra/vector_view_engine.hpp"
 #include "linear_algebra/matrix_view_engine.hpp"
 #include "linear_algebra/vector_iterators.hpp"
 #include "linear_algebra/vector.hpp"
 #include "linear_algebra/matrix.hpp"
 
-#include "linear_algebra/debug_helpers.hpp"     //- helpers for debug/test.  Not for production.
+#include "linear_algebra/debug_helpers.hpp"     //- Helpers for debug/test -- not for production.
 
 #include "linear_algebra/addition_traits.hpp"
 #include "linear_algebra/addition_traits_impl.hpp"
@@ -86,6 +86,5 @@
 #include "linear_algebra/multiplication_traits_impl.hpp"
 #include "linear_algebra/operation_traits.hpp"
 #include "linear_algebra/arithmetic_operators.hpp"
-#include "linear_algebra/library_aliases.hpp"
 
 #endif  //- LINEAR_ALGEBRA_HPP_DEFINED
