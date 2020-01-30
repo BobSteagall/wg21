@@ -442,7 +442,7 @@ matrix<ET,OT>::engine() const noexcept
 #ifdef LA_USE_MDSPAN
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_spannable<ET, ET2>> inline constexpr
+template<class ET2, detail::enable_if_spannable<ET, ET2>> constexpr
 typename matrix<ET,OT>::span_type
 matrix<ET,OT>::span() noexcept
 {
@@ -450,7 +450,7 @@ matrix<ET,OT>::span() noexcept
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_spannable<ET, ET2>> inline constexpr
+template<class ET2, detail::enable_if_spannable<ET, ET2>> constexpr
 typename matrix<ET,OT>::const_span_type
 matrix<ET,OT>::span() const noexcept
 {
@@ -470,7 +470,7 @@ matrix<ET,OT>::swap(matrix& rhs) noexcept
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_writable<ET, ET2>> inline constexpr
+template<class ET2, detail::enable_if_writable<ET, ET2>> constexpr
 void
 matrix<ET,OT>::swap_columns(size_type c1, size_type c2) noexcept
 {
@@ -478,7 +478,7 @@ matrix<ET,OT>::swap_columns(size_type c1, size_type c2) noexcept
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_writable<ET, ET2>> inline constexpr
+template<class ET2, detail::enable_if_writable<ET, ET2>> constexpr
 void
 matrix<ET,OT>::swap_rows(size_type r1, size_type r2) noexcept
 {
@@ -488,37 +488,15 @@ matrix<ET,OT>::swap_rows(size_type r1, size_type r2) noexcept
 //------------
 //- Comparison
 //
-template<class ET1, class OT1, class ET2, class OT2>
-constexpr bool
+template<class ET1, class OT1, class ET2, class OT2> constexpr
+bool
 operator ==(matrix<ET1, OT1> const& lhs, matrix<ET2, OT2> const& rhs)
 {
-    using lhs_size = typename ET1::size_type;
-    using rhs_size = typename ET2::size_type;
-
-    lhs_size    i1 = 0;
-    lhs_size    j1 = 0;
-    lhs_size    r1 = lhs.rows();
-    lhs_size    c1 = lhs.columns();
-
-    rhs_size    i2 = 0;
-    rhs_size    j2 = 0;
-    rhs_size    r2 = rhs.rows();
-    rhs_size    c2 = rhs.columns();
-
-    if (r1 != static_cast<lhs_size>(r2)  ||  c1 != static_cast<lhs_size>(c2)) return false;
-
-    for (;  i1 < r1;  ++i1, ++i2)
-    {
-        for (;  j1 < c1;  ++j1, ++j2)
-        {
-            if (lhs(i1, j1) != rhs(i2, j2)) return false;
-        }
-    }
-    return true;
+    return detail::m_cmp_eq(lhs.engine(), rhs.engine());
 }
 
-template<class ET1, class OT1, class ET2, class OT2>
-constexpr bool
+template<class ET1, class OT1, class ET2, class OT2> constexpr
+bool
 operator !=(matrix<ET1, OT1> const& lhs, matrix<ET2, OT2> const& rhs)
 {
     return !(lhs == rhs);
@@ -530,29 +508,14 @@ template<class ET, class OT, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class
 bool
 operator ==(matrix<ET, OT> const& lhs, basic_mdspan<T, extents<X0, X1>, L, A> const& rhs)
 {
-    using lhs_size = typename ET::size_type;
-    using rhs_size = typename basic_mdspan<T, extents<X0, X1>, L, A>::index_type;
+    return detail::m_cmp_eq(lhs.engine(), rhs);
+}
 
-    lhs_size    i1 = 0;
-    lhs_size    j1 = 0;
-    lhs_size    r1 = lhs.rows();
-    lhs_size    c1 = lhs.columns();
-
-    rhs_size    i2 = 0;
-    rhs_size    j2 = 0;
-    rhs_size    r2 = rhs.extent(0);
-    rhs_size    c2 = rhs.extent(1);
-
-    if (r1 != static_cast<lhs_size>(r2)  ||  c1 != static_cast<lhs_size>(c2)) return false;
-
-    for (;  i1 < r1;  ++i1, ++i2)
-    {
-        for (;  j1 < c1;  ++j1, ++j2)
-        {
-            if (lhs(i1, j1) != rhs(i2, j2)) return false;
-        }
-    }
-    return true;
+template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A, class ET, class OT> constexpr
+bool
+operator ==(basic_mdspan<T, extents<X0, X1>, L, A> const& lhs, matrix<ET, OT> const& rhs)
+{
+    return detail::m_cmp_eq(rhs.engine(), lhs);
 }
 
 template<class ET, class OT, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
@@ -564,41 +527,11 @@ operator !=(matrix<ET, OT> const& lhs, basic_mdspan<T, extents<X0, X1>, L, A> co
 
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A, class ET, class OT> constexpr
 bool
-operator ==(basic_mdspan<T, extents<X0, X1>, L, A> const& lhs, matrix<ET, OT> const& rhs)
-{
-    using lhs_size = typename basic_mdspan<T, extents<X0, X1>, L, A>::index_type;
-    using rhs_size = typename ET::size_type;
-
-    lhs_size    i1 = 0;
-    lhs_size    j1 = 0;
-    lhs_size    r1 = lhs.rows();
-    lhs_size    c1 = lhs.columns();
-
-    rhs_size    i2 = 0;
-    rhs_size    j2 = 0;
-    rhs_size    r2 = rhs.extent(0);
-    rhs_size    c2 = rhs.extent(1);
-
-    if (r2 != static_cast<lhs_size>(r1)  ||  c2 != static_cast<lhs_size>(c1)) return false;
-
-    for (;  i1 < r1;  ++i1, ++i2)
-    {
-        for (;  j1 < c1;  ++j1, ++j2)
-        {
-            if (lhs(i1, j1) != rhs(i2, j2)) return false;
-        }
-    }
-    return true;
-}
-
-template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A, class ET, class OT> constexpr
-bool
 operator !=(basic_mdspan<T, extents<X0, X1>, L, A> const& lhs, matrix<ET, OT> const& rhs)
 {
     return !(lhs == rhs);
 }
 
 #endif
-
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_MATRIX_HPP_DEFINED

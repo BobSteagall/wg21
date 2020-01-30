@@ -32,8 +32,8 @@ template<class T>   struct scalar_engine;
 
 //- Owning engines with dynamically-allocated external storage.
 //
-template<class T, class AT>     class dr_vector_engine;
-template<class T, class AT>     class dr_matrix_engine;
+template<class T, class AT = allocator<T>>  class dr_vector_engine;
+template<class T, class AT = allocator<T>>  class dr_matrix_engine;
 
 //- Owning engines with fixed-size internal storage.
 //

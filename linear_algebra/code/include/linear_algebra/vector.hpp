@@ -479,22 +479,7 @@ template<class ET1, class OT1, class ET2, class OT2> constexpr
 bool
 operator ==(vector<ET1, OT1> const& lhs, vector<ET2, OT2> const& rhs)
 {
-    using lhs_size = typename ET1::size_type;
-    using rhs_size = typename ET2::size_type;
-
-    lhs_size    i1 = 0;
-    lhs_size    e1 = lhs.elements();
-
-    rhs_size    i2 = 0;
-    rhs_size    e2 = rhs.elements();
-
-    if (e1 != static_cast<lhs_size>(e2)) return false;
-
-    for (;  i1 < e1;  ++i1, ++i2)
-    {
-        if (lhs(i1) != rhs(i2)) return false;
-    }
-    return true;
+    return detail::v_cmp_eq(lhs.engine(), rhs.engine());
 }
 
 template<class ET1, class OT1, class ET2, class OT2> constexpr
@@ -510,22 +495,14 @@ template<class ET, class OT, class T, ptrdiff_t X0, class L, class A> constexpr
 bool
 operator ==(vector<ET, OT> const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
 {
-    using lhs_size = typename ET::size_type;
-    using rhs_size = typename basic_mdspan<T, extents<X0>, L, A>::index_type;
+    return detail::v_cmp_eq(lhs.engine(), rhs);
+}
 
-    lhs_size    i1 = 0;
-    lhs_size    e1 = lhs.elements();
-
-    rhs_size    i2 = 0;
-    rhs_size    e2 = rhs.elements();
-
-    if (e1 != static_cast<lhs_size>(e2)) return false;
-
-    for (;  i1 < e1;  ++i1, ++i2)
-    {
-        if (lhs(i1) != rhs(i2)) return false;
-    }
-    return true;
+template<class T, ptrdiff_t X0, class L, class A, class ET, class OT> constexpr
+bool
+operator ==(basic_mdspan<T, extents<X0>, L, A> const& lhs, vector<ET, OT> const& rhs)
+{
+    return detail::v_cmp_eq(rhs.engine(), lhs);
 }
 
 template<class ET, class OT, class T, ptrdiff_t X0, class L, class A> constexpr
@@ -533,28 +510,6 @@ bool
 operator !=(vector<ET, OT> const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
 {
     return !(lhs == rhs);
-}
-
-template<class T, ptrdiff_t X0, class L, class A, class ET, class OT> constexpr
-bool
-operator ==(basic_mdspan<T, extents<X0>, L, A> const& lhs, vector<ET, OT> const& rhs)
-{
-    using lhs_size = typename basic_mdspan<T, extents<X0>, L, A>::index_type;
-    using rhs_size = typename ET::size_type;
-
-    lhs_size    i1 = 0;
-    lhs_size    e1 = lhs.elements();
-
-    rhs_size    i2 = 0;
-    rhs_size    e2 = rhs.elements();
-
-    if (e2 != static_cast<rhs_size>(e1)) return false;
-
-    for (;  i1 < e1;  ++i1, ++i2)
-    {
-        if (lhs(i1) != rhs(i2)) return false;
-    }
-    return true;
 }
 
 template<class T, ptrdiff_t X0, class L, class A, class ET, class OT> constexpr
