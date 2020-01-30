@@ -64,6 +64,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="test\test_fs_engines.cpp" />
     <ClCompile Include="test\test_main.cpp" />
     <ClCompile Include="test\test_obj_matrix.cpp" />
     <ClCompile Include="test\test_op_add_traits.cpp" />

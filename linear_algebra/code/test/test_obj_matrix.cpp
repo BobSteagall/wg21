@@ -1,8 +1,4 @@
-#include "linear_algebra.hpp"
-#include <array>
-
-using std::cout;
-using std::endl;
+#include "test_common.hpp"
 
 using fsd_mat_engine_35 = STD_LA::fs_matrix_engine<double, 3, 5>;
 using drd_mat_engine    = STD_LA::dr_matrix_engine<double, std::allocator<double>>;

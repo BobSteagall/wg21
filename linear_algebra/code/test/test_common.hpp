@@ -17,7 +17,10 @@ using cx_double = std::complex<double>;
 
 using std::cout;
 using std::endl;
-using STD_LA::get_type_name;
+
+using namespace STD_LA;
+using STD_LA::detail::v_cmp_eq;
+using STD_LA::detail::m_cmp_eq;
 
 struct dummy_type {};
 
@@ -25,5 +28,11 @@ struct dummy_type {};
     #undef PRINT_TYPE
     #define PRINT_TYPE(...)
 #endif
+
+template<typename = void>
+struct test_expr : public std::false_type {};
+
+#define TEST_EXPR(X)    \
+  template<> struct test_expr<void_t<decltype(X)>> : public std:true_type {}
 
 #endif  //- LA_TEST_COMMON_HPP_DEFINED

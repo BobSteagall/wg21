@@ -145,6 +145,9 @@
     <ClCompile Include="test\test_op_add_traits.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
+    <ClCompile Include="test\test_fs_engines.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

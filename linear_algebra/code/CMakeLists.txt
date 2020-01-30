@@ -111,11 +111,12 @@ if (${BUILD_TESTING})
             test/test_new_arithmetic.hpp
             test/test_new_engine.hpp
             test/test_new_number.hpp
+            test/test_fs_engines.cpp
             test/test_obj_matrix.cpp
-        test/test_op_add_traits.cpp
-        test/test_op_mul_traits.cpp
-        test/test_op_neg_traits.cpp
-        test/test_op_sub_traits.cpp
+            test/test_op_add_traits.cpp
+            test/test_op_mul_traits.cpp
+            test/test_op_neg_traits.cpp
+            test/test_op_sub_traits.cpp
      #       test/test_01.cpp
      #       test/test_02.cpp
             test/test_main.cpp

@@ -9,10 +9,10 @@ void TestGroup50();
 void TestGroup60();
 void TestGroup70();
 
-TEST(TestCaseName0, TestName0) {
-  EXPECT_EQ(1, 1);
-  EXPECT_TRUE(true);
-}
+//TEST(TestCaseName0, TestName0) {
+//  EXPECT_EQ(1, 1);
+//  EXPECT_TRUE(true);
+//}
 
 int main(int argc, char** argv)
 {
