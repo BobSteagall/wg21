@@ -47,7 +47,7 @@ class fs_matrix_engine
     constexpr fs_matrix_engine(fs_matrix_engine const&) = default;
     template<class T2, size_t R2, size_t C2>
     constexpr fs_matrix_engine(fs_matrix_engine<T2, R2, C2> const& rhs);
-    template<class ET2, detail::enable_if_has_convertible_element<ET2,T> = true>
+    template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T> = true>
     constexpr fs_matrix_engine(ET2 const& rhs);
     template<class T2, detail::enable_if_convertible_element<T2,T> = true>
     constexpr fs_matrix_engine(initializer_list<initializer_list<T2>> rhs);
@@ -56,7 +56,7 @@ class fs_matrix_engine
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine const&) = default;
     template<class T2, size_t R2, size_t C2>
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine<T2, R2, C2> const& rhs);
-    template<class ET2, detail::enable_if_has_convertible_element<ET2,T> = true>
+    template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T> = true>
     constexpr fs_matrix_engine&     operator =(ET2 const& rhs);
     template<class T2, detail::enable_if_convertible_element<T2,T> = true>
     constexpr fs_matrix_engine&     operator =(initializer_list<initializer_list<T2>> rhs);
@@ -119,7 +119,7 @@ fs_matrix_engine<T,R,C>::fs_matrix_engine(fs_matrix_engine<T2,R2,C2> const& rhs)
 }
 
 template<class T, size_t R, size_t C>
-template<class ET2, detail::enable_if_has_convertible_element<ET2,T>> constexpr
+template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T>> constexpr
 fs_matrix_engine<T,R,C>::fs_matrix_engine(ET2 const& rhs)
 :   ma_elems()
 {
@@ -144,7 +144,7 @@ fs_matrix_engine<T,R,C>::operator =(fs_matrix_engine<T2,R2,C2> const& rhs)
 }
 
 template<class T, size_t R, size_t C>
-template<class ET2, detail::enable_if_has_convertible_element<ET2,T>> constexpr
+template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T>> constexpr
 fs_matrix_engine<T,R,C>&
 fs_matrix_engine<T,R,C>::operator =(ET2 const& rhs)
 {
