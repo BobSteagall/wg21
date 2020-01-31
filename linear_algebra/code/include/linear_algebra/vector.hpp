@@ -148,7 +148,7 @@ class vector
 
     template<class ET2, class OT2>
     constexpr vector(vector<ET2, OT2> const& src);
-    template<class U, class ET2 = ET, detail::enable_if_initable<ET, ET2> = true>
+    template<class U, class ET2 = ET, detail::enable_if_initable<ET, ET2, U> = true>
     constexpr vector(initializer_list<U> list);
 
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
@@ -234,7 +234,7 @@ vector<ET,OT>::vector(vector<ET2, OT2> const& rhs)
 {}
 
 template<class ET, class OT>
-template<class U, class ET2, detail::enable_if_initable<ET, ET2>> constexpr
+template<class U, class ET2, detail::enable_if_initable<ET, ET2, U>> constexpr
 vector<ET,OT>::vector(initializer_list<U> list)
 :   m_engine(list)
 {}

@@ -192,7 +192,7 @@ template<class T2, class T>
 using enable_if_convertible_element = enable_if_t<is_convertible_v<T2, T>, bool>;
 
 template<class ET2, class T>
-using enable_if_has_convertible_element =
+using enable_if_engine_has_convertible_element =
         enable_if_t<is_convertible_v<typename ET2::value_type, T>, bool>;
 
 template<class ET2, class ET>
@@ -202,8 +202,9 @@ using enable_if_convertible_engine =
 template<class ET1, class ET2>
 using enable_if_writable = enable_if_t<is_same_v<ET1, ET2> && is_writable_v<ET1>, bool>;
 
-template<class ET1, class ET2>
-using enable_if_initable = enable_if_t<is_same_v<ET1, ET2> && is_initable_v<ET1>, bool>;
+template<class ET1, class ET2, class U>
+using enable_if_initable = enable_if_t<is_same_v<ET1, ET2> && is_initable_v<ET1>  &&
+                                       is_convertible_v<U, typename ET1::value_type>, bool>;
 
 template<class ET1, class ET2>
 using enable_if_resizable = enable_if_t<is_same_v<ET1, ET2> && is_resizable_v<ET1>, bool>;

@@ -65,7 +65,7 @@ class matrix
 
     template<class ET2, class OT2>
     constexpr matrix(matrix<ET2, OT2> const& src);
-    template<class U, class ET2 = ET, detail::enable_if_initable<ET, ET2> = true>
+    template<class U, class ET2 = ET, detail::enable_if_initable<ET, ET2, U> = true>
     constexpr matrix(initializer_list<initializer_list<U>> rhs);
 
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
@@ -168,7 +168,7 @@ matrix<ET,OT>::matrix(matrix<ET2, OT2> const& rhs)
 }
 
 template<class ET, class OT>
-template<class U, class ET2, detail::enable_if_initable<ET, ET2>> constexpr
+template<class U, class ET2, detail::enable_if_initable<ET, ET2, U>> constexpr
 matrix<ET,OT>::matrix(initializer_list<initializer_list<U>> rhs)
 :   m_engine(rhs)
 {}
