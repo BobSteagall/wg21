@@ -417,6 +417,9 @@ TestGroup00()
     constexpr int    i = t003X();
     int j = t003Y();
 
+//    auto v = STD_LA::fs_vector<double, 3>{};
+//    auto u = STD_LA::fs_vector<long double, 3>{v};
+//    auto w = STD_LA::fs_vector<double, 4>{v};
 //    PRINT_FNAME();
 
 //    PRINT_TYPE(decltype(tf));
