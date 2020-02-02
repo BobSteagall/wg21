@@ -1142,7 +1142,7 @@ m_cmp_eq(ET const& lhs, initializer_list<initializer_list<U>> rhs)
 
         for (;  ej < ec;  ++ej, ++cp)
         {
-            if (engine(ei, ej) != *cp) return false;
+            if (lhs(ei, ej) != *cp) return false;
         }
     }
     return true;
@@ -1150,7 +1150,7 @@ m_cmp_eq(ET const& lhs, initializer_list<initializer_list<U>> rhs)
 
 #ifdef LA_USE_MDSPAN
 
-template<class ET, class OT, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
+template<class ET, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
 bool
 m_cmp_eq(ET const& lhs, basic_mdspan<T, extents<X0, X1>, L, A> const& rhs)
 {

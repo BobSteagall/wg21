@@ -145,7 +145,10 @@
     <ClCompile Include="test\test_op_add_traits.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
-    <ClCompile Include="test\test_fs_engines.cpp">
+    <ClCompile Include="test\test_dynamic_engines.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\test_fixed_size_engines.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
   </ItemGroup>
