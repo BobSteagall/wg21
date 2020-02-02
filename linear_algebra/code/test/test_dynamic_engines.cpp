@@ -1,11 +1,20 @@
 #include "test_common.hpp"
 
-TEST(FsVectorEngine, DefaultCtor)
+TEST(DynVectorEngine, DefaultCtor)
 {
-    fs_vector_engine<float, 4>      e1;
+    dr_vector_engine<float>     e1;
 
-    EXPECT_EQ(e1.elements(), 4);
-    EXPECT_EQ(e1.capacity(), 4);
+    EXPECT_EQ(e1.size(), 0);
+    EXPECT_GE(e1.capacity(), 0);
+}
+
+
+TEST(DynVectorEngine, DirectCtor)
+{
+    dr_vector_engine<float>     e1(4);
+
+    EXPECT_EQ(e1.size(), 4);
+    EXPECT_GE(e1.capacity(), 4);
 
     //- Verify elements are value initialized.
     //
@@ -16,22 +25,22 @@ TEST(FsVectorEngine, DefaultCtor)
 }
 
 
-TEST(FsVectorEngine, CmpEq)
+TEST(DynVectorEngine, CmpEq)
 {
     std::initializer_list<float>    l1 = {0, 0, 0, 0};
     std::initializer_list<float>    l2 = {13, 17, 19, 23};
-    fs_vector_engine<float, 4>      e1, e2, e3;
+    dr_vector_engine<float>         e1(4), e2(4), e3(4);
 
     //- Verify size, capacity, initial values.
     //
-    EXPECT_EQ(e1.elements(), 4);
-    EXPECT_EQ(e1.capacity(), 4);
+    EXPECT_EQ(e1.size(), 4);
+    EXPECT_GE(e1.capacity(), 4);
     EXPECT_EQ(e1(0), 0.0f);
     EXPECT_EQ(e1(1), 0.0f);
     EXPECT_EQ(e1(2), 0.0f);
     EXPECT_EQ(e1(3), 0.0f);
 
-    //- Verify expected equality of default-constructed engines.
+    //- Verify expected equality of direct-constructed engines.
     //
     EXPECT_TRUE(v_cmp_eq(e1, e1));
     EXPECT_TRUE(v_cmp_eq(e1, e2));
@@ -43,6 +52,7 @@ TEST(FsVectorEngine, CmpEq)
     EXPECT_TRUE(v_cmp_eq(e1, {0, 0, 0, 0}));
 
     //- Verify inequality against an init-list of different values.
+    //
     EXPECT_FALSE(v_cmp_eq(e1, l2));
     EXPECT_FALSE(v_cmp_eq(e1, {13, 17, 19, 23}));
 
@@ -84,26 +94,26 @@ TEST(FsVectorEngine, CmpEq)
     //- Verify expected inequality against init-lists and engines having different contents.
     //
     EXPECT_FALSE(v_cmp_eq(e3, {11, 17, 19, 23}));
-    EXPECT_FALSE(v_cmp_eq(e3, fs_vector_engine<float, 4>({11, 17, 19, 23})));
+    EXPECT_FALSE(v_cmp_eq(e3, dr_vector_engine<float>({11, 17, 19, 23})));
 
     EXPECT_FALSE(v_cmp_eq(e3, {13, 11, 19, 23}));
-    EXPECT_FALSE(v_cmp_eq(e3, fs_vector_engine<float, 4>({13, 11, 19, 23})));
+    EXPECT_FALSE(v_cmp_eq(e3, dr_vector_engine<float>({13, 11, 19, 23})));
 
     EXPECT_FALSE(v_cmp_eq(e3, {13, 17, 11, 23}));
-    EXPECT_FALSE(v_cmp_eq(e3, fs_vector_engine<float, 4>({13, 17, 11, 23})));
+    EXPECT_FALSE(v_cmp_eq(e3, dr_vector_engine<float>({13, 17, 11, 23})));
 
     EXPECT_FALSE(v_cmp_eq(e3, {13, 17, 19, 11}));
-    EXPECT_FALSE(v_cmp_eq(e3, fs_vector_engine<float, 4>({13, 17, 19, 11})));
+    EXPECT_FALSE(v_cmp_eq(e3, dr_vector_engine<float>({13, 17, 19, 11})));
 }
 
 
-TEST(FsVectorEngine, MoveCtor)
+TEST(DynVectorEngine, MoveCtor)
 {
-    //- Default construct and verify initial state.
+    //- Direct construct and verify initial state.
     //
-    fs_vector_engine<float, 4>      e1;
-    EXPECT_EQ(e1.elements(), 4);
-    EXPECT_EQ(e1.capacity(), 4);
+    dr_vector_engine<float>     e1(4);
+    EXPECT_EQ(e1.size(), 4);
+    EXPECT_GE(e1.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e1, {0, 0, 0, 0}));
 
     //- Change the state to new element values and verify them.
@@ -116,19 +126,19 @@ TEST(FsVectorEngine, MoveCtor)
 
     //- Construct a new engine via move ctor and verify that its initial state is as expected.
     //
-    fs_vector_engine<float, 4>      e2(std::move(e1));
-    EXPECT_EQ(e2.elements(), 4);
-    EXPECT_EQ(e2.capacity(), 4);
-    EXPECT_TRUE(v_cmp_eq(e2, e1));
+    dr_vector_engine<float>     e2(std::move(e1));
+    EXPECT_EQ(e2.size(), 4);
+    EXPECT_GE(e2.capacity(), 4);
+    EXPECT_FALSE(v_cmp_eq(e2, e1));
 }
 
 
-TEST(FsVectorEngine, CopyCtor)
+TEST(DynVectorEngine, CopyCtor)
 {
-    //- Default construct and verify initial state.
+    //- Direct construct and verify initial state.
     //
-    fs_vector_engine<float, 4>      e1;
-    EXPECT_EQ(e1.elements(), 4);
+    dr_vector_engine<float>     e1(4);
+    EXPECT_EQ(e1.size(), 4);
     EXPECT_EQ(e1.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e1, {0, 0, 0, 0}));
 
@@ -142,92 +152,92 @@ TEST(FsVectorEngine, CopyCtor)
 
     //- Construct new engines via copy ctors and verify that their initial states are as expected.
     //
-    fs_vector_engine<float, 4>      e2(e1);
-    EXPECT_EQ(e2.elements(), 4);
-    EXPECT_EQ(e2.capacity(), 4);
+    dr_vector_engine<float>     e2(e1);
+    EXPECT_EQ(e2.size(), 4);
+    EXPECT_GE(e2.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e2, e1));
 
-    fs_vector_engine<float, 4>      e3{e1};
-    EXPECT_EQ(e3.elements(), 4);
-    EXPECT_EQ(e3.capacity(), 4);
+    dr_vector_engine<float>     e3{e1};
+    EXPECT_EQ(e3.size(), 4);
+    EXPECT_GE(e3.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e3, e1));
 
-    fs_vector_engine<float, 4>      e4 = e1;
-    EXPECT_EQ(e4.elements(), 4);
-    EXPECT_EQ(e4.capacity(), 4);
+    dr_vector_engine<float>     e4 = e1;
+    EXPECT_EQ(e4.size(), 4);
+    EXPECT_GE(e4.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e4, e1));
 }
 
 
-TEST(FsVectorEngine, ListCtor)
+TEST(DynVectorEngine, ListCtor)
 {
     //- Construct new engines via list ctor and verify that their initial states are as expected.
     //
-    fs_vector_engine<float, 4>      e1 = {13, 17, 19, 23};
-    fs_vector_engine<float, 4>      e2{13, 17, 19, 23};
-    fs_vector_engine<float, 4>      e3({13, 17, 19, 23});
+    dr_vector_engine<float>     e1 = {13, 17, 19, 23};
+    dr_vector_engine<float>     e2{13, 17, 19, 23};
+    dr_vector_engine<float>     e3({13, 17, 19, 23});
 
-    EXPECT_EQ(e1.elements(), 4);
-    EXPECT_EQ(e1.capacity(), 4);
+    EXPECT_EQ(e1.size(), 4);
+    EXPECT_GE(e1.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e1, {13, 17, 19, 23}));
 
-    EXPECT_EQ(e2.elements(), 4);
-    EXPECT_EQ(e2.capacity(), 4);
+    EXPECT_EQ(e2.size(), 4);
+    EXPECT_GE(e2.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e2, e1));
 
-    EXPECT_EQ(e3.elements(), 4);
-    EXPECT_EQ(e3.capacity(), 4);
+    EXPECT_EQ(e3.size(), 4);
+    EXPECT_GE(e3.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e3, e1));
 }
 
 
-TEST(FsVectorEngine, EngineCtor)
+TEST(DynVectorEngine, EngineCtor)
 {
     //- Construct new engines via direct engine ctor and verify that their initial states are
     //  as expected.
     //
-    fs_vector_engine<int, 4>        e1{13, 17, 19, 23};
-    fs_vector_engine<float, 4>      e2(e1);
-    fs_vector_engine<double, 4>     e3(e2);
-    dr_vector_engine<double>        e4{13, 17, 19, 23};
-    fs_vector_engine<float, 4>      e5{e4};
+    dr_vector_engine<int>       e1{13, 17, 19, 23};
+    dr_vector_engine<float>     e2(e1);
+    dr_vector_engine<double>    e3(e2);
+    fs_vector_engine<double, 4> e4{13, 17, 19, 23};
+    dr_vector_engine<float>     e5{e4};
 
-    EXPECT_EQ(e1.elements(), 4);
-    EXPECT_EQ(e1.capacity(), 4);
+    EXPECT_EQ(e1.size(), 4);
+    EXPECT_GE(e1.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e1, {13, 17, 19, 23}));
 
-    EXPECT_EQ(e2.elements(), 4);
-    EXPECT_EQ(e2.capacity(), 4);
+    EXPECT_EQ(e2.size(), 4);
+    EXPECT_GE(e2.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e2, e1));
 
-    EXPECT_EQ(e3.elements(), 4);
-    EXPECT_EQ(e3.capacity(), 4);
+    EXPECT_EQ(e3.size(), 4);
+    EXPECT_GE(e3.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e3, e1));
 
-    EXPECT_EQ(e4.elements(), 4);
-    EXPECT_GE(e4.capacity(), 4);
+    EXPECT_EQ(e4.size(), 4);
+    EXPECT_EQ(e4.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e4, e1));
 
-    EXPECT_EQ(e5.elements(), 4);
-    EXPECT_EQ(e5.capacity(), 4);
+    EXPECT_EQ(e5.size(), 4);
+    EXPECT_GE(e5.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e5, e1));
 }
 
 
-TEST(FsVectorEngine, MoveAssign)
+TEST(DynVectorEngine, MoveAssign)
 {
-    //- Default construct and verify initial state.
+    //- Direct construct and verify initial state.
     //
-    fs_vector_engine<float, 4>      e1;
-    EXPECT_EQ(e1.elements(), 4);
-    EXPECT_EQ(e1.capacity(), 4);
+    dr_vector_engine<float>     e1(4);
+    EXPECT_EQ(e1.size(), 4);
+    EXPECT_GE(e1.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e1, {0, 0, 0, 0}));
 
     //- List construct and verify initial state.
     //
-    fs_vector_engine<float, 4>      e2{13, 17, 19, 23};
-    EXPECT_EQ(e2.elements(), 4);
-    EXPECT_EQ(e2.capacity(), 4);
+    dr_vector_engine<float>     e2{13, 17, 19, 23};
+    EXPECT_EQ(e2.size(), 4);
+    EXPECT_GE(e2.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e2, {13, 17, 19, 23}));
 
     //- Assign and verify.
@@ -237,19 +247,19 @@ TEST(FsVectorEngine, MoveAssign)
 }
 
 
-TEST(FsVectorEngine, CopyAssign)
+TEST(DynVectorEngine, CopyAssign)
 {
-    //- Default construct and verify initial state.
+    //- Direct construct and verify initial state.
     //
-    fs_vector_engine<float, 4>      e1;
-    EXPECT_EQ(e1.elements(), 4);
-    EXPECT_EQ(e1.capacity(), 4);
+    dr_vector_engine<float>     e1(4);
+    EXPECT_EQ(e1.size(), 4);
+    EXPECT_GE(e1.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e1, {0, 0, 0, 0}));
 
     //- List construct and verify initial state.
     //
-    fs_vector_engine<float, 4>      e2{13, 17, 19, 23};
-    EXPECT_EQ(e2.elements(), 4);
+    dr_vector_engine<float>     e2{13, 17, 19, 23};
+    EXPECT_EQ(e2.size(), 4);
     EXPECT_EQ(e2.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e2, {13, 17, 19, 23}));
 
@@ -260,27 +270,27 @@ TEST(FsVectorEngine, CopyAssign)
 }
 
 
-TEST(FsVectorEngine, EngineAssign)
+TEST(DynVectorEngine, EngineAssign)
 {
-    //- Default construct and verify initial state.
+    //- Direct construct and verify initial state.
     //
-    fs_vector_engine<float, 4>      e1, e2;
-    EXPECT_EQ(e1.elements(), 4);
-    EXPECT_EQ(e1.capacity(), 4);
-    EXPECT_TRUE(v_cmp_eq(e1, {0, 0, 0, 0}));
-    EXPECT_EQ(e2.elements(), 4);
-    EXPECT_EQ(e2.capacity(), 4);
-    EXPECT_TRUE(v_cmp_eq(e2, {0, 0, 0, 0}));
+    dr_vector_engine<float>     e1(3), e2(3);
+    EXPECT_EQ(e1.size(), 3);
+    EXPECT_GE(e1.capacity(), 3);
+    EXPECT_TRUE(v_cmp_eq(e1, {0, 0, 0}));
+    EXPECT_EQ(e2.size(), 3);
+    EXPECT_GE(e2.capacity(), 3);
+    EXPECT_TRUE(v_cmp_eq(e2, {0, 0, 0}));
 
     //- List construct and verify initial state.
     //
-    fs_vector_engine<int, 4>        e3{13, 17, 19, 23};
-    EXPECT_EQ(e3.elements(), 4);
-    EXPECT_EQ(e3.capacity(), 4);
+    fs_vector_engine<int, 4>    e3{13, 17, 19, 23};
+    EXPECT_EQ(e3.size(), 4);
+    EXPECT_GE(e3.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e3, {13, 17, 19, 23}));
 
-    dr_vector_engine<int>           e4{130, 170, 190, 230};
-    EXPECT_EQ(e4.elements(), 4);
+    dr_vector_engine<int>       e4{130, 170, 190, 230};
+    EXPECT_EQ(e4.size(), 4);
     EXPECT_GE(e4.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e4, {130, 170, 190, 230}));
 
@@ -288,26 +298,30 @@ TEST(FsVectorEngine, EngineAssign)
     //
     e1 = e3;
     EXPECT_TRUE(v_cmp_eq(e1, {13, 17, 19, 23}));
+    EXPECT_EQ(e1.size(), 4);
+    EXPECT_GE(e1.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e1, e3));
 
     e2 = e4;
     EXPECT_TRUE(v_cmp_eq(e2, {130, 170, 190, 230}));
+    EXPECT_EQ(e2.size(), 4);
+    EXPECT_GE(e2.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e2, e4));
 }
 
 
-TEST(FsVectorEngine, ListAssign)
+TEST(DynVectorEngine, ListAssign)
 {
-    //- Default construct and verify initial state.
+    //- Direct construct and verify initial state.
     //
     std::initializer_list<float>    l1 = {13, 17, 19, 23};
-    fs_vector_engine<float, 4>      e1;
-    fs_vector_engine<float, 4>      e2{l1};
+    dr_vector_engine<float>         e1(4);
+    dr_vector_engine<float>         e2{l1};
 
-    EXPECT_EQ(e1.elements(), 4);
+    EXPECT_EQ(e1.size(), 4);
     EXPECT_EQ(e1.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e1, {0, 0, 0, 0}));
-    EXPECT_EQ(e2.elements(), 4);
+    EXPECT_EQ(e2.size(), 4);
     EXPECT_EQ(e2.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e2, l1));
 
@@ -320,23 +334,67 @@ TEST(FsVectorEngine, ListAssign)
 }
 
 
-TEST(FsVectorEngine, Swap)
+TEST(DynVectorEngine, Reserve)
 {
-    //- Default construct and verify initial state.
+    //- List construct and verify initial state.
     //
-    fs_vector_engine<float, 4>      e1;
-    EXPECT_EQ(e1.elements(), 4);
-    EXPECT_EQ(e1.capacity(), 4);
+    dr_vector_engine<float>      e1{13, 17, 19, 23};
+    EXPECT_EQ(e1.size(), 4);
+    EXPECT_GE(e1.capacity(), 4);
+    EXPECT_LT(e1.capacity(), 256);
+    EXPECT_TRUE(v_cmp_eq(e1, {13, 17, 19, 23}));
+
+    //- Reserve extra space and verify.
+    //
+    e1.reserve(256);
+    EXPECT_EQ(e1.size(), 4);
+    EXPECT_GE(e1.capacity(), 256);
+    EXPECT_TRUE(v_cmp_eq(e1, {13, 17, 19, 23}));
+}
+
+
+TEST(DynVectorEngine, Resize)
+{
+    //- List construct and verify initial state.
+    //
+    dr_vector_engine<float>      e1{13, 17, 19, 23};
+    EXPECT_EQ(e1.size(), 4);
+    EXPECT_GE(e1.capacity(), 4);
+    EXPECT_TRUE(v_cmp_eq(e1, {13, 17, 19, 23}));
+
+    //- Resize upward and verify.
+    //
+    e1.resize(8);
+    EXPECT_EQ(e1.size(), 8);
+    EXPECT_GE(e1.capacity(), 8);
+    EXPECT_TRUE(v_cmp_eq(e1, {13, 17, 19, 23, 0, 0, 0, 0}));
+
+    //- Resize downward and verify.
+    //
+    e1.resize(3);
+    EXPECT_EQ(e1.size(), 3);
+    EXPECT_GE(e1.capacity(), 8);
+    EXPECT_TRUE(v_cmp_eq(e1, {13, 17, 19}));
+}
+
+
+TEST(DynVectorEngine, Swap)
+{
+    //- Direct construct and verify initial state.
+    //
+    dr_vector_engine<float>      e1(4);
+    EXPECT_EQ(e1.size(), 4);
+    EXPECT_GE(e1.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e1, {0, 0, 0, 0}));
 
     //- List construct and verify initial state.
     //
-    fs_vector_engine<float, 4>      e2{13, 17, 19, 23};
-    EXPECT_EQ(e2.elements(), 4);
-    EXPECT_EQ(e2.capacity(), 4);
+    dr_vector_engine<float>      e2{13, 17, 19, 23};
+    EXPECT_EQ(e2.size(), 4);
+    EXPECT_GE(e2.capacity(), 4);
     EXPECT_TRUE(v_cmp_eq(e2, {13, 17, 19, 23}));
 
-    //- Swap and verify.
+    //- Swap contents and verify.
     //
     e1.swap(e2);
     EXPECT_TRUE(v_cmp_eq(e1, {13, 17, 19, 23}));
@@ -344,15 +402,21 @@ TEST(FsVectorEngine, Swap)
     e2.swap(e1);
     EXPECT_TRUE(v_cmp_eq(e1, {0, 0, 0, 0}));
     EXPECT_TRUE(v_cmp_eq(e2, {13, 17, 19, 23}));
+
+    //- Swap some elements and verify.
+    //
+    e2.swap_elements(0, 3);
+    e2.swap_elements(1, 2);
+    EXPECT_TRUE(v_cmp_eq(e2, {23, 19, 17, 13}));
 }
 
 
 #ifdef LA_USE_MDSPAN
 
-TEST(FsVectorEngine, Span)
+TEST(DynVectorEngine, Span)
 {
-    fs_vector_engine<float, 4>          e1{13, 17, 19, 23}, e2, e3{e1};
-    fs_vector_engine<float, 4> const&   ce1 = e1;
+    dr_vector_engine<float>         e1{13, 17, 19, 23}, e2(4), e3{e1};
+    dr_vector_engine<float> const&  ce1 = e1;
 
     auto    sp1  = e1.span();
     auto    csp1 = ce1.span();

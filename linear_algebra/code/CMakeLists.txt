@@ -111,7 +111,8 @@ if (${BUILD_TESTING})
             test/test_new_arithmetic.hpp
             test/test_new_engine.hpp
             test/test_new_number.hpp
-            test/test_fs_engines.cpp
+            test/test_dynamic_engines.cpp
+            test/test_fixed_size_engines.cpp
             test/test_obj_matrix.cpp
             test/test_op_add_traits.cpp
             test/test_op_mul_traits.cpp
