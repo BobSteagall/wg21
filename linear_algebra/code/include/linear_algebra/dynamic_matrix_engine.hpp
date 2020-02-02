@@ -115,7 +115,7 @@ class dr_matrix_engine
 template<class T, class AT> inline
 dr_matrix_engine<T,AT>::~dr_matrix_engine() noexcept
 {
-    delete [] mp_elems;
+    detail::deallocate(m_alloc, mp_elems, m_rowcap*m_colcap);
 }
 
 template<class T, class AT>
@@ -457,7 +457,7 @@ dr_matrix_engine<T,AT>::reshape(size_type rows, size_type cols, size_type rowcap
         {
             for (size_type j = 0;  j < dst_cols;  ++j)
             {
-                tmp.mp_elems[i*tmp.m_colcap + j] = mp_elems[i*m_colcap + j];
+                tmp(i, j) = (*this)(i, j);
             }
         }
         tmp.swap(*this);

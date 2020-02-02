@@ -128,6 +128,7 @@ if (${BUILD_TESTING})
             wg21_linear_algebra
             gtest_main
             gtest
+            asan
     )
 
     set_target_properties(la_test PROPERTIES
@@ -136,10 +137,12 @@ if (${BUILD_TESTING})
         CXX_EXTENSIONS NO
     )
 
+    #set(ASAN_FLAG "-fno-omit-frame-pointer -fsanitize=address")
+
     target_compile_options(la_test
         PRIVATE
-            $<$<OR:$<CXX_COMPILER_ID:GNU>>:-Wall -pedantic -Wextra  -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable -Wno-unused-local-typedefs -fmax-errors=10>
-            $<$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function -Wno-unused-local-typedefs>
+            $<$<OR:$<CXX_COMPILER_ID:GNU>>:-Wall -pedantic -Wextra  -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable -Wno-unused-local-typedefs -fmax-errors=10 ${ASAN_FLAGS}>
+            $<$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function -Wno-unused-local-typedefs ${ASAN_FLAGS}>
     )
 
     include(CTest)

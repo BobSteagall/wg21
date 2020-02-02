@@ -27,5 +27,7 @@ int main(int argc, char** argv)
 //	TestGroup60();
 //	TestGroup70();
 
-    return RUN_ALL_TESTS();
+    volatile int rv = RUN_ALL_TESTS();
+
+    return rv;
 }

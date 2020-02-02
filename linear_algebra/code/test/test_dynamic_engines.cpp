@@ -964,16 +964,16 @@ TEST(DynMatrixEngine, Reserve)
     EXPECT_EQ(e1.size(), st_44);
     EXPECT_GE(e1.column_capacity(), 4);
     EXPECT_GE(e1.row_capacity(), 4);
-    EXPECT_LT(e1.column_capacity(), 256);
-    EXPECT_LT(e1.row_capacity(), 256);
+    EXPECT_LT(e1.column_capacity(), 32);
+    EXPECT_LT(e1.row_capacity(), 32);
     EXPECT_TRUE(m_cmp_eq(e1, il_44_2));
 
     //- Reserve extra space and verify.
     //
-    e1.reserve(256, 256);
+    e1.reserve(32, 32);
     EXPECT_EQ(e1.size(), st_44);
-    EXPECT_GE(e1.column_capacity(), 256);
-    EXPECT_GE(e1.row_capacity(), 256);
+    EXPECT_GE(e1.column_capacity(), 32);
+    EXPECT_GE(e1.row_capacity(), 32);
     EXPECT_TRUE(m_cmp_eq(e1, il_44_2));
 }
 
