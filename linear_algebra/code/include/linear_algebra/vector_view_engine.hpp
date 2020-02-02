@@ -56,7 +56,7 @@ class vector_view_engine<ET, VCT, subvector_view_tag>
     //- Capacity
     //
     constexpr size_type     capacity() const noexcept;
-    constexpr size_type     elements() const noexcept;
+    constexpr size_type     size() const noexcept;
 
     //- Element access
     //
@@ -98,7 +98,7 @@ template<class ET2, detail::enable_if_convertible_engine<ET2, ET>> constexpr
 vector_view_engine<ET, VCT, subvector_view_tag>&
 vector_view_engine<ET, VCT, subvector_view_tag>::operator =(ET2 const& rhs)
 {
-    detail::check_source_engine_size(rhs, elements());
+    detail::check_source_engine_size(rhs, size());
     detail::assign_from_vector_engine(*this, rhs);
     return *this;
 }
@@ -108,7 +108,7 @@ template<class U, class ET2, detail::enable_if_writable<ET2, ET>> constexpr
 vector_view_engine<ET, VCT, subvector_view_tag>&
 vector_view_engine<ET, VCT, subvector_view_tag>::operator =(initializer_list<U> rhs)
 {
-    detail::check_source_init_list(rhs, elements());
+    detail::check_source_init_list(rhs, size());
     detail::assign_from_vector_list(*this, rhs);
     return *this;
 }
@@ -125,7 +125,7 @@ vector_view_engine<ET, VCT, subvector_view_tag>::capacity() const noexcept
 
 template<class ET, class VCT> constexpr
 typename vector_view_engine<ET, VCT, subvector_view_tag>::size_type
-vector_view_engine<ET, VCT, subvector_view_tag>::elements() const noexcept
+vector_view_engine<ET, VCT, subvector_view_tag>::size() const noexcept
 {
     return m_count;
 }
@@ -224,7 +224,7 @@ class vector_view_engine<ET, VCT, column_view_tag>
     //- Capacity
     //
     constexpr size_type     capacity() const noexcept;
-    constexpr size_type     elements() const noexcept;
+    constexpr size_type     size() const noexcept;
 
     //- Element access
     //
@@ -264,7 +264,7 @@ template<class ET2, detail::enable_if_convertible_engine<ET2, ET>> constexpr
 vector_view_engine<ET, VCT, column_view_tag>&
 vector_view_engine<ET, VCT, column_view_tag>::operator =(ET2 const& rhs)
 {
-    detail::check_source_engine_size(rhs, elements());
+    detail::check_source_engine_size(rhs, size());
     detail::assign_from_vector_engine(*this, rhs);
     return *this;
 }
@@ -274,7 +274,7 @@ template<class U, class ET2, detail::enable_if_writable<ET2, ET>> constexpr
 vector_view_engine<ET, VCT, column_view_tag>&
 vector_view_engine<ET, VCT, column_view_tag>::operator =(initializer_list<U> rhs)
 {
-    detail::check_source_init_list(rhs, elements());
+    detail::check_source_init_list(rhs, size());
     detail::assign_from_vector_list(*this, rhs);
     return *this;
 }
@@ -291,7 +291,7 @@ vector_view_engine<ET, VCT, column_view_tag>::capacity() const noexcept
 
 template<class ET, class VCT> constexpr
 typename vector_view_engine<ET, VCT, column_view_tag>::size_type
-vector_view_engine<ET, VCT, column_view_tag>::elements() const noexcept
+vector_view_engine<ET, VCT, column_view_tag>::size() const noexcept
 {
     return mp_other->rows();
 }
@@ -388,7 +388,7 @@ class vector_view_engine<ET, VCT, row_view_tag>
     //- Capacity
     //
     constexpr size_type     capacity() const noexcept;
-    constexpr size_type     elements() const noexcept;
+    constexpr size_type     size() const noexcept;
 
     //- Element access
     //
@@ -428,7 +428,7 @@ template<class ET2, detail::enable_if_convertible_engine<ET2, ET>> constexpr
 vector_view_engine<ET, VCT, row_view_tag>&
 vector_view_engine<ET, VCT, row_view_tag>::operator =(ET2 const& rhs)
 {
-    detail::check_source_engine_size(rhs, elements());
+    detail::check_source_engine_size(rhs, size());
     detail::assign_from_vector_engine(*this, rhs);
     return *this;
 }
@@ -438,7 +438,7 @@ template<class U, class ET2, detail::enable_if_writable<ET2, ET>> constexpr
 vector_view_engine<ET, VCT, row_view_tag>&
 vector_view_engine<ET, VCT, row_view_tag>::operator =(initializer_list<U> rhs)
 {
-    detail::check_source_init_list(rhs, elements());
+    detail::check_source_init_list(rhs, size());
     detail::assign_from_vector_list(*this, rhs);
     return *this;
 }
@@ -455,7 +455,7 @@ vector_view_engine<ET, VCT, row_view_tag>::capacity() const noexcept
 
 template<class ET, class VCT> constexpr
 typename vector_view_engine<ET, VCT, row_view_tag>::size_type
-vector_view_engine<ET, VCT, row_view_tag>::elements() const noexcept
+vector_view_engine<ET, VCT, row_view_tag>::size() const noexcept
 {
     return mp_other->columns();
 }

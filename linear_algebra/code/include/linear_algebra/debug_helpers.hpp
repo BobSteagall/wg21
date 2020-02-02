@@ -211,13 +211,13 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
     using size_type = typename vector<ET, OT>::size_type;
 
     cout << endl << "vector: " << ((pname) ? pname : "<anon>") << endl;
-    cout << "  size: " << v.elements() << endl;
+    cout << "  size: " << v.size() << endl;
     cout << "  capy: " << v.capacity() << endl;
     cout << "  -----" << endl;
 
     cout << "(idx) " << right << setw(4) << setprecision(3) << (double) v(0);
 
-    for (size_type i = 1;  i < v.elements();  ++i)
+    for (size_type i = 1;  i < v.size();  ++i)
     {
             cout << right << setw(6) << setprecision(3) << (double) v(i);
     }
@@ -297,7 +297,7 @@ Fill(vector<ET, OT>& v)
 
     element_type    x = 1;
 
-    for (size_type i = 0;  i < v.elements();  ++i)
+    for (size_type i = 0;  i < v.size();  ++i)
     {
          v(i) = x;  x = x + 1;
     }

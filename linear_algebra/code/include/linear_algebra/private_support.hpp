@@ -858,7 +858,7 @@ template<class ET, class ST> constexpr
 void
 check_source_engine_size(ET const& engine, ST elems)
 {
-    if (engine.elements() != elems)
+    if (engine.size() != elems)
     {
         throw runtime_error("source engine size does not match destination vector engine size");
     }
@@ -933,7 +933,7 @@ assign_from_vector_engine(ET1& dst, ET2 const& src)
 {
     typename ET1::size_type     di = 0;
     typename ET2::size_type     si = 0;
-    typename ET2::size_type     ni = src.elements();
+    typename ET2::size_type     ni = src.size();
 
     for (;  si < ni;  ++di, ++si)
     {
@@ -971,7 +971,7 @@ assign_from_vector_list(ET& engine, initializer_list<T> rhs)
     using elem_iter = decltype(rhs.begin());
 
     size_type   di = 0;
-    size_type   dn = engine.elements();
+    size_type   dn = engine.size();
     elem_iter   ep = rhs.begin();
 
     for (;  di < dn;  ++di, ++ep)
@@ -1016,10 +1016,10 @@ v_cmp_eq(ET1 const& lhs, ET2 const& rhs)
     using rhs_size = typename ET2::size_type;
 
     lhs_size   i1 = 0;
-    lhs_size   n1 = lhs.elements();
+    lhs_size   n1 = lhs.size();
 
     rhs_size   i2 = 0;
-    rhs_size   n2 = rhs.elements();
+    rhs_size   n2 = rhs.size();
 
     if (n1 != static_cast<lhs_size>(n2)) return false;
 
@@ -1034,13 +1034,13 @@ template<class ET, class U> constexpr
 bool
 v_cmp_eq(ET const& lhs, initializer_list<U> rhs)
 {
-    if (static_cast<size_t>(lhs.elements()) != rhs.size()) return false;
+    if (static_cast<size_t>(lhs.size()) != rhs.size()) return false;
 
     using size_type = typename ET::size_type;
     using elem_iter = decltype(rhs.begin());
 
     size_type   di = 0;
-    size_type   dn = lhs.elements();
+    size_type   dn = lhs.size();
     elem_iter   ep = rhs.begin();
 
     for (;  di < dn;  ++di, ++ep)
@@ -1060,7 +1060,7 @@ v_cmp_eq(ET const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
     using rhs_size = typename basic_mdspan<T, extents<X0>, L, A>::index_type;
 
     lhs_size    i1 = 0;
-    lhs_size    e1 = lhs.elements();
+    lhs_size    e1 = lhs.size();
 
     rhs_size    i2 = 0;
     rhs_size    e2 = rhs.extent(0);

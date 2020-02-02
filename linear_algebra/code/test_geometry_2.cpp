@@ -44,7 +44,7 @@ public:
 	constexpr const_iterator    end() const noexcept;
 
 	constexpr size_type      capacity() const noexcept;
-	constexpr size_type      elements() const noexcept;
+	constexpr size_type      size() const noexcept;
 	constexpr size_type      size() const noexcept;
 
 	constexpr reference     operator ()(size_type i);

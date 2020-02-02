@@ -20,7 +20,7 @@ matrix_addition_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>::add
 {
     PrintOperandTypes<result_type>("addition_traits", v1, v2);
 
-    size_type_r const   elems = static_cast<size_type_r>(v1.elements());
+    size_type_r const   elems = static_cast<size_type_r>(v1.size());
 
     result_type     vr;
     size_type_r     ir;

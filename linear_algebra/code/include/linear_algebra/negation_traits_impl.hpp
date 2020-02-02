@@ -19,7 +19,7 @@ matrix_negation_traits<OT, vector<ET1, OT1>>::negate(vector<ET1, OT1> const& v1)
 {
     PrintOperandTypes<result_type>("negation_traits", v1);
 
-    size_type_r const   elems = static_cast<size_type_r>(v1.elements());
+    size_type_r const   elems = static_cast<size_type_r>(v1.size());
 
     result_type     vr;
     size_type_r     ir;

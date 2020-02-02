@@ -60,7 +60,7 @@ class fs_vector_engine
     //- Capacity
     //
     static constexpr size_type  capacity() noexcept;
-    static constexpr size_type  elements() noexcept;
+    static constexpr size_type  size() noexcept;
 
     //- Element access
     //
@@ -163,7 +163,7 @@ fs_vector_engine<T,N>::capacity() noexcept
 
 template<class T, size_t N> constexpr
 typename fs_vector_engine<T,N>::size_type
-fs_vector_engine<T,N>::elements() noexcept
+fs_vector_engine<T,N>::size() noexcept
 {
     return N;
 }

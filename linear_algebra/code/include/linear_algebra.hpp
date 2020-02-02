@@ -25,12 +25,8 @@
 #define USING_STD   using namespace std::experimental;
 
 #include <cstdint>
-#include <algorithm>
-#include <array>
 #include <complex>
 #include <initializer_list>
-#include <memory>
-#include <numeric>
 #include <tuple>
 #include <type_traits>
 
@@ -48,6 +44,8 @@
 
 #ifdef LA_USE_MDSPAN
     #include <experimental/mdspan>
+#else
+    #include <array>
 #endif
 
 //- Restore the compiler's diagnostic state.
