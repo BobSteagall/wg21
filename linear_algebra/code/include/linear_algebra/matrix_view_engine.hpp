@@ -44,10 +44,10 @@ class matrix_view_engine<ET, MCT, submatrix_view_tag>
 
     constexpr matrix_view_engine();
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine(matrix_view_engine const&) noexcept = default;
 
     constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) noexcept = default;
 
     template<class ET2, detail::enable_if_convertible_engine<ET2, ET> = true>
     constexpr matrix_view_engine&     operator =(ET2 const& rhs);

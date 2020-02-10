@@ -34,7 +34,7 @@ begin(vector<ET, OT> const& v) noexcept
 
 template<class ET, class OT> constexpr
 detail::vector_const_iterator<vector<ET, OT>>
-end(vector<ET, OT>const & v) noexcept
+end(vector<ET, OT> const & v) noexcept
 {
     return detail::vector_const_iterator<vector<ET, OT>>(v, v.size(), v.size());
 }
@@ -49,7 +49,7 @@ cbegin(vector<ET, OT> const& v) noexcept
 
 template<class ET, class OT> constexpr
 detail::vector_const_iterator<vector<ET, OT>>
-cend(vector<ET, OT>const & v) noexcept
+cend(vector<ET, OT> const & v) noexcept
 {
     return detail::vector_const_iterator<vector<ET, OT>>(v, v.size(), v.size());
 }
@@ -80,7 +80,7 @@ rbegin(vector<ET, OT> const& v) noexcept
 
 template<class ET, class OT> constexpr
 reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>
-rend(vector<ET, OT>const & v) noexcept
+rend(vector<ET, OT> const & v) noexcept
 {
     return reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>(v, v.size(), v.size());
 }
@@ -95,7 +95,7 @@ crbegin(vector<ET, OT> const& v) noexcept
 
 template<class ET, class OT> constexpr
 reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>
-crend(vector<ET, OT>const & v) noexcept
+crend(vector<ET, OT> const & v) noexcept
 {
     return reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>(v, v.size(), v.size());
 }

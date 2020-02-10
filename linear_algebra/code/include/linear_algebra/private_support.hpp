@@ -605,11 +605,11 @@ struct noe_mdspan_traits;
 template<>
 struct noe_mdspan_traits<void>
 {
-    using source_span_type       = void;
+    using source_span_type    = void;
     using rowcolumn_span_type = void;
     using submatrix_span_type = void;
-    using transpose_span_type    = void;
-    using index_type             = void;
+    using transpose_span_type = void;
+    using index_type          = void;
 };
 
 
