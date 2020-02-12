@@ -397,6 +397,7 @@ t003Y()
     drm2.submatrix(6, fsm.rows(), 4, fsm.columns()) = fsm;
     PRINT(drm2);
 
+    PRINT(fsm);
     PRINT(fsm.t());
     PRINT(fsm.t().row(1));
 

@@ -184,5 +184,13 @@ auto  operator *(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
 template<class ET1, class OT1, class ET2, class OT2>
 auto  operator *(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
 
+//- Other functions.
+//
+template<class ET1, class OT1, class ET2, class OT2>
+auto  inner_product(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
+
+template<class ET1, class OT1, class ET2, class OT2>
+auto  outer_product(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
+
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_FORWARD_DECLARATIONS_HPP_DEFINED
