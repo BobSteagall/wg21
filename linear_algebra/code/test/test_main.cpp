@@ -9,23 +9,25 @@ void TestGroup50();
 void TestGroup60();
 void TestGroup70();
 
-TEST(TestCaseName0, TestName0) {
-  EXPECT_EQ(1, 1);
-  EXPECT_TRUE(true);
-}
+//TEST(TestCaseName0, TestName0) {
+//  EXPECT_EQ(1, 1);
+//  EXPECT_TRUE(true);
+//}
 
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
     TestGroup00();
-//    TestGroup10();
-//    TestGroup20();
-//    TestGroup30();
-//	TestGroup40();
+    TestGroup10();
+    TestGroup20();
+    TestGroup30();
+	TestGroup40();
 //	TestGroup50();
 //	TestGroup60();
 //	TestGroup70();
 
-    return RUN_ALL_TESTS();
+    volatile int rv = RUN_ALL_TESTS();
+
+    return rv;
 }

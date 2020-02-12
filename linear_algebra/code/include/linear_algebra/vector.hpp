@@ -34,7 +34,7 @@ begin(vector<ET, OT> const& v) noexcept
 
 template<class ET, class OT> constexpr
 detail::vector_const_iterator<vector<ET, OT>>
-end(vector<ET, OT>const & v) noexcept
+end(vector<ET, OT> const & v) noexcept
 {
     return detail::vector_const_iterator<vector<ET, OT>>(v, v.size(), v.size());
 }
@@ -49,7 +49,7 @@ cbegin(vector<ET, OT> const& v) noexcept
 
 template<class ET, class OT> constexpr
 detail::vector_const_iterator<vector<ET, OT>>
-cend(vector<ET, OT>const & v) noexcept
+cend(vector<ET, OT> const & v) noexcept
 {
     return detail::vector_const_iterator<vector<ET, OT>>(v, v.size(), v.size());
 }
@@ -80,7 +80,7 @@ rbegin(vector<ET, OT> const& v) noexcept
 
 template<class ET, class OT> constexpr
 reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>
-rend(vector<ET, OT>const & v) noexcept
+rend(vector<ET, OT> const & v) noexcept
 {
     return reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>(v, v.size(), v.size());
 }
@@ -95,7 +95,7 @@ crbegin(vector<ET, OT> const& v) noexcept
 
 template<class ET, class OT> constexpr
 reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>
-crend(vector<ET, OT>const & v) noexcept
+crend(vector<ET, OT> const & v) noexcept
 {
     return reverse_iterator<detail::vector_const_iterator<vector<ET, OT>>>(v, v.size(), v.size());
 }
@@ -148,7 +148,7 @@ class vector
 
     template<class ET2, class OT2>
     constexpr vector(vector<ET2, OT2> const& src);
-    template<class U, class ET2 = ET, detail::enable_if_initable<ET, ET2> = true>
+    template<class U, class ET2 = ET, detail::enable_if_initable<ET, ET2, U> = true>
     constexpr vector(initializer_list<U> list);
 
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
@@ -167,7 +167,6 @@ class vector
     //
     static constexpr bool   is_resizable() noexcept;
     constexpr size_type     capacity() const noexcept;
-    constexpr size_type     elements() const noexcept;
     constexpr size_type     size() const noexcept;
 
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
@@ -234,7 +233,7 @@ vector<ET,OT>::vector(vector<ET2, OT2> const& rhs)
 {}
 
 template<class ET, class OT>
-template<class U, class ET2, detail::enable_if_initable<ET, ET2>> constexpr
+template<class U, class ET2, detail::enable_if_initable<ET, ET2, U>> constexpr
 vector<ET,OT>::vector(initializer_list<U> list)
 :   m_engine(list)
 {}
@@ -294,16 +293,9 @@ vector<ET,OT>::capacity() const noexcept
 
 template<class ET, class OT> constexpr
 typename vector<ET,OT>::size_type
-vector<ET,OT>::elements() const noexcept
-{
-    return m_engine.elements();
-}
-
-template<class ET, class OT> constexpr
-typename vector<ET,OT>::size_type
 vector<ET,OT>::size() const noexcept
 {
-    return m_engine.elements();
+    return m_engine.size();
 }
 
 template<class ET, class OT>
@@ -477,32 +469,49 @@ vector<ET,OT>::swap_elements(size_type i, size_type j) noexcept
 //
 template<class ET1, class OT1, class ET2, class OT2> constexpr
 bool
-operator ==(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2)
+operator ==(vector<ET1, OT1> const& lhs, vector<ET2, OT2> const& rhs)
 {
-    using lhs_size = typename ET1::size_type;
-    using rhs_size = typename ET2::size_type;
-
-    lhs_size    i1 = 0;
-    lhs_size    e1 = v1.elements();
-
-    rhs_size    i2 = 0;
-    rhs_size    e2 = v2.elements();
-
-    if (e1 != static_cast<lhs_size>(e2)) return false;
-
-    for (;  i1 < e1;  ++i1, ++i2)
-    {
-        if (v1(i1) != v2(i2)) return false;
-    }
-    return true;
+    return detail::v_cmp_eq(lhs.engine(), rhs.engine());
 }
 
 template<class ET1, class OT1, class ET2, class OT2> constexpr
 bool
-operator !=(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2)
+operator !=(vector<ET1, OT1> const& lhs, vector<ET2, OT2> const& rhs)
 {
-    return !(v1 == v2);
+    return !(lhs == rhs);
 }
+
+#ifdef LA_USE_MDSPAN
+
+template<class ET, class OT, class T, ptrdiff_t X0, class L, class A> constexpr
+bool
+operator ==(vector<ET, OT> const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
+{
+    return detail::v_cmp_eq(lhs.engine(), rhs);
+}
+
+template<class T, ptrdiff_t X0, class L, class A, class ET, class OT> constexpr
+bool
+operator ==(basic_mdspan<T, extents<X0>, L, A> const& lhs, vector<ET, OT> const& rhs)
+{
+    return detail::v_cmp_eq(rhs.engine(), lhs);
+}
+
+template<class ET, class OT, class T, ptrdiff_t X0, class L, class A> constexpr
+bool
+operator !=(vector<ET, OT> const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
+{
+    return !(lhs == rhs);
+}
+
+template<class T, ptrdiff_t X0, class L, class A, class ET, class OT> constexpr
+bool
+operator !=(basic_mdspan<T, extents<X0>, L, A> const& lhs, vector<ET, OT> const& rhs)
+{
+    return !(lhs == rhs);
+}
+
+#endif
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_VECTOR_HPP_DEFINED

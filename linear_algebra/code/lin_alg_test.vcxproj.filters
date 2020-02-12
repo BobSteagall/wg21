@@ -38,9 +38,6 @@
     <ClInclude Include="include\linear_algebra\forward_declarations.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="include\linear_algebra\library_aliases.hpp">
-      <Filter>Implementation Headers</Filter>
-    </ClInclude>
     <ClInclude Include="include\linear_algebra\debug_helpers.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
@@ -104,6 +101,9 @@
     <ClInclude Include="include\linear_algebra\vector_view_engine.hpp">
       <Filter>Implementation Headers</Filter>
     </ClInclude>
+    <ClInclude Include="test\test_common.hpp">
+      <Filter>Test Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\test_01.cpp">
@@ -113,18 +113,6 @@
       <Filter>Test Files</Filter>
     </ClCompile>
     <ClCompile Include="test\test_main.cpp">
-      <Filter>Test Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test\test_op_add.cpp">
-      <Filter>Test Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test\test_op_sub.cpp">
-      <Filter>Test Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test\test_op_neg.cpp">
-      <Filter>Test Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test\test_op_mul.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
     <ClCompile Include="test\test_obj_matrix.cpp">
@@ -143,6 +131,24 @@
       <Filter>Test Files</Filter>
     </ClCompile>
     <ClCompile Include="test\pch.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\test_op_mul_traits.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\test_op_neg_traits.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\test_op_sub_traits.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\test_op_add_traits.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\test_dynamic_engines.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\test_fixed_size_engines.cpp">
       <Filter>Test Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -43,7 +43,7 @@ class fs_vector_engine
     constexpr fs_vector_engine(fs_vector_engine const&) = default;
     template<class T2, size_t N2>
     constexpr fs_vector_engine(fs_vector_engine<T2, N2> const& src);
-    template<class ET2, detail::enable_if_has_convertible_element<ET2,T> = true>
+    template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T> = true>
     constexpr fs_vector_engine(ET2 const& src);
     template<class T2, detail::enable_if_convertible_element<T2,T> = true>
     constexpr fs_vector_engine(initializer_list<T2> rhs);
@@ -52,7 +52,7 @@ class fs_vector_engine
     constexpr fs_vector_engine&     operator =(fs_vector_engine const&) = default;
     template<class T2, size_t N2>
     constexpr fs_vector_engine&     operator =(fs_vector_engine<T2, N2> const& rhs);
-    template<class ET2, detail::enable_if_has_convertible_element<ET2,T> = true>
+    template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T> = true>
     constexpr fs_vector_engine&     operator =(ET2 const& rhs);
     template<class T2, detail::enable_if_convertible_element<T2,T> = true>
     constexpr fs_vector_engine&     operator =(initializer_list<T2> rhs);
@@ -60,7 +60,7 @@ class fs_vector_engine
     //- Capacity
     //
     static constexpr size_type  capacity() noexcept;
-    static constexpr size_type  elements() noexcept;
+    static constexpr size_type  size() noexcept;
 
     //- Element access
     //
@@ -109,7 +109,7 @@ fs_vector_engine<T,N>::fs_vector_engine(fs_vector_engine<T2, N2> const& rhs)
 }
 
 template<class T, size_t N>
-template<class ET2, detail::enable_if_has_convertible_element<ET2,T>> constexpr
+template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T>> constexpr
 fs_vector_engine<T,N>::fs_vector_engine(ET2 const& rhs)
 :   ma_elems()
 {
@@ -134,7 +134,7 @@ fs_vector_engine<T,N>::operator =(fs_vector_engine<T2,N2> const& rhs)
 }
 
 template<class T, size_t N>
-template<class ET2, detail::enable_if_has_convertible_element<ET2,T>> constexpr
+template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T>> constexpr
 fs_vector_engine<T,N>&
 fs_vector_engine<T,N>::operator =(ET2 const& rhs)
 {
@@ -163,7 +163,7 @@ fs_vector_engine<T,N>::capacity() noexcept
 
 template<class T, size_t N> constexpr
 typename fs_vector_engine<T,N>::size_type
-fs_vector_engine<T,N>::elements() noexcept
+fs_vector_engine<T,N>::size() noexcept
 {
     return N;
 }

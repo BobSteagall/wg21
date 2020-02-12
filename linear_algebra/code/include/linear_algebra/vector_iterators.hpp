@@ -93,7 +93,7 @@ template<class VT> constexpr
 vector_iterator<VT>::vector_iterator(vector_type& vec)
 :   mp_vector(&vec)
 ,   m_curr(0)
-,   m_upper(static_cast<size_type>(vec.elements()))
+,   m_upper(static_cast<size_type>(vec.size()))
 {}
 
 template<class VT> constexpr
@@ -343,7 +343,7 @@ template<class VT> constexpr
 vector_const_iterator<VT>::vector_const_iterator(vector_type const& vec)
 :   mp_vector(&vec)
 ,   m_curr(0)
-,   m_upper(static_cast<size_type>(vec.elements()))
+,   m_upper(static_cast<size_type>(vec.size()))
 {}
 
 template<class VT> constexpr

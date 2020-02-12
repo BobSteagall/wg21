@@ -36,7 +36,15 @@ bool    is_complex_v = is_complex<T>::value;
 //==================================================================================================
 //
 template<class TAG>
-struct engine_tag_traits;
+struct engine_tag_traits
+{
+    static constexpr bool   is_scalar    = false;
+    static constexpr bool   is_vector    = false;
+    static constexpr bool   is_matrix    = false;
+    static constexpr bool   is_readable  = false;
+    static constexpr bool   is_initable  = false;
+    static constexpr bool   is_resizable = false;
+};
 
 template<>
 struct engine_tag_traits<scalar_engine_tag>
@@ -184,7 +192,7 @@ template<class T2, class T>
 using enable_if_convertible_element = enable_if_t<is_convertible_v<T2, T>, bool>;
 
 template<class ET2, class T>
-using enable_if_has_convertible_element =
+using enable_if_engine_has_convertible_element =
         enable_if_t<is_convertible_v<typename ET2::value_type, T>, bool>;
 
 template<class ET2, class ET>
@@ -194,8 +202,9 @@ using enable_if_convertible_engine =
 template<class ET1, class ET2>
 using enable_if_writable = enable_if_t<is_same_v<ET1, ET2> && is_writable_v<ET1>, bool>;
 
-template<class ET1, class ET2>
-using enable_if_initable = enable_if_t<is_same_v<ET1, ET2> && is_initable_v<ET1>, bool>;
+template<class ET1, class ET2, class U>
+using enable_if_initable = enable_if_t<is_same_v<ET1, ET2> && is_initable_v<ET1>  &&
+                                       is_convertible_v<U, typename ET1::value_type>, bool>;
 
 template<class ET1, class ET2>
 using enable_if_resizable = enable_if_t<is_same_v<ET1, ET2> && is_resizable_v<ET1>, bool>;
@@ -596,11 +605,11 @@ struct noe_mdspan_traits;
 template<>
 struct noe_mdspan_traits<void>
 {
-    using source_span_type       = void;
+    using source_span_type    = void;
     using rowcolumn_span_type = void;
     using submatrix_span_type = void;
-    using transpose_span_type    = void;
-    using index_type             = void;
+    using transpose_span_type = void;
+    using index_type          = void;
 };
 
 
@@ -849,7 +858,7 @@ template<class ET, class ST> constexpr
 void
 check_source_engine_size(ET const& engine, ST elems)
 {
-    if (engine.elements() != elems)
+    if (engine.size() != elems)
     {
         throw runtime_error("source engine size does not match destination vector engine size");
     }
@@ -924,11 +933,11 @@ assign_from_vector_engine(ET1& dst, ET2 const& src)
 {
     typename ET1::size_type     di = 0;
     typename ET2::size_type     si = 0;
-    typename ET2::size_type     ni = src.elements();
+    typename ET2::size_type     ni = src.size();
 
     for (;  si < ni;  ++di, ++si)
     {
-        dst(di) = src(si);
+        dst(di) = static_cast<typename ET1::value_type>(src(si));
     }
 }
 
@@ -947,7 +956,7 @@ assign_from_matrix_engine(ET1& dst, ET2 const& src)
     {
         for (dj = 0, sj = 0;  sj < nj;  ++dj, ++sj)
         {
-            dst(di, dj) = src(si, sj);
+            dst(di, dj) = static_cast<typename ET1::value_type>(src(si, sj));
         }
     }
 }
@@ -958,15 +967,16 @@ template<class ET, class T> constexpr void
 assign_from_vector_list(ET& engine, initializer_list<T> rhs)
 {
     using size_type = typename ET::size_type;
+    using dest_elem = typename ET::value_type;
     using elem_iter = decltype(rhs.begin());
 
     size_type   di = 0;
-    size_type   dn = engine.elements();
+    size_type   dn = engine.size();
     elem_iter   ep = rhs.begin();
 
     for (;  di < dn;  ++di, ++ep)
     {
-        engine(di) = *ep;
+        engine(di) = static_cast<dest_elem>(*ep);
     }
 }
 
@@ -974,6 +984,7 @@ template<class ET, class T> constexpr void
 assign_from_matrix_list(ET& engine, initializer_list<initializer_list<T>> rhs)
 {
     using size_type = typename ET::size_type;
+    using dest_elem = typename ET::value_type;
     using row_iter  = decltype(rhs.begin());
     using col_iter  = decltype(rhs.begin()->begin());
 
@@ -987,10 +998,188 @@ assign_from_matrix_list(ET& engine, initializer_list<initializer_list<T>> rhs)
 
         for (;  dj < engine.columns();  ++dj, ++cp)
         {
-            engine(di, dj) = *cp;
+            engine(di, dj) = static_cast<dest_elem>(*cp);
         }
     }
 }
+
+//==================================================================================================
+//  These helper functions are used to compare the contents of vector engines with that of other
+//  vector engines, 1-D mdspans, and 1-D initializer lists.
+//==================================================================================================
+//
+template<class ET1, class ET2> constexpr
+bool
+v_cmp_eq(ET1 const& lhs, ET2 const& rhs)
+{
+    using lhs_size = typename ET1::size_type;
+    using rhs_size = typename ET2::size_type;
+
+    lhs_size   i1 = 0;
+    lhs_size   n1 = lhs.size();
+
+    rhs_size   i2 = 0;
+    rhs_size   n2 = rhs.size();
+
+    if (n1 != static_cast<lhs_size>(n2)) return false;
+
+    for (;  i1 < n1;  ++i1, ++i2)
+    {
+        if (lhs(i1) != rhs(i2)) return false;
+    }
+    return true;
+}
+
+template<class ET, class U> constexpr
+bool
+v_cmp_eq(ET const& lhs, initializer_list<U> rhs)
+{
+    if (static_cast<size_t>(lhs.size()) != rhs.size()) return false;
+
+    using size_type = typename ET::size_type;
+    using elem_iter = decltype(rhs.begin());
+
+    size_type   di = 0;
+    size_type   dn = lhs.size();
+    elem_iter   ep = rhs.begin();
+
+    for (;  di < dn;  ++di, ++ep)
+    {
+        if (lhs(di) != *ep) return false;
+    }
+    return true;
+}
+
+#ifdef LA_USE_MDSPAN
+
+template<class ET, class T, ptrdiff_t X0, class L, class A> constexpr
+bool
+v_cmp_eq(ET const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
+{
+    using lhs_size = typename ET::size_type;
+    using rhs_size = typename basic_mdspan<T, extents<X0>, L, A>::index_type;
+
+    lhs_size    i1 = 0;
+    lhs_size    e1 = lhs.size();
+
+    rhs_size    i2 = 0;
+    rhs_size    e2 = rhs.extent(0);
+
+    if (e1 != static_cast<lhs_size>(e2)) return false;
+
+    for (;  i1 < e1;  ++i1, ++i2)
+    {
+        if (lhs(i1) != rhs(i2)) return false;
+    }
+    return true;
+}
+
+#endif
+//==================================================================================================
+//  These helper functions are used to compare the contents of vector engines with that of other
+//  vector engines, 1-D mdspans, and 1-D initializer lists.
+//==================================================================================================
+//
+template<class ET1, class ET2> constexpr
+bool
+m_cmp_eq(ET1 const& lhs, ET2 const& rhs)
+{
+    using lhs_size = typename ET1::size_type;
+    using rhs_size = typename ET2::size_type;
+
+    lhs_size    i1 = 0;
+    lhs_size    j1 = 0;
+    lhs_size    r1 = lhs.rows();
+    lhs_size    c1 = lhs.columns();
+
+    rhs_size    i2 = 0;
+    rhs_size    j2 = 0;
+    rhs_size    r2 = rhs.rows();
+    rhs_size    c2 = rhs.columns();
+
+    if (r1 != static_cast<lhs_size>(r2)  ||  c1 != static_cast<lhs_size>(c2)) return false;
+
+    for (;  i1 < r1;  ++i1, ++i2)
+    {
+        for (;  j1 < c1;  ++j1, ++j2)
+        {
+            if (lhs(i1, j1) != rhs(i2, j2)) return false;
+        }
+    }
+    return true;
+}
+
+template<class ET, class U> constexpr
+bool
+m_cmp_eq(ET const& lhs, initializer_list<initializer_list<U>> rhs)
+{
+    size_t  first_row_size = rhs.begin()->size();
+
+    for (auto row : rhs)
+    {
+        if (row.size() != first_row_size)
+        {
+            return false;
+        }
+    }
+
+    if (static_cast<size_t>(lhs.rows()) != rhs.size()) return false;
+    if (static_cast<size_t>(lhs.columns()) != first_row_size) return false;
+
+    using size_type = typename ET::size_type;
+    using row_iter  = decltype(rhs.begin());
+    using col_iter  = decltype(rhs.begin()->begin());
+
+    size_type   ei = 0;
+    size_type   er = lhs.rows();
+    size_type   ec = lhs.columns();
+    row_iter    rp = rhs.begin();
+
+    for (;  ei < er;  ++ei, ++rp)
+    {
+        size_type   ej = 0;
+        col_iter    cp = rp->begin();
+
+        for (;  ej < ec;  ++ej, ++cp)
+        {
+            if (lhs(ei, ej) != *cp) return false;
+        }
+    }
+    return true;
+}
+
+#ifdef LA_USE_MDSPAN
+
+template<class ET, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
+bool
+m_cmp_eq(ET const& lhs, basic_mdspan<T, extents<X0, X1>, L, A> const& rhs)
+{
+    using lhs_size = typename ET::size_type;
+    using rhs_size = typename basic_mdspan<T, extents<X0, X1>, L, A>::index_type;
+
+    lhs_size    i1 = 0;
+    lhs_size    j1 = 0;
+    lhs_size    r1 = lhs.rows();
+    lhs_size    c1 = lhs.columns();
+
+    rhs_size    i2 = 0;
+    rhs_size    j2 = 0;
+    rhs_size    r2 = rhs.extent(0);
+    rhs_size    c2 = rhs.extent(1);
+
+    if (r1 != static_cast<lhs_size>(r2)  ||  c1 != static_cast<lhs_size>(c2)) return false;
+
+    for (;  i1 < r1;  ++i1, ++i2)
+    {
+        for (;  j1 < c1;  ++j1, ++j2)
+        {
+            if (lhs(i1, j1) != rhs(i2, j2)) return false;
+        }
+    }
+    return true;
+}
+
+#endif
 
 }       //- detail namespace
 }       //- STD_LA namespace

@@ -22,7 +22,7 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, T2>::multiply
 {
     PrintOperandTypes<result_type>("multiplication_traits (v*s)", v1, s2);
 
-	size_type_r const  elems = static_cast<size_type_r>(v1.elements());
+	size_type_r const  elems = static_cast<size_type_r>(v1.size());
 
 	result_type     vr;
 	size_type_r    ir;
@@ -51,7 +51,7 @@ matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>::multiply
 {
     PrintOperandTypes<result_type>("multiplication_traits (s*v)", s1, v2);
 
-	size_type_r const  elems = static_cast<size_type_r>(v2.elements());
+	size_type_r const  elems = static_cast<size_type_r>(v2.size());
 
 	result_type     vr;
 	size_type_r     ir;
@@ -146,7 +146,7 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>::multiply
 {
     PrintOperandTypes<result_type>("multiplication_traits (v*v)", v1, v2);
 
-	size_type_1 const  elems = static_cast<size_type_1>(v1.elements());
+	size_type_1 const  elems = static_cast<size_type_1>(v1.size());
 
 	result_type     er{};
 	size_type_1    i1;

@@ -46,14 +46,14 @@ class dr_matrix_engine
     dr_matrix_engine(dr_matrix_engine const& rhs);
     dr_matrix_engine(size_type rows, size_type cols);
     dr_matrix_engine(size_type rows, size_type cols, size_type rowcap, size_type colcap);
-    template<class ET2, detail::enable_if_has_convertible_element<ET2,T> = true>
+    template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T> = true>
     dr_matrix_engine(ET2 const& rhs);
     template<class T2, detail::enable_if_convertible_element<T2,T> = true>
     dr_matrix_engine(initializer_list<initializer_list<T2>> rhs);
 
     dr_matrix_engine&   operator =(dr_matrix_engine&&) noexcept;
     dr_matrix_engine&   operator =(dr_matrix_engine const&);
-    template<class ET2, detail::enable_if_has_convertible_element<ET2,T> = true>
+    template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T> = true>
     dr_matrix_engine&   operator =(ET2 const& rhs);
     template<class T2, detail::enable_if_convertible_element<T2,T> = true>
     dr_matrix_engine&   operator =(initializer_list<initializer_list<T2>> rhs);
@@ -115,7 +115,7 @@ class dr_matrix_engine
 template<class T, class AT> inline
 dr_matrix_engine<T,AT>::~dr_matrix_engine() noexcept
 {
-    delete [] mp_elems;
+    detail::deallocate(m_alloc, mp_elems, m_rowcap*m_colcap);
 }
 
 template<class T, class AT>
@@ -158,7 +158,7 @@ dr_matrix_engine<T,AT>::dr_matrix_engine
 }
 
 template<class T, class AT>
-template<class ET2, detail::enable_if_has_convertible_element<ET2,T>>
+template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T>>
 dr_matrix_engine<T,AT>::dr_matrix_engine(ET2 const& rhs)
 :   dr_matrix_engine()
 {
@@ -192,7 +192,7 @@ dr_matrix_engine<T,AT>::operator =(dr_matrix_engine const& rhs)
 }
 
 template<class T, class AT>
-template<class ET2, detail::enable_if_has_convertible_element<ET2,T>> inline
+template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T>> inline
 dr_matrix_engine<T,AT>&
 dr_matrix_engine<T,AT>::operator =(ET2 const& rhs)
 {
@@ -326,6 +326,7 @@ dr_matrix_engine<T,AT>::swap(dr_matrix_engine& other) noexcept
         detail::la_swap(m_cols,   other.m_cols);
         detail::la_swap(m_rowcap, other.m_rowcap);
         detail::la_swap(m_colcap, other.m_colcap);
+        detail::la_swap(m_alloc,  other.m_alloc);
     }
 }
 
@@ -456,7 +457,7 @@ dr_matrix_engine<T,AT>::reshape(size_type rows, size_type cols, size_type rowcap
         {
             for (size_type j = 0;  j < dst_cols;  ++j)
             {
-                tmp.mp_elems[i*m_colcap + j] = mp_elems[i*m_colcap + j];
+                tmp(i, j) = (*this)(i, j);
             }
         }
         tmp.swap(*this);

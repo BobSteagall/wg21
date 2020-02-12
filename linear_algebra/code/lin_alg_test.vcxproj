@@ -30,7 +30,6 @@
     <ClInclude Include="include\linear_algebra\matrix_view_engine.hpp" />
     <ClInclude Include="include\linear_algebra\private_support.hpp" />
     <ClInclude Include="include\linear_algebra\forward_declarations.hpp" />
-    <ClInclude Include="include\linear_algebra\library_aliases.hpp" />
     <ClInclude Include="include\linear_algebra\matrix.hpp" />
     <ClInclude Include="include\linear_algebra\public_support.hpp" />
     <ClInclude Include="include\linear_algebra\arithmetic_operators.hpp" />
@@ -45,6 +44,7 @@
     <ClInclude Include="include\linear_algebra\vector_iterators.hpp" />
     <ClInclude Include="include\linear_algebra\vector_view_engine.hpp" />
     <ClInclude Include="test\pch.h" />
+    <ClInclude Include="test\test_common.hpp" />
     <ClInclude Include="test\test_new_arithmetic.hpp" />
     <ClInclude Include="test\test_new_engine.hpp" />
     <ClInclude Include="test\test_new_number.hpp" />
@@ -64,12 +64,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="test\test_dynamic_engines.cpp" />
+    <ClCompile Include="test\test_fixed_size_engines.cpp" />
     <ClCompile Include="test\test_main.cpp" />
     <ClCompile Include="test\test_obj_matrix.cpp" />
-    <ClCompile Include="test\test_op_add.cpp" />
-    <ClCompile Include="test\test_op_mul.cpp" />
-    <ClCompile Include="test\test_op_neg.cpp" />
-    <ClCompile Include="test\test_op_sub.cpp" />
+    <ClCompile Include="test\test_op_add_traits.cpp" />
+    <ClCompile Include="test\test_op_mul_traits.cpp" />
+    <ClCompile Include="test\test_op_neg_traits.cpp" />
+    <ClCompile Include="test\test_op_sub_traits.cpp" />
     <ClCompile Include="test_geometry_2.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

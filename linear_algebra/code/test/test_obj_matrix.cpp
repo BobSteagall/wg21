@@ -1,8 +1,4 @@
-#include "linear_algebra.hpp"
-#include <array>
-
-using std::cout;
-using std::endl;
+#include "test_common.hpp"
 
 using fsd_mat_engine_35 = STD_LA::fs_matrix_engine<double, 3, 5>;
 using drd_mat_engine    = STD_LA::dr_matrix_engine<double, std::allocator<double>>;
@@ -401,6 +397,7 @@ t003Y()
     drm2.submatrix(6, fsm.rows(), 4, fsm.columns()) = fsm;
     PRINT(drm2);
 
+    PRINT(fsm);
     PRINT(fsm.t());
     PRINT(fsm.t().row(1));
 
@@ -421,6 +418,9 @@ TestGroup00()
     constexpr int    i = t003X();
     int j = t003Y();
 
+//    auto v = STD_LA::fs_vector<double, 3>{};
+//    auto u = STD_LA::fs_vector<long double, 3>{v};
+//    auto w = STD_LA::fs_vector<double, 4>{v};
 //    PRINT_FNAME();
 
 //    PRINT_TYPE(decltype(tf));
