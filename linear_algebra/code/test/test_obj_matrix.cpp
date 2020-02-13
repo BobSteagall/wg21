@@ -375,6 +375,7 @@ t003Y()
     PRINT(fsm);
 
     auto    dcv = drm.column(1);
+
     PRINT(dcv);
     dcv = {3, 3, 3};
     PRINT(dcv);
@@ -387,6 +388,7 @@ t003Y()
     drm_double  drm2(10, 10);
     PRINT(drm2);
     drm2.submatrix(1, 4, 3, 2) = {{1, 2}, {3, 4}, {5, 6}, {7, 8}};
+
     auto const& cdrm2 = drm2;
     PRINT(cdrm2);
 

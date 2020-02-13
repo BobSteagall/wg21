@@ -17,7 +17,7 @@ template<class OT, class ET1, class OT1>
 inline auto
 matrix_negation_traits<OT, vector<ET1, OT1>>::negate(vector<ET1, OT1> const& v1) -> result_type
 {
-    PrintOperandTypes<result_type>("negation_traits", v1);
+    PRINT_OP_TYPES(result_type, "negation_traits", v1);
 
     size_type_r const   elems = static_cast<size_type_r>(v1.size());
 
