@@ -3,6 +3,8 @@ project(wg21_linear_algebra VERSION 0.0.1)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
+option(ENABLE_SANITIZERS "Enable Address Sanitizer and Undefined Behaviour Sanitizer if available" OFF)
+
 include(FetchContent)
 FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git)
 FetchContent_GetProperties(mdspan)
@@ -91,8 +93,11 @@ if (${BUILD_TESTING})
     FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git)
     FetchContent_GetProperties(gtest)
     option(BUILD_GMOCK "" OFF)
+    option(INSTALL_GTEST "" OFF)
     option(gtest_force_shared_crt "" ON)
     if(NOT gtest_POPULATED)
+        set(CMAKE_CXX_STANDARD 11)
+        set(CMAKE_CXX_STANDARD_REQUIRED ON)
         FetchContent_Populate(gtest)
         add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
     endif()
@@ -128,7 +133,6 @@ if (${BUILD_TESTING})
             wg21_linear_algebra
             gtest_main
             gtest
-            asan
     )
 
     set_target_properties(la_test PROPERTIES
@@ -137,26 +141,57 @@ if (${BUILD_TESTING})
         CXX_EXTENSIONS NO
     )
 
-    #set(ASAN_FLAG "-fno-omit-frame-pointer -fsanitize=address")
-
     target_compile_options(la_test
         PRIVATE
             $<$<OR:$<CXX_COMPILER_ID:GNU>>:-Wall -pedantic -Wextra  -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable -Wno-unused-local-typedefs -fmax-errors=10 ${ASAN_FLAGS}>
             $<$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function -Wno-unused-local-typedefs ${ASAN_FLAGS}>
     )
 
+    if (ENABLE_SANITIZERS)
+        set(SANITIZER_FLAGS_ASAN "-fsanitize=address -fno-omit-frame-pointer")
+        set(SANITIZER_FLAGS_UBSAN "-fsanitize=undefined")
+
+        include(CheckCXXCompilerFlag)
+        check_cxx_compiler_flag("${SANITIZER_FLAGS_ASAN}" COMPILER_SUPPORTS_ASAN)
+        check_cxx_compiler_flag("${SANITIZER_FLAGS_UBSAN}" COMPILER_SUPPORTS_UBSAN)
+
+        if (COMPILER_SUPPORTS_ASAN)
+            add_library(asan INTERFACE IMPORTED)
+            set_target_properties(asan PROPERTIES
+                INTERFACE_COMPILE_OPTIONS "${SANITIZER_FLAGS_ASAN}"
+                INTERFACE_LINK_OPTIONS "${SANITIZER_FLAGS_ASAN}"
+            )
+            target_link_libraries(la_test
+                PRIVATE
+                    asan
+            )
+        endif(COMPILER_SUPPORTS_ASAN)
+
+        if (COMPILER_SUPPORTS_UBSAN)
+            add_library(ubsan INTERFACE IMPORTED)
+            set_target_properties(ubsan PROPERTIES
+                INTERFACE_COMPILE_OPTIONS "${SANITIZER_FLAGS_UBSAN}"
+                INTERFACE_LINK_OPTIONS "${SANITIZER_FLAGS_UBSAN}"
+            )
+            target_link_libraries(la_test
+                PRIVATE
+                    ubsan
+            )
+        endif(COMPILER_SUPPORTS_UBSAN)
+    endif(ENABLE_SANITIZERS)
+
     include(CTest)
     add_test(LA_TEST la_test COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/la_test" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
-#    enable_testing()
-#    include(GoogleTest)
-#    gtest_discover_tests(la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DISCOVERY_TIMEOUT 30)
+    enable_testing()
+    include(GoogleTest)
+    gtest_discover_tests(la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DISCOVERY_TIMEOUT 30)
     #set_tests_properties(la_test PROPERTIES TIMEOUT 10)
-    #[[add_test(
+    add_test(
             NAME la_test
             COMMAND la_test
             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-    )#]]
+    )
 endif(${BUILD_TESTING})
 
 include(GNUInstallDirs)
