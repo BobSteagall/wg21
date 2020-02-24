@@ -27,6 +27,8 @@ class LinearAlgebraConan(ConanFile):
 
     def build(self):
         self.cmake.build()
+        if tools.cross_building(self.settings):
+            return
         self.cmake.test()
 
     def package(self):
