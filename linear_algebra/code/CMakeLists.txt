@@ -182,16 +182,8 @@ if (${BUILD_TESTING})
 
     include(CTest)
     enable_testing()
-#   This runs GTest to discover tests.  However, that fails in a cross-compiled situation (i.e. compiling ARM code on x86)
-#   We need to set the tests up to run via an ARM emulator in this case to get this working.
-#    include(GoogleTest)
-#    gtest_discover_tests(la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DISCOVERY_TIMEOUT 30)
-    #set_tests_properties(la_test PROPERTIES TIMEOUT 10)
-    add_test(
-        NAME la_test
-        COMMAND la_test
-        WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-    )
+    include(GoogleTest)
+    gtest_discover_tests(la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DISCOVERY_TIMEOUT 30)
 endif(${BUILD_TESTING})
 
 include(GNUInstallDirs)
