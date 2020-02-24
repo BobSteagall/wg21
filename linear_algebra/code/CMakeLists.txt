@@ -181,16 +181,16 @@ if (${BUILD_TESTING})
     endif(ENABLE_SANITIZERS)
 
     include(CTest)
-    add_test(LA_TEST la_test COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/la_test" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-
     enable_testing()
-    include(GoogleTest)
-    gtest_discover_tests(la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DISCOVERY_TIMEOUT 30)
+#   This runs GTest to discover tests.  However, that fails in a cross-compiled situation (i.e. compiling ARM code on x86)
+#   We need to set the tests up to run via an ARM emulator in this case to get this working.
+#    include(GoogleTest)
+#    gtest_discover_tests(la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DISCOVERY_TIMEOUT 30)
     #set_tests_properties(la_test PROPERTIES TIMEOUT 10)
     add_test(
-            NAME la_test
-            COMMAND la_test
-            WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+        NAME la_test
+        COMMAND la_test
+        WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     )
 endif(${BUILD_TESTING})
 
@@ -218,7 +218,6 @@ install(
 install(
     EXPORT wg21_linear_algebra-target
     NAMESPACE wg21_linear_algebra::
-    #FILE wg21_linear_algebra-target.cmake
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/wg21_linear_algebra"
 )
 
