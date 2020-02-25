@@ -12,6 +12,7 @@ class LinearAlgebraConan(ConanFile):
     topics = ("conan", "linear algebra", "header-only", "std", "math", "wg21")
     exports_sources = "*.txt", "*.hpp", "*.cpp", "*.cmake", "*.cmake.in", "LICENSE.txt"
     generators = "cmake"
+    settings = "os", "compiler", "build_type", "arch"
 
     _cmake = None
     @property
@@ -24,9 +25,10 @@ class LinearAlgebraConan(ConanFile):
             self._cmake.configure(source_folder=os.path.join("linear_algebra", "code"))
         return self._cmake
 
-
     def build(self):
         self.cmake.build()
+        if tools.cross_building(self.settings):
+            return
         self.cmake.test()
 
     def package(self):

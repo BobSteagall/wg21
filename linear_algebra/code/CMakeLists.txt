@@ -181,17 +181,9 @@ if (${BUILD_TESTING})
     endif(ENABLE_SANITIZERS)
 
     include(CTest)
-    add_test(LA_TEST la_test COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/la_test" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-
     enable_testing()
     include(GoogleTest)
     gtest_discover_tests(la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DISCOVERY_TIMEOUT 30)
-    #set_tests_properties(la_test PROPERTIES TIMEOUT 10)
-    add_test(
-            NAME la_test
-            COMMAND la_test
-            WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-    )
 endif(${BUILD_TESTING})
 
 include(GNUInstallDirs)
@@ -218,7 +210,6 @@ install(
 install(
     EXPORT wg21_linear_algebra-target
     NAMESPACE wg21_linear_algebra::
-    #FILE wg21_linear_algebra-target.cmake
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/wg21_linear_algebra"
 )
 
