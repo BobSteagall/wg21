@@ -1,7 +1,6 @@
 build: false
 
 environment:
-  #APPVEYOR_RDP_PASSWORD: Testing123
   CONAN_BUILD_REQUIRES: "cmake_installer/3.14.7@conan/stable"
   CONAN_PRINT_RUN_COMMANDS: 1
   PYTHON_HOME: "C:\\Python37"
@@ -31,6 +30,3 @@ install:
 
 test_script:
   - python .conan/build.py
-
-#on_finish:
-#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
