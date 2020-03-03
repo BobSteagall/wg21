@@ -3,6 +3,7 @@ env:
     - CONAN_BUILD_REQUIRES="cmake_installer/3.14.7@conan/stable, ninja/1.9.0"
     - CONAN_CMAKE_GENERATOR=Ninja
     - CONAN_PRINT_RUN_COMMANDS=1
+    - CONAN_UPLOAD_ONLY_WHEN_STABLE=0
 
 linux: &linux
   os: linux
