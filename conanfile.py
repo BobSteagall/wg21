@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 from conans import ConanFile, CMake, tools
 from conans.tools import load
+from conans.model.version import Version
+
 import re, os.path
 
 class LinearAlgebraConan(ConanFile):
@@ -18,6 +20,11 @@ class LinearAlgebraConan(ConanFile):
         content = load(os.path.join(os.path.dirname(__file__), "linear_algebra", "code", "CMakeLists.txt"))
         version = re.search(r'project\(wg21_linear_algebra VERSION (\d+\.\d+\.\d+)\)', content).group(1)
         self.version = version.strip()
+
+    def build_requirements(self):
+        # Ensure the package is build against a version of CMake from 3.14 onwards.
+        if CMake.get_version() < Version("3.14"):
+            self.build_requires("cmake_installer/3.14.7@conan/stable")
 
     _cmake = None
     @property

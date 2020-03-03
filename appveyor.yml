@@ -1,7 +1,6 @@
 build: false
 
 environment:
-  CONAN_BUILD_REQUIRES: "cmake_installer/3.14.7@conan/stable"
   CONAN_PRINT_RUN_COMMANDS: 1
   PYTHON_HOME: "C:\\Python37"
   matrix:
