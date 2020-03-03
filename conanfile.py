@@ -1,17 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from conans import ConanFile, CMake, tools
-import os.path
+from conans.tools import load
+import re, os.path
 
 class LinearAlgebraConan(ConanFile):
     name = "linear_algebra"
-    version = "0.0.1"
     license = "MIT"
     url = "https://github.com/BobSteagall/wg21"
     description = "A linear algebra proposal for the C++ standard library"
     topics = ("conan", "linear algebra", "header-only", "std", "math", "wg21")
     exports_sources = "*.txt", "*.hpp", "*.cpp", "*.cmake", "*.cmake.in", "LICENSE.txt"
     generators = "cmake"
+
+    def set_version(self):
+        content = load(os.path.join(os.path.dirname(__file__), "linear_algebra", "code", "CMakeLists.txt"))
+        version = re.search(r'project\(wg21_linear_algebra VERSION (\d+\.\d+\.\d+)\)', content).group(1)
+        self.version = version.strip()
 
     _cmake = None
     @property
