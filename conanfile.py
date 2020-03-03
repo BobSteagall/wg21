@@ -11,6 +11,7 @@ class LinearAlgebraConan(ConanFile):
     description = "A linear algebra proposal for the C++ standard library"
     topics = ("conan", "linear algebra", "header-only", "std", "math", "wg21")
     exports_sources = "*.txt", "*.hpp", "*.cpp", "*.cmake", "*.cmake.in", "LICENSE.txt"
+    settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
 
     def set_version(self):
