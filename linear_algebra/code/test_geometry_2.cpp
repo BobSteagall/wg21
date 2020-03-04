@@ -171,7 +171,7 @@ auto
 matrix_addition_traits<matrix_operation_traits, vector<float2_engine>, vector<float2_engine>>::add
 (vector<float2_engine> const& v1, vector<float2_engine> const& v2) -> result_type
 {
-	PrintOperandTypes<result_type>("float2 addition_traits", v1, v2);
+	PRINT_OP_TYPES(result_type, "float2 addition_traits", v1, v2);
 
 	return result_type{ v1(0) + v2(0), v1(1) + v2(1) };
 }
@@ -192,7 +192,7 @@ auto
 matrix_addition_traits<matrix_operation_traits, matrix<float22_engine>, matrix<float22_engine>>::add
 (matrix<float22_engine> const& m1, matrix<float22_engine> const& m2) -> result_type
 {
-	PrintOperandTypes<result_type>("float22 addition_traits", m1, m2);
+	PRINT_OP_TYPES(result_type, "float22 addition_traits", m1, m2);
 
 	return result_type{ m1(0, 0) + m2(0, 0), m1(0, 1) + m2(0, 1), m1(1, 0) + m2(1, 0), m1(1, 1) + m2(1, 1) };
 }
@@ -213,7 +213,7 @@ auto
 matrix_subtraction_traits<matrix_operation_traits, vector<float2_engine>, vector<float2_engine>>::subtract
 (vector<float2_engine> const& v1, vector<float2_engine> const& v2) -> result_type
 {
-	PrintOperandTypes<result_type>("float2 subtraction_traits", v1, v2);
+	PRINT_OP_TYPES(result_type, "float2 subtraction_traits", v1, v2);
 
 	return result_type{ v1(0) - v2(0), v1(1) - v2(1) };
 }
@@ -234,7 +234,7 @@ auto
 matrix_subtraction_traits<matrix_operation_traits, matrix<float22_engine>, matrix<float22_engine>>::subtract
 (matrix<float22_engine> const& m1, matrix<float22_engine> const& m2) -> result_type
 {
-	PrintOperandTypes<result_type>("float22 subtraction_traits", m1, m2);
+	PRINT_OP_TYPES(result_type, "float22 subtraction_traits", m1, m2);
 
 	return result_type{ m1(0, 0) - m2(0, 0), m1(0, 1) - m2(0, 1), m1(1, 0) - m2(1, 0), m1(1, 1) - m2(1, 1) };
 }
@@ -253,7 +253,7 @@ auto
 matrix_negation_traits<matrix_operation_traits, vector<float2_engine>>::negate
 (vector<float2_engine> const& v) -> result_type
 {
-	PrintOperandTypes<result_type>("float2 negation_traits", v);
+	PRINT_OP_TYPES(result_type, "float2 negation_traits", v);
 
 	return result_type{ -v(0), -v(1) };
 }
@@ -272,7 +272,7 @@ auto
 matrix_negation_traits<matrix_operation_traits, matrix<float22_engine>>::negate
 (matrix<float22_engine> const& m) -> result_type
 {
-	PrintOperandTypes<result_type>("float22 negation_traits", m);
+	PRINT_OP_TYPES(result_type, "float22 negation_traits", m);
 
 	return result_type{ -m(0, 0), -m(0, 1), -m(1, 0), -m(1, 1) };
 }
@@ -291,7 +291,7 @@ auto
 matrix_multiplication_traits<matrix_operation_traits, vector<float2_engine>, float>::multiply
 (vector<float2_engine> const& v, float const& s) -> result_type
 {
-	PrintOperandTypes<result_type>("float2 multiplication_traits (v*s)", v, s);
+	PRINT_OP_TYPES(result_type, "float2 multiplication_traits (v*s)", v, s);
 
 	return result_type{ v(0) * s, v(1) * s };
 }
@@ -310,7 +310,7 @@ auto
 matrix_multiplication_traits<matrix_operation_traits, matrix<float22_engine>, float>::multiply
 (matrix<float22_engine> const& m, float const& s) -> result_type
 {
-	PrintOperandTypes<result_type>("float22 multiplication_traits (m*s)", m, s);
+	PRINT_OP_TYPES(result_type, "float22 multiplication_traits (m*s)", m, s);
 
 	return result_type{ m(0, 0) * s, m(0, 1) * s, m(1, 0) * s, m(1, 1) * s };
 }
@@ -329,7 +329,7 @@ auto
 matrix_multiplication_traits<matrix_operation_traits, float, vector<float2_engine>>::multiply
 (float const& s, vector<float2_engine> const& v) -> result_type
 {
-	PrintOperandTypes<result_type>("float2 multiplication_traits (s*v)", s, v);
+	PRINT_OP_TYPES(result_type, "float2 multiplication_traits (s*v)", s, v);
 
 	return v * s;
 }
@@ -348,7 +348,7 @@ auto
 matrix_multiplication_traits<matrix_operation_traits, float, matrix<float22_engine>>::multiply
 (float const& s, matrix<float22_engine> const& m) -> result_type
 {
-	PrintOperandTypes<result_type>("float22 multiplication_traits (s*m)", s, m);
+	PRINT_OP_TYPES(result_type, "float22 multiplication_traits (s*m)", s, m);
 
 	return m * s;
 }
@@ -360,7 +360,7 @@ auto
 matrix_multiplication_traits<matrix_operation_traits, vector<float2_engine>, vector<float2_engine>>::multiply
 (vector<float2_engine> const& v1, vector<float2_engine> const& v2) -> result_type
 {
-	PrintOperandTypes<result_type>("float2 multiplication_traits (v*v)", v1, v2);
+	PRINT_OP_TYPES(result_type, "float2 multiplication_traits (v*v)", v1, v2);
 
 	return result_type{ (v1(0) * v2(0)) + (v1(1) * v2(1)) };
 }
@@ -379,7 +379,7 @@ auto
 matrix_multiplication_traits<matrix_operation_traits, vector<float2_engine>, matrix<float22_engine>>::multiply
 (vector<float2_engine> const& v, matrix<float22_engine> const& m) -> result_type
 {
-	PrintOperandTypes<result_type>("float22 multiplication_traits (v*m)", v, m);
+	PRINT_OP_TYPES(result_type, "float22 multiplication_traits (v*m)", v, m);
 
 	return result_type{ (v(0) * m(0, 0)) + (v(1) * m(1, 0)), (v(0) * m(0, 1)) + (v(1) * m(1, 1)) };
 }
@@ -398,7 +398,7 @@ auto
 matrix_multiplication_traits<matrix_operation_traits, matrix<float22_engine>, vector<float2_engine>>::multiply
 (matrix<float22_engine> const& m, vector<float2_engine> const& v) -> result_type
 {
-	PrintOperandTypes<result_type>("float22 multiplication_traits (m*v)", m, v);
+	PRINT_OP_TYPES(result_type, "float22 multiplication_traits (m*v)", m, v);
 
 	return result_type{ (m(0, 0) * v(0)) + (m(0, 1) * v(1)), (m(1, 0) * v(0)) + (m(1, 1) * v(1)) };
 }
@@ -417,7 +417,7 @@ auto
 matrix_multiplication_traits<matrix_operation_traits, matrix<float22_engine>, matrix<float22_engine>>::multiply
 (matrix<float22_engine> const& m1, matrix<float22_engine> const& m2) -> result_type
 {
-	PrintOperandTypes<result_type>("float22 multiplication_traits (m*m)", m1, m2);
+	PRINT_OP_TYPES(result_type, "float22 multiplication_traits (m*m)", m1, m2);
 
 	return result_type{ (m1(0, 0) * m2(0, 0)) + (m1(0, 1) * m2(1, 0)), (m1(0, 0) * m2(0, 1)) + (m1(0, 1) * m2(1, 1)),
 		                (m1(1, 0) * m2(0, 0)) + (m1(1, 1) * m2(1, 0)), (m1(1, 0) * m2(0, 1)) + (m1(1, 1) * m2(1, 1)) };

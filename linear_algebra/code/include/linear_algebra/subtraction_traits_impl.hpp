@@ -18,7 +18,7 @@ inline auto
 matrix_subtraction_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>::subtract
 (vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2) -> result_type
 {
-    PrintOperandTypes<result_type>("subtraction_traits", v1, v2);
+    PRINT_OP_TYPES(result_type, "subtraction_traits", v1, v2);
 
     size_type_r const   elems = static_cast<size_type_r>(v1.size());
 
@@ -47,7 +47,7 @@ inline auto
 matrix_subtraction_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::subtract
 (matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2) -> result_type
 {
-    PrintOperandTypes<result_type>("subtraction_traits", m1, m2);
+    PRINT_OP_TYPES(result_type, "subtraction_traits", m1, m2);
 
     size_type_r const   rows = static_cast<size_type_r>(m1.rows());
     size_type_r const   cols = static_cast<size_type_r>(m1.columns());

@@ -59,7 +59,7 @@ if __name__ == "__main__":
         username = args.username,
         login_username=args.login,
         upload=args.upload,
-        upload_only_when_stable=upload_only_when_stable(),
+        # upload_only_when_stable=upload_only_when_stable(),
         stable_branch_pattern=stable_branch_pattern(),
         reference=reference(),
         test_folder=os.path.join(".conan", "test_package")

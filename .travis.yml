@@ -1,8 +1,9 @@
 env:
   global:
-    - CONAN_BUILD_REQUIRES="cmake_installer/3.14.7@conan/stable, ninja/1.9.0"
+    - CONAN_BUILD_REQUIRES="ninja/1.9.0"
     - CONAN_CMAKE_GENERATOR=Ninja
     - CONAN_PRINT_RUN_COMMANDS=1
+    - CONAN_UPLOAD_ONLY_WHEN_STABLE=0
 
 linux: &linux
   os: linux
@@ -16,10 +17,11 @@ osx: &osx
   language: generic
 matrix:
   include:
-      - <<: *linux
-        env: CONAN_GCC_VERSIONS=9 CONAN_ARCHS=armv7hf CONAN_DOCKER_IMAGE=conanio/gcc9-armv7hf
-      - <<: *linux
-        env: CONAN_GCC_VERSIONS=9 CONAN_ARCHS=armv8 CONAN_DOCKER_IMAGE=conanio/gcc9-armv8
+      # Test detection and unit tests fail due to cross-compiling environment.
+      #- <<: *linux
+      #  env: CONAN_GCC_VERSIONS=9 CONAN_ARCHS=armv7hf CONAN_DOCKER_IMAGE=conanio/gcc9-armv7hf
+      #- <<: *linux
+      #  env: CONAN_GCC_VERSIONS=9 CONAN_ARCHS=armv8 CONAN_DOCKER_IMAGE=conanio/gcc9-armv8
       - <<: *linux
         env: CONAN_GCC_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/gcc8
       - <<: *linux
@@ -31,12 +33,12 @@ matrix:
         env: CONAN_CLANG_VERSIONS=8 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/clang8
       - <<: *linux
         env: CONAN_CLANG_VERSIONS=9 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/clang9
-      # - <<: *osx
-        # osx_image: xcode10.3
-        # env: CONAN_APPLE_CLANG_VERSIONS=10.0
-      # - <<: *osx
-        # osx_image: xcode11.2
-        # env: CONAN_APPLE_CLANG_VERSIONS=11.0
+      - <<: *osx
+        osx_image: xcode10.3
+        env: CONAN_APPLE_CLANG_VERSIONS=10.0
+      - <<: *osx
+        osx_image: xcode11.2
+        env: CONAN_APPLE_CLANG_VERSIONS=11.0
 
 install:
   - ./.travis/install.sh

@@ -158,6 +158,8 @@ get_type_name(T const&)
     return clean_type_name(string(view.data(), view.size()));
 }
 
+#define PRINT_TYPE(T)       std::cout << #T << ": " << STD_LA::get_type_name<T>() << std::endl
+
 template<class RT, class O1>
 void
 PrintOperandTypes(string const& loc, O1 const& o1)
@@ -177,8 +179,8 @@ PrintOperandTypes(string const& loc, O1 const& o1, O2 const& o2)
          << "  ret: " << get_type_name<RT>() << endl << endl;
 }
 
-#define PRINT_TYPE(T)       std::cout << #T << ": " << STD_LA::get_type_name<T>() << std::endl
-
+#define PRINT_OP_TYPES(ET, MSG, ...)
+//#define PRINT_OP_TYPES(ET, MSG, ...)    STD_LA::PrintOperandTypes<ET>(MSG, __VA_ARGS__)
 
 template<class ET, class OT>
 void

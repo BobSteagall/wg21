@@ -13,3 +13,10 @@ add_executable(test_linear_algebra
 )
 
 target_link_libraries(test_linear_algebra PRIVATE wg21_linear_algebra::wg21_linear_algebra)
+
+enable_testing()
+add_test(
+        NAME test_linear_algebra
+        COMMAND test_linear_algebra
+        WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+)
