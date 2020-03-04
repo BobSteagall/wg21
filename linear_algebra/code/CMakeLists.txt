@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(wg21_linear_algebra VERSION 0.0.1)
+project(wg21_linear_algebra VERSION 0.5.0)
 
 add_library(wg21_linear_algebra INTERFACE)
 target_include_directories(wg21_linear_algebra
