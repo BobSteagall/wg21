@@ -1,7 +1,6 @@
 build: false
 
 environment:
-  CONAN_BUILD_REQUIRES: "cmake_installer/3.14.7@conan/stable"
   CONAN_PRINT_RUN_COMMANDS: 1
   PYTHON_HOME: "C:\\Python37"
   matrix:
@@ -9,18 +8,22 @@ environment:
         CONAN_VISUAL_VERSIONS: 16
         CONAN_BUILD_TYPES: Release
         CONAN_ARCHS: x86_64
+        CONAN_UPLOAD_ONLY_WHEN_STABLE: 0
       - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
         CONAN_VISUAL_VERSIONS: 16
         CONAN_BUILD_TYPES: Release
         CONAN_ARCHS: x86
+        CONAN_UPLOAD_ONLY_WHEN_STABLE: 0
       - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
         CONAN_VISUAL_VERSIONS: 16
         CONAN_BUILD_TYPES: Debug
         CONAN_ARCHS: x86_64
+        CONAN_UPLOAD_ONLY_WHEN_STABLE: 0
       - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
         CONAN_VISUAL_VERSIONS: 16
         CONAN_BUILD_TYPES: Debug
         CONAN_ARCHS: x86
+        CONAN_UPLOAD_ONLY_WHEN_STABLE: 0
 
 install:
   - set PATH=%PYTHON_HOME%;%PYTHON_HOME%/Scripts/;%PATH%
