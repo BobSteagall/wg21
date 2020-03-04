@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(wg21_linear_algebra VERSION 0.0.1)
+project(wg21_linear_algebra VERSION 0.5.0)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
