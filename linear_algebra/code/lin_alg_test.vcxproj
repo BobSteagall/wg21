@@ -22,34 +22,36 @@
     <ClInclude Include="include\linear_algebra.hpp" />
     <ClInclude Include="include\linear_algebra\addition_traits.hpp" />
     <ClInclude Include="include\linear_algebra\addition_traits_impl.hpp" />
-    <ClInclude Include="include\linear_algebra\column_engine.hpp" />
     <ClInclude Include="include\linear_algebra\debug_helpers.hpp" />
+    <ClInclude Include="include\linear_algebra\dynamic_matrix_engine.hpp" />
+    <ClInclude Include="include\linear_algebra\dynamic_vector_engine.hpp" />
+    <ClInclude Include="include\linear_algebra\fixed_size_matrix_engine.hpp" />
+    <ClInclude Include="include\linear_algebra\fixed_size_vector_engine.hpp" />
+    <ClInclude Include="include\linear_algebra\matrix_view_engine.hpp" />
     <ClInclude Include="include\linear_algebra\private_support.hpp" />
-    <ClInclude Include="include\linear_algebra\dynamic_engines.hpp" />
     <ClInclude Include="include\linear_algebra\forward_declarations.hpp" />
-    <ClInclude Include="include\linear_algebra\library_aliases.hpp" />
     <ClInclude Include="include\linear_algebra\matrix.hpp" />
     <ClInclude Include="include\linear_algebra\public_support.hpp" />
-    <ClInclude Include="include\linear_algebra\fixed_size_engines.hpp" />
     <ClInclude Include="include\linear_algebra\arithmetic_operators.hpp" />
     <ClInclude Include="include\linear_algebra\multiplication_traits.hpp" />
     <ClInclude Include="include\linear_algebra\multiplication_traits_impl.hpp" />
     <ClInclude Include="include\linear_algebra\negation_traits.hpp" />
     <ClInclude Include="include\linear_algebra\negation_traits_impl.hpp" />
-    <ClInclude Include="include\linear_algebra\number_traits.hpp" />
     <ClInclude Include="include\linear_algebra\operation_traits.hpp" />
-    <ClInclude Include="include\linear_algebra\row_engine.hpp" />
-    <ClInclude Include="include\linear_algebra\submatrix_engine.hpp" />
     <ClInclude Include="include\linear_algebra\subtraction_traits.hpp" />
     <ClInclude Include="include\linear_algebra\subtraction_traits_impl.hpp" />
-    <ClInclude Include="include\linear_algebra\transpose_engine.hpp" />
     <ClInclude Include="include\linear_algebra\vector.hpp" />
     <ClInclude Include="include\linear_algebra\vector_iterators.hpp" />
+    <ClInclude Include="include\linear_algebra\vector_view_engine.hpp" />
+    <ClInclude Include="test\pch.h" />
+    <ClInclude Include="test\test_common.hpp" />
     <ClInclude Include="test\test_new_arithmetic.hpp" />
     <ClInclude Include="test\test_new_engine.hpp" />
     <ClInclude Include="test\test_new_number.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="test\pch.cpp" />
+    <ClCompile Include="test\test.cpp" />
     <ClCompile Include="test\test_01.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -62,12 +64,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="test\test_dynamic_engines.cpp" />
+    <ClCompile Include="test\test_fixed_size_engines.cpp" />
     <ClCompile Include="test\test_main.cpp" />
     <ClCompile Include="test\test_obj_matrix.cpp" />
-    <ClCompile Include="test\test_op_add.cpp" />
-    <ClCompile Include="test\test_op_mul.cpp" />
-    <ClCompile Include="test\test_op_neg.cpp" />
-    <ClCompile Include="test\test_op_sub.cpp" />
+    <ClCompile Include="test\test_op_add_traits.cpp" />
+    <ClCompile Include="test\test_op_mul_traits.cpp" />
+    <ClCompile Include="test\test_op_neg_traits.cpp" />
+    <ClCompile Include="test\test_op_sub_traits.cpp" />
     <ClCompile Include="test_geometry_2.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -86,6 +90,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -139,16 +146,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include;extsrc\mdspan\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include;extsrc\mdspan\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include;extsrc\mdspan\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include;extsrc\mdspan\include</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -204,5 +211,12 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.3\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets" Condition="Exists('packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.3\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.3\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.3\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets'))" />
+  </Target>
 </Project>

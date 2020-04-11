@@ -8,52 +8,72 @@
 #ifndef LINEAR_ALGEBRA_HPP_DEFINED
 #define LINEAR_ALGEBRA_HPP_DEFINED
 
-#include <cstdint>
-#include <algorithm>
-#include <complex>
-#include <initializer_list>
-#include <memory>
-#include <numeric>
-#include <tuple>
-#include <type_traits>
+//- Some build options for dev/debug/test.
+//
+//#define LA_USE_MDSPAN
 
-//--------------------------------------------------------------------------------------------------
-//- Namespace alternatives for testing and also for detecting/avoiding ADL issues.  Pick a pair
+//- Namespace alternatives for testing and also for detecting  ADL issues.  Pick a pair
 //  and attempt to build.
 //
 //#define STD_LA      la
-//#define USING_STD   using namespace std;
+//#define USING_STD   using namespace std; using namespace std::experimental;
 
-//#define STD_LA      std
+//#define STD_LA      std::math
 //#define USING_STD
 
-#define STD_LA  std::experimental::math
-#define USING_STD
+#define STD_LA      std::experimental::math
+#define USING_STD   using namespace std::experimental;
 
-//#define LA_USE_VECTOR_ENGINE_ITERATORS
+#include <cstdint>
+#include <complex>
+#include <initializer_list>
+#include <tuple>
+#include <type_traits>
+
+//- Disable some compiler warnings (noise) coming from mdspan.
+//
+#if defined _MSC_VER
+    #undef LA_USE_MDSPAN
+#elif defined __clang__
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#elif defined __GNUG__
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
+
+#ifdef LA_USE_MDSPAN
+    #include <experimental/mdspan>
+#else
+    #include <array>
+#endif
+
+//- Restore the compiler's diagnostic state.
+//
+#if defined _MSC_VER
+#elif defined __clang__
+    #pragma clang diagnostic pop
+#elif defined __GNUG__
+    #pragma GCC diagnostic pop
+#endif
 
 //- Implementation headers.
 //
 #include "linear_algebra/forward_declarations.hpp"
 #include "linear_algebra/private_support.hpp"
 #include "linear_algebra/public_support.hpp"
+#include "linear_algebra/fixed_size_vector_engine.hpp"
+#include "linear_algebra/fixed_size_matrix_engine.hpp"
+#include "linear_algebra/dynamic_vector_engine.hpp"
+#include "linear_algebra/dynamic_matrix_engine.hpp"
+#include "linear_algebra/vector_view_engine.hpp"
+#include "linear_algebra/matrix_view_engine.hpp"
 #include "linear_algebra/vector_iterators.hpp"
-#include "linear_algebra/dynamic_engines.hpp"
-#include "linear_algebra/fixed_size_engines.hpp"
-#include "linear_algebra/column_engine.hpp"
-#include "linear_algebra/row_engine.hpp"
-#include "linear_algebra/transpose_engine.hpp"
-#include "linear_algebra/submatrix_engine.hpp"
 #include "linear_algebra/vector.hpp"
 #include "linear_algebra/matrix.hpp"
-#include "linear_algebra/library_aliases.hpp"
 
-//- Some helpers for debugging/testing.  Not for production.
-//
-#include "linear_algebra/debug_helpers.hpp"
+#include "linear_algebra/debug_helpers.hpp"     //- Helpers for debug/test -- not for production.
 
-//- Some more implementation headers.
-//
 #include "linear_algebra/addition_traits.hpp"
 #include "linear_algebra/addition_traits_impl.hpp"
 #include "linear_algebra/subtraction_traits.hpp"

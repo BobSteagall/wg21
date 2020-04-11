@@ -8,10 +8,6 @@
 #ifndef LINEAR_ALGEBRA_DEBUG_HELPERS_HPP_DEFINED
 #define LINEAR_ALGEBRA_DEBUG_HELPERS_HPP_DEFINED
 
-//-------------------------------------------------------------------------------------------------
-//  Helper functions and utilities for testing the interface; not part of the final proposal!
-//-------------------------------------------------------------------------------------------------
-//
 #include <iostream>
 #include <iomanip>
 #include <string_view>
@@ -28,7 +24,7 @@ type_name()                //- From StackOverflow...
     using namespace std;
 #ifdef __clang__
     string_view p = __PRETTY_FUNCTION__;
-    return string_view(p.data() + 34, p.size() - 34 - 1);
+    return string_view(p.data() + 59, p.size() - 59 - 1);
 #elif defined(__GNUC__)
     string_view p = __PRETTY_FUNCTION__;
     # if __cplusplus < 201402
@@ -105,6 +101,7 @@ clean_type_name(basic_string<C,T,A> tname)
 {
     static basic_string<C,T,A> const   ns = MATRIX_STRINGIFY(STD_LA) "::";
     static basic_string<C,T,A> const   sl = "std::";
+    static basic_string<C,T,A> const   ex = "experimental::";
     static basic_string<C,T,A> const   aa = "> >";
 
     for (auto pos = string::npos;  (pos = tname.rfind(ns, pos)) != string::npos; )
@@ -115,6 +112,11 @@ clean_type_name(basic_string<C,T,A> tname)
     for (auto pos = string::npos;  (pos = tname.rfind(sl, pos)) != string::npos; )
     {
         tname.erase(pos, sl.size());
+    }
+
+    for (auto pos = string::npos;  (pos = tname.rfind(ex, pos)) != string::npos; )
+    {
+        tname.erase(pos, ex.size());
     }
 
     for (auto pos = string::npos;  (pos = tname.rfind(aa, pos)) != string::npos; )
@@ -132,8 +134,8 @@ clean_type_name(basic_string<C,T,A> tname)
 inline void
 PrintFuncName(char const* name)
 {
-    cout << "********************************************************************************\n";
-    cout << "********************************************************************************\n";
+    cout << "--------------------------------------------------------------------------------\n";
+    cout << "--------------------------------------------------------------------------------\n";
     cout << "    In test function: " << name << endl;
 }
 
@@ -156,6 +158,8 @@ get_type_name(T const&)
     return clean_type_name(string(view.data(), view.size()));
 }
 
+#define PRINT_TYPE(T)       std::cout << #T << ": " << STD_LA::get_type_name<T>() << std::endl
+
 template<class RT, class O1>
 void
 PrintOperandTypes(string const& loc, O1 const& o1)
@@ -175,8 +179,8 @@ PrintOperandTypes(string const& loc, O1 const& o1, O2 const& o2)
          << "  ret: " << get_type_name<RT>() << endl << endl;
 }
 
-#define PRINT_TYPE(T)       std::cout << #T << ": " << STD_LA::get_type_name<T>() << std::endl
-
+#define PRINT_OP_TYPES(ET, MSG, ...)
+//#define PRINT_OP_TYPES(ET, MSG, ...)    STD_LA::PrintOperandTypes<ET>(MSG, __VA_ARGS__)
 
 template<class ET, class OT>
 void
@@ -209,20 +213,20 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
     using size_type = typename vector<ET, OT>::size_type;
 
     cout << endl << "vector: " << ((pname) ? pname : "<anon>") << endl;
-    cout << "  size: " << v.elements() << endl;
+    cout << "  size: " << v.size() << endl;
     cout << "  capy: " << v.capacity() << endl;
     cout << "  -----" << endl;
 
     cout << "(idx) " << right << setw(4) << setprecision(3) << (double) v(0);
 
-    for (size_type i = 1;  i < v.elements();  ++i)
+    for (size_type i = 1;  i < v.size();  ++i)
     {
             cout << right << setw(6) << setprecision(3) << (double) v(i);
     }
     cout << endl;
 
-    auto    iter = v.begin();
-    auto    last = v.end();
+    auto    iter = cbegin(v);
+    auto    last = cend(v);
 
     cout << "(itr) " << right << setw(4) << setprecision(3) << (double) *iter;
 
@@ -232,6 +236,51 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
     }
     cout << endl;
 }
+
+#ifdef LA_USE_MDSPAN
+
+template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+void
+Print(basic_mdspan<T, extents<X0, X1>, L, A> const& s, char const* pname = nullptr)
+{
+    using index_type = ptrdiff_t;
+
+    cout << endl << "mdspan: " << ((pname) ? pname : "<anon>") << endl;
+    cout << "  size: " << s.extent(0) << "x" << s.extent(1) << endl;
+    cout << "  -----" << endl;
+
+    for (index_type i = 0;  i < s.extent(0);  ++i)
+    {
+        std::cout << std::right << std::setw(4) << std::setprecision(3) << (double) s(i, 0);
+
+        for (index_type j = 1;  j < s.extent(1);  ++j)
+        {
+             std::cout << std::right << std::setw(6) << std::setprecision(3) << (double) s(i, j);
+        }
+        cout << endl;
+    }
+}
+
+template<class T, ptrdiff_t X0, class L, class A>
+void
+Print(basic_mdspan<T, extents<X0>, L, A> const& s, char const* pname = nullptr)
+{
+    using index_type = ptrdiff_t;
+
+    cout << endl << "mdspan: " << ((pname) ? pname : "<anon>") << endl;
+    cout << "  size: " << s.extent(0) << endl;
+    cout << "  -----" << endl;
+
+    cout << "(idx) " << right << setw(4) << setprecision(3) << (double) s(0);
+
+    for (index_type i = 1;  i < s.extent(0);  ++i)
+    {
+         std::cout << std::right << std::setw(6) << std::setprecision(3) << (double) s(i);
+    }
+    cout << endl;
+}
+
+#endif  //- LA_USE_MDSPAN
 
 inline void
 Print(bool b, char const* pname = nullptr)
@@ -250,7 +299,7 @@ Fill(vector<ET, OT>& v)
 
     element_type    x = 1;
 
-    for (size_type i = 0;  i < v.elements();  ++i)
+    for (size_type i = 0;  i < v.size();  ++i)
     {
          v(i) = x;  x = x + 1;
     }

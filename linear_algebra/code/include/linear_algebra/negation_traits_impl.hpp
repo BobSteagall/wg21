@@ -17,15 +17,15 @@ template<class OT, class ET1, class OT1>
 inline auto
 matrix_negation_traits<OT, vector<ET1, OT1>>::negate(vector<ET1, OT1> const& v1) -> result_type
 {
-    PrintOperandTypes<result_type>("negation_traits", v1);
+    PRINT_OP_TYPES(result_type, "negation_traits", v1);
 
-    size_type_r const   elems = static_cast<size_type_r>(v1.elements());
+    size_type_r const   elems = static_cast<size_type_r>(v1.size());
 
     result_type     vr;
     size_type_r     ir;
     size_type_1     i1;
 
-    if constexpr (result_requires_resize(vr))
+    if constexpr (vr.is_resizable())
     {
         vr.resize(elems);
     }
@@ -51,7 +51,7 @@ matrix_negation_traits<OT, matrix<ET1, OT1>>::negate(matrix<ET1, OT1> const& m1)
     size_type_r     ir, jr;
     size_type_1     i1, j1;
 
-    if constexpr (result_requires_resize(mr))
+    if constexpr (mr.is_resizable())
     {
         mr.resize(rows, cols);
     }

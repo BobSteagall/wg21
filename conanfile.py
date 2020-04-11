@@ -15,6 +15,7 @@ class LinearAlgebraConan(ConanFile):
     exports_sources = "*.txt", "*.hpp", "*.cpp", "*.cmake", "*.cmake.in", "LICENSE.txt"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
+    settings = "os", "compiler", "build_type", "arch"
 
     def set_version(self):
         content = load(os.path.join(os.path.dirname(__file__), "linear_algebra", "code", "CMakeLists.txt"))
@@ -32,16 +33,16 @@ class LinearAlgebraConan(ConanFile):
         if self._cmake is None:
             self._cmake = CMake(self)
             self._cmake.definitions.update({
-                "BUILD_TESTING": False
+                "BUILD_TESTING": True
             })
             self._cmake.configure(source_folder=os.path.join("linear_algebra", "code"))
         return self._cmake
 
-
-    def package(self):
+    def build(self):
         self.cmake.build()
-        if self.options.build_testing:
-            self.cmake.test()
+        if tools.cross_building(self.settings):
+            return
+        self.cmake.test()
 
     def package(self):
         self.cmake.install()

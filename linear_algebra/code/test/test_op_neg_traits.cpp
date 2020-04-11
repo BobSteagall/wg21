@@ -1,28 +1,24 @@
-#include "linear_algebra.hpp"
-#include "test_new_number.hpp"
-#include "test_new_engine.hpp"
-#include "test_new_arithmetic.hpp"
+#include "test_common.hpp"
 
-using cx_float  = std::complex<float>;
-using cx_double = std::complex<double>;
+//- A helper macro to assist in readability of test functions below.
+//
+#define ASSERT_NEG_A_EQ_B(A, B)     \
+    static_assert(std::is_same_v<decltype(-std::declval<A>()), B>)
 
-using std::cout;
-using std::endl;
-using STD_LA::get_type_name;
-
-struct dummy_type {};
 
 //--------------------------------------------------------------------------------------------------
-//- The following are several traits types used to exercise the element, engine, and operation
-//  type detection meta-functions.
+//  The following are several traits types used to exercise the element, engine, and operation
+//  type detection meta-functions in the private implementation.  See test function t300() below.
+//--------------------------------------------------------------------------------------------------
 //
-//- This operation traits type is analogous to STD_LA::default_matrix_operations, but with a different name.
+//- This traits type is used to verify that default operations are selected when they are not
+//  declared in the operations traits type.
 //
 struct test_neg_op_traits_empty {};
 
 
-//- This operation traits type has its element/engine/operation nested traits type as ordinary
-//  type aliases.
+//- This operation traits type has its element/engine/arithmetic nested traits type as ordinary
+//  (i.e., non-template) type aliases.
 //
 //  Suffix "_ord" means "ordinary"
 //
@@ -50,7 +46,7 @@ struct test_neg_op_traits_ord
 
 
 //- This operation traits type is analogous to STD_LA::matrix_operation_traits, where its nested
-//  traits types for element/engine/operation are template type aliases.
+//  traits types for element/engine/arithmetic are alias templates.
 //
 //  Suffix "_nta" means "nested type alias"
 //
@@ -85,7 +81,7 @@ struct test_neg_op_traits_nta
 };
 
 
-//- This operation traits type is has the element/engine/operation traits as nested class templates.
+//- This operation traits type has its element/engine/arithmetic traits as nested class templates.
 //
 //  Suffix "_nct" means "nested class type"
 //
@@ -111,19 +107,6 @@ struct test_neg_op_traits_nct
 };
 
 
-//- A couple of helper macros to assist in readability below
-//
-#ifdef EXEC_OP_TEST_OUTPUT
-    #define EXEC_NEG_A(A)   (void)(-A());
-#else
-    #define EXEC_NEG_A(A)
-#endif
-
-#define ASSERT_NEG_A_EQ_B(A, B)     \
-    EXEC_NEG_A(A)                   \
-    static_assert(std::is_same_v<decltype(-std::declval<A>()), B>)
-
-
 //--------------------------------------------------------------------------------------------------
 //  This test ensures that the type detection meta-functions are working properly.  It exercises
 //  only the detection meta-functions.
@@ -138,7 +121,6 @@ void t300()
     using elem_t = double;
 
     static_assert(!STD_LA::detail::has_element_neg_traits_v<test_neg_op_traits_empty, elem_t>);
-    static_assert(!STD_LA::detail::has_element_neg_traits_v<STD_LA::default_matrix_operations, elem_t>);
     static_assert(!STD_LA::detail::has_element_neg_traits_v<void, elem_t>);
 
     static_assert(STD_LA::detail::has_element_neg_traits_v<STD_LA::matrix_operation_traits, elem_t>);
@@ -151,7 +133,6 @@ void t300()
     using eng_t = STD_LA::dr_matrix_engine<elem_t, std::allocator<elem_t>>;
 
     static_assert(!STD_LA::detail::has_engine_neg_traits_v<test_neg_op_traits_empty, eng_t>);
-    static_assert(!STD_LA::detail::has_engine_neg_traits_v<STD_LA::default_matrix_operations, eng_t>);
     static_assert(!STD_LA::detail::has_engine_neg_traits_v<void, eng_t>);
 
     static_assert(STD_LA::detail::has_engine_neg_traits_v<STD_LA::matrix_operation_traits, eng_t>);
@@ -164,7 +145,6 @@ void t300()
     using opnd_t = STD_LA::dyn_matrix<elem_t>;
 
     static_assert(!STD_LA::detail::has_neg_traits_v<test_neg_op_traits_empty, opnd_t>);
-    static_assert(!STD_LA::detail::has_neg_traits_v<STD_LA::default_matrix_operations, opnd_t>);
     static_assert(!STD_LA::detail::has_neg_traits_v<void, opnd_t>);
 
     static_assert(STD_LA::detail::has_neg_traits_v<STD_LA::matrix_operation_traits, opnd_t>);
