@@ -5,9 +5,6 @@
 #include <iomanip>
 #include <string_view>
 
-#include <gtest/gtest.h>
-
-#include "linear_algebra.hpp"
 #include "test_new_number.hpp"
 #include "test_new_engine.hpp"
 #include "test_new_arithmetic.hpp"

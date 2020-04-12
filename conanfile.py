@@ -15,17 +15,16 @@ class LinearAlgebraConan(ConanFile):
     exports_sources = "*.txt", "*.hpp", "*.cpp", "*.cmake", "*.cmake.in", "LICENSE.txt"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
-    settings = "os", "compiler", "build_type", "arch"
 
     def set_version(self):
-        content = load(os.path.join(os.path.dirname(__file__), "linear_algebra", "code", "CMakeLists.txt"))
+        content = load(os.path.join(os.path.dirname(__file__), "CMakeLists.txt"))
         version = re.search(r'project\(wg21_linear_algebra VERSION (\d+\.\d+\.\d+)\)', content).group(1)
         self.version = version.strip()
 
     def build_requirements(self):
-        # Ensure the package is build against a version of CMake from 3.14 onwards.
-        if CMake.get_version() < Version("3.14"):
-            self.build_requires("cmake_installer/3.14.7@conan/stable")
+        # Ensure the package is build against a version of CMake from 3.16 onwards.
+        if CMake.get_version() < Version("3.16"):
+            self.build_requires("cmake_installer/3.16.4@conan/stable")
 
     _cmake = None
     @property
@@ -33,9 +32,9 @@ class LinearAlgebraConan(ConanFile):
         if self._cmake is None:
             self._cmake = CMake(self)
             self._cmake.definitions.update({
-                "BUILD_TESTING": True
+                "LA_BUILD_PACKAGE": True
             })
-            self._cmake.configure(source_folder=os.path.join("linear_algebra", "code"))
+            self._cmake.configure()
         return self._cmake
 
     def build(self):

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.16)
 project(wg21_linear_algebra VERSION 0.6.0)
 
 include(CTest)
@@ -75,9 +75,10 @@ target_sources(wg21_linear_algebra
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/vector_view_engine.hpp>
 )
 
-include(CMakePrintHelpers)
-#    cmake_print_properties(TARGETS gtest_main gtest PROPERTIES LOCATION INTERFACE_INCLUDE_DIRECTORIES)
-cmake_print_variables(CMAKE_INSTALL_INCLUDEDIR)
+target_compile_features(wg21_linear_algebra
+    INTERFACE
+        cxx_std_17
+)
 
 target_compile_definitions(wg21_linear_algebra
     INTERFACE
@@ -102,9 +103,11 @@ if (${LA_ENABLE_TESTS})
     add_library(wg21_linear_algebra::wg21_linear_algebra ALIAS wg21_linear_algebra)
     add_executable(la_test "")
 
-    target_include_directories(la_test
+    target_precompile_headers(la_test
         PRIVATE
-            test
+            <gtest/gtest.h>
+            <linear_algebra.hpp>
+            <cassert>
     )
 
     target_sources(la_test
@@ -122,7 +125,7 @@ if (${LA_ENABLE_TESTS})
             tests/test_op_sub_traits.cpp
      #       tests/test_01.cpp
      #       tests/test_02.cpp
-            tests/test_main.cpp
+            tests/test_main.cpp  
     )
 
     target_link_libraries(la_test
