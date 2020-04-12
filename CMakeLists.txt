@@ -109,20 +109,20 @@ if (${LA_ENABLE_TESTS})
 
     target_sources(la_test
         PRIVATE
-            test/test_common.hpp
-            test/test_new_arithmetic.hpp
-            test/test_new_engine.hpp
-            test/test_new_number.hpp
-            test/test_dynamic_engines.cpp
-            test/test_fixed_size_engines.cpp
-            test/test_obj_matrix.cpp
-            test/test_op_add_traits.cpp
-            test/test_op_mul_traits.cpp
-            test/test_op_neg_traits.cpp
-            test/test_op_sub_traits.cpp
-     #       test/test_01.cpp
-     #       test/test_02.cpp
-            test/test_main.cpp
+            tests/test_common.hpp
+            tests/test_new_arithmetic.hpp
+            tests/test_new_engine.hpp
+            tests/test_new_number.hpp
+            tests/test_dynamic_engines.cpp
+            tests/test_fixed_size_engines.cpp
+            tests/test_obj_matrix.cpp
+            tests/test_op_add_traits.cpp
+            tests/test_op_mul_traits.cpp
+            tests/test_op_neg_traits.cpp
+            tests/test_op_sub_traits.cpp
+     #       tests/test_01.cpp
+     #       tests/test_02.cpp
+            tests/test_main.cpp
     )
 
     target_link_libraries(la_test
@@ -211,7 +211,7 @@ install(
 )
 
 configure_package_config_file(
-    ${CMAKE_CURRENT_LIST_DIR}/wg21_linear_algebra-config.cmake.in
+    ${CMAKE_CURRENT_LIST_DIR}/cmake/wg21_linear_algebra-config.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/wg21_linear_algebra-config.cmake
     INSTALL_DESTINATION
         "${CMAKE_INSTALL_LIBDIR}/cmake/wg21_linear_algebra"
