@@ -1,18 +1,21 @@
 cmake_minimum_required(VERSION 3.14)
 project(wg21_linear_algebra VERSION 0.6.0)
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
-option(ENABLE_SANITIZERS "Enable Address Sanitizer and Undefined Behaviour Sanitizer if available" OFF)
-
+include(CTest)
 include(FetchContent)
-FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git)
-FetchContent_GetProperties(mdspan)
+include(GNUInstallDirs)
+include(CMakeDependentOption)
+include(CMakePackageConfigHelpers)
+
+option(LA_BUILD_PACKAGE "Build package files" ON)
+option(LA_ENABLE_SANITIZERS "Enable Address Sanitizer and Undefined Behaviour Sanitizer if available" OFF)
+cmake_dependent_option(LA_ENABLE_TESTS "Enable std::math:linear_algebra tests" ON "BUILD_TESTING" OFF)
+cmake_dependent_option(LA_BUILD_DEB "Create a DEB" ON "LA_BUILD_PACKAGE" OFF)
+cmake_dependent_option(LA_BUILD_RPM "Create a RPM" ON "LA_BUILD_PACKAGE" OFF)
+
 option(MDSPAN_ENABLE_CONCEPTS "" OFF)
-if(NOT mdspan_POPULATED)
-    FetchContent_Populate(mdspan)
-    add_subdirectory(${mdspan_SOURCE_DIR} ${mdspan_BINARY_DIR})
-endif()
+FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git)
+FetchContent_MakeAvailable(mdspan)
 
 add_library(wg21_linear_algebra INTERFACE)
 
@@ -72,11 +75,6 @@ target_sources(wg21_linear_algebra
         $<INSTALL_INTERFACE:include/linear_algebra/vector_view_engine.hpp>
 )
 
-target_compile_features(wg21_linear_algebra
-    INTERFACE
-        cxx_std_17
-)
-
 target_compile_definitions(wg21_linear_algebra
     INTERFACE
         LA_USE_MDSPAN
@@ -87,20 +85,15 @@ target_link_libraries(wg21_linear_algebra
         std::mdspan
 )
 
-include(CTest)
-if (${BUILD_TESTING})
+if (${LA_ENABLE_TESTS})
 
-    FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git)
-    FetchContent_GetProperties(gtest)
     option(BUILD_GMOCK "" OFF)
     option(INSTALL_GTEST "" OFF)
     option(gtest_force_shared_crt "" ON)
-    if(NOT gtest_POPULATED)
-        set(CMAKE_CXX_STANDARD 11)
-        set(CMAKE_CXX_STANDARD_REQUIRED ON)
-        FetchContent_Populate(gtest)
-        add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
-    endif()
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git)
+    FetchContent_MakeAvailable(gtest)
 
     add_library(wg21_linear_algebra::wg21_linear_algebra ALIAS wg21_linear_algebra)
     add_executable(la_test "")
@@ -135,6 +128,9 @@ if (${BUILD_TESTING})
             gtest
     )
 
+    #include(CMakePrintHelpers)
+#    cmake_print_properties(TARGETS gtest_main gtest PROPERTIES LOCATION INTERFACE_INCLUDE_DIRECTORIES)
+
     set_target_properties(la_test PROPERTIES
         CXX_STANDARD 17
         CXX_STANDARD_REQUIRED YES
@@ -147,7 +143,8 @@ if (${BUILD_TESTING})
             $<$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function -Wno-unused-local-typedefs ${ASAN_FLAGS}>
     )
 
-    if (ENABLE_SANITIZERS)
+
+    if (LA_ENABLE_SANITIZERS)
         set(SANITIZER_FLAGS_ASAN "-fsanitize=address -fno-omit-frame-pointer")
         set(SANITIZER_FLAGS_UBSAN "-fsanitize=undefined")
 
@@ -178,15 +175,14 @@ if (${BUILD_TESTING})
                     ubsan
             )
         endif(COMPILER_SUPPORTS_UBSAN)
-    endif(ENABLE_SANITIZERS)
 
-    include(CTest)
+    endif(LA_ENABLE_SANITIZERS)
+
     enable_testing()
     include(GoogleTest)
     gtest_discover_tests(la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DISCOVERY_TIMEOUT 30)
-endif(${BUILD_TESTING})
+endif(${LA_ENABLE_TESTS})
 
-include(GNUInstallDirs)
 
 # Hierarchically copy headers to the install dir
 install (
@@ -213,7 +209,6 @@ install(
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/wg21_linear_algebra"
 )
 
-include(CMakePackageConfigHelpers)
 configure_package_config_file(
     ${CMAKE_CURRENT_LIST_DIR}/wg21_linear_algebra-config.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/wg21_linear_algebra-config.cmake
@@ -235,3 +230,35 @@ install(
     DESTINATION
         "${CMAKE_INSTALL_LIBDIR}/cmake/wg21_linear_algebra"
 )
+
+
+if (NOT LA_BUILD_PACKAGE)
+    return()
+endif()
+
+list(APPEND source-generators TBZ2 TGZ TXZ ZIP)
+
+if (CMAKE_HOST_WIN32)
+    list(APPEND binary-generators "WIX")
+endif()
+
+if (LA_PACKAGE_DEB)
+    list(APPEND binary-generators "DEB")
+endif()
+
+if (LA_BUILD_RPM)
+    list(APPEND binary-generators "RPM")
+endif()
+
+
+set(CPACK_SOURCE_GENERATOR ${source-generators})
+set(CPACK_GENERATOR ${binary-generators})
+
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}")
+
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Bob Steagall")
+
+list(APPEND CPACK_SOURCE_IGNORE_FILES /.git/ /build/ .gitignore .DS_Store)
+
+include(CPack)
