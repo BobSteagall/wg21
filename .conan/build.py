@@ -26,7 +26,7 @@ def stable_branch_pattern():
 
 def version():
     version = 'latest'
-    with open(os.path.join(os.path.dirname(__file__), "..", "linear_algebra", "code", "CMakeLists.txt")) as file:
+    with open(os.path.join(os.path.dirname(__file__), "..", "CMakeLists.txt")) as file:
         pattern = re.compile(r'project\(wg21_linear_algebra VERSION (\d+\.\d+\.\d+)\)')
         for line in file:
             result = pattern.search(line)
