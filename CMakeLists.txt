@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
+
+if(NOT DEFINED PROJECT_NAME)
+    set(LA_IS_PRIMARY_PROJECT ON)
+endif()
+
 project(wg21_linear_algebra VERSION 0.6.0)
 
 include(CTest)
@@ -9,6 +14,7 @@ include(CMakePackageConfigHelpers)
 
 option(LA_BUILD_PACKAGE "Build package files" ON)
 option(LA_ENABLE_SANITIZERS "Enable Address Sanitizer and Undefined Behaviour Sanitizer if available" OFF)
+cmake_dependent_option(LA_INSTALL "Install WG Linear Algrbra library" ON "LA_IS_PRIMARY_PROJECT" OFF)
 cmake_dependent_option(LA_ENABLE_TESTS "Enable std::math:linear_algebra tests" ON "BUILD_TESTING" OFF)
 cmake_dependent_option(LA_BUILD_DEB "Create a DEB" ON "LA_BUILD_PACKAGE" OFF)
 cmake_dependent_option(LA_BUILD_RPM "Create a RPM" ON "LA_BUILD_PACKAGE" OFF)
@@ -94,83 +100,85 @@ add_library(wg21_linear_algebra::wg21_linear_algebra ALIAS wg21_linear_algebra)
 
 if (${LA_ENABLE_TESTS})
     add_subdirectory(tests)
-endif(${LA_ENABLE_TESTS})
+endif()
 
-# Hierarchically copy headers to the install dir
-install (
-    DIRECTORY
-        "${CMAKE_CURRENT_SOURCE_DIR}/include/"
-    DESTINATION
-        ${CMAKE_INSTALL_INCLUDEDIR}
-    FILES_MATCHING PATTERN
-        "*.hpp"
-)
+if (${LA_INSTALL})
+    # Hierarchically copy headers to the install dir
+    install (
+        DIRECTORY
+            "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+        DESTINATION
+            ${CMAKE_INSTALL_INCLUDEDIR}
+        FILES_MATCHING PATTERN
+            "*.hpp"
+    )
 
-install(
-    TARGETS wg21_linear_algebra
-    DESTINATION lib/cmake/wg21_linear_algebra
-    EXPORT wg21_linear_algebra-target
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+    install(
+        TARGETS wg21_linear_algebra
+        DESTINATION lib/cmake/wg21_linear_algebra
+        EXPORT wg21_linear_algebra-target
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
 
-install(
-    EXPORT wg21_linear_algebra-target
-    NAMESPACE wg21_linear_algebra::
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/wg21_linear_algebra"
-)
+    install(
+        EXPORT wg21_linear_algebra-target
+        NAMESPACE wg21_linear_algebra::
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/wg21_linear_algebra"
+    )
 
-configure_package_config_file(
-    ${CMAKE_CURRENT_LIST_DIR}/cmake/wg21_linear_algebra-config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/wg21_linear_algebra-config.cmake
-    INSTALL_DESTINATION
-        "${CMAKE_INSTALL_LIBDIR}/cmake/wg21_linear_algebra"
-)
-
-write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/wg21_linear_algebra-version.cmake
-    VERSION ${PROPAGATE_CONST_VERSION}
-    COMPATIBILITY SameMajorVersion
-    ARCH_INDEPENDENT
-)
-
-install(
-    FILES
+    configure_package_config_file(
+        ${CMAKE_CURRENT_LIST_DIR}/cmake/wg21_linear_algebra-config.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/wg21_linear_algebra-config.cmake
+        INSTALL_DESTINATION
+            "${CMAKE_INSTALL_LIBDIR}/cmake/wg21_linear_algebra"
+    )
+
+    write_basic_package_version_file(
         ${CMAKE_CURRENT_BINARY_DIR}/wg21_linear_algebra-version.cmake
-    DESTINATION
-        "${CMAKE_INSTALL_LIBDIR}/cmake/wg21_linear_algebra"
-)
+        VERSION ${PROPAGATE_CONST_VERSION}
+        COMPATIBILITY SameMajorVersion
+        ARCH_INDEPENDENT
+    )
+
+    install(
+        FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/wg21_linear_algebra-config.cmake
+            ${CMAKE_CURRENT_BINARY_DIR}/wg21_linear_algebra-version.cmake
+        DESTINATION
+            "${CMAKE_INSTALL_LIBDIR}/cmake/wg21_linear_algebra"
+    )
 
 
-if (NOT LA_BUILD_PACKAGE)
-    return()
+    if (NOT LA_BUILD_PACKAGE)
+        return()
+    endif()
+
+    list(APPEND source-generators TBZ2 TGZ TXZ ZIP)
+
+    if (CMAKE_HOST_WIN32)
+        list(APPEND binary-generators "WIX")
+    endif()
+
+    if (LA_PACKAGE_DEB AND CMAKE_HOST_LINUX)
+        list(APPEND binary-generators "DEB")
+    endif()
+
+    if (LA_BUILD_RPM AND CMAKE_HOST_LINUX)
+        list(APPEND binary-generators "RPM")
+    endif()
+
+
+    set(CPACK_SOURCE_GENERATOR ${source-generators})
+    set(CPACK_GENERATOR ${binary-generators})
+
+    set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
+    set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}")
+
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Bob Steagall")
+
+    list(APPEND CPACK_SOURCE_IGNORE_FILES /.git/ /build/ .gitignore .DS_Store)
+
+    include(CPack)
 endif()
-
-list(APPEND source-generators TBZ2 TGZ TXZ ZIP)
-
-if (CMAKE_HOST_WIN32)
-    list(APPEND binary-generators "WIX")
-endif()
-
-if (LA_PACKAGE_DEB)
-    list(APPEND binary-generators "DEB")
-endif()
-
-if (LA_BUILD_RPM)
-    list(APPEND binary-generators "RPM")
-endif()
-
-
-set(CPACK_SOURCE_GENERATOR ${source-generators})
-set(CPACK_GENERATOR ${binary-generators})
-
-set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}")
-
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Bob Steagall")
-
-list(APPEND CPACK_SOURCE_IGNORE_FILES /.git/ /build/ .gitignore .DS_Store)
-
-include(CPack)
