@@ -62,7 +62,7 @@ if __name__ == "__main__":
         # upload_only_when_stable=upload_only_when_stable(),
         stable_branch_pattern=stable_branch_pattern(),
         reference=reference(),
-        test_folder=os.path.join(".conan", "test_package")
+        test_folder=os.path.join(".conan", "test_package"),
         build_policy="missing"
     )
     builder.add_common_builds()
