@@ -830,7 +830,8 @@ using rebind_alloc_t = typename allocator_traits<A1>::template rebind_alloc<T1>;
 //==================================================================================================
 //
 template<class T> inline constexpr
-bool    is_movable_v = std::is_move_constructible_v<T> && std::is_move_assignable_v<T>;
+bool    is_movable_v = std::is_move_constructible_v<T> && 
+                       std::is_move_assignable_v<T>;
 
 template<class T> inline constexpr
 bool    is_nothrow_movable_v = std::is_nothrow_move_constructible_v<T> &&

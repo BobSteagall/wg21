@@ -70,7 +70,7 @@ class vector_view_engine<ET, VCT, subvector_view_tag>
 
     //- Modifiers
     //
-    constexpr void      swap(vector_view_engine& rhs);
+    constexpr void      swap(vector_view_engine& rhs) noexcept;
 
   private:
     template<class ET2, class OT2>  friend class vector;
@@ -158,7 +158,7 @@ vector_view_engine<ET, VCT, subvector_view_tag>::span() const noexcept
 //
 template<class ET, class VCT> constexpr
 void
-vector_view_engine<ET, VCT, subvector_view_tag>::swap(vector_view_engine& rhs)
+vector_view_engine<ET, VCT, subvector_view_tag>::swap(vector_view_engine& rhs) noexcept
 {
     std::swap(mp_other, rhs.mp_other);
     std::swap(m_start, rhs.m_start);
@@ -238,7 +238,7 @@ class vector_view_engine<ET, VCT, column_view_tag>
 
     //- Modifiers
     //
-    constexpr void      swap(vector_view_engine& rhs);
+    constexpr void      swap(vector_view_engine& rhs) noexcept;
 
   private:
     template<class ET2, class OT2>  friend class vector;
@@ -324,7 +324,7 @@ vector_view_engine<ET, VCT, column_view_tag>::span() const noexcept
 //
 template<class ET, class VCT> constexpr
 void
-vector_view_engine<ET, VCT, column_view_tag>::swap(vector_view_engine& rhs)
+vector_view_engine<ET, VCT, column_view_tag>::swap(vector_view_engine& rhs) noexcept
 {
     std::swap(mp_other, rhs.mp_other);
     std::swap(m_column, rhs.m_column);
@@ -402,7 +402,7 @@ class vector_view_engine<ET, VCT, row_view_tag>
 
     //- Modifiers
     //
-    constexpr void      swap(vector_view_engine& rhs);
+    constexpr void      swap(vector_view_engine& rhs) noexcept;
 
   private:
     template<class ET2, class OT2>  friend class vector;
@@ -488,7 +488,7 @@ vector_view_engine<ET, VCT, row_view_tag>::span() const noexcept
 //
 template<class ET, class VCT> constexpr
 void
-vector_view_engine<ET, VCT, row_view_tag>::swap(vector_view_engine& rhs)
+vector_view_engine<ET, VCT, row_view_tag>::swap(vector_view_engine& rhs) noexcept
 {
     std::swap(mp_other, rhs.mp_other);
     std::swap(m_row, rhs.m_row);

@@ -76,7 +76,7 @@ class matrix_view_engine<ET, MCT, submatrix_view_tag>
 
     //- Modifiers
     //
-    constexpr void          swap(matrix_view_engine& rhs);
+    constexpr void          swap(matrix_view_engine& rhs) noexcept;
 
   private:
     template<class ET2, class OT2>  friend class matrix;
@@ -198,7 +198,7 @@ matrix_view_engine<ET, MCT, submatrix_view_tag>::span() const noexcept
 //
 template<class ET, class MCT> constexpr
 void
-matrix_view_engine<ET, MCT, submatrix_view_tag>::swap(matrix_view_engine& rhs)
+matrix_view_engine<ET, MCT, submatrix_view_tag>::swap(matrix_view_engine& rhs) noexcept
 {
     if (&rhs != this)
     {
@@ -289,7 +289,7 @@ class matrix_view_engine<ET, MCT, transpose_view_tag>
 
     //- Modifiers
     //
-    constexpr void          swap(matrix_view_engine& rhs);
+    constexpr void          swap(matrix_view_engine& rhs) noexcept;
 
   private:
     template<class ET2, class OT2>  friend class matrix;
@@ -401,7 +401,7 @@ matrix_view_engine<ET, MCT, transpose_view_tag>::span() const noexcept
 //
 template<class ET, class MCT> constexpr
 void
-matrix_view_engine<ET, MCT, transpose_view_tag>::swap(matrix_view_engine& rhs)
+matrix_view_engine<ET, MCT, transpose_view_tag>::swap(matrix_view_engine& rhs) noexcept
 {
     if (&rhs != this)
     {
