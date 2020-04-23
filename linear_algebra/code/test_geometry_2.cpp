@@ -16,8 +16,8 @@ public:
 	using const_pointer   = float const*;
 	using iterator        = detail::vector_iterator<float2_engine>;
 	using const_iterator  = detail::vector_const_iterator<float2_engine>;
-	using difference_type = size_t;
-	using size_type       = int_fast32_t;
+	using difference_type = ptrdiff_t;
+	using index_type      = int_fast32_t;
 
 	static constexpr bool   is_fixed_size   = true;
 	static constexpr bool   is_resizable    = false;
@@ -39,20 +39,20 @@ public:
 	constexpr float2_engine& operator =(float2_engine&&) noexcept = default;
 	constexpr float2_engine& operator =(float2_engine const&) = default;
 
-	constexpr const_reference   operator ()(size_type i) const;
+	constexpr const_reference   operator ()(index_type i) const;
 	constexpr const_iterator    begin() const noexcept;
 	constexpr const_iterator    end() const noexcept;
 
-	constexpr size_type      capacity() const noexcept;
-	constexpr size_type      size() const noexcept;
-	constexpr size_type      size() const noexcept;
+	constexpr index_type    capacity() const noexcept;
+	constexpr index_type    size() const noexcept;
+	constexpr index_type    size() const noexcept;
 
-	constexpr reference     operator ()(size_type i);
+	constexpr reference     operator ()(index_type i);
 	constexpr iterator      begin() noexcept;
 	constexpr iterator      end() noexcept;
 
 	constexpr void  swap(float2_engine& rhs) noexcept;
-	constexpr void  swap_elements(size_type i, size_type j) noexcept;
+	constexpr void  swap_elements(index_type i, index_type j) noexcept;
 
 private:
 	float   ma_elems[2];
@@ -69,7 +69,7 @@ float2_engine::float2_engine(initializer_list<U> list)
 }
 
 constexpr typename float2_engine::const_reference
-float2_engine::operator ()(size_type i) const
+float2_engine::operator ()(index_type i) const
 {
 	assert(i < 2 && i >= 0);
 	return ma_elems[i];
@@ -86,8 +86,8 @@ public:
 	using const_reference = float const&;
 	using const_pointer   = float const*;
 	using difference_type = size_t;
-	using size_type       = int_fast32_t;
-	using size_tuple      = std::tuple<size_type, size_type>;
+	using index_type       = int_fast32_t;
+	using index_tuple      = std::tuple<index_type, index_type>;
 
 	static constexpr bool   is_fixed_size   = true;
 	static constexpr bool   is_resizable    = false;
@@ -111,25 +111,25 @@ public:
 	constexpr float22_engine& operator =(float22_engine&&) noexcept = default;
 	constexpr float22_engine& operator =(float22_engine const&) = default;
 
-	constexpr const_reference   operator ()(size_type i, size_type j) const;
+	constexpr const_reference   operator ()(index_type i, index_type j) const;
 
-	constexpr size_type     columns() const noexcept;
-	constexpr size_type     rows() const noexcept;
-	constexpr size_tuple    size() const noexcept;
+	constexpr index_type     columns() const noexcept;
+	constexpr index_type     rows() const noexcept;
+	constexpr index_tuple    size() const noexcept;
 
-	constexpr size_type     column_capacity() const noexcept;
-	constexpr size_type     row_capacity() const noexcept;
-	constexpr size_tuple    capacity() const noexcept;
+	constexpr index_type     column_capacity() const noexcept;
+	constexpr index_type     row_capacity() const noexcept;
+	constexpr index_tuple    capacity() const noexcept;
 
-	constexpr reference     operator ()(size_type i, size_type j);
+	constexpr reference     operator ()(index_type i, index_type j);
 
 	constexpr void      assign(float22_engine const& rhs);
 	template<class ET2>
 	constexpr void      assign(ET2 const& rhs);
 
 	constexpr void      swap(float22_engine& rhs) noexcept;
-	constexpr void      swap_columns(size_type j1, size_type j2) noexcept;
-	constexpr void      swap_rows(size_type i1, size_type i2) noexcept;
+	constexpr void      swap_columns(index_type j1, index_type j2) noexcept;
+	constexpr void      swap_rows(index_type i1, index_type i2) noexcept;
 
 private:
 	float   ma_elems[4];
@@ -148,7 +148,7 @@ float22_engine::float22_engine(initializer_list<U> list)
 }
 
 constexpr typename float22_engine::const_reference
-float22_engine::operator ()(size_type i, size_type j) const
+float22_engine::operator ()(index_type i, index_type j) const
 {
 	assert(i < 2 && i >= 0);
 	assert(j < 2 && j >= 0);

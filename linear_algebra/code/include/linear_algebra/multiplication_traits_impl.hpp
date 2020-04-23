@@ -22,11 +22,11 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, T2>::multiply
 {
     PRINT_OP_TYPES(result_type, "multiplication_traits (v*s)", v1, s2);
 
-	size_type_r const  elems = static_cast<size_type_r>(v1.size());
+	index_type_r const  elems = static_cast<index_type_r>(v1.size());
 
 	result_type     vr;
-	size_type_r    ir;
-	size_type_1    i1;
+	index_type_r    ir;
+	index_type_1    i1;
 
 	if constexpr (vr.is_resizable())
 	{
@@ -51,11 +51,11 @@ matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>::multiply
 {
     PRINT_OP_TYPES(result_type, "multiplication_traits (s*v)", s1, v2);
 
-	size_type_r const  elems = static_cast<size_type_r>(v2.size());
+	index_type_r const  elems = static_cast<index_type_r>(v2.size());
 
 	result_type     vr;
-	size_type_r     ir;
-	size_type_2     i2;
+	index_type_r     ir;
+	index_type_2     i2;
 
 	if constexpr (vr.is_resizable())
 	{
@@ -80,12 +80,12 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>::multiply
 {
     PRINT_OP_TYPES(result_type, "multiplication_traits (m*s)", m1, s2);
 
-	size_type_r const  rows = static_cast<size_type_r>(m1.rows());
-	size_type_r const  cols = static_cast<size_type_r>(m1.columns());
+	index_type_r const  rows = static_cast<index_type_r>(m1.rows());
+	index_type_r const  cols = static_cast<index_type_r>(m1.columns());
 
 	result_type		mr;
-	size_type_r    ir, jr;
-	size_type_1    i1, j1;
+	index_type_r    ir, jr;
+	index_type_1    i1, j1;
 
 	if constexpr (mr.is_resizable())
 	{
@@ -113,12 +113,12 @@ matrix_multiplication_traits<OTR, T1, matrix<ET2, OT2>>::multiply
 {
     PRINT_OP_TYPES(result_type, "multiplication_traits (s*m)", s1, m2);
 
-	size_type_r const  rows = static_cast<size_type_r>(m2.rows());
-	size_type_r const  cols = static_cast<size_type_r>(m2.columns());
+	index_type_r const  rows = static_cast<index_type_r>(m2.rows());
+	index_type_r const  cols = static_cast<index_type_r>(m2.columns());
 
 	result_type		mr;
-	size_type_r    ir, jr;
-	size_type_2    i2, j2;
+	index_type_r    ir, jr;
+	index_type_2    i2, j2;
 
 	if constexpr (mr.is_resizable())
 	{
@@ -146,11 +146,11 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>::multiply
 {
     PRINT_OP_TYPES(result_type, "multiplication_traits (v*v)", v1, v2);
 
-	size_type_1 const  elems = static_cast<size_type_1>(v1.size());
+	index_type_1 const  elems = static_cast<index_type_1>(v1.size());
 
 	result_type     er{};
-	size_type_1    i1;
-	size_type_2    i2;
+	index_type_1    i1;
+	index_type_2    i2;
 
 	for (i1 = 0, i2 = 0;  i1 < elems;  ++i1, ++i2)
 	{
@@ -170,13 +170,13 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, vector<ET2, OT2>>::multiply
 {
     PRINT_OP_TYPES(result_type, "multiplication_traits (m*v) ", m1, v2);
 
-	size_type_r const  elems = static_cast<size_type_r>(m1.rows());
-	size_type_1 const  inner = static_cast<size_type_1>(m1.columns());
+	index_type_r const  elems = static_cast<index_type_r>(m1.rows());
+	index_type_1 const  inner = static_cast<index_type_1>(m1.columns());
 
 	result_type		vr;
-	size_type_r    ir;
-	size_type_1    i1, k1;
-	size_type_2    k2;
+	index_type_r    ir;
+	index_type_1    i1, k1;
+	index_type_2    k2;
 
 	if constexpr (vr.is_resizable())
 	{
@@ -208,13 +208,13 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, matrix<ET2, OT2>>::multiply
 {
     PRINT_OP_TYPES(result_type, "multiplication_traits (v*m)", v1, m2);
 
-	size_type_r const  elems = static_cast<size_type_r>(m2.columns());
-	size_type_2 const  inner = static_cast<size_type_2>(m2.rows());
+	index_type_r const  elems = static_cast<index_type_r>(m2.columns());
+	index_type_2 const  inner = static_cast<index_type_2>(m2.rows());
 
 	result_type		vr;
-	size_type_r    jr;
-	size_type_1    k1;
-	size_type_2    k2, j2;
+	index_type_r    jr;
+	index_type_1    k1;
+	index_type_2    k2, j2;
 
 	if constexpr (vr.is_resizable())
 	{
@@ -246,14 +246,14 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::multiply
 {
     PRINT_OP_TYPES(result_type, "multiplication_traits (m*m)", m1, m2);
 
-	size_type_r const  rows  = static_cast<size_type_r>(m1.rows());
-	size_type_r const  cols  = static_cast<size_type_r>(m2.columns());
-	size_type_1 const  inner = m1.columns();
+	index_type_r const  rows  = static_cast<index_type_r>(m1.rows());
+	index_type_r const  cols  = static_cast<index_type_r>(m2.columns());
+	index_type_1 const  inner = m1.columns();
 
 	result_type		mr;
-	size_type_r    ir, jr;
-	size_type_1    i1, k1;
-	size_type_2    j2, k2;
+	index_type_r    ir, jr;
+	index_type_1    i1, k1;
+	index_type_2    j2, k2;
 
 	if constexpr (mr.is_resizable())
 	{

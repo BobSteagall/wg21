@@ -30,7 +30,7 @@ class vector_view_engine<ET, VCT, subvector_view_tag>
     using reference       = detail::noe_reference_t<ET, VCT>;
     using const_reference = typename ET::const_reference;
     using difference_type = typename ET::difference_type;
-    using size_type       = typename ET::size_type;
+    using index_type       = typename ET::index_type;
 
 #ifdef LA_USE_MDSPAN
     using span_type       = detail::noe_mdspan_subvector_t<detail::noe_mdspan_t<ET, VCT>>;
@@ -55,12 +55,12 @@ class vector_view_engine<ET, VCT, subvector_view_tag>
 
     //- Capacity
     //
-    constexpr size_type     capacity() const noexcept;
-    constexpr size_type     size() const noexcept;
+    constexpr index_type    capacity() const noexcept;
+    constexpr index_type    size() const noexcept;
 
     //- Element access
     //
-    constexpr reference     operator ()(size_type i) const;
+    constexpr reference     operator ()(index_type i) const;
 
     //- Data access
     //
@@ -77,10 +77,10 @@ class vector_view_engine<ET, VCT, subvector_view_tag>
     using referent_type = detail::noe_referent_t<ET, VCT>;
 
     referent_type*  mp_other;
-    size_type       m_start;
-    size_type       m_count;
+    index_type      m_start;
+    index_type      m_count;
 
-    constexpr vector_view_engine(referent_type& eng, size_type start, size_type count);
+    constexpr vector_view_engine(referent_type& eng, index_type start, index_type count);
 };
 
 //------------------------
@@ -117,14 +117,14 @@ vector_view_engine<ET, VCT, subvector_view_tag>::operator =(initializer_list<U> 
 //- Capacity
 //
 template<class ET, class VCT> constexpr
-typename vector_view_engine<ET, VCT, subvector_view_tag>::size_type
+typename vector_view_engine<ET, VCT, subvector_view_tag>::index_type
 vector_view_engine<ET, VCT, subvector_view_tag>::capacity() const noexcept
 {
     return m_count;
 }
 
 template<class ET, class VCT> constexpr
-typename vector_view_engine<ET, VCT, subvector_view_tag>::size_type
+typename vector_view_engine<ET, VCT, subvector_view_tag>::index_type
 vector_view_engine<ET, VCT, subvector_view_tag>::size() const noexcept
 {
     return m_count;
@@ -135,7 +135,7 @@ vector_view_engine<ET, VCT, subvector_view_tag>::size() const noexcept
 //
 template<class ET, class VCT> constexpr
 typename vector_view_engine<ET, VCT, subvector_view_tag>::reference
-vector_view_engine<ET, VCT, subvector_view_tag>::operator ()(size_type i) const
+vector_view_engine<ET, VCT, subvector_view_tag>::operator ()(index_type i) const
 {
     return (*mp_other)(i + m_start);
 }
@@ -169,7 +169,7 @@ vector_view_engine<ET, VCT, subvector_view_tag>::swap(vector_view_engine& rhs) n
 //- Private implementation
 //
 template<class ET, class VCT> constexpr
-vector_view_engine<ET, VCT, subvector_view_tag>::vector_view_engine(referent_type& eng, size_type start, size_type count)
+vector_view_engine<ET, VCT, subvector_view_tag>::vector_view_engine(referent_type& eng, index_type start, index_type count)
 :   mp_other(&eng)
 ,   m_start(start)
 ,   m_count(count)
@@ -198,7 +198,7 @@ class vector_view_engine<ET, VCT, column_view_tag>
     using reference       = detail::noe_reference_t<ET, VCT>;
     using const_reference = typename ET::const_reference;
     using difference_type = typename ET::difference_type;
-    using size_type       = typename ET::size_type;
+    using index_type      = typename ET::index_type;
 
 #ifdef LA_USE_MDSPAN
     using span_type       = detail::noe_mdspan_rowcolumn_t<detail::noe_mdspan_t<ET, VCT>>;
@@ -223,12 +223,12 @@ class vector_view_engine<ET, VCT, column_view_tag>
 
     //- Capacity
     //
-    constexpr size_type     capacity() const noexcept;
-    constexpr size_type     size() const noexcept;
+    constexpr index_type    capacity() const noexcept;
+    constexpr index_type    size() const noexcept;
 
     //- Element access
     //
-    constexpr reference     operator ()(size_type i) const;
+    constexpr reference     operator ()(index_type i) const;
 
     //- Data access
     //
@@ -245,9 +245,9 @@ class vector_view_engine<ET, VCT, column_view_tag>
     using referent_type = detail::noe_referent_t<ET, VCT>;
 
     referent_type*  mp_other;
-    size_type       m_column;
+    index_type      m_column;
 
-    constexpr vector_view_engine(referent_type& eng, size_type col);
+    constexpr vector_view_engine(referent_type& eng, index_type col);
 };
 
 //------------------------
@@ -283,14 +283,14 @@ vector_view_engine<ET, VCT, column_view_tag>::operator =(initializer_list<U> rhs
 //- Capacity
 //
 template<class ET, class VCT> constexpr
-typename vector_view_engine<ET, VCT, column_view_tag>::size_type
+typename vector_view_engine<ET, VCT, column_view_tag>::index_type
 vector_view_engine<ET, VCT, column_view_tag>::capacity() const noexcept
 {
     return mp_other->rows();
 }
 
 template<class ET, class VCT> constexpr
-typename vector_view_engine<ET, VCT, column_view_tag>::size_type
+typename vector_view_engine<ET, VCT, column_view_tag>::index_type
 vector_view_engine<ET, VCT, column_view_tag>::size() const noexcept
 {
     return mp_other->rows();
@@ -301,7 +301,7 @@ vector_view_engine<ET, VCT, column_view_tag>::size() const noexcept
 //
 template<class ET, class VCT> constexpr
 typename vector_view_engine<ET, VCT, column_view_tag>::reference
-vector_view_engine<ET, VCT, column_view_tag>::operator ()(size_type i) const
+vector_view_engine<ET, VCT, column_view_tag>::operator ()(index_type i) const
 {
     return (*mp_other)(i, m_column);
 }
@@ -334,7 +334,7 @@ vector_view_engine<ET, VCT, column_view_tag>::swap(vector_view_engine& rhs) noex
 //- Private implementation
 //
 template<class ET, class VCT> constexpr
-vector_view_engine<ET, VCT, column_view_tag>::vector_view_engine(referent_type& eng, size_type col)
+vector_view_engine<ET, VCT, column_view_tag>::vector_view_engine(referent_type& eng, index_type col)
 :   mp_other(&eng)
 ,   m_column(col)
 {}
@@ -362,7 +362,7 @@ class vector_view_engine<ET, VCT, row_view_tag>
     using reference       = detail::noe_reference_t<ET, VCT>;
     using const_reference = typename ET::const_reference;
     using difference_type = typename ET::difference_type;
-    using size_type       = typename ET::size_type;
+    using index_type      = typename ET::index_type;
 
 #ifdef LA_USE_MDSPAN
     using span_type       = detail::noe_mdspan_rowcolumn_t<detail::noe_mdspan_t<ET, VCT>>;
@@ -387,12 +387,12 @@ class vector_view_engine<ET, VCT, row_view_tag>
 
     //- Capacity
     //
-    constexpr size_type     capacity() const noexcept;
-    constexpr size_type     size() const noexcept;
+    constexpr index_type    capacity() const noexcept;
+    constexpr index_type    size() const noexcept;
 
     //- Element access
     //
-    constexpr reference     operator ()(size_type i) const;
+    constexpr reference     operator ()(index_type i) const;
 
     //- Data access
     //
@@ -409,9 +409,9 @@ class vector_view_engine<ET, VCT, row_view_tag>
     using referent_type = detail::noe_referent_t<ET, VCT>;
 
     referent_type*  mp_other;
-    size_type       m_row;
+    index_type      m_row;
 
-    constexpr vector_view_engine(referent_type& eng, size_type row);
+    constexpr vector_view_engine(referent_type& eng, index_type row);
 };
 
 //------------------------
@@ -447,14 +447,14 @@ vector_view_engine<ET, VCT, row_view_tag>::operator =(initializer_list<U> rhs)
 //- Capacity
 //
 template<class ET, class VCT> constexpr
-typename vector_view_engine<ET, VCT, row_view_tag>::size_type
+typename vector_view_engine<ET, VCT, row_view_tag>::index_type
 vector_view_engine<ET, VCT, row_view_tag>::capacity() const noexcept
 {
     return mp_other->columns();
 }
 
 template<class ET, class VCT> constexpr
-typename vector_view_engine<ET, VCT, row_view_tag>::size_type
+typename vector_view_engine<ET, VCT, row_view_tag>::index_type
 vector_view_engine<ET, VCT, row_view_tag>::size() const noexcept
 {
     return mp_other->columns();
@@ -465,7 +465,7 @@ vector_view_engine<ET, VCT, row_view_tag>::size() const noexcept
 //
 template<class ET, class VCT> constexpr
 typename vector_view_engine<ET, VCT, row_view_tag>::reference
-vector_view_engine<ET, VCT, row_view_tag>::operator ()(size_type i) const
+vector_view_engine<ET, VCT, row_view_tag>::operator ()(index_type i) const
 {
     return (*mp_other)(m_row, i);
 }
@@ -498,7 +498,7 @@ vector_view_engine<ET, VCT, row_view_tag>::swap(vector_view_engine& rhs) noexcep
 //- Private implementation
 //
 template<class ET, class VCT> constexpr
-vector_view_engine<ET, VCT, row_view_tag>::vector_view_engine(referent_type& eng, size_type row)
+vector_view_engine<ET, VCT, row_view_tag>::vector_view_engine(referent_type& eng, index_type row)
 :   mp_other(&eng)
 ,   m_row(row)
 {}

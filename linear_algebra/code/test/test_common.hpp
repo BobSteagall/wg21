@@ -29,11 +29,26 @@ struct dummy_type {};
     #define PRINT_TYPE(...)
 #endif
 
-using size_tuple = std::tuple<size_t, size_t>;
+#ifdef LA_USE_MDSPAN
+    using index_tuple = std::experimental::extents<std::experimental::dynamic_extent,
+                                                   std::experimental::dynamic_extent>;
 
-inline constexpr size_tuple     st_33(3, 3);
-inline constexpr size_tuple     st_44(4, 4);
-inline constexpr size_tuple     st_55(5, 5);
+    namespace std::experimental
+    {
+        inline bool
+        operator >=(index_tuple lhs, index_tuple rhs)
+        {
+            return lhs.extent(0) >= rhs.extent(0)  &&  lhs.extent(1) >= rhs.extent(1);
+        }
+    }
+#else
+    using index_tuple = std::tuple<ptrdiff_t, ptrdiff_t>;
+#endif
+
+
+inline constexpr index_tuple     st_33(3, 3);
+inline constexpr index_tuple     st_44(4, 4);
+inline constexpr index_tuple     st_55(5, 5);
 
 #define LST_33_0   {{0, 0, 0},          \
                     {0, 0, 0},          \

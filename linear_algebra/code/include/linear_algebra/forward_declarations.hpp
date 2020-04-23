@@ -37,8 +37,8 @@ template<class T, class AT = allocator<T>>  class dr_matrix_engine;
 
 //- Owning engines with fixed-size internal storage.
 //
-template<class T, size_t N>             class fs_vector_engine;
-template<class T, size_t R, size_t C>   class fs_matrix_engine;
+template<class T, ptrdiff_t N>              class fs_vector_engine;
+template<class T, ptrdiff_t R, ptrdiff_t C> class fs_matrix_engine;
 
 //- Non-owning, view-style engines (NOEs).
 //
@@ -90,10 +90,10 @@ using dyn_matrix = matrix<dr_matrix_engine<T, A>>;
 
 //- Aliases for vector and matrix objects based on fixed-size engines.
 //
-template<class T, size_t N>
+template<class T, ptrdiff_t N>
 using fs_vector = vector<fs_vector_engine<T, N>>;
 
-template<class T, size_t R, size_t C>
+template<class T, ptrdiff_t R, ptrdiff_t C>
 using fs_matrix = matrix<fs_matrix_engine<T, R, C>>;
 
 

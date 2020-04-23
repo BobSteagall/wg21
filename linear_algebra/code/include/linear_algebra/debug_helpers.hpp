@@ -186,18 +186,18 @@ template<class ET, class OT>
 void
 Print(matrix<ET, OT> const& m, char const* pname = nullptr)
 {
-    using size_type = typename matrix<ET, OT>::size_type;
+    using index_type = typename matrix<ET, OT>::index_type;
 
     cout << endl << "matrix: " << ((pname) ? pname : "<anon>") << endl;
     cout << "  size: " << m.rows() << "x" << m.columns() << endl;
     cout << "  capy: " << m.row_capacity() << "x" << m.column_capacity() << endl;
     cout << "  -----" << endl;
 
-    for (size_type i = 0;  i < m.rows();  ++i)
+    for (index_type i = 0;  i < m.rows();  ++i)
     {
         cout << right << setw(4) << setprecision(3) << (double) m(i, 0);
 
-        for (size_type j = 1;  j < m.columns();  ++j)
+        for (index_type j = 1;  j < m.columns();  ++j)
         {
              cout << right << setw(6) << setprecision(3) << (double) m(i, j);
         }
@@ -210,7 +210,7 @@ template<class ET, class OT>
 void
 Print(vector<ET, OT> const& v, char const* pname = nullptr)
 {
-    using size_type = typename vector<ET, OT>::size_type;
+    using index_type = typename vector<ET, OT>::index_type;
 
     cout << endl << "vector: " << ((pname) ? pname : "<anon>") << endl;
     cout << "  size: " << v.size() << endl;
@@ -219,7 +219,7 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
 
     cout << "(idx) " << right << setw(4) << setprecision(3) << (double) v(0);
 
-    for (size_type i = 1;  i < v.size();  ++i)
+    for (index_type i = 1;  i < v.size();  ++i)
     {
             cout << right << setw(6) << setprecision(3) << (double) v(i);
     }
@@ -294,12 +294,12 @@ template<class ET, class OT>
 void
 Fill(vector<ET, OT>& v)
 {
-    using size_type    = typename vector<ET, OT>::size_type;
+    using index_type    = typename vector<ET, OT>::index_type;
     using element_type = typename vector<ET, OT>::element_type;
 
     element_type    x = 1;
 
-    for (size_type i = 0;  i < v.size();  ++i)
+    for (index_type i = 0;  i < v.size();  ++i)
     {
          v(i) = x;  x = x + 1;
     }
@@ -309,14 +309,14 @@ template<class ET, class OT>
 void
 Fill(matrix<ET, OT>& m)
 {
-    using size_type    = typename STD_LA::matrix<ET, OT>::size_type;
+    using index_type    = typename STD_LA::matrix<ET, OT>::index_type;
     using element_type = typename STD_LA::matrix<ET, OT>::element_type;
 
     element_type    x = 1;
 
-    for (size_type i = 0;  i < m.rows();  ++i)
+    for (index_type i = 0;  i < m.rows();  ++i)
     {
-        for (size_type j = 0;  j < m.columns();  ++j)
+        for (index_type j = 0;  j < m.columns();  ++j)
         {
             m(i, j) = x;  x = x + 1;
         }

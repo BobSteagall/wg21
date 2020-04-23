@@ -830,7 +830,7 @@ using rebind_alloc_t = typename allocator_traits<A1>::template rebind_alloc<T1>;
 //==================================================================================================
 //
 template<class T> inline constexpr
-bool    is_movable_v = std::is_move_constructible_v<T> && 
+bool    is_movable_v = std::is_move_constructible_v<T> &&
                        std::is_move_assignable_v<T>;
 
 template<class T> inline constexpr
@@ -932,9 +932,9 @@ template<class ET1, class ET2> constexpr
 void
 assign_from_vector_engine(ET1& dst, ET2 const& src)
 {
-    typename ET1::size_type     di = 0;
-    typename ET2::size_type     si = 0;
-    typename ET2::size_type     ni = src.size();
+    typename ET1::index_type     di = 0;
+    typename ET2::index_type     si = 0;
+    typename ET2::index_type     ni = src.size();
 
     for (;  si < ni;  ++di, ++si)
     {
@@ -946,12 +946,12 @@ template<class ET1, class ET2> constexpr
 void
 assign_from_matrix_engine(ET1& dst, ET2 const& src)
 {
-    typename ET1::size_type     di = 0;
-    typename ET1::size_type     dj = 0;
-    typename ET2::size_type     si = 0;
-    typename ET2::size_type     sj = 0;
-    typename ET2::size_type     ni = src.rows();
-    typename ET2::size_type     nj = src.columns();
+    typename ET1::index_type     di = 0;
+    typename ET1::index_type     dj = 0;
+    typename ET2::index_type     si = 0;
+    typename ET2::index_type     sj = 0;
+    typename ET2::index_type     ni = src.rows();
+    typename ET2::index_type     nj = src.columns();
 
     for (;  si < ni;  ++di, ++si)
     {
@@ -967,12 +967,12 @@ assign_from_matrix_engine(ET1& dst, ET2 const& src)
 template<class ET, class T> constexpr void
 assign_from_vector_list(ET& engine, initializer_list<T> rhs)
 {
-    using size_type = typename ET::size_type;
+    using index_type = typename ET::index_type;
     using dest_elem = typename ET::value_type;
     using elem_iter = decltype(rhs.begin());
 
-    size_type   di = 0;
-    size_type   dn = engine.size();
+    index_type   di = 0;
+    index_type   dn = engine.size();
     elem_iter   ep = rhs.begin();
 
     for (;  di < dn;  ++di, ++ep)
@@ -984,17 +984,17 @@ assign_from_vector_list(ET& engine, initializer_list<T> rhs)
 template<class ET, class T> constexpr void
 assign_from_matrix_list(ET& engine, initializer_list<initializer_list<T>> rhs)
 {
-    using size_type = typename ET::size_type;
+    using index_type = typename ET::index_type;
     using dest_elem = typename ET::value_type;
     using row_iter  = decltype(rhs.begin());
     using col_iter  = decltype(rhs.begin()->begin());
 
-    size_type   di = 0;
+    index_type   di = 0;
     row_iter    rp = rhs.begin();
 
     for (;  di < engine.rows();  ++di, ++rp)
     {
-        size_type   dj = 0;
+        index_type   dj = 0;
         col_iter    cp = rp->begin();
 
         for (;  dj < engine.columns();  ++dj, ++cp)
@@ -1013,8 +1013,8 @@ template<class ET1, class ET2> constexpr
 bool
 v_cmp_eq(ET1 const& lhs, ET2 const& rhs)
 {
-    using lhs_size = typename ET1::size_type;
-    using rhs_size = typename ET2::size_type;
+    using lhs_size = typename ET1::index_type;
+    using rhs_size = typename ET2::index_type;
 
     lhs_size   i1 = 0;
     lhs_size   n1 = lhs.size();
@@ -1037,11 +1037,11 @@ v_cmp_eq(ET const& lhs, initializer_list<U> rhs)
 {
     if (static_cast<size_t>(lhs.size()) != rhs.size()) return false;
 
-    using size_type = typename ET::size_type;
-    using elem_iter = decltype(rhs.begin());
+    using index_type = typename ET::index_type;
+    using elem_iter  = decltype(rhs.begin());
 
-    size_type   di = 0;
-    size_type   dn = lhs.size();
+    index_type  di = 0;
+    index_type  dn = lhs.size();
     elem_iter   ep = rhs.begin();
 
     for (;  di < dn;  ++di, ++ep)
@@ -1057,7 +1057,7 @@ template<class ET, class T, ptrdiff_t X0, class L, class A> constexpr
 bool
 v_cmp_eq(ET const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
 {
-    using lhs_size = typename ET::size_type;
+    using lhs_size = typename ET::index_type;
     using rhs_size = typename basic_mdspan<T, extents<X0>, L, A>::index_type;
 
     lhs_size    i1 = 0;
@@ -1085,8 +1085,8 @@ template<class ET1, class ET2> constexpr
 bool
 m_cmp_eq(ET1 const& lhs, ET2 const& rhs)
 {
-    using lhs_size = typename ET1::size_type;
-    using rhs_size = typename ET2::size_type;
+    using lhs_size = typename ET1::index_type;
+    using rhs_size = typename ET2::index_type;
 
     lhs_size    i1 = 0;
     lhs_size    j1 = 0;
@@ -1127,18 +1127,18 @@ m_cmp_eq(ET const& lhs, initializer_list<initializer_list<U>> rhs)
     if (static_cast<size_t>(lhs.rows()) != rhs.size()) return false;
     if (static_cast<size_t>(lhs.columns()) != first_row_size) return false;
 
-    using size_type = typename ET::size_type;
-    using row_iter  = decltype(rhs.begin());
-    using col_iter  = decltype(rhs.begin()->begin());
+    using index_type = typename ET::index_type;
+    using row_iter   = decltype(rhs.begin());
+    using col_iter   = decltype(rhs.begin()->begin());
 
-    size_type   ei = 0;
-    size_type   er = lhs.rows();
-    size_type   ec = lhs.columns();
+    index_type  ei = 0;
+    index_type  er = lhs.rows();
+    index_type  ec = lhs.columns();
     row_iter    rp = rhs.begin();
 
     for (;  ei < er;  ++ei, ++rp)
     {
-        size_type   ej = 0;
+        index_type  ej = 0;
         col_iter    cp = rp->begin();
 
         for (;  ej < ec;  ++ej, ++cp)
@@ -1155,7 +1155,7 @@ template<class ET, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> conste
 bool
 m_cmp_eq(ET const& lhs, basic_mdspan<T, extents<X0, X1>, L, A> const& rhs)
 {
-    using lhs_size = typename ET::size_type;
+    using lhs_size = typename ET::index_type;
     using rhs_size = typename basic_mdspan<T, extents<X0, X1>, L, A>::index_type;
 
     lhs_size    i1 = 0;

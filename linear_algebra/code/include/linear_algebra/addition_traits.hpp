@@ -354,7 +354,7 @@ struct matrix_addition_engine_traits<OT, dr_vector_engine<T1, A1>, dr_vector_eng
 //--------------------------------------
 //- dr_vector_engine + fs_vector_engine.
 //
-template<class OT, class T1, class A1, class T2, size_t N2>
+template<class OT, class T1, class A1, class T2, ptrdiff_t N2>
 struct matrix_addition_engine_traits<OT, dr_vector_engine<T1, A1>, fs_vector_engine<T2, N2>>
 {
     using element_type = matrix_addition_element_t<OT, T1, T2>;
@@ -365,7 +365,7 @@ struct matrix_addition_engine_traits<OT, dr_vector_engine<T1, A1>, fs_vector_eng
 //--------------------------------------
 //- fs_vector_engine + dr_vector_engine.
 //
-template<class OT, class T1, size_t N1, class T2, class A2>
+template<class OT, class T1, ptrdiff_t N1, class T2, class A2>
 struct matrix_addition_engine_traits<OT, fs_vector_engine<T1, N1>, dr_vector_engine<T2, A2>>
 {
     using element_type = matrix_addition_element_t<OT, T1, T2>;
@@ -376,7 +376,7 @@ struct matrix_addition_engine_traits<OT, fs_vector_engine<T1, N1>, dr_vector_eng
 //--------------------------------------
 //- fs_vector_engine + fs_vector_engine.
 //
-template<class OT, class T1, size_t N1, class T2, size_t N2>
+template<class OT, class T1, ptrdiff_t N1, class T2, ptrdiff_t N2>
 struct matrix_addition_engine_traits<OT, fs_vector_engine<T1, N1>, fs_vector_engine<T2, N2>>
 {
     static_assert(N1 == N2);
@@ -433,7 +433,7 @@ struct matrix_addition_engine_traits<OT,
 //--------------------------------------
 //- dr_matrix_engine + fs_matrix_engine.
 //
-template<class OT, class T1, class A1, class T2, size_t R2, size_t C2>
+template<class OT, class T1, class A1, class T2, ptrdiff_t R2, ptrdiff_t C2>
 struct matrix_addition_engine_traits<OT,
                                      dr_matrix_engine<T1, A1>,
                                      fs_matrix_engine<T2, R2, C2>>
@@ -443,7 +443,7 @@ struct matrix_addition_engine_traits<OT,
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, class A1, class T2, size_t R2, size_t C2, class MCT2>
+template<class OT, class T1, class A1, class T2, ptrdiff_t R2, ptrdiff_t C2, class MCT2>
 struct matrix_addition_engine_traits<OT,
                                      dr_matrix_engine<T1, A1>,
                                      transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
@@ -453,7 +453,7 @@ struct matrix_addition_engine_traits<OT,
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, class A1, class MCT1, class T2, size_t R2, size_t C2>
+template<class OT, class T1, class A1, class MCT1, class T2, ptrdiff_t R2, ptrdiff_t C2>
 struct matrix_addition_engine_traits<OT,
                                      transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
                                      fs_matrix_engine<T2, R2, C2>>
@@ -463,7 +463,7 @@ struct matrix_addition_engine_traits<OT,
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, class A1, class MCT1, class T2, size_t R2, size_t C2, class MCT2>
+template<class OT, class T1, class A1, class MCT1, class T2, ptrdiff_t R2, ptrdiff_t C2, class MCT2>
 struct matrix_addition_engine_traits<OT,
                                      transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
                                      transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
@@ -476,7 +476,7 @@ struct matrix_addition_engine_traits<OT,
 //--------------------------------------
 //- fs_matrix_engine + dr_matrix_engine.
 //
-template<class OT, class T1, size_t R1, size_t C1, class T2, class A2>
+template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class T2, class A2>
 struct matrix_addition_engine_traits<OT,
                                      fs_matrix_engine<T1, R1, C1>,
                                      dr_matrix_engine<T2, A2>>
@@ -486,7 +486,7 @@ struct matrix_addition_engine_traits<OT,
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, size_t R1, size_t C1, class T2, class A2, class MCT2>
+template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class T2, class A2, class MCT2>
 struct matrix_addition_engine_traits<OT,
                                      fs_matrix_engine<T1, R1, C1>,
                                      transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
@@ -496,7 +496,7 @@ struct matrix_addition_engine_traits<OT,
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, size_t R1, size_t C1, class MCT1, class T2, class A2>
+template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class MCT1, class T2, class A2>
 struct matrix_addition_engine_traits<OT,
                                      transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
                                      dr_matrix_engine<T2, A2>>
@@ -506,7 +506,7 @@ struct matrix_addition_engine_traits<OT,
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, size_t R1, size_t C1, class MCT1, class T2, class A2, class MCT2>
+template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class MCT1, class T2, class A2, class MCT2>
 struct matrix_addition_engine_traits<OT,
                                      transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
                                      transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
@@ -519,7 +519,7 @@ struct matrix_addition_engine_traits<OT,
 //--------------------------------------
 //- fs_matrix_engine + fs_matrix_engine.
 //
-template<class OT, class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class T2, ptrdiff_t R2, ptrdiff_t C2>
 struct matrix_addition_engine_traits<OT,
                                      fs_matrix_engine<T1, R1, C1>,
                                      fs_matrix_engine<T2, R2, C2>>
@@ -530,7 +530,7 @@ struct matrix_addition_engine_traits<OT,
     using engine_type  = fs_matrix_engine<element_type, R1, C1>;
 };
 
-template<class OT, class T1, size_t R1, size_t C1, class MCT1, class T2, size_t R2, size_t C2>
+template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class MCT1, class T2, ptrdiff_t R2, ptrdiff_t C2>
 struct matrix_addition_engine_traits<OT,
                                      transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
                                      fs_matrix_engine<T2, R2, C2>>
@@ -541,7 +541,7 @@ struct matrix_addition_engine_traits<OT,
     using engine_type  = fs_matrix_engine<element_type, R2, C2>;
 };
 
-template<class OT, class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2, class MCT2>
+template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class T2, ptrdiff_t R2, ptrdiff_t C2, class MCT2>
 struct matrix_addition_engine_traits<OT,
                                      fs_matrix_engine<T1, R1, C1>,
                                      transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
@@ -552,7 +552,7 @@ struct matrix_addition_engine_traits<OT,
     using engine_type  = fs_matrix_engine<element_type, R1, C1>;
 };
 
-template<class OT, class T1, size_t R1, size_t C1, class MCT1, class T2, size_t R2, size_t C2, class MCT2>
+template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class MCT1, class T2, ptrdiff_t R2, ptrdiff_t C2, class MCT2>
 struct matrix_addition_engine_traits<OT,
                                      transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
                                      transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
@@ -584,9 +584,9 @@ struct matrix_addition_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>
     using op_traits    = OT;
     using result_type  = vector<engine_type, op_traits>;
 
-    using size_type_1 = typename vector<ET1, OT1>::size_type;
-    using size_type_2 = typename vector<ET2, OT2>::size_type;
-    using size_type_r = typename result_type::size_type;
+    using index_type_1 = typename vector<ET1, OT1>::index_type;
+    using index_type_2 = typename vector<ET2, OT2>::index_type;
+    using index_type_r = typename result_type::index_type;
 
     static result_type  add(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
 };
@@ -600,9 +600,9 @@ struct matrix_addition_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>
     using op_traits    = OT;
     using result_type  = matrix<engine_type, op_traits>;
 
-    using size_type_1 = typename matrix<ET1, OT1>::size_type;
-    using size_type_2 = typename matrix<ET2, OT2>::size_type;
-    using size_type_r = typename result_type::size_type;
+    using index_type_1 = typename matrix<ET1, OT1>::index_type;
+    using index_type_2 = typename matrix<ET2, OT2>::index_type;
+    using index_type_r = typename result_type::index_type;
 
     static result_type  add(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
 };

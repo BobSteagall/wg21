@@ -212,7 +212,7 @@ operator *(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
 
 
 template<class ET1, class OT1, class ET2, class OT2>
-inline auto  
+inline auto
 inner_product(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2)
 {
     using op_traits  = matrix_operation_traits_selector_t<OT1, OT2>;
@@ -224,7 +224,7 @@ inner_product(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2)
 }
 
 template<class ET1, class OT1, class ET2, class OT2>
-inline auto  
+inline auto
 outer_product(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2)
 {
     //- TODO: This is going to require some thinking.  Engine type determination for

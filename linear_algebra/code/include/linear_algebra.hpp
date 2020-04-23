@@ -25,6 +25,7 @@
 #define USING_STD   using namespace std::experimental;
 
 #include <cstdint>
+#include <array>
 #include <complex>
 #include <initializer_list>
 #include <tuple>
@@ -37,6 +38,7 @@
 #elif defined __clang__
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+    #pragma clang diagnostic ignored "-Wembedded-directive"
 #elif defined __GNUG__
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -44,8 +46,7 @@
 
 #ifdef LA_USE_MDSPAN
     #include <experimental/mdspan>
-#else
-    #include <array>
+    using std::experimental::dynamic_extent;
 #endif
 
 //- Restore the compiler's diagnostic state.
