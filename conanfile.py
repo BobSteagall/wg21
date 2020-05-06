@@ -32,16 +32,22 @@ class LinearAlgebraConan(ConanFile):
         if self._cmake is None:
             self._cmake = CMake(self)
             self._cmake.definitions.update({
-                "LA_BUILD_PACKAGE": True
+                "LA_BUILD_PACKAGE": True,
+                "LA_ENABLE_TESTS": self.run_tests
             })
             self._cmake.configure()
         return self._cmake
+
+    @property
+    def run_tests(self):
+        return tools.get_env("CONAN_RUN_TESTS", False)
 
     def build(self):
         self.cmake.build()
         if tools.cross_building(self.settings):
             return
-        self.cmake.test()
+        if self.run_tests:
+            self.cmake.test()
 
     def package(self):
         self.cmake.install()

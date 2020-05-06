@@ -4,6 +4,7 @@ env:
     - CONAN_CMAKE_GENERATOR=Ninja
     - CONAN_PRINT_RUN_COMMANDS=1
     - CONAN_UPLOAD_ONLY_WHEN_STABLE=0
+    - CONAN_RUN_TESTS=1
 
 linux: &linux
   os: linux
