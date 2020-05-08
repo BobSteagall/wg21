@@ -5,6 +5,7 @@ env:
     - CONAN_PRINT_RUN_COMMANDS=1
     - CONAN_UPLOAD_ONLY_WHEN_STABLE=0
     - CONAN_RUN_TESTS=1
+    - CONAN_DOCKER_32_IMAGES=1
 
 linux: &linux
   os: linux
