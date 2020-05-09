@@ -5,7 +5,6 @@ env:
     - CONAN_PRINT_RUN_COMMANDS=1
     - CONAN_UPLOAD_ONLY_WHEN_STABLE=0
     - CONAN_RUN_TESTS=1
-    - CONAN_DOCKER_32_IMAGES=1
 
 linux: &linux
   os: linux
@@ -25,16 +24,25 @@ matrix:
       #- <<: *linux
       #  env: CONAN_GCC_VERSIONS=9 CONAN_ARCHS=armv8 CONAN_DOCKER_IMAGE=conanio/gcc9-armv8
       - <<: *linux
-        env: CONAN_GCC_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/gcc8
+        env: CONAN_GCC_VERSIONS=8 CONAN_ARCHS=x86 CONAN_DOCKER_IMAGE=conanio/gcc8 CONAN_DOCKER_32_IMAGES=1
       - <<: *linux
-        env: CONAN_GCC_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/gcc9
+        env: CONAN_GCC_VERSIONS=8 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/gcc8
       - <<: *linux
-        env: CONAN_CLANG_VERSIONS=7.0 CONAN_DOCKER_IMAGE=conanio/clang7
-      # libc++ 32 bit is broken in the clang8/clang9 Docker images
+        env: CONAN_GCC_VERSIONS=9 CONAN_ARCHS=x86 CONAN_DOCKER_IMAGE=conanio/gcc9 CONAN_DOCKER_32_IMAGES=1
       - <<: *linux
-        env: CONAN_CLANG_VERSIONS=8 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/clang8
+        env: CONAN_GCC_VERSIONS=9 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/gcc9
       - <<: *linux
-        env: CONAN_CLANG_VERSIONS=9 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/clang9
+        env: CONAN_CLANG_VERSIONS=7.0 CONAN_ARCHS=x86 CONAN_DOCKER_IMAGE=conanio/clang7 CONAN_DOCKER_32_IMAGES=1
+      - <<: *linux
+        env: CONAN_CLANG_VERSIONS=7.0 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/clang7
+      - <<: *linux
+        env: CONAN_CLANG_VERSIONS=8.0 CONAN_ARCHS=x86 CONAN_DOCKER_IMAGE=conanio/clang8 CONAN_DOCKER_32_IMAGES=1
+      - <<: *linux
+        env: CONAN_CLANG_VERSIONS=8.0 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/clang8
+      - <<: *linux
+        env: CONAN_CLANG_VERSIONS=9.0 CONAN_ARCHS=x86 CONAN_DOCKER_IMAGE=conanio/clang9 CONAN_DOCKER_32_IMAGES=1
+        - <<: *linux
+        env: CONAN_CLANG_VERSIONS=9.0 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/clang9
       - <<: *osx
         osx_image: xcode10.3
         env: CONAN_APPLE_CLANG_VERSIONS=10.0
