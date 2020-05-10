@@ -6,6 +6,14 @@ endif()
 
 project(wg21_linear_algebra VERSION 0.6.0)
 
+if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
+    include(${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
+else()
+    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+endif()
+
+conan_basic_setup()
+
 include(CTest)
 include(FetchContent)
 include(GNUInstallDirs)
