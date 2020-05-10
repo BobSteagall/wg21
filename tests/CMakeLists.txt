@@ -1,11 +1,3 @@
-#option(BUILD_GMOCK "" OFF)
-#option(INSTALL_GTEST "" OFF)
-option(gtest_force_shared_crt "" ON)
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-#FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git)
-#FetchContent_MakeAvailable(gtest)
-
 add_executable(la_test "")
 
 target_precompile_headers(la_test
