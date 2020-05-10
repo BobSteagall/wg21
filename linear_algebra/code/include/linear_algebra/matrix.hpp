@@ -25,7 +25,7 @@ class matrix
     using possibly_writable_vector_tag = detail::noe_category_t<ET, writable_vector_engine_tag>;
     using possibly_writable_matrix_tag = detail::noe_category_t<ET, writable_matrix_engine_tag>;
 
-    static constexpr bool   has_cx_elem  = detail::is_complex_v<typename ET::value_type>;
+    static constexpr bool   has_cx_elem = detail::is_complex_v<typename ET::value_type>;
 
   public:
     //- Types
@@ -36,8 +36,8 @@ class matrix
     using reference            = typename engine_type::reference;
     using const_reference      = typename engine_type::const_reference;
     using difference_type      = typename engine_type::difference_type;
-    using index_type            = typename engine_type::index_type;
-    using index_tuple           = typename engine_type::index_tuple;
+    using index_type           = typename engine_type::index_type;
+    using index_tuple          = typename engine_type::index_tuple;
 
     using column_type          = vector<column_engine<engine_type, possibly_writable_vector_tag>, OT>;
     using const_column_type    = vector<column_engine<engine_type, readable_vector_engine_tag>, OT>;
@@ -87,13 +87,13 @@ class matrix
     //- Capacity
     //
     static constexpr bool   is_resizable() noexcept;
-    constexpr index_type     columns() const noexcept;
-    constexpr index_type     rows() const noexcept;
-    constexpr index_tuple    size() const noexcept;
+    constexpr index_type    columns() const noexcept;
+    constexpr index_type    rows() const noexcept;
+    constexpr index_tuple   size() const noexcept;
 
-    constexpr index_type     column_capacity() const noexcept;
-    constexpr index_type     row_capacity() const noexcept;
-    constexpr index_tuple    capacity() const noexcept;
+    constexpr index_type    column_capacity() const noexcept;
+    constexpr index_type    row_capacity() const noexcept;
+    constexpr index_tuple   capacity() const noexcept;
 
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr void      reserve(index_tuple cap);

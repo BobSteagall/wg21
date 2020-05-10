@@ -85,8 +85,8 @@ class dr_vector_engine
 
   private:
     pointer         mp_elems;
-    index_type       m_elems;
-    index_type       m_elemcap;
+    index_type      m_elems;
+    index_type      m_elemcap;
     allocator_type  m_alloc;
 
     void    alloc_new(index_type elems, index_type cap);

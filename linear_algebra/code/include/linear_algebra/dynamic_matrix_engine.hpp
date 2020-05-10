@@ -256,21 +256,21 @@ dr_matrix_engine<T,AT>::capacity() const noexcept
     return index_tuple(m_rowcap, m_colcap);
 }
 
-template<class T, class AT>
+template<class T, class AT> inline
 void
 dr_matrix_engine<T,AT>::reserve(index_type rowcap, index_type colcap)
 {
     reshape(m_rows, m_cols, rowcap, colcap);
 }
 
-template<class T, class AT>
+template<class T, class AT> inline
 void
 dr_matrix_engine<T,AT>::resize(index_type rows, index_type cols)
 {
     reshape(rows, cols, m_rowcap, m_colcap);
 }
 
-template<class T, class AT>
+template<class T, class AT> inline
 void
 dr_matrix_engine<T,AT>::resize(index_type rows, index_type cols, index_type rowcap, index_type colcap)
 {
@@ -402,8 +402,8 @@ dr_matrix_engine<T,AT>::assign(ET2 const& rhs)
 {
     static_assert(is_matrix_engine_v<ET2>);
 
-    typename ET2::index_type     rows = static_cast<index_type>(rhs.rows());
-    typename ET2::index_type     cols = static_cast<index_type>(rhs.columns());
+    typename ET2::index_type    rows = static_cast<index_type>(rhs.rows());
+    typename ET2::index_type    cols = static_cast<index_type>(rhs.columns());
     dr_matrix_engine            tmp(rows, cols);
 
     detail::assign_from_matrix_engine(tmp, rhs);
@@ -417,8 +417,8 @@ dr_matrix_engine<T,AT>::assign(initializer_list<initializer_list<T2>> rhs)
 {
     detail::check_source_init_list(rhs);
 
-    index_type const     rows = static_cast<index_type>(rhs.size());
-    index_type const     cols = static_cast<index_type>(rhs.begin()->size());
+    index_type const    rows = static_cast<index_type>(rhs.size());
+    index_type const    cols = static_cast<index_type>(rhs.begin()->size());
     dr_matrix_engine    tmp(rows, cols);
 
     detail::assign_from_matrix_list(tmp, rhs);

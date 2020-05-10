@@ -244,11 +244,13 @@ class matrix_view_engine<ET, MCT, transpose_view_tag>
     using const_reference = typename ET::const_reference;
     using difference_type = typename ET::difference_type;
     using index_type      = typename ET::index_type;
-    using index_tuple     = typename ET::index_tuple;
 
 #ifdef LA_USE_MDSPAN
+    using index_tuple     = extents<dynamic_extent, dynamic_extent>;
     using span_type       = detail::noe_mdspan_transpose_t<detail::noe_mdspan_t<ET, MCT>>;
     using const_span_type = detail::noe_mdspan_transpose_t<detail::noe_const_mdspan_t<ET, MCT>>;
+#else
+    using index_tuple = tuple<index_type, index_type>;
 #endif
 
     //- Construct/copy/destroy

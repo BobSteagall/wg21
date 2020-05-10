@@ -577,35 +577,94 @@ using matrix_addition_traits_t = detail::addition_traits_t<OT, OP1, OP2>;
 //- The standard addition traits type provides the default mechanism for computing the result
 //  of a matrix/matrix or vector/vector addition.
 //
+//- (vector + vector)
+//
 template<class OT, class ET1, class OT1, class ET2, class OT2>
 struct matrix_addition_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>
 {
-    using engine_type  = matrix_addition_engine_t<OT, ET1, ET2>;
-    using op_traits    = OT;
-    using result_type  = vector<engine_type, op_traits>;
+    using engine_type = matrix_addition_engine_t<OT, ET1, ET2>;
+    using result_type = vector<engine_type, OT>;
 
+    static constexpr result_type    add(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
+};
+
+template<class OT, class ET1, class OT1, class ET2, class OT2> inline constexpr
+auto
+matrix_addition_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>::add
+(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2) -> result_type
+{
     using index_type_1 = typename vector<ET1, OT1>::index_type;
     using index_type_2 = typename vector<ET2, OT2>::index_type;
     using index_type_r = typename result_type::index_type;
 
-    static result_type  add(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
-};
+    index_type_r    elems = static_cast<index_type_r>(v1.size());
+    result_type     vr;
 
-//------
+    if constexpr (vr.is_resizable())
+    {
+        vr.resize(elems);
+    }
+
+    index_type_r    ir = 0;
+    index_type_1    i1 = 0;
+    index_type_2    i2 = 0;
+
+    for (;  ir < elems;  ++ir, ++i1, ++i2)
+    {
+        vr(ir) = v1(i1) + v2(i2);
+    }
+
+    return vr;
+}
+
+//-------------------
+//- (matrix + matrix)
 //
 template<class OT, class ET1, class OT1, class ET2, class OT2>
 struct matrix_addition_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>
 {
-    using engine_type  = matrix_addition_engine_t<OT, ET1, ET2>;
-    using op_traits    = OT;
-    using result_type  = matrix<engine_type, op_traits>;
+    using engine_type = matrix_addition_engine_t<OT, ET1, ET2>;
+    using result_type = matrix<engine_type, OT>;
 
+    static constexpr result_type    add(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
+};
+
+template<class OT, class ET1, class OT1, class ET2, class OT2> inline constexpr
+auto
+matrix_addition_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
+(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2) -> result_type
+{
     using index_type_1 = typename matrix<ET1, OT1>::index_type;
     using index_type_2 = typename matrix<ET2, OT2>::index_type;
     using index_type_r = typename result_type::index_type;
 
-    static result_type  add(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
-};
+    index_type_r    rows = static_cast<index_type_r>(m1.rows());
+    index_type_r    cols = static_cast<index_type_r>(m1.columns());
+    result_type		mr;
+
+    if constexpr (mr.is_resizable())
+	{
+		mr.resize(rows, cols);
+    }
+
+    index_type_r    ir = 0;
+    index_type_1    i1 = 0;
+    index_type_2    i2 = 0;
+
+	for (;  ir < rows;  ++ir, ++i1, ++i2)
+    {
+        index_type_r    jr = 0;
+        index_type_1    j1 = 0;
+        index_type_2    j2 = 0;
+
+        for (;  jr < cols;  ++jr, ++j1, ++j2)
+        {
+			mr(ir, jr) = m1(i1, j1) + m2(i2, j2);
+        }
+    }
+
+	return mr;
+}
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_ADDITION_TRAITS_HPP_DEFINED

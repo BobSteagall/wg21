@@ -402,14 +402,36 @@ template<class OT, class ET1, class OT1>
 struct matrix_negation_traits<OT, vector<ET1, OT1>>
 {
     using engine_type = matrix_negation_engine_t<OT, ET1>;
-    using op_traits   = OT;
-    using result_type = vector<engine_type, op_traits>;
+    using result_type = vector<engine_type, OT>;
 
+    static constexpr result_type    negate(vector<ET1, OT1> const& v1);
+};
+
+template<class OT, class ET1, class OT1> inline constexpr
+auto
+matrix_negation_traits<OT, vector<ET1, OT1>>::negate(vector<ET1, OT1> const& v1) -> result_type
+{
     using index_type_1 = typename vector<ET1, OT1>::index_type;
     using index_type_r = typename result_type::index_type;
 
-    static result_type  negate(vector<ET1, OT1> const& v1);
-};
+    index_type_r    elems = static_cast<index_type_r>(v1.size());
+    result_type     vr;
+
+    if constexpr (vr.is_resizable())
+    {
+        vr.resize(elems);
+    }
+
+    index_type_r    ir = 0;
+    index_type_1    i1 = 0;
+
+    for (;  ir < elems;  ++ir, ++i1)
+    {
+        vr(ir) = -v1(i1);
+    }
+
+    return vr;
+}
 
 //------
 //
@@ -417,14 +439,43 @@ template<class OT, class ET1, class OT1>
 struct matrix_negation_traits<OT, matrix<ET1, OT1>>
 {
     using engine_type = matrix_negation_engine_t<OT, ET1>;
-    using op_traits   = OT;
-    using result_type = matrix<engine_type, op_traits>;
+    using result_type = matrix<engine_type, OT>;
 
+    static constexpr result_type    negate(matrix<ET1, OT1> const& m1);
+};
+
+template<class OT, class ET1, class OT1> inline constexpr
+auto
+matrix_negation_traits<OT, matrix<ET1, OT1>>::negate(matrix<ET1, OT1> const& m1) -> result_type
+{
     using index_type_1 = typename matrix<ET1, OT1>::index_type;
     using index_type_r = typename result_type::index_type;
 
-    static result_type  negate(matrix<ET1, OT1> const& m1);
-};
+    index_type_r    rows = static_cast<index_type_r>(m1.rows());
+    index_type_r    cols = static_cast<index_type_r>(m1.columns());
+    result_type		mr;
+
+    if constexpr (mr.is_resizable())
+    {
+        mr.resize(rows, cols);
+    }
+
+    index_type_r    ir = 0;
+    index_type_1    i1 = 0;
+
+    for (;  ir < rows;  ++ir, ++i1)
+    {
+        index_type_r    jr = 0;
+        index_type_1    j1 = 0;
+
+        for (;  jr < cols;  ++jr, ++j1)
+        {
+            mr(ir, jr) = -m1(i1, j1);
+        }
+    }
+
+    return mr;
+}
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_NEGATION_TRAITS_HPP_DEFINED

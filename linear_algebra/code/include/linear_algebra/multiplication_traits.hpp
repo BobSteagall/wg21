@@ -849,144 +849,381 @@ using matrix_multiplication_traits_t = detail::multiplication_traits_t<OT, OP1, 
 //- The standard multiplication traits type provides the default mechanism for computing the
 //  correct result type of a multiplication.
 //
-//---------------
-//- vector*scalar
+//-------------------
+//- (vector * scalar)
 //
 template<class OT, class ET1, class OT1, class T2>
 struct matrix_multiplication_traits<OT, vector<ET1, OT1>, T2>
 {
-    using scalar_type  = scalar_engine<T2>;
-    using engine_type  = matrix_multiplication_engine_t<OT, ET1, scalar_type>;
-    using op_traits    = OT;
-    using result_type  = vector<engine_type, op_traits>;
+    using engine_type = matrix_multiplication_engine_t<OT, ET1, scalar_engine<T2>>;
+    using result_type = vector<engine_type, OT>;
 
+    static constexpr result_type    multiply(vector<ET1, OT1> const& v1, T2 const& s2);
+};
+
+template<class OTR, class ET1, class OT1, class T2> inline constexpr
+auto
+matrix_multiplication_traits<OTR, vector<ET1, OT1>, T2>::multiply
+(vector<ET1, OT1> const& v1, T2 const& s2) -> result_type
+{
     using index_type_1 = typename vector<ET1, OT1>::index_type;
     using index_type_r = typename result_type::index_type;
 
-    static result_type  multiply(vector<ET1, OT1> const& v1, T2 const& s2);
-};
+    index_type_r    elems = static_cast<index_type_r>(v1.size());
+    result_type     vr;
 
-//---------------
-//- scalar*vector
+    if constexpr (vr.is_resizable())
+    {
+        vr.resize(elems);
+    }
+
+    index_type_r    ir = 0;
+    index_type_1    i1 = 0;
+
+    for (;  ir < elems;  ++ir, ++i1)
+    {
+        vr(ir) = v1(i1) * s2;
+    }
+
+    return vr;
+}
+
+
+//-------------------
+//- (scalar * vector)
 //
 template<class OT, class T1, class ET2, class OT2>
 struct matrix_multiplication_traits<OT, T1, vector<ET2, OT2>>
 {
-    using scalar_type  = scalar_engine<T1>;
-    using engine_type  = matrix_multiplication_engine_t<OT, scalar_type, ET2>;
-    using op_traits    = OT;
-    using result_type  = vector<engine_type, op_traits>;
+    using engine_type = matrix_multiplication_engine_t<OT, scalar_engine<T1>, ET2>;
+    using result_type = vector<engine_type, OT>;
 
+    static constexpr result_type    multiply(T1 const& s1, vector<ET2, OT2> const& v2);
+};
+
+template<class OTR, class T1, class ET2, class OT2> inline constexpr
+auto
+matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>::multiply
+(T1 const& s1, vector<ET2, OT2> const& v2) -> result_type
+{
     using index_type_2 = typename vector<ET2, OT2>::index_type;
     using index_type_r = typename result_type::index_type;
 
-    static result_type  multiply(T1 const& s1, vector<ET2, OT2> const& v2);
-};
+    index_type_r    elems = static_cast<index_type_r>(v2.size());
+    result_type     vr;
 
-//---------------
-//- matrix*scalar
+    if constexpr (vr.is_resizable())
+    {
+        vr.resize(elems);
+    }
+
+    index_type_r    ir = 0;
+    index_type_2    i2 = 0;
+
+    for (;  ir < elems;  ++ir, ++i2)
+    {
+        vr(ir) = s1 * v2(i2);
+    }
+
+    return vr;
+}
+
+
+//-------------------
+//- (matrix * scalar)
 //
 template<class OT, class ET1, class OT1, class T2>
 struct matrix_multiplication_traits<OT, matrix<ET1, OT1>, T2>
 {
-    using scalar_type  = scalar_engine<T2>;
-    using engine_type  = matrix_multiplication_engine_t<OT, ET1, scalar_type>;
-    using op_traits    = OT;
-    using result_type  = matrix<engine_type, op_traits>;
+    using engine_type = matrix_multiplication_engine_t<OT, ET1, scalar_engine<T2>>;
+    using result_type = matrix<engine_type, OT>;
 
+    static constexpr result_type    multiply(matrix<ET1, OT1> const& m1, T2 const& s2);
+};
+
+template<class OTR, class ET1, class OT1, class T2> inline constexpr
+auto
+matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>::multiply
+(matrix<ET1, OT1> const& m1, T2 const& s2) -> result_type
+{
     using index_type_1 = typename matrix<ET1, OT1>::index_type;
     using index_type_r = typename result_type::index_type;
 
-    static result_type  multiply(matrix<ET1, OT1> const& m1, T2 const& s2);
-};
+    index_type_r    rows = static_cast<index_type_r>(m1.rows());
+    index_type_r    cols = static_cast<index_type_r>(m1.columns());
+    result_type		mr;
 
-//---------------
-//- scalar*matrix
+    if constexpr (mr.is_resizable())
+    {
+        mr.resize(rows, cols);
+    }
+
+    index_type_r    ir = 0;
+    index_type_1    i1 = 0;
+
+    for (;  ir < rows;  ++ir, ++i1)
+    {
+        index_type_r    jr = 0;
+        index_type_1    j1 = 0;
+
+        for (;  jr < cols;  ++jr, ++j1)
+        {
+            mr(ir, jr) = m1(i1, j1) * s2;
+        }
+    }
+
+    return mr;
+}
+
+
+//-------------------
+//- (scalar * matrix)
 //
 template<class OT, class T1, class ET2, class OT2>
 struct matrix_multiplication_traits<OT, T1, matrix<ET2, OT2>>
 {
-    using scalar_type  = scalar_engine<T1>;
-    using engine_type  = matrix_multiplication_engine_t<OT, scalar_type, ET2>;
-    using op_traits    = OT;
-    using result_type  = matrix<engine_type, op_traits>;
+    using engine_type = matrix_multiplication_engine_t<OT, scalar_engine<T1>, ET2>;
+    using result_type = matrix<engine_type, OT>;
 
+    static constexpr result_type    multiply(T1 const& s1, matrix<ET2, OT2> const& m2);
+};
+
+template<class OTR, class T1, class ET2, class OT2> inline constexpr
+auto
+matrix_multiplication_traits<OTR, T1, matrix<ET2, OT2>>::multiply
+(T1 const& s1, matrix<ET2, OT2> const& m2) -> result_type
+{
     using index_type_2 = typename matrix<ET2, OT2>::index_type;
     using index_type_r = typename result_type::index_type;
 
-    static result_type  multiply(T1 const& s1, matrix<ET2, OT2> const& m2);
-};
+    index_type_r    rows = static_cast<index_type_r>(m2.rows());
+    index_type_r    cols = static_cast<index_type_r>(m2.columns());
+    result_type		mr;
 
-//---------------
-//- vector*vector
+    if constexpr (mr.is_resizable())
+    {
+        mr.resize(rows, cols);
+    }
+
+    index_type_r    ir = 0;
+    index_type_2    i2 = 0;
+
+    for (;  ir < rows;  ++ir, ++i2)
+    {
+        index_type_r    jr = 0;
+        index_type_2    j2 = 0;
+
+        for (;  jr < cols;  ++jr, ++j2)
+        {
+            mr(ir, jr) = s1 * m2(i2, j2);
+        }
+    }
+
+    return mr;
+}
+
+
+//-------------------
+//- (vector * vector)
 //
 template<class OT, class ET1, class OT1, class ET2, class OT2>
 struct matrix_multiplication_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>
 {
-    //- Note that this specialization returns a scalar, and therefore does not compute an
-    //  engine type.
-    //
-    using op_traits    = OT;
+  private:
     using elem_type_1  = typename vector<ET1, OT1>::element_type;
     using elem_type_2  = typename vector<ET2, OT2>::element_type;
-    using result_type  = matrix_multiplication_element_t<op_traits, elem_type_1, elem_type_2>;
 
+  public:
+    //- Note that this specialization returns a scalar, and therefore does not compute a
+    //  resulting engine type.
+    //
+    using result_type = matrix_multiplication_element_t<OT, elem_type_1, elem_type_2>;
+
+    static constexpr result_type    multiply(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
+};
+
+template<class OTR, class ET1, class OT1, class ET2, class OT2> inline constexpr
+auto
+matrix_multiplication_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>::multiply
+(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2) -> result_type
+{
     using index_type_1 = typename vector<ET1, OT1>::index_type;
     using index_type_2 = typename vector<ET2, OT2>::index_type;
 
-    static result_type  multiply(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
-};
+    index_type_1    elems = static_cast<index_type_1>(v1.size());
+    result_type     er{};
+    index_type_1    i1 = 0;
+    index_type_2    i2 = 0;
 
-//---------------
-//- matrix*vector
+    for (;  i1 < elems;  ++i1, ++i2)
+    {
+        er = er + (v1(i1) * v2(i2));
+    }
+
+    return er;
+}
+
+
+//-------------------
+//- (matrix * vector)
 //
 template<class OT, class ET1, class OT1, class ET2, class OT2>
 struct matrix_multiplication_traits<OT, matrix<ET1, OT1>, vector<ET2, OT2>>
 {
-    using engine_type  = matrix_multiplication_engine_t<OT, ET1, ET2>;
-    using op_traits    = OT;
-    using result_type  = vector<engine_type, op_traits>;
+    using engine_type = matrix_multiplication_engine_t<OT, ET1, ET2>;
+    using result_type = vector<engine_type, OT>;
 
+    static constexpr result_type    multiply(matrix<ET1, OT1> const& m1, vector<ET2, OT2> const& m2);
+};
+
+template<class OTR, class ET1, class OT1, class ET2, class OT2> inline constexpr
+auto
+matrix_multiplication_traits<OTR, matrix<ET1, OT1>, vector<ET2, OT2>>::multiply
+(matrix<ET1, OT1> const& m1, vector<ET2, OT2> const& v2) -> result_type
+{
     using index_type_1 = typename matrix<ET1, OT1>::index_type;
     using index_type_2 = typename vector<ET2, OT2>::index_type;
     using index_type_r = typename result_type::index_type;
+    using element_type = typename result_type::element_type;
 
-    static result_type  multiply(matrix<ET1, OT1> const& m1, vector<ET2, OT2> const& m2);
-};
+    index_type_r    elems = static_cast<index_type_r>(m1.rows());
+    index_type_1    inner = static_cast<index_type_1>(m1.columns());
+    result_type		vr;
 
-//---------------
-//- vector*matrix
+    if constexpr (vr.is_resizable())
+    {
+        vr.resize(elems);
+    }
+
+    index_type_r    ir = 0;
+    index_type_1    i1 = 0;
+
+    for (;  ir < elems;  ++ir, ++i1)
+    {
+        element_type	er{};
+        index_type_1    k1 = 0;
+        index_type_2    k2 = 0;
+
+        for (;  k1 < inner;  ++k1, ++k2)
+        {
+            er = er + (m1(i1, k1) * v2(k2));
+        }
+
+        vr(ir) = er;
+    }
+
+    return vr;
+}
+
+
+//-------------------
+//- (vector * matrix)
 //
 template<class OT, class ET1, class OT1, class ET2, class OT2>
 struct matrix_multiplication_traits<OT, vector<ET1, OT1>, matrix<ET2, OT2>>
 {
-    using engine_type  = matrix_multiplication_engine_t<OT, ET1, ET2>;
-    using op_traits    = OT;
-    using result_type  = vector<engine_type, op_traits>;
+    using engine_type = matrix_multiplication_engine_t<OT, ET1, ET2>;
+    using result_type = vector<engine_type, OT>;
 
+    static constexpr result_type    multiply(vector<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
+};
+
+template<class OTR, class ET1, class OT1, class ET2, class OT2> inline constexpr
+auto
+matrix_multiplication_traits<OTR, vector<ET1, OT1>, matrix<ET2, OT2>>::multiply
+(vector<ET1, OT1> const& v1, matrix<ET2, OT2> const& m2) -> result_type
+{
     using index_type_1 = typename vector<ET1, OT1>::index_type;
     using index_type_2 = typename matrix<ET2, OT2>::index_type;
     using index_type_r = typename result_type::index_type;
+    using element_type = typename result_type::element_type;
 
-    static result_type  multiply(vector<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
-};
+    index_type_r    elems = static_cast<index_type_r>(m2.columns());
+    index_type_2    inner = static_cast<index_type_2>(m2.rows());
+    result_type		vr;
 
-//---------------
-//- matrix*matrix
+    if constexpr (vr.is_resizable())
+    {
+        vr.resize(elems);
+    }
+
+    index_type_r    jr = 0;
+    index_type_2    j2 = 0;
+
+    for (;  jr < elems;  ++jr, ++j2)
+    {
+        element_type	er{};
+        index_type_1    k1 = 0;
+        index_type_2    k2 = 0;
+
+        for (;  k2 < inner;  ++k1, ++k2)
+        {
+            er = er + (v1(k1) * m2(k2, j2));
+        }
+
+        vr(jr) = er;
+    }
+
+    return vr;
+}
+
+
+//-------------------
+//- (matrix * matrix)
 //
 template<class OT, class ET1, class OT1, class ET2, class OT2>
 struct matrix_multiplication_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>
 {
-    using engine_type  = matrix_multiplication_engine_t<OT, ET1, ET2>;
-    using op_traits    = OT;
-    using result_type  = matrix<engine_type, op_traits>;
+    using engine_type = matrix_multiplication_engine_t<OT, ET1, ET2>;
+    using result_type = matrix<engine_type, OT>;
 
+    static constexpr result_type    multiply(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
+};
+
+template<class OTR, class ET1, class OT1, class ET2, class OT2> inline constexpr auto
+matrix_multiplication_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::multiply
+(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2) -> result_type
+{
     using index_type_1 = typename matrix<ET1, OT1>::index_type;
     using index_type_2 = typename matrix<ET2, OT2>::index_type;
     using index_type_r = typename result_type::index_type;
+    using element_type = typename result_type::element_type;
 
-    static result_type  multiply(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
-};
+    index_type_r    rows  = static_cast<index_type_r>(m1.rows());
+    index_type_r    cols  = static_cast<index_type_r>(m2.columns());
+    index_type_1    inner = m1.columns();
+    result_type		mr;
+
+    if constexpr (mr.is_resizable())
+    {
+        mr.resize(rows, cols);
+    }
+
+    index_type_r    ir = 0;
+    index_type_1    i1 = 0;
+
+    for (;  ir < rows;  ++ir, ++i1)
+    {
+        index_type_r    jr = 0;
+        index_type_2    j2 = 0;
+
+        for (;  jr < cols;  ++jr, ++j2)
+        {
+            element_type    er{};
+            index_type_1    k1 = 0;
+            index_type_2    k2 = 0;
+
+            for (k1 = 0, k2 = 0;  k1 < inner;  ++k1, ++k2)
+            {
+                er = er + (m1(i1, k1) * m2(k2, j2));
+            }
+
+            mr(ir, jr) = er;
+        }
+    }
+
+    return mr;
+}
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_MULTIPLICATION_TRAITS_HPP_DEFINED

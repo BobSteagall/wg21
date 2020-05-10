@@ -22,8 +22,8 @@ class fs_matrix_engine_tst
     using const_reference = T const&;
     using const_pointer   = T const*;
     using difference_type = std::int32_t;
-    using index_type       = std::uint32_t;
-    using index_tuple      = std::tuple<index_type, index_type>;
+    using index_type      = std::uint32_t;
+    using index_tuple     = std::tuple<index_type, index_type>;
 
 #ifdef LA_USE_MDSPAN
 //    using span_type       = typename STD_LA::fs_matrix_engine<T, R, C>::span_type;

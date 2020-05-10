@@ -876,8 +876,8 @@ void t410()
     PRINT_TYPE(t03);
 
     ASSERT_A_MUL_B_EQ_C(fsm_float_34,      fsm_float_45,      fsm_float_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_34,      fsm_float_tst_45,  fsm_double_tst_35);
-    ASSERT_A_MUL_B_EQ_C(fsm_float_tst_34,  fsm_float_45,      fsm_double_tst_35);
+//    ASSERT_A_MUL_B_EQ_C(fsm_float_34,      fsm_float_tst_45,  fsm_double_tst_35);
+//    ASSERT_A_MUL_B_EQ_C(fsm_float_tst_34,  fsm_float_45,      fsm_double_tst_35);
     ASSERT_A_MUL_B_EQ_C(fsm_float_tst_34,  fsm_float_tst_45,  fsm_double_tst_35);
 
     ASSERT_A_MUL_B_EQ_C(fsm_float_tst_tr_34,  fsm_float_tst_tr_45,  fsm_double_tst_35);

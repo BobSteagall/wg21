@@ -26,7 +26,6 @@ target_sources(wg21_linear_algebra
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/addition_traits.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/addition_traits_impl.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/arithmetic_operators.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/debug_helpers.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/dynamic_vector_engine.hpp>
@@ -37,19 +36,15 @@ target_sources(wg21_linear_algebra
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/matrix.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/matrix_view_engine.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/multiplication_traits.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/multiplication_traits_impl.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/negation_traits.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/negation_traits_impl.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/operation_traits.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/private_support.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/public_support.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/subtraction_traits.hpp>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/subtraction_traits_impl.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/vector.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/vector_view_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/addition_traits.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/addition_traits_impl.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/arithmetic_operators.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/debug_helpers.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/dynamic_vector_engine.hpp>
@@ -60,14 +55,11 @@ target_sources(wg21_linear_algebra
         $<INSTALL_INTERFACE:include/linear_algebra/matrix.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/matrix_view_engine.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/multiplication_traits.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/multiplication_traits_impl.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/negation_traits.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/negation_traits_impl.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/operation_traits.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/private_support.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/public_support.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/subtraction_traits.hpp>
-        $<INSTALL_INTERFACE:include/linear_algebra/subtraction_traits_impl.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/vector.hpp>
         $<INSTALL_INTERFACE:include/linear_algebra/vector_view_engine.hpp>
 )

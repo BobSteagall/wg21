@@ -154,39 +154,40 @@ struct engine_tag_traits<resizable_matrix_engine_tag>
 };
 
 
-//- These variable templates are used as a convenience to report important engine properties,
-//  using the engine_tag_traits type defined above.  They are used in the private implementation
-//  below, as well as by a corresponding set of public variable templates (is_*_engine_v<ET>).
+//- These private variable templates are used as a convenience to report important engine
+//  properties, using the engine_tag_traits type defined above.  They are used in the private
+//  implementation below, as well as by a corresponding set of public variable templates
+//  (i.e., is_*_engine_v<ET>).
 //
 template<class ET> inline constexpr
-bool    is_scalar_v = detail::engine_tag_traits<typename ET::engine_category>::is_scalar;
+bool    is_scalar_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_scalar;
 
 template<class ET> inline constexpr
-bool    is_vector_v = detail::engine_tag_traits<typename ET::engine_category>::is_vector;
+bool    is_vector_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_vector;
 
 template<class ET> inline constexpr
-bool    is_matrix_v = detail::engine_tag_traits<typename ET::engine_category>::is_matrix;
+bool    is_matrix_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_matrix;
 
 template<class ET> inline constexpr
-bool    is_readable_v = detail::engine_tag_traits<typename ET::engine_category>::is_readable;
+bool    is_readable_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_readable;
 
 template<class ET> inline constexpr
-bool    is_writable_v = detail::engine_tag_traits<typename ET::engine_category>::is_writable;
+bool    is_writable_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_writable;
 
 template<class ET> inline constexpr
-bool    is_initable_v = detail::engine_tag_traits<typename ET::engine_category>::is_initable;
+bool    is_initable_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_initable;
 
 template<class ET> inline constexpr
-bool    is_resizable_v = detail::engine_tag_traits<typename ET::engine_category>::is_resizable;
+bool    is_resizable_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_resizable;
 
 template<class ET1, class ET2> inline constexpr
-bool    engines_match_v = (is_matrix_v<ET1> && is_matrix_v<ET2>) ||
-                          (is_vector_v<ET1> && is_vector_v<ET2>) ||
-                          (is_scalar_v<ET1> && is_scalar_v<ET2>);
+bool    engines_match_v = (is_matrix_engine_v<ET1> && is_matrix_engine_v<ET2>) ||
+                          (is_vector_engine_v<ET1> && is_vector_engine_v<ET2>) ||
+                          (is_scalar_engine_v<ET1> && is_scalar_engine_v<ET2>);
 
 
-//- These alias templates are used by the vector and matrix class templates to enable/disable
-//  various parts of their public interfaces via SFINAE.
+//- These privatee alias templates are used by the vector and matrix class templates to
+//  enable/disable various parts of their public interfaces via SFINAE.
 //
 template<class T2, class T>
 using enable_if_convertible_element = enable_if_t<is_convertible_v<T2, T>, bool>;
@@ -200,17 +201,17 @@ using enable_if_convertible_engine =
         enable_if_t<is_convertible_v<typename ET2::element_type, typename ET::element_type>, bool>;
 
 template<class ET1, class ET2>
-using enable_if_writable = enable_if_t<is_same_v<ET1, ET2> && is_writable_v<ET1>, bool>;
+using enable_if_writable = enable_if_t<is_same_v<ET1, ET2> && is_writable_engine_v<ET1>, bool>;
 
 template<class ET1, class ET2, class U>
-using enable_if_initable = enable_if_t<is_same_v<ET1, ET2> && is_initable_v<ET1>  &&
+using enable_if_initable = enable_if_t<is_same_v<ET1, ET2> && is_initable_engine_v<ET1>  &&
                                        is_convertible_v<U, typename ET1::value_type>, bool>;
 
 template<class ET1, class ET2>
-using enable_if_resizable = enable_if_t<is_same_v<ET1, ET2> && is_resizable_v<ET1>, bool>;
+using enable_if_resizable = enable_if_t<is_same_v<ET1, ET2> && is_resizable_engine_v<ET1>, bool>;
 
 template<class ET1, class ET2, class U>
-using enable_if_init_list_ok = enable_if_t<is_same_v<ET1, ET2> && !is_resizable_v<ET1> &&
+using enable_if_init_list_ok = enable_if_t<is_same_v<ET1, ET2> && !is_resizable_engine_v<ET1> &&
                                            is_convertible_v<U, typename ET1::value_type>, bool>;
 
 

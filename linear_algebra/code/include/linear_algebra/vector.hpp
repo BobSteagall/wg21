@@ -121,7 +121,7 @@ class vector
     using element_type         = typename engine_type::element_type;
     using value_type           = typename engine_type::value_type;
     using difference_type      = typename engine_type::difference_type;
-    using index_type            = typename engine_type::index_type;
+    using index_type           = typename engine_type::index_type;
     using pointer              = typename engine_type::pointer;
     using const_pointer        = typename engine_type::const_pointer;
     using reference            = typename engine_type::reference;
@@ -166,8 +166,8 @@ class vector
     //- Capacity
     //
     static constexpr bool   is_resizable() noexcept;
-    constexpr index_type     capacity() const noexcept;
-    constexpr index_type     size() const noexcept;
+    constexpr index_type    capacity() const noexcept;
+    constexpr index_type    size() const noexcept;
 
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr void      reserve(index_type elemcap);
