@@ -30,14 +30,9 @@ class dr_matrix_engine
     using const_reference = element_type const&;
     using difference_type = ptrdiff_t;
     using index_type      = ptrdiff_t;
-
-#ifdef LA_USE_MDSPAN
     using index_tuple     = extents<dynamic_extent, dynamic_extent>;
     using span_type       = basic_mdspan<T, detail::dyn_mat_extents, detail::dyn_mat_layout>;
     using const_span_type = basic_mdspan<T const, detail::dyn_mat_extents, detail::dyn_mat_layout>;
-#else
-    using index_tuple     = tuple<index_type, index_type>;
-#endif
 
     //- Construct/copy/destroy
     //
@@ -81,10 +76,8 @@ class dr_matrix_engine
 
     //- Data access
     //
-#ifdef LA_USE_MDSPAN
     span_type       span() noexcept;
     const_span_type span() const noexcept;
-#endif
 
     //- Modifiers
     //
@@ -93,7 +86,7 @@ class dr_matrix_engine
     void    swap_rows(index_type r1, index_type r2) noexcept;
 
   private:
-    pointer         mp_elems;       //- For exposition; data buffer
+    pointer         mp_elems;
     index_type      m_rows;
     index_type      m_cols;
     index_type      m_rowcap;
@@ -297,8 +290,6 @@ dr_matrix_engine<T,AT>::operator ()(index_type i, index_type j) const
 //-------------
 //- Data access
 //
-#ifdef LA_USE_MDSPAN
-
 template<class T, class AT> inline
 typename dr_matrix_engine<T,AT>::span_type
 dr_matrix_engine<T,AT>::span() noexcept
@@ -313,7 +304,6 @@ dr_matrix_engine<T,AT>::span() const noexcept
     return detail::make_dyn_span(static_cast<element_type const*>(mp_elems), m_rows, m_cols, m_colcap);
 }
 
-#endif
 //-----------
 //- Modifiers
 //
@@ -421,7 +411,7 @@ dr_matrix_engine<T,AT>::assign(initializer_list<initializer_list<T2>> rhs)
     index_type const    cols = static_cast<index_type>(rhs.begin()->size());
     dr_matrix_engine    tmp(rows, cols);
 
-    detail::assign_from_matrix_list(tmp, rhs);
+    detail::assign_from_matrix_initlist(tmp, rhs);
     tmp.swap(*this);
 }
 

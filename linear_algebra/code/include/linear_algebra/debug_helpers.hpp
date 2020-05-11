@@ -237,8 +237,6 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
     cout << endl;
 }
 
-#ifdef LA_USE_MDSPAN
-
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
 void
 Print(basic_mdspan<T, extents<X0, X1>, L, A> const& s, char const* pname = nullptr)
@@ -279,8 +277,6 @@ Print(basic_mdspan<T, extents<X0>, L, A> const& s, char const* pname = nullptr)
     }
     cout << endl;
 }
-
-#endif  //- LA_USE_MDSPAN
 
 inline void
 Print(bool b, char const* pname = nullptr)

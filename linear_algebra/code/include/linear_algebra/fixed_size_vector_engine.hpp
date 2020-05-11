@@ -2,7 +2,7 @@
 //  File:       fixed_size_vector_engine.hpp
 //
 //  Summary:    This header defines a fixed-size vector engine.  In this context, fixed-size
-//              means that the extent of such objects are known at compile-time.
+//              means that the extents of such objects are known at compile-time.
 //==================================================================================================
 //
 #ifndef LINEAR_ALGEBRA_FIXED_SIZE_VECTOR_ENGINE_HPP_DEFINED
@@ -25,14 +25,11 @@ class fs_vector_engine
     using pointer         = element_type*;
     using const_pointer   = element_type const*;
     using reference       = element_type&;
-    using const_reference = const element_type&;
+    using const_reference = element_type const&;
     using difference_type = ptrdiff_t;
     using index_type      = ptrdiff_t;
-
-#ifdef LA_USE_MDSPAN
     using span_type       = mdspan<element_type, N>;
     using const_span_type = mdspan<element_type const, N>;
-#endif
 
     //- Construct/copy/destroy
     //
@@ -69,10 +66,8 @@ class fs_vector_engine
 
     //- Data access
     //
-#ifdef LA_USE_MDSPAN
     constexpr span_type         span() noexcept;
     constexpr const_span_type   span() const noexcept;
-#endif
 
     //- Modifiers
     //
@@ -188,8 +183,6 @@ fs_vector_engine<T,N>::operator ()(index_type i) const
 //-------------
 //- Data access
 //
-#ifdef LA_USE_MDSPAN
-
 template<class T, ptrdiff_t N> constexpr
 typename fs_vector_engine<T,N>::span_type
 fs_vector_engine<T,N>::span() noexcept
@@ -204,7 +197,6 @@ fs_vector_engine<T,N>::span() const noexcept
     return const_span_type(ma_elems.data());
 }
 
-#endif
 //-----------
 //- Modifiers
 //
@@ -260,7 +252,7 @@ void
 fs_vector_engine<T,N>::assign(initializer_list<T2> rhs)
 {
     detail::check_source_init_list(rhs, N);
-    detail::assign_from_vector_list(*this, rhs);
+    detail::assign_from_vector_initlist(*this, rhs);
 }
 
 }       //- STD_LA namespace

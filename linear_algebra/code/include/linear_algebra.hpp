@@ -8,23 +8,17 @@
 #ifndef LINEAR_ALGEBRA_HPP_DEFINED
 #define LINEAR_ALGEBRA_HPP_DEFINED
 
-//- Some build options for dev/debug/test.
-//
-#ifndef LA_USE_MDSPAN
-    #define LA_USE_MDSPAN
-#endif
-
-//- Namespace alternatives for testing and also for detecting  ADL issues.  Pick a pair
+//- Namespace alternatives for testing and also for detecting ADL issues.  Pick a pair
 //  and attempt to build.
 //
 //#define STD_LA      la
 //#define USING_STD   using namespace std; using namespace std::experimental;
 
-//#define STD_LA      std::math
-//#define USING_STD   using namespace std::experimental;
+#define STD_LA      std::math
+#define USING_STD   using namespace std; using namespace std::experimental;
 
-#define STD_LA      std::experimental::math
-#define USING_STD   using namespace std::experimental;
+//#define STD_LA      std::experimental::math
+//#define USING_STD   using namespace std::experimental;
 
 #include <cstdint>
 #include <array>
@@ -46,10 +40,8 @@
     #pragma warning(disable: 4100)
 #endif
 
-#ifdef LA_USE_MDSPAN
-    #include <experimental/mdspan>
-    using std::experimental::dynamic_extent;
-#endif
+#include <experimental/mdspan>
+using std::experimental::dynamic_extent;
 
 //- Restore the compiler's diagnostic state.
 //

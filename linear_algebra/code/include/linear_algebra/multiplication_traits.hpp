@@ -872,7 +872,7 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, T2>::multiply
     index_type_r    elems = static_cast<index_type_r>(v1.size());
     result_type     vr;
 
-    if constexpr (vr.is_resizable())
+    if constexpr (is_resizable(vr))
     {
         vr.resize(elems);
     }
@@ -912,7 +912,7 @@ matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>::multiply
     index_type_r    elems = static_cast<index_type_r>(v2.size());
     result_type     vr;
 
-    if constexpr (vr.is_resizable())
+    if constexpr (is_resizable(vr))
     {
         vr.resize(elems);
     }
@@ -953,7 +953,7 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>::multiply
     index_type_r    cols = static_cast<index_type_r>(m1.columns());
     result_type		mr;
 
-    if constexpr (mr.is_resizable())
+    if constexpr (is_resizable(mr))
     {
         mr.resize(rows, cols);
     }
@@ -1000,7 +1000,7 @@ matrix_multiplication_traits<OTR, T1, matrix<ET2, OT2>>::multiply
     index_type_r    cols = static_cast<index_type_r>(m2.columns());
     result_type		mr;
 
-    if constexpr (mr.is_resizable())
+    if constexpr (is_resizable(mr))
     {
         mr.resize(rows, cols);
     }
@@ -1090,7 +1090,7 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, vector<ET2, OT2>>::multiply
     index_type_1    inner = static_cast<index_type_1>(m1.columns());
     result_type		vr;
 
-    if constexpr (vr.is_resizable())
+    if constexpr (is_resizable(vr))
     {
         vr.resize(elems);
     }
@@ -1142,7 +1142,7 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, matrix<ET2, OT2>>::multiply
     index_type_2    inner = static_cast<index_type_2>(m2.rows());
     result_type		vr;
 
-    if constexpr (vr.is_resizable())
+    if constexpr (is_resizable(vr))
     {
         vr.resize(elems);
     }
@@ -1180,7 +1180,8 @@ struct matrix_multiplication_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>
     static constexpr result_type    multiply(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
 };
 
-template<class OTR, class ET1, class OT1, class ET2, class OT2> inline constexpr auto
+template<class OTR, class ET1, class OT1, class ET2, class OT2> inline constexpr 
+auto
 matrix_multiplication_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::multiply
 (matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2) -> result_type
 {
@@ -1194,7 +1195,7 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::multiply
     index_type_1    inner = m1.columns();
     result_type		mr;
 
-    if constexpr (mr.is_resizable())
+    if constexpr (is_resizable(mr))
     {
         mr.resize(rows, cols);
     }

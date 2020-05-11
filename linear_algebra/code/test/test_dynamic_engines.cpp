@@ -415,8 +415,6 @@ TEST(DynVectorEngine, Swap)
 }
 
 
-#ifdef LA_USE_MDSPAN
-
 TEST(DynVectorEngine, Span)
 {
     dr_vector_engine<float>         e1{13, 17, 19, 23}, e2(4), e3{e1};
@@ -457,8 +455,6 @@ TEST(DynVectorEngine, Span)
     sp1(3) = 14.0f;
     EXPECT_TRUE(v_cmp_eq(e1, {11, 12, 13, 14}));
 }
-
-#endif
 
 //==================================================================================================
 //  Unit tests for dynamically-resizeable matrix engine.
@@ -1043,8 +1039,6 @@ TEST(DynMatrixEngine, Swap)
 }
 
 
-#ifdef LA_USE_MDSPAN
-
 TEST(DynMatrixEngine, Span)
 {
     dr_matrix_engine<float>         e1(il_44_2), e2{4, 4}, e3{e1};
@@ -1113,6 +1107,3 @@ TEST(DynMatrixEngine, Span)
     EXPECT_EQ(e1(2, 2), 333.0f);
     EXPECT_EQ(e1(3, 3), 444.0f);
 }
-
-#endif
-

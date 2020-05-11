@@ -30,11 +30,8 @@ class dr_vector_engine
     using const_reference = element_type const&;
     using difference_type = ptrdiff_t;
     using index_type      = ptrdiff_t;
-
-#ifdef LA_USE_MDSPAN
     using span_type       = mdspan<element_type, dynamic_extent>;
     using const_span_type = mdspan<element_type const, dynamic_extent>;
-#endif
 
     //- Construct/copy/destroy
     //
@@ -73,10 +70,8 @@ class dr_vector_engine
 
     //- Data access
     //
-#ifdef LA_USE_MDSPAN
     span_type       span() noexcept;
     const_span_type span() const noexcept;
-#endif
 
     //- Modifiers
     //
@@ -255,8 +250,6 @@ dr_vector_engine<T,AT>::operator ()(index_type i) const
 //-------------
 //- Data access
 //
-#ifdef LA_USE_MDSPAN
-
 template<class T, class AT> inline
 typename dr_vector_engine<T,AT>::span_type
 dr_vector_engine<T,AT>::span() noexcept
@@ -273,7 +266,6 @@ dr_vector_engine<T,AT>::span() const noexcept
                            static_cast<ptrdiff_t>(m_elems));
 }
 
-#endif
 //-----------
 //- Modifiers
 //
@@ -348,7 +340,7 @@ dr_vector_engine<T,AT>::assign(initializer_list<T2> rhs)
 {
     dr_vector_engine    tmp(static_cast<index_type>(rhs.size()));
 
-    detail::assign_from_vector_list(tmp, rhs);
+    detail::assign_from_vector_initlist(tmp, rhs);
     tmp.swap(*this);
 }
 

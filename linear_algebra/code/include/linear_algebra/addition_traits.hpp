@@ -600,7 +600,7 @@ matrix_addition_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>::add
     index_type_r    elems = static_cast<index_type_r>(v1.size());
     result_type     vr;
 
-    if constexpr (vr.is_resizable())
+    if constexpr (is_resizable(vr))
     {
         vr.resize(elems);
     }
@@ -642,7 +642,7 @@ matrix_addition_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
     index_type_r    cols = static_cast<index_type_r>(m1.columns());
     result_type		mr;
 
-    if constexpr (mr.is_resizable())
+    if constexpr (is_resizable(mr))
 	{
 		mr.resize(rows, cols);
     }

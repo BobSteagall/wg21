@@ -177,8 +177,8 @@ constexpr double t003()
 
 constexpr double cd = t003();
 
-using namespace std::experimental;
-using namespace std::experimental::math;
+//using namespace std::experimental;
+//using namespace std::experimental::math;
 
 #include <array>
 
@@ -187,7 +187,6 @@ using std::array;
 namespace {
 void t002X(drm_double const& m1, fsm_double_36 const& m2)
 {
-#ifdef LA_USE_MDSPAN
     PRINT_FNAME();
     PRINT(m1);
 
@@ -247,13 +246,10 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     PRINT(subrow1);
     auto    sbrwspn1 = subrow1.span();
     PRINT(sbrwspn1);
-
-#endif
 }
 
 void t001X()
 {
-#ifdef LA_USE_MDSPAN
     PRINT_FNAME();
 
     drm_double  m1(10, 13, 16, 19);
@@ -315,7 +311,6 @@ void t001X()
     t002X(m1, m2);
 
 //    static_assert(!std::is_same_v<double, double const>);
-#endif
 }
 }
 
@@ -446,7 +441,7 @@ addition_traits_tst<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
     index_type_r    cols = static_cast<index_type_r>(m1.columns());
     result_type		mr;
 
-    if constexpr (mr.is_resizable())
+    if constexpr (is_resizable(mr))
 	{
 		mr.resize(rows, cols);
     }
@@ -525,10 +520,10 @@ TestGroup00()
     constexpr fsm_float_35_tst  m11 = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}};
 
     //constexpr
-    //    fsm_float_35_tst  m12 = m10 + m11;
+        fsm_float_35_tst  m12 = m10 + m11;
     //constexpr
-    //    fsm_float_35      m13 = m10 + m11;
-    //fsm_float_35      m14 = m10 + m6;
+        fsm_float_35      m13 = m10 + m11;
+    fsm_float_35      m14 = m10 + m6;
 
 
 //    t000();

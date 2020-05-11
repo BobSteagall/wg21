@@ -108,9 +108,8 @@ template<class ET, class OT>
 class vector
 {
     static_assert(is_vector_engine_v<ET>);
-#ifdef LA_USE_MDSPAN
     static_assert(detail::has_valid_span_alias_form_v<ET>);
-#endif
+
     using possibly_writable_vector_tag = detail::noe_category_t<ET, writable_vector_engine_tag>;
     static constexpr bool   has_cx_elem  = detail::is_complex_v<typename ET::value_type>;
 
@@ -132,11 +131,8 @@ class vector
     using const_transpose_type = vector const&;
     using hermitian_type       = conditional_t<has_cx_elem, vector, transpose_type>;
     using const_hermitian_type = conditional_t<has_cx_elem, vector, const_transpose_type>;
-
-#ifdef LA_USE_MDSPAN
     using span_type            = detail::engine_span_t<ET>;
     using const_span_type      = detail::engine_const_span_t<ET>;
-#endif
 
     //- Construct/copy/destroy
     //
@@ -165,7 +161,6 @@ class vector
 
     //- Capacity
     //
-    static constexpr bool   is_resizable() noexcept;
     constexpr index_type    capacity() const noexcept;
     constexpr index_type    size() const noexcept;
 
@@ -195,12 +190,10 @@ class vector
     constexpr engine_type&          engine() noexcept;
     constexpr engine_type const&    engine() const noexcept;
 
-#ifdef LA_USE_MDSPAN
     template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
     constexpr span_type             span() noexcept;
     template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
     constexpr const_span_type       span() const noexcept;
-#endif
 
     //- Modifiers
     //
@@ -277,13 +270,6 @@ vector<ET,OT>::operator =(initializer_list<U> rhs)
 //----------
 //- Capacity
 //
-template<class ET, class OT> constexpr
-bool
-vector<ET,OT>::is_resizable() noexcept
-{
-    return is_resizable_engine_v<ET>;
-}
-
 template<class ET, class OT> constexpr
 typename vector<ET,OT>::index_type
 vector<ET,OT>::capacity() const noexcept
@@ -426,8 +412,6 @@ vector<ET,OT>::engine() const noexcept
     return m_engine;
 }
 
-#ifdef LA_USE_MDSPAN
-
 template<class ET, class OT>
 template<class ET2, detail::enable_if_spannable<ET, ET2>> constexpr
 typename vector<ET,OT>::span_type
@@ -443,8 +427,6 @@ vector<ET,OT>::span() const noexcept
 {
     return m_engine.span();
 }
-
-#endif
 
 //-----------
 //- Modifiers
@@ -481,8 +463,6 @@ operator !=(vector<ET1, OT1> const& lhs, vector<ET2, OT2> const& rhs)
     return !(lhs == rhs);
 }
 
-#ifdef LA_USE_MDSPAN
-
 template<class ET, class OT, class T, ptrdiff_t X0, class L, class A> constexpr
 bool
 operator ==(vector<ET, OT> const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
@@ -510,8 +490,6 @@ operator !=(basic_mdspan<T, extents<X0>, L, A> const& lhs, vector<ET, OT> const&
 {
     return !(lhs == rhs);
 }
-
-#endif
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_VECTOR_HPP_DEFINED

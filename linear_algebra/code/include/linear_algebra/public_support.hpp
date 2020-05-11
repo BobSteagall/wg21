@@ -72,21 +72,22 @@ template<class ET1, class ET2> inline constexpr
 bool    engines_are_similar_v = detail::engines_match_v<ET1, ET2>;
 
 
-//- These variable templates are used to determine the attributes of a vector or matrix based
-//  on that object's type type: readable, writable, initable, resizable.
+//- These constexpr function templates are provided as a convenience for designers of custom
+//  arithmetic traits types.
 //
-template<class ET> inline constexpr
-bool    is_readable_vector_v = detail::is_readable_engine_v<ET>;
+template<class ET, class OT> constexpr
+bool
+is_resizable(vector<ET, OT> const&)
+{
+    return is_resizable_engine_v<ET>;
+}
 
-template<class ET> inline constexpr
-bool    is_writable_vector_v = detail::is_writable_engine_v<ET>;
-
-template<class ET> inline constexpr
-bool    is_initable_v = detail::is_initable_engine_v<ET>;
-
-template<class ET> inline constexpr
-bool    is_resizable_v = detail::is_resizable_engine_v<ET>;
-
+template<class ET, class OT> constexpr
+bool
+is_resizable(matrix<ET, OT> const&)
+{
+    return is_resizable_engine_v<ET>;
+}
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_PUBLIC_SUPPORT_HPP_DEFINED

@@ -19,9 +19,8 @@ template<class ET, class OT>
 class matrix
 {
     static_assert(is_matrix_engine_v<ET>);
-#ifdef LA_USE_MDSPAN
     static_assert(detail::has_valid_span_alias_form_v<ET>);
-#endif
+
     using possibly_writable_vector_tag = detail::noe_category_t<ET, writable_vector_engine_tag>;
     using possibly_writable_matrix_tag = detail::noe_category_t<ET, writable_matrix_engine_tag>;
 
@@ -49,11 +48,8 @@ class matrix
     using const_transpose_type = matrix<transpose_engine<engine_type, readable_matrix_engine_tag>, OT>;
     using hermitian_type       = conditional_t<has_cx_elem, matrix, transpose_type>;
     using const_hermitian_type = conditional_t<has_cx_elem, matrix, const_transpose_type>;
-
-#ifdef LA_USE_MDSPAN
     using span_type            = detail::engine_span_t<ET>;
     using const_span_type      = detail::engine_const_span_t<ET>;
-#endif
 
     //- Construct/copy/destroy
     //
@@ -86,7 +82,6 @@ class matrix
 
     //- Capacity
     //
-    static constexpr bool   is_resizable() noexcept;
     constexpr index_type    columns() const noexcept;
     constexpr index_type    rows() const noexcept;
     constexpr index_tuple   size() const noexcept;
@@ -131,12 +126,10 @@ class matrix
     constexpr engine_type&          engine() noexcept;
     constexpr engine_type const&    engine() const noexcept;
 
-#ifdef LA_USE_MDSPAN
     template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
     constexpr span_type             span() noexcept;
     template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
     constexpr const_span_type       span() const noexcept;
-#endif
 
     //- Modifiers
     //
@@ -162,10 +155,8 @@ class matrix
 template<class ET, class OT>
 template<class ET2, class OT2> constexpr
 matrix<ET,OT>::matrix(matrix<ET2, OT2> const& rhs)
-:   m_engine()
-{
-    assign(rhs);
-}
+:   m_engine(rhs.m_engine)
+{}
 
 template<class ET, class OT>
 template<class U, class ET2, detail::enable_if_initable<ET, ET2, U>> constexpr
@@ -224,13 +215,6 @@ matrix<ET,OT>::operator =(initializer_list<initializer_list<U>> rhs)
 //----------
 //- Capacity
 //
-template<class ET, class OT> constexpr
-bool
-matrix<ET,OT>::is_resizable() noexcept
-{
-    return is_resizable_engine_v<ET>;
-}
-
 template<class ET, class OT> inline constexpr
 typename matrix<ET,OT>::index_type
 matrix<ET,OT>::columns() const noexcept
@@ -439,8 +423,6 @@ matrix<ET,OT>::engine() const noexcept
     return m_engine;
 }
 
-#ifdef LA_USE_MDSPAN
-
 template<class ET, class OT>
 template<class ET2, detail::enable_if_spannable<ET, ET2>> constexpr
 typename matrix<ET,OT>::span_type
@@ -456,8 +438,6 @@ matrix<ET,OT>::span() const noexcept
 {
     return m_engine.span();
 }
-
-#endif
 
 //-----------
 //- Modifiers
@@ -502,8 +482,6 @@ operator !=(matrix<ET1, OT1> const& lhs, matrix<ET2, OT2> const& rhs)
     return !(lhs == rhs);
 }
 
-#ifdef LA_USE_MDSPAN
-
 template<class ET, class OT, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
 bool
 operator ==(matrix<ET, OT> const& lhs, basic_mdspan<T, extents<X0, X1>, L, A> const& rhs)
@@ -532,6 +510,5 @@ operator !=(basic_mdspan<T, extents<X0, X1>, L, A> const& lhs, matrix<ET, OT> co
     return !(lhs == rhs);
 }
 
-#endif
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_MATRIX_HPP_DEFINED

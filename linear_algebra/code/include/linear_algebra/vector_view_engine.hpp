@@ -31,11 +31,8 @@ class vector_view_engine<ET, VCT, subvector_view_tag>
     using const_reference = typename ET::const_reference;
     using difference_type = typename ET::difference_type;
     using index_type       = typename ET::index_type;
-
-#ifdef LA_USE_MDSPAN
     using span_type       = detail::noe_mdspan_subvector_t<detail::noe_mdspan_t<ET, VCT>>;
     using const_span_type = detail::noe_mdspan_subvector_t<detail::noe_const_mdspan_t<ET, VCT>>;
-#endif
 
     //- Construct/copy/destroy
     //
@@ -64,9 +61,7 @@ class vector_view_engine<ET, VCT, subvector_view_tag>
 
     //- Data access
     //
-#ifdef LA_USE_MDSPAN
     constexpr span_type     span() const noexcept;
-#endif
 
     //- Modifiers
     //
@@ -109,7 +104,7 @@ vector_view_engine<ET, VCT, subvector_view_tag>&
 vector_view_engine<ET, VCT, subvector_view_tag>::operator =(initializer_list<U> rhs)
 {
     detail::check_source_init_list(rhs, size());
-    detail::assign_from_vector_list(*this, rhs);
+    detail::assign_from_vector_initlist(*this, rhs);
     return *this;
 }
 
@@ -143,8 +138,6 @@ vector_view_engine<ET, VCT, subvector_view_tag>::operator ()(index_type i) const
 //-------------
 //- Data access
 //
-#ifdef LA_USE_MDSPAN
-
 template<class ET, class VCT> constexpr
 typename vector_view_engine<ET, VCT, subvector_view_tag>::span_type
 vector_view_engine<ET, VCT, subvector_view_tag>::span() const noexcept
@@ -152,7 +145,6 @@ vector_view_engine<ET, VCT, subvector_view_tag>::span() const noexcept
     return detail::noe_mdspan_subvector(mp_other->span(), m_start, m_count);
 }
 
-#endif
 //-----------
 //- Modifiers
 //
@@ -199,11 +191,8 @@ class vector_view_engine<ET, VCT, column_view_tag>
     using const_reference = typename ET::const_reference;
     using difference_type = typename ET::difference_type;
     using index_type      = typename ET::index_type;
-
-#ifdef LA_USE_MDSPAN
     using span_type       = detail::noe_mdspan_rowcolumn_t<detail::noe_mdspan_t<ET, VCT>>;
     using const_span_type = detail::noe_mdspan_rowcolumn_t<detail::noe_const_mdspan_t<ET, VCT>>;
-#endif
 
     //- Construct/copy/destroy
     //
@@ -232,9 +221,7 @@ class vector_view_engine<ET, VCT, column_view_tag>
 
     //- Data access
     //
-#ifdef LA_USE_MDSPAN
     constexpr span_type     span() const noexcept;
-#endif
 
     //- Modifiers
     //
@@ -275,7 +262,7 @@ vector_view_engine<ET, VCT, column_view_tag>&
 vector_view_engine<ET, VCT, column_view_tag>::operator =(initializer_list<U> rhs)
 {
     detail::check_source_init_list(rhs, size());
-    detail::assign_from_vector_list(*this, rhs);
+    detail::assign_from_vector_initlist(*this, rhs);
     return *this;
 }
 
@@ -309,8 +296,6 @@ vector_view_engine<ET, VCT, column_view_tag>::operator ()(index_type i) const
 //-------------
 //- Data access
 //
-#ifdef LA_USE_MDSPAN
-
 template<class ET, class VCT> constexpr
 typename vector_view_engine<ET, VCT, column_view_tag>::span_type
 vector_view_engine<ET, VCT, column_view_tag>::span() const noexcept
@@ -318,7 +303,6 @@ vector_view_engine<ET, VCT, column_view_tag>::span() const noexcept
     return detail::noe_mdspan_column(mp_other->span(), m_column);
 }
 
-#endif
 //-----------
 //- Modifiers
 //
@@ -341,7 +325,7 @@ vector_view_engine<ET, VCT, column_view_tag>::vector_view_engine(referent_type& 
 
 
 //=================================================================================================
-//  Matrix row engine, meant to act as a "view" of a portion of a matrix rwo in expresssions
+//  Matrix row engine, meant to act as a "view" of a portion of a matrix row in expresssions
 //  so as to help avoid unnecessary allocation and element copying.
 //==================================================================================================
 //
@@ -363,11 +347,8 @@ class vector_view_engine<ET, VCT, row_view_tag>
     using const_reference = typename ET::const_reference;
     using difference_type = typename ET::difference_type;
     using index_type      = typename ET::index_type;
-
-#ifdef LA_USE_MDSPAN
     using span_type       = detail::noe_mdspan_rowcolumn_t<detail::noe_mdspan_t<ET, VCT>>;
     using const_span_type = detail::noe_mdspan_rowcolumn_t<detail::noe_const_mdspan_t<ET, VCT>>;
-#endif
 
     //- Construct/copy/destroy
     //
@@ -396,9 +377,7 @@ class vector_view_engine<ET, VCT, row_view_tag>
 
     //- Data access
     //
-#ifdef LA_USE_MDSPAN
     constexpr span_type     span() const noexcept;
-#endif
 
     //- Modifiers
     //
@@ -439,7 +418,7 @@ vector_view_engine<ET, VCT, row_view_tag>&
 vector_view_engine<ET, VCT, row_view_tag>::operator =(initializer_list<U> rhs)
 {
     detail::check_source_init_list(rhs, size());
-    detail::assign_from_vector_list(*this, rhs);
+    detail::assign_from_vector_initlist(*this, rhs);
     return *this;
 }
 
@@ -473,8 +452,6 @@ vector_view_engine<ET, VCT, row_view_tag>::operator ()(index_type i) const
 //-------------
 //- Data access
 //
-#ifdef LA_USE_MDSPAN
-
 template<class ET, class VCT> constexpr
 typename vector_view_engine<ET, VCT, row_view_tag>::span_type
 vector_view_engine<ET, VCT, row_view_tag>::span() const noexcept
@@ -482,7 +459,6 @@ vector_view_engine<ET, VCT, row_view_tag>::span() const noexcept
     return detail::noe_mdspan_row(mp_other->span(), m_row);
 }
 
-#endif
 //-----------
 //- Modifiers
 //

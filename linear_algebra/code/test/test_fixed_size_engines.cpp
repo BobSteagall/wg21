@@ -358,8 +358,6 @@ TEST(FsVectorEngine, Swap)
 }
 
 
-#ifdef LA_USE_MDSPAN
-
 TEST(FsVectorEngine, Span)
 {
     fs_vector_engine<float, 4>          e1{13, 17, 19, 23}, e2, e3{e1};
@@ -401,7 +399,6 @@ TEST(FsVectorEngine, Span)
     EXPECT_TRUE(v_cmp_eq(e1, {11, 12, 13, 14}));
 }
 
-#endif
 
 //==================================================================================================
 //  Unit tests for fixed-size matrix engine.
@@ -902,8 +899,6 @@ TEST(FsMatrixEngine, Swap)
 }
 
 
-#ifdef LA_USE_MDSPAN
-
 TEST(FsMatrixEngine, Span)
 {
     fs_matrix_engine<float, 4, 4>          e1(il_44_2), e2, e3{e1};
@@ -972,5 +967,3 @@ TEST(FsMatrixEngine, Span)
     EXPECT_EQ(e1(2, 2), 333.0f);
     EXPECT_EQ(e1(3, 3), 444.0f);
 }
-
-#endif

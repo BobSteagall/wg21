@@ -31,14 +31,9 @@ class fs_matrix_engine
     using const_reference = element_type const&;
     using difference_type = ptrdiff_t;
     using index_type      = ptrdiff_t;
-
-#ifdef LA_USE_MDSPAN
-    using index_tuple     = extents<dynamic_extent, dynamic_extent>;
+    using index_tuple     = extents<R, C>;
     using span_type       = mdspan<element_type, R, C>;
     using const_span_type = mdspan<element_type const, R, C>;
-#else
-    using index_tuple     = tuple<index_type, index_type>;
-#endif
 
     //- Construct/copy/destroy
     //
@@ -80,10 +75,8 @@ class fs_matrix_engine
 
     //- Data access
     //
-#ifdef LA_USE_MDSPAN
     constexpr span_type         span() noexcept;
     constexpr const_span_type   span() const noexcept;
-#endif
 
     //- Modifiers
     //
@@ -184,7 +177,7 @@ template<class T, ptrdiff_t R, ptrdiff_t C> constexpr
 typename fs_matrix_engine<T,R,C>::index_tuple
 fs_matrix_engine<T,R,C>::size() const noexcept
 {
-    return index_tuple(R, C);
+    return index_tuple{};
 }
 
 template<class T, ptrdiff_t R, ptrdiff_t C> constexpr
@@ -205,7 +198,7 @@ template<class T, ptrdiff_t R, ptrdiff_t C> constexpr
 typename fs_matrix_engine<T,R,C>::index_tuple
 fs_matrix_engine<T,R,C>::capacity() const noexcept
 {
-    return index_tuple(R, C);
+    return index_tuple{};
 }
 
 //----------------
@@ -228,8 +221,6 @@ fs_matrix_engine<T,R,C>::operator ()(index_type i, index_type j) const
 //-------------
 //- Data access
 //
-#ifdef LA_USE_MDSPAN
-
 template<class T, ptrdiff_t R, ptrdiff_t C> constexpr
 typename fs_matrix_engine<T,R,C>::span_type
 fs_matrix_engine<T,R,C>::span() noexcept
@@ -244,7 +235,6 @@ fs_matrix_engine<T,R,C>::span() const noexcept
     return const_span_type(ma_elems.data());
 }
 
-#endif
 //-----------
 //- Modifiers
 //
@@ -319,7 +309,7 @@ void
 fs_matrix_engine<T,R,C>::assign(initializer_list<initializer_list<T2>> rhs)
 {
     detail::check_source_init_list(rhs, R, C);
-    detail::assign_from_matrix_list(*this, rhs);
+    detail::assign_from_matrix_initlist(*this, rhs);
 }
 
 }       //- STD_LA namespace
