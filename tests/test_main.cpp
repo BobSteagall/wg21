@@ -1,5 +1,3 @@
-#include <gtest/gtest.h>
-
 void TestGroup00();
 void TestGroup10();
 void TestGroup20();

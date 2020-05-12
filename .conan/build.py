@@ -26,7 +26,7 @@ def stable_branch_pattern():
 
 def version():
     version = 'latest'
-    with open(os.path.join(os.path.dirname(__file__), "..", "linear_algebra", "code", "CMakeLists.txt")) as file:
+    with open(os.path.join(os.path.dirname(__file__), "..", "CMakeLists.txt")) as file:
         pattern = re.compile(r'project\(wg21_linear_algebra VERSION (\d+\.\d+\.\d+)\)')
         for line in file:
             result = pattern.search(line)
@@ -62,7 +62,8 @@ if __name__ == "__main__":
         # upload_only_when_stable=upload_only_when_stable(),
         stable_branch_pattern=stable_branch_pattern(),
         reference=reference(),
-        test_folder=os.path.join(".conan", "test_package")
+        test_folder=os.path.join(".conan", "test_package"),
+        build_policy="missing"
     )
     builder.add_common_builds()
     builder.run()
