@@ -170,7 +170,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)../include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>linear_algebra.hpp;gtest/gtest.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
@@ -185,7 +185,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)../include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>linear_algebra.hpp;gtest/gtest.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
@@ -202,7 +202,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)../include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>linear_algebra.hpp;gtest/gtest.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
@@ -221,7 +221,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)../include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>linear_algebra.hpp;gtest/gtest.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
