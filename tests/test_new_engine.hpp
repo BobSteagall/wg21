@@ -1,8 +1,6 @@
 #ifndef TEST_NEW_ENGINE_HPP_DEFINED
 #define TEST_NEW_ENGINE_HPP_DEFINED
 
-#include "linear_algebra.hpp"
-
 //==================================================================================================
 //  Fixed-size, fixed-capacity matrix engine.
 //==================================================================================================

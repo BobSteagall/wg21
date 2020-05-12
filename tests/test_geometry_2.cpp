@@ -1,5 +1,3 @@
-#include "linear_algebra.hpp"
-#include <cassert>
 
 namespace STD_LA {
 USING_STD

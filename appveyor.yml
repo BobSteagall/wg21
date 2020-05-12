@@ -2,6 +2,7 @@ build: false
 
 environment:
   CONAN_PRINT_RUN_COMMANDS: 1
+  CONAN_RUN_TESTS: 1
   PYTHON_HOME: "C:\\Python37"
   matrix:
       - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
