@@ -1,143 +1,134 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
+    <Filter Include="Unit Test Source Files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Interface Headers">
-      <UniqueIdentifier>{d983a94d-1b7f-4c43-bbaf-feb32ee50fa3}</UniqueIdentifier>
+    <Filter Include="Unit Test Header Files">
+      <UniqueIdentifier>{1a82a994-1a4a-49b9-aff5-2714c5bf905e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Implementation Headers">
+    <Filter Include="Library Implementation Headers">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Library Interface Headers">
+      <UniqueIdentifier>{d983a94d-1b7f-4c43-bbaf-feb32ee50fa3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\linear_algebra.hpp">
-      <Filter>Interface Headers</Filter>
+      <Filter>Library Interface Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\matrix.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\vector.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\forward_declarations.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\debug_helpers.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\operation_traits.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\addition_traits.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\subtraction_traits.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\negation_traits.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\multiplication_traits.hpp">
-      <Filter>Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\addition_traits_impl.hpp">
-      <Filter>Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\subtraction_traits_impl.hpp">
-      <Filter>Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\negation_traits_impl.hpp">
-      <Filter>Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\multiplication_traits_impl.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\vector_iterators.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\arithmetic_operators.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\public_support.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\private_support.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\dynamic_matrix_engine.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\dynamic_vector_engine.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\fixed_size_matrix_engine.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\fixed_size_vector_engine.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\matrix_view_engine.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\vector_view_engine.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\tests\test_common.hpp">
-      <Filter>Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\tests\test_new_arithmetic.hpp">
-      <Filter>Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\tests\test_new_engine.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Unit Test Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\tests\test_new_number.hpp">
-      <Filter>Implementation Headers</Filter>
+      <Filter>Unit Test Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tests\test_new_engine.hpp">
+      <Filter>Unit Test Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tests\test_new_arithmetic.hpp">
+      <Filter>Unit Test Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tests\test_01.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_02.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_dynamic_engines.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_fixed_size_engines.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_main.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_obj_matrix.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_op_add_traits.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_op_mul_traits.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_op_neg_traits.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_op_sub_traits.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_geometry_2.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_geometry_3.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_geometry_4.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Unit Test Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
