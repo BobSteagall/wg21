@@ -4,8 +4,9 @@ using namespace STD_LA;
 
 int main()
 {
-    vector<fs_vector_engine<double, 4>> vector;
-    matrix<fs_matrix_engine<double, 4, 4>> matrix;
-    vector * matrix;
+    STD_LA::vector<fs_vector_engine<double, 4>>     v;
+    STD_LA::matrix<fs_matrix_engine<double, 4, 4>>  m;
+    v*m;
+
     return EXIT_SUCCESS;
 }
