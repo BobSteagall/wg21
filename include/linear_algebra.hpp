@@ -24,10 +24,11 @@
 #include <array>
 #include <complex>
 #include <initializer_list>
+#include <memory>
 #include <tuple>
 #include <type_traits>
 
-//- Disable some compiler warnings (noise) coming from mdspan.
+//- Disable some unnecessary compiler warnings (i.e., noise) coming from mdspan.
 //
 #if defined __clang__
     #pragma clang diagnostic push

@@ -768,7 +768,7 @@ allocate(AT& alloc, size_t n)
 
     try
     {
-        uninitialized_value_construct_n(p_dst, n);
+        std::uninitialized_value_construct_n(p_dst, n);
     }
     catch (...)
     {
@@ -786,7 +786,7 @@ allocate(AT& alloc, size_t n, typename allocator_traits<AT>::const_pointer p_src
 
     try
     {
-        uninitialized_copy_n(p_src, n, p_dst);
+        std::uninitialized_copy_n(p_src, n, p_dst);
     }
     catch (...)
     {
@@ -802,7 +802,7 @@ deallocate(AT& alloc, typename allocator_traits<AT>::pointer p_dst, size_t n) no
 {
     if (p_dst != nullptr)
     {
-        destroy_n(p_dst, n);
+        std::destroy_n(p_dst, n);
         allocator_traits<AT>::deallocate(alloc, p_dst, n);
     }
 }
@@ -844,7 +844,7 @@ la_swap(T& t0, T& t1) noexcept(is_nothrow_movable_v<T>)
 //      B. cause an exception to be thrown at run-time.
 //==================================================================================================
 //
-template<class ET, class ST> inline constexpr 
+template<class ET, class ST> inline constexpr
 void
 check_source_engine_size(ET const& engine, ST elems)
 {
@@ -854,7 +854,7 @@ check_source_engine_size(ET const& engine, ST elems)
     }
 }
 
-template<class ET, class ST> inline constexpr 
+template<class ET, class ST> inline constexpr
 void
 check_source_engine_size(ET const& engine, ST rows, ST cols)
 {
@@ -864,7 +864,7 @@ check_source_engine_size(ET const& engine, ST rows, ST cols)
     }
 }
 
-template<class T, class ST> inline constexpr 
+template<class T, class ST> inline constexpr
 void
 check_source_init_list(initializer_list<T> list, ST elems)
 {
@@ -874,7 +874,7 @@ check_source_init_list(initializer_list<T> list, ST elems)
     }
 }
 
-template<class T> inline constexpr 
+template<class T> inline constexpr
 void
 check_source_init_list(initializer_list<initializer_list<T>> list)
 {
@@ -889,7 +889,7 @@ check_source_init_list(initializer_list<initializer_list<T>> list)
     }
 }
 
-template<class T, class ST> inline constexpr 
+template<class T, class ST> inline constexpr
 void
 check_source_init_list(initializer_list<initializer_list<T>> list, ST rows, ST cols)
 {
@@ -916,7 +916,7 @@ check_source_init_list(initializer_list<initializer_list<T>> list, ST rows, ST c
 //  will have already done such checking.
 //==================================================================================================
 //
-template<class ET1, class ET2> constexpr 
+template<class ET1, class ET2> constexpr
 void
 assign_from_vector_engine(ET1& dst, ET2 const& src)
 {
@@ -934,7 +934,7 @@ assign_from_vector_engine(ET1& dst, ET2 const& src)
     }
 }
 
-template<class ET1, class ET2> constexpr 
+template<class ET1, class ET2> constexpr
 void
 assign_from_matrix_engine(ET1& dst, ET2 const& src)
 {
@@ -943,15 +943,16 @@ assign_from_matrix_engine(ET1& dst, ET2 const& src)
     using index_type_src = typename ET2::index_type;
 
     index_type_dst  di = 0;
-    index_type_dst  dj = 0;
     index_type_src  si = 0;
-    index_type_src  sj = 0;
-    index_type_src  ni = src.rows();
-    index_type_src  nj = src.columns();
+    index_type_src  rows = src.rows();
+    index_type_src  cols = src.columns();
 
-    for (;  si < ni;  ++di, ++si)
+    for (; si < rows;  ++di, ++si)
     {
-        for (;  sj < nj;  ++dj, ++sj)
+        index_type_dst  dj = 0;
+        index_type_src  sj = 0;
+
+        for (; sj < cols;  ++dj, ++sj)
         {
             dst(di, dj) = static_cast<elem_type_dst>(src(si, sj));
         }
@@ -960,7 +961,7 @@ assign_from_matrix_engine(ET1& dst, ET2 const& src)
 
 //------
 //
-template<class ET, class T> constexpr 
+template<class ET, class T> constexpr
 void
 assign_from_vector_initlist(ET& dst, initializer_list<T> src)
 {
@@ -978,7 +979,7 @@ assign_from_vector_initlist(ET& dst, initializer_list<T> src)
     }
 }
 
-template<class ET, class T> constexpr 
+template<class ET, class T> constexpr
 void
 assign_from_matrix_initlist(ET& engine, initializer_list<initializer_list<T>> rhs)
 {
@@ -1159,7 +1160,7 @@ m_cmp_eq(ET const& lhs, basic_mdspan<T, extents<X0, X1>, L, A> const& rhs)
     index_type_rhs  r2 = rhs.extent(0);
     index_type_rhs  c2 = rhs.extent(1);
 
-    if (r1 != static_cast<index_type_lhs>(r2)  ||  c1 != static_cast<index_type_lhs>(c2)) 
+    if (r1 != static_cast<index_type_lhs>(r2)  ||  c1 != static_cast<index_type_lhs>(c2))
         return false;
 
     index_type_lhs  i1 = 0;
