@@ -28,7 +28,7 @@ cmake_dependent_option(LA_ENABLE_TESTS "Enable std::math:linear_algebra tests" O
 cmake_dependent_option(LA_BUILD_DEB "Create a DEB" ON "LA_BUILD_PACKAGE" OFF)
 cmake_dependent_option(LA_BUILD_RPM "Create a RPM" ON "LA_BUILD_PACKAGE" OFF)
 
-option(MDSPAN_ENABLE_CONCEPTS "" OFF)
+option(MDSPAN_ENABLE_CONCEPTS "" OFF)`
 FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git)
 FetchContent_MakeAvailable(mdspan)
 
