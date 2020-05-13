@@ -22,4 +22,3 @@ fi
 pip install conan_package_tools --upgrade
 
 conan user
-conan profile update settings.compiler.libcxx=libstdc++11 default

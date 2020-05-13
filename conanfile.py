@@ -25,8 +25,8 @@ class LinearAlgebraConan(ConanFile):
         # Ensure the package is build against a version of CMake from 3.16 onwards.
         if CMake.get_version() < Version("3.16"):
             self.build_requires("cmake_installer/3.16.4@conan/stable")
-        if self.run_tests:
-            self.build_requires("gtest/1.10.0")
+        #if self.run_tests:
+            # self.build_requires("gtest/1.10.0")
 
     _cmake = None
     @property
