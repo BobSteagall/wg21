@@ -1,5 +1,16 @@
 add_executable(la_test "")
 
+FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git)
+FetchContent_GetProperties(gtest)
+option(BUILD_GMOCK "" OFF)
+option(INSTALL_GTEST "" OFF)
+option(gtest_force_shared_crt "" ON)
+
+if(NOT gtest_POPULATED)
+    FetchContent_Populate(gtest)
+    add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
+endif()
+
 target_precompile_headers(la_test
     PRIVATE
         <linear_algebra.hpp>
@@ -22,7 +33,7 @@ target_sources(la_test
         test_op_sub_traits.cpp
  #       test_01.cpp
  #       test_02.cpp
-        test_main.cpp  
+        test_main.cpp
 )
 
 target_link_libraries(la_test
@@ -30,13 +41,9 @@ target_link_libraries(la_test
         wg21_linear_algebra
         gtest_main
         gtest
+        pthread
 )
 
-set_target_properties(la_test PROPERTIES
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
-)
 
 target_compile_options(la_test
     PRIVATE
