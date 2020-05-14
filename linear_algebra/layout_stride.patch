@@ -1,0 +1,40 @@
+--- layout_stride.hpp-orig	2020-04-23 14:59:54.000000000 -0400
++++ layout_stride.hpp	2020-04-23 15:02:54.000000000 -0400
+@@ -198,19 +198,27 @@
+ 
+   // TODO @proposal-bug @proposal-extension layout stride needs this constructor
+   // clang-format off
++#if defined(__INTEL_COMPILER)
+   MDSPAN_FUNCTION_REQUIRES(
+     (MDSPAN_INLINE_FUNCTION constexpr explicit),
+     layout_stride_impl, (std::experimental::extents<Exts...> const& e), noexcept,
+     /* requires */ (
+       // remember that this also covers the zero strides case because an && fold on an empty pack is true
+-#if defined(__INTEL_COMPILER)
+       // Work-around for an ICE. layout_stride won't properly SFINAE with ICC, but oh well
+       true
++    )
++  )
+ #else
++  MDSPAN_FUNCTION_REQUIRES(
++    (MDSPAN_INLINE_FUNCTION constexpr explicit),
++    layout_stride_impl, (std::experimental::extents<Exts...> const& e), noexcept,
++    /* requires */ (
++      // remember that this also covers the zero strides case because an && fold on an empty pack is true
+       _MDSPAN_FOLD_AND(Strides != dynamic_extent /* && ... */)
+-#endif
+     )
+-  ) : __base_t(__base_t{__member_pair_t(e, __strides_storage_t())})
++  )
++#endif
++  : __base_t(__base_t{__member_pair_t(e, __strides_storage_t())})
+   { }
+   // clang-format on
+ 
+@@ -323,4 +331,4 @@
+ };
+ 
+ } // end namespace experimental
+-} // end namespace std
+\ No newline at end of file
++} // end namespace std

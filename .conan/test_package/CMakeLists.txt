@@ -20,3 +20,4 @@ add_test(
         COMMAND test_linear_algebra
         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 )
+

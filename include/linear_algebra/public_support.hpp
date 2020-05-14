@@ -40,29 +40,29 @@ bool    is_matrix_engine_tag = TT::value >= readable_matrix_engine_tag::value &&
 //  type: scalar, vector, or matrix.
 //
 template<class ET> inline constexpr
-bool    is_scalar_engine_v = detail::is_scalar_v<ET>;
+bool    is_scalar_engine_v = detail::is_scalar_engine_v<ET>;
 
 template<class ET> inline constexpr
-bool    is_vector_engine_v = detail::is_vector_v<ET>;
+bool    is_vector_engine_v = detail::is_vector_engine_v<ET>;
 
 template<typename ET> inline constexpr
-bool    is_matrix_engine_v = detail::is_matrix_v<ET>;
+bool    is_matrix_engine_v = detail::is_matrix_engine_v<ET>;
 
 
 //- These variable templates are used to determine the attributes of an engine based on that
-//  engine's type type: readable, writable, resizable.
+//  engine's type type: readable, writable, initable, resizable.
 //
 template<class ET> inline constexpr
-bool    is_readable_engine_v = detail::is_readable_v<ET>;
+bool    is_readable_engine_v = detail::is_readable_engine_v<ET>;
 
 template<class ET> inline constexpr
-bool    is_writable_engine_v = detail::is_writable_v<ET>;
+bool    is_writable_engine_v = detail::is_writable_engine_v<ET>;
 
 template<class ET> inline constexpr
-bool    is_initable_engine_v = detail::is_initable_v<ET>;
+bool    is_initable_engine_v = detail::is_initable_engine_v<ET>;
 
 template<class ET> inline constexpr
-bool    is_resizable_engine_v = detail::is_resizable_v<ET>;
+bool    is_resizable_engine_v = detail::is_resizable_engine_v<ET>;
 
 
 //- This variable templates is used to determine whether or not two engine types are similar:
@@ -70,6 +70,24 @@ bool    is_resizable_engine_v = detail::is_resizable_v<ET>;
 //
 template<class ET1, class ET2> inline constexpr
 bool    engines_are_similar_v = detail::engines_match_v<ET1, ET2>;
+
+
+//- These constexpr function templates are provided as a convenience for designers of custom
+//  arithmetic traits types.
+//
+template<class ET, class OT> constexpr
+bool
+is_resizable(vector<ET, OT> const&)
+{
+    return is_resizable_engine_v<ET>;
+}
+
+template<class ET, class OT> constexpr
+bool
+is_resizable(matrix<ET, OT> const&)
+{
+    return is_resizable_engine_v<ET>;
+}
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_PUBLIC_SUPPORT_HPP_DEFINED

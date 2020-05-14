@@ -182,22 +182,46 @@ PrintOperandTypes(string const& loc, O1 const& o1, O2 const& o2)
 #define PRINT_OP_TYPES(ET, MSG, ...)
 //#define PRINT_OP_TYPES(ET, MSG, ...)    STD_LA::PrintOperandTypes<ET>(MSG, __VA_ARGS__)
 
-template<class ET, class OT>
+template<class T, class A>
 void
-Print(matrix<ET, OT> const& m, char const* pname = nullptr)
+Print(dr_matrix_engine<T, A> const& m, char const* pname = nullptr)
 {
-    using size_type = typename matrix<ET, OT>::size_type;
+    using index_type = typename dr_matrix_engine<T, A>::index_type;
 
     cout << endl << "matrix: " << ((pname) ? pname : "<anon>") << endl;
     cout << "  size: " << m.rows() << "x" << m.columns() << endl;
     cout << "  capy: " << m.row_capacity() << "x" << m.column_capacity() << endl;
     cout << "  -----" << endl;
 
-    for (size_type i = 0;  i < m.rows();  ++i)
+    for (index_type i = 0;  i < m.rows();  ++i)
     {
         cout << right << setw(4) << setprecision(3) << (double) m(i, 0);
 
-        for (size_type j = 1;  j < m.columns();  ++j)
+        for (index_type j = 1;  j < m.columns();  ++j)
+        {
+             cout << right << setw(6) << setprecision(3) << (double) m(i, j);
+        }
+
+        cout << endl;
+    }
+}
+
+template<class ET, class OT>
+void
+Print(matrix<ET, OT> const& m, char const* pname = nullptr)
+{
+    using index_type = typename matrix<ET, OT>::index_type;
+
+    cout << endl << "matrix: " << ((pname) ? pname : "<anon>") << endl;
+    cout << "  size: " << m.rows() << "x" << m.columns() << endl;
+    cout << "  capy: " << m.row_capacity() << "x" << m.column_capacity() << endl;
+    cout << "  -----" << endl;
+
+    for (index_type i = 0;  i < m.rows();  ++i)
+    {
+        cout << right << setw(4) << setprecision(3) << (double) m(i, 0);
+
+        for (index_type j = 1;  j < m.columns();  ++j)
         {
              cout << right << setw(6) << setprecision(3) << (double) m(i, j);
         }
@@ -210,7 +234,7 @@ template<class ET, class OT>
 void
 Print(vector<ET, OT> const& v, char const* pname = nullptr)
 {
-    using size_type = typename vector<ET, OT>::size_type;
+    using index_type = typename vector<ET, OT>::index_type;
 
     cout << endl << "vector: " << ((pname) ? pname : "<anon>") << endl;
     cout << "  size: " << v.size() << endl;
@@ -219,7 +243,7 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
 
     cout << "(idx) " << right << setw(4) << setprecision(3) << (double) v(0);
 
-    for (size_type i = 1;  i < v.size();  ++i)
+    for (index_type i = 1;  i < v.size();  ++i)
     {
             cout << right << setw(6) << setprecision(3) << (double) v(i);
     }
@@ -236,8 +260,6 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
     }
     cout << endl;
 }
-
-#ifdef LA_USE_MDSPAN
 
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
 void
@@ -280,8 +302,6 @@ Print(basic_mdspan<T, extents<X0>, L, A> const& s, char const* pname = nullptr)
     cout << endl;
 }
 
-#endif  //- LA_USE_MDSPAN
-
 inline void
 Print(bool b, char const* pname = nullptr)
 {
@@ -294,12 +314,12 @@ template<class ET, class OT>
 void
 Fill(vector<ET, OT>& v)
 {
-    using size_type    = typename vector<ET, OT>::size_type;
+    using index_type    = typename vector<ET, OT>::index_type;
     using element_type = typename vector<ET, OT>::element_type;
 
     element_type    x = 1;
 
-    for (size_type i = 0;  i < v.size();  ++i)
+    for (index_type i = 0;  i < v.size();  ++i)
     {
          v(i) = x;  x = x + 1;
     }
@@ -309,14 +329,14 @@ template<class ET, class OT>
 void
 Fill(matrix<ET, OT>& m)
 {
-    using size_type    = typename STD_LA::matrix<ET, OT>::size_type;
+    using index_type    = typename STD_LA::matrix<ET, OT>::index_type;
     using element_type = typename STD_LA::matrix<ET, OT>::element_type;
 
     element_type    x = 1;
 
-    for (size_type i = 0;  i < m.rows();  ++i)
+    for (index_type i = 0;  i < m.rows();  ++i)
     {
-        for (size_type j = 0;  j < m.columns();  ++j)
+        for (index_type j = 0;  j < m.columns();  ++j)
         {
             m(i, j) = x;  x = x + 1;
         }

@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClInclude Include="..\include\linear_algebra.hpp" />
     <ClInclude Include="..\include\linear_algebra\addition_traits.hpp" />
-    <ClInclude Include="..\include\linear_algebra\addition_traits_impl.hpp" />
     <ClInclude Include="..\include\linear_algebra\debug_helpers.hpp" />
     <ClInclude Include="..\include\linear_algebra\dynamic_matrix_engine.hpp" />
     <ClInclude Include="..\include\linear_algebra\dynamic_vector_engine.hpp" />
@@ -34,12 +33,9 @@
     <ClInclude Include="..\include\linear_algebra\public_support.hpp" />
     <ClInclude Include="..\include\linear_algebra\arithmetic_operators.hpp" />
     <ClInclude Include="..\include\linear_algebra\multiplication_traits.hpp" />
-    <ClInclude Include="..\include\linear_algebra\multiplication_traits_impl.hpp" />
     <ClInclude Include="..\include\linear_algebra\negation_traits.hpp" />
-    <ClInclude Include="..\include\linear_algebra\negation_traits_impl.hpp" />
     <ClInclude Include="..\include\linear_algebra\operation_traits.hpp" />
     <ClInclude Include="..\include\linear_algebra\subtraction_traits.hpp" />
-    <ClInclude Include="..\include\linear_algebra\subtraction_traits_impl.hpp" />
     <ClInclude Include="..\include\linear_algebra\vector.hpp" />
     <ClInclude Include="..\include\linear_algebra\vector_iterators.hpp" />
     <ClInclude Include="..\include\linear_algebra\vector_view_engine.hpp" />
@@ -143,24 +139,24 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include;extsrc\mdspan\include</IncludePath>
-    <OutDir>$(SolutionDir)\bin\$(PlatformTarget)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)\obj\$(PlatformTarget)\$(Configuration)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)include;$(SolutionDir)externals\mdspan\include</IncludePath>
+    <OutDir>$(ProjectDir)$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)$(PlatformTarget)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include;extsrc\mdspan\include</IncludePath>
-    <OutDir>$(SolutionDir)\bin\$(PlatformTarget)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)\obj\$(PlatformTarget)\$(Configuration)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)include;$(SolutionDir)externals\mdspan\include</IncludePath>
+    <OutDir>$(ProjectDir)$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)$(PlatformTarget)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include;extsrc\mdspan\include</IncludePath>
-    <OutDir>$(SolutionDir)\bin\$(PlatformTarget)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)\obj\$(PlatformTarget)\$(Configuration)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)include;$(SolutionDir)externals\mdspan\include</IncludePath>
+    <OutDir>$(ProjectDir)$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)$(PlatformTarget)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include;extsrc\mdspan\include</IncludePath>
-    <OutDir>$(SolutionDir)\bin\$(PlatformTarget)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)\obj\$(PlatformTarget)\$(Configuration)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)include;$(SolutionDir)externals\mdspan\include</IncludePath>
+    <OutDir>$(ProjectDir)$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)$(PlatformTarget)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -168,13 +164,15 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>linear_algebra.hpp;gtest/gtest.h</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals/mdspan/include;$(SolutionDir)Include</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ClCompile>
     <Link>
-      <OutputFile>$(OutDir)\bin\$(PlatformTarget)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -183,13 +181,15 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>linear_algebra.hpp;gtest/gtest.h</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals/mdspan/include;$(SolutionDir)Include</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ClCompile>
     <Link>
-      <OutputFile>$(OutDir)\bin\$(PlatformTarget)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -200,15 +200,17 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>linear_algebra.hpp;gtest/gtest.h</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals/mdspan/include;$(SolutionDir)Include</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <OutputFile>$(OutDir)\bin\$(PlatformTarget)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -219,25 +221,27 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>linear_algebra.hpp;gtest/gtest.h</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals/mdspan/include;$(SolutionDir)Include</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <OutputFile>$(OutDir)\bin\$(PlatformTarget)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.3\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets" Condition="Exists('packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.3\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets')" />
+    <Import Project="..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.3\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets" Condition="Exists('..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.3\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.3\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.3\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.3\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.3\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets'))" />
   </Target>
 </Project>

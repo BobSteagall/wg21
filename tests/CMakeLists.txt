@@ -1,11 +1,24 @@
 add_executable(la_test "")
 
-target_precompile_headers(la_test
-    PRIVATE
-        <linear_algebra.hpp>
-        <gtest/gtest.h>
-        <cassert>
-)
+FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git)
+FetchContent_GetProperties(gtest)
+option(BUILD_GMOCK "" OFF)
+option(INSTALL_GTEST "" OFF)
+option(gtest_force_shared_crt "" ON)
+
+if(NOT gtest_POPULATED)
+    FetchContent_Populate(gtest)
+    add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
+endif()
+
+if(LA_BUILD_USING_PCH)
+    target_precompile_headers(la_test
+        PRIVATE
+            <linear_algebra.hpp>
+            <gtest/gtest.h>
+            <cassert>
+    )
+endif()
 
 target_sources(la_test
     PRIVATE
@@ -22,7 +35,7 @@ target_sources(la_test
         test_op_sub_traits.cpp
  #       test_01.cpp
  #       test_02.cpp
-        test_main.cpp  
+        test_main.cpp
 )
 
 target_link_libraries(la_test
@@ -32,11 +45,6 @@ target_link_libraries(la_test
         gtest
 )
 
-set_target_properties(la_test PROPERTIES
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
-)
 
 target_compile_options(la_test
     PRIVATE
@@ -81,4 +89,9 @@ endif(LA_ENABLE_SANITIZERS)
 
 enable_testing()
 include(GoogleTest)
-gtest_discover_tests(la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DISCOVERY_TIMEOUT 30)
+
+if (LA_VERBOSE_TEST_OUTPUT)
+    gtest_discover_tests(la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DISCOVERY_TIMEOUT 30)
+else()
+    add_test(NAME la_test COMMAND la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+endif()

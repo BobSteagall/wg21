@@ -6,9 +6,13 @@ using drd_mat_engine    = STD_LA::dr_matrix_engine<double, std::allocator<double
 using drm_double    = STD_LA::dyn_matrix<double>;
 using drv_double    = STD_LA::dyn_vector<double>;
 
+using drm_float     = STD_LA::dyn_matrix<float>;
+using drv_float     = STD_LA::dyn_vector<float>;
+
 using fsv_double_5  = STD_LA::fs_vector<double, 5>;
 using fsm_double_35 = STD_LA::fs_matrix<double, 3, 5>;
 using fsm_float_35  = STD_LA::fs_matrix<float, 3, 5>;
+using fsm_float_53  = STD_LA::fs_matrix<float, 5, 3>;
 using fsm_double_36 = STD_LA::fs_matrix<double, 3, 6>;
 using fsm_double_99 = STD_LA::fs_matrix<double, 9, 9>;
 
@@ -173,8 +177,8 @@ constexpr double t003()
 
 constexpr double cd = t003();
 
-using namespace std::experimental;
-using namespace std::experimental::math;
+//using namespace std::experimental;
+//using namespace std::experimental::math;
 
 #include <array>
 
@@ -183,7 +187,6 @@ using std::array;
 namespace {
 void t002X(drm_double const& m1, fsm_double_36 const& m2)
 {
-#ifdef LA_USE_MDSPAN
     PRINT_FNAME();
     PRINT(m1);
 
@@ -243,13 +246,10 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     PRINT(subrow1);
     auto    sbrwspn1 = subrow1.span();
     PRINT(sbrwspn1);
-
-#endif
 }
 
 void t001X()
 {
-#ifdef LA_USE_MDSPAN
     PRINT_FNAME();
 
     drm_double  m1(10, 13, 16, 19);
@@ -311,7 +311,6 @@ void t001X()
     t002X(m1, m2);
 
 //    static_assert(!std::is_same_v<double, double const>);
-#endif
 }
 }
 
@@ -413,12 +412,75 @@ t003Y()
     return 0;
 }
 
+
+//------
+//
+template<class OTR, class OP1, class OP2>
+struct addition_traits_tst;
+
+template<class OT, class ET1, class OT1, class ET2, class OT2>
+struct addition_traits_tst<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>
+{
+    using engine_type  = matrix_addition_engine_t<OT, ET1, ET2>;
+    using op_traits    = OT;
+    using result_type  = matrix<engine_type, op_traits>;
+
+    using index_type_1 = typename matrix<ET1, OT1>::index_type;
+    using index_type_2 = typename matrix<ET2, OT2>::index_type;
+    using index_type_r = typename result_type::index_type;
+
+    static result_type  add(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
+};
+
+template<class OT, class ET1, class OT1, class ET2, class OT2> inline
+auto
+addition_traits_tst<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
+(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2) -> result_type
+{
+    index_type_r    rows = static_cast<index_type_r>(m1.rows());
+    index_type_r    cols = static_cast<index_type_r>(m1.columns());
+    result_type		mr;
+
+    if constexpr (is_resizable(mr))
+	{
+		mr.resize(rows, cols);
+    }
+
+    index_type_r    ir = 0;
+    index_type_1    i1 = 0;
+    index_type_2    i2 = 0;
+
+	for (;  ir < rows;  ++ir, ++i1, ++i2)
+    {
+        index_type_r    jr = 0;
+        index_type_1    j1 = 0;
+        index_type_2    j2 = 0;
+
+        for (;  jr < cols;  ++jr, ++j1, ++j2)
+        {
+			mr(ir, jr) = m1(i1, j1) + m2(i2, j2);
+        }
+    }
+
+	return mr;
+}
+
+struct op_traits_tst
+{
+    template<class OTR, class OP1, class OP2>
+    using addition_traits = addition_traits_tst<OTR, OP1, OP2>;
+
+};
+
+using fsm_float_35_tst = matrix<fs_matrix_engine<float, 3, 5>, op_traits_tst>;
+
+
 void
 TestGroup00()
 {
-    constexpr double x = t002();
-    constexpr int    i = t003X();
-    int j = t003Y();
+    constexpr double    x = t002();
+    constexpr int       i = t003X();
+    t003Y();
 
 //    auto v = STD_LA::fs_vector<double, 3>{};
 //    auto u = STD_LA::fs_vector<long double, 3>{v};
@@ -428,6 +490,41 @@ TestGroup00()
 //    PRINT_TYPE(decltype(tf));
 
     t001X();
+
+    constexpr fsm_float_35  m1 = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}};
+    constexpr fsm_float_35  m2 = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}};
+    constexpr fsm_float_35  m3 = m1 + m2;
+    constexpr fsm_float_53  m4 = m1.t() + m2.t();
+
+    fsm_float_53  m5 = m1.t() + m2.t();
+
+    PRINT(m1);
+    PRINT(m3);
+    PRINT(m4);
+    PRINT(m5);
+
+    drm_float   m6 =  {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}};
+    drm_float   m7;
+
+    m7 = m6;
+    m7 = m6 + m7;
+
+    fsm_float_35_tst    m8 = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}};
+    fsm_float_35_tst    m9 = m8 + m1;
+    PRINT(m9);
+
+    m9 = m1 + m2 + m8;
+    PRINT(m9);
+
+    constexpr fsm_float_35_tst  m10 = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}};
+    constexpr fsm_float_35_tst  m11 = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}};
+
+    //constexpr
+        fsm_float_35_tst  m12 = m10 + m11;
+    //constexpr
+        fsm_float_35      m13 = m10 + m11;
+    fsm_float_35      m14 = m10 + m6;
+
 
 //    t000();
 //    t001();

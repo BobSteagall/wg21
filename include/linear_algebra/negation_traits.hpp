@@ -340,7 +340,7 @@ struct matrix_negation_engine_traits<OT, dr_vector_engine<T1, A1>>
 //-------------------
 //- fs_vector_engine.
 //
-template<class OT, class T1, size_t N1>
+template<class OT, class T1, ptrdiff_t N1>
 struct matrix_negation_engine_traits<OT, fs_vector_engine<T1, N1>>
 {
     using element_type = matrix_negation_element_t<OT, T1>;
@@ -353,14 +353,14 @@ struct matrix_negation_engine_traits<OT, fs_vector_engine<T1, N1>>
 //
 //- dr_matrix_engine.
 //
-template<class OT, class T1, size_t R1, size_t C1>
+template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1>
 struct matrix_negation_engine_traits<OT, fs_matrix_engine<T1, R1, C1>>
 {
     using element_type = matrix_negation_element_t<OT, T1>;
     using engine_type  = fs_matrix_engine<T1, R1, C1>;
 };
 
-template<class OT, class T1, size_t R1, size_t C1, class MCT1>
+template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class MCT1>
 struct matrix_negation_engine_traits<OT, transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>>
 {
     using element_type = matrix_negation_element_t<OT, T1>;
@@ -402,14 +402,36 @@ template<class OT, class ET1, class OT1>
 struct matrix_negation_traits<OT, vector<ET1, OT1>>
 {
     using engine_type = matrix_negation_engine_t<OT, ET1>;
-    using op_traits   = OT;
-    using result_type = vector<engine_type, op_traits>;
+    using result_type = vector<engine_type, OT>;
 
-    using size_type_1 = typename vector<ET1, OT1>::size_type;
-    using size_type_r = typename result_type::size_type;
-
-    static result_type  negate(vector<ET1, OT1> const& v1);
+    static constexpr result_type    negate(vector<ET1, OT1> const& v1);
 };
+
+template<class OT, class ET1, class OT1> inline constexpr
+auto
+matrix_negation_traits<OT, vector<ET1, OT1>>::negate(vector<ET1, OT1> const& v1) -> result_type
+{
+    using index_type_1 = typename vector<ET1, OT1>::index_type;
+    using index_type_r = typename result_type::index_type;
+
+    index_type_r    elems = static_cast<index_type_r>(v1.size());
+    result_type     vr;
+
+    if constexpr (is_resizable(vr))
+    {
+        vr.resize(elems);
+    }
+
+    index_type_r    ir = 0;
+    index_type_1    i1 = 0;
+
+    for (;  ir < elems;  ++ir, ++i1)
+    {
+        vr(ir) = -v1(i1);
+    }
+
+    return vr;
+}
 
 //------
 //
@@ -417,14 +439,43 @@ template<class OT, class ET1, class OT1>
 struct matrix_negation_traits<OT, matrix<ET1, OT1>>
 {
     using engine_type = matrix_negation_engine_t<OT, ET1>;
-    using op_traits   = OT;
-    using result_type = matrix<engine_type, op_traits>;
+    using result_type = matrix<engine_type, OT>;
 
-    using size_type_1 = typename matrix<ET1, OT1>::size_type;
-    using size_type_r = typename result_type::size_type;
-
-    static result_type  negate(matrix<ET1, OT1> const& m1);
+    static constexpr result_type    negate(matrix<ET1, OT1> const& m1);
 };
+
+template<class OT, class ET1, class OT1> inline constexpr
+auto
+matrix_negation_traits<OT, matrix<ET1, OT1>>::negate(matrix<ET1, OT1> const& m1) -> result_type
+{
+    using index_type_1 = typename matrix<ET1, OT1>::index_type;
+    using index_type_r = typename result_type::index_type;
+
+    index_type_r    rows = static_cast<index_type_r>(m1.rows());
+    index_type_r    cols = static_cast<index_type_r>(m1.columns());
+    result_type		mr;
+
+    if constexpr (is_resizable(mr))
+    {
+        mr.resize(rows, cols);
+    }
+
+    index_type_r    ir = 0;
+    index_type_1    i1 = 0;
+
+    for (;  ir < rows;  ++ir, ++i1)
+    {
+        index_type_r    jr = 0;
+        index_type_1    j1 = 0;
+
+        for (;  jr < cols;  ++jr, ++j1)
+        {
+            mr(ir, jr) = -m1(i1, j1);
+        }
+    }
+
+    return mr;
+}
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_NEGATION_TRAITS_HPP_DEFINED

@@ -32,13 +32,13 @@ class vector_iterator
     using reference         = typename vector_type::reference;
     using const_reference   = typename vector_type::const_reference;
     using difference_type   = typename vector_type::difference_type;
-    using size_type         = typename vector_type::size_type;
+    using index_type         = typename vector_type::index_type;
 
   public:
     ~vector_iterator() noexcept = default;
 
     constexpr vector_iterator() noexcept;
-    constexpr vector_iterator(vector_type& vec, size_type curr, size_type upper);
+    constexpr vector_iterator(vector_type& vec, index_type curr, index_type upper);
     constexpr vector_iterator(vector_iterator&&) noexcept = default;
     constexpr vector_iterator(vector_iterator const&) noexcept = default;
 
@@ -47,7 +47,7 @@ class vector_iterator
 
     constexpr pointer           operator ->() const;
     constexpr reference         operator  *() const;
-    constexpr reference         operator [](size_type n) const;
+    constexpr reference         operator [](index_type n) const;
 
     constexpr difference_type   operator -(vector_iterator const& p) const;
     constexpr vector_iterator   operator -(difference_type n) const;
@@ -74,12 +74,12 @@ class vector_iterator
 
   private:
     vector_type*    mp_vector;
-    size_type       m_curr;
-    size_type       m_upper;
+    index_type       m_curr;
+    index_type       m_upper;
 
   private:
     constexpr vector_iterator(vector_type& vec);
-    constexpr vector_iterator(vector_type* vec, size_type curr, size_type upper);
+    constexpr vector_iterator(vector_type* vec, index_type curr, index_type upper);
 };
 
 template<class VT> constexpr
@@ -93,18 +93,18 @@ template<class VT> constexpr
 vector_iterator<VT>::vector_iterator(vector_type& vec)
 :   mp_vector(&vec)
 ,   m_curr(0)
-,   m_upper(static_cast<size_type>(vec.size()))
+,   m_upper(static_cast<index_type>(vec.size()))
 {}
 
 template<class VT> constexpr
-vector_iterator<VT>::vector_iterator(vector_type& vec, size_type curr, size_type upper)
+vector_iterator<VT>::vector_iterator(vector_type& vec, index_type curr, index_type upper)
 :   mp_vector(&vec)
 ,   m_curr(curr)
 ,   m_upper(upper)
 {}
 
 template<class VT> constexpr
-vector_iterator<VT>::vector_iterator(vector_type* p_eng, size_type curr, size_type upper)
+vector_iterator<VT>::vector_iterator(vector_type* p_eng, index_type curr, index_type upper)
 :   mp_vector(p_eng)
 ,   m_curr(curr)
 ,   m_upper(upper)
@@ -126,7 +126,7 @@ vector_iterator<VT>::operator *() const
 
 template<class VT> constexpr
 typename vector_iterator<VT>::reference
-vector_iterator<VT>::operator [](size_type n) const
+vector_iterator<VT>::operator [](index_type n) const
 {
     return (*mp_vector)(m_curr + n);
 }
@@ -281,13 +281,13 @@ class vector_const_iterator
     using reference         = typename vector_type::const_reference;
     using const_reference   = typename vector_type::const_reference;
     using difference_type   = typename vector_type::difference_type;
-    using size_type         = typename vector_type::size_type;
+    using index_type         = typename vector_type::index_type;
 
   public:
     ~vector_const_iterator() noexcept = default;
 
     constexpr vector_const_iterator() noexcept;
-    constexpr vector_const_iterator(vector_type const& vec, size_type curr, size_type upper);
+    constexpr vector_const_iterator(vector_type const& vec, index_type curr, index_type upper);
     constexpr vector_const_iterator(vector_const_iterator&&) noexcept = default;
     constexpr vector_const_iterator(vector_const_iterator const&) noexcept = default;
 
@@ -296,7 +296,7 @@ class vector_const_iterator
 
     constexpr const_pointer             operator ->() const;
     constexpr const_reference           operator  *() const;
-    constexpr const_reference           operator [](size_type n) const;
+    constexpr const_reference           operator [](index_type n) const;
 
     constexpr difference_type           operator -(vector_const_iterator const& p) const;
     constexpr vector_const_iterator     operator -(difference_type n) const;
@@ -323,12 +323,12 @@ class vector_const_iterator
 
   private:
     vector_type const*  mp_vector;
-    size_type           m_curr;
-    size_type           m_upper;
+    index_type           m_curr;
+    index_type           m_upper;
 
   private:
     constexpr vector_const_iterator(vector_type const& vec);
-    constexpr vector_const_iterator(vector_type const* vec, size_type curr, size_type upper);
+    constexpr vector_const_iterator(vector_type const* vec, index_type curr, index_type upper);
     constexpr vector_const_iterator(vector_iterator<VT> const& p);
 };
 
@@ -343,12 +343,12 @@ template<class VT> constexpr
 vector_const_iterator<VT>::vector_const_iterator(vector_type const& vec)
 :   mp_vector(&vec)
 ,   m_curr(0)
-,   m_upper(static_cast<size_type>(vec.size()))
+,   m_upper(static_cast<index_type>(vec.size()))
 {}
 
 template<class VT> constexpr
 vector_const_iterator<VT>::vector_const_iterator
-(vector_type const& vec, size_type curr, size_type upper)
+(vector_type const& vec, index_type curr, index_type upper)
 :   mp_vector(&vec)
 ,   m_curr(curr)
 ,   m_upper(upper)
@@ -356,7 +356,7 @@ vector_const_iterator<VT>::vector_const_iterator
 
 template<class VT> constexpr
 vector_const_iterator<VT>::vector_const_iterator
-(vector_type const* p_eng, size_type curr, size_type upper)
+(vector_type const* p_eng, index_type curr, index_type upper)
 :   mp_vector(p_eng)
 ,   m_curr(curr)
 ,   m_upper(upper)
@@ -385,7 +385,7 @@ vector_const_iterator<VT>::operator *() const
 
 template<class VT> constexpr
 typename vector_const_iterator<VT>::reference
-vector_const_iterator<VT>::operator [](size_type n) const
+vector_const_iterator<VT>::operator [](index_type n) const
 {
     return (*mp_vector)(m_curr + n);
 }

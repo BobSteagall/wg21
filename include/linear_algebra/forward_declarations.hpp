@@ -37,8 +37,8 @@ template<class T, class AT = allocator<T>>  class dr_matrix_engine;
 
 //- Owning engines with fixed-size internal storage.
 //
-template<class T, size_t N>             class fs_vector_engine;
-template<class T, size_t R, size_t C>   class fs_matrix_engine;
+template<class T, ptrdiff_t N>              class fs_vector_engine;
+template<class T, ptrdiff_t R, ptrdiff_t C> class fs_matrix_engine;
 
 //- Non-owning, view-style engines (NOEs).
 //
@@ -90,10 +90,10 @@ using dyn_matrix = matrix<dr_matrix_engine<T, A>>;
 
 //- Aliases for vector and matrix objects based on fixed-size engines.
 //
-template<class T, size_t N>
+template<class T, ptrdiff_t N>
 using fs_vector = vector<fs_vector_engine<T, N>>;
 
-template<class T, size_t R, size_t C>
+template<class T, ptrdiff_t R, ptrdiff_t C>
 using fs_matrix = matrix<fs_matrix_engine<T, R, C>>;
 
 
@@ -127,70 +127,70 @@ template<class T1, class T2>    struct matrix_operation_traits_selector;
 //- Addition operators
 //
 template<class ET1, class OT1, class ET2, class OT2>
-auto  operator +(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
+constexpr auto  operator +(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
 
 template<class ET1, class OT1, class ET2, class OT2>
-auto  operator +(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
+constexpr auto  operator +(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
 
 //- Subtraction operators
 //
 template<class ET1, class OT1, class ET2, class OT2>
-auto  operator -(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
+constexpr auto  operator -(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
 
 template<class ET1, class OT1, class ET2, class OT2>
-auto  operator -(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
+constexpr auto  operator -(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
 
 //- Negation operators
 //
 template<class ET1, class OT1>
-auto  operator -(vector<ET1, OT1> const& v1);
+constexpr auto  operator -(vector<ET1, OT1> const& v1);
 
 template<class ET1, class OT1, class ET2, class OT2>
-auto  operator -(matrix<ET1, OT1> const& m1);
+constexpr auto  operator -(matrix<ET1, OT1> const& m1);
 
 //- Vector*Scalar multiplication operators
 //
 template<class ET1, class OT1, class S2>
-auto  operator *(vector<ET1, OT1> const& v1, S2 const& s2);
+constexpr auto  operator *(vector<ET1, OT1> const& v1, S2 const& s2);
 
 template<class S1, class ET2, class OT2>
-auto    operator *(S1 const& s1, vector<ET2, OT2> const& v2);
+constexpr auto    operator *(S1 const& s1, vector<ET2, OT2> const& v2);
 
 //- Matrix*Scalar multiplication operators
 //
 template<class ET1, class OT1, class S2>
-auto  operator *(matrix<ET1, OT1> const& m1, S2 const& s2);
+constexpr auto  operator *(matrix<ET1, OT1> const& m1, S2 const& s2);
 
 template<class S1, class ET2, class OT2>
-auto  operator *(S1 const& s1, matrix<ET2, OT2> const& m2);
+constexpr auto  operator *(S1 const& s1, matrix<ET2, OT2> const& m2);
 
 //- Vector*Matrix multiplication operators
 //
 template<class ET1, class OT1, class ET2, class OT2>
-auto  operator *(vector<ET1, OT1> const& v1, matrix<ET2, OT2> const& m2);
+constexpr auto  operator *(vector<ET1, OT1> const& v1, matrix<ET2, OT2> const& m2);
 
 //- Matrix*Vector multiplication operators
 //
 template<class ET1, class OT1, class ET2, class OT2>
-auto  operator *(matrix<ET1, OT1> const& m1, vector<ET2, OT2> const& v2);
+constexpr auto  operator *(matrix<ET1, OT1> const& m1, vector<ET2, OT2> const& v2);
 
 //- Vector*Vector multiplication operators
 //
 template<class ET1, class OT1, class ET2, class OT2>
-auto  operator *(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
+constexpr auto  operator *(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
 
 //- Matrix*Matrix multiplication operators
 //
 template<class ET1, class OT1, class ET2, class OT2>
-auto  operator *(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
+constexpr auto  operator *(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
 
 //- Other functions.
 //
 template<class ET1, class OT1, class ET2, class OT2>
-auto  inner_product(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
+constexpr auto  inner_product(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
 
 template<class ET1, class OT1, class ET2, class OT2>
-auto  outer_product(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
+constexpr auto  outer_product(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_FORWARD_DECLARATIONS_HPP_DEFINED

@@ -2,7 +2,7 @@
 //  File:       operation_traits.hpp
 //
 //  Summary:    This header defines library's default operation traits type and a customization
-//              point that is specialize-able by users.
+//              point that is specializable by users.
 //
 //              Class matrix_operation_traits provides a set of nested type aliases which, in
 //              turn, provide for element promotion, engine promotion, and computation for the

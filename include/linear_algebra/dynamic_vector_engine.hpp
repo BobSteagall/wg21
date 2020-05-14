@@ -29,12 +29,9 @@ class dr_vector_engine
     using reference       = element_type&;
     using const_reference = element_type const&;
     using difference_type = ptrdiff_t;
-    using size_type       = size_t;
-
-#ifdef LA_USE_MDSPAN
+    using index_type      = ptrdiff_t;
     using span_type       = mdspan<element_type, dynamic_extent>;
     using const_span_type = mdspan<element_type const, dynamic_extent>;
-#endif
 
     //- Construct/copy/destroy
     //
@@ -43,8 +40,8 @@ class dr_vector_engine
     dr_vector_engine();
     dr_vector_engine(dr_vector_engine&& rhs) noexcept;
     dr_vector_engine(dr_vector_engine const& rhs);
-    dr_vector_engine(size_type elems);
-    dr_vector_engine(size_type elems, size_type elem_cap);
+    dr_vector_engine(index_type elems);
+    dr_vector_engine(index_type elems, index_type elem_cap);
     template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T> = true>
     dr_vector_engine(ET2 const& rhs);
     template<class T2, detail::enable_if_convertible_element<T2,T> = true>
@@ -59,44 +56,43 @@ class dr_vector_engine
 
     //- Capacity
     //
-    size_type       capacity() const noexcept;
-    size_type       size() const noexcept;
-    void            reserve(size_type cap);
-    void            resize(size_type elems);
-    void            resize(size_type elems, size_type cap);
+    index_type  capacity() const noexcept;
+    index_type  size() const noexcept;
+
+    void        reserve(index_type cap);
+    void        resize(index_type elems);
+    void        resize(index_type elems, index_type cap);
 
     //- Element access
     //
-    reference       operator ()(size_type i);
-    const_reference operator ()(size_type i) const;
+    reference       operator ()(index_type i);
+    const_reference operator ()(index_type i) const;
 
     //- Data access
     //
-#ifdef LA_USE_MDSPAN
     span_type       span() noexcept;
     const_span_type span() const noexcept;
-#endif
 
     //- Modifiers
     //
     void    swap(dr_vector_engine& rhs) noexcept;
-    void    swap_elements(size_type i, size_type j) noexcept;
+    void    swap_elements(index_type i, index_type j) noexcept;
 
   private:
     pointer         mp_elems;
-    size_type       m_elems;
-    size_type       m_elemcap;
+    index_type      m_elems;
+    index_type      m_elemcap;
     allocator_type  m_alloc;
 
-    void    alloc_new(size_type elems, size_type cap);
+    void    alloc_new(index_type elems, index_type cap);
     void    assign(dr_vector_engine const& rhs);
     template<class ET2>
     void    assign(ET2 const& rhs);
     template<class T2>
     void    assign(initializer_list<T2> rhs);
-    void    check_capacity(size_type cap);
-    void    check_size(size_type elems);
-    void    reshape(size_type elems, size_type cap);
+    void    check_capacity(index_type cap);
+    void    check_size(index_type elems);
+    void    reshape(index_type elems, index_type cap);
 };
 
 //------------------------
@@ -131,14 +127,14 @@ dr_vector_engine<T,AT>::dr_vector_engine(dr_vector_engine const& rhs)
 }
 
 template<class T, class AT> inline
-dr_vector_engine<T,AT>::dr_vector_engine(size_type elems)
+dr_vector_engine<T,AT>::dr_vector_engine(index_type elems)
 :   dr_vector_engine()
 {
     alloc_new(elems, elems);
 }
 
 template<class T, class AT> inline
-dr_vector_engine<T,AT>::dr_vector_engine(size_type elems, size_type cap)
+dr_vector_engine<T,AT>::dr_vector_engine(index_type elems, index_type cap)
 :   dr_vector_engine()
 {
     alloc_new(elems, cap);
@@ -200,14 +196,14 @@ dr_vector_engine<T,AT>::operator =(initializer_list<T2> rhs)
 //- Capacity
 //
 template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::size_type
+typename dr_vector_engine<T,AT>::index_type
 dr_vector_engine<T,AT>::capacity() const noexcept
 {
     return m_elemcap;
 }
 
 template<class T, class AT> inline
-typename dr_vector_engine<T,AT>::size_type
+typename dr_vector_engine<T,AT>::index_type
 dr_vector_engine<T,AT>::size() const noexcept
 {
     return m_elems;
@@ -215,21 +211,21 @@ dr_vector_engine<T,AT>::size() const noexcept
 
 template<class T, class AT> inline
 void
-dr_vector_engine<T,AT>::reserve(size_type cap)
+dr_vector_engine<T,AT>::reserve(index_type cap)
 {
     reshape(m_elems, cap);
 }
 
 template<class T, class AT> inline
 void
-dr_vector_engine<T,AT>::resize(size_type elems)
+dr_vector_engine<T,AT>::resize(index_type elems)
 {
     reshape(elems, m_elemcap);
 }
 
 template<class T, class AT> inline
 void
-dr_vector_engine<T,AT>::resize(size_type elems, size_type cap)
+dr_vector_engine<T,AT>::resize(index_type elems, index_type cap)
 {
     reshape(elems, cap);
 }
@@ -239,14 +235,14 @@ dr_vector_engine<T,AT>::resize(size_type elems, size_type cap)
 //
 template<class T, class AT> inline
 typename dr_vector_engine<T,AT>::reference
-dr_vector_engine<T,AT>::operator ()(size_type i)
+dr_vector_engine<T,AT>::operator ()(index_type i)
 {
     return mp_elems[i];
 }
 
 template<class T, class AT> inline
 typename dr_vector_engine<T,AT>::const_reference
-dr_vector_engine<T,AT>::operator ()(size_type i) const
+dr_vector_engine<T,AT>::operator ()(index_type i) const
 {
     return mp_elems[i];
 }
@@ -254,8 +250,6 @@ dr_vector_engine<T,AT>::operator ()(size_type i) const
 //-------------
 //- Data access
 //
-#ifdef LA_USE_MDSPAN
-
 template<class T, class AT> inline
 typename dr_vector_engine<T,AT>::span_type
 dr_vector_engine<T,AT>::span() noexcept
@@ -272,7 +266,6 @@ dr_vector_engine<T,AT>::span() const noexcept
                            static_cast<ptrdiff_t>(m_elems));
 }
 
-#endif
 //-----------
 //- Modifiers
 //
@@ -290,7 +283,7 @@ dr_vector_engine<T,AT>::swap(dr_vector_engine& other) noexcept
 
 template<class T, class AT> inline
 void
-dr_vector_engine<T,AT>::swap_elements(size_type i, size_type j) noexcept
+dr_vector_engine<T,AT>::swap_elements(index_type i, index_type j) noexcept
 {
     detail::la_swap(mp_elems[i], mp_elems[j]);
 }
@@ -300,7 +293,7 @@ dr_vector_engine<T,AT>::swap_elements(size_type i, size_type j) noexcept
 //
 template<class T, class AT>
 void
-dr_vector_engine<T,AT>::alloc_new(size_type new_size, size_type new_cap)
+dr_vector_engine<T,AT>::alloc_new(index_type new_size, index_type new_cap)
 {
     check_size(new_size);
     check_capacity(new_cap);
@@ -317,8 +310,8 @@ dr_vector_engine<T,AT>::assign(dr_vector_engine const& rhs)
 {
     if (&rhs == this) return;
 
-    size_type   old_n = m_elemcap;
-    size_type   new_n = (size_type)(rhs.m_elemcap);
+    index_type   old_n = m_elemcap;
+    index_type   new_n = (index_type)(rhs.m_elemcap);
     pointer     p_tmp = detail::allocate(m_alloc, new_n, rhs.mp_elems);
 
     detail::deallocate(m_alloc, mp_elems, old_n);
@@ -334,7 +327,7 @@ dr_vector_engine<T,AT>::assign(ET2 const& rhs)
 {
     static_assert(is_vector_engine_v<ET2>);
 
-    dr_vector_engine    tmp(static_cast<size_type>(rhs.size()));
+    dr_vector_engine    tmp(static_cast<index_type>(rhs.size()));
 
     detail::assign_from_vector_engine(tmp, rhs);
     tmp.swap(*this);
@@ -345,15 +338,15 @@ template<class T2>
 void
 dr_vector_engine<T,AT>::assign(initializer_list<T2> rhs)
 {
-    dr_vector_engine    tmp(static_cast<size_type>(rhs.size()));
+    dr_vector_engine    tmp(static_cast<index_type>(rhs.size()));
 
-    detail::assign_from_vector_list(tmp, rhs);
+    detail::assign_from_vector_initlist(tmp, rhs);
     tmp.swap(*this);
 }
 
 template<class T, class AT>
 void
-dr_vector_engine<T,AT>::check_capacity(size_type cap)
+dr_vector_engine<T,AT>::check_capacity(index_type cap)
 {
     if (cap < 0)
     {
@@ -363,7 +356,7 @@ dr_vector_engine<T,AT>::check_capacity(size_type cap)
 
 template<class T, class AT>
 void
-dr_vector_engine<T,AT>::check_size(size_type elems)
+dr_vector_engine<T,AT>::check_size(index_type elems)
 {
     if (elems < 1)
     {
@@ -373,14 +366,14 @@ dr_vector_engine<T,AT>::check_size(size_type elems)
 
 template<class T, class AT>
 void
-dr_vector_engine<T,AT>::reshape(size_type elems, size_type cap)
+dr_vector_engine<T,AT>::reshape(index_type elems, index_type cap)
 {
     if (elems > m_elemcap  ||  cap > m_elemcap)
     {
         dr_vector_engine    tmp(elems, cap);
-        size_type const     dst_elems = min(elems, m_elems);
+        index_type const     dst_elems = min(elems, m_elems);
 
-        for (size_type i = 0;  i < dst_elems;  ++i)
+        for (index_type i = 0;  i < dst_elems;  ++i)
         {
             tmp.mp_elems[i] = mp_elems[i];
         }

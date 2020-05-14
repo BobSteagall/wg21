@@ -154,39 +154,40 @@ struct engine_tag_traits<resizable_matrix_engine_tag>
 };
 
 
-//- These variable templates are used as a convenience to report important engine properties,
-//  using the engine_tag_traits type defined above.  They are used in the private implementation
-//  below, as well as by a corresponding set of public variable templates (is_*_engine_v<ET>).
+//- These private variable templates are used as a convenience to report important engine
+//  properties, using the engine_tag_traits type defined above.  They are used in the private
+//  implementation below, as well as by a corresponding set of public variable templates
+//  (i.e., is_*_engine_v<ET>).
 //
 template<class ET> inline constexpr
-bool    is_scalar_v = detail::engine_tag_traits<typename ET::engine_category>::is_scalar;
+bool    is_scalar_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_scalar;
 
 template<class ET> inline constexpr
-bool    is_vector_v = detail::engine_tag_traits<typename ET::engine_category>::is_vector;
+bool    is_vector_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_vector;
 
 template<class ET> inline constexpr
-bool    is_matrix_v = detail::engine_tag_traits<typename ET::engine_category>::is_matrix;
+bool    is_matrix_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_matrix;
 
 template<class ET> inline constexpr
-bool    is_readable_v = detail::engine_tag_traits<typename ET::engine_category>::is_readable;
+bool    is_readable_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_readable;
 
 template<class ET> inline constexpr
-bool    is_writable_v = detail::engine_tag_traits<typename ET::engine_category>::is_writable;
+bool    is_writable_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_writable;
 
 template<class ET> inline constexpr
-bool    is_initable_v = detail::engine_tag_traits<typename ET::engine_category>::is_initable;
+bool    is_initable_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_initable;
 
 template<class ET> inline constexpr
-bool    is_resizable_v = detail::engine_tag_traits<typename ET::engine_category>::is_resizable;
+bool    is_resizable_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_resizable;
 
 template<class ET1, class ET2> inline constexpr
-bool    engines_match_v = (is_matrix_v<ET1> && is_matrix_v<ET2>) ||
-                          (is_vector_v<ET1> && is_vector_v<ET2>) ||
-                          (is_scalar_v<ET1> && is_scalar_v<ET2>);
+bool    engines_match_v = (is_matrix_engine_v<ET1> && is_matrix_engine_v<ET2>) ||
+                          (is_vector_engine_v<ET1> && is_vector_engine_v<ET2>) ||
+                          (is_scalar_engine_v<ET1> && is_scalar_engine_v<ET2>);
 
 
-//- These alias templates are used by the vector and matrix class templates to enable/disable
-//  various parts of their public interfaces via SFINAE.
+//- These privatee alias templates are used by the vector and matrix class templates to
+//  enable/disable various parts of their public interfaces via SFINAE.
 //
 template<class T2, class T>
 using enable_if_convertible_element = enable_if_t<is_convertible_v<T2, T>, bool>;
@@ -200,21 +201,20 @@ using enable_if_convertible_engine =
         enable_if_t<is_convertible_v<typename ET2::element_type, typename ET::element_type>, bool>;
 
 template<class ET1, class ET2>
-using enable_if_writable = enable_if_t<is_same_v<ET1, ET2> && is_writable_v<ET1>, bool>;
+using enable_if_writable = enable_if_t<is_same_v<ET1, ET2> && is_writable_engine_v<ET1>, bool>;
 
 template<class ET1, class ET2, class U>
-using enable_if_initable = enable_if_t<is_same_v<ET1, ET2> && is_initable_v<ET1>  &&
+using enable_if_initable = enable_if_t<is_same_v<ET1, ET2> && is_initable_engine_v<ET1>  &&
                                        is_convertible_v<U, typename ET1::value_type>, bool>;
 
 template<class ET1, class ET2>
-using enable_if_resizable = enable_if_t<is_same_v<ET1, ET2> && is_resizable_v<ET1>, bool>;
+using enable_if_resizable = enable_if_t<is_same_v<ET1, ET2> && is_resizable_engine_v<ET1>, bool>;
 
 template<class ET1, class ET2, class U>
-using enable_if_init_list_ok = enable_if_t<is_same_v<ET1, ET2> && !is_resizable_v<ET1> &&
+using enable_if_init_list_ok = enable_if_t<is_same_v<ET1, ET2> && !is_resizable_engine_v<ET1> &&
                                            is_convertible_v<U, typename ET1::value_type>, bool>;
 
 
-#ifdef LA_USE_MDSPAN
 //==================================================================================================
 //  The following are several detection idiom traits types, regular traits types, and alias
 //  templates for determining the type aliases 'span_type' and 'const_span_type' that may be
@@ -344,7 +344,6 @@ template<class ET1, class ET2>
 using enable_if_spannable = enable_if_t<is_same_v<ET1, ET2> && has_span_type_v<ET1>, bool>;
 
 
-#endif
 //==================================================================================================
 //  This traits type chooses the correct tag for a non-owning engine (NOE), given the tag of the
 //  source engine type to be wrapped (ETT) and the desired tag type of the resulting non-owning
@@ -543,10 +542,8 @@ struct noe_traits
     using reference = conditional_t<is_writable, typename ET::reference, typename ET::const_reference>;
     using pointer   = conditional_t<is_writable, typename ET::pointer, typename ET::const_pointer>;
 
-#ifdef LA_USE_MDSPAN
     using span_type       = conditional_t<is_writable, engine_span_t<ET>, engine_const_span_t<ET>>;
     using const_span_type = engine_const_span_t<ET>;
-#endif
 };
 
 
@@ -564,19 +561,12 @@ using noe_reference_t = typename noe_traits<ET, NEWCAT>::reference;
 template<class ET, class NEWCAT>
 using noe_pointer_t = typename noe_traits<ET, NEWCAT>::pointer;
 
-
-#ifdef LA_USE_MDSPAN
-
 template<class ET, class NEWCAT>
 using noe_mdspan_t = typename noe_traits<ET, NEWCAT>::span_type;
 
 template<class ET, class NEWCAT>
 using noe_const_mdspan_t = typename noe_traits<ET, NEWCAT>::const_span_type;
 
-#endif
-
-
-#ifdef LA_USE_MDSPAN
 //==================================================================================================
 //  The following define a traits type and several associated facilities for determining an
 //  mdspan type on behalf of a non-owning engine.
@@ -735,7 +725,6 @@ make_dyn_span(T* pdata, ST rows, ST cols, ST row_stride, ST col_stride = 1u)
 }
 
 
-#endif
 //==================================================================================================
 //  This traits type is used for choosing between three alternative traits-type parameters.  It
 //  is used extensively in those sections of the private implementation where it is necessary to
@@ -771,7 +760,7 @@ struct non_void_traits_chooser<void, void, DEF>
 //  are also initialized; NB: this may or may not be what happens in the final version.
 //==================================================================================================
 //
-template<class AT>
+template<class AT> inline
 typename allocator_traits<AT>::pointer
 allocate(AT& alloc, size_t n)
 {
@@ -779,7 +768,7 @@ allocate(AT& alloc, size_t n)
 
     try
     {
-        uninitialized_value_construct_n(p_dst, n);
+        std::uninitialized_value_construct_n(p_dst, n);
     }
     catch (...)
     {
@@ -789,7 +778,7 @@ allocate(AT& alloc, size_t n)
     return p_dst;
 }
 
-template<class AT>
+template<class AT> inline
 typename allocator_traits<AT>::pointer
 allocate(AT& alloc, size_t n, typename allocator_traits<AT>::const_pointer p_src)
 {
@@ -797,7 +786,7 @@ allocate(AT& alloc, size_t n, typename allocator_traits<AT>::const_pointer p_src
 
     try
     {
-        uninitialized_copy_n(p_src, n, p_dst);
+        std::uninitialized_copy_n(p_src, n, p_dst);
     }
     catch (...)
     {
@@ -807,13 +796,13 @@ allocate(AT& alloc, size_t n, typename allocator_traits<AT>::const_pointer p_src
     return p_dst;
 }
 
-template<class AT>
+template<class AT> inline
 void
 deallocate(AT& alloc, typename allocator_traits<AT>::pointer p_dst, size_t n) noexcept
 {
     if (p_dst != nullptr)
     {
-        destroy_n(p_dst, n);
+        std::destroy_n(p_dst, n);
         allocator_traits<AT>::deallocate(alloc, p_dst, n);
     }
 }
@@ -830,7 +819,8 @@ using rebind_alloc_t = typename allocator_traits<A1>::template rebind_alloc<T1>;
 //==================================================================================================
 //
 template<class T> inline constexpr
-bool    is_movable_v = std::is_move_constructible_v<T> && std::is_move_assignable_v<T>;
+bool    is_movable_v = std::is_move_constructible_v<T> &&
+                       std::is_move_assignable_v<T>;
 
 template<class T> inline constexpr
 bool    is_nothrow_movable_v = std::is_nothrow_move_constructible_v<T> &&
@@ -854,7 +844,7 @@ la_swap(T& t0, T& t1) noexcept(is_nothrow_movable_v<T>)
 //      B. cause an exception to be thrown at run-time.
 //==================================================================================================
 //
-template<class ET, class ST> constexpr
+template<class ET, class ST> inline constexpr
 void
 check_source_engine_size(ET const& engine, ST elems)
 {
@@ -864,7 +854,7 @@ check_source_engine_size(ET const& engine, ST elems)
     }
 }
 
-template<class ET, class ST> constexpr
+template<class ET, class ST> inline constexpr
 void
 check_source_engine_size(ET const& engine, ST rows, ST cols)
 {
@@ -874,8 +864,7 @@ check_source_engine_size(ET const& engine, ST rows, ST cols)
     }
 }
 
-
-template<class T, class ST> constexpr
+template<class T, class ST> inline constexpr
 void
 check_source_init_list(initializer_list<T> list, ST elems)
 {
@@ -885,7 +874,7 @@ check_source_init_list(initializer_list<T> list, ST elems)
     }
 }
 
-template<class T> constexpr
+template<class T> inline constexpr
 void
 check_source_init_list(initializer_list<initializer_list<T>> list)
 {
@@ -900,7 +889,7 @@ check_source_init_list(initializer_list<initializer_list<T>> list)
     }
 }
 
-template<class T, class ST> constexpr
+template<class T, class ST> inline constexpr
 void
 check_source_init_list(initializer_list<initializer_list<T>> list, ST rows, ST cols)
 {
@@ -931,13 +920,17 @@ template<class ET1, class ET2> constexpr
 void
 assign_from_vector_engine(ET1& dst, ET2 const& src)
 {
-    typename ET1::size_type     di = 0;
-    typename ET2::size_type     si = 0;
-    typename ET2::size_type     ni = src.size();
+    using elem_type_dst  = typename ET1::element_type;
+    using index_type_dst = typename ET1::index_type;
+    using index_type_src = typename ET2::index_type;
+
+    index_type_dst  di = 0;
+    index_type_src  si = 0;
+    index_type_src  ni = src.size();
 
     for (;  si < ni;  ++di, ++si)
     {
-        dst(di) = static_cast<typename ET1::value_type>(src(si));
+        dst(di) = static_cast<elem_type_dst>(src(si));
     }
 }
 
@@ -945,60 +938,67 @@ template<class ET1, class ET2> constexpr
 void
 assign_from_matrix_engine(ET1& dst, ET2 const& src)
 {
-    typename ET1::size_type     di = 0;
-    typename ET1::size_type     dj = 0;
-    typename ET2::size_type     si = 0;
-    typename ET2::size_type     sj = 0;
-    typename ET2::size_type     ni = src.rows();
-    typename ET2::size_type     nj = src.columns();
+    using elem_type_dst  = typename ET1::element_type;
+    using index_type_dst = typename ET1::index_type;
+    using index_type_src = typename ET2::index_type;
 
-    for (;  si < ni;  ++di, ++si)
+    index_type_dst  di = 0;
+    index_type_src  si = 0;
+    index_type_src  rows = src.rows();
+    index_type_src  cols = src.columns();
+
+    for (; si < rows;  ++di, ++si)
     {
-        for (dj = 0, sj = 0;  sj < nj;  ++dj, ++sj)
+        index_type_dst  dj = 0;
+        index_type_src  sj = 0;
+
+        for (; sj < cols;  ++dj, ++sj)
         {
-            dst(di, dj) = static_cast<typename ET1::value_type>(src(si, sj));
+            dst(di, dj) = static_cast<elem_type_dst>(src(si, sj));
         }
     }
 }
 
 //------
 //
-template<class ET, class T> constexpr void
-assign_from_vector_list(ET& engine, initializer_list<T> rhs)
+template<class ET, class T> constexpr
+void
+assign_from_vector_initlist(ET& dst, initializer_list<T> src)
 {
-    using size_type = typename ET::size_type;
-    using dest_elem = typename ET::value_type;
-    using elem_iter = decltype(rhs.begin());
+    using elem_type_dst  = typename ET::element_type;
+    using index_type_dst = typename ET::index_type;
+    using elem_iter_src  = decltype(src.begin());
 
-    size_type   di = 0;
-    size_type   dn = engine.size();
-    elem_iter   ep = rhs.begin();
+    index_type_dst  di = 0;
+    index_type_dst  dn = dst.size();
+    elem_iter_src   ep = src.begin();
 
     for (;  di < dn;  ++di, ++ep)
     {
-        engine(di) = static_cast<dest_elem>(*ep);
+        dst(di) = static_cast<elem_type_dst>(*ep);
     }
 }
 
-template<class ET, class T> constexpr void
-assign_from_matrix_list(ET& engine, initializer_list<initializer_list<T>> rhs)
+template<class ET, class T> constexpr
+void
+assign_from_matrix_initlist(ET& engine, initializer_list<initializer_list<T>> rhs)
 {
-    using size_type = typename ET::size_type;
-    using dest_elem = typename ET::value_type;
-    using row_iter  = decltype(rhs.begin());
-    using col_iter  = decltype(rhs.begin()->begin());
+    using elem_type_dst  = typename ET::element_type;
+    using index_type_dst = typename ET::index_type;
+    using row_iter_src   = decltype(rhs.begin());
+    using col_iter_src   = decltype(rhs.begin()->begin());
 
-    size_type   di = 0;
-    row_iter    rp = rhs.begin();
+    index_type_dst  di = 0;
+    row_iter_src    rp = rhs.begin();
 
     for (;  di < engine.rows();  ++di, ++rp)
     {
-        size_type   dj = 0;
-        col_iter    cp = rp->begin();
+        index_type_dst  dj = 0;
+        col_iter_src    cp = rp->begin();
 
         for (;  dj < engine.columns();  ++dj, ++cp)
         {
-            engine(di, dj) = static_cast<dest_elem>(*cp);
+            engine(di, dj) = static_cast<elem_type_dst>(*cp);
         }
     }
 }
@@ -1012,16 +1012,16 @@ template<class ET1, class ET2> constexpr
 bool
 v_cmp_eq(ET1 const& lhs, ET2 const& rhs)
 {
-    using lhs_size = typename ET1::size_type;
-    using rhs_size = typename ET2::size_type;
+    using index_type_lhs = typename ET1::index_type;
+    using index_type_rhs = typename ET2::index_type;
 
-    lhs_size   i1 = 0;
-    lhs_size   n1 = lhs.size();
+    index_type_lhs  i1 = 0;
+    index_type_lhs  n1 = lhs.size();
 
-    rhs_size   i2 = 0;
-    rhs_size   n2 = rhs.size();
+    index_type_rhs  i2 = 0;
+    index_type_rhs  n2 = rhs.size();
 
-    if (n1 != static_cast<lhs_size>(n2)) return false;
+    if (n1 != static_cast<index_type_lhs>(n2)) return false;
 
     for (;  i1 < n1;  ++i1, ++i2)
     {
@@ -1036,12 +1036,12 @@ v_cmp_eq(ET const& lhs, initializer_list<U> rhs)
 {
     if (static_cast<size_t>(lhs.size()) != rhs.size()) return false;
 
-    using size_type = typename ET::size_type;
-    using elem_iter = decltype(rhs.begin());
+    using index_type_lhs = typename ET::index_type;
+    using elem_iter_rhs  = decltype(rhs.begin());
 
-    size_type   di = 0;
-    size_type   dn = lhs.size();
-    elem_iter   ep = rhs.begin();
+    index_type_lhs  di = 0;
+    index_type_lhs  dn = lhs.size();
+    elem_iter_rhs   ep = rhs.begin();
 
     for (;  di < dn;  ++di, ++ep)
     {
@@ -1050,22 +1050,20 @@ v_cmp_eq(ET const& lhs, initializer_list<U> rhs)
     return true;
 }
 
-#ifdef LA_USE_MDSPAN
-
 template<class ET, class T, ptrdiff_t X0, class L, class A> constexpr
 bool
 v_cmp_eq(ET const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
 {
-    using lhs_size = typename ET::size_type;
-    using rhs_size = typename basic_mdspan<T, extents<X0>, L, A>::index_type;
+    using index_type_lhs = typename ET::index_type;
+    using index_type_rhs = typename basic_mdspan<T, extents<X0>, L, A>::index_type;
 
-    lhs_size    i1 = 0;
-    lhs_size    e1 = lhs.size();
+    index_type_lhs  i1 = 0;
+    index_type_lhs  e1 = lhs.size();
 
-    rhs_size    i2 = 0;
-    rhs_size    e2 = rhs.extent(0);
+    index_type_rhs  i2 = 0;
+    index_type_rhs  e2 = rhs.extent(0);
 
-    if (e1 != static_cast<lhs_size>(e2)) return false;
+    if (e1 != static_cast<index_type_lhs>(e2)) return false;
 
     for (;  i1 < e1;  ++i1, ++i2)
     {
@@ -1074,33 +1072,35 @@ v_cmp_eq(ET const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
     return true;
 }
 
-#endif
+
 //==================================================================================================
-//  These helper functions are used to compare the contents of vector engines with that of other
-//  vector engines, 1-D mdspans, and 1-D initializer lists.
+//  These helper functions are used to compare the contents of matrix engines with that of other
+//  matirx engines, 2-D mdspans, and 2-D initializer lists.
 //==================================================================================================
 //
 template<class ET1, class ET2> constexpr
 bool
 m_cmp_eq(ET1 const& lhs, ET2 const& rhs)
 {
-    using lhs_size = typename ET1::size_type;
-    using rhs_size = typename ET2::size_type;
+    using index_type_lhs = typename ET1::index_type;
+    using index_type_rhs = typename ET2::index_type;
 
-    lhs_size    i1 = 0;
-    lhs_size    j1 = 0;
-    lhs_size    r1 = lhs.rows();
-    lhs_size    c1 = lhs.columns();
+    index_type_lhs  r1 = lhs.rows();
+    index_type_lhs  c1 = lhs.columns();
+    index_type_rhs  r2 = rhs.rows();
+    index_type_rhs  c2 = rhs.columns();
 
-    rhs_size    i2 = 0;
-    rhs_size    j2 = 0;
-    rhs_size    r2 = rhs.rows();
-    rhs_size    c2 = rhs.columns();
+    if (r1 != static_cast<index_type_lhs>(r2)  ||  c1 != static_cast<index_type_lhs>(c2))
+        return false;
 
-    if (r1 != static_cast<lhs_size>(r2)  ||  c1 != static_cast<lhs_size>(c2)) return false;
+    index_type_lhs  i1 = 0;
+    index_type_rhs  i2 = 0;
 
     for (;  i1 < r1;  ++i1, ++i2)
     {
+        index_type_lhs  j1 = 0;
+        index_type_rhs  j2 = 0;
+
         for (;  j1 < c1;  ++j1, ++j2)
         {
             if (lhs(i1, j1) != rhs(i2, j2)) return false;
@@ -1126,19 +1126,19 @@ m_cmp_eq(ET const& lhs, initializer_list<initializer_list<U>> rhs)
     if (static_cast<size_t>(lhs.rows()) != rhs.size()) return false;
     if (static_cast<size_t>(lhs.columns()) != first_row_size) return false;
 
-    using size_type = typename ET::size_type;
-    using row_iter  = decltype(rhs.begin());
-    using col_iter  = decltype(rhs.begin()->begin());
+    using index_type_lhs = typename ET::index_type;
+    using row_iter_rhs   = decltype(rhs.begin());
+    using col_iter_rhs   = decltype(rhs.begin()->begin());
 
-    size_type   ei = 0;
-    size_type   er = lhs.rows();
-    size_type   ec = lhs.columns();
-    row_iter    rp = rhs.begin();
+    index_type_lhs  ei = 0;
+    index_type_lhs  er = lhs.rows();
+    index_type_lhs  ec = lhs.columns();
+    row_iter_rhs    rp = rhs.begin();
 
     for (;  ei < er;  ++ei, ++rp)
     {
-        size_type   ej = 0;
-        col_iter    cp = rp->begin();
+        index_type_lhs  ej = 0;
+        col_iter_rhs    cp = rp->begin();
 
         for (;  ej < ec;  ++ej, ++cp)
         {
@@ -1148,29 +1148,29 @@ m_cmp_eq(ET const& lhs, initializer_list<initializer_list<U>> rhs)
     return true;
 }
 
-#ifdef LA_USE_MDSPAN
-
 template<class ET, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
 bool
 m_cmp_eq(ET const& lhs, basic_mdspan<T, extents<X0, X1>, L, A> const& rhs)
 {
-    using lhs_size = typename ET::size_type;
-    using rhs_size = typename basic_mdspan<T, extents<X0, X1>, L, A>::index_type;
+    using index_type_lhs = typename ET::index_type;
+    using index_type_rhs = typename basic_mdspan<T, extents<X0, X1>, L, A>::index_type;
 
-    lhs_size    i1 = 0;
-    lhs_size    j1 = 0;
-    lhs_size    r1 = lhs.rows();
-    lhs_size    c1 = lhs.columns();
+    index_type_lhs  r1 = lhs.rows();
+    index_type_lhs  c1 = lhs.columns();
+    index_type_rhs  r2 = rhs.extent(0);
+    index_type_rhs  c2 = rhs.extent(1);
 
-    rhs_size    i2 = 0;
-    rhs_size    j2 = 0;
-    rhs_size    r2 = rhs.extent(0);
-    rhs_size    c2 = rhs.extent(1);
+    if (r1 != static_cast<index_type_lhs>(r2)  ||  c1 != static_cast<index_type_lhs>(c2))
+        return false;
 
-    if (r1 != static_cast<lhs_size>(r2)  ||  c1 != static_cast<lhs_size>(c2)) return false;
+    index_type_lhs  i1 = 0;
+    index_type_rhs  i2 = 0;
 
     for (;  i1 < r1;  ++i1, ++i2)
     {
+        index_type_lhs  j1 = 0;
+        index_type_rhs  j2 = 0;
+
         for (;  j1 < c1;  ++j1, ++j2)
         {
             if (lhs(i1, j1) != rhs(i2, j2)) return false;
@@ -1178,8 +1178,6 @@ m_cmp_eq(ET const& lhs, basic_mdspan<T, extents<X0, X1>, L, A> const& rhs)
     }
     return true;
 }
-
-#endif
 
 }       //- detail namespace
 }       //- STD_LA namespace
