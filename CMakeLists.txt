@@ -21,6 +21,8 @@ include(GNUInstallDirs)
 include(CMakeDependentOption)
 include(CMakePackageConfigHelpers)
 
+option(LA_BUILD_USING_PCH "Build using precompiled headers" OFF)
+option(LA_VERBOSE_TEST_OUTPUT "Write verbose test results" OFF)
 option(LA_BUILD_PACKAGE "Build package files" ON)
 option(LA_ENABLE_SANITIZERS "Enable Address Sanitizer and Undefined Behaviour Sanitizer if available" OFF)
 cmake_dependent_option(LA_INSTALL "Install WG Linear Algebra library" ON "LA_IS_PRIMARY_PROJECT" OFF)
@@ -32,7 +34,7 @@ option(MDSPAN_ENABLE_CONCEPTS "" OFF)
 FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git)
 FetchContent_MakeAvailable(mdspan)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
 
@@ -88,7 +90,7 @@ target_sources(wg21_linear_algebra
 
 target_compile_features(wg21_linear_algebra
     INTERFACE
-        cxx_std_17
+        cxx_std_20
 )
 
 target_compile_definitions(wg21_linear_algebra
@@ -103,7 +105,7 @@ target_link_libraries(wg21_linear_algebra
 
 add_library(wg21_linear_algebra::wg21_linear_algebra ALIAS wg21_linear_algebra)
 
-message("VAR la_enable_tests is: " ${LA_ENABLE_TESTS})
+# message("VAR la_enable_tests is: " ${LA_ENABLE_TESTS})
 
 if (${LA_ENABLE_TESTS})
     add_subdirectory(tests)
@@ -185,7 +187,7 @@ if (${LA_INSTALL})
 
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Bob Steagall")
 
-    list(APPEND CPACK_SOURCE_IGNORE_FILES /.git/ /build/ .gitignore .DS_Store)
+    list(APPEND CPACK_SOURCE_IGNORE_FILES /.git/ /build*/ .gitignore .DS_Store)
 
     include(CPack)
 endif()

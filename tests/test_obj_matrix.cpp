@@ -478,9 +478,9 @@ using fsm_float_35_tst = matrix<fs_matrix_engine<float, 3, 5>, op_traits_tst>;
 void
 TestGroup00()
 {
-    constexpr double x = t002();
-    constexpr int    i = t003X();
-    int j = t003Y();
+    constexpr double    x = t002();
+    constexpr int       i = t003X();
+    t003Y();
 
 //    auto v = STD_LA::fs_vector<double, 3>{};
 //    auto u = STD_LA::fs_vector<long double, 3>{v};

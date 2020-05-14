@@ -11,12 +11,14 @@ if(NOT gtest_POPULATED)
     add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
 endif()
 
-target_precompile_headers(la_test
-    PRIVATE
-        <linear_algebra.hpp>
-        <gtest/gtest.h>
-        <cassert>
-)
+if(LA_BUILD_USING_PCH)
+    target_precompile_headers(la_test
+        PRIVATE
+            <linear_algebra.hpp>
+            <gtest/gtest.h>
+            <cassert>
+    )
+endif()
 
 target_sources(la_test
     PRIVATE
@@ -41,7 +43,6 @@ target_link_libraries(la_test
         wg21_linear_algebra
         gtest_main
         gtest
-        pthread
 )
 
 
@@ -88,4 +89,9 @@ endif(LA_ENABLE_SANITIZERS)
 
 enable_testing()
 include(GoogleTest)
-gtest_discover_tests(la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DISCOVERY_TIMEOUT 30)
+
+if (LA_VERBOSE_TEST_OUTPUT)
+    gtest_discover_tests(la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DISCOVERY_TIMEOUT 30)
+else()
+    add_test(NAME la_test COMMAND la_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+endif()
