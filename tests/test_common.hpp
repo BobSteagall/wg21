@@ -1,13 +1,14 @@
 #ifndef LA_TEST_COMMON_HPP_DEFINED
 #define LA_TEST_COMMON_HPP_DEFINED
 
+#include "linear_algebra.hpp"
+
 #include <iostream>
 #include <iomanip>
 #include <string_view>
 
 #include <gtest/gtest.h>
 
-#include "linear_algebra.hpp"
 #include "test_new_number.hpp"
 #include "test_new_engine.hpp"
 #include "test_new_arithmetic.hpp"
