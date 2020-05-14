@@ -166,8 +166,10 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)extsrc/mdspan/include;$(SolutionDir)Include</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>linear_algebra.hpp;gtest/gtest.h</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals/mdspan/include;$(SolutionDir)Include</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -181,8 +183,10 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)extsrc/mdspan/include;$(SolutionDir)Include</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>linear_algebra.hpp;gtest/gtest.h</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals/mdspan/include;$(SolutionDir)Include</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -198,8 +202,10 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)extsrc/mdspan/include;$(SolutionDir)Include</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>linear_algebra.hpp;gtest/gtest.h</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals/mdspan/include;$(SolutionDir)Include</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -217,8 +223,10 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)extsrc/mdspan/include;$(SolutionDir)Include</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>linear_algebra.hpp;gtest/gtest.h</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals/mdspan/include;$(SolutionDir)Include</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
