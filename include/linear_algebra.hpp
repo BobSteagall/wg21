@@ -20,7 +20,8 @@
 //#define STD_LA      std::experimental::math
 //#define USING_STD   using namespace std::experimental;
 
-#include <version>
+#include <version>  //- Included first due to possible libc++ bug on Xcode 10/11
+
 #include <cstdint>
 #include <array>
 #include <complex>

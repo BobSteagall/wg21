@@ -1,6 +1,8 @@
 #ifndef LA_TEST_COMMON_HPP_DEFINED
 #define LA_TEST_COMMON_HPP_DEFINED
 
+#include <version>  //- Included first due to possible libc++ bug on Xcode 10/11
+
 #include <iostream>
 #include <iomanip>
 #include <string_view>
