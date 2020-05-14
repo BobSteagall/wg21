@@ -93,10 +93,10 @@ target_compile_features(wg21_linear_algebra
         cxx_std_20
 )
 
-target_compile_definitions(wg21_linear_algebra
-    INTERFACE
-        LA_USE_MDSPAN
-)
+#target_compile_definitions(wg21_linear_algebra
+#    INTERFACE
+#        LA_USE_MDSPAN
+#)
 
 target_link_libraries(wg21_linear_algebra
     INTERFACE
