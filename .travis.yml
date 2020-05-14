@@ -5,6 +5,8 @@ env:
     - CONAN_PRINT_RUN_COMMANDS=1
     - CONAN_UPLOAD_ONLY_WHEN_STABLE=0
     - CONAN_RUN_TESTS=1
+    - LA_ENABLE_TESTS=ON
+    - BUILD_TESTING=ON
 
 linux: &linux
   os: linux
