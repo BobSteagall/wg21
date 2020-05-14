@@ -42,7 +42,7 @@ class LinearAlgebraConan(ConanFile):
     def run_tests(self):
         """ By default tests should not be built and run during package creation. It can optionally be enabled,
             for example for on CI by enabling setting the environment variable CONAN_RUN_TESTS=1. """
-        return tools.get_env("CONAN_RUN_TESTS", False)
+        return tools.get_env("CONAN_RUN_TESTS", True) # False)
 
     def build(self):
         self.cmake.build()
