@@ -20,7 +20,9 @@
 //#define STD_LA      std::experimental::math
 //#define USING_STD   using namespace std::experimental;
 
-#include <version>
+#if __has_include(<version>)
+#  include <version>
+#endif
 #include <cstdint>
 #include <array>
 #include <complex>
