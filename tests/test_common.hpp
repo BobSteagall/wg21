@@ -1,7 +1,9 @@
 #ifndef LA_TEST_COMMON_HPP_DEFINED
 #define LA_TEST_COMMON_HPP_DEFINED
 
-#include "linear_algebra.hpp"
+#if __has_include(<version>)
+    #include <version>      //- Included first due to possible libc++ bug on Xcode 11
+#endif
 
 #include <iostream>
 #include <iomanip>
@@ -9,6 +11,7 @@
 
 #include <gtest/gtest.h>
 
+#include "linear_algebra.hpp"
 #include "test_new_number.hpp"
 #include "test_new_engine.hpp"
 #include "test_new_arithmetic.hpp"
