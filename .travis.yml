@@ -28,14 +28,13 @@ matrix:
       - <<: *linux
         env: CONAN_GCC_VERSIONS=9 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/gcc9
       - <<: *linux
-        env: CONAN_CLANG_VERSIONS=7.0 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/clang7
+        env: CONAN_GCC_VERSIONS=10 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/gcc10
       - <<: *linux
         env: CONAN_CLANG_VERSIONS=8 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/clang8
       - <<: *linux
         env: CONAN_CLANG_VERSIONS=9 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/clang9
-      - <<: *osx
-        osx_image: xcode10.3
-        env: CONAN_APPLE_CLANG_VERSIONS=10.0
+      - <<: *linux
+        env: CONAN_CLANG_VERSIONS=10 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/clang10
       - <<: *osx
         osx_image: xcode11.4
         env: CONAN_APPLE_CLANG_VERSIONS=11.0
