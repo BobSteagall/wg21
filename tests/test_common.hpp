@@ -1,7 +1,9 @@
 #ifndef LA_TEST_COMMON_HPP_DEFINED
 #define LA_TEST_COMMON_HPP_DEFINED
 
-#include <version>  //- Included first due to possible libc++ bug on Xcode 10/11
+#if __has_include(<version>)
+    #include <version>      //- Included first due to possible libc++ bug on Xcode 11
+#endif
 
 #include <iostream>
 #include <iomanip>
