@@ -1,3 +1,4 @@
+//#define ENABLE_TYPE_PRINTING
 #include "test_common.hpp"
 
 //- A helper macro to assist in readability of test functions below.
@@ -299,10 +300,10 @@ void t303()
     static_assert(STD_LA::detail::has_element_neg_traits_v<test_neg_op_traits_tst, float>);
     static_assert(!STD_LA::detail::has_element_neg_traits_v<test_neg_op_traits_tst, double>);
 
-    using t00 = STD_LA::detail::element_neg_traits_t<test_neg_op_traits_tst, float>;
+    using t00 = STD_LA::detail::element_neg_result_t<test_neg_op_traits_tst, float>;
     PRINT_TYPE(t00);
 
-    using t01 = STD_LA::detail::element_neg_traits_t<test_neg_op_traits_tst, double>;
+    using t01 = STD_LA::detail::element_neg_result_t<test_neg_op_traits_tst, double>;
     PRINT_TYPE(t01);
 }
 
@@ -322,15 +323,11 @@ void t304()
     using drm_double_tst  = STD_LA::matrix<STD_LA::dr_matrix_engine<double, std::allocator<double>>, test_neg_op_traits_tst>;
     using drm_new_num_tst = STD_LA::matrix<STD_LA::dr_matrix_engine<new_num, std::allocator<new_num>>, test_neg_op_traits_tst>;
 
-    using t00 = STD_LA::detail::engine_neg_traits_t<test_neg_op_traits_tst, fs_matrix_engine_tst<float, 3, 4>>;
+    using t00 = STD_LA::detail::engine_neg_result_t<test_neg_op_traits_tst, fs_matrix_engine_tst<float, 3, 4>>;
     PRINT_TYPE(t00);
 
-    using t01 = typename t00::engine_type;
+    using t01 = STD_LA::detail::engine_neg_result_t<test_neg_op_traits_tst, STD_LA::fs_matrix_engine<new_num, 3, 4>>;
     PRINT_TYPE(t01);
-
-    using t02 = STD_LA::detail::engine_neg_traits_t<test_neg_op_traits_tst, STD_LA::fs_matrix_engine<new_num, 3, 4>>;
-    using t03 = typename t02::engine_type;
-    PRINT_TYPE(t03);
 
     ASSERT_NEG_A_EQ_B(fsm_float,        fsm_float);
     ASSERT_NEG_A_EQ_B(fsm_float_tst,    fsm_double_tst);

@@ -28,7 +28,7 @@ using STD_LA::detail::m_cmp_eq;
 
 struct dummy_type {};
 
-#if 1
+#ifndef ENABLE_TYPE_PRINTING
     #undef PRINT_TYPE
     #define PRINT_TYPE(...)
 #endif

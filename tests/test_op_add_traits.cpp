@@ -1,3 +1,4 @@
+//#define ENABLE_TYPE_PRINTING
 #include "test_common.hpp"
 
 //- A helper macro to assist in readability of test functions below.
@@ -426,10 +427,21 @@ struct engine_add_traits_tst<OT,
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
 };
 
-template<class OT, class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class T2, ptrdiff_t R2, ptrdiff_t C2>
 struct engine_add_traits_tst<OT,
                              STD_LA::fs_matrix_engine<T1, R1, C1>,
                              STD_LA::fs_matrix_engine<T2, R2, C2>>
+{
+    static_assert(R1 == R2);
+    static_assert(C1 == C2);
+    using element_type = STD_LA::matrix_addition_element_t<OT, T1, T2>;
+    using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
+};
+
+template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class T2, size_t R2, size_t C2>
+struct engine_add_traits_tst<OT,
+                             STD_LA::fs_matrix_engine<T1, R1, C1>,
+                             fs_matrix_engine_tst<T2, R2, C2>>
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
@@ -495,10 +507,10 @@ void t103()
     static_assert(!STD_LA::detail::has_element_add_traits_v<test_add_op_traits_tst, float, double>);
     static_assert(!STD_LA::detail::has_element_add_traits_v<test_add_op_traits_tst, double, float>);
 
-    using t00 = STD_LA::detail::element_add_traits_t<test_add_op_traits_tst, float, float>;
+    using t00 = STD_LA::detail::element_add_result_t<test_add_op_traits_tst, float, float>;
     PRINT_TYPE(t00);
 
-    using t01 = STD_LA::detail::element_add_traits_t<test_add_op_traits_tst, float, double>;
+    using t01 = STD_LA::detail::element_add_result_t<test_add_op_traits_tst, float, double>;
     PRINT_TYPE(t01);
 }
 
@@ -518,22 +530,18 @@ void t104()
     using drm_double_tst  = STD_LA::matrix<STD_LA::dr_matrix_engine<double, std::allocator<double>>, test_add_op_traits_tst>;
     using drm_new_num_tst = STD_LA::matrix<STD_LA::dr_matrix_engine<new_num, std::allocator<new_num>>, test_add_op_traits_tst>;
 
-    using t00 = STD_LA::detail::engine_add_traits_t<test_add_op_traits_tst,
+    using t00 = STD_LA::detail::engine_add_result_t<test_add_op_traits_tst,
                                                     fs_matrix_engine_tst<float, 3, 4>,
                                                     fs_matrix_engine_tst<float, 3, 4>>;
     PRINT_TYPE(t00);
 
-    using t01 = typename t00::engine_type;
+    using t01 = STD_LA::detail::engine_add_result_t<test_add_op_traits_tst,
+                                                    STD_LA::fs_matrix_engine<float, 3, 4>,
+                                                    fs_matrix_engine_tst<float, 3, 4>>;
     PRINT_TYPE(t01);
 
-    using t02 = STD_LA::detail::engine_add_traits_t<test_add_op_traits_tst,
-                                                    STD_LA::fs_matrix_engine<new_num, 3, 4>,
-                                                    fs_matrix_engine_tst<float, 3, 4>>;
-    using t03 = typename t02::engine_type;
-    PRINT_TYPE(t03);
-
     ASSERT_A_ADD_B_EQ_C(fsm_float,      fsm_float,      fsm_float);
-    ASSERT_A_ADD_B_EQ_C(fsm_float,      fsm_float_tst,  drm_double_tst);
+    ASSERT_A_ADD_B_EQ_C(fsm_float,      fsm_float_tst,  fsm_double_tst);
     ASSERT_A_ADD_B_EQ_C(fsm_float_tst,  fsm_float,      drm_double_tst);
     ASSERT_A_ADD_B_EQ_C(fsm_float_tst,  fsm_float_tst,  fsm_double_tst);
 
