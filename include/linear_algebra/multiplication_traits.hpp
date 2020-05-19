@@ -23,28 +23,28 @@ namespace detail {
 //                         **** ELEMENT MULTIPLICATION TRAITS DETECTORS ****
 //==================================================================================================
 //
-//- Form 1 type detection of nested element multiplication traits.
+//- Form 0 type detection of nested element multiplication traits.
 //
 template<typename OT>
-using element_mul_traits_f1_t = typename OT::element_multiplication_traits;
+using element_mul_traits_f0_t = typename OT::element_multiplication_traits;
 
 template<typename OT>
-using element_mul_type_f1_t = typename element_mul_traits_f1_t<OT>::element_type;
+using element_mul_result_f0_t = typename element_mul_traits_f0_t<OT>::element_type;
 
-//- Define the form 1 detectors.
+//- Define the form 0 detectors.
 //
 template<typename OT, typename = void>
-struct detect_element_mul_traits_f1
+struct detect_element_mul_traits_f0
 :   public false_type
 {
     using traits_type = void;
 };
 
 template<typename OT>
-struct detect_element_mul_traits_f1<OT, void_t<element_mul_type_f1_t<OT>>>
+struct detect_element_mul_traits_f0<OT, void_t<element_mul_result_f0_t<OT>>>
 :   public true_type
 {
-    using traits_type = element_mul_traits_f1_t<OT>;
+    using traits_type = element_mul_traits_f0_t<OT>;
 };
 
 //----------------------------------------------------------------
@@ -54,7 +54,7 @@ template<typename OT, typename T1, typename T2>
 using element_mul_traits_f2_t = typename OT::template element_multiplication_traits<T1, T2>;
 
 template<typename OT, typename T1, typename T2>
-using element_mul_type_f2_t = typename element_mul_traits_f2_t<OT, T1, T2>::element_type;
+using element_mul_result_f2_t = typename element_mul_traits_f2_t<OT, T1, T2>::element_type;
 
 //- Define the form 2 detectors.
 //
@@ -66,11 +66,17 @@ struct detect_element_mul_traits_f2
 };
 
 template<typename OT, typename T1, typename T2>
-struct detect_element_mul_traits_f2<OT, T1, T2, void_t<element_mul_type_f2_t<OT, T1, T2>>>
+struct detect_element_mul_traits_f2<OT, T1, T2, void_t<element_mul_result_f2_t<OT, T1, T2>>>
 :   public true_type
 {
     using traits_type = element_mul_traits_f2_t<OT, T1, T2>;
 };
+
+//- Used only for testing.
+//
+template<class OT, class T1, class T2>
+constexpr bool  has_element_mul_traits_v = detect_element_mul_traits_f2<OT, T1, T2>::value ||
+                                           detect_element_mul_traits_f0<OT>::value;
 
 //---------------------------------------------------
 //- Element multiplication traits type determination.
@@ -78,60 +84,44 @@ struct detect_element_mul_traits_f2<OT, T1, T2, void_t<element_mul_type_f2_t<OT,
 template<typename OT, typename T1, typename T2>
 struct element_mul_traits_chooser
 {
-    using CT1 = typename detect_element_mul_traits_f1<OT>::traits_type;
+    using CT1 = typename detect_element_mul_traits_f0<OT>::traits_type;
     using CT2 = typename detect_element_mul_traits_f2<OT, T1, T2>::traits_type;
     using DEF = matrix_multiplication_element_traits<T1, T2>;
 
     using traits_type = typename non_void_traits_chooser<CT1, CT2, DEF>::traits_type;
-};
-
-template<typename OT, typename T1, typename T2>
-using element_mul_traits_t = typename element_mul_traits_chooser<OT, T1, T2>::traits_type;
-
-template<class OT, class T1, class T2>
-constexpr bool  has_element_mul_traits_v = detect_element_mul_traits_f2<OT, T1, T2>::value ||
-                                           detect_element_mul_traits_f1<OT>::value;
-
-//---------------------------------------------------
-//- Element multiplication result type determination.
-//
-template<typename OT, typename T1, typename T2>
-struct element_mul_type
-{
-    using traits_type  = typename element_mul_traits_chooser<OT, T1, T2>::traits_type;
     using element_type = typename traits_type::element_type;
 };
 
 template<typename OT, typename T1, typename T2>
-using element_mul_type_t = typename element_mul_type<OT, T1, T2>::element_type;
+using element_mul_result_t = typename element_mul_traits_chooser<OT, T1, T2>::element_type;
 
 
 //==================================================================================================
 //                         **** ENGINE MULTIPLICATION TRAITS DETECTORS ****
 //==================================================================================================
 //
-//- Form 1 type detection of nested engine multiplication traits.
+//- Form 0 type detection of nested engine multiplication traits.
 //
 template<typename OT>
-using engine_mul_traits_f1_t = typename OT::engine_multiplication_traits;
+using engine_mul_traits_f0_t = typename OT::engine_multiplication_traits;
 
 template<typename OT>
-using engine_mul_type_f1_t = typename engine_mul_traits_f1_t<OT>::engine_type;
+using engine_mul_result_f0_t = typename engine_mul_traits_f0_t<OT>::engine_type;
 
-//- Define the form 1 detectors.
+//- Define the form 0 detectors.
 //
 template<typename OT, typename = void>
-struct detect_engine_mul_traits_f1
+struct detect_engine_mul_traits_f0
 :   public false_type
 {
     using traits_type = void;
 };
 
 template<typename OT>
-struct detect_engine_mul_traits_f1<OT, void_t<engine_mul_type_f1_t<OT>>>
+struct detect_engine_mul_traits_f0<OT, std::void_t<engine_mul_result_f0_t<OT>>>
 :   public true_type
 {
-    using traits_type = engine_mul_traits_f1_t<OT>;
+    using traits_type = engine_mul_traits_f0_t<OT>;
 };
 
 //---------------------------------------------------------------
@@ -141,7 +131,7 @@ template<typename OT, typename T1, typename T2>
 using engine_mul_traits_f2_t = typename OT::template engine_multiplication_traits<OT, T1, T2>;
 
 template<typename OT, typename T1, typename T2>
-using engine_mul_type_f2_t = typename engine_mul_traits_f2_t<OT, T1, T2>::engine_type;
+using engine_mul_result_f2_t = typename engine_mul_traits_f2_t<OT, T1, T2>::engine_type;
 
 //- Define the form 2 detectors.
 //
@@ -153,11 +143,17 @@ struct detect_engine_mul_traits_f2
 };
 
 template<typename OT, typename ET1, typename ET2>
-struct detect_engine_mul_traits_f2<OT, ET1, ET2, void_t<engine_mul_type_f2_t<OT, ET1, ET2>>>
+struct detect_engine_mul_traits_f2<OT, ET1, ET2, std::void_t<engine_mul_result_f2_t<OT, ET1, ET2>>>
 :   public true_type
 {
     using traits_type = engine_mul_traits_f2_t<OT, ET1, ET2>;
 };
+
+//- Used only for testing.
+//
+template<class OT, class ET1, class ET2>
+constexpr bool  has_engine_mul_traits_v = detect_engine_mul_traits_f2<OT, ET1, ET2>::value ||
+                                          detect_engine_mul_traits_f0<OT>::value;
 
 //--------------------------------------------------
 //- Engine multiplication traits type determination.
@@ -165,60 +161,44 @@ struct detect_engine_mul_traits_f2<OT, ET1, ET2, void_t<engine_mul_type_f2_t<OT,
 template<typename OT, typename ET1, typename ET2>
 struct engine_mul_traits_chooser
 {
-    using CT1 = typename detect_engine_mul_traits_f1<OT>::traits_type;
+    using CT1 = typename detect_engine_mul_traits_f0<OT>::traits_type;
     using CT2 = typename detect_engine_mul_traits_f2<OT, ET1, ET2>::traits_type;
     using DEF = matrix_multiplication_engine_traits<OT, ET1, ET2>;
 
     using traits_type = typename non_void_traits_chooser<CT1, CT2, DEF>::traits_type;
-};
-
-template<typename OT, typename ET1, typename ET2>
-using engine_mul_traits_t = typename engine_mul_traits_chooser<OT, ET1, ET2>::traits_type;
-
-template<class OT, class ET1, class ET2>
-constexpr bool  has_engine_mul_traits_v = detect_engine_mul_traits_f2<OT, ET1, ET2>::value ||
-                                          detect_engine_mul_traits_f1<OT>::value;
-
-//--------------------------------------------------
-//- Engine multiplication result type determination.
-//
-template<typename OT, typename ET1, typename ET2>
-struct engine_mul_type
-{
-    using traits_type = typename engine_mul_traits_chooser<OT, ET1, ET2>::traits_type;
     using engine_type = typename traits_type::engine_type;
 };
 
 template<typename OT, typename ET1, typename ET2>
-using engine_mul_type_t = typename engine_mul_type<OT, ET1, ET2>::engine_type;
+using engine_mul_result_t = typename engine_mul_traits_chooser<OT, ET1, ET2>::engine_type;
 
 
 //==================================================================================================
 //                        **** MULTIPLICATION ARITHMETIC TRAITS DETECTORS ****
 //==================================================================================================
 //
-//- Form 1 type detection of nested multiplication arithmetic traits.
+//- Form 0 type detection of nested multiplication arithmetic traits.
 //
 template<typename OT>
-using mul_traits_f1_t = typename OT::multiplication_traits;
+using mul_traits_f0_t = typename OT::multiplication_traits;
 
 template<typename OT>
-using mul_type_f1_t = typename mul_traits_f1_t<OT>::result_type;
+using mul_result_f0_t = typename mul_traits_f0_t<OT>::result_type;
 
-//- Define the form 1 detectors.
+//- Define the form 0 detectors.
 //
 template<typename OT, typename = void>
-struct detect_mul_traits_f1
+struct detect_mul_traits_f0
 :   public false_type
 {
     using traits_type = void;
 };
 
 template<typename OT>
-struct detect_mul_traits_f1<OT, void_t<mul_type_f1_t<OT>>>
+struct detect_mul_traits_f0<OT, void_t<mul_result_f0_t<OT>>>
 :   public true_type
 {
-    using traits_type = mul_traits_f1_t<OT>;
+    using traits_type = mul_traits_f0_t<OT>;
 };
 
 //-------------------------------------------------------------------
@@ -228,7 +208,7 @@ template<typename OT, typename T1, typename T2>
 using mul_traits_f2_t = typename OT::template multiplication_traits<OT, T1, T2>;
 
 template<typename OT, typename T1, typename T2>
-using mul_type_f2_t = typename mul_traits_f2_t<OT, T1, T2>::result_type;
+using mul_result_f2_t = typename mul_traits_f2_t<OT, T1, T2>::result_type;
 
 
 //- Define the form 2 detectors.
@@ -241,11 +221,17 @@ struct detect_mul_traits_f2
 };
 
 template<typename OT, typename OP1, typename OP2>
-struct detect_mul_traits_f2<OT, OP1, OP2, void_t<mul_type_f2_t<OT, OP1, OP2>>>
+struct detect_mul_traits_f2<OT, OP1, OP2, void_t<mul_result_f2_t<OT, OP1, OP2>>>
 :   public true_type
 {
     using traits_type = typename OT::template multiplication_traits<OT, OP1, OP2>;
 };
+
+//- Used only for testing.
+//
+template<class OT, class OP1, class OP2>
+constexpr bool  has_mul_traits_v = detect_mul_traits_f2<OT, OP1, OP2>::value ||
+                                   detect_mul_traits_f0<OT>::value;
 
 //------------------------------------------------------
 //- Multiplication arithmetic traits type determination.
@@ -253,7 +239,7 @@ struct detect_mul_traits_f2<OT, OP1, OP2, void_t<mul_type_f2_t<OT, OP1, OP2>>>
 template<typename OT, typename OP1, typename OP2>
 struct mul_traits_chooser
 {
-    using CT1 = typename detect_mul_traits_f1<OT>::traits_type;
+    using CT1 = typename detect_mul_traits_f0<OT>::traits_type;
     using CT2 = typename detect_mul_traits_f2<OT, OP1, OP2>::traits_type;
     using DEF = matrix_multiplication_traits<OT, OP1, OP2>;
 
@@ -261,11 +247,7 @@ struct mul_traits_chooser
 };
 
 template<typename OT, typename OP1, typename OP2>
-using multiplication_traits_t = typename mul_traits_chooser<OT, OP1, OP2>::traits_type;
-
-template<class OT, class OP1, class OP2>
-constexpr bool  has_mul_traits_v = detect_mul_traits_f2<OT, OP1, OP2>::value ||
-                                   detect_mul_traits_f1<OT>::value;
+using mul_traits_result_t = typename mul_traits_chooser<OT, OP1, OP2>::traits_type;
 
 
 }       //- detail namespace
@@ -276,7 +258,7 @@ constexpr bool  has_mul_traits_v = detect_mul_traits_f2<OT, OP1, OP2>::value ||
 //- Alias interface to detection meta-function that extracts the element multiplication traits type.
 //
 template<class OT, class T1, class T2>
-using matrix_multiplication_element_t = detail::element_mul_type_t<OT, T1, T2>;
+using matrix_multiplication_element_t = detail::element_mul_result_t<OT, T1, T2>;
 
 
 //- The standard element multiplication traits type provides the default mechanism for determining
@@ -296,7 +278,7 @@ struct matrix_multiplication_element_traits
 //- Alias interface to detection meta-function that extracts the engine multiplication traits type.
 //
 template<class OT, class ET1, class ET2>
-using matrix_multiplication_engine_t = detail::engine_mul_type_t<OT, ET1, ET2>;
+using matrix_multiplication_engine_t = detail::engine_mul_result_t<OT, ET1, ET2>;
 
 //- The standard engine multiplication traits type provides the default mechanism for determining
 //  the correct engine type for a matrix/matrix, matrix/vector, matrix/scalar, vector/vector, or
@@ -843,7 +825,7 @@ struct matrix_multiplication_engine_traits<OT,
 //- Alias interface to detection meta-function that extracts the multiplication traits type.
 //
 template<class OT, class OP1, class OP2>
-using matrix_multiplication_traits_t = detail::multiplication_traits_t<OT, OP1, OP2>;
+using matrix_multiplication_traits_t = detail::mul_traits_result_t<OT, OP1, OP2>;
 
 
 //- The standard multiplication traits type provides the default mechanism for computing the
@@ -1180,7 +1162,7 @@ struct matrix_multiplication_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>
     static constexpr result_type    multiply(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
 };
 
-template<class OTR, class ET1, class OT1, class ET2, class OT2> inline constexpr 
+template<class OTR, class ET1, class OT1, class ET2, class OT2> inline constexpr
 auto
 matrix_multiplication_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::multiply
 (matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2) -> result_type
