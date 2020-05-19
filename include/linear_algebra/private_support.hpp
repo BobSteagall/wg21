@@ -905,7 +905,8 @@ check_source_init_list(initializer_list<initializer_list<T>> list, ST rows, ST c
 
     if (list.size() != static_cast<size_t>(rows)  ||  first_row_size != static_cast<size_t>(cols))
     {
-        throw runtime_error("source 2-D initializer_list size does not match destination matrix engine size");
+        throw runtime_error("source 2-D initializer_list size does not match "
+                            "destination matrix engine size");
     }
 }
 
