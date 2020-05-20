@@ -421,7 +421,7 @@ struct addition_traits_tst;
 template<class OT, class ET1, class OT1, class ET2, class OT2>
 struct addition_traits_tst<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>
 {
-    using engine_type  = matrix_addition_engine_t<OT, ET1, ET2>;
+    using engine_type  = select_matrix_addition_engine_t<OT, ET1, ET2>;
     using op_traits    = OT;
     using result_type  = matrix<engine_type, op_traits>;
 
@@ -441,7 +441,7 @@ addition_traits_tst<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
     index_type_r    cols = static_cast<index_type_r>(m1.columns());
     result_type		mr;
 
-    if constexpr (is_resizable(mr))
+    if constexpr (is_resizable_engine_v<engine_type>)
 	{
 		mr.resize(rows, cols);
     }

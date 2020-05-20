@@ -40,6 +40,9 @@ struct matrix_operation_traits
     template<class T1, class T2>
     using element_multiplication_traits = matrix_multiplication_element_traits<T1, T2>;
 
+    template<class T1, class T2>
+    using element_division_traits = matrix_division_element_traits<T1, T2>;
+
     //- Default engine promotion traits.
     //
     template<class OTR, class ET1>
@@ -54,6 +57,9 @@ struct matrix_operation_traits
     template<class OTR, class ET1, class ET2>
     using engine_multiplication_traits = matrix_multiplication_engine_traits<OTR, ET1, ET2>;
 
+    template<class OTR, class T1, class T2>
+    using engine_division_traits = matrix_division_engine_traits<OTR, T1, T2>;
+
     //- Default arithmetic operation traits.
     //
     template<class OP1, class OTR>
@@ -67,6 +73,9 @@ struct matrix_operation_traits
 
     template<class OTR, class OP1, class OP2>
     using multiplication_traits = matrix_multiplication_traits<OTR, OP1, OP2>;
+
+    template<class OTR, class T1, class T2>
+    using division_traits = matrix_division_traits<OTR, T1, T2>;
 };
 
 //==================================================================================================
@@ -105,7 +114,7 @@ struct matrix_operation_traits_selector<matrix_operation_traits, matrix_operatio
 //- Alias template interface to trait.
 //
 template<class T1, class T2>
-using matrix_operation_traits_selector_t = typename matrix_operation_traits_selector<T1,T2>::traits_type;
+using select_matrix_operation_traits_t = typename matrix_operation_traits_selector<T1,T2>::traits_type;
 
 
 }       //- STD_LA namespace

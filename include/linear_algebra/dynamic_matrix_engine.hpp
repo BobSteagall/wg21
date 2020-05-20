@@ -442,8 +442,8 @@ dr_matrix_engine<T,AT>::reshape(index_type rows, index_type cols, index_type row
     if (rows > m_rowcap  ||  cols > m_colcap   ||  rowcap > m_rowcap  ||  colcap > m_colcap)
     {
         dr_matrix_engine   tmp(rows, cols, rowcap, colcap);
-        index_type const    dst_rows = min(rows, m_rows);
-        index_type const    dst_cols = min(cols, m_cols);
+        index_type const   dst_rows = min(rows, m_rows);
+        index_type const   dst_cols = min(cols, m_cols);
 
         for (index_type i = 0;  i < dst_rows;  ++i)
         {

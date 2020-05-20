@@ -22,8 +22,8 @@ int main(int argc, char** argv)
     TestGroup10();
     TestGroup20();
     TestGroup30();
-	TestGroup40();
-//	TestGroup50();
+    TestGroup40();
+    TestGroup50();
 //	TestGroup60();
 //	TestGroup70();
 

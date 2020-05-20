@@ -24,9 +24,11 @@ using STD_LA::detail::m_cmp_eq;
 
 struct dummy_type {};
 
-#if 1
-    #undef PRINT_TYPE
+#ifndef ENABLE_TEST_PRINTING
+    #undef  PRINT_TYPE
     #define PRINT_TYPE(...)
+    #undef  PRINT_FNAME
+    #define PRINT_FNAME()
 #endif
 
 using index_tuple = std::experimental::extents<std::experimental::dynamic_extent,

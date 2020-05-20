@@ -1,3 +1,4 @@
+//#define ENABLE_TEST_PRINTING
 #include "test_common.hpp"
 
 //- A helper macro to assist in readability of test functions below.
@@ -718,7 +719,7 @@ void t408()
 template<class T1, class T2>
 struct element_mul_traits_tst;
 
-//- Promote any float/float addition to double.
+//- Promote any float/float multiplication to double.
 //
 template<>
 struct element_mul_traits_tst<float, float>
@@ -737,37 +738,37 @@ struct engine_mul_traits_tst<OT,
                              fs_matrix_engine_tst<T2, R2, C2>>
 {
     static_assert(C1 == R2);
-    using element_type = STD_LA::matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C2>;
 };
 
-template<class OT, class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class OT, class T1, size_t R1, size_t C1, class T2, ptrdiff_t R2, ptrdiff_t C2>
 struct engine_mul_traits_tst<OT,
                              fs_matrix_engine_tst<T1, R1, C1>,
                              STD_LA::fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(C1 == R2);
-    using element_type = STD_LA::matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C2>;
 };
 
-template<class OT, class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class T2, size_t R2, size_t C2>
 struct engine_mul_traits_tst<OT,
                              STD_LA::fs_matrix_engine<T1, R1, C1>,
                              fs_matrix_engine_tst<T2, R2, C2>>
 {
     static_assert(C1 == R2);
-    using element_type = STD_LA::matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C2>;
 };
 
-template<class OT, class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class T2, ptrdiff_t R2, ptrdiff_t C2>
 struct engine_mul_traits_tst<OT,
                              STD_LA::fs_matrix_engine<T1, R1, C1>,
                              STD_LA::fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(C1 == R2);
-    using element_type = STD_LA::matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C2>;
 };
 
@@ -777,7 +778,7 @@ struct engine_mul_traits_tst<OT,
                              STD_LA::transpose_engine<fs_matrix_engine_tst<T2, R2, C2>, MCT2>>
 {
     static_assert(R1 == C2);
-    using element_type = STD_LA::matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, C1, R2>;
 };
 
@@ -788,11 +789,11 @@ struct multiplication_traits_tst;
 
 template<class OTR>
 struct multiplication_traits_tst<OTR,
-                           STD_LA::matrix<fs_matrix_engine_tst<double, 5, 7>, OTR>,
-                           STD_LA::matrix<fs_matrix_engine_tst<double, 7, 9>, OTR>>
+                                 STD_LA::matrix<fs_matrix_engine_tst<double, 5, 7>, OTR>,
+                                 STD_LA::matrix<fs_matrix_engine_tst<double, 7, 9>, OTR>>
 {
     using op_traits   = OTR;
-    using engine_type = STD_LA::matrix_multiplication_engine_t<op_traits,
+    using engine_type = STD_LA::select_matrix_multiplication_engine_t<op_traits,
                                                          fs_matrix_engine_tst<double, 5, 7>,
                                                          fs_matrix_engine_tst<double, 7, 9>>;
     using result_type = STD_LA::matrix<engine_type, op_traits>;
@@ -828,10 +829,10 @@ void t409()
     static_assert(!STD_LA::detail::has_element_mul_traits_v<test_mul_op_traits_tst, float, double>);
     static_assert(!STD_LA::detail::has_element_mul_traits_v<test_mul_op_traits_tst, double, float>);
 
-    using t00 = STD_LA::detail::element_mul_traits_t<test_mul_op_traits_tst, float, float>;
+    using t00 = STD_LA::detail::element_mul_result_t<test_mul_op_traits_tst, float, float>;
     PRINT_TYPE(t00);
 
-    using t01 = STD_LA::detail::element_mul_traits_t<test_mul_op_traits_tst, float, double>;
+    using t01 = STD_LA::detail::element_mul_result_t<test_mul_op_traits_tst, float, double>;
     PRINT_TYPE(t01);
 }
 
@@ -861,23 +862,19 @@ void t410()
     using drm_double_tst  = STD_LA::matrix<STD_LA::dr_matrix_engine<double, std::allocator<double>>, test_mul_op_traits_tst>;
     using drm_new_num_tst = STD_LA::matrix<STD_LA::dr_matrix_engine<new_num, std::allocator<new_num>>, test_mul_op_traits_tst>;
 
-    using t00 = STD_LA::detail::engine_mul_traits_t<test_mul_op_traits_tst,
+    using t00 = STD_LA::detail::engine_mul_result_t<test_mul_op_traits_tst,
                                                     fs_matrix_engine_tst<float, 3, 4>,
                                                     fs_matrix_engine_tst<float, 4, 5>>;
     PRINT_TYPE(t00);
 
-    using t01 = typename t00::engine_type;
+    using t01 = STD_LA::detail::engine_mul_result_t<test_mul_op_traits_tst,
+                                                    STD_LA::fs_matrix_engine<float, 3, 4>,
+                                                    fs_matrix_engine_tst<float, 4, 5>>;
     PRINT_TYPE(t01);
 
-    using t02 = STD_LA::detail::engine_mul_traits_t<test_mul_op_traits_tst,
-                                                    STD_LA::fs_matrix_engine<new_num, 3, 4>,
-                                                    fs_matrix_engine_tst<float, 4, 5>>;
-    using t03 = typename t02::engine_type;
-    PRINT_TYPE(t03);
-
     ASSERT_A_MUL_B_EQ_C(fsm_float_34,      fsm_float_45,      fsm_float_35);
-//    ASSERT_A_MUL_B_EQ_C(fsm_float_34,      fsm_float_tst_45,  fsm_double_tst_35);
-//    ASSERT_A_MUL_B_EQ_C(fsm_float_tst_34,  fsm_float_45,      fsm_double_tst_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_34,      fsm_float_tst_45,  fsm_double_tst_35);
+    ASSERT_A_MUL_B_EQ_C(fsm_float_tst_34,  fsm_float_45,      fsm_double_tst_35);
     ASSERT_A_MUL_B_EQ_C(fsm_float_tst_34,  fsm_float_tst_45,  fsm_double_tst_35);
 
     ASSERT_A_MUL_B_EQ_C(fsm_float_tst_tr_34,  fsm_float_tst_tr_45,  fsm_double_tst_35);

@@ -103,6 +103,7 @@ template<class T1>              struct matrix_negation_element_traits;
 template<class T1, class T2>    struct matrix_addition_element_traits;
 template<class T1, class T2>    struct matrix_subtraction_element_traits;
 template<class T1, class T2>    struct matrix_multiplication_element_traits;
+template<class T1, class T2>    struct matrix_division_element_traits;
 
 //- Math object engine promotion traits, per arithmetical operation.
 //
@@ -110,6 +111,7 @@ template<class OT, class ET1>               struct matrix_negation_engine_traits
 template<class OT, class ET1, class ET2>    struct matrix_addition_engine_traits;
 template<class OT, class ET1, class ET2>    struct matrix_subtraction_engine_traits;
 template<class OT, class ET1, class ET2>    struct matrix_multiplication_engine_traits;
+template<class OT, class ET1, class ET2>    struct matrix_division_engine_traits;
 
 //- Math object arithmetic traits.
 //
@@ -117,6 +119,7 @@ template<class OT, class OP1>               struct matrix_negation_traits;
 template<class OT, class OP1, class OP2>    struct matrix_addition_traits;
 template<class OT, class OP1, class OP2>    struct matrix_subtraction_traits;
 template<class OT, class OP1, class OP2>    struct matrix_multiplication_traits;
+template<class OT, class OP1, class OP2>    struct matrix_division_traits;
 
 //- A traits type that chooses between two operation traits types in the binary arithmetic
 //  operators and free functions that act like binary operators (e.g., outer_product()).
@@ -148,7 +151,7 @@ constexpr auto  operator -(vector<ET1, OT1> const& v1);
 template<class ET1, class OT1, class ET2, class OT2>
 constexpr auto  operator -(matrix<ET1, OT1> const& m1);
 
-//- Vector*Scalar multiplication operators
+//- Multiplication operators
 //
 template<class ET1, class OT1, class S2>
 constexpr auto  operator *(vector<ET1, OT1> const& v1, S2 const& s2);
@@ -156,33 +159,44 @@ constexpr auto  operator *(vector<ET1, OT1> const& v1, S2 const& s2);
 template<class S1, class ET2, class OT2>
 constexpr auto    operator *(S1 const& s1, vector<ET2, OT2> const& v2);
 
-//- Matrix*Scalar multiplication operators
-//
 template<class ET1, class OT1, class S2>
 constexpr auto  operator *(matrix<ET1, OT1> const& m1, S2 const& s2);
 
 template<class S1, class ET2, class OT2>
 constexpr auto  operator *(S1 const& s1, matrix<ET2, OT2> const& m2);
 
-//- Vector*Matrix multiplication operators
-//
 template<class ET1, class OT1, class ET2, class OT2>
 constexpr auto  operator *(vector<ET1, OT1> const& v1, matrix<ET2, OT2> const& m2);
 
-//- Matrix*Vector multiplication operators
-//
 template<class ET1, class OT1, class ET2, class OT2>
 constexpr auto  operator *(matrix<ET1, OT1> const& m1, vector<ET2, OT2> const& v2);
 
-//- Vector*Vector multiplication operators
-//
 template<class ET1, class OT1, class ET2, class OT2>
 constexpr auto  operator *(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
 
-//- Matrix*Matrix multiplication operators
-//
 template<class ET1, class OT1, class ET2, class OT2>
 constexpr auto  operator *(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
+
+//- Scalar division operators
+//
+template<class ET1, class OT1, class S2>
+constexpr auto  operator /(vector<ET1, OT1> const& v1, S2 const& s2);
+
+template<class ET1, class OT1, class S2>
+constexpr auto  operator /(matrix<ET1, OT1> const& m1, S2 const& s2);
+
+template<class ET1, class OT1, class ET2, class OT2>
+auto  operator /(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2) = delete;
+
+template<class ET1, class OT1, class ET2, class OT2>
+auto  operator /(vector<ET1, OT1> const& v1, matrix<ET2, OT2> const& v2) = delete;
+
+template<class ET1, class OT1, class ET2, class OT2>
+auto  operator /(matrix<ET1, OT1> const& v1, vector<ET2, OT2> const& v2) = delete;
+
+template<class ET1, class OT1, class ET2, class OT2>
+auto  operator /(matrix<ET1, OT1> const& v1, matrix<ET2, OT2> const& v2) = delete;
+
 
 //- Other functions.
 //
