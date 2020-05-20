@@ -423,7 +423,7 @@ struct engine_sub_traits_tst<OT,
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
-    using element_type = STD_LA::matrix_subtraction_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_subtraction_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
 };
 
@@ -434,7 +434,7 @@ struct engine_sub_traits_tst<OT,
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
-    using element_type = STD_LA::matrix_subtraction_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_subtraction_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
 };
 
@@ -445,7 +445,7 @@ struct engine_sub_traits_tst<OT,
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
-    using element_type = STD_LA::matrix_subtraction_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_subtraction_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
 };
 
@@ -456,7 +456,7 @@ struct engine_sub_traits_tst<OT,
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
-    using element_type = STD_LA::matrix_subtraction_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_subtraction_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, C1, R1>;
 };
 
@@ -471,7 +471,7 @@ struct subtraction_traits_tst<OTR,
                            STD_LA::matrix<fs_matrix_engine_tst<double, 3, 4>, OTR>>
 {
     using op_traits   = OTR;
-    using engine_type = STD_LA::matrix_subtraction_engine_t<op_traits,
+    using engine_type = STD_LA::select_matrix_subtraction_engine_t<op_traits,
                                                          fs_matrix_engine_tst<double, 3, 4>,
                                                          fs_matrix_engine_tst<double, 3, 4>>;
     using result_type = STD_LA::matrix<engine_type, op_traits>;

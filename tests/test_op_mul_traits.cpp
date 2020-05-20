@@ -738,7 +738,7 @@ struct engine_mul_traits_tst<OT,
                              fs_matrix_engine_tst<T2, R2, C2>>
 {
     static_assert(C1 == R2);
-    using element_type = STD_LA::matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C2>;
 };
 
@@ -748,7 +748,7 @@ struct engine_mul_traits_tst<OT,
                              STD_LA::fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(C1 == R2);
-    using element_type = STD_LA::matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C2>;
 };
 
@@ -758,7 +758,7 @@ struct engine_mul_traits_tst<OT,
                              fs_matrix_engine_tst<T2, R2, C2>>
 {
     static_assert(C1 == R2);
-    using element_type = STD_LA::matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C2>;
 };
 
@@ -768,7 +768,7 @@ struct engine_mul_traits_tst<OT,
                              STD_LA::fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(C1 == R2);
-    using element_type = STD_LA::matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C2>;
 };
 
@@ -778,7 +778,7 @@ struct engine_mul_traits_tst<OT,
                              STD_LA::transpose_engine<fs_matrix_engine_tst<T2, R2, C2>, MCT2>>
 {
     static_assert(R1 == C2);
-    using element_type = STD_LA::matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, C1, R2>;
 };
 
@@ -793,7 +793,7 @@ struct multiplication_traits_tst<OTR,
                                  STD_LA::matrix<fs_matrix_engine_tst<double, 7, 9>, OTR>>
 {
     using op_traits   = OTR;
-    using engine_type = STD_LA::matrix_multiplication_engine_t<op_traits,
+    using engine_type = STD_LA::select_matrix_multiplication_engine_t<op_traits,
                                                          fs_matrix_engine_tst<double, 5, 7>,
                                                          fs_matrix_engine_tst<double, 7, 9>>;
     using result_type = STD_LA::matrix<engine_type, op_traits>;

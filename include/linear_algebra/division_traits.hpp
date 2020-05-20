@@ -258,7 +258,7 @@ using div_traits_result_t = typename div_traits_chooser<OT, OP1, OP2>::traits_ty
 //- Alias interface to detection meta-function that extracts the element division traits type.
 //
 template<class OT, class T1, class T2>
-using matrix_division_element_t = detail::element_div_result_t<OT, T1, T2>;
+using select_matrix_division_element_t = detail::element_div_result_t<OT, T1, T2>;
 
 
 //- The standard element division traits type provides the default mechanism for determining
@@ -278,7 +278,7 @@ struct matrix_division_element_traits
 //- Alias interface to detection meta-function that extracts the engine division traits type.
 //
 template<class OT, class ET1, class ET2>
-using matrix_division_engine_t = detail::engine_div_result_t<OT, ET1, ET2>;
+using select_matrix_division_engine_t = detail::engine_div_result_t<OT, ET1, ET2>;
 
 //- The standard engine division traits type provides the default mechanism for determining
 //  the correct engine type for a matrix/matrix, matrix/vector, matrix/scalar, vector/vector, or
@@ -294,7 +294,7 @@ struct matrix_division_engine_traits
 
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
-    using element_type   = matrix_division_element_t<OT, element_type_1, element_type_2>;
+    using element_type   = select_matrix_division_element_t<OT, element_type_1, element_type_2>;
     using engine_type    = conditional_t<use_matrix_engine,
                                          dr_matrix_engine<element_type, allocator<element_type>>,
                                          dr_vector_engine<element_type, allocator<element_type>>>;
@@ -314,7 +314,7 @@ struct matrix_division_engine_traits<OT, transpose_engine<ET1, MCT1>, ET2>
 template<class OT, class T1, class A1, class T2>
 struct matrix_division_engine_traits<OT, dr_vector_engine<T1, A1>, scalar_engine<T2>>
 {
-    using element_type = matrix_division_element_t<OT, T1, T2>;
+    using element_type = select_matrix_division_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
@@ -322,7 +322,7 @@ struct matrix_division_engine_traits<OT, dr_vector_engine<T1, A1>, scalar_engine
 template<class OT, class T1, ptrdiff_t N1, class T2>
 struct matrix_division_engine_traits<OT, fs_vector_engine<T1, N1>, scalar_engine<T2>>
 {
-    using element_type = matrix_division_element_t<OT, T1, T2>;
+    using element_type = select_matrix_division_element_t<OT, T1, T2>;
     using engine_type  = fs_vector_engine<element_type, N1>;
 };
 
@@ -336,7 +336,7 @@ struct matrix_division_engine_traits<OT,
                                      dr_matrix_engine<T1, A1>,
                                      scalar_engine<T2>>
 {
-    using element_type = matrix_division_element_t<OT, T1, T2>;
+    using element_type = select_matrix_division_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -346,7 +346,7 @@ struct matrix_division_engine_traits<OT,
                                      transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
                                      scalar_engine<T2>>
 {
-    using element_type = matrix_division_element_t<OT, T1, T2>;
+    using element_type = select_matrix_division_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -359,7 +359,7 @@ struct matrix_division_engine_traits<OT,
                                      fs_matrix_engine<T1, R1, C1>,
                                      scalar_engine<T2>>
 {
-    using element_type = matrix_division_element_t<OT, T1, T2>;
+    using element_type = select_matrix_division_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C1>;
 };
 
@@ -368,7 +368,7 @@ struct matrix_division_engine_traits<OT,
                                      transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
                                      scalar_engine<T2>>
 {
-    using element_type = matrix_division_element_t<OT, T1, T2>;
+    using element_type = select_matrix_division_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, C1, R1>;
 };
 
@@ -380,7 +380,7 @@ struct matrix_division_engine_traits<OT,
 //- Alias interface to detection meta-function that extracts the division traits type.
 //
 template<class OT, class OP1, class OP2>
-using matrix_division_traits_t = detail::div_traits_result_t<OT, OP1, OP2>;
+using select_matrix_division_traits_t = detail::div_traits_result_t<OT, OP1, OP2>;
 
 
 //- The standard division traits type provides the default mechanism for computing the
@@ -392,7 +392,7 @@ using matrix_division_traits_t = detail::div_traits_result_t<OT, OP1, OP2>;
 template<class OT, class ET1, class OT1, class T2>
 struct matrix_division_traits<OT, vector<ET1, OT1>, T2>
 {
-    using engine_type = matrix_division_engine_t<OT, ET1, scalar_engine<T2>>;
+    using engine_type = select_matrix_division_engine_t<OT, ET1, scalar_engine<T2>>;
     using result_type = vector<engine_type, OT>;
 
     static constexpr result_type    divide(vector<ET1, OT1> const& v1, T2 const& s2);
@@ -432,7 +432,7 @@ matrix_division_traits<OTR, vector<ET1, OT1>, T2>::divide
 template<class OT, class ET1, class OT1, class T2>
 struct matrix_division_traits<OT, matrix<ET1, OT1>, T2>
 {
-    using engine_type = matrix_division_engine_t<OT, ET1, scalar_engine<T2>>;
+    using engine_type = select_matrix_division_engine_t<OT, ET1, scalar_engine<T2>>;
     using result_type = matrix<engine_type, OT>;
 
     static constexpr result_type    divide(matrix<ET1, OT1> const& m1, T2 const& s2);

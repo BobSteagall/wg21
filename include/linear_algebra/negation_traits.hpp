@@ -260,7 +260,7 @@ using neg_traits_result_t = typename neg_traits_chooser<OT, OP1>::traits_type;
 //- Alias interface to detection meta-function that extracts the element negation traits type.
 //
 template<class OT, class T1>
-using matrix_negation_element_t = detail::element_neg_result_t<OT, T1>;
+using select_matrix_negation_element_t = detail::element_neg_result_t<OT, T1>;
 
 
 //- The standard element negation traits type provides the default mechanism for determining the
@@ -281,7 +281,7 @@ struct matrix_negation_element_traits
 //- Alias interface to trait.
 //
 template<class OT, class ET1>
-using matrix_negation_engine_t = detail::engine_neg_result_t<OT, ET1>;
+using select_matrix_negation_engine_t = detail::engine_neg_result_t<OT, ET1>;
 
 
 //- The standard engine negation traits type provides the default mechanism for determining the
@@ -291,7 +291,7 @@ template<class OT, class ET1>
 struct matrix_negation_engine_traits
 {
     using element_type_1 = typename ET1::element_type;
-    using element_type   = matrix_negation_element_t<OT, element_type_1>;
+    using element_type   = select_matrix_negation_element_t<OT, element_type_1>;
     using engine_type    = conditional_t<is_matrix_engine_v<ET1>,
                                          dr_matrix_engine<element_type, allocator<element_type>>,
                                          dr_vector_engine<element_type, allocator<element_type>>>;
@@ -302,7 +302,7 @@ struct matrix_negation_engine_traits
 template<class OT, class ET1, class MCT1>
 struct matrix_negation_engine_traits<OT, transpose_engine<ET1, MCT1>>
 {
-    using element_type = matrix_negation_element_t<OT, typename ET1::element_type>;
+    using element_type = select_matrix_negation_element_t<OT, typename ET1::element_type>;
     using engine_type  = typename matrix_negation_engine_traits<OT, ET1>::engine_type;
 };
 
@@ -315,7 +315,7 @@ struct matrix_negation_engine_traits<OT, transpose_engine<ET1, MCT1>>
 template<class OT, class T1, class A1>
 struct matrix_negation_engine_traits<OT, dr_vector_engine<T1, A1>>
 {
-    using element_type = matrix_negation_element_t<OT, T1>;
+    using element_type = select_matrix_negation_element_t<OT, T1>;
     using engine_type  = dr_vector_engine<T1, A1>;
 };
 
@@ -325,7 +325,7 @@ struct matrix_negation_engine_traits<OT, dr_vector_engine<T1, A1>>
 template<class OT, class T1, ptrdiff_t N1>
 struct matrix_negation_engine_traits<OT, fs_vector_engine<T1, N1>>
 {
-    using element_type = matrix_negation_element_t<OT, T1>;
+    using element_type = select_matrix_negation_element_t<OT, T1>;
     using engine_type  = fs_vector_engine<T1, N1>;
 };
 
@@ -338,14 +338,14 @@ struct matrix_negation_engine_traits<OT, fs_vector_engine<T1, N1>>
 template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1>
 struct matrix_negation_engine_traits<OT, fs_matrix_engine<T1, R1, C1>>
 {
-    using element_type = matrix_negation_element_t<OT, T1>;
+    using element_type = select_matrix_negation_element_t<OT, T1>;
     using engine_type  = fs_matrix_engine<T1, R1, C1>;
 };
 
 template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class MCT1>
 struct matrix_negation_engine_traits<OT, transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>>
 {
-    using element_type = matrix_negation_element_t<OT, T1>;
+    using element_type = select_matrix_negation_element_t<OT, T1>;
     using engine_type  = fs_matrix_engine<element_type, C1, R1>;
 };
 
@@ -355,14 +355,14 @@ struct matrix_negation_engine_traits<OT, transpose_engine<fs_matrix_engine<T1, R
 template<class OT, class T1, class A1>
 struct matrix_negation_engine_traits<OT, dr_matrix_engine<T1, A1>>
 {
-    using element_type = matrix_negation_element_t<OT, T1>;
+    using element_type = select_matrix_negation_element_t<OT, T1>;
     using engine_type  = dr_matrix_engine<T1, A1>;
 };
 
 template<class OT, class T1, class A1, class MCT1>
 struct matrix_negation_engine_traits<OT, transpose_engine<dr_matrix_engine<T1, A1>, MCT1>>
 {
-    using element_type = matrix_negation_element_t<OT, T1>;
+    using element_type = select_matrix_negation_element_t<OT, T1>;
     using engine_type  = dr_matrix_engine<T1, A1>;
 };
 
@@ -374,7 +374,7 @@ struct matrix_negation_engine_traits<OT, transpose_engine<dr_matrix_engine<T1, A
 //- Alias interface to detection meta-function that extracts the negation traits type.
 //
 template<class OT, class OP1>
-using matrix_negation_traits_t = detail::neg_traits_result_t<OT, OP1>;
+using select_matrix_negation_traits_t = detail::neg_traits_result_t<OT, OP1>;
 
 
 //- The standard addition traits type provides the default mechanism for computing the result
@@ -383,7 +383,7 @@ using matrix_negation_traits_t = detail::neg_traits_result_t<OT, OP1>;
 template<class OT, class ET1, class OT1>
 struct matrix_negation_traits<OT, vector<ET1, OT1>>
 {
-    using engine_type = matrix_negation_engine_t<OT, ET1>;
+    using engine_type = select_matrix_negation_engine_t<OT, ET1>;
     using result_type = vector<engine_type, OT>;
 
     static constexpr result_type    negate(vector<ET1, OT1> const& v1);
@@ -420,7 +420,7 @@ matrix_negation_traits<OT, vector<ET1, OT1>>::negate(vector<ET1, OT1> const& v1)
 template<class OT, class ET1, class OT1>
 struct matrix_negation_traits<OT, matrix<ET1, OT1>>
 {
-    using engine_type = matrix_negation_engine_t<OT, ET1>;
+    using engine_type = select_matrix_negation_engine_t<OT, ET1>;
     using result_type = matrix<engine_type, OT>;
 
     static constexpr result_type    negate(matrix<ET1, OT1> const& m1);

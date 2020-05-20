@@ -114,7 +114,7 @@ struct matrix_operation_traits_selector<matrix_operation_traits, matrix_operatio
 //- Alias template interface to trait.
 //
 template<class T1, class T2>
-using matrix_operation_traits_selector_t = typename matrix_operation_traits_selector<T1,T2>::traits_type;
+using select_matrix_operation_traits_t = typename matrix_operation_traits_selector<T1,T2>::traits_type;
 
 
 }       //- STD_LA namespace

@@ -258,7 +258,7 @@ using mul_traits_result_t = typename mul_traits_chooser<OT, OP1, OP2>::traits_ty
 //- Alias interface to detection meta-function that extracts the element multiplication traits type.
 //
 template<class OT, class T1, class T2>
-using matrix_multiplication_element_t = detail::element_mul_result_t<OT, T1, T2>;
+using select_matrix_multiplication_element_t = detail::element_mul_result_t<OT, T1, T2>;
 
 
 //- The standard element multiplication traits type provides the default mechanism for determining
@@ -278,7 +278,7 @@ struct matrix_multiplication_element_traits
 //- Alias interface to detection meta-function that extracts the engine multiplication traits type.
 //
 template<class OT, class ET1, class ET2>
-using matrix_multiplication_engine_t = detail::engine_mul_result_t<OT, ET1, ET2>;
+using select_matrix_multiplication_engine_t = detail::engine_mul_result_t<OT, ET1, ET2>;
 
 //- The standard engine multiplication traits type provides the default mechanism for determining
 //  the correct engine type for a matrix/matrix, matrix/vector, matrix/scalar, vector/vector, or
@@ -294,7 +294,7 @@ struct matrix_multiplication_engine_traits
 
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
-    using element_type   = matrix_multiplication_element_t<OT, element_type_1, element_type_2>;
+    using element_type   = select_matrix_multiplication_element_t<OT, element_type_1, element_type_2>;
     using engine_type    = conditional_t<use_matrix_engine,
                                          dr_matrix_engine<element_type, allocator<element_type>>,
                                          dr_vector_engine<element_type, allocator<element_type>>>;
@@ -328,7 +328,7 @@ struct matrix_multiplication_engine_traits<OT,
 template<class OT, class T1, class A1, class T2>
 struct matrix_multiplication_engine_traits<OT, dr_vector_engine<T1, A1>, scalar_engine<T2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
@@ -336,7 +336,7 @@ struct matrix_multiplication_engine_traits<OT, dr_vector_engine<T1, A1>, scalar_
 template<class OT, class T1, ptrdiff_t N1, class T2>
 struct matrix_multiplication_engine_traits<OT, fs_vector_engine<T1, N1>, scalar_engine<T2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_vector_engine<element_type, N1>;
 };
 
@@ -346,7 +346,7 @@ struct matrix_multiplication_engine_traits<OT, fs_vector_engine<T1, N1>, scalar_
 template<class OT, class T1, class T2, class A2>
 struct matrix_multiplication_engine_traits<OT, scalar_engine<T1>, dr_vector_engine<T2, A2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
@@ -354,7 +354,7 @@ struct matrix_multiplication_engine_traits<OT, scalar_engine<T1>, dr_vector_engi
 template<class OT, class T1, class T2, ptrdiff_t N2>
 struct matrix_multiplication_engine_traits<OT, scalar_engine<T1>, fs_vector_engine<T2, N2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_vector_engine<element_type, N2>;
 };
 
@@ -368,7 +368,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            dr_matrix_engine<T1, A1>,
                                            scalar_engine<T2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -378,7 +378,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
                                            scalar_engine<T2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -391,7 +391,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            fs_matrix_engine<T1, R1, C1>,
                                            scalar_engine<T2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C1>;
 };
 
@@ -400,7 +400,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
                                            scalar_engine<T2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, C1, R1>;
 };
 
@@ -414,7 +414,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            scalar_engine<T1>,
                                            dr_matrix_engine<T2, A2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -424,7 +424,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            scalar_engine<T1>,
                                            transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -437,7 +437,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            scalar_engine<T1>,
                                            fs_matrix_engine<T2, R2, C2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R2, C2>;
 };
 
@@ -446,7 +446,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            scalar_engine<T1>,
                                            transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, C2, R2>;
 };
 
@@ -461,7 +461,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            dr_matrix_engine<T1, A1>,
                                            dr_vector_engine<T2, A2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
@@ -471,7 +471,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
                                            dr_vector_engine<T2, A2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
@@ -484,7 +484,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            dr_matrix_engine<T1, A1>,
                                            fs_vector_engine<T2, N2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
@@ -494,7 +494,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
                                            fs_vector_engine<T2, N2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
@@ -507,7 +507,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            fs_matrix_engine<T1, R1, C1>,
                                            dr_vector_engine<T2, A2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
@@ -517,7 +517,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
                                            dr_vector_engine<T2, A2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
@@ -531,7 +531,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            fs_vector_engine<T2, N2>>
 {
     static_assert(C1 == N2);
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_vector_engine<element_type, N2>;
 };
 
@@ -541,7 +541,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            fs_vector_engine<T2, N2>>
 {
     static_assert(R1 == N2);
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_vector_engine<element_type, N2>;
 };
 
@@ -557,7 +557,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            dr_vector_engine<T1, A1>,
                                            dr_matrix_engine<T2, A2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
@@ -567,7 +567,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            dr_vector_engine<T1, A1>,
                                            transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
@@ -580,7 +580,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            dr_vector_engine<T1, A1>,
                                            fs_matrix_engine<T2, R2, C2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
@@ -590,7 +590,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            dr_vector_engine<T1, A1>,
                                            transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
@@ -603,7 +603,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            fs_vector_engine<T1, N1>,
                                            dr_matrix_engine<T2, A2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
@@ -613,7 +613,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            fs_vector_engine<T1, N1>,
                                            transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
     using engine_type  = dr_vector_engine<element_type, alloc_type>;
 };
@@ -627,7 +627,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(N1 == R2);
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_vector_engine<element_type, N1>;
 };
 
@@ -637,7 +637,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
 {
     static_assert(N1 == C2);
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_vector_engine<element_type, N1>;
 };
 
@@ -653,7 +653,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            dr_matrix_engine<T1, A1>,
                                            dr_matrix_engine<T2, A2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -663,7 +663,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            dr_matrix_engine<T1, A1>,
                                            transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -673,7 +673,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
                                            dr_matrix_engine<T2, A2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -683,7 +683,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
                                            transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -696,7 +696,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            dr_matrix_engine<T1, A1>,
                                            fs_matrix_engine<T2, R2, C2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -706,7 +706,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            dr_matrix_engine<T1, A1>,
                                            transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -716,7 +716,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
                                            fs_matrix_engine<T2, R2, C2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -726,7 +726,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
                                            transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A1, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -739,7 +739,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            fs_matrix_engine<T1, R1, C1>,
                                            dr_matrix_engine<T2, A2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -749,7 +749,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            fs_matrix_engine<T1, R1, C1>,
                                            transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -759,7 +759,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
                                            dr_matrix_engine<T2, A2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -769,7 +769,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
                                            transpose_engine<dr_matrix_engine<T2, A2>, MCT2>>
 {
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using alloc_type   = detail::rebind_alloc_t<A2, element_type>;
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
@@ -783,7 +783,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(C1 == R2);
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, C2>;
 };
 
@@ -793,7 +793,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
 {
     static_assert(C1 == C2);
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, R1, R2>;
 };
 
@@ -803,7 +803,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            fs_matrix_engine<T2, R2, C2>>
 {
     static_assert(R1 == R2);
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, C1, C2>;
 };
 
@@ -813,7 +813,7 @@ struct matrix_multiplication_engine_traits<OT,
                                            transpose_engine<fs_matrix_engine<T2, R2, C2>, MCT2>>
 {
     static_assert(R1 == C2);
-    using element_type = matrix_multiplication_element_t<OT, T1, T2>;
+    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine<element_type, C1, R2>;
 };
 
@@ -825,7 +825,7 @@ struct matrix_multiplication_engine_traits<OT,
 //- Alias interface to detection meta-function that extracts the multiplication traits type.
 //
 template<class OT, class OP1, class OP2>
-using matrix_multiplication_traits_t = detail::mul_traits_result_t<OT, OP1, OP2>;
+using select_matrix_multiplication_traits_t = detail::mul_traits_result_t<OT, OP1, OP2>;
 
 
 //- The standard multiplication traits type provides the default mechanism for computing the
@@ -837,7 +837,7 @@ using matrix_multiplication_traits_t = detail::mul_traits_result_t<OT, OP1, OP2>
 template<class OT, class ET1, class OT1, class T2>
 struct matrix_multiplication_traits<OT, vector<ET1, OT1>, T2>
 {
-    using engine_type = matrix_multiplication_engine_t<OT, ET1, scalar_engine<T2>>;
+    using engine_type = select_matrix_multiplication_engine_t<OT, ET1, scalar_engine<T2>>;
     using result_type = vector<engine_type, OT>;
 
     static constexpr result_type    multiply(vector<ET1, OT1> const& v1, T2 const& s2);
@@ -877,7 +877,7 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, T2>::multiply
 template<class OT, class T1, class ET2, class OT2>
 struct matrix_multiplication_traits<OT, T1, vector<ET2, OT2>>
 {
-    using engine_type = matrix_multiplication_engine_t<OT, scalar_engine<T1>, ET2>;
+    using engine_type = select_matrix_multiplication_engine_t<OT, scalar_engine<T1>, ET2>;
     using result_type = vector<engine_type, OT>;
 
     static constexpr result_type    multiply(T1 const& s1, vector<ET2, OT2> const& v2);
@@ -917,7 +917,7 @@ matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>::multiply
 template<class OT, class ET1, class OT1, class T2>
 struct matrix_multiplication_traits<OT, matrix<ET1, OT1>, T2>
 {
-    using engine_type = matrix_multiplication_engine_t<OT, ET1, scalar_engine<T2>>;
+    using engine_type = select_matrix_multiplication_engine_t<OT, ET1, scalar_engine<T2>>;
     using result_type = matrix<engine_type, OT>;
 
     static constexpr result_type    multiply(matrix<ET1, OT1> const& m1, T2 const& s2);
@@ -964,7 +964,7 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>::multiply
 template<class OT, class T1, class ET2, class OT2>
 struct matrix_multiplication_traits<OT, T1, matrix<ET2, OT2>>
 {
-    using engine_type = matrix_multiplication_engine_t<OT, scalar_engine<T1>, ET2>;
+    using engine_type = select_matrix_multiplication_engine_t<OT, scalar_engine<T1>, ET2>;
     using result_type = matrix<engine_type, OT>;
 
     static constexpr result_type    multiply(T1 const& s1, matrix<ET2, OT2> const& m2);
@@ -1019,7 +1019,7 @@ struct matrix_multiplication_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>
     //- Note that this specialization returns a scalar, and therefore does not compute a
     //  resulting engine type.
     //
-    using result_type = matrix_multiplication_element_t<OT, elem_type_1, elem_type_2>;
+    using result_type = select_matrix_multiplication_element_t<OT, elem_type_1, elem_type_2>;
 
     static constexpr result_type    multiply(vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2);
 };
@@ -1052,7 +1052,7 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, vector<ET2, OT2>>::multiply
 template<class OT, class ET1, class OT1, class ET2, class OT2>
 struct matrix_multiplication_traits<OT, matrix<ET1, OT1>, vector<ET2, OT2>>
 {
-    using engine_type = matrix_multiplication_engine_t<OT, ET1, ET2>;
+    using engine_type = select_matrix_multiplication_engine_t<OT, ET1, ET2>;
     using result_type = vector<engine_type, OT>;
 
     static constexpr result_type    multiply(matrix<ET1, OT1> const& m1, vector<ET2, OT2> const& m2);
@@ -1104,7 +1104,7 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, vector<ET2, OT2>>::multiply
 template<class OT, class ET1, class OT1, class ET2, class OT2>
 struct matrix_multiplication_traits<OT, vector<ET1, OT1>, matrix<ET2, OT2>>
 {
-    using engine_type = matrix_multiplication_engine_t<OT, ET1, ET2>;
+    using engine_type = select_matrix_multiplication_engine_t<OT, ET1, ET2>;
     using result_type = vector<engine_type, OT>;
 
     static constexpr result_type    multiply(vector<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);
@@ -1156,7 +1156,7 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, matrix<ET2, OT2>>::multiply
 template<class OT, class ET1, class OT1, class ET2, class OT2>
 struct matrix_multiplication_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>
 {
-    using engine_type = matrix_multiplication_engine_t<OT, ET1, ET2>;
+    using engine_type = select_matrix_multiplication_engine_t<OT, ET1, ET2>;
     using result_type = matrix<engine_type, OT>;
 
     static constexpr result_type    multiply(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2);

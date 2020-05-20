@@ -265,7 +265,7 @@ struct engine_div_traits_tst<OT,
                              fs_matrix_engine_tst<T1, R1, C1>,
                              STD_LA::scalar_engine<T2>>
 {
-    using element_type = STD_LA::matrix_division_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_division_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
 };
 
@@ -274,7 +274,7 @@ struct engine_div_traits_tst<OT,
                              STD_LA::fs_matrix_engine<T1, R1, C1>,
                              STD_LA::scalar_engine<T2>>
 {
-    using element_type = STD_LA::matrix_division_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_division_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
 };
 
@@ -283,7 +283,7 @@ struct engine_div_traits_tst<OT,
                              STD_LA::transpose_engine<fs_matrix_engine_tst<T1, R1, C1>, MCT1>,
                              STD_LA::scalar_engine<T2>>
 {
-    using element_type = STD_LA::matrix_division_element_t<OT, T1, T2>;
+    using element_type = STD_LA::select_matrix_division_element_t<OT, T1, T2>;
     using engine_type  = fs_matrix_engine_tst<element_type, C1, R1>;
 };
 
@@ -298,7 +298,7 @@ struct division_traits_tst<OTR,
                            double>
 {
     using op_traits   = OTR;
-    using engine_type = STD_LA::matrix_division_engine_t<op_traits,
+    using engine_type = STD_LA::select_matrix_division_engine_t<op_traits,
                                                          fs_matrix_engine_tst<double, 5, 7>,
                                                          STD_LA::scalar_engine<double>>;
     using result_type = STD_LA::matrix<engine_type, op_traits>;

@@ -241,21 +241,21 @@ struct engine_neg_traits_tst;
 template<class OT, class T1, size_t R1, size_t C1>
 struct engine_neg_traits_tst<OT, fs_matrix_engine_tst<T1, R1, C1>>
 {
-    using element_type = STD_LA::matrix_negation_element_t<OT, T1>;
+    using element_type = STD_LA::select_matrix_negation_element_t<OT, T1>;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
 };
 
 template<class OT, class T1, size_t R1, size_t C1>
 struct engine_neg_traits_tst<OT, STD_LA::fs_matrix_engine<T1, R1, C1>>
 {
-    using element_type = STD_LA::matrix_negation_element_t<OT, T1>;
+    using element_type = STD_LA::select_matrix_negation_element_t<OT, T1>;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
 };
 
 template<class OT, class T1, size_t R1, size_t C1, class MCT1>
 struct engine_neg_traits_tst<OT, STD_LA::transpose_engine<fs_matrix_engine_tst<T1, R1, C1>, MCT1>>
 {
-    using element_type = STD_LA::matrix_negation_element_t<OT, T1>;
+    using element_type = STD_LA::select_matrix_negation_element_t<OT, T1>;
     using engine_type  = fs_matrix_engine_tst<element_type, C1, R1>;
 };
 
@@ -268,7 +268,7 @@ template<class OTR>
 struct negation_traits_tst<OTR, STD_LA::matrix<fs_matrix_engine_tst<double, 3, 4>, OTR>>
 {
     using op_traits   = OTR;
-    using engine_type = STD_LA::matrix_negation_engine_t<op_traits, fs_matrix_engine_tst<double, 3, 4>>;
+    using engine_type = STD_LA::select_matrix_negation_engine_t<op_traits, fs_matrix_engine_tst<double, 3, 4>>;
     using result_type = STD_LA::matrix<engine_type, op_traits>;
 
     static result_type  negate(STD_LA::matrix<fs_matrix_engine_tst<double, 3, 4>, OTR> const& m1)
