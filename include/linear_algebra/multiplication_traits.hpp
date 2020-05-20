@@ -854,7 +854,7 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, T2>::multiply
     index_type_r    elems = static_cast<index_type_r>(v1.size());
     result_type     vr;
 
-    if constexpr (is_resizable(vr))
+    if constexpr (is_resizable_engine_v<engine_type>)
     {
         vr.resize(elems);
     }
@@ -894,7 +894,7 @@ matrix_multiplication_traits<OTR, T1, vector<ET2, OT2>>::multiply
     index_type_r    elems = static_cast<index_type_r>(v2.size());
     result_type     vr;
 
-    if constexpr (is_resizable(vr))
+    if constexpr (is_resizable_engine_v<engine_type>)
     {
         vr.resize(elems);
     }
@@ -935,7 +935,7 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, T2>::multiply
     index_type_r    cols = static_cast<index_type_r>(m1.columns());
     result_type		mr;
 
-    if constexpr (is_resizable(mr))
+    if constexpr (is_resizable_engine_v<engine_type>)
     {
         mr.resize(rows, cols);
     }
@@ -982,7 +982,7 @@ matrix_multiplication_traits<OTR, T1, matrix<ET2, OT2>>::multiply
     index_type_r    cols = static_cast<index_type_r>(m2.columns());
     result_type		mr;
 
-    if constexpr (is_resizable(mr))
+    if constexpr (is_resizable_engine_v<engine_type>)
     {
         mr.resize(rows, cols);
     }
@@ -1072,7 +1072,7 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, vector<ET2, OT2>>::multiply
     index_type_1    inner = static_cast<index_type_1>(m1.columns());
     result_type		vr;
 
-    if constexpr (is_resizable(vr))
+    if constexpr (is_resizable_engine_v<engine_type>)
     {
         vr.resize(elems);
     }
@@ -1124,7 +1124,7 @@ matrix_multiplication_traits<OTR, vector<ET1, OT1>, matrix<ET2, OT2>>::multiply
     index_type_2    inner = static_cast<index_type_2>(m2.rows());
     result_type		vr;
 
-    if constexpr (is_resizable(vr))
+    if constexpr (is_resizable_engine_v<engine_type>)
     {
         vr.resize(elems);
     }
@@ -1177,7 +1177,7 @@ matrix_multiplication_traits<OTR, matrix<ET1, OT1>, matrix<ET2, OT2>>::multiply
     index_type_1    inner = m1.columns();
     result_type		mr;
 
-    if constexpr (is_resizable(mr))
+    if constexpr (is_resizable_engine_v<engine_type>)
     {
         mr.resize(rows, cols);
     }

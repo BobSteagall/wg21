@@ -186,7 +186,7 @@ bool    engines_match_v = (is_matrix_engine_v<ET1> && is_matrix_engine_v<ET2>) |
                           (is_scalar_engine_v<ET1> && is_scalar_engine_v<ET2>);
 
 
-//- These privatee alias templates are used by the vector and matrix class templates to
+//- These private alias templates are used by the vector and matrix class templates to
 //  enable/disable various parts of their public interfaces via SFINAE.
 //
 template<class T2, class T>
@@ -209,10 +209,6 @@ using enable_if_initable = enable_if_t<is_same_v<ET1, ET2> && is_initable_engine
 
 template<class ET1, class ET2>
 using enable_if_resizable = enable_if_t<is_same_v<ET1, ET2> && is_resizable_engine_v<ET1>, bool>;
-
-template<class ET1, class ET2, class U>
-using enable_if_init_list_ok = enable_if_t<is_same_v<ET1, ET2> && !is_resizable_engine_v<ET1> &&
-                                           is_convertible_v<U, typename ET1::value_type>, bool>;
 
 
 //==================================================================================================

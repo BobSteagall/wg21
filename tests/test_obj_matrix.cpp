@@ -441,7 +441,7 @@ addition_traits_tst<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
     index_type_r    cols = static_cast<index_type_r>(m1.columns());
     result_type		mr;
 
-    if constexpr (is_resizable(mr))
+    if constexpr (is_resizable_engine_v<engine_type>)
 	{
 		mr.resize(rows, cols);
     }

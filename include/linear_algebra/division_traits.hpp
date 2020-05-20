@@ -409,7 +409,7 @@ matrix_division_traits<OTR, vector<ET1, OT1>, T2>::divide
     index_type_r    elems = static_cast<index_type_r>(v1.size());
     result_type     vr;
 
-    if constexpr (is_resizable(vr))
+    if constexpr (is_resizable_engine_v<engine_type>)
     {
         vr.resize(elems);
     }
@@ -450,7 +450,7 @@ matrix_division_traits<OTR, matrix<ET1, OT1>, T2>::divide
     index_type_r    cols = static_cast<index_type_r>(m1.columns());
     result_type		mr;
 
-    if constexpr (is_resizable(mr))
+    if constexpr (is_resizable_engine_v<engine_type>)
     {
         mr.resize(rows, cols);
     }
