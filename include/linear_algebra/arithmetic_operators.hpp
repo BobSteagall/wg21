@@ -205,6 +205,35 @@ operator *(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
 }
 
 
+//=================================================================================================
+//  Scalar division operators, which forward to the division traits to do the work.
+//=================================================================================================
+//
+template<class ET1, class OT1, class S2> inline constexpr
+auto
+operator /(vector<ET1, OT1> const& v1, S2 const& s2)
+{
+    using op_traits  = OT1;
+    using op1_type   = vector<ET1, OT1>;
+    using op2_type   = S2;
+    using div_traits = matrix_division_traits_t<op_traits, op1_type, op2_type>;
+
+    return div_traits::divide(v1, s2);
+}
+
+template<class ET1, class OT1, class S2> inline constexpr
+auto
+operator /(matrix<ET1, OT1> const& m1, S2 const& s2)
+{
+    using op_traits  = OT1;
+    using op1_type   = matrix<ET1, OT1>;
+    using op2_type   = S2;
+    using div_traits = matrix_division_traits_t<op_traits, op1_type, op2_type>;
+
+    return div_traits::divide(m1, s2);
+}
+
+
 //------
 //
 template<class ET1, class OT1, class ET2, class OT2> inline constexpr

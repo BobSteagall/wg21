@@ -1,4 +1,4 @@
-//#define ENABLE_TYPE_PRINTING
+//#define ENABLE_TEST_PRINTING
 #include "test_common.hpp"
 
 //- A helper macro to assist in readability of test functions below.

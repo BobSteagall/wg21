@@ -89,6 +89,9 @@
     <ClInclude Include="..\tests\test_new_arithmetic.hpp">
       <Filter>Unit Test Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\division_traits.hpp">
+      <Filter>Library Implementation Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tests\test_01.cpp">
@@ -128,6 +131,9 @@
       <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_geometry_4.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_op_div_traits.cpp">
       <Filter>Unit Test Source Files</Filter>
     </ClCompile>
   </ItemGroup>
