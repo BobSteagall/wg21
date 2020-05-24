@@ -51,6 +51,10 @@ class matrix
     using span_type            = detail::engine_span_t<ET>;
     using const_span_type      = detail::engine_const_span_t<ET>;
 
+#ifdef LA_NEGATION_AS_VIEW
+    using const_negation_type  = matrix<matrix_negation_engine<engine_type>, OT>;
+#endif
+
     //- Construct/copy/destroy
     //
     ~matrix() noexcept = default;
@@ -65,7 +69,7 @@ class matrix
     constexpr matrix(initializer_list<initializer_list<U>> rhs);
 
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr matrix(index_tuple size);
+    explicit constexpr matrix(index_tuple size);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr matrix(index_type rows, index_type cols);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
@@ -110,6 +114,10 @@ class matrix
     constexpr reference             operator ()(index_type i, index_type j);
     constexpr const_reference       operator ()(index_type i, index_type j) const;
 
+#ifdef LA_NEGATION_AS_VIEW
+    constexpr const_negation_type   operator -() const noexcept;
+#endif
+
     constexpr column_type           column(index_type j) noexcept;
     constexpr const_column_type     column(index_type j) const noexcept;
     constexpr row_type              row(index_type i) noexcept;
@@ -135,9 +143,9 @@ class matrix
     //
     constexpr void      swap(matrix& rhs) noexcept;
     template<class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
-    constexpr void      swap_columns(index_type i, index_type j) noexcept;
+    constexpr void      swap_columns(index_type c1, index_type c2) noexcept;
     template<class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
-    constexpr void      swap_rows(index_type i, index_type j) noexcept;
+    constexpr void      swap_rows(index_type r1, index_type r2) noexcept;
 
   private:
     template<class ET2, class OT2> friend class matrix;
@@ -321,6 +329,15 @@ matrix<ET,OT>::operator ()(index_type i, index_type j) const
 {
     return m_engine(i, j);
 }
+
+#ifdef LA_NEGATION_AS_VIEW
+template<class ET, class OT> constexpr
+typename matrix<ET, OT>::const_negation_type
+matrix<ET,OT>::operator -() const noexcept
+{
+    return const_negation_type{m_engine};
+}
+#endif
 
 template<class ET, class OT> inline constexpr
 typename matrix<ET,OT>::const_column_type

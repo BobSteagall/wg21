@@ -134,6 +134,10 @@ class vector
     using span_type            = detail::engine_span_t<ET>;
     using const_span_type      = detail::engine_const_span_t<ET>;
 
+#ifdef LA_NEGATION_AS_VIEW
+    using const_negation_type  = vector<vector_negation_engine<engine_type>, OT>;
+#endif
+
     //- Construct/copy/destroy
     //
     ~vector() = default;
@@ -148,7 +152,7 @@ class vector
     constexpr vector(initializer_list<U> list);
 
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr vector(index_type elems);
+    explicit constexpr vector(index_type elems);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr vector(index_type elems, index_type elemcap);
 
@@ -178,6 +182,9 @@ class vector
     constexpr const_reference       operator [](index_type i) const;
     constexpr const_reference       operator ()(index_type i) const;
 
+#ifdef LA_NEGATION_AS_VIEW
+    constexpr const_negation_type   operator -() const noexcept;
+#endif
     constexpr subvector_type        subvector(index_type i, index_type n) noexcept;
     constexpr const_subvector_type  subvector(index_type i, index_type n) const noexcept;
     constexpr transpose_type        t();
@@ -338,6 +345,15 @@ vector<ET,OT>::operator ()(index_type i) const
 {
     return m_engine(i);
 }
+
+#ifdef LA_NEGATION_AS_VIEW
+template<class ET, class OT> constexpr
+typename vector<ET, OT>::const_negation_type
+vector<ET,OT>::operator -() const noexcept
+{
+    return const_negation_type{m_engine};
+}
+#endif
 
 template<class ET, class OT> constexpr
 typename vector<ET,OT>::subvector_type

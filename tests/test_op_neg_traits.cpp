@@ -1,6 +1,17 @@
 //#define ENABLE_TEST_PRINTING
 #include "test_common.hpp"
 
+#ifdef LA_NEGATION_AS_VIEW
+
+void
+TestGroup30()
+{
+    PRINT_FNAME();
+}
+
+
+#else
+
 //- A helper macro to assist in readability of test functions below.
 //
 #define ASSERT_NEG_A_EQ_B(A, B)     \
@@ -356,3 +367,5 @@ TestGroup30()
     t302();
     t304();
 }
+
+#endif

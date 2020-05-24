@@ -25,14 +25,14 @@ struct scalar_engine
 //  tag: scalar, vector, or matrix.
 //
 template<class TT> inline constexpr
-bool    is_scalar_engine_tag = TT::value == scalar_engine_tag::value;
+bool    is_scalar_engine_tag_v = TT::value == scalar_engine_tag::value;
 
 template<class TT> inline constexpr
-bool    is_vector_engine_tag = TT::value >= readable_vector_engine_tag::value &&
+bool    is_vector_engine_tag_v = TT::value >= readable_vector_engine_tag::value &&
                                TT::value <= resizable_vector_engine_tag::value;
 
 template<class TT> inline constexpr
-bool    is_matrix_engine_tag = TT::value >= readable_matrix_engine_tag::value &&
+bool    is_matrix_engine_tag_v = TT::value >= readable_matrix_engine_tag::value &&
                                TT::value <= resizable_matrix_engine_tag::value;
 
 
