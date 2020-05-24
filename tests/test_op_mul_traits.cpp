@@ -40,9 +40,9 @@ struct test_mul_traits_ord
 
 struct test_mul_op_traits_ord
 {
-    using element_multiplication_traits = test_element_mul_traits_ord;
-    using engine_multiplication_traits  = test_engine_mul_traits_ord;
-    using multiplication_traits         = test_mul_traits_ord;
+    using multiplication_element_traits = test_element_mul_traits_ord;
+    using multiplication_engine_traits  = test_engine_mul_traits_ord;
+    using multiplication_arithmetic_traits         = test_mul_traits_ord;
 };
 
 
@@ -72,13 +72,13 @@ struct test_mul_traits_nta
 struct test_mul_op_traits_nta
 {
     template<class T1, class T2>
-    using element_multiplication_traits = test_element_mul_traits_nta<T1, T2>;
+    using multiplication_element_traits = test_element_mul_traits_nta<T1, T2>;
 
     template<class OT, class ET1, class ET2>
-    using engine_multiplication_traits = test_engine_mul_traits_nta<OT, ET1, ET2>;
+    using multiplication_engine_traits = test_engine_mul_traits_nta<OT, ET1, ET2>;
 
     template<class OT, class OP1, class OP2>
-    using multiplication_traits = test_mul_traits_nta<OT, OP1, OP2>;
+    using multiplication_arithmetic_traits = test_mul_traits_nta<OT, OP1, OP2>;
 };
 
 
@@ -89,19 +89,19 @@ struct test_mul_op_traits_nta
 struct test_mul_op_traits_nct
 {
     template<class T1, class T2>
-    struct element_multiplication_traits
+    struct multiplication_element_traits
     {
         using element_type = dummy_type;
     };
 
     template<class OT, class ET1, class ET2>
-    struct engine_multiplication_traits
+    struct multiplication_engine_traits
     {
         using engine_type = dummy_type;
     };
 
     template<class OT, class OP1, class OP2>
-    struct multiplication_traits
+    struct multiplication_arithmetic_traits
     {
         using result_type = dummy_type;
     };
@@ -811,13 +811,13 @@ struct multiplication_traits_tst<OTR,
 struct test_mul_op_traits_tst
 {
      template<class T1, class T2>
-     using element_multiplication_traits = element_mul_traits_tst<T1, T2>;
+     using multiplication_element_traits = element_mul_traits_tst<T1, T2>;
 
      template<class OT, class ET1, class ET2>
-     using engine_multiplication_traits = engine_mul_traits_tst<OT, ET1, ET2>;
+     using multiplication_engine_traits = engine_mul_traits_tst<OT, ET1, ET2>;
 
      template<class OT, class OP1, class OP2>
-     using multiplication_traits = multiplication_traits_tst<OT, OP1, OP2>;
+     using multiplication_arithmetic_traits = multiplication_traits_tst<OT, OP1, OP2>;
 };
 
 

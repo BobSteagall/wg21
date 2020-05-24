@@ -468,7 +468,7 @@ addition_traits_tst<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
 struct op_traits_tst
 {
     template<class OTR, class OP1, class OP2>
-    using addition_traits = addition_traits_tst<OTR, OP1, OP2>;
+    using addition_arithmetic_traits = addition_traits_tst<OTR, OP1, OP2>;
 
 };
 

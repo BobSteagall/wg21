@@ -43,7 +43,7 @@ struct has_element_addition_traits
 :   std::false_type {};
 
 template<typename T>
-struct has_element_addition_traits<T, void_t<typename T::element_addition_traits>>
+struct has_element_addition_traits<T, void_t<typename T::addition_element_traits>>
 :   std::true_type {};
 
 template<typename T, typename M1, typename M2, typename = void>
@@ -51,7 +51,7 @@ struct has_element_addition_traits_mt
 :   std::false_type {};
 
 template<typename T, typename M1, typename M2>
-struct has_element_addition_traits_mt<T, M1, M2, void_t<typename T::template element_addition_traits<M1, M2>>>
+struct has_element_addition_traits_mt<T, M1, M2, void_t<typename T::template addition_element_traits<M1, M2>>>
 :   std::true_type {};
 
 template<typename T, typename M1, typename M2>
@@ -116,9 +116,9 @@ struct extract_element_addition_traits_stf : public std::false_type
 };
 
 template<typename OT>
-struct extract_element_addition_traits_stf<OT, void_t<decltype(std::declval<typename OT::element_addition_traits>())>>  : public std::true_type
+struct extract_element_addition_traits_stf<OT, void_t<decltype(std::declval<typename OT::addition_element_traits>())>>  : public std::true_type
 {
-    using type = typename OT::element_addition_traits;
+    using type = typename OT::addition_element_traits;
 };
 
 
@@ -129,9 +129,9 @@ struct extract_element_addition_traits_mtf : public std::false_type
 };
 
 template<typename OT, typename T1, typename T2>
-struct extract_element_addition_traits_mtf<OT, T1, T2, void_t<decltype(std::declval<typename OT::template element_addition_traits<T1, T2>>())>> : public std::true_type
+struct extract_element_addition_traits_mtf<OT, T1, T2, void_t<decltype(std::declval<typename OT::template addition_element_traits<T1, T2>>())>> : public std::true_type
 {
-    using type = typename OT::template element_addition_traits<T1, T2>;
+    using type = typename OT::template addition_element_traits<T1, T2>;
 };
 
 
@@ -142,9 +142,9 @@ struct extract_element_addition_traits_ttf : public std::false_type
 };
 
 template<template<typename, typename> typename OT, typename T1, typename T2>
-struct extract_element_addition_traits_ttf<OT, T1, T2, void_t<decltype(std::declval<typename OT<T1, T2>::element_addition_traits>())>> : public std::true_type
+struct extract_element_addition_traits_ttf<OT, T1, T2, void_t<decltype(std::declval<typename OT<T1, T2>::addition_element_traits>())>> : public std::true_type
 {
-    using type = typename OT<T1, T2>::element_addition_traits;
+    using type = typename OT<T1, T2>::addition_element_traits;
 };
 
 
@@ -171,9 +171,9 @@ struct extract_engine_addition_traits_stf
 };
 
 template<typename OT>
-struct extract_engine_addition_traits_stf<OT, void_t<decltype(std::declval<typename OT::engine_addition_traits>())>>
+struct extract_engine_addition_traits_stf<OT, void_t<decltype(std::declval<typename OT::addition_engine_traits>())>>
 {
-    using type = typename OT::engine_addition_traits;
+    using type = typename OT::addition_engine_traits;
 };
 
 
@@ -184,9 +184,9 @@ struct extract_engine_addition_traits_mtf
 };
 
 template<typename OT, typename ET1, typename ET2>
-struct extract_engine_addition_traits_mtf<OT, ET1, ET2, void_t<decltype(std::declval<typename OT::template engine_addition_traits<ET1, ET2>>())>>
+struct extract_engine_addition_traits_mtf<OT, ET1, ET2, void_t<decltype(std::declval<typename OT::template addition_engine_traits<ET1, ET2>>())>>
 {
-    using type = typename OT::template engine_addition_traits<ET1, ET2>;
+    using type = typename OT::template addition_engine_traits<ET1, ET2>;
 };
 
 
@@ -213,9 +213,9 @@ struct extract_addition_traits_stf
 };
 
 template<typename OT>
-struct extract_addition_traits_stf<OT, void_t<decltype(std::declval<typename OT::addition_traits>())>>
+struct extract_addition_traits_stf<OT, void_t<decltype(std::declval<typename OT::addition_arithmetic_traits>())>>
 {
-    using type = typename OT::addition_traits;
+    using type = typename OT::addition_arithmetic_traits;
 };
 
 
@@ -226,9 +226,9 @@ struct extract_addition_traits_mtf
 };
 
 template<typename OT, typename OP1, typename OP2>
-struct extract_addition_traits_mtf<OT, OP1, OP2, void_t<decltype(std::declval<typename OT::template addition_traits<OP1, OP2>>())>>
+struct extract_addition_traits_mtf<OT, OP1, OP2, void_t<decltype(std::declval<typename OT::template addition_arithmetic_traits<OP1, OP2>>())>>
 {
-    using type = typename OT::template addition_traits<OP1, OP2>;
+    using type = typename OT::template addition_arithmetic_traits<OP1, OP2>;
 };
 
 
@@ -237,7 +237,7 @@ struct extract_addition_traits
 {
     using COP1 = typename extract_addition_traits_stf<OT>::type;
     using COP2 = typename extract_addition_traits_mtf<OT, OP1, OP2>::type;
-    using DEF  = STD_LA::matrix_addition_traits<OT, OP1, OP2>;
+    using DEF  = STD_LA::matrix_addition_arithmetic_traits<OT, OP1, OP2>;
 
     using type = typename nv_traits_chooser2<COP1, COP2, DEF>::type;
 };
@@ -264,7 +264,7 @@ struct test_element_addition_traits {};
 template<class T1, class T2>
 struct test_matrix_operation_traits
 {
-    using element_addition_traits = test_element_addition_traits<T1, T2>;
+    using addition_element_traits = test_element_addition_traits<T1, T2>;
 };
 
 struct test_element_add_traits
@@ -284,9 +284,9 @@ struct test_add_traits
 
 struct test_op_traits
 {
-    using element_addition_traits = test_element_add_traits;
-    using engine_addition_traits  = test_engine_add_traits;
-    using addition_traits         = test_add_traits;
+    using addition_element_traits = test_element_add_traits;
+    using addition_engine_traits  = test_engine_add_traits;
+    using addition_arithmetic_traits         = test_add_traits;
 };
 
 

@@ -26,7 +26,7 @@ namespace detail {
 //- Form 0 type detection of nested element addition traits.
 //
 template<typename OT>
-using element_add_traits_f0_t = typename OT::element_addition_traits;
+using element_add_traits_f0_t = typename OT::addition_element_traits;
 
 template<typename OT>
 using element_add_result_f0_t = typename element_add_traits_f0_t<OT>::element_type;
@@ -51,7 +51,7 @@ struct detect_element_add_traits_f0<OT, void_t<element_add_result_f0_t<OT>>>
 //- Form 2 type detection of nested element addition traits.
 //
 template<typename OT, typename T1, typename T2>
-using element_add_traits_f2_t = typename OT::template element_addition_traits<T1, T2>;
+using element_add_traits_f2_t = typename OT::template addition_element_traits<T1, T2>;
 
 template<typename OT, typename T1, typename T2>
 using element_add_result_f2_t = typename element_add_traits_f2_t<OT, T1, T2>::element_type;
@@ -103,7 +103,7 @@ using element_add_result_t = typename element_add_traits_chooser<OT, T1, T2>::el
 //- Form 0 type detection of nested engine addition traits.
 //
 template<typename OT>
-using engine_add_traits_f0_t = typename OT::engine_addition_traits;
+using engine_add_traits_f0_t = typename OT::addition_engine_traits;
 
 template<typename OT>
 using engine_add_result_f0_t = typename engine_add_traits_f0_t<OT>::engine_type;
@@ -128,7 +128,7 @@ struct detect_engine_add_traits_f0<OT, void_t<engine_add_result_f0_t<OT>>>
 //- Form 2 type detection of nested engine addition traits.
 //
 template<typename OT, typename T1, typename T2>
-using engine_add_traits_f2_t = typename OT::template engine_addition_traits<OT, T1, T2>;
+using engine_add_traits_f2_t = typename OT::template addition_engine_traits<OT, T1, T2>;
 
 template<typename OT, typename T1, typename T2>
 using engine_add_result_f2_t = typename engine_add_traits_f2_t<OT, T1, T2>::engine_type;
@@ -180,7 +180,7 @@ using engine_add_result_t = typename engine_add_traits_chooser<OT, ET1, ET2>::en
 //- Form 0 type detection of nested addition arithmetic traits.
 //
 template<typename OT>
-using add_traits_f0_t = typename OT::addition_traits;
+using add_traits_f0_t = typename OT::addition_arithmetic_traits;
 
 template<typename OT>
 using add_result_f0_t = typename add_traits_f0_t<OT>::result_type;
@@ -205,7 +205,7 @@ struct detect_add_traits_f0<OT, void_t<add_result_f0_t<OT>>>
 //- Form 2 type detection of nested addition arithmetic traits.
 //
 template<typename OT, typename T1, typename T2>
-using add_traits_f2_t = typename OT::template addition_traits<OT, T1, T2>;
+using add_traits_f2_t = typename OT::template addition_arithmetic_traits<OT, T1, T2>;
 
 template<typename OT, typename T1, typename T2>
 using add_result_f2_t = typename add_traits_f2_t<OT, T1, T2>::result_type;
@@ -223,7 +223,7 @@ template<typename OT, typename OP1, typename OP2>
 struct detect_add_traits_f2<OT, OP1, OP2, void_t<add_result_f2_t<OT, OP1, OP2>>>
 :   public true_type
 {
-    using traits_type = typename OT::template addition_traits<OT, OP1, OP2>;
+    using traits_type = typename OT::template addition_arithmetic_traits<OT, OP1, OP2>;
 };
 
 //- Used only for testing.
@@ -240,7 +240,7 @@ struct add_traits_chooser
 {
     using CT1 = typename detect_add_traits_f0<OT>::traits_type;
     using CT2 = typename detect_add_traits_f2<OT, OP1, OP2>::traits_type;
-    using DEF = matrix_addition_traits<OT, OP1, OP2>;
+    using DEF = matrix_addition_arithmetic_traits<OT, OP1, OP2>;
 
     using traits_type = typename non_void_traits_chooser<CT1, CT2, DEF>::traits_type;
 };
@@ -553,7 +553,7 @@ struct matrix_addition_engine_traits<OT,
 //- Alias interface to detection meta-function that extracts the addition traits type.
 //
 template<class OT, class OP1, class OP2>
-using select_matrix_addition_traits_t = detail::add_traits_result_t<OT, OP1, OP2>;
+using select_matrix_addition_arithmetic_t = detail::add_traits_result_t<OT, OP1, OP2>;
 
 
 //- The standard addition traits type provides the default mechanism for computing the result
@@ -562,7 +562,7 @@ using select_matrix_addition_traits_t = detail::add_traits_result_t<OT, OP1, OP2
 //- (vector + vector)
 //
 template<class OT, class ET1, class OT1, class ET2, class OT2>
-struct matrix_addition_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>
+struct matrix_addition_arithmetic_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>
 {
     using engine_type = select_matrix_addition_engine_t<OT, ET1, ET2>;
     using result_type = vector<engine_type, OT>;
@@ -572,7 +572,7 @@ struct matrix_addition_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>
 
 template<class OT, class ET1, class OT1, class ET2, class OT2> inline constexpr
 auto
-matrix_addition_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>::add
+matrix_addition_arithmetic_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>::add
 (vector<ET1, OT1> const& v1, vector<ET2, OT2> const& v2) -> result_type
 {
     using index_type_1 = typename vector<ET1, OT1>::index_type;
@@ -603,7 +603,7 @@ matrix_addition_traits<OT, vector<ET1, OT1>, vector<ET2, OT2>>::add
 //- (matrix + matrix)
 //
 template<class OT, class ET1, class OT1, class ET2, class OT2>
-struct matrix_addition_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>
+struct matrix_addition_arithmetic_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>
 {
     using engine_type = select_matrix_addition_engine_t<OT, ET1, ET2>;
     using result_type = matrix<engine_type, OT>;
@@ -613,7 +613,7 @@ struct matrix_addition_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>
 
 template<class OT, class ET1, class OT1, class ET2, class OT2> inline constexpr
 auto
-matrix_addition_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
+matrix_addition_arithmetic_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
 (matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2) -> result_type
 {
     using index_type_1 = typename matrix<ET1, OT1>::index_type;

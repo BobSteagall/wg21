@@ -40,9 +40,9 @@ struct test_add_traits_ord
 
 struct test_add_op_traits_ord
 {
-    using element_addition_traits = test_element_add_traits_ord;
-    using engine_addition_traits  = test_engine_add_traits_ord;
-    using addition_traits         = test_add_traits_ord;
+    using addition_element_traits = test_element_add_traits_ord;
+    using addition_engine_traits  = test_engine_add_traits_ord;
+    using addition_arithmetic_traits         = test_add_traits_ord;
 };
 
 
@@ -72,13 +72,13 @@ struct test_add_traits_nta
 struct test_add_op_traits_nta
 {
     template<class T1, class T2>
-    using element_addition_traits = test_element_add_traits_nta<T1, T2>;
+    using addition_element_traits = test_element_add_traits_nta<T1, T2>;
 
     template<class OT, class ET1, class ET2>
-    using engine_addition_traits = test_engine_add_traits_nta<OT, ET1, ET2>;
+    using addition_engine_traits = test_engine_add_traits_nta<OT, ET1, ET2>;
 
     template<class OT, class OP1, class OP2>
-    using addition_traits = test_add_traits_nta<OT, OP1, OP2>;
+    using addition_arithmetic_traits = test_add_traits_nta<OT, OP1, OP2>;
 };
 
 
@@ -89,19 +89,19 @@ struct test_add_op_traits_nta
 struct test_add_op_traits_nct
 {
     template<class T1, class T2>
-    struct element_addition_traits
+    struct addition_element_traits
     {
         using element_type = dummy_type;
     };
 
     template<class OT, class ET1, class ET2>
-    struct engine_addition_traits
+    struct addition_engine_traits
     {
         using engine_type = dummy_type;
     };
 
     template<class OT, class OP1, class OP2>
-    struct addition_traits
+    struct addition_arithmetic_traits
     {
         using result_type = dummy_type;
     };
@@ -489,13 +489,13 @@ struct addition_traits_tst<OTR,
 struct test_add_op_traits_tst
 {
      template<class T1, class T2>
-     using element_addition_traits = element_add_traits_tst<T1, T2>;
+     using addition_element_traits = element_add_traits_tst<T1, T2>;
 
      template<class OT, class ET1, class ET2>
-     using engine_addition_traits = engine_add_traits_tst<OT, ET1, ET2>;
+     using addition_engine_traits = engine_add_traits_tst<OT, ET1, ET2>;
 
      template<class OT, class OP1, class OP2>
-     using addition_traits = addition_traits_tst<OT, OP1, OP2>;
+     using addition_arithmetic_traits = addition_traits_tst<OT, OP1, OP2>;
 };
 
 

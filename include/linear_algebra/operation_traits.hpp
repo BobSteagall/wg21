@@ -30,58 +30,58 @@ struct matrix_operation_traits
     //- Negation
     //
     template<class T1>
-    using element_negation_traits = matrix_negation_element_traits<T1>;
+    using negation_element_traits = matrix_negation_element_traits<T1>;
 
     template<class OTR, class ET1>
-    using engine_negation_traits = matrix_negation_engine_traits<OTR, ET1>;
+    using negation_engine_traits = matrix_negation_engine_traits<OTR, ET1>;
 
     template<class OP1, class OTR>
-    using negation_traits = matrix_negation_traits<OP1, OTR>;
+    using negation_arithmetic_traits = matrix_negation_arithmetic_traits<OP1, OTR>;
 #endif
 
     //- Addition
     //
     template<class T1, class T2>
-    using element_addition_traits = matrix_addition_element_traits<T1, T2>;
+    using addition_element_traits = matrix_addition_element_traits<T1, T2>;
 
     template<class OTR, class ET1, class ET2>
-    using engine_addition_traits = matrix_addition_engine_traits<OTR, ET1, ET2>;
+    using addition_engine_traits = matrix_addition_engine_traits<OTR, ET1, ET2>;
 
     template<class OTR, class OP1, class OP2>
-    using addition_traits = matrix_addition_traits<OTR, OP1, OP2>;
+    using addition_arithmetic_traits = matrix_addition_arithmetic_traits<OTR, OP1, OP2>;
 
     //- Subtraction
     //
     template<class T1, class T2>
-    using element_subtraction_traits = matrix_subtraction_element_traits<T1, T2>;
+    using subtraction_element_traits = matrix_subtraction_element_traits<T1, T2>;
 
     template<class OTR, class ET1, class ET2>
-    using engine_subtraction_traits = matrix_subtraction_engine_traits<OTR, ET1, ET2>;
+    using subtraction_engine_traits = matrix_subtraction_engine_traits<OTR, ET1, ET2>;
 
     template<class OTR, class OP1, class OP2>
-    using subtraction_traits = matrix_subtraction_traits<OTR, OP1, OP2>;
+    using subtraction_arithmetic_traits = matrix_subtraction_arithmetic_traits<OTR, OP1, OP2>;
 
     //- Multiplication
     //
     template<class T1, class T2>
-    using element_multiplication_traits = matrix_multiplication_element_traits<T1, T2>;
+    using multiplication_element_traits = matrix_multiplication_element_traits<T1, T2>;
 
     template<class OTR, class ET1, class ET2>
-    using engine_multiplication_traits = matrix_multiplication_engine_traits<OTR, ET1, ET2>;
+    using multiplication_engine_traits = matrix_multiplication_engine_traits<OTR, ET1, ET2>;
 
     template<class OTR, class OP1, class OP2>
-    using multiplication_traits = matrix_multiplication_traits<OTR, OP1, OP2>;
+    using multiplication_arithmetic_traits = matrix_multiplication_arithmetic_traits<OTR, OP1, OP2>;
 
     //- Default arithmetic operation traits.
     //
     template<class T1, class T2>
-    using element_division_traits = matrix_division_element_traits<T1, T2>;
+    using division_element_traits = matrix_division_element_traits<T1, T2>;
 
     template<class OTR, class T1, class T2>
-    using engine_division_traits = matrix_division_engine_traits<OTR, T1, T2>;
+    using division_engine_traits = matrix_division_engine_traits<OTR, T1, T2>;
 
     template<class OTR, class T1, class T2>
-    using division_traits = matrix_division_traits<OTR, T1, T2>;
+    using division_arithmetic_traits = matrix_division_arithmetic_traits<OTR, T1, T2>;
 };
 
 //==================================================================================================

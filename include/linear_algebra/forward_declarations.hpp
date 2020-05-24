@@ -110,32 +110,32 @@ using fs_matrix = matrix<fs_matrix_engine<T, R, C>>;
 //
 template<class T1>              struct matrix_negation_element_traits;
 template<class OT, class ET1>   struct matrix_negation_engine_traits;
-template<class OT, class OP1>   struct matrix_negation_traits;
+template<class OT, class OP1>   struct matrix_negation_arithmetic_traits;
 #endif
 
 //- Traits pertaining to addition.
 //
 template<class T1, class T2>                struct matrix_addition_element_traits;
 template<class OT, class ET1, class ET2>    struct matrix_addition_engine_traits;
-template<class OT, class OP1, class OP2>    struct matrix_addition_traits;
+template<class OT, class OP1, class OP2>    struct matrix_addition_arithmetic_traits;
 
 //- Traits pertaining to subtraction.
 //
 template<class T1, class T2>                struct matrix_subtraction_element_traits;
 template<class OT, class ET1, class ET2>    struct matrix_subtraction_engine_traits;
-template<class OT, class OP1, class OP2>    struct matrix_subtraction_traits;
+template<class OT, class OP1, class OP2>    struct matrix_subtraction_arithmetic_traits;
 
 //- Traits pertaining to multiplication.
 //
 template<class T1, class T2>                struct matrix_multiplication_element_traits;
 template<class OT, class ET1, class ET2>    struct matrix_multiplication_engine_traits;
-template<class OT, class OP1, class OP2>    struct matrix_multiplication_traits;
+template<class OT, class OP1, class OP2>    struct matrix_multiplication_arithmetic_traits;
 
 //- Traits pertaining to scalar division.
 //
 template<class T1, class T2>                struct matrix_division_element_traits;
 template<class OT, class ET1, class ET2>    struct matrix_division_engine_traits;
-template<class OT, class OP1, class OP2>    struct matrix_division_traits;
+template<class OT, class OP1, class OP2>    struct matrix_division_arithmetic_traits;
 
 //- A traits type that chooses between two operation traits types in the binary arithmetic
 //  operators and free functions that act like binary operators (e.g., outer_product()).

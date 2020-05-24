@@ -40,9 +40,9 @@ struct test_div_traits_ord
 
 struct test_div_op_traits_ord
 {
-    using element_division_traits = test_element_div_traits_ord;
-    using engine_division_traits  = test_engine_div_traits_ord;
-    using division_traits         = test_div_traits_ord;
+    using division_element_traits = test_element_div_traits_ord;
+    using division_engine_traits  = test_engine_div_traits_ord;
+    using division_arithmetic_traits         = test_div_traits_ord;
 };
 
 
@@ -72,13 +72,13 @@ struct test_div_traits_nta
 struct test_div_op_traits_nta
 {
     template<class T1, class T2>
-    using element_division_traits = test_element_div_traits_nta<T1, T2>;
+    using division_element_traits = test_element_div_traits_nta<T1, T2>;
 
     template<class OT, class ET1, class ET2>
-    using engine_division_traits = test_engine_div_traits_nta<OT, ET1, ET2>;
+    using division_engine_traits = test_engine_div_traits_nta<OT, ET1, ET2>;
 
     template<class OT, class OP1, class OP2>
-    using division_traits = test_div_traits_nta<OT, OP1, OP2>;
+    using division_arithmetic_traits = test_div_traits_nta<OT, OP1, OP2>;
 };
 
 
@@ -89,19 +89,19 @@ struct test_div_op_traits_nta
 struct test_div_op_traits_nct
 {
     template<class T1, class T2>
-    struct element_division_traits
+    struct division_element_traits
     {
         using element_type = dummy_type;
     };
 
     template<class OT, class ET1, class ET2>
-    struct engine_division_traits
+    struct division_engine_traits
     {
         using engine_type = dummy_type;
     };
 
     template<class OT, class OP1, class OP2>
-    struct division_traits
+    struct division_arithmetic_traits
     {
         using result_type = dummy_type;
     };
@@ -316,13 +316,13 @@ struct division_traits_tst<OTR,
 struct test_div_op_traits_tst
 {
      template<class T1, class T2>
-     using element_division_traits = element_div_traits_tst<T1, T2>;
+     using division_element_traits = element_div_traits_tst<T1, T2>;
 
      template<class OT, class ET1, class ET2>
-     using engine_division_traits = engine_div_traits_tst<OT, ET1, ET2>;
+     using division_engine_traits = engine_div_traits_tst<OT, ET1, ET2>;
 
      template<class OT, class OP1, class OP2>
-     using division_traits = division_traits_tst<OT, OP1, OP2>;
+     using division_arithmetic_traits = division_traits_tst<OT, OP1, OP2>;
 };
 
 
