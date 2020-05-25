@@ -246,6 +246,12 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     PRINT(subrow1);
     auto    sbrwspn1 = subrow1.span();
     PRINT(sbrwspn1);
+
+
+    auto    neg1  = -m1;
+    PRINT(neg1);
+    auto    nspn1 = neg1.span();
+    PRINT(nspn1);
 }
 
 void t001X()
@@ -524,7 +530,6 @@ TestGroup00()
     //constexpr
         fsm_float_35      m13 = m10 + m11;
     fsm_float_35      m14 = m10 + m6;
-
 
 //    t000();
 //    t001();

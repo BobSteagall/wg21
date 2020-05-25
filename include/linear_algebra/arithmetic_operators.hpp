@@ -11,7 +11,7 @@
 namespace STD_LA {
 #ifndef LA_NEGATION_AS_VIEW
 //=================================================================================================
-//  Unary negation operators, which forward to the negation traits to do the work.
+//  Unary negation operators, which employ the negation arithmetic traits to do the work.
 //=================================================================================================
 //
 template<class ET1, class OT1> inline constexpr
@@ -38,7 +38,7 @@ operator -(matrix<ET1, OT1> const& m1)
 
 #endif
 //=================================================================================================
-//  Binary addition operators, which forward to the addition traits to do the work.
+//  Binary addition operators, which employ the addition arithmetic traits to do the work.
 //=================================================================================================
 //
 template<class ET1, class OT1, class ET2, class OT2> inline constexpr
@@ -67,7 +67,7 @@ operator +(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
 
 
 //=================================================================================================
-//  Binary subtraction operators, which forward to the subtraction traits to do the work.
+//  Binary subtraction operators, which employ the subtraction arithmetic traits to do the work.
 //=================================================================================================
 //
 template<class ET1, class OT1, class ET2, class OT2> inline constexpr
@@ -96,7 +96,7 @@ operator -(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
 
 
 //=================================================================================================
-//  Multiplication operators, which forward to the multiplication traits to do the work.
+//  Multiplication operators, which employ the multiplication arithmetic traits to do the work.
 //=================================================================================================
 //
 template<class ET1, class OT1, class S2> inline constexpr
@@ -207,7 +207,7 @@ operator *(matrix<ET1, OT1> const& m1, matrix<ET2, OT2> const& m2)
 
 
 //=================================================================================================
-//  Scalar division operators, which forward to the division traits to do the work.
+//  Scalar division operators, which employ the division arithmetic traits to do the work.
 //=================================================================================================
 //
 template<class ET1, class OT1, class S2> inline constexpr

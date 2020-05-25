@@ -11,14 +11,13 @@ namespace STD_LA {
 #ifdef LA_NEGATION_AS_VIEW
 //=================================================================================================
 //  Matrix negation engine, meant to act as "view" of the negation of a matrix in expressions
-//  so as to help avoid unnecessary allocation and element copying.
+//  so as to help avoid unnecessary allocation and/or element copying.
 //==================================================================================================
 //
 template<class ET>
 class matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>
 {
     static_assert(is_matrix_engine_v<ET>);
-    static_assert(is_matrix_engine_tag_v<readable_matrix_engine_tag>);
 
   public:
     //- Types
@@ -26,14 +25,15 @@ class matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>
     using engine_category = readable_matrix_engine_tag;
     using element_type    = typename ET::element_type;
     using value_type      = typename ET::value_type;
-    using pointer         = detail::noe_pointer_t<ET, readable_matrix_engine_tag>;
+    using pointer         = typename ET::const_pointer;
     using const_pointer   = typename ET::const_pointer;
-    using reference       = detail::noe_reference_t<ET, readable_matrix_engine_tag>;
-    using const_reference = typename ET::const_reference;
+    using reference       = typename ET::element_type;
+    using const_reference = typename ET::element_type;
     using difference_type = typename ET::difference_type;
     using index_type      = typename ET::index_type;
-    using span_type       = detail::noe_mdspan_submatrix_t<detail::noe_mdspan_t<ET, readable_matrix_engine_tag>>;
-    using const_span_type = detail::noe_mdspan_submatrix_t<detail::noe_const_mdspan_t<ET, readable_matrix_engine_tag>>;
+    using index_tuple     = typename ET::index_tuple;
+    using span_type       = detail::noe_mdspan_negation_t<detail::noe_const_mdspan_t<ET, readable_matrix_engine_tag>>;
+    using const_span_type = detail::noe_mdspan_negation_t<detail::noe_const_mdspan_t<ET, readable_matrix_engine_tag>>;
 
     //- Construct/copy/destroy
     //
@@ -46,19 +46,19 @@ class matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>
     constexpr matrix_view_engine&    operator =(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine&    operator =(matrix_view_engine const&) noexcept = default;
 
-    template<class ET2, detail::enable_if_convertible_engine<ET2, ET> = true>
-    constexpr matrix_view_engine&    operator =(ET2 const& rhs);
-    template<class U, class ET2 = ET, detail::enable_if_writable<ET2, ET> = true>
-    constexpr matrix_view_engine&    operator =(initializer_list<U> rhs);
-
     //- Capacity
     //
-    constexpr index_type    capacity() const noexcept;
-    constexpr index_type    size() const noexcept;
+    constexpr index_type    columns() const noexcept;
+    constexpr index_type    rows() const noexcept;
+    constexpr index_tuple   size() const noexcept;
+
+    constexpr index_type    column_capacity() const noexcept;
+    constexpr index_type    row_capacity() const noexcept;
+    constexpr index_tuple   capacity() const noexcept;
 
     //- Element access
     //
-    constexpr reference     operator ()(index_type i) const;
+    constexpr reference     operator ()(index_type i, index_type j) const;
 
     //- Data access
     //
@@ -86,39 +86,47 @@ matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::matrix_vi
 :   mp_other(nullptr)
 {}
 
-template<class ET>
-template<class ET2, detail::enable_if_convertible_engine<ET2, ET>> constexpr
-matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>&
-matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::operator =(ET2 const& rhs)
-{
-    detail::check_source_engine_size(rhs, size());
-    detail::assign_from_matrix_engine(*this, rhs);
-    return *this;
-}
-
-template<class ET>
-template<class U, class ET2, detail::enable_if_writable<ET2, ET>> constexpr
-matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>&
-matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::operator =(initializer_list<U> rhs)
-{
-    detail::check_source_init_list(rhs, size());
-    detail::assign_from_matrix_initlist(*this, rhs);
-    return *this;
-}
-
 //----------
 //- Capacity
 //
 template<class ET> constexpr
 typename matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::index_type
-matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::capacity() const noexcept
+matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::columns() const noexcept
+{
+    return mp_other->columns();
+}
+
+template<class ET> constexpr
+typename matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::index_type
+matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::rows() const noexcept
+{
+    return mp_other->rows();
+}
+
+template<class ET> constexpr
+typename matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::index_tuple
+matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::size() const noexcept
 {
     return mp_other->size();
 }
 
 template<class ET> constexpr
 typename matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::index_type
-matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::size() const noexcept
+matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::column_capacity() const noexcept
+{
+    return mp_other->columns();
+}
+
+template<class ET> constexpr
+typename matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::index_type
+matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::row_capacity() const noexcept
+{
+    return mp_other->rows();
+}
+
+template<class ET> constexpr
+typename matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::index_tuple
+matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::capacity() const noexcept
 {
     return mp_other->size();
 }
@@ -128,9 +136,9 @@ matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::size() co
 //
 template<class ET> constexpr
 typename matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::reference
-matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::operator ()(index_type i) const
+matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::operator ()(index_type i, index_type j) const
 {
-    return -(*mp_other)(i);
+    return -(*mp_other)(i, j);
 }
 
 //-------------
@@ -140,7 +148,7 @@ template<class ET> constexpr
 typename matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::span_type
 matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::span() const noexcept
 {
-    return detail::noe_mdspan_submatrix(mp_other->span(), 0, mp_other->size());
+    return detail::noe_mdspan_negation(mp_other->span());
 }
 
 //-----------
@@ -163,12 +171,12 @@ matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>::matrix_vi
 
 #endif
 //==================================================================================================
-//  Sub-matrix engine, meant to act as a "view" of a portion of a matrix in expressions, so as
-//  to help avoid unnecessary allocation and element copying.
+//  Sub-matrix engine, meant to act as a "view" of a subset of a matrix in expressions, so as
+//  to help avoid unnecessary allocation and/or element copying.
 //==================================================================================================
 //
 template<class ET, class MCT>
-class matrix_view_engine<ET, MCT, submatrix_view_tag>
+class matrix_view_engine<ET, MCT, subset_view_tag>
 {
     static_assert(is_matrix_engine_v<ET>);
     static_assert(is_matrix_engine_tag_v<MCT>);
@@ -246,7 +254,7 @@ class matrix_view_engine<ET, MCT, submatrix_view_tag>
 //- Construct/copy/destroy
 //
 template<class ET, class MCT> constexpr
-matrix_view_engine<ET, MCT, submatrix_view_tag>::matrix_view_engine()
+matrix_view_engine<ET, MCT, subset_view_tag>::matrix_view_engine()
 :   mp_other(nullptr)
 ,   m_row_start(0)
 ,   m_row_count(0)
@@ -256,8 +264,8 @@ matrix_view_engine<ET, MCT, submatrix_view_tag>::matrix_view_engine()
 
 template<class ET, class MCT>
 template<class ET2, detail::enable_if_convertible_engine<ET2, ET>> constexpr
-matrix_view_engine<ET, MCT, submatrix_view_tag>&
-matrix_view_engine<ET, MCT, submatrix_view_tag>::operator =(ET2 const& rhs)
+matrix_view_engine<ET, MCT, subset_view_tag>&
+matrix_view_engine<ET, MCT, subset_view_tag>::operator =(ET2 const& rhs)
 {
     detail::check_source_engine_size(rhs, rows(), columns());
     detail::assign_from_matrix_engine(*this, rhs);
@@ -266,8 +274,8 @@ matrix_view_engine<ET, MCT, submatrix_view_tag>::operator =(ET2 const& rhs)
 
 template<class ET, class MCT>
 template<class U, detail::enable_if_writable<ET, ET>> constexpr
-matrix_view_engine<ET, MCT, submatrix_view_tag>&
-matrix_view_engine<ET, MCT, submatrix_view_tag>::operator =(initializer_list<initializer_list<U>> rhs)
+matrix_view_engine<ET, MCT, subset_view_tag>&
+matrix_view_engine<ET, MCT, subset_view_tag>::operator =(initializer_list<initializer_list<U>> rhs)
 {
     detail::check_source_init_list(rhs, m_row_count, m_col_count);
     detail::assign_from_matrix_initlist(*this, rhs);
@@ -278,43 +286,43 @@ matrix_view_engine<ET, MCT, submatrix_view_tag>::operator =(initializer_list<ini
 //- Capacity
 //
 template<class ET, class MCT> constexpr
-typename matrix_view_engine<ET, MCT, submatrix_view_tag>::index_type
-matrix_view_engine<ET, MCT, submatrix_view_tag>::columns() const noexcept
+typename matrix_view_engine<ET, MCT, subset_view_tag>::index_type
+matrix_view_engine<ET, MCT, subset_view_tag>::columns() const noexcept
 {
     return m_col_count;
 }
 
 template<class ET, class MCT> constexpr
-typename matrix_view_engine<ET, MCT, submatrix_view_tag>::index_type
-matrix_view_engine<ET, MCT, submatrix_view_tag>::rows() const noexcept
+typename matrix_view_engine<ET, MCT, subset_view_tag>::index_type
+matrix_view_engine<ET, MCT, subset_view_tag>::rows() const noexcept
 {
     return m_row_count;
 }
 
 template<class ET, class MCT> constexpr
-typename matrix_view_engine<ET, MCT, submatrix_view_tag>::index_tuple
-matrix_view_engine<ET, MCT, submatrix_view_tag>::size() const noexcept
+typename matrix_view_engine<ET, MCT, subset_view_tag>::index_tuple
+matrix_view_engine<ET, MCT, subset_view_tag>::size() const noexcept
 {
     return index_tuple(m_row_count, m_col_count);
 }
 
 template<class ET, class MCT> constexpr
-typename matrix_view_engine<ET, MCT, submatrix_view_tag>::index_type
-matrix_view_engine<ET, MCT, submatrix_view_tag>::column_capacity() const noexcept
+typename matrix_view_engine<ET, MCT, subset_view_tag>::index_type
+matrix_view_engine<ET, MCT, subset_view_tag>::column_capacity() const noexcept
 {
     return m_col_count;
 }
 
 template<class ET, class MCT> constexpr
-typename matrix_view_engine<ET, MCT, submatrix_view_tag>::index_type
-matrix_view_engine<ET, MCT, submatrix_view_tag>::row_capacity() const noexcept
+typename matrix_view_engine<ET, MCT, subset_view_tag>::index_type
+matrix_view_engine<ET, MCT, subset_view_tag>::row_capacity() const noexcept
 {
     return m_row_count;
 }
 
 template<class ET, class MCT> constexpr
-typename matrix_view_engine<ET, MCT, submatrix_view_tag>::index_tuple
-matrix_view_engine<ET, MCT, submatrix_view_tag>::capacity() const noexcept
+typename matrix_view_engine<ET, MCT, subset_view_tag>::index_tuple
+matrix_view_engine<ET, MCT, subset_view_tag>::capacity() const noexcept
 {
     return index_tuple(m_row_count, m_col_count);
 }
@@ -323,8 +331,8 @@ matrix_view_engine<ET, MCT, submatrix_view_tag>::capacity() const noexcept
 //- Element access
 //
 template<class ET, class MCT> constexpr
-typename matrix_view_engine<ET, MCT, submatrix_view_tag>::reference
-matrix_view_engine<ET, MCT, submatrix_view_tag>::operator ()(index_type i, index_type j) const
+typename matrix_view_engine<ET, MCT, subset_view_tag>::reference
+matrix_view_engine<ET, MCT, subset_view_tag>::operator ()(index_type i, index_type j) const
 {
     return (*mp_other)(i + m_row_start, j + m_col_start);
 }
@@ -333,8 +341,8 @@ matrix_view_engine<ET, MCT, submatrix_view_tag>::operator ()(index_type i, index
 //- Data access
 //
 template<class ET, class MCT> constexpr
-typename matrix_view_engine<ET, MCT, submatrix_view_tag>::span_type
-matrix_view_engine<ET, MCT, submatrix_view_tag>::span() const noexcept
+typename matrix_view_engine<ET, MCT, subset_view_tag>::span_type
+matrix_view_engine<ET, MCT, subset_view_tag>::span() const noexcept
 {
     return detail::noe_mdspan_submatrix(mp_other->span(), m_row_start, m_row_count,
                                                           m_col_start, m_col_count);
@@ -345,7 +353,7 @@ matrix_view_engine<ET, MCT, submatrix_view_tag>::span() const noexcept
 //
 template<class ET, class MCT> constexpr
 void
-matrix_view_engine<ET, MCT, submatrix_view_tag>::swap(matrix_view_engine& rhs) noexcept
+matrix_view_engine<ET, MCT, subset_view_tag>::swap(matrix_view_engine& rhs) noexcept
 {
     if (&rhs != this)
     {
@@ -358,7 +366,7 @@ matrix_view_engine<ET, MCT, submatrix_view_tag>::swap(matrix_view_engine& rhs) n
 }
 
 template<class ET, class MCT> constexpr
-matrix_view_engine<ET, MCT, submatrix_view_tag>::matrix_view_engine
+matrix_view_engine<ET, MCT, subset_view_tag>::matrix_view_engine
 (referent_type& eng, index_type ri, index_type rn, index_type ci, index_type cn)
 :   mp_other(&eng)
 ,   m_row_start(ri)
@@ -369,8 +377,8 @@ matrix_view_engine<ET, MCT, submatrix_view_tag>::matrix_view_engine
 
 
 //==================================================================================================
-//  Matrix transpose engine, meant to act as a "view" of a a matrix transpose in expressions,
-//  to help avoid unnecessary allocation and element copying.
+//  Matrix transpose engine, meant to act as a "view" of a matrix transpose in expressions,
+//  to help avoid unnecessary allocation and/or element copying.
 //==================================================================================================
 //
 template<class ET, class MCT>
@@ -551,6 +559,167 @@ matrix_view_engine<ET, MCT, transpose_view_tag>::swap(matrix_view_engine& rhs) n
 
 template<class ET, class MCT> constexpr
 matrix_view_engine<ET, MCT, transpose_view_tag>::matrix_view_engine(referent_type& eng)
+:   mp_other(&eng)
+{}
+
+
+//==================================================================================================
+//  Matrix hermitian engine, meant to act as a "view" of a matrix conjugate transpose in
+//  expressions, to help avoid unnecessary allocation and/or element copying.
+//==================================================================================================
+//
+template<class ET>
+class matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>
+{
+    static_assert(is_matrix_engine_v<ET>);
+
+  public:
+    //- Types
+    //
+    using engine_category = readable_matrix_engine_tag;
+    using element_type    = typename ET::element_type;
+    using value_type      = typename ET::value_type;
+    using pointer         = detail::noe_pointer_t<ET, readable_matrix_engine_tag>;
+    using const_pointer   = typename ET::const_pointer;
+    using reference       = detail::noe_reference_t<ET, readable_matrix_engine_tag>;
+    using const_reference = typename ET::const_reference;
+    using difference_type = typename ET::difference_type;
+    using index_type      = typename ET::index_type;
+    using index_tuple     = extents<dynamic_extent, dynamic_extent>;
+    using span_type       = detail::noe_mdspan_transpose_t<detail::noe_const_mdspan_t<ET, readable_matrix_engine_tag>>;
+    using const_span_type = detail::noe_mdspan_transpose_t<detail::noe_const_mdspan_t<ET, readable_matrix_engine_tag>>;
+
+    //- Construct/copy/destroy
+    //
+    ~matrix_view_engine() noexcept = default;
+
+    constexpr matrix_view_engine();
+    constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine(matrix_view_engine const&) = default;
+
+    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+
+    //- Capacity
+    //
+    constexpr index_type    columns() const noexcept;
+    constexpr index_type    rows() const noexcept;
+    constexpr index_tuple   size() const noexcept;
+
+    constexpr index_type    column_capacity() const noexcept;
+    constexpr index_type    row_capacity() const noexcept;
+    constexpr index_tuple   capacity() const noexcept;
+
+    //- Element access
+    //
+    constexpr reference     operator ()(index_type i, index_type j) const;
+
+    //- Data access
+    //
+    constexpr span_type     span() const noexcept;
+
+    //- Modifiers
+    //
+    constexpr void          swap(matrix_view_engine& rhs) noexcept;
+
+  private:
+    template<class ET2, class OT2>  friend class matrix;
+
+    using referent_type = detail::noe_referent_t<ET, readable_matrix_engine_tag>;
+
+    referent_type*  mp_other;
+
+    constexpr matrix_view_engine(referent_type& eng);
+};
+
+//------------------------
+//- Construct/copy/destroy
+//
+template<class ET> constexpr
+matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::matrix_view_engine()
+:   mp_other(nullptr)
+{}
+
+//----------
+//- Capacity
+//
+template<class ET> constexpr
+typename matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::index_type
+matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::columns() const noexcept
+{
+    return mp_other->rows();
+}
+
+template<class ET> constexpr
+typename matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::index_type
+matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::rows() const noexcept
+{
+    return mp_other->columns();
+}
+
+template<class ET> constexpr
+typename matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::index_tuple
+matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::size() const noexcept
+{
+    return index_tuple(mp_other->columns(), mp_other->rows());
+}
+
+template<class ET> constexpr
+typename matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::index_type
+matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::column_capacity() const noexcept
+{
+    return mp_other->rows();
+}
+
+template<class ET> constexpr
+typename matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::index_type
+matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::row_capacity() const noexcept
+{
+    return mp_other->columns();
+}
+
+template<class ET> constexpr
+typename matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::index_tuple
+matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::capacity() const noexcept
+{
+    return index_tuple(mp_other->columns(), mp_other->rows());
+}
+
+//----------------
+//- Element access
+//
+template<class ET> constexpr
+typename matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::reference
+matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::operator ()(index_type i, index_type j) const
+{
+    return (*mp_other)(j, i);
+}
+
+//-------------
+//- Data access
+//
+template<class ET> constexpr
+typename matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::span_type
+matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::span() const noexcept
+{
+    return detail::noe_mdspan_transpose(mp_other->span());
+}
+
+//-----------
+//- Modifiers
+//
+template<class ET> constexpr
+void
+matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::swap(matrix_view_engine& rhs) noexcept
+{
+    if (&rhs != this)
+    {
+        std::swap(mp_other, rhs.mp_other);
+    }
+}
+
+template<class ET> constexpr
+matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::matrix_view_engine(referent_type& eng)
 :   mp_other(&eng)
 {}
 

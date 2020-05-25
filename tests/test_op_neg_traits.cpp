@@ -264,7 +264,7 @@ struct engine_neg_traits_tst<OT, STD_LA::fs_matrix_engine<T1, R1, C1>>
 };
 
 template<class OT, class T1, size_t R1, size_t C1, class MCT1>
-struct engine_neg_traits_tst<OT, STD_LA::transpose_engine<fs_matrix_engine_tst<T1, R1, C1>, MCT1>>
+struct engine_neg_traits_tst<OT, STD_LA::matrix_transpose_engine<fs_matrix_engine_tst<T1, R1, C1>, MCT1>>
 {
     using element_type = STD_LA::select_matrix_negation_element_t<OT, T1>;
     using engine_type  = fs_matrix_engine_tst<element_type, C1, R1>;

@@ -774,8 +774,8 @@ struct engine_mul_traits_tst<OT,
 
 template<class OT, class T1, size_t R1, size_t C1, class MCT1, class T2, size_t R2, size_t C2, class MCT2>
 struct engine_mul_traits_tst<OT,
-                             STD_LA::transpose_engine<fs_matrix_engine_tst<T1, R1, C1>, MCT1>,
-                             STD_LA::transpose_engine<fs_matrix_engine_tst<T2, R2, C2>, MCT2>>
+                             STD_LA::matrix_transpose_engine<fs_matrix_engine_tst<T1, R1, C1>, MCT1>,
+                             STD_LA::matrix_transpose_engine<fs_matrix_engine_tst<T2, R2, C2>, MCT2>>
 {
     static_assert(R1 == C2);
     using element_type = STD_LA::select_matrix_multiplication_element_t<OT, T1, T2>;

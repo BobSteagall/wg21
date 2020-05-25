@@ -125,8 +125,8 @@ class vector
     using const_pointer        = typename engine_type::const_pointer;
     using reference            = typename engine_type::reference;
     using const_reference      = typename engine_type::const_reference;
-    using subvector_type       = vector<subvector_engine<engine_type, possibly_writable_vector_tag>, OT>;
-    using const_subvector_type = vector<subvector_engine<engine_type, readable_vector_engine_tag>, OT>;
+    using subvector_type       = vector<vector_subset_engine<engine_type, possibly_writable_vector_tag>, OT>;
+    using const_subvector_type = vector<vector_subset_engine<engine_type, readable_vector_engine_tag>, OT>;
     using transpose_type       = vector&;
     using const_transpose_type = vector const&;
     using hermitian_type       = conditional_t<has_cx_elem, vector, transpose_type>;
@@ -189,7 +189,6 @@ class vector
     constexpr const_subvector_type  subvector(index_type i, index_type n) const noexcept;
     constexpr transpose_type        t();
     constexpr const_transpose_type  t() const;
-    constexpr hermitian_type        h();
     constexpr const_hermitian_type  h() const;
 
     //- Data access
@@ -381,20 +380,6 @@ typename vector<ET,OT>::const_transpose_type
 vector<ET,OT>::t() const
 {
     return *this;
-}
-
-template<class ET, class OT> constexpr
-typename vector<ET,OT>::hermitian_type
-vector<ET,OT>::h()
-{
-    if constexpr (detail::is_complex_v<element_type>)
-    {
-        return hermitian_type();
-    }
-    else
-    {
-        return hermitian_type(m_engine);
-    }
 }
 
 template<class ET, class OT> constexpr

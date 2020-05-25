@@ -96,9 +96,9 @@ public:
 	static constexpr bool   is_rectangular  = true;
 	static constexpr bool   is_row_major    = true;
 
-	using column_view_type    = column_engine<float44_engine>;
-	using row_view_type       = row_engine<float44_engine>;
-	using transpose_view_type = transpose_engine<float44_engine>;
+	using column_view_type    = matrix_column_engine<float44_engine>;
+	using row_view_type       = matrix_row_engine<float44_engine>;
+	using transpose_view_type = matrix_transpose_engine<float44_engine>;
 
 public:
 	constexpr float44_engine();

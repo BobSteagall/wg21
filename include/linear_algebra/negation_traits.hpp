@@ -300,7 +300,7 @@ struct matrix_negation_engine_traits
 //- General transpose cases for matrices.
 //
 template<class OT, class ET1, class MCT1>
-struct matrix_negation_engine_traits<OT, transpose_engine<ET1, MCT1>>
+struct matrix_negation_engine_traits<OT, matrix_transpose_engine<ET1, MCT1>>
 {
     using element_type = select_matrix_negation_element_t<OT, typename ET1::element_type>;
     using engine_type  = typename matrix_negation_engine_traits<OT, ET1>::engine_type;
@@ -343,7 +343,7 @@ struct matrix_negation_engine_traits<OT, fs_matrix_engine<T1, R1, C1>>
 };
 
 template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class MCT1>
-struct matrix_negation_engine_traits<OT, transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>>
+struct matrix_negation_engine_traits<OT, matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>>
 {
     using element_type = select_matrix_negation_element_t<OT, T1>;
     using engine_type  = fs_matrix_engine<element_type, C1, R1>;
@@ -360,7 +360,7 @@ struct matrix_negation_engine_traits<OT, dr_matrix_engine<T1, A1>>
 };
 
 template<class OT, class T1, class A1, class MCT1>
-struct matrix_negation_engine_traits<OT, transpose_engine<dr_matrix_engine<T1, A1>, MCT1>>
+struct matrix_negation_engine_traits<OT, matrix_transpose_engine<dr_matrix_engine<T1, A1>, MCT1>>
 {
     using element_type = select_matrix_negation_element_t<OT, T1>;
     using engine_type  = dr_matrix_engine<T1, A1>;
