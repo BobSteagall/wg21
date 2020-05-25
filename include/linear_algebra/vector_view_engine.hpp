@@ -32,8 +32,8 @@ class vector_view_engine<ET, readable_vector_engine_tag, negation_view_tag>
     using const_reference = typename ET::element_type;
     using difference_type = typename ET::difference_type;
     using index_type      = typename ET::index_type;
-    using span_type       = detail::noe_mdspan_subvector_t<detail::noe_const_mdspan_t<ET, readable_vector_engine_tag>>;
-    using const_span_type = detail::noe_mdspan_subvector_t<detail::noe_const_mdspan_t<ET, readable_vector_engine_tag>>;
+    using span_type       = detail::noe_mdspan_negation_t<detail::noe_const_mdspan_t<ET, readable_vector_engine_tag>>;
+    using const_span_type = detail::noe_mdspan_negation_t<detail::noe_const_mdspan_t<ET, readable_vector_engine_tag>>;
 
     //- Construct/copy/destroy
     //
