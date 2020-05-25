@@ -208,9 +208,9 @@ class matrix_view_engine<ET, MCT, subset_view_tag>
     constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine&     operator =(matrix_view_engine const&) noexcept = default;
 
-    template<class ET2, detail::enable_if_convertible_engine<ET2, ET> = true>
+    template<class ET2 = ET, detail::enable_if_convertible_engine<ET2, ET> = true>
     constexpr matrix_view_engine&     operator =(ET2 const& rhs);
-    template<class U, detail::enable_if_writable<ET, ET> = true>
+    template<class U, class ET2 = ET, detail::enable_if_writable<ET2, ET> = true>
     constexpr matrix_view_engine&     operator =(initializer_list<initializer_list<U>> list);
 
     //- Capacity
@@ -273,7 +273,7 @@ matrix_view_engine<ET, MCT, subset_view_tag>::operator =(ET2 const& rhs)
 }
 
 template<class ET, class MCT>
-template<class U, detail::enable_if_writable<ET, ET>> constexpr
+template<class U, class ET2, detail::enable_if_writable<ET2, ET>> constexpr
 matrix_view_engine<ET, MCT, subset_view_tag>&
 matrix_view_engine<ET, MCT, subset_view_tag>::operator =(initializer_list<initializer_list<U>> rhs)
 {
@@ -414,9 +414,9 @@ class matrix_view_engine<ET, MCT, transpose_view_tag>
     constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
 
-    template<class ET2, detail::enable_if_convertible_engine<ET2, ET> = true>
+    template<class ET2 = ET, detail::enable_if_convertible_engine<ET2, ET> = true>
     constexpr matrix_view_engine&     operator =(ET2 const& rhs);
-    template<class U, detail::enable_if_writable<ET, ET> = true>
+    template<class U, class ET2 = ET, detail::enable_if_writable<ET2, ET> = true>
     constexpr matrix_view_engine&     operator =(initializer_list<initializer_list<U>> list);
 
     //- Capacity
@@ -470,7 +470,7 @@ matrix_view_engine<ET, MCT, transpose_view_tag>::operator =(ET2 const& rhs)
 }
 
 template<class ET, class MCT>
-template<class U, detail::enable_if_writable<ET, ET>> constexpr
+template<class U, class ET2, detail::enable_if_writable<ET2, ET>> constexpr
 matrix_view_engine<ET, MCT, transpose_view_tag>&
 matrix_view_engine<ET, MCT, transpose_view_tag>::operator =(initializer_list<initializer_list<U>> rhs)
 {

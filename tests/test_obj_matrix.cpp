@@ -252,6 +252,14 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     PRINT(neg1);
     auto    nspn1 = neg1.span();
     PRINT(nspn1);
+
+    PRINT(-m1);
+    PRINT((-m1).span());
+    PRINT(-m1.t());
+    PRINT(-m1.t().t());
+
+    PRINT((-m1).t());
+    PRINT((-m1).t().t());
 }
 
 void t001X()

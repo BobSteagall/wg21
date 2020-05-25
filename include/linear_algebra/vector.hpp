@@ -350,7 +350,7 @@ template<class ET, class OT> constexpr
 typename vector<ET, OT>::const_negation_type
 vector<ET,OT>::operator -() const noexcept
 {
-    return const_negation_type{m_engine};
+    return const_negation_type(detail::special_ctor_tag(), m_engine);
 }
 #endif
 

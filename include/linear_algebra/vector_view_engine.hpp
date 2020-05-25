@@ -28,8 +28,8 @@ class vector_view_engine<ET, readable_vector_engine_tag, negation_view_tag>
     using value_type      = typename ET::value_type;
     using pointer         = typename ET::const_pointer;
     using const_pointer   = typename ET::const_pointer;
-    using reference       = typename ET::const_reference;
-    using const_reference = typename ET::const_reference;
+    using reference       = typename ET::element_type;
+    using const_reference = typename ET::element_type;
     using difference_type = typename ET::difference_type;
     using index_type      = typename ET::index_type;
     using span_type       = detail::noe_mdspan_subvector_t<detail::noe_const_mdspan_t<ET, readable_vector_engine_tag>>;
@@ -115,7 +115,7 @@ template<class ET> constexpr
 typename vector_view_engine<ET, readable_vector_engine_tag, negation_view_tag>::span_type
 vector_view_engine<ET, readable_vector_engine_tag, negation_view_tag>::span() const noexcept
 {
-    return detail::noe_mdspan_subvector(mp_other->span(), 0, mp_other->size());
+    return detail::noe_mdspan_negation(mp_other->span());
 }
 
 //-----------
@@ -174,7 +174,7 @@ class vector_view_engine<ET, VCT, subset_view_tag>
     constexpr vector_view_engine&    operator =(vector_view_engine&&) noexcept = default;
     constexpr vector_view_engine&    operator =(vector_view_engine const&) noexcept = default;
 
-    template<class ET2, detail::enable_if_convertible_engine<ET2, ET> = true>
+    template<class ET2 = ET, detail::enable_if_convertible_engine<ET2, ET> = true>
     constexpr vector_view_engine&    operator =(ET2 const& rhs);
     template<class U, class ET2 = ET, detail::enable_if_writable<ET2, ET> = true>
     constexpr vector_view_engine&    operator =(initializer_list<U> list);
@@ -335,7 +335,7 @@ class vector_view_engine<ET, VCT, column_view_tag>
     constexpr vector_view_engine&    operator =(vector_view_engine&&) noexcept = default;
     constexpr vector_view_engine&    operator =(vector_view_engine const&) noexcept = default;
 
-    template<class ET2, detail::enable_if_convertible_engine<ET2, ET> = true>
+    template<class ET2 = ET, detail::enable_if_convertible_engine<ET2, ET> = true>
     constexpr vector_view_engine&    operator =(ET2 const& rhs);
     template<class U, class ET2 = ET, detail::enable_if_writable<ET2, ET> = true>
     constexpr vector_view_engine&    operator =(initializer_list<U> list);
@@ -492,7 +492,7 @@ class vector_view_engine<ET, VCT, row_view_tag>
     constexpr vector_view_engine&    operator =(vector_view_engine&&) noexcept = default;
     constexpr vector_view_engine&    operator =(vector_view_engine const&) noexcept = default;
 
-    template<class ET2, detail::enable_if_convertible_engine<ET2, ET> = true>
+    template<class ET2 = ET, detail::enable_if_convertible_engine<ET2, ET> = true>
     constexpr vector_view_engine&    operator =(ET2 const& rhs);
     template<class U, class ET2 = ET, detail::enable_if_writable<ET2, ET> = true>
     constexpr vector_view_engine&    operator =(initializer_list<U> list);
