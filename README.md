@@ -6,31 +6,41 @@ Work on revision R7  of linear algebra proposal P1385 is currently underway in t
 
 ## Support
 
-P1385 is targeted for C++23.  Current compiler support is as follows, but will change as compilers catch up with implementing new language features for C++20.
+P1385 is targeted for C++23.  Current compiler support is as follows, but will change as new compilers become available and catch up with implementing new language features for C++20.  Builds and unit testing have been successful on the following combinations of operating system and compiler:
 
-* Windows
-  * Visual Studio 2019, Version 16.5.4
+* Windows 10
+  * Visual Studio 2019, Version 16.5.4 and higher
 
-* Mac OS
-  * macOS 10.14, Xcode 10.3
-  * macOS 10.14, Xcode 11.2
+* Mac OS 10.14
+  * Xcode 11.4 and higher
 
-* Ubuntu 18
+* Ubuntu 18.04
   * GCC 8.x, 9.x, 10.x
   * Clang 8.x, 9.x, 10.x 
 
-## Building Manually Via CMake
-
-The project can be built via CMake as follows:
+## Cloning the Repo
 
 ```bash
-cd <project root>
+cd <repo_root>
+git clone --recurse-submodules https://github.com/BobSteagall/wg21.git <project_root>
+```
+
+## Building with the Visual Studio Solution
+
+Open the `lin_alg_test.sln` solution file in the `<repo_root>/<project_root>` directory.  Click Build..Build Solution to build the unit test program.  (NB: This build method uses NuGet package manager to download and install Google Test in the `<project_root>/packages` directory, and so you will need to ensure NuGet is installed.)
+
+
+## Building Manually Via CMake
+
+The project can be built via CMake on Linux/Unix and Windows as follows:
+
+```bash
+cd <project_root>
 mkdir build
 cd build
-
-cmake -G <generator> <configuration options> ..
-cmake --build . --config <build_type>
-ctest --config <build_type>
+cmake [-G <generator>] [configuration options] ..
+cmake --build . [--config <build_type>]
+ctest [--config <build_type>]
 ```
 
 The following configuration options are available:
@@ -52,22 +62,20 @@ cd <project root>
 mkdir build
 cd build
 
-cmake -G <generator> <configuration options> -DCMAKE_INSTALL_PREFIX=<install dir> ..
+cmake [-G <generator>] [configuration options] -DCMAKE_INSTALL_PREFIX=<install_dir> ..
 cmake --build . --target install
 ```
 
 ## Packages
 
-The Linear Algebra library is available for integration into your own project via our favorite package manager:
+The Linear Algebra library is available for integration into your own project via our favorite package manager: [Conan](https://docs.conan.io/en/latest/).
 
-### Conan
+### Getting the Conan package
 
-To add the linear_algebra library to your project as a dependency, you need to add a remote to Conan to point to the location of the library:
+To add the *linear_algebra* library to your project as a dependency, you need to add a remote to Conan that points to the location of the package:
 
 ```bash
-cd <project root>
 pip install conan
-
 conan remote add linear_algebra https://api.bintray.com/conan/twonington/public-conan
 ```
 
@@ -88,7 +96,7 @@ conan search linear_algebra
 The linear_algebra project and package can be built locally via the Conan as such:
 
 ```bash
-cd <project root>
+cd <project_root>
 pip install conan
-conan create <project root> [--test-folder None]
+conan create [conan options] <project_root> [--test-folder None]
 ```
