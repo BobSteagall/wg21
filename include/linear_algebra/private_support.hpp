@@ -592,7 +592,7 @@ struct conjugation_accessor
     using pointer       = T*;
 
     constexpr pointer   offset(pointer p, ptrdiff_t i) const noexcept { return p + i; }
-    constexpr reference access(pointer p, ptrdiff_t i) const noexcept { return std::conj(p[i]); }
+    constexpr reference access(pointer p, ptrdiff_t i) const noexcept { return conj(p[i]); }
     constexpr pointer   decay(pointer p) const noexcept               { return p; }
 };
 

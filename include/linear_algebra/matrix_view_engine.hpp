@@ -692,7 +692,7 @@ template<class ET> constexpr
 typename matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::reference
 matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>::operator ()(index_type i, index_type j) const
 {
-    return (*mp_other)(j, i);
+    return conj((*mp_other)(j, i));
 }
 
 //-------------

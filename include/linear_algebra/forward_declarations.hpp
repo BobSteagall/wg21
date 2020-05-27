@@ -62,6 +62,7 @@ using vector_negation_engine = vector_view_engine<ET, readable_vector_engine_tag
 template<class ET, class VCT>
 using vector_subset_engine = vector_view_engine<ET, VCT, subset_view_tag>;
 
+
 template<class ET, class VCT>
 using matrix_column_engine = vector_view_engine<ET, VCT, column_view_tag>;
 
@@ -72,13 +73,13 @@ template<class ET>
 using matrix_negation_engine = matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>;
 
 template<class ET, class MCT>
+using matrix_hermitian_engine = matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>;
+
+template<class ET, class MCT>
 using matrix_subset_engine = matrix_view_engine<ET, MCT, subset_view_tag>;
 
 template<class ET, class MCT>
 using matrix_transpose_engine = matrix_view_engine<ET, MCT, transpose_view_tag>;
-
-template<class ET, class MCT>
-using matrix_hermitian_engine = matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>;
 
 //- The default element promotion, engine promotion, and arithmetic operation traits for
 //  the four basic arithmetic operations.
