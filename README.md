@@ -27,7 +27,7 @@ git clone --recurse-submodules https://github.com/BobSteagall/wg21.git <project_
 
 ## Building with the Visual Studio Solution
 
-Open the `lin_alg_test.sln` solution file in the `<repo_root>/<project_root>` directory.  Click Build..Build Solution to build the unit test program.  (NB: This build method uses NuGet package manager to download and install Google Test in the `<project_root>/packages` directory, and so you will need to ensure NuGet is installed.)
+Open the `lin_alg_test.sln` solution file in the `<repo_root>/<project_root>` directory.  Click **Build..Build Solution** to build the unit test program.  (Note: This build method uses the NuGet package manager to download and install Google Test in the `<project_root>/packages` directory, and so you'll need to ensure NuGet is installed.)
 
 
 ## Building Manually Via CMake
