@@ -402,6 +402,7 @@ class matrix_view_engine<ET, MCT, transpose_view_tag>
     using index_tuple     = extents<dynamic_extent, dynamic_extent>;
     using span_type       = detail::noe_mdspan_transpose_t<detail::noe_mdspan_t<ET, MCT>>;
     using const_span_type = detail::noe_mdspan_transpose_t<detail::noe_const_mdspan_t<ET, MCT>>;
+    using referent_type   = detail::noe_referent_t<ET, MCT>;
 
     //- Construct/copy/destroy
     //
@@ -410,6 +411,7 @@ class matrix_view_engine<ET, MCT, transpose_view_tag>
     constexpr matrix_view_engine();
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine(referent_type& eng);
 
     constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
@@ -418,6 +420,10 @@ class matrix_view_engine<ET, MCT, transpose_view_tag>
     constexpr matrix_view_engine&     operator =(ET2 const& rhs);
     template<class U, class ET2 = ET, detail::enable_if_writable<ET2, ET> = true>
     constexpr matrix_view_engine&     operator =(initializer_list<initializer_list<U>> list);
+
+    //- Status
+    //
+    constexpr bool          is_valid() const noexcept;
 
     //- Capacity
     //
@@ -442,13 +448,7 @@ class matrix_view_engine<ET, MCT, transpose_view_tag>
     constexpr void          swap(matrix_view_engine& rhs) noexcept;
 
   private:
-    template<class ET2, class OT2>  friend class matrix;
-
-    using referent_type = detail::noe_referent_t<ET, MCT>;
-
     referent_type*  mp_other;
-
-    constexpr matrix_view_engine(referent_type& eng);
 };
 
 //------------------------
@@ -477,6 +477,17 @@ matrix_view_engine<ET, MCT, transpose_view_tag>::operator =(initializer_list<ini
     detail::check_source_init_list(rhs, rows(), columns());
     detail::assign_from_matrix_initlist(*this, rhs);
     return *this;
+}
+
+
+//----------
+//- Status
+//
+template<class ET, class MCT> constexpr
+bool
+matrix_view_engine<ET, MCT, transpose_view_tag>::is_valid() const noexcept
+{
+    return mp_other != nullptr;
 }
 
 //----------

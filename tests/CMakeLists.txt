@@ -28,6 +28,8 @@ target_sources(la_test
         test_new_number.hpp
         test_dynamic_engines.cpp
         test_fixed_size_engines.cpp
+        test_matrix_view_engines.cpp
+        test_vector_view_engines.cpp
         test_obj_matrix.cpp
         test_op_add_traits.cpp
         test_op_div_traits.cpp

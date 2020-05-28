@@ -133,6 +133,7 @@ TEST(DynVectorEngine, MoveCtor)
     dr_vector_engine<float>     e2(std::move(e1));
     EXPECT_EQ(e2.size(), 4);
     EXPECT_GE(e2.capacity(), 4);
+    EXPECT_TRUE(v_cmp_eq(e2, {13.0f, 17.0f, 19.0f, 23.0f}));
     EXPECT_FALSE(v_cmp_eq(e2, e1));
 }
 
@@ -195,7 +196,7 @@ TEST(DynVectorEngine, ListCtor)
 }
 
 
-TEST(DynVectorEngine, EngineCtor)
+TEST(DynVectorEngine, EngineConvCtor)
 {
     //- Construct new engines via direct engine ctor and verify that their initial states are
     //  as expected.
@@ -203,7 +204,7 @@ TEST(DynVectorEngine, EngineCtor)
     dr_vector_engine<int>       e1{13, 17, 19, 23};
     dr_vector_engine<float>     e2(e1);
     dr_vector_engine<double>    e3(e2);
-    fs_vector_engine<double, 4> e4{13, 17, 19, 23};
+    fs_vector_engine<double,4>  e4{13, 17, 19, 23};
     dr_vector_engine<float>     e5{e4};
 
     EXPECT_EQ(e1.size(), 4);
