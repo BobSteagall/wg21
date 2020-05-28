@@ -20,30 +20,93 @@ P1385 is targeted for C++23.  Current compiler support is as follows, but will c
 
 ## Cloning the Repo
 
+After ensuring that git is in your executable path, open a terminal window on Linux, or a Command Prompt on Windows 10, and then:
+
 ```bash
 cd <repo_root>
 git clone --recurse-submodules https://github.com/BobSteagall/wg21.git <project_root>
 ```
 
+If you do not specify `<project_root>`, it will default to `wg21`.
+
 ## Building with the Visual Studio Solution
 
-Open the `lin_alg_test.sln` solution file in the `<repo_root>/<project_root>` directory.  Click **Build..Build Solution** to build the unit test program.  (Note: This build method uses the NuGet package manager to download and install Google Test in the `<project_root>/packages` directory, and so you'll need to ensure NuGet is installed.)
+Open the `lin_alg_test.sln` solution file in the `<repo_root>/<project_root>` directory.  Click **Build..Build Solution** to build the unit test program.  (Note: This build method uses the NuGet package manager to download and install Google Test in the `<project_root>/packages` directory, so you'll need to ensure NuGet is installed.)
 
 
-## Building Manually Via CMake
+## Building Manually Via CMake on Windows 10
 
-The project can be built via CMake on Linux/Unix and Windows as follows:
+The unit test program can be built via CMake on Windows 10 by proceeding as follows.  First, generate the Visual Studio project files:
 
 ```bash
 cd <project_root>
-mkdir build
-cd build
+mkdir build-win
+cd build-win
+cmake -G "Visual Studio 16 2019" ..
+```
+
+Next, build the `Debug` configuration and run the unit test:
+
+```bash
+cmake --build . --config Debug
+ctest -C Debug
+```
+
+Finally, build the `Release` configuration and run the unit test:
+
+```bash
+cmake --build . --config Release
+ctest -C Release
+```
+
+> Note: CMake uses a multi-configuration generator for Visual Studio, so there is no need to specify a CMake build type;  in fact, CMake will ignore `CMAKE_BUILD_TYPE` when using the Visual Studio generator.  
+
+The following CMake configuration options are available on Windows:
+
+| Name                     | Possible Values                      | Description                          | Default Value |
+|--------------------------|--------------------------------------|--------------------------------------|---------------|
+| `BUILD_TESTING`          | `ON`, `OFF`                          | Build the test suite                 | `ON`          |
+| `LA_BUILD_USING_PCH`     | `ON`, `OFF`                          | Build using precompiled headers      | `OFF`         |
+
+
+## Building Manually Via CMake on Linux
+
+The project can be built via CMake on Linux as follows:
+
+```bash
+cd <project_root>
+mkdir build-dir
+cd build-dir
 cmake [-G <generator>] [configuration options] ..
 cmake --build . [--config <build_type>]
 ctest [--config <build_type>]
 ```
 
-The following configuration options are available:
+For example, to build and test the `Debug` configuration, you could do the following:
+
+```bash
+cd <project_root>
+mkdir build-debug
+cd build-debug
+cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ..
+cmake --build .
+ctest
+```
+
+Likewise, for the `Release` configuration, you could do this:
+
+```bash
+cd <project_root>
+mkdir build-release
+cd build-release
+cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ..
+cmake --build .
+ctest
+```
+
+> Note: CMake uses a single-configuration generator when generating makefiles, so there is no need to use the `--config` flag with CMake or the `-C` flag with CTest.  When using CMake on Linux, a good practice is to create a separate build directory for each CMake build type.
+
+The following configuration options are available on Linux:
 
 | Name                     | Possible Values                      | Description                          | Default Value |
 |--------------------------|--------------------------------------|--------------------------------------|---------------|
