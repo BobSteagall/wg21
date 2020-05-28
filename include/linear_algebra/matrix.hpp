@@ -38,18 +38,23 @@ class matrix
     using index_type           = typename engine_type::index_type;
     using index_tuple          = typename engine_type::index_tuple;
 
-    using column_type          = vector<column_engine<engine_type, possibly_writable_vector_tag>, OT>;
-    using const_column_type    = vector<column_engine<engine_type, readable_vector_engine_tag>, OT>;
-    using row_type             = vector<row_engine<engine_type, possibly_writable_vector_tag>, OT>;
-    using const_row_type       = vector<row_engine<engine_type, readable_vector_engine_tag>, OT>;
-    using submatrix_type       = matrix<submatrix_engine<engine_type, possibly_writable_matrix_tag>, OT>;
-    using const_submatrix_type = matrix<submatrix_engine<engine_type, readable_matrix_engine_tag>, OT>;
-    using transpose_type       = matrix<transpose_engine<engine_type, possibly_writable_matrix_tag>, OT>;
-    using const_transpose_type = matrix<transpose_engine<engine_type, readable_matrix_engine_tag>, OT>;
-    using hermitian_type       = conditional_t<has_cx_elem, matrix, transpose_type>;
+    using column_type          = vector<matrix_column_engine<engine_type, possibly_writable_vector_tag>, OT>;
+    using const_column_type    = vector<matrix_column_engine<engine_type, readable_vector_engine_tag>, OT>;
+    using row_type             = vector<matrix_row_engine<engine_type, possibly_writable_vector_tag>, OT>;
+    using const_row_type       = vector<matrix_row_engine<engine_type, readable_vector_engine_tag>, OT>;
+    using submatrix_type       = matrix<matrix_subset_engine<engine_type, possibly_writable_matrix_tag>, OT>;
+    using const_submatrix_type = matrix<matrix_subset_engine<engine_type, readable_matrix_engine_tag>, OT>;
+    using transpose_type       = matrix<matrix_transpose_engine<engine_type, possibly_writable_matrix_tag>, OT>;
+    using const_transpose_type = matrix<matrix_transpose_engine<engine_type, readable_matrix_engine_tag>, OT>;
+    using hermitian_type       = conditional_t<has_cx_elem, matrix, const_transpose_type>;
     using const_hermitian_type = conditional_t<has_cx_elem, matrix, const_transpose_type>;
     using span_type            = detail::engine_span_t<ET>;
     using const_span_type      = detail::engine_const_span_t<ET>;
+
+#ifdef LA_NEGATION_AS_VIEW
+    using negation_type        = matrix<matrix_negation_engine<engine_type>, OT>;
+    using const_negation_type  = matrix<matrix_negation_engine<engine_type>, OT>;
+#endif
 
     //- Construct/copy/destroy
     //
@@ -65,7 +70,7 @@ class matrix
     constexpr matrix(initializer_list<initializer_list<U>> rhs);
 
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr matrix(index_tuple size);
+    explicit constexpr matrix(index_tuple size);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
     constexpr matrix(index_type rows, index_type cols);
     template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
@@ -110,6 +115,10 @@ class matrix
     constexpr reference             operator ()(index_type i, index_type j);
     constexpr const_reference       operator ()(index_type i, index_type j) const;
 
+#ifdef LA_NEGATION_AS_VIEW
+    constexpr const_negation_type   operator -() const noexcept;
+#endif
+
     constexpr column_type           column(index_type j) noexcept;
     constexpr const_column_type     column(index_type j) const noexcept;
     constexpr row_type              row(index_type i) noexcept;
@@ -118,7 +127,6 @@ class matrix
     constexpr const_submatrix_type  submatrix(index_type ri, index_type rn, index_type ci, index_type cn) const noexcept;
     constexpr transpose_type        t() noexcept;
     constexpr const_transpose_type  t() const noexcept;
-    constexpr hermitian_type        h();
     constexpr const_hermitian_type  h() const;
 
     //- Data access
@@ -135,9 +143,9 @@ class matrix
     //
     constexpr void      swap(matrix& rhs) noexcept;
     template<class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
-    constexpr void      swap_columns(index_type i, index_type j) noexcept;
+    constexpr void      swap_columns(index_type c1, index_type c2) noexcept;
     template<class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
-    constexpr void      swap_rows(index_type i, index_type j) noexcept;
+    constexpr void      swap_rows(index_type r1, index_type r2) noexcept;
 
   private:
     template<class ET2, class OT2> friend class matrix;
@@ -322,6 +330,15 @@ matrix<ET,OT>::operator ()(index_type i, index_type j) const
     return m_engine(i, j);
 }
 
+#ifdef LA_NEGATION_AS_VIEW
+template<class ET, class OT> constexpr
+typename matrix<ET, OT>::const_negation_type
+matrix<ET,OT>::operator -() const noexcept
+{
+    return const_negation_type(detail::special_ctor_tag(), m_engine);
+}
+#endif
+
 template<class ET, class OT> inline constexpr
 typename matrix<ET,OT>::const_column_type
 matrix<ET,OT>::column(index_type j) const noexcept
@@ -376,20 +393,6 @@ typename matrix<ET,OT>::const_transpose_type
 matrix<ET,OT>::t() const noexcept
 {
     return const_transpose_type(detail::special_ctor_tag(), m_engine);
-}
-
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::hermitian_type
-matrix<ET,OT>::h()
-{
-    if constexpr (detail::is_complex_v<element_type>)
-    {
-        return hermitian_type();
-    }
-    else
-    {
-        return hermitian_type(detail::special_ctor_tag(), m_engine);
-    }
 }
 
 template<class ET, class OT> inline constexpr

@@ -246,6 +246,26 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     PRINT(subrow1);
     auto    sbrwspn1 = subrow1.span();
     PRINT(sbrwspn1);
+
+
+    auto    neg1  = -m1;
+    PRINT(neg1);
+    auto    nspn1 = neg1.span();
+    PRINT(nspn1);
+
+    PRINT(-m1);
+    PRINT((-m1).span());
+    PRINT(-m1.t());
+    PRINT(-m1.t().t());
+
+    PRINT((-m1).t());
+    PRINT((-m1).t().t());
+    PRINT((-m1).t().t().span());
+
+    PRINT(-sub1);
+    PRINT((-sub1).span());
+    PRINT(-row1);
+    PRINT((-row1).span());
 }
 
 void t001X()
@@ -468,7 +488,7 @@ addition_traits_tst<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
 struct op_traits_tst
 {
     template<class OTR, class OP1, class OP2>
-    using addition_traits = addition_traits_tst<OTR, OP1, OP2>;
+    using addition_arithmetic_traits = addition_traits_tst<OTR, OP1, OP2>;
 
 };
 
@@ -524,7 +544,6 @@ TestGroup00()
     //constexpr
         fsm_float_35      m13 = m10 + m11;
     fsm_float_35      m14 = m10 + m6;
-
 
 //    t000();
 //    t001();

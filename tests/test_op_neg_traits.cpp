@@ -1,6 +1,17 @@
 //#define ENABLE_TEST_PRINTING
 #include "test_common.hpp"
 
+#ifdef LA_NEGATION_AS_VIEW
+
+void
+TestGroup30()
+{
+    PRINT_FNAME();
+}
+
+
+#else
+
 //- A helper macro to assist in readability of test functions below.
 //
 #define ASSERT_NEG_A_EQ_B(A, B)     \
@@ -40,9 +51,9 @@ struct test_neg_traits_ord
 
 struct test_neg_op_traits_ord
 {
-    using element_negation_traits = test_element_neg_traits_ord;
-    using engine_negation_traits  = test_engine_neg_traits_ord;
-    using negation_traits         = test_neg_traits_ord;
+    using negation_element_traits = test_element_neg_traits_ord;
+    using negation_engine_traits  = test_engine_neg_traits_ord;
+    using negation_arithmetic_traits         = test_neg_traits_ord;
 };
 
 
@@ -72,13 +83,13 @@ struct test_neg_traits_nta
 struct test_neg_op_traits_nta
 {
     template<class T1>
-    using element_negation_traits = test_element_neg_traits_nta<T1>;
+    using negation_element_traits = test_element_neg_traits_nta<T1>;
 
     template<class OT, class ET1>
-    using engine_negation_traits = test_engine_neg_traits_nta<OT, ET1>;
+    using negation_engine_traits = test_engine_neg_traits_nta<OT, ET1>;
 
     template<class OT, class OP1>
-    using negation_traits = test_neg_traits_nta<OT, OP1>;
+    using negation_arithmetic_traits = test_neg_traits_nta<OT, OP1>;
 };
 
 
@@ -89,19 +100,19 @@ struct test_neg_op_traits_nta
 struct test_neg_op_traits_nct
 {
     template<class T1>
-    struct element_negation_traits
+    struct negation_element_traits
     {
         using element_type = dummy_type;
     };
 
     template<class OT, class ET1>
-    struct engine_negation_traits
+    struct negation_engine_traits
     {
         using engine_type = dummy_type;
     };
 
     template<class OT, class OP1>
-    struct negation_traits
+    struct negation_arithmetic_traits
     {
         using result_type = dummy_type;
     };
@@ -253,7 +264,7 @@ struct engine_neg_traits_tst<OT, STD_LA::fs_matrix_engine<T1, R1, C1>>
 };
 
 template<class OT, class T1, size_t R1, size_t C1, class MCT1>
-struct engine_neg_traits_tst<OT, STD_LA::transpose_engine<fs_matrix_engine_tst<T1, R1, C1>, MCT1>>
+struct engine_neg_traits_tst<OT, STD_LA::matrix_transpose_engine<fs_matrix_engine_tst<T1, R1, C1>, MCT1>>
 {
     using element_type = STD_LA::select_matrix_negation_element_t<OT, T1>;
     using engine_type  = fs_matrix_engine_tst<element_type, C1, R1>;
@@ -283,13 +294,13 @@ struct negation_traits_tst<OTR, STD_LA::matrix<fs_matrix_engine_tst<double, 3, 4
 struct test_neg_op_traits_tst
 {
      template<class T1>
-     using element_negation_traits = element_neg_traits_tst<T1>;
+     using negation_element_traits = element_neg_traits_tst<T1>;
 
      template<class OT, class ET1>
-     using engine_negation_traits = engine_neg_traits_tst<OT, ET1>;
+     using negation_engine_traits = engine_neg_traits_tst<OT, ET1>;
 
      template<class OT, class OP1>
-     using negation_traits = negation_traits_tst<OT, OP1>;
+     using negation_arithmetic_traits = negation_traits_tst<OT, OP1>;
 };
 
 
@@ -356,3 +367,5 @@ TestGroup30()
     t302();
     t304();
 }
+
+#endif

@@ -95,9 +95,9 @@ public:
 	static constexpr bool   is_rectangular  = true;
 	static constexpr bool   is_row_major    = true;
 
-	using column_view_type    = column_engine<float33_engine>;
-	using row_view_type       = row_engine<float33_engine>;
-	using transpose_view_type = transpose_engine<float33_engine>;
+	using column_view_type    = matrix_column_engine<float33_engine>;
+	using row_view_type       = matrix_row_engine<float33_engine>;
+	using transpose_view_type = matrix_transpose_engine<float33_engine>;
 
 public:
 	constexpr float33_engine();
@@ -171,10 +171,10 @@ struct matrix_addition_engine_traits<matrix_operation_traits, float3_engine, flo
 
 template<>
 auto
-matrix_addition_traits<matrix_operation_traits, vector<float3_engine>, vector<float3_engine>>::add
+matrix_addition_arithmetic_traits<matrix_operation_traits, vector<float3_engine>, vector<float3_engine>>::add
 (vector<float3_engine> const& v1, vector<float3_engine> const& v2) -> result_type
 {
-	PRINT_OP_TYPES(result_type, "float3 addition_traits", v1, v2);
+	PRINT_OP_TYPES(result_type, "float3 addition_arithmetic_traits", v1, v2);
 
 	return result_type{ v1(0) + v2(0), v1(1) + v2(1), v1(2) + v2(2) };
 }
@@ -192,10 +192,10 @@ struct matrix_addition_engine_traits<matrix_operation_traits, float33_engine, fl
 
 template<>
 auto
-matrix_addition_traits<matrix_operation_traits, matrix<float33_engine>, matrix<float33_engine>>::add
+matrix_addition_arithmetic_traits<matrix_operation_traits, matrix<float33_engine>, matrix<float33_engine>>::add
 (matrix<float33_engine> const& m1, matrix<float33_engine> const& m2) -> result_type
 {
-	PRINT_OP_TYPES(result_type, "float33 addition_traits", m1, m2);
+	PRINT_OP_TYPES(result_type, "float33 addition_arithmetic_traits", m1, m2);
 
 	return result_type{ m1(0, 0) + m2(0, 0), m1(0, 1) + m2(0, 1), m1(0, 2) + m2(0, 2),
 						m1(1, 0) + m2(1, 0), m1(1, 1) + m2(1, 1), m1(1, 2) + m2(1, 2),
@@ -215,10 +215,10 @@ struct matrix_subtraction_engine_traits<matrix_operation_traits, float3_engine, 
 
 template<>
 auto
-matrix_subtraction_traits<matrix_operation_traits, vector<float3_engine>, vector<float3_engine>>::subtract
+matrix_subtraction_arithmetic_traits<matrix_operation_traits, vector<float3_engine>, vector<float3_engine>>::subtract
 (vector<float3_engine> const& v1, vector<float3_engine> const& v2) -> result_type
 {
-	PRINT_OP_TYPES(result_type, "float3 subtraction_traits", v1, v2);
+	PRINT_OP_TYPES(result_type, "float3 subtraction_arithmetic_traits", v1, v2);
 
 	return result_type{ v1(0) - v2(0), v1(1) - v2(1), v1(2) - v2(2) };
 }
@@ -236,10 +236,10 @@ struct matrix_subtraction_engine_traits<matrix_operation_traits, float33_engine,
 
 template<>
 auto
-matrix_subtraction_traits<matrix_operation_traits, matrix<float33_engine>, matrix<float33_engine>>::subtract
+matrix_subtraction_arithmetic_traits<matrix_operation_traits, matrix<float33_engine>, matrix<float33_engine>>::subtract
 (matrix<float33_engine> const& m1, matrix<float33_engine> const& m2) -> result_type
 {
-	PRINT_OP_TYPES(result_type, "float33 subtraction_traits", m1, m2);
+	PRINT_OP_TYPES(result_type, "float33 subtraction_arithmetic_traits", m1, m2);
 
 	return result_type{ m1(0, 0) - m2(0, 0), m1(0, 1) - m2(0, 1), m1(0, 2) - m2(0, 2),
 						m1(1, 0) - m2(1, 0), m1(1, 1) - m2(1, 1), m1(1, 2) - m2(1, 2),
@@ -257,10 +257,10 @@ struct matrix_negation_engine_traits<matrix_operation_traits, float3_engine>
 
 template<>
 auto
-matrix_negation_traits<matrix_operation_traits, vector<float3_engine>>::negate
+matrix_negation_arithmetic_traits<matrix_operation_traits, vector<float3_engine>>::negate
 (vector<float3_engine> const& v) -> result_type
 {
-	PRINT_OP_TYPES(result_type, "float3 negation_traits", v);
+	PRINT_OP_TYPES(result_type, "float3 negation_arithmetic_traits", v);
 
 	return result_type{ -v(0), -v(1), -v(2) };
 }
@@ -276,10 +276,10 @@ struct matrix_negation_engine_traits<matrix_operation_traits, float33_engine>
 
 template<>
 auto
-matrix_negation_traits<matrix_operation_traits, matrix<float33_engine>>::negate
+matrix_negation_arithmetic_traits<matrix_operation_traits, matrix<float33_engine>>::negate
 (matrix<float33_engine> const& m) -> result_type
 {
-	PRINT_OP_TYPES(result_type, "float33 negation_traits", m);
+	PRINT_OP_TYPES(result_type, "float33 negation_arithmetic_traits", m);
 
 	return result_type{ -m(0, 0), -m(0, 1), -m(0, 2),
 						-m(1, 0), -m(1, 1), -m(1, 2),
@@ -297,10 +297,10 @@ struct matrix_multiplication_engine_traits<matrix_operation_traits, float3_engin
 
 template<>
 auto
-matrix_multiplication_traits<matrix_operation_traits, vector<float3_engine>, float>::multiply
+matrix_multiplication_arithmetic_traits<matrix_operation_traits, vector<float3_engine>, float>::multiply
 (vector<float3_engine> const& v, float const& s) -> result_type
 {
-	PRINT_OP_TYPES(result_type, "float3 multiplication_traits (v*s)", v, s);
+	PRINT_OP_TYPES(result_type, "float3 multiplication_arithmetic_traits (v*s)", v, s);
 
 	return result_type{ v(0) * s, v(1) * s, v(2) * s };
 }
@@ -316,10 +316,10 @@ struct matrix_multiplication_engine_traits<matrix_operation_traits, float33_engi
 
 template<>
 auto
-matrix_multiplication_traits<matrix_operation_traits, matrix<float33_engine>, float>::multiply
+matrix_multiplication_arithmetic_traits<matrix_operation_traits, matrix<float33_engine>, float>::multiply
 (matrix<float33_engine> const& m, float const& s) -> result_type
 {
-	PRINT_OP_TYPES(result_type, "float33 multiplication_traits (m*s)", m, s);
+	PRINT_OP_TYPES(result_type, "float33 multiplication_arithmetic_traits (m*s)", m, s);
 
 	return result_type{ m(0, 0) * s, m(0, 1) * s, m(0, 2) * s,
 						m(1, 0) * s, m(1, 1) * s, m(1, 2) * s,
@@ -337,10 +337,10 @@ struct matrix_multiplication_engine_traits<matrix_operation_traits, scalar_engin
 
 template<>
 auto
-matrix_multiplication_traits<matrix_operation_traits, float, vector<float3_engine>>::multiply
+matrix_multiplication_arithmetic_traits<matrix_operation_traits, float, vector<float3_engine>>::multiply
 (float const& s, vector<float3_engine> const& v) -> result_type
 {
-	PRINT_OP_TYPES(result_type, "float3 multiplication_traits (s*v)", s, v);
+	PRINT_OP_TYPES(result_type, "float3 multiplication_arithmetic_traits (s*v)", s, v);
 
 	return v * s;
 }
@@ -356,10 +356,10 @@ struct matrix_multiplication_engine_traits<matrix_operation_traits, scalar_engin
 
 template<>
 auto
-matrix_multiplication_traits<matrix_operation_traits, float, matrix<float33_engine>>::multiply
+matrix_multiplication_arithmetic_traits<matrix_operation_traits, float, matrix<float33_engine>>::multiply
 (float const& s, matrix<float33_engine> const& m) -> result_type
 {
-	PRINT_OP_TYPES(result_type, "float33 multiplication_traits (s*m)", s, m);
+	PRINT_OP_TYPES(result_type, "float33 multiplication_arithmetic_traits (s*m)", s, m);
 
 	return m * s;
 }
@@ -368,10 +368,10 @@ matrix_multiplication_traits<matrix_operation_traits, float, matrix<float33_engi
 
 template<>
 auto
-matrix_multiplication_traits<matrix_operation_traits, vector<float3_engine>, vector<float3_engine>>::multiply
+matrix_multiplication_arithmetic_traits<matrix_operation_traits, vector<float3_engine>, vector<float3_engine>>::multiply
 (vector<float3_engine> const& v1, vector<float3_engine> const& v2) -> result_type
 {
-	PRINT_OP_TYPES(result_type, "float3 multiplication_traits (v*v)", v1, v2);
+	PRINT_OP_TYPES(result_type, "float3 multiplication_arithmetic_traits (v*v)", v1, v2);
 
 	return result_type{ (v1(0) * v2(0)) + (v1(1) * v2(1)) + (v1(2) * v2(2)) };
 }
@@ -387,10 +387,10 @@ struct matrix_multiplication_engine_traits<matrix_operation_traits, float3_engin
 
 template<>
 auto
-matrix_multiplication_traits<matrix_operation_traits, vector<float3_engine>, matrix<float33_engine>>::multiply
+matrix_multiplication_arithmetic_traits<matrix_operation_traits, vector<float3_engine>, matrix<float33_engine>>::multiply
 (vector<float3_engine> const& v, matrix<float33_engine> const& m) -> result_type
 {
-	PRINT_OP_TYPES(result_type, "float33 multiplication_traits (v*m)", v, m);
+	PRINT_OP_TYPES(result_type, "float33 multiplication_arithmetic_traits (v*m)", v, m);
 
 	return result_type{ (v(0) * m(0, 0)) + (v(1) * m(1, 0)) + (v(2) * m(2, 0)),
 						(v(0) * m(0, 1)) + (v(1) * m(1, 1)) + (v(2) * m(2, 1)),
@@ -408,10 +408,10 @@ struct matrix_multiplication_engine_traits<matrix_operation_traits, float33_engi
 
 template<>
 auto
-matrix_multiplication_traits<matrix_operation_traits, matrix<float33_engine>, vector<float3_engine>>::multiply
+matrix_multiplication_arithmetic_traits<matrix_operation_traits, matrix<float33_engine>, vector<float3_engine>>::multiply
 (matrix<float33_engine> const& m, vector<float3_engine> const& v) -> result_type
 {
-	PRINT_OP_TYPES(result_type, "float33 multiplication_traits (m*v)", m, v);
+	PRINT_OP_TYPES(result_type, "float33 multiplication_arithmetic_traits (m*v)", m, v);
 
 	return result_type{ (m(0, 0) * v(0)) + (m(0, 1) * v(1)) + (m(0, 2) * v(2)),
 						(m(1, 0) * v(0)) + (m(1, 1) * v(1)) + (m(1, 2) * v(2)),
@@ -429,10 +429,10 @@ struct matrix_multiplication_engine_traits<matrix_operation_traits, float33_engi
 
 template<>
 auto
-matrix_multiplication_traits<matrix_operation_traits, matrix<float33_engine>, matrix<float33_engine>>::multiply
+matrix_multiplication_arithmetic_traits<matrix_operation_traits, matrix<float33_engine>, matrix<float33_engine>>::multiply
 (matrix<float33_engine> const& m1, matrix<float33_engine> const& m2) -> result_type
 {
-	PRINT_OP_TYPES(result_type, "float22 multiplication_traits (m*m)", m1, m2);
+	PRINT_OP_TYPES(result_type, "float22 multiplication_arithmetic_traits (m*m)", m1, m2);
 
 	return result_type{ (m1(0, 0) * m2(0, 0)) + (m1(0, 1) * m2(1, 0)) + (m1(0, 2) * m2(2, 0)), (m1(0, 0) * m2(0, 1)) + (m1(0, 1) * m2(1, 1)) + (m1(0, 2) * m2(2, 1)), (m1(0, 0) * m2(0, 2)) + (m1(0, 1) * m2(1, 2)) + (m1(0, 2) * m2(2, 2)),
 						(m1(1, 0) * m2(0, 0)) + (m1(1, 1) * m2(1, 0)) + (m1(1, 2) * m2(2, 0)), (m1(1, 0) * m2(0, 1)) + (m1(1, 1) * m2(1, 1)) + (m1(1, 2) * m2(2, 1)), (m1(1, 0) * m2(0, 2)) + (m1(1, 1) * m2(1, 2)) + (m1(1, 2) * m2(2, 2)),

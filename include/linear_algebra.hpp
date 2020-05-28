@@ -20,6 +20,8 @@
 //#define STD_LA      std::experimental::math
 //#define USING_STD   using namespace std::experimental;
 
+#define LA_NEGATION_AS_VIEW
+
 #include <cstdint>
 #include <array>
 #include <complex>
@@ -28,7 +30,7 @@
 #include <tuple>
 #include <type_traits>
 
-//- Disable some unnecessary compiler warnings (i.e., noise) coming from mdspan.
+//- Disable some unnecessary compiler warnings coming from mdspan.
 //
 #if defined __clang__
     #pragma clang diagnostic push
@@ -71,9 +73,11 @@ using std::experimental::dynamic_extent;
 
 #include "linear_algebra/debug_helpers.hpp"     //- Helpers for debug/test -- not for production.
 
+#ifndef LA_NEGATION_AS_VIEW
+    #include "linear_algebra/negation_traits.hpp"
+#endif
 #include "linear_algebra/addition_traits.hpp"
 #include "linear_algebra/subtraction_traits.hpp"
-#include "linear_algebra/negation_traits.hpp"
 #include "linear_algebra/multiplication_traits.hpp"
 #include "linear_algebra/division_traits.hpp"
 #include "linear_algebra/operation_traits.hpp"
