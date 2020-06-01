@@ -42,16 +42,16 @@ class dr_vector_engine
     dr_vector_engine(dr_vector_engine const& rhs);
     explicit dr_vector_engine(index_type elems);
     dr_vector_engine(index_type elems, index_type elem_cap);
-    template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T> = true>
+    template<class ET2, detail::enable_if_engine_has_convertible_element_type<ET2,T> = true>
     dr_vector_engine(ET2 const& rhs);
-    template<class T2, detail::enable_if_convertible_element<T2,T> = true>
+    template<class T2, detail::enable_if_convertible_element_type<T2,T> = true>
     dr_vector_engine(initializer_list<T2> rhs);
 
     dr_vector_engine&   operator =(dr_vector_engine&& rhs) noexcept;
     dr_vector_engine&   operator =(dr_vector_engine const& rhs);
-    template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T> = true>
+    template<class ET2, detail::enable_if_engine_has_convertible_element_type<ET2,T> = true>
     dr_vector_engine&   operator =(ET2 const& rhs);
-    template<class T2, detail::enable_if_convertible_element<T2,T> = true>
+    template<class T2, detail::enable_if_convertible_element_type<T2,T> = true>
     dr_vector_engine&   operator =(initializer_list<T2> rhs);
 
     //- Capacity
@@ -141,7 +141,7 @@ dr_vector_engine<T,AT>::dr_vector_engine(index_type elems, index_type cap)
 }
 
 template<class T, class AT>
-template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T>> inline
+template<class ET2, detail::enable_if_engine_has_convertible_element_type<ET2,T>> inline
 dr_vector_engine<T,AT>::dr_vector_engine(ET2 const& rhs)
 :   dr_vector_engine()
 {
@@ -149,7 +149,7 @@ dr_vector_engine<T,AT>::dr_vector_engine(ET2 const& rhs)
 }
 
 template<class T, class AT>
-template<class T2, detail::enable_if_convertible_element<T2,T>>
+template<class T2, detail::enable_if_convertible_element_type<T2,T>>
 dr_vector_engine<T,AT>::dr_vector_engine(initializer_list<T2> rhs)
 :   dr_vector_engine()
 {
@@ -175,7 +175,7 @@ dr_vector_engine<T,AT>::operator =(dr_vector_engine const& rhs)
 }
 
 template<class T, class AT>
-template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T>> inline
+template<class ET2, detail::enable_if_engine_has_convertible_element_type<ET2,T>> inline
 dr_vector_engine<T,AT>&
 dr_vector_engine<T,AT>::operator =(ET2 const& rhs)
 {
@@ -184,7 +184,7 @@ dr_vector_engine<T,AT>::operator =(ET2 const& rhs)
 }
 
 template<class T, class AT>
-template<class T2, detail::enable_if_convertible_element<T2,T>> inline
+template<class T2, detail::enable_if_convertible_element_type<T2,T>> inline
 dr_vector_engine<T,AT>&
 dr_vector_engine<T,AT>::operator =(initializer_list<T2> rhs)
 {

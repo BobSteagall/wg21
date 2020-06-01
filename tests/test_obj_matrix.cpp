@@ -265,7 +265,7 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     PRINT(-sub1);
     PRINT((-sub1).span());
     PRINT(-row1);
-    PRINT((-row1).span());
+//    PRINT((-row1).span());
 }
 
 void t001X()

@@ -43,16 +43,16 @@ class dr_matrix_engine
     dr_matrix_engine(dr_matrix_engine const& rhs);
     dr_matrix_engine(index_type rows, index_type cols);
     dr_matrix_engine(index_type rows, index_type cols, index_type rowcap, index_type colcap);
-    template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T> = true>
+    template<class ET2, detail::enable_if_engine_has_convertible_element_type<ET2,T> = true>
     dr_matrix_engine(ET2 const& rhs);
-    template<class T2, detail::enable_if_convertible_element<T2,T> = true>
+    template<class T2, detail::enable_if_convertible_element_type<T2,T> = true>
     dr_matrix_engine(initializer_list<initializer_list<T2>> rhs);
 
     dr_matrix_engine&   operator =(dr_matrix_engine&& rhs) noexcept;
     dr_matrix_engine&   operator =(dr_matrix_engine const& rhs);
-    template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T> = true>
+    template<class ET2, detail::enable_if_engine_has_convertible_element_type<ET2,T> = true>
     dr_matrix_engine&   operator =(ET2 const& rhs);
-    template<class T2, detail::enable_if_convertible_element<T2,T> = true>
+    template<class T2, detail::enable_if_convertible_element_type<T2,T> = true>
     dr_matrix_engine&   operator =(initializer_list<initializer_list<T2>> rhs);
 
     //- Capacity
@@ -153,7 +153,7 @@ dr_matrix_engine<T,AT>::dr_matrix_engine
 }
 
 template<class T, class AT>
-template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T>>
+template<class ET2, detail::enable_if_engine_has_convertible_element_type<ET2,T>>
 dr_matrix_engine<T,AT>::dr_matrix_engine(ET2 const& rhs)
 :   dr_matrix_engine()
 {
@@ -161,7 +161,7 @@ dr_matrix_engine<T,AT>::dr_matrix_engine(ET2 const& rhs)
 }
 
 template<class T, class AT>
-template<class T2, detail::enable_if_convertible_element<T2,T>> inline
+template<class T2, detail::enable_if_convertible_element_type<T2,T>> inline
 dr_matrix_engine<T,AT>::dr_matrix_engine(initializer_list<initializer_list<T2>> rhs)
 :   dr_matrix_engine()
 {
@@ -187,7 +187,7 @@ dr_matrix_engine<T,AT>::operator =(dr_matrix_engine const& rhs)
 }
 
 template<class T, class AT>
-template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T>> inline
+template<class ET2, detail::enable_if_engine_has_convertible_element_type<ET2,T>> inline
 dr_matrix_engine<T,AT>&
 dr_matrix_engine<T,AT>::operator =(ET2 const& rhs)
 {
@@ -196,7 +196,7 @@ dr_matrix_engine<T,AT>::operator =(ET2 const& rhs)
 }
 
 template<class T, class AT>
-template<class T2, detail::enable_if_convertible_element<T2,T>> inline
+template<class T2, detail::enable_if_convertible_element_type<T2,T>> inline
 dr_matrix_engine<T,AT>&
 dr_matrix_engine<T,AT>::operator =(initializer_list<initializer_list<T2>> rhs)
 {

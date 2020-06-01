@@ -70,10 +70,10 @@ template<class ET, class VCT>
 using matrix_row_engine = vector_view_engine<ET, VCT, row_view_tag>;
 
 template<class ET>
-using matrix_negation_engine = matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>;
-
-template<class ET, class MCT>
 using matrix_hermitian_engine = matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>;
+
+template<class ET>
+using matrix_negation_engine = matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>;
 
 template<class ET, class MCT>
 using matrix_subset_engine = matrix_view_engine<ET, MCT, subset_view_tag>;

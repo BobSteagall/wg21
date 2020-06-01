@@ -20,20 +20,34 @@ struct scalar_engine
     using engine_category = scalar_engine_tag;
 };
 
+//- This variable template determines whether a type is an engine.
+//
+template<class ET> inline constexpr
+bool    is_engine_v = detail::is_engine_v<ET>;
 
 //- These variable templates are used to determine the kind of engine represented by a category
-//  tag: scalar, vector, or matrix.
+//  tag: scalar/vector/matrix, as well as readable/writable/initable/resizable.
 //
-template<class TT> inline constexpr
-bool    is_scalar_engine_tag_v = TT::value == scalar_engine_tag::value;
+template<class CT> inline constexpr
+bool    is_scalar_engine_tag_v = detail::is_scalar_tag_v<CT>;
 
-template<class TT> inline constexpr
-bool    is_vector_engine_tag_v = TT::value >= readable_vector_engine_tag::value &&
-                                 TT::value <= resizable_vector_engine_tag::value;
+template<class CT> inline constexpr
+bool    is_vector_engine_tag_v = detail::is_vector_tag_v<CT>;
 
-template<class TT> inline constexpr
-bool    is_matrix_engine_tag_v = TT::value >= readable_matrix_engine_tag::value &&
-                                 TT::value <= resizable_matrix_engine_tag::value;
+template<class CT> inline constexpr
+bool    is_matrix_engine_tag_v = detail::is_matrix_tag_v<CT>;
+
+template<class CT> inline constexpr
+bool    is_readable_engine_tag_v = detail::is_readable_tag_v<CT>;
+
+template<class CT> inline constexpr
+bool    is_writable_engine_tag_v = detail::is_writable_tag_v<CT>;
+
+template<class CT> inline constexpr
+bool    is_initable_engine_tag_v = detail::is_initable_tag_v<CT>;
+
+template<class CT> inline constexpr
+bool    is_resizable_engine_tag_v = detail::is_resizable_tag_v<CT>;
 
 
 //- These variable templates are used to determine the kind of engine based on the engine's

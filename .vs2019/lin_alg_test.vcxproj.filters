@@ -136,6 +136,9 @@
     <ClCompile Include="..\tests\test_op_div_traits.cpp">
       <Filter>Unit Test Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\tests\test_matrix_view_engines.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

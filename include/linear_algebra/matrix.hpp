@@ -38,23 +38,22 @@ class matrix
     using index_type           = typename engine_type::index_type;
     using index_tuple          = typename engine_type::index_tuple;
 
+    using span_type            = detail::engine_span_t<ET>;
+    using const_span_type      = detail::engine_const_span_t<ET>;
+
     using column_type          = vector<matrix_column_engine<engine_type, possibly_writable_vector_tag>, OT>;
     using const_column_type    = vector<matrix_column_engine<engine_type, readable_vector_engine_tag>, OT>;
     using row_type             = vector<matrix_row_engine<engine_type, possibly_writable_vector_tag>, OT>;
     using const_row_type       = vector<matrix_row_engine<engine_type, readable_vector_engine_tag>, OT>;
+
+    using negation_type        = matrix<matrix_negation_engine<engine_type>, OT>;
+    using const_negation_type  = matrix<matrix_negation_engine<engine_type>, OT>;
     using submatrix_type       = matrix<matrix_subset_engine<engine_type, possibly_writable_matrix_tag>, OT>;
     using const_submatrix_type = matrix<matrix_subset_engine<engine_type, readable_matrix_engine_tag>, OT>;
     using transpose_type       = matrix<matrix_transpose_engine<engine_type, possibly_writable_matrix_tag>, OT>;
     using const_transpose_type = matrix<matrix_transpose_engine<engine_type, readable_matrix_engine_tag>, OT>;
     using hermitian_type       = conditional_t<has_cx_elem, matrix, const_transpose_type>;
     using const_hermitian_type = conditional_t<has_cx_elem, matrix, const_transpose_type>;
-    using span_type            = detail::engine_span_t<ET>;
-    using const_span_type      = detail::engine_const_span_t<ET>;
-
-#ifdef LA_NEGATION_AS_VIEW
-    using negation_type        = matrix<matrix_negation_engine<engine_type>, OT>;
-    using const_negation_type  = matrix<matrix_negation_engine<engine_type>, OT>;
-#endif
 
     //- Construct/copy/destroy
     //
@@ -65,24 +64,24 @@ class matrix
     constexpr matrix(matrix const&) = default;
 
     template<class ET2, class OT2>
-    constexpr matrix(matrix<ET2, OT2> const& src);
-    template<class U, class ET2 = ET, detail::enable_if_initable<ET, ET2, U> = true>
+    constexpr matrix(matrix<ET2, OT2> const& rhs);
+    template<class U, class ET2 = ET, detail::enable_if_initable_engine<ET, ET2, U> = true>
     constexpr matrix(initializer_list<initializer_list<U>> rhs);
 
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     explicit constexpr matrix(index_tuple size);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     constexpr matrix(index_type rows, index_type cols);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     constexpr matrix(index_tuple size, index_tuple cap);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     constexpr matrix(index_type rows, index_type cols, index_type rowcap, index_type colcap);
 
     constexpr matrix&   operator =(matrix&&) noexcept = default;
     constexpr matrix&   operator =(matrix const&) = default;
     template<class ET2, class OT2>
     constexpr matrix&   operator =(matrix<ET2, OT2> const& rhs);
-    template<class U, class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
+    template<class U, class ET2 = ET, detail::enable_if_writable_engine<ET, ET2> = true>
     constexpr matrix&   operator =(initializer_list<initializer_list<U>> rhs);
 
     //- Capacity
@@ -95,19 +94,19 @@ class matrix
     constexpr index_type    row_capacity() const noexcept;
     constexpr index_tuple   capacity() const noexcept;
 
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     constexpr void      reserve(index_tuple cap);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     constexpr void      reserve(index_type rowcap, index_type colcap);
 
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     constexpr void      resize(index_tuple size);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     constexpr void      resize(index_type rows, index_type cols);
 
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     constexpr void      resize(index_tuple size, index_tuple cap);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     constexpr void      resize(index_type rows, index_type cols, index_type rowcap, index_type colcap);
 
     //- Element access
@@ -142,9 +141,9 @@ class matrix
     //- Modifiers
     //
     constexpr void      swap(matrix& rhs) noexcept;
-    template<class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_writable_engine<ET, ET2> = true>
     constexpr void      swap_columns(index_type c1, index_type c2) noexcept;
-    template<class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_writable_engine<ET, ET2> = true>
     constexpr void      swap_rows(index_type r1, index_type r2) noexcept;
 
   private:
@@ -167,31 +166,31 @@ matrix<ET,OT>::matrix(matrix<ET2, OT2> const& rhs)
 {}
 
 template<class ET, class OT>
-template<class U, class ET2, detail::enable_if_initable<ET, ET2, U>> constexpr
+template<class U, class ET2, detail::enable_if_initable_engine<ET, ET2, U>> constexpr
 matrix<ET,OT>::matrix(initializer_list<initializer_list<U>> rhs)
 :   m_engine(rhs)
 {}
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
+template<class ET2, detail::enable_if_resizable_engine<ET, ET2>> constexpr
 matrix<ET,OT>::matrix(index_tuple size)
 :   m_engine(get<0>(size), get<1>(size))
 {}
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
+template<class ET2, detail::enable_if_resizable_engine<ET, ET2>> constexpr
 matrix<ET,OT>::matrix(index_type rows, index_type cols)
 :   m_engine(rows, cols)
 {}
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
+template<class ET2, detail::enable_if_resizable_engine<ET, ET2>> constexpr
 matrix<ET,OT>::matrix(index_tuple size, index_tuple cap)
 :   m_engine(get<0>(size), get<1>(size), get<0>(cap), get<1>(cap))
 {}
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
+template<class ET2, detail::enable_if_resizable_engine<ET, ET2>> constexpr
 matrix<ET,OT>::matrix(index_type rows, index_type cols, index_type rowcap, index_type colcap)
 :   m_engine(rows, cols, rowcap, colcap)
 {}
@@ -212,7 +211,7 @@ matrix<ET,OT>::operator =(matrix<ET2, OT2> const& rhs)
 }
 
 template<class ET, class OT>
-template<class U, class ET2, detail::enable_if_writable<ET, ET2>> constexpr
+template<class U, class ET2, detail::enable_if_writable_engine<ET, ET2>> constexpr
 matrix<ET,OT>&
 matrix<ET,OT>::operator =(initializer_list<initializer_list<U>> rhs)
 {
@@ -266,7 +265,7 @@ matrix<ET,OT>::capacity() const noexcept
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> inline constexpr
+template<class ET2, detail::enable_if_resizable_engine<ET, ET2>> inline constexpr
 void
 matrix<ET,OT>::reserve(index_tuple cap)
 {
@@ -274,7 +273,7 @@ matrix<ET,OT>::reserve(index_tuple cap)
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> inline constexpr
+template<class ET2, detail::enable_if_resizable_engine<ET, ET2>> inline constexpr
 void
 matrix<ET,OT>::reserve(index_type rowcap, index_type colcap)
 {
@@ -282,7 +281,7 @@ matrix<ET,OT>::reserve(index_type rowcap, index_type colcap)
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> inline constexpr
+template<class ET2, detail::enable_if_resizable_engine<ET, ET2>> inline constexpr
 void
 matrix<ET,OT>::resize(index_tuple size)
 {
@@ -290,7 +289,7 @@ matrix<ET,OT>::resize(index_tuple size)
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> inline constexpr
+template<class ET2, detail::enable_if_resizable_engine<ET, ET2>> inline constexpr
 void
 matrix<ET,OT>::resize(index_type rows, index_type cols)
 {
@@ -298,7 +297,7 @@ matrix<ET,OT>::resize(index_type rows, index_type cols)
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> inline constexpr
+template<class ET2, detail::enable_if_resizable_engine<ET, ET2>> inline constexpr
 void
 matrix<ET,OT>::resize(index_tuple size, index_tuple cap)
 {
@@ -306,7 +305,7 @@ matrix<ET,OT>::resize(index_tuple size, index_tuple cap)
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> inline constexpr
+template<class ET2, detail::enable_if_resizable_engine<ET, ET2>> inline constexpr
 void
 matrix<ET,OT>::resize(index_type rows, index_type cols, index_type rowcap, index_type colcap)
 {
@@ -453,7 +452,7 @@ matrix<ET,OT>::swap(matrix& rhs) noexcept
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_writable<ET, ET2>> constexpr
+template<class ET2, detail::enable_if_writable_engine<ET, ET2>> constexpr
 void
 matrix<ET,OT>::swap_columns(index_type c1, index_type c2) noexcept
 {
@@ -461,7 +460,7 @@ matrix<ET,OT>::swap_columns(index_type c1, index_type c2) noexcept
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_writable<ET, ET2>> constexpr
+template<class ET2, detail::enable_if_writable_engine<ET, ET2>> constexpr
 void
 matrix<ET,OT>::swap_rows(index_type r1, index_type r2) noexcept
 {

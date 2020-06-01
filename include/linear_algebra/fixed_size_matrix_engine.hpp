@@ -44,18 +44,18 @@ class fs_matrix_engine
     constexpr fs_matrix_engine(fs_matrix_engine const&) = default;
     template<class T2, ptrdiff_t R2, ptrdiff_t C2>
     constexpr fs_matrix_engine(fs_matrix_engine<T2, R2, C2> const& rhs);
-    template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T> = true>
+    template<class ET2, detail::enable_if_engine_has_convertible_element_type<ET2,T> = true>
     constexpr fs_matrix_engine(ET2 const& rhs);
-    template<class T2, detail::enable_if_convertible_element<T2,T> = true>
+    template<class T2, detail::enable_if_convertible_element_type<T2,T> = true>
     constexpr fs_matrix_engine(initializer_list<initializer_list<T2>> rhs);
 
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine&&) noexcept = default;
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine const&) = default;
     template<class T2, ptrdiff_t R2, ptrdiff_t C2>
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine<T2, R2, C2> const& rhs);
-    template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T> = true>
+    template<class ET2, detail::enable_if_engine_has_convertible_element_type<ET2,T> = true>
     constexpr fs_matrix_engine&     operator =(ET2 const& rhs);
-    template<class T2, detail::enable_if_convertible_element<T2,T> = true>
+    template<class T2, detail::enable_if_convertible_element_type<T2,T> = true>
     constexpr fs_matrix_engine&     operator =(initializer_list<initializer_list<T2>> rhs);
 
     //- Capacity
@@ -114,7 +114,7 @@ fs_matrix_engine<T,R,C>::fs_matrix_engine(fs_matrix_engine<T2,R2,C2> const& rhs)
 }
 
 template<class T, ptrdiff_t R, ptrdiff_t C>
-template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T>> constexpr
+template<class ET2, detail::enable_if_engine_has_convertible_element_type<ET2,T>> constexpr
 fs_matrix_engine<T,R,C>::fs_matrix_engine(ET2 const& rhs)
 :   ma_elems()
 {
@@ -122,7 +122,7 @@ fs_matrix_engine<T,R,C>::fs_matrix_engine(ET2 const& rhs)
 }
 
 template<class T, ptrdiff_t R, ptrdiff_t C>
-template<class T2, detail::enable_if_convertible_element<T2,T>> constexpr
+template<class T2, detail::enable_if_convertible_element_type<T2,T>> constexpr
 fs_matrix_engine<T,R,C>::fs_matrix_engine(initializer_list<initializer_list<T2>> rhs)
 :   ma_elems()
 {
@@ -139,7 +139,7 @@ fs_matrix_engine<T,R,C>::operator =(fs_matrix_engine<T2,R2,C2> const& rhs)
 }
 
 template<class T, ptrdiff_t R, ptrdiff_t C>
-template<class ET2, detail::enable_if_engine_has_convertible_element<ET2,T>> constexpr
+template<class ET2, detail::enable_if_engine_has_convertible_element_type<ET2,T>> constexpr
 fs_matrix_engine<T,R,C>&
 fs_matrix_engine<T,R,C>::operator =(ET2 const& rhs)
 {
@@ -148,7 +148,7 @@ fs_matrix_engine<T,R,C>::operator =(ET2 const& rhs)
 }
 
 template<class T, ptrdiff_t R, ptrdiff_t C>
-template<class T2, detail::enable_if_convertible_element<T2,T>> constexpr
+template<class T2, detail::enable_if_convertible_element_type<T2,T>> constexpr
 fs_matrix_engine<T,R,C>&
 fs_matrix_engine<T,R,C>::operator =(initializer_list<initializer_list<T2>> rhs)
 {

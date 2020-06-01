@@ -176,7 +176,7 @@ class vector_view_engine<ET, VCT, subset_view_tag>
 
     template<class ET2 = ET, detail::enable_if_convertible_engine<ET2, ET> = true>
     constexpr vector_view_engine&    operator =(ET2 const& rhs);
-    template<class U, class ET2 = ET, detail::enable_if_writable<ET2, ET> = true>
+    template<class U, class ET2 = ET, detail::enable_if_writable_engine<ET2, ET> = true>
     constexpr vector_view_engine&    operator =(initializer_list<U> list);
 
     //- Capacity
@@ -229,7 +229,7 @@ vector_view_engine<ET, VCT, subset_view_tag>::operator =(ET2 const& rhs)
 }
 
 template<class ET, class VCT>
-template<class U, class ET2, detail::enable_if_writable<ET2, ET>> constexpr
+template<class U, class ET2, detail::enable_if_writable_engine<ET2, ET>> constexpr
 vector_view_engine<ET, VCT, subset_view_tag>&
 vector_view_engine<ET, VCT, subset_view_tag>::operator =(initializer_list<U> rhs)
 {
@@ -337,7 +337,7 @@ class vector_view_engine<ET, VCT, column_view_tag>
 
     template<class ET2 = ET, detail::enable_if_convertible_engine<ET2, ET> = true>
     constexpr vector_view_engine&    operator =(ET2 const& rhs);
-    template<class U, class ET2 = ET, detail::enable_if_writable<ET2, ET> = true>
+    template<class U, class ET2 = ET, detail::enable_if_writable_engine<ET2, ET> = true>
     constexpr vector_view_engine&    operator =(initializer_list<U> list);
 
     //- Capacity
@@ -388,7 +388,7 @@ vector_view_engine<ET, VCT, column_view_tag>::operator =(ET2 const& rhs)
 }
 
 template<class ET, class VCT>
-template<class U, class ET2, detail::enable_if_writable<ET2, ET>> constexpr
+template<class U, class ET2, detail::enable_if_writable_engine<ET2, ET>> constexpr
 vector_view_engine<ET, VCT, column_view_tag>&
 vector_view_engine<ET, VCT, column_view_tag>::operator =(initializer_list<U> rhs)
 {
@@ -494,7 +494,7 @@ class vector_view_engine<ET, VCT, row_view_tag>
 
     template<class ET2 = ET, detail::enable_if_convertible_engine<ET2, ET> = true>
     constexpr vector_view_engine&    operator =(ET2 const& rhs);
-    template<class U, class ET2 = ET, detail::enable_if_writable<ET2, ET> = true>
+    template<class U, class ET2 = ET, detail::enable_if_writable_engine<ET2, ET> = true>
     constexpr vector_view_engine&    operator =(initializer_list<U> list);
 
     //- Capacity
@@ -545,7 +545,7 @@ vector_view_engine<ET, VCT, row_view_tag>::operator =(ET2 const& rhs)
 }
 
 template<class ET, class VCT>
-template<class U, class ET2, detail::enable_if_writable<ET2, ET>> constexpr
+template<class U, class ET2, detail::enable_if_writable_engine<ET2, ET>> constexpr
 vector_view_engine<ET, VCT, row_view_tag>&
 vector_view_engine<ET, VCT, row_view_tag>::operator =(initializer_list<U> rhs)
 {

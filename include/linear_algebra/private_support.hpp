@@ -31,8 +31,27 @@ bool    is_complex_v = is_complex<T>::value;
 
 
 //==================================================================================================
+//  ENGINE CATEGORY
+//==================================================================================================
+//  This traits type and the associated variable templates are used to determine whether or not
+//  a type is an engine.
+//==================================================================================================
+//
+template<class ET, typename = void>
+struct detect_engine : public false_type
+{};
+
+template<class ET>
+struct detect_engine<ET, void_t<typename ET::engine_category>> : public true_type
+{};
+
+template<class ET> inline constexpr
+bool    is_engine_v = detect_engine<ET>::value;
+
+
+//==================================================================================================
 //  This traits type specifies important properties that are to be associated with an engine,
-//  based on a given tag type.  These properties are represented by boolean values.
+//  based on a given category tag type.  These properties are represented by boolean values.
 //==================================================================================================
 //
 template<class TAG>
@@ -154,31 +173,79 @@ struct engine_tag_traits<resizable_matrix_engine_tag>
 };
 
 
+//- These private variable templates return various boolean flags based on a category tag type.
+//
+template<class CT> inline constexpr
+bool    is_scalar_tag_v = engine_tag_traits<CT>::is_scalar;
+
+template<class CT> inline constexpr
+bool    is_vector_tag_v = engine_tag_traits<CT>::is_vector;
+
+template<class CT> inline constexpr
+bool    is_matrix_tag_v = engine_tag_traits<CT>::is_matrix;
+
+template<class CT> inline constexpr
+bool    is_readable_tag_v = engine_tag_traits<CT>::is_readable;
+
+template<class CT> inline constexpr
+bool    is_writable_tag_v = engine_tag_traits<CT>::is_writable;
+
+template<class CT> inline constexpr
+bool    is_initable_tag_v = engine_tag_traits<CT>::is_initable;
+
+template<class CT> inline constexpr
+bool    is_resizable_tag_v = engine_tag_traits<CT>::is_resizable;
+
+
+//- These private variable templates return various boolean flags based on an engine's category.
+//
+template<class ET> inline constexpr
+bool    engine_has_scalar_tag_v = is_scalar_tag_v<typename ET::engine_category>;
+
+template<class ET> inline constexpr
+bool    engine_has_vector_tag_v = is_vector_tag_v<typename ET::engine_category>;
+
+template<class ET> inline constexpr
+bool    engine_has_matrix_tag_v = is_matrix_tag_v<typename ET::engine_category>;
+
+template<class ET> inline constexpr
+bool    engine_has_readable_tag_v = is_readable_tag_v<typename ET::engine_category>;
+
+template<class ET> inline constexpr
+bool    engine_has_writable_tag_v = is_writable_tag_v<typename ET::engine_category>;
+
+template<class ET> inline constexpr
+bool    engine_has_initable_tag_v = is_initable_tag_v<typename ET::engine_category>;
+
+template<class ET> inline constexpr
+bool    engine_has_resizable_tag_v = is_resizable_tag_v<typename ET::engine_category>;
+
+
 //- These private variable templates are used as a convenience to report important engine
 //  properties, using the engine_tag_traits type defined above.  They are used in the private
 //  implementation below, as well as by a corresponding set of public variable templates
 //  (i.e., is_*_engine_v<ET>).
 //
 template<class ET> inline constexpr
-bool    is_scalar_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_scalar;
+bool    is_scalar_engine_v = is_engine_v<ET> && engine_has_scalar_tag_v<ET>;
 
 template<class ET> inline constexpr
-bool    is_vector_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_vector;
+bool    is_vector_engine_v = is_engine_v<ET> && engine_has_vector_tag_v<ET>;
 
 template<class ET> inline constexpr
-bool    is_matrix_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_matrix;
+bool    is_matrix_engine_v = is_engine_v<ET> && engine_has_matrix_tag_v<ET>;
 
 template<class ET> inline constexpr
-bool    is_readable_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_readable;
+bool    is_readable_engine_v = is_engine_v<ET> && engine_has_readable_tag_v<ET>;
 
 template<class ET> inline constexpr
-bool    is_writable_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_writable;
+bool    is_writable_engine_v = is_engine_v<ET> && engine_has_writable_tag_v<ET>;
 
 template<class ET> inline constexpr
-bool    is_initable_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_initable;
+bool    is_initable_engine_v = is_engine_v<ET> && engine_has_initable_tag_v<ET>;
 
 template<class ET> inline constexpr
-bool    is_resizable_engine_v = detail::engine_tag_traits<typename ET::engine_category>::is_resizable;
+bool    is_resizable_engine_v = is_engine_v<ET> && engine_has_resizable_tag_v<ET>;
 
 template<class ET1, class ET2> inline constexpr
 bool    engines_match_v = (is_matrix_engine_v<ET1> && is_matrix_engine_v<ET2>) ||
@@ -187,30 +254,65 @@ bool    engines_match_v = (is_matrix_engine_v<ET1> && is_matrix_engine_v<ET2>) |
 
 
 //- These private alias templates are used by the vector and matrix class templates to
-//  enable/disable various parts of their public interfaces via SFINAE.
+//  enable/disable various parts of their public interfaces via SFINAE, depeding on their
+//  engine types.
 //
-template<class T2, class T>
-using enable_if_convertible_element = enable_if_t<is_convertible_v<T2, T>, bool>;
+template<class ET1, class ET2>
+using enable_if_readable_engine =
+        enable_if_t<is_same_v<ET1, ET2> && is_readable_engine_v<ET1>, bool>;
 
-template<class ET2, class T>
-using enable_if_engine_has_convertible_element =
-        enable_if_t<is_convertible_v<typename ET2::value_type, T>, bool>;
+template<class ET1, class ET2>
+using enable_if_writable_engine =
+        enable_if_t<is_same_v<ET1, ET2> && is_writable_engine_v<ET1>, bool>;
+
+template<class ET1, class ET2, class U>
+using enable_if_initable_engine =
+        enable_if_t<is_same_v<ET1, ET2> && is_initable_engine_v<ET1>, bool>;
+
+template<class ET1, class ET2>
+using enable_if_resizable_engine =
+        enable_if_t<is_same_v<ET1, ET2> && is_resizable_engine_v<ET1>, bool>;
+
+
+//- These private alias templates are used by the (non-owning) vector and matrix view engine
+//  types to enable/disable portions of their public interface via SFINAE, depending on their
+//  engine category.
+//
+template<class CT1, class CT2>
+using enable_if_readable_category =
+        enable_if_t<is_same_v<CT1, CT2> && engine_tag_traits<CT1>::is_readable, bool>;
+
+template<class CT1, class CT2>
+using enable_if_writable_category =
+        enable_if_t<is_same_v<CT1, CT2> && engine_tag_traits<CT1>::is_writable, bool>;
+
+template<class CT1, class CT2>
+using enable_if_initable_category =
+        enable_if_t<is_same_v<CT1, CT2> && engine_tag_traits<CT1>::is_initable, bool>;
+
+template<class CT1, class CT2>
+using enable_if_resizable_category =
+        enable_if_t<is_same_v<CT1, CT2> && engine_tag_traits<CT1>::is_resizable, bool>;
+
+
+//- These private alias templates are used by the owning vector and matrix engines to
+//  enable/disable portions of their public interfaces via SFINAE, depending on properties
+//  inherent to those engines.
+//
+template<class T2, class T1>
+using enable_if_convertible_element_type = enable_if_t<is_convertible_v<T2, T1>, bool>;
+
+template<class ET1, class T>
+using enable_if_engine_has_convertible_element_type =
+        enable_if_t<is_engine_v<ET1> && is_convertible_v<typename ET1::value_type, T>, bool>;
 
 template<class ET2, class ET>
 using enable_if_convertible_engine =
-        enable_if_t<is_convertible_v<typename ET2::element_type, typename ET::element_type>, bool>;
-
-template<class ET1, class ET2>
-using enable_if_writable = enable_if_t<is_same_v<ET1, ET2> && is_writable_engine_v<ET1>, bool>;
-
-template<class ET1, class ET2, class U>
-using enable_if_initable = enable_if_t<is_same_v<ET1, ET2> && is_initable_engine_v<ET1>  &&
-                                       is_convertible_v<U, typename ET1::value_type>, bool>;
-
-template<class ET1, class ET2>
-using enable_if_resizable = enable_if_t<is_same_v<ET1, ET2> && is_resizable_engine_v<ET1>, bool>;
+        enable_if_t<is_engine_v<ET2> && is_convertible_v<typename ET2::element_type, typename ET::element_type>, bool>;
 
 
+//==================================================================================================
+//  MDSPAN INTERFACE
 //==================================================================================================
 //  The following are several detection idiom traits types, regular traits types, and alias
 //  templates for determining the type aliases 'span_type' and 'const_span_type' that may be
@@ -340,6 +442,240 @@ template<class ET1, class ET2>
 using enable_if_spannable = enable_if_t<is_same_v<ET1, ET2> && has_span_type_v<ET1>, bool>;
 
 
+//==================================================================================================
+//  The following define several inter-related facilities used for determining an mdspan type
+//  on behalf of a non-owning engine.
+//==================================================================================================
+//
+//- First, these are specialized accessor policies used for negation and hermitian views.
+//
+template<class T>
+struct negation_accessor
+{
+    using offset_policy = negation_accessor;
+    using element_type  = T;
+    using reference     = T;
+    using pointer       = T*;
+
+    constexpr pointer   offset(pointer p, ptrdiff_t i) const noexcept { return p + i; }
+    constexpr reference access(pointer p, ptrdiff_t i) const noexcept { return -p[i]; }
+    constexpr pointer   decay(pointer p) const noexcept               { return p; }
+};
+
+template<class T>
+struct conjugation_accessor
+{
+    using offset_policy = conjugation_accessor;
+    using element_type  = T;
+    using reference     = T;
+    using pointer       = T*;
+
+    constexpr pointer   offset(pointer p, ptrdiff_t i) const noexcept { return p + i; }
+    constexpr reference access(pointer p, ptrdiff_t i) const noexcept { return conj(p[i]); }
+    constexpr pointer   decay(pointer p) const noexcept               { return p; }
+};
+
+//--------------------------------------------------------------------
+//- Next, these are some type alias helpers to reduce verbosity in the
+//  noe_mdspan_traits type below.
+//
+using dyn_mat_extents = extents<dynamic_extent, dynamic_extent>;
+using dyn_mat_strides = array<typename dyn_mat_extents::index_type, 2>;
+using dyn_mat_layout  = layout_stride<dynamic_extent, dynamic_extent>;
+using dyn_mat_mapping = typename dyn_mat_layout::template mapping<dyn_mat_extents>;
+
+using dyn_vec_extents = extents<dynamic_extent>;
+using dyn_vec_strides = array<typename dyn_vec_extents::index_type, 1>;
+using dyn_vec_layout  = layout_stride<dynamic_extent>;
+using dyn_vec_mapping = typename dyn_mat_layout::template mapping<dyn_vec_extents>;
+
+//------------------------------------------------------------------------
+//- The actual noe_mdspan_traits type, with partial specializations below.
+//
+template<class T>
+struct noe_mdspan_traits;
+
+//- This partial specialization is used when no span interface is desired.
+//
+template<>
+struct noe_mdspan_traits<void>
+{
+    using source_span_type    = void;
+    using rowcolumn_span_type = void;
+    using subvector_span_type = void;
+    using submatrix_span_type = void;
+    using transpose_span_type = void;
+    using index_type          = void;
+};
+
+//- This partial specialization is used when an engine is one-dimensional.
+//
+template<class T, ptrdiff_t X0, class L, class A>
+struct noe_mdspan_traits<basic_mdspan<T, extents<X0>, L, A>>
+{
+    using source_span_type    = basic_mdspan<T, extents<X0>, L, A>;
+    using negation_span_type  = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, negation_accessor<T>>;
+    using hermitian_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, conjugation_accessor<T>>;
+    using subvector_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
+    using index_type          = typename source_span_type::index_type;
+    using element_type        = T;
+};
+
+//- This partial specialization is used when an engine is two-dimensional.
+//
+template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+struct noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
+{
+    using source_span_type    = basic_mdspan<T, extents<X0, X1>, L, A>;
+    using negation_span_type  = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, negation_accessor<T>>;
+    using hermitian_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, conjugation_accessor<T>>;
+    using rowcolumn_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
+    using transpose_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
+    using submatrix_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
+    using index_type          = typename source_span_type::index_type;
+    using element_type        = T;
+};
+
+//--------------------------------------------------------------------------------
+//- The following are a helper alias template and function template for specifying
+//  and returning negation spans (needed by negation engines).
+//
+template<class ST>
+using noe_mdspan_negation_t = typename noe_mdspan_traits<ST>::negation_span_type;
+
+template<class ST> inline constexpr
+noe_mdspan_negation_t<ST>
+noe_mdspan_negation(ST const& s)
+{
+    using accessor = negation_accessor<typename noe_mdspan_traits<ST>::element_type>;
+
+    dyn_mat_extents     ext(s.extent(0), s.extent(1));
+    dyn_mat_strides     str{s.stride(0), s.stride(1)};
+    dyn_mat_mapping     map(ext, str);
+
+    return noe_mdspan_negation_t<ST>(s.data(), map, accessor());
+}
+
+//--------------------------------------------------------------------------------
+//- The following are a helper alias template and function template for specifying
+//  and returning hermitian spans (needed by hermitian engines).
+//
+template<class ST>
+using noe_mdspan_hermitian_t = typename noe_mdspan_traits<ST>::herimitian_span_type;
+
+template<class ST> inline constexpr
+noe_mdspan_hermitian_t<ST>
+noe_mdspan_hermitian(ST const& s)
+{
+    using accessor = conjugation_accessor<typename noe_mdspan_traits<ST>::element_type>;
+
+    dyn_mat_extents     ext(s.extent(1), s.extent(0));
+    dyn_mat_strides     str{s.stride(1), s.stride(0)};
+    dyn_mat_mapping     map(ext, str);
+
+    return noe_mdspan_hermitian_t<ST>(s.data(), s.mapping(), accessor());
+}
+
+//--------------------------------------------------------------------------------
+//- The following are a helper alias template and function template for specifying
+//  and returning subvector spans (needed by subvector engines).
+//
+template<class ST>
+using noe_mdspan_subvector_t = typename noe_mdspan_traits<ST>::subvector_span_type;
+
+template<class ST, class SZ> inline constexpr
+noe_mdspan_subvector_t<ST>
+noe_mdspan_subvector(ST const& s, SZ idx, SZ count)
+{
+    using idx_t  = typename noe_mdspan_traits<ST>::index_type;
+    using pair_t = pair<idx_t, idx_t>;
+
+    pair_t  elem_pair(static_cast<idx_t>(idx), static_cast<idx_t>(idx + count));
+
+    return subspan(s, elem_pair);
+}
+
+//--------------------------------------------------------------------------------
+//- The following are a helper alias template and function template for specifying
+//  and returning column and row spans (needed by column and row engines).
+//
+template<class ST>
+using noe_mdspan_rowcolumn_t = typename noe_mdspan_traits<ST>::rowcolumn_span_type;
+
+template<class ST, class SZ> inline constexpr
+noe_mdspan_rowcolumn_t<ST>
+noe_mdspan_column(ST const& s, SZ col)
+{
+    using idx_t = typename noe_mdspan_traits<ST>::index_type;
+    return subspan(s, all, static_cast<idx_t>(col));
+}
+
+template<class ST, class SZ> inline constexpr
+noe_mdspan_rowcolumn_t<ST>
+noe_mdspan_row(ST const& s, SZ row)
+{
+    using idx_t = typename noe_mdspan_traits<ST>::index_type;
+    return subspan(s, static_cast<idx_t>(row), all);
+}
+
+//--------------------------------------------------------------------------------
+//- The following are a helper alias template and function template for specifying
+//  and returning transpose spans (needed by transpose engines).
+//
+template<class ST>
+using noe_mdspan_transpose_t = typename noe_mdspan_traits<ST>::transpose_span_type;
+
+template<class ST> inline constexpr
+noe_mdspan_transpose_t<ST>
+noe_mdspan_transpose(ST const& s)
+{
+    dyn_mat_extents     ext(s.extent(1), s.extent(0));
+    dyn_mat_strides     str{s.stride(1), s.stride(0)};
+    dyn_mat_mapping     map(ext, str);
+
+    return noe_mdspan_transpose_t<ST>(s.data(), map);
+}
+
+//--------------------------------------------------------------------------------
+//- The following are a helper alias template and function template for specifying
+//  and returning submatrix spans (needed by submatrix engines).
+//
+template<class ST>
+using noe_mdspan_submatrix_t = typename noe_mdspan_traits<ST>::submatrix_span_type;
+
+template<class ST, class SZ> inline constexpr
+noe_mdspan_submatrix_t<ST>
+noe_mdspan_submatrix(ST const& s, SZ row, SZ row_count, SZ col, SZ col_count)
+{
+    using idx_t  = typename noe_mdspan_traits<ST>::index_type;
+    using pair_t = std::pair<idx_t, idx_t>;
+
+    pair_t  row_pair(static_cast<idx_t>(row), static_cast<idx_t>(row + row_count));
+    pair_t  col_pair(static_cast<idx_t>(col), static_cast<idx_t>(col + col_count));
+
+    return subspan(s, row_pair, col_pair);
+}
+
+//------------------------------------------------------------------------------
+//- This helper function is used to construct strided mdspan objects for dynamic
+//  matrix engines.
+//
+template<class T, class ST> inline constexpr
+basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>
+make_dyn_span(T* pdata, ST rows, ST cols, ST row_stride, ST col_stride = 1u)
+{
+    using idx_t = typename dyn_mat_extents::index_type;
+
+    dyn_mat_extents     extents(static_cast<idx_t>(rows), static_cast<idx_t>(cols));
+    dyn_mat_strides     strides{static_cast<idx_t>(row_stride), static_cast<idx_t>(col_stride)};
+    dyn_mat_mapping     mapping(extents, strides);
+
+    return basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>(pdata, mapping);
+}
+
+
+//==================================================================================================
+//  NON-OWNING ENGINE PROPERTIES
 //==================================================================================================
 //  This traits type chooses the correct tag for a non-owning engine (NOE), given the tag of the
 //  source engine type to be wrapped (ETT) and the desired tag type of the resulting non-owning
@@ -509,7 +845,7 @@ struct noe_tag_chooser<resizable_matrix_engine_tag, writable_vector_engine_tag>
 };
 
 
-//- This alias template provides a convenience interface to noe_tag_chooser.  It is used by
+//- This alias template provides a convenience interface to noe_tag_chooser.  It is used only by
 //  the matrix class template to determine the engine categories for view types it might return
 //  representing rows, columns, submatrices, and transposes.
 //
@@ -562,227 +898,6 @@ using noe_mdspan_t = typename noe_traits<ET, NEWCAT>::span_type;
 
 template<class ET, class NEWCAT>
 using noe_const_mdspan_t = typename noe_traits<ET, NEWCAT>::const_span_type;
-
-//==================================================================================================
-//  The following define several inter-related facilities used for determining an mdspan type
-//  on behalf of a non-owning engine.
-//==================================================================================================
-//
-//- First, these are specialized accessor policies used for negation and hermitian views.
-//
-template<class T>
-struct negation_accessor
-{
-    using offset_policy = negation_accessor;
-    using element_type  = T;
-    using reference     = T;
-    using pointer       = T*;
-
-    constexpr pointer   offset(pointer p, ptrdiff_t i) const noexcept { return p + i; }
-    constexpr reference access(pointer p, ptrdiff_t i) const noexcept { return -p[i]; }
-    constexpr pointer   decay(pointer p) const noexcept               { return p; }
-};
-
-template<class T>
-struct conjugation_accessor
-{
-    using offset_policy = conjugation_accessor;
-    using element_type  = T;
-    using reference     = T;
-    using pointer       = T*;
-
-    constexpr pointer   offset(pointer p, ptrdiff_t i) const noexcept { return p + i; }
-    constexpr reference access(pointer p, ptrdiff_t i) const noexcept { return conj(p[i]); }
-    constexpr pointer   decay(pointer p) const noexcept               { return p; }
-};
-
-//--------------------------------------------------------------------
-//- Next, these are some type alias helpers to reduce verbosity in the
-//  noe_mdspan_traits type below.
-//
-using dyn_mat_extents = extents<dynamic_extent, dynamic_extent>;
-using dyn_mat_strides = array<typename dyn_mat_extents::index_type, 2>;
-using dyn_mat_layout  = layout_stride<dynamic_extent, dynamic_extent>;
-using dyn_mat_mapping = typename dyn_mat_layout::template mapping<dyn_mat_extents>;
-
-using dyn_vec_extents = extents<dynamic_extent>;
-using dyn_vec_strides = array<typename dyn_vec_extents::index_type, 1>;
-using dyn_vec_layout  = layout_stride<dynamic_extent>;
-using dyn_vec_mapping = typename dyn_mat_layout::template mapping<dyn_vec_extents>;
-
-//------------------------------------------------------------------------
-//- The actual noe_mdspan_traits type, with partial specializations below.
-//
-template<class T>
-struct noe_mdspan_traits;
-
-//- This partial specialization is used when no span interface is desired.
-//
-template<>
-struct noe_mdspan_traits<void>
-{
-    using source_span_type    = void;
-    using rowcolumn_span_type = void;
-    using subvector_span_type = void;
-    using submatrix_span_type = void;
-    using transpose_span_type = void;
-    using index_type          = void;
-};
-
-//- This partial specialization is used when an engine is one-dimensional.
-//
-template<class T, ptrdiff_t X0, class L, class A>
-struct noe_mdspan_traits<basic_mdspan<T, extents<X0>, L, A>>
-{
-    using source_span_type    = basic_mdspan<T, extents<X0>, L, A>;
-    using negation_span_type  = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, negation_accessor<T>>;
-    using hermitian_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, conjugation_accessor<T>>;
-    using subvector_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
-    using index_type          = typename source_span_type::index_type;
-    using element_type        = T;
-};
-
-//- This partial specialization is used when an engine is two-dimensional.
-//
-template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
-struct noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
-{
-    using source_span_type    = basic_mdspan<T, extents<X0, X1>, L, A>;
-    using negation_span_type  = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, negation_accessor<T>>;
-    using hermitian_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, conjugation_accessor<T>>;
-    using rowcolumn_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
-    using transpose_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
-    using submatrix_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
-    using index_type          = typename source_span_type::index_type;
-    using element_type        = T;
-};
-
-//--------------------------------------------------------------------------------
-//- The following are a helper alias template and function template for specifying
-//  and returning negation spans (needed by negation engines).
-//
-template<class ST>
-using noe_mdspan_negation_t = typename noe_mdspan_traits<ST>::negation_span_type;
-
-template<class ST> inline constexpr
-noe_mdspan_negation_t<ST>
-noe_mdspan_negation(ST const& s)
-{
-    using accessor = negation_accessor<typename noe_mdspan_traits<ST>::element_type>;
-    return noe_mdspan_negation_t<ST>(s.data(), s.mapping(), accessor());
-}
-
-//--------------------------------------------------------------------------------
-//- The following are a helper alias template and function template for specifying
-//  and returning hermitian spans (needed by hermitian engines).
-//
-template<class ST>
-using noe_mdspan_hermitian_t = typename noe_mdspan_traits<ST>::herimitian_span_type;
-
-template<class ST> inline constexpr
-noe_mdspan_hermitian_t<ST>
-noe_mdspan_hermitian(ST const& s)
-{
-    using accessor = conjugation_accessor<typename noe_mdspan_traits<ST>::element_type>;
-    return noe_mdspan_hermitian_t<ST>(s.data(), s.mapping(), accessor());
-}
-
-//--------------------------------------------------------------------------------
-//- The following are a helper alias template and function template for specifying
-//  and returning subvector spans (needed by subvector engines).
-//
-template<class ST>
-using noe_mdspan_subvector_t = typename noe_mdspan_traits<ST>::subvector_span_type;
-
-template<class ST, class SZ> inline constexpr
-noe_mdspan_subvector_t<ST>
-noe_mdspan_subvector(ST const& s, SZ idx, SZ count)
-{
-    using idx_t  = typename noe_mdspan_traits<ST>::index_type;
-    using pair_t = pair<idx_t, idx_t>;
-
-    pair_t  elem_pair(static_cast<idx_t>(idx), static_cast<idx_t>(idx + count));
-
-    return subspan(s, elem_pair);
-}
-
-//--------------------------------------------------------------------------------
-//- The following are a helper alias template and function template for specifying
-//  and returning column and row spans (needed by column and row engines).
-//
-template<class ST>
-using noe_mdspan_rowcolumn_t = typename noe_mdspan_traits<ST>::rowcolumn_span_type;
-
-template<class ST, class SZ> inline constexpr
-noe_mdspan_rowcolumn_t<ST>
-noe_mdspan_column(ST const& s, SZ col)
-{
-    using idx_t = typename noe_mdspan_traits<ST>::index_type;
-    return subspan(s, all, static_cast<idx_t>(col));
-}
-
-template<class ST, class SZ> inline constexpr
-noe_mdspan_rowcolumn_t<ST>
-noe_mdspan_row(ST const& s, SZ row)
-{
-    using idx_t = typename noe_mdspan_traits<ST>::index_type;
-    return subspan(s, static_cast<idx_t>(row), all);
-}
-
-//--------------------------------------------------------------------------------
-//- The following are a helper alias template and function template for specifying
-//  and returning transpose spans (needed by transpose engines).
-//
-template<class ST>
-using noe_mdspan_transpose_t = typename noe_mdspan_traits<ST>::transpose_span_type;
-
-template<class ST> inline constexpr
-noe_mdspan_transpose_t<ST>
-noe_mdspan_transpose(ST const& s)
-{
-    dyn_mat_extents     ext(s.extent(1), s.extent(0));
-    dyn_mat_strides     str{s.stride(1), s.stride(0)};
-    dyn_mat_mapping     map(ext, str);
-
-    return noe_mdspan_transpose_t<ST>(s.data(), map);
-}
-
-//--------------------------------------------------------------------------------
-//- The following are a helper alias template and function template for specifying
-//  and returning submatrix spans (needed by submatrix engines).
-//
-template<class ST>
-using noe_mdspan_submatrix_t = typename noe_mdspan_traits<ST>::submatrix_span_type;
-
-template<class ST, class SZ> inline constexpr
-noe_mdspan_submatrix_t<ST>
-noe_mdspan_submatrix(ST const& s, SZ row, SZ row_count, SZ col, SZ col_count)
-{
-    using idx_t  = typename noe_mdspan_traits<ST>::index_type;
-    using pair_t = std::pair<idx_t, idx_t>;
-
-    pair_t  row_pair(static_cast<idx_t>(row), static_cast<idx_t>(row + row_count));
-    pair_t  col_pair(static_cast<idx_t>(col), static_cast<idx_t>(col + col_count));
-
-    return subspan(s, row_pair, col_pair);
-}
-
-//------------------------------------------------------------------------------
-//- This helper function is used to construct strided mdspan objects for dynamic
-//  matrix engines.
-//
-template<class T, class ST> inline constexpr
-basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>
-make_dyn_span(T* pdata, ST rows, ST cols, ST row_stride, ST col_stride = 1u)
-{
-    using idx_t = typename dyn_mat_extents::index_type;
-
-    dyn_mat_extents     extents(static_cast<idx_t>(rows), static_cast<idx_t>(cols));
-    dyn_mat_strides     strides{static_cast<idx_t>(row_stride), static_cast<idx_t>(col_stride)};
-    dyn_mat_mapping     mapping(extents, strides);
-
-    return basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>(pdata, mapping);
-}
 
 
 //==================================================================================================

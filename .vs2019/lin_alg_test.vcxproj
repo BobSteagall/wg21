@@ -61,6 +61,7 @@
     <ClCompile Include="..\tests\test_dynamic_engines.cpp" />
     <ClCompile Include="..\tests\test_fixed_size_engines.cpp" />
     <ClCompile Include="..\tests\test_main.cpp" />
+    <ClCompile Include="..\tests\test_matrix_view_engines.cpp" />
     <ClCompile Include="..\tests\test_obj_matrix.cpp" />
     <ClCompile Include="..\tests\test_op_add_traits.cpp" />
     <ClCompile Include="..\tests\test_op_div_traits.cpp" />

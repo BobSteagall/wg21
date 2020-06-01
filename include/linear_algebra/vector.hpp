@@ -148,19 +148,19 @@ class vector
 
     template<class ET2, class OT2>
     constexpr vector(vector<ET2, OT2> const& src);
-    template<class U, class ET2 = ET, detail::enable_if_initable<ET, ET2, U> = true>
+    template<class U, class ET2 = ET, detail::enable_if_initable_engine<ET, ET2, U> = true>
     constexpr vector(initializer_list<U> list);
 
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     explicit constexpr vector(index_type elems);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     constexpr vector(index_type elems, index_type elemcap);
 
     constexpr vector&   operator =(vector&&) noexcept = default;
     constexpr vector&   operator =(vector const&) = default;
     template<class ET2, class OT2>
     constexpr vector&   operator =(vector<ET2, OT2> const& rhs);
-    template<class U, class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
+    template<class U, class ET2 = ET, detail::enable_if_writable_engine<ET, ET2> = true>
     constexpr vector&   operator =(initializer_list<U> list);
 
     //- Capacity
@@ -168,11 +168,11 @@ class vector
     constexpr index_type    capacity() const noexcept;
     constexpr index_type    size() const noexcept;
 
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     constexpr void      reserve(index_type elemcap);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     constexpr void      resize(index_type elems);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     constexpr void      resize(index_type elems, index_type elemcap);
 
     //- Element access
@@ -204,7 +204,7 @@ class vector
     //- Modifiers
     //
     constexpr void      swap(vector& rhs) noexcept;
-    template<class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
+    template<class ET2 = ET, detail::enable_if_writable_engine<ET, ET2> = true>
     constexpr void      swap_elements(index_type i, index_type j) noexcept;
 
   private:
@@ -232,19 +232,19 @@ vector<ET,OT>::vector(vector<ET2, OT2> const& rhs)
 {}
 
 template<class ET, class OT>
-template<class U, class ET2, detail::enable_if_initable<ET, ET2, U>> constexpr
+template<class U, class ET2, detail::enable_if_initable_engine<ET, ET2, U>> constexpr
 vector<ET,OT>::vector(initializer_list<U> list)
 :   m_engine(list)
 {}
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
+template<class ET2, detail::enable_if_resizable_engine<ET, ET2>> constexpr
 vector<ET,OT>::vector(index_type elems)
 :   m_engine(elems)
 {}
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
+template<class ET2, detail::enable_if_resizable_engine<ET, ET2>> constexpr
 vector<ET,OT>::vector(index_type elems, index_type cap)
 :   m_engine(elems, cap)
 {}
@@ -265,7 +265,7 @@ vector<ET,OT>::operator =(vector<ET2, OT2> const& rhs)
 }
 
 template<class ET, class OT>
-template<class U, class ET2, detail::enable_if_writable<ET, ET2>> constexpr
+template<class U, class ET2, detail::enable_if_writable_engine<ET, ET2>> constexpr
 vector<ET,OT>&
 vector<ET,OT>::operator =(initializer_list<U> rhs)
 {
@@ -291,7 +291,7 @@ vector<ET,OT>::size() const noexcept
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
+template<class ET2, detail::enable_if_resizable_engine<ET, ET2>> constexpr
 void
 vector<ET,OT>::reserve(index_type cap)
 {
@@ -299,7 +299,7 @@ vector<ET,OT>::reserve(index_type cap)
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
+template<class ET2, detail::enable_if_resizable_engine<ET, ET2>> constexpr
 void
 vector<ET,OT>::resize(index_type elems)
 {
@@ -307,7 +307,7 @@ vector<ET,OT>::resize(index_type elems)
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
+template<class ET2, detail::enable_if_resizable_engine<ET, ET2>> constexpr
 void
 vector<ET,OT>::resize(index_type elems, index_type cap)
 {
@@ -440,7 +440,7 @@ vector<ET,OT>::swap(vector& rhs) noexcept
 }
 
 template<class ET, class OT>
-template<class ET2, detail::enable_if_writable<ET, ET2>> constexpr
+template<class ET2, detail::enable_if_writable_engine<ET, ET2>> constexpr
 void
 vector<ET,OT>::swap_elements(index_type i, index_type j) noexcept
 {
