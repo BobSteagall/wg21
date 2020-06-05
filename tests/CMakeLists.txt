@@ -34,7 +34,6 @@ target_sources(la_test
         test_op_add_traits.cpp
         test_op_div_traits.cpp
         test_op_mul_traits.cpp
-        test_op_neg_traits.cpp
         test_op_sub_traits.cpp
  #       test_01.cpp
  #       test_02.cpp

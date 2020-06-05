@@ -302,8 +302,8 @@ struct matrix_division_engine_traits
 
 //- General transpose cases for matrices.
 //
-template<class OT, class ET1, class MCT1, class ET2>
-struct matrix_division_engine_traits<OT, matrix_transpose_engine<ET1, MCT1>, ET2>
+template<class OT, class ET1, class ET2>
+struct matrix_division_engine_traits<OT, matrix_transpose_engine<ET1>, ET2>
 {
     using engine_type = typename matrix_division_engine_traits<OT, ET1, ET2>::engine_type;
 };
@@ -341,9 +341,9 @@ struct matrix_division_engine_traits<OT,
     using engine_type  = dr_matrix_engine<element_type, alloc_type>;
 };
 
-template<class OT, class T1, class A1, class MCT1, class T2>
+template<class OT, class T1, class A1, class T2>
 struct matrix_division_engine_traits<OT,
-                                     matrix_transpose_engine<dr_matrix_engine<T1, A1>, MCT1>,
+                                     matrix_transpose_engine<dr_matrix_engine<T1, A1>>,
                                      scalar_engine<T2>>
 {
     using element_type = select_matrix_division_element_t<OT, T1, T2>;
@@ -363,9 +363,9 @@ struct matrix_division_engine_traits<OT,
     using engine_type  = fs_matrix_engine<element_type, R1, C1>;
 };
 
-template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class MCT1, class T2>
+template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class T2>
 struct matrix_division_engine_traits<OT,
-                                     matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>, MCT1>,
+                                     matrix_transpose_engine<fs_matrix_engine<T1, R1, C1>>,
                                      scalar_engine<T2>>
 {
     using element_type = select_matrix_division_element_t<OT, T1, T2>;

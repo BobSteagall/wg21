@@ -278,9 +278,9 @@ struct engine_div_traits_tst<OT,
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
 };
 
-template<class OT, class T1, size_t R1, size_t C1, class MCT1, class T2>
+template<class OT, class T1, size_t R1, size_t C1, class T2>
 struct engine_div_traits_tst<OT,
-                             STD_LA::matrix_transpose_engine<fs_matrix_engine_tst<T1, R1, C1>, MCT1>,
+                             STD_LA::matrix_transpose_engine<fs_matrix_engine_tst<T1, R1, C1>>,
                              STD_LA::scalar_engine<T2>>
 {
     using element_type = STD_LA::select_matrix_division_element_t<OT, T1, T2>;

@@ -9,34 +9,6 @@
 #define LINEAR_ALGEBRA_ARITHMETIC_OPERATORS_HPP_DEFINED
 
 namespace STD_LA {
-#ifndef LA_NEGATION_AS_VIEW
-//=================================================================================================
-//  Unary negation operators, which employ the negation arithmetic traits to do the work.
-//=================================================================================================
-//
-template<class ET1, class OT1> inline constexpr
-auto
-operator -(vector<ET1, OT1> const& v1)
-{
-    using op1_type   = vector<ET1, OT1>;
-    using op_traits  = OT1;
-    using neg_traits = select_matrix_negation_arithmetic_t<op_traits, op1_type>;
-
-    return neg_traits::negate(v1);
-}
-
-template<class ET1, class OT1> inline constexpr
-auto
-operator -(matrix<ET1, OT1> const& m1)
-{
-    using op1_type   = matrix<ET1, OT1>;
-    using op_traits  = OT1;
-    using neg_traits = select_matrix_negation_arithmetic_t<op_traits, op1_type>;
-
-    return neg_traits::negate(m1);
-}
-
-#endif
 //=================================================================================================
 //  Binary addition operators, which employ the addition arithmetic traits to do the work.
 //=================================================================================================
