@@ -311,6 +311,111 @@ using enable_if_convertible_engine =
         enable_if_t<is_engine_v<ET2> && is_convertible_v<typename ET2::element_type, typename ET::element_type>, bool>;
 
 
+//- This type detector and variable template are used to determine whether or not an engine
+//  type is an owning engine.  An owning engine is one that owns (manages the lifetime of) the
+//  elements it contains.
+//
+template<class ET, typename = void>
+struct determine_owning_engine_type
+:   public false_type
+{
+    static constexpr bool   is_owning = true;
+    using owning_engine_type = ET;
+};
+
+template<class ET>
+struct determine_owning_engine_type<ET, void_t<typename ET::owning_engine_type>>
+:   public true_type
+{
+    static constexpr bool   is_owning = false;
+    using owning_engine_type = typename ET::owning_engine_type;
+};
+
+template<class ET> inline constexpr
+bool    is_owning_engine_v = determine_owning_engine_type<ET>::is_owning;
+
+template<class ET> inline constexpr
+bool    is_non_owning_engine_v = !determine_owning_engine_type<ET>::is_owning;
+
+template<class ET>
+using select_owning_engine_type_t = typename determine_owning_engine_type<ET>::owning_engine_type;
+
+template<class ET1>
+using enable_if_engine_types_differ =
+        enable_if_t<!is_same_v<typename ET1::engine_type, typename ET1::owning_engine_type>, bool>;
+
+
+//- The following are used to determine whether or not an engine type actually has constexpr
+//  size member functions.  This technique relies on the facts that: (1) a lambda can be
+//  constexpr in C++17; (2) a capture-less lambda can be default-constructed (C++20); and (3),
+//  engine types must have default constructor.
+//
+//  The detection code comes directly from a very cool technique described on StackOverflow at:
+//  https://stackoverflow.com/questions/55288555/c-check-if-statement-can-be-evaluated-constexpr.
+//
+//
+template<class Lambda, int = (Lambda{}(), 0)> inline constexpr
+bool
+is_constexpr(Lambda)
+{
+    return true;
+}
+
+inline constexpr
+bool
+is_constexpr(...)
+{
+    return false;
+}
+
+template<class ET> inline constexpr
+bool
+has_constexpr_size()
+{
+    return is_constexpr([]{ ET().rows(); })  &&  is_constexpr([]{ ET().columns(); });
+}
+
+template<class ET> inline constexpr
+bool    has_constexpr_size_v = has_constexpr_size<ET>();
+
+
+//- These constexpr functions and template variables return the sizes of a constexpr engine.
+//
+template<class ET> inline constexpr
+ET
+make_temp_engine()
+{
+    if constexpr (is_owning_engine_v<ET>)
+    {
+        return ET();
+    }
+    else
+    {
+        return ET(make_temp_engine<typename ET::engine_type>());
+    }
+}
+
+template<class ET> inline constexpr
+typename ET::index_type
+engine_columns()
+{
+    return make_temp_engine<ET>().columns();
+}
+
+template<class ET> inline constexpr
+typename ET::index_type
+engine_rows()
+{
+    return make_temp_engine<ET>().rows();
+}
+
+template<class ET> inline constexpr typename ET::index_type
+engine_columns_v = engine_columns<ET>();
+
+template<class ET> inline constexpr typename ET::index_type
+engine_rows_v = engine_rows<ET>();
+
+
 //==================================================================================================
 //  MDSPAN INTERFACE
 //==================================================================================================
@@ -447,32 +552,45 @@ using enable_if_spannable = enable_if_t<is_same_v<ET1, ET2> && has_span_type_v<E
 //  on behalf of a non-owning engine.
 //==================================================================================================
 //
-//- First, these are specialized accessor policies used for negation and hermitian views.
+//- First, these are specialized accessor policies used for negation, transpose, and hermitian views.
 //
-template<class T>
+template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
+struct passthru_accessor
+{
+    using offset_policy = passthru_accessor;
+    using element_type  = T;
+    using reference     = typename WA::reference;
+    using pointer       = typename WA::pointer;
+
+    constexpr pointer   offset(pointer p, ptrdiff_t i) const noexcept { return WA().offset(p, i);  }
+    constexpr reference access(pointer p, ptrdiff_t i) const noexcept { return WA().access(p, i); }
+    constexpr pointer   decay(pointer p) const noexcept               { return WA().decay(p); }
+};
+
+template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
 struct negation_accessor
 {
     using offset_policy = negation_accessor;
     using element_type  = T;
     using reference     = T;
-    using pointer       = T*;
+    using pointer       = typename WA::pointer;
 
-    constexpr pointer   offset(pointer p, ptrdiff_t i) const noexcept { return p + i; }
-    constexpr reference access(pointer p, ptrdiff_t i) const noexcept { return -p[i]; }
-    constexpr pointer   decay(pointer p) const noexcept               { return p; }
+    constexpr pointer   offset(pointer p, ptrdiff_t i) const noexcept { return WA().offset(p, i);  }
+    constexpr reference access(pointer p, ptrdiff_t i) const noexcept { return -WA().access(p, i); }
+    constexpr pointer   decay(pointer p) const noexcept               { return WA().decay(p); }
 };
 
-template<class T>
+template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
 struct conjugation_accessor
 {
     using offset_policy = conjugation_accessor;
     using element_type  = T;
     using reference     = T;
-    using pointer       = T*;
+    using pointer       = typename WA::pointer;
 
-    constexpr pointer   offset(pointer p, ptrdiff_t i) const noexcept { return p + i; }
-    constexpr reference access(pointer p, ptrdiff_t i) const noexcept { return conj(p[i]); }
-    constexpr pointer   decay(pointer p) const noexcept               { return p; }
+    constexpr pointer   offset(pointer p, ptrdiff_t i) const noexcept { return WA().offset(p, i);       }
+    constexpr reference access(pointer p, ptrdiff_t i) const noexcept { return conj(WA().access(p, i)); }
+    constexpr pointer   decay(pointer p) const noexcept               { return WA().decay(p); }
 };
 
 //--------------------------------------------------------------------
@@ -527,10 +645,10 @@ template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
 struct noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
 {
     using source_span_type    = basic_mdspan<T, extents<X0, X1>, L, A>;
-    using negation_span_type  = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, negation_accessor<T>>;
-    using hermitian_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, conjugation_accessor<T>>;
+    using negation_span_type  = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, negation_accessor<T, A>>;
+    using hermitian_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, conjugation_accessor<T, A>>;
     using rowcolumn_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
-    using transpose_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
+    using transpose_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, passthru_accessor<T, A>>;
     using submatrix_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
     using index_type          = typename source_span_type::index_type;
     using element_type        = T;
@@ -547,7 +665,8 @@ template<class ST> inline constexpr
 noe_mdspan_negation_t<ST>
 noe_mdspan_negation(ST const& s)
 {
-    using accessor = negation_accessor<typename noe_mdspan_traits<ST>::element_type>;
+//    using accessor = negation_accessor<typename noe_mdspan_traits<ST>::element_type>;
+    using accessor = typename noe_mdspan_negation_t<ST>::accessor_type;
 
     dyn_mat_extents     ext(s.extent(0), s.extent(1));
     dyn_mat_strides     str{s.stride(0), s.stride(1)};
@@ -675,7 +794,7 @@ make_dyn_span(T* pdata, ST rows, ST cols, ST row_stride, ST col_stride = 1u)
 
 
 //==================================================================================================
-//  NON-OWNING ENGINE PROPERTIES
+//  NON-OWNING ENGINE (NOE) PROPERTIES
 //==================================================================================================
 //  This traits type chooses the correct tag for a non-owning engine (NOE), given the tag of the
 //  source engine type to be wrapped (ETT) and the desired tag type of the resulting non-owning
@@ -867,13 +986,12 @@ using noe_category_t = typename noe_tag_chooser<typename ET::engine_category, NO
 template<class ET, class NEWCAT>
 struct noe_traits
 {
-    static constexpr bool   is_writable = engine_tag_traits<NEWCAT>::is_writable;
+    static constexpr bool   is_writable = is_writable_tag_v<NEWCAT>;
 
-    using referent  = conditional_t<is_writable, remove_cv_t<ET>, remove_cv_t<ET> const>;
-    using element   = conditional_t<is_writable, typename ET::element_type, typename ET::element_type const>;
-    using reference = conditional_t<is_writable, typename ET::reference, typename ET::const_reference>;
-    using pointer   = conditional_t<is_writable, typename ET::pointer, typename ET::const_pointer>;
-
+    using engine          = conditional_t<is_writable, ET, ET const>;
+    using element         = conditional_t<is_writable, typename ET::element_type, typename ET::element_type const>;
+    using reference       = conditional_t<is_writable, typename ET::reference, typename ET::const_reference>;
+    using pointer         = conditional_t<is_writable, typename ET::pointer, typename ET::const_pointer>;
     using span_type       = conditional_t<is_writable, engine_span_t<ET>, engine_const_span_t<ET>>;
     using const_span_type = engine_const_span_t<ET>;
 };
@@ -882,7 +1000,7 @@ struct noe_traits
 //- These alias templates provide a convenience interface to noe_traits.
 //
 template<class ET, class NEWCAT>
-using noe_referent_t = typename noe_traits<ET, NEWCAT>::referent;
+using noe_engine_t = typename noe_traits<ET, NEWCAT>::engine;
 
 template<class ET, class NEWCAT>
 using noe_element_t = typename noe_traits<ET, NEWCAT>::element;
@@ -900,6 +1018,8 @@ template<class ET, class NEWCAT>
 using noe_const_mdspan_t = typename noe_traits<ET, NEWCAT>::const_span_type;
 
 
+//==================================================================================================
+//  OPERATION TRAITS CHOOSER
 //==================================================================================================
 //  This traits type is used for choosing between three alternative traits-type parameters.  It
 //  is used extensively in those sections of the private implementation where it is necessary to
@@ -928,6 +1048,8 @@ struct non_void_traits_chooser<void, void, DEF>
 };
 
 
+//==================================================================================================
+//  ALLOCATION HELPERS
 //==================================================================================================
 //  The following are some private helper functions for allocating/deallocating the memory used
 //  by the dynamic vector and matrix engines.  Note that in this implementation all allocated
@@ -1011,6 +1133,8 @@ la_swap(T& t0, T& t1) noexcept(is_nothrow_movable_v<T>)
 }
 
 
+//==================================================================================================
+//  CONSTRUCT/ASSIGN SOURCE OBJECT HELPERS
 //==================================================================================================
 //  These helper functions are used inside engine member functions to validate a source engine
 //  or initializer list prior to assignment to a destination engine.  If validation should fail,
@@ -1179,6 +1303,9 @@ assign_from_matrix_initlist(ET& engine, initializer_list<initializer_list<T>> rh
     }
 }
 
+
+//==================================================================================================
+//  VECTOR COMPARISON HELPERS
 //==================================================================================================
 //  These helper functions are used to compare the contents of vector engines with that of other
 //  vector engines, 1-D mdspans, and 1-D initializer lists.
@@ -1250,8 +1377,10 @@ v_cmp_eq(ET const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
 
 
 //==================================================================================================
+//  MATRIX COMPARISON HELPERS
+//==================================================================================================
 //  These helper functions are used to compare the contents of matrix engines with that of other
-//  matirx engines, 2-D mdspans, and 2-D initializer lists.
+//  matix engines, 2-D mdspans, and 2-D initializer lists.
 //==================================================================================================
 //
 template<class ET1, class ET2> constexpr

@@ -86,7 +86,7 @@ public:
 	using const_pointer   = float const*;
 	using difference_type = size_t;
 	using index_type       = int_fast32_t;
-	using index_tuple      = std::tuple<index_type, index_type>;
+	using index_tuple_type      = std::tuple<index_type, index_type>;
 
 	static constexpr bool   is_fixed_size   = true;
 	static constexpr bool   is_resizable    = false;
@@ -114,11 +114,11 @@ public:
 
 	constexpr index_type     columns() const noexcept;
 	constexpr index_type     rows() const noexcept;
-	constexpr index_tuple    size() const noexcept;
+	constexpr index_tuple_type    size() const noexcept;
 
 	constexpr index_type     column_capacity() const noexcept;
 	constexpr index_type     row_capacity() const noexcept;
-	constexpr index_tuple    capacity() const noexcept;
+	constexpr index_tuple_type    capacity() const noexcept;
 
 	constexpr reference     operator ()(index_type i, index_type j);
 

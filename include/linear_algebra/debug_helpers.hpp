@@ -59,8 +59,13 @@ clean_type_name(basic_string<C,T,A> tname)
     static basic_string<C,T,A> const   st = "struct ";
     static basic_string<C,T,A> const   ns = MATRIX_STRINGIFY(STD_LA) "::";
     static basic_string<C,T,A> const   sl = "std::";
+    static basic_string<C,T,A> const   dl = "detail::";
+    static basic_string<C,T,A> const   xl = "experimental::";
     static basic_string<C,T,A> const   aa = "> >";
     static basic_string<C,T,A> const   tn = "type_name<";
+    static basic_string<C,T,A> const   sc = " ,";
+    static basic_string<C,T,A> const   sa = " >";
+
 
     for (auto pos = string::npos;  (pos = tname.rfind(cl, pos)) != string::npos; )
     {
@@ -82,6 +87,16 @@ clean_type_name(basic_string<C,T,A> tname)
         tname.erase(pos, sl.size());
     }
 
+    for (auto pos = string::npos;  (pos = tname.rfind(dl, pos)) != string::npos; )
+    {
+        tname.erase(pos, dl.size());
+    }
+
+    for (auto pos = string::npos;  (pos = tname.rfind(xl, pos)) != string::npos; )
+    {
+        tname.erase(pos, xl.size());
+    }
+
     for (auto pos = string::npos;  (pos = tname.rfind(aa, pos)) != string::npos; )
     {
         tname.replace(pos, 3u, ">>");
@@ -91,6 +106,17 @@ clean_type_name(basic_string<C,T,A> tname)
     {
         tname.erase(pos, tn.size());
     }
+
+    for (auto pos = string::npos;  (pos = tname.rfind(sc, pos)) != string::npos; )
+    {
+        tname.replace(pos, 2u, ",");
+    }
+
+    for (auto pos = string::npos;  (pos = tname.rfind(sa, pos)) != string::npos; )
+    {
+        tname.replace(pos, 2u, ">");
+    }
+
     return tname;
 }
 
@@ -159,7 +185,7 @@ get_type_name(T const&)
     return clean_type_name(string(view.data(), view.size()));
 }
 
-#define PRINT_TYPE(T)       std::cout << #T << ": " << STD_LA::get_type_name<T>() << std::endl
+#define PRINT_TYPE(T)       std::cout << "\n" << #T << ":\n  " << STD_LA::get_type_name<T>() << "\n"
 
 template<class RT, class O1>
 void

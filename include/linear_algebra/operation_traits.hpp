@@ -26,19 +26,6 @@ namespace STD_LA {
 //
 struct matrix_operation_traits
 {
-#ifndef LA_NEGATION_AS_VIEW
-    //- Negation
-    //
-    template<class T1>
-    using negation_element_traits = matrix_negation_element_traits<T1>;
-
-    template<class OTR, class ET1>
-    using negation_engine_traits = matrix_negation_engine_traits<OTR, ET1>;
-
-    template<class OP1, class OTR>
-    using negation_arithmetic_traits = matrix_negation_arithmetic_traits<OP1, OTR>;
-#endif
-
     //- Addition
     //
     template<class T1, class T2>

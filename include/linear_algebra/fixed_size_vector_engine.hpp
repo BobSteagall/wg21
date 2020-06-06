@@ -19,17 +19,18 @@ class fs_vector_engine
     static_assert(N >= 1);
 
   public:
-    using engine_category = initable_vector_engine_tag;
-    using element_type    = T;
-    using value_type      = remove_cv_t<T>;
-    using pointer         = element_type*;
-    using const_pointer   = element_type const*;
-    using reference       = element_type&;
-    using const_reference = element_type const&;
-    using difference_type = ptrdiff_t;
-    using index_type      = ptrdiff_t;
-    using span_type       = mdspan<element_type, N>;
-    using const_span_type = mdspan<element_type const, N>;
+    using engine_category    = initable_vector_engine_tag;
+    using owning_engine_type = fs_vector_engine;
+    using value_type         = T;
+    using element_type       = value_type;
+    using pointer            = element_type*;
+    using const_pointer      = element_type const*;
+    using reference          = element_type&;
+    using const_reference    = element_type const&;
+    using difference_type    = ptrdiff_t;
+    using index_type         = ptrdiff_t;
+    using span_type          = mdspan<element_type, N>;
+    using const_span_type    = mdspan<element_type const, N>;
 
     //- Construct/copy/destroy
     //
@@ -56,8 +57,8 @@ class fs_vector_engine
 
     //- Capacity
     //
-    static constexpr index_type capacity() noexcept;
-    static constexpr index_type size() noexcept;
+    static constexpr    index_type size() noexcept;
+    static constexpr    index_type capacity() noexcept;
 
     //- Element access
     //
@@ -66,8 +67,11 @@ class fs_vector_engine
 
     //- Data access
     //
-    constexpr span_type         span() noexcept;
-    constexpr const_span_type   span() const noexcept;
+    constexpr fs_vector_engine&         owning_engine() noexcept;
+    constexpr fs_vector_engine const&   owning_engine() const noexcept;
+
+    constexpr span_type                 span() noexcept;
+    constexpr const_span_type           span() const noexcept;
 
     //- Modifiers
     //
@@ -183,6 +187,20 @@ fs_vector_engine<T,N>::operator ()(index_type i) const
 //-------------
 //- Data access
 //
+template<class T, ptrdiff_t N> constexpr
+fs_vector_engine<T,N>&
+fs_vector_engine<T,N>::owning_engine() noexcept
+{
+    return *this;
+}
+
+template<class T, ptrdiff_t N> constexpr
+fs_vector_engine<T,N> const&
+fs_vector_engine<T,N>::owning_engine() const noexcept
+{
+    return *this;
+}
+
 template<class T, ptrdiff_t N> constexpr
 typename fs_vector_engine<T,N>::span_type
 fs_vector_engine<T,N>::span() noexcept

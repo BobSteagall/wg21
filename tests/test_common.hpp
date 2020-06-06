@@ -31,24 +31,36 @@ struct dummy_type {};
     #define PRINT_FNAME()
 #endif
 
-using index_tuple = std::experimental::extents<std::experimental::dynamic_extent,
+#if 0
+using index_tuple_type = std::experimental::extents<std::experimental::dynamic_extent,
                                                std::experimental::dynamic_extent>;
 
 namespace std::experimental
 {
     inline bool
-    operator >=(index_tuple lhs, index_tuple rhs)
+    operator >=(index_tuple_type lhs, index_tuple_type rhs)
     {
         return lhs.extent(0) >= rhs.extent(0)  &&  lhs.extent(1) >= rhs.extent(1);
     }
 }
+#else
+using index_tuple_type = std::tuple<ptrdiff_t, ptrdiff_t>;
 
+namespace STD_LA
+{
+    inline bool
+    operator >=(index_tuple_type lhs, index_tuple_type rhs)
+    {
+        return !(lhs < rhs);
+    }
+}
+#endif
 
-inline constexpr index_tuple     st_33(3, 3);
-inline constexpr index_tuple     st_34(3, 4);
-inline constexpr index_tuple     st_43(4, 3);
-inline constexpr index_tuple     st_44(4, 4);
-inline constexpr index_tuple     st_55(5, 5);
+inline constexpr index_tuple_type     st_33(3, 3);
+inline constexpr index_tuple_type     st_34(3, 4);
+inline constexpr index_tuple_type     st_43(4, 3);
+inline constexpr index_tuple_type     st_44(4, 4);
+inline constexpr index_tuple_type     st_55(5, 5);
 
 #define LST_33_0       {{ 0, 0, 0 },        \
                         { 0, 0, 0 },        \

@@ -20,7 +20,7 @@
 //#define STD_LA      std::experimental::math
 //#define USING_STD   using namespace std::experimental;
 
-#define LA_NEGATION_AS_VIEW
+#define MDSPAN_NS   std::experimental
 
 #include <cstdint>
 #include <array>
@@ -73,9 +73,6 @@ using std::experimental::dynamic_extent;
 
 #include "linear_algebra/debug_helpers.hpp"     //- Helpers for debug/test -- not for production.
 
-#ifndef LA_NEGATION_AS_VIEW
-    #include "linear_algebra/negation_traits.hpp"
-#endif
 #include "linear_algebra/addition_traits.hpp"
 #include "linear_algebra/subtraction_traits.hpp"
 #include "linear_algebra/multiplication_traits.hpp"

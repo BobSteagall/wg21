@@ -62,6 +62,14 @@ using vector_negation_engine = vector_view_engine<ET, readable_vector_engine_tag
 template<class ET, class VCT>
 using vector_subset_engine = vector_view_engine<ET, VCT, subset_view_tag>;
 
+template<class ET>
+using matrix_negation_engine = matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>;
+
+template<class ET>
+using matrix_transpose_engine = matrix_view_engine<ET, readable_matrix_engine_tag, transpose_view_tag>;
+
+template<class ET>
+using matrix_hermitian_engine = matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>;
 
 template<class ET, class VCT>
 using matrix_column_engine = vector_view_engine<ET, VCT, column_view_tag>;
@@ -69,17 +77,8 @@ using matrix_column_engine = vector_view_engine<ET, VCT, column_view_tag>;
 template<class ET, class VCT>
 using matrix_row_engine = vector_view_engine<ET, VCT, row_view_tag>;
 
-template<class ET>
-using matrix_hermitian_engine = matrix_view_engine<ET, readable_matrix_engine_tag, hermitian_view_tag>;
-
-template<class ET>
-using matrix_negation_engine = matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>;
-
 template<class ET, class MCT>
 using matrix_subset_engine = matrix_view_engine<ET, MCT, subset_view_tag>;
-
-template<class ET, class MCT>
-using matrix_transpose_engine = matrix_view_engine<ET, MCT, transpose_view_tag>;
 
 //- The default element promotion, engine promotion, and arithmetic operation traits for
 //  the four basic arithmetic operations.
@@ -106,14 +105,6 @@ using fs_vector = vector<fs_vector_engine<T, N>>;
 
 template<class T, ptrdiff_t R, ptrdiff_t C>
 using fs_matrix = matrix<fs_matrix_engine<T, R, C>>;
-
-#ifndef LA_NEGATION_AS_VIEW
-//- Traits pertaining to negation.
-//
-template<class T1>              struct matrix_negation_element_traits;
-template<class OT, class ET1>   struct matrix_negation_engine_traits;
-template<class OT, class OP1>   struct matrix_negation_arithmetic_traits;
-#endif
 
 //- Traits pertaining to addition.
 //
@@ -145,16 +136,6 @@ template<class OT, class OP1, class OP2>    struct matrix_division_arithmetic_tr
 //
 template<class T1, class T2>    struct matrix_operation_traits_selector;
 
-#ifndef LA_NEGATION_AS_VIEW
-//- Negation operators
-//
-template<class ET1, class OT1>
-constexpr auto  operator -(vector<ET1, OT1> const& v1);
-
-template<class ET1, class OT1, class ET2, class OT2>
-constexpr auto  operator -(matrix<ET1, OT1> const& m1);
-
-#endif
 //- Addition operators
 //
 template<class ET1, class OT1, class ET2, class OT2>

@@ -12,21 +12,24 @@ class fs_matrix_engine_tst
     static_assert(C >= 1);
 
   public:
-    using engine_category = STD_LA::writable_matrix_engine_tag;
-    using element_type    = T;
-    using value_type      = T;
-    using reference       = T&;
-    using pointer         = T*;
-    using const_reference = T const&;
-    using const_pointer   = T const*;
-    using difference_type = std::int32_t;
-    using index_type      = std::uint32_t;
-    using index_tuple     = std::tuple<index_type, index_type>;
+    using engine_category  = STD_LA::writable_matrix_engine_tag;
+    using element_type     = T;
+    using value_type       = T;
+    using pointer          = T*;
+    using const_pointer    = T const*;
+    using reference        = T&;
+    using const_reference  = T const&;
+    using difference_type  = std::int32_t;
+    using index_type       = std::uint32_t;
+    using index_tuple_type = std::tuple<index_type, index_type>;
 
 #ifdef LA_USE_MDSPAN
 //    using span_type       = typename STD_LA::fs_matrix_engine<T, R, C>::span_type;
 //    using const_span_type = typename STD_LA::fs_matrix_engine<T, R, C>::const_span_type;
 #endif
+
+    using direct_engine_type = fs_matrix_engine_tst;
+    using owning_engine_type = fs_matrix_engine_tst;
 
   public:
     constexpr fs_matrix_engine_tst();
@@ -40,11 +43,11 @@ class fs_matrix_engine_tst
 
     constexpr index_type     columns() const noexcept;
     constexpr index_type     rows() const noexcept;
-    constexpr index_tuple    size() const noexcept;
+    constexpr index_tuple_type    size() const noexcept;
 
     constexpr index_type     column_capacity() const noexcept;
     constexpr index_type     row_capacity() const noexcept;
-    constexpr index_tuple    capacity() const noexcept;
+    constexpr index_tuple_type    capacity() const noexcept;
 
     constexpr reference     operator ()(index_type i, index_type j);
 
@@ -93,10 +96,10 @@ fs_matrix_engine_tst<T,R,C>::rows() const noexcept
 }
 
 template<class T, size_t R, size_t C> inline
-constexpr typename fs_matrix_engine_tst<T,R,C>::index_tuple
+constexpr typename fs_matrix_engine_tst<T,R,C>::index_tuple_type
 fs_matrix_engine_tst<T,R,C>::size() const noexcept
 {
-    return index_tuple(R, C);
+    return index_tuple_type(R, C);
 }
 
 template<class T, size_t R, size_t C> inline
@@ -114,10 +117,10 @@ fs_matrix_engine_tst<T,R,C>::row_capacity() const noexcept
 }
 
 template<class T, size_t R, size_t C> inline
-constexpr typename fs_matrix_engine_tst<T,R,C>::index_tuple
+constexpr typename fs_matrix_engine_tst<T,R,C>::index_tuple_type
 fs_matrix_engine_tst<T,R,C>::capacity() const noexcept
 {
-    return index_tuple(R, C);
+    return index_tuple_type(R, C);
 }
 
 template<class T, size_t R, size_t C> inline

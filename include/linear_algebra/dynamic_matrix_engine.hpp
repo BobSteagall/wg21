@@ -20,19 +20,20 @@ class dr_matrix_engine
   public:
     //- Types
     //
-    using engine_category = resizable_matrix_engine_tag;
-    using element_type    = T;
-    using value_type      = remove_cv_t<T>;
-    using allocator_type  = AT;
-    using pointer         = typename allocator_traits<AT>::pointer;
-    using const_pointer   = typename allocator_traits<AT>::const_pointer;
-    using reference       = element_type&;
-    using const_reference = element_type const&;
-    using difference_type = ptrdiff_t;
-    using index_type      = ptrdiff_t;
-    using index_tuple     = extents<dynamic_extent, dynamic_extent>;
-    using span_type       = basic_mdspan<T, detail::dyn_mat_extents, detail::dyn_mat_layout>;
-    using const_span_type = basic_mdspan<T const, detail::dyn_mat_extents, detail::dyn_mat_layout>;
+    using engine_category    = resizable_matrix_engine_tag;
+    using owning_engine_type = dr_matrix_engine;
+    using value_type         = T;
+    using allocator_type     = AT;
+    using element_type       = value_type;
+    using pointer            = typename allocator_traits<AT>::pointer;
+    using const_pointer      = typename allocator_traits<AT>::const_pointer;
+    using reference          = element_type&;
+    using const_reference    = element_type const&;
+    using difference_type    = ptrdiff_t;
+    using index_type         = ptrdiff_t;
+    using index_tuple_type   = tuple<index_type, index_type>;
+    using span_type          = basic_mdspan<T, detail::dyn_mat_extents, detail::dyn_mat_layout>;
+    using const_span_type    = basic_mdspan<T const, detail::dyn_mat_extents, detail::dyn_mat_layout>;
 
     //- Construct/copy/destroy
     //
@@ -57,27 +58,30 @@ class dr_matrix_engine
 
     //- Capacity
     //
-    index_type  columns() const noexcept;
-    index_type  rows() const noexcept;
-    index_tuple size() const noexcept;
+    index_type          columns() const noexcept;
+    index_type          rows() const noexcept;
+    index_tuple_type    size() const noexcept;
 
-    index_type  column_capacity() const noexcept;
-    index_type  row_capacity() const noexcept;
-    index_tuple capacity() const noexcept;
+    index_type          column_capacity() const noexcept;
+    index_type          row_capacity() const noexcept;
+    index_tuple_type    capacity() const noexcept;
 
-    void        reserve(index_type rowcap, index_type colcap);
-    void        resize(index_type rows, index_type cols);
-    void        resize(index_type rows, index_type cols, index_type rowcap, index_type colcap);
+    void    reserve(index_type rowcap, index_type colcap);
+    void    resize(index_type rows, index_type cols);
+    void    resize(index_type rows, index_type cols, index_type rowcap, index_type colcap);
 
     //- Element access
     //
-    reference       operator ()(index_type i, index_type j);
-    const_reference operator ()(index_type i, index_type j) const;
+    reference           operator ()(index_type i, index_type j);
+    const_reference     operator ()(index_type i, index_type j) const;
 
     //- Data access
     //
-    span_type       span() noexcept;
-    const_span_type span() const noexcept;
+    dr_matrix_engine&       owning_engine() noexcept;
+    dr_matrix_engine const& owning_engine() const noexcept;
+
+    span_type               span() noexcept;
+    const_span_type         span() const noexcept;
 
     //- Modifiers
     //
@@ -222,10 +226,10 @@ dr_matrix_engine<T,AT>::rows() const noexcept
 }
 
 template<class T, class AT> inline
-typename dr_matrix_engine<T,AT>::index_tuple
+typename dr_matrix_engine<T,AT>::index_tuple_type
 dr_matrix_engine<T,AT>::size() const noexcept
 {
-    return index_tuple(m_rows, m_cols);
+    return index_tuple_type(m_rows, m_cols);
 }
 
 template<class T, class AT> inline
@@ -243,10 +247,10 @@ dr_matrix_engine<T,AT>::row_capacity() const noexcept
 }
 
 template<class T, class AT> inline
-typename dr_matrix_engine<T,AT>::index_tuple
+typename dr_matrix_engine<T,AT>::index_tuple_type
 dr_matrix_engine<T,AT>::capacity() const noexcept
 {
-    return index_tuple(m_rowcap, m_colcap);
+    return index_tuple_type(m_rowcap, m_colcap);
 }
 
 template<class T, class AT> inline
@@ -290,6 +294,20 @@ dr_matrix_engine<T,AT>::operator ()(index_type i, index_type j) const
 //-------------
 //- Data access
 //
+template<class T, class AT> inline
+dr_matrix_engine<T,AT>&
+dr_matrix_engine<T,AT>::owning_engine() noexcept
+{
+    return *this;
+}
+
+template<class T, class AT> inline
+dr_matrix_engine<T,AT> const&
+dr_matrix_engine<T,AT>::owning_engine() const noexcept
+{
+    return *this;
+}
+
 template<class T, class AT> inline
 typename dr_matrix_engine<T,AT>::span_type
 dr_matrix_engine<T,AT>::span() noexcept

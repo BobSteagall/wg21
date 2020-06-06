@@ -1,3 +1,4 @@
+#define ENABLE_TEST_PRINTING
 #include "test_common.hpp"
 
 using fsd_mat_engine_35 = STD_LA::fs_matrix_engine<double, 3, 5>;
@@ -139,6 +140,7 @@ void t001()
 
 constexpr double t002()
 {
+#if 0
     fsm_double_35   fsm  = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}};
 
     fsv_double_5    fsv  = {11, 12, 13, 14, 15};
@@ -164,9 +166,10 @@ constexpr double t002()
     fsm3.submatrix(1, 4, 3, 2) = {{1, 2}, {3, 4}, {5, 6}, {7, 8}};
     fsm3.submatrix(1, 4, 3, 2).row(2) = {11, 11};
 
-    fsm.t().row(3) = {22, 23, 24};
-
     return fsm3(1, 2);
+#else
+    return 0.0;
+#endif
 }
 
 constexpr double t003()
@@ -257,10 +260,33 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     PRINT((-m1).span());
     PRINT(-m1.t());
     PRINT(-m1.t().t());
-
     PRINT((-m1).t());
+
+    using oet = STD_LA::fs_matrix_engine<float,3,4>;
+    using nvt = STD_LA::matrix_negation_engine<oet>;
+    using tvt = STD_LA::matrix_transpose_engine<nvt>;
+
+    PRINT_TYPE(oet);
+    PRINT_TYPE(oet::span_type);
+    PRINT_TYPE(oet::const_span_type);
+
+    PRINT_TYPE(nvt);
+    PRINT_TYPE(nvt::engine_type);
+    PRINT_TYPE(nvt::engine_type::span_type);
+    PRINT_TYPE(nvt::engine_type::const_span_type);
+    PRINT_TYPE(nvt::span_type);
+
+    PRINT_TYPE(tvt);
+    PRINT_TYPE(tvt::engine_type);
+    PRINT_TYPE(tvt::engine_type::span_type);
+    PRINT_TYPE(tvt::engine_type::const_span_type);
+    PRINT_TYPE(tvt::span_type);
+
     PRINT((-m1).t().t());
+
+    PRINT((-m1).t().span());
     PRINT((-m1).t().t().span());
+    PRINT((-((-m1).t()).t()).span());
 
     PRINT(-sub1);
     PRINT((-sub1).span());
@@ -383,7 +409,7 @@ t003Y()
     PRINT(drv);
     fsv = {5, 4, 3, 2, 1};
     PRINT(fsv);
-
+#if 0
     auto    fcv = fsm.column(2);
     PRINT(fcv);
     fcv = {6, 6, 6};
@@ -421,14 +447,7 @@ t003Y()
     PRINT(fsm);
     PRINT(fsm.t());
     PRINT(fsm.t().row(1));
-
-    fsm.t().row(1) = {86, 87, 88};
-    PRINT(fsm.t());
-    PRINT(fsm);
-
-    fsm.column(0) = drm.column(1);
-    PRINT(fsm);
-
+#endif
     return 0;
 }
 

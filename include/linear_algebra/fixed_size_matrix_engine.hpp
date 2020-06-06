@@ -22,18 +22,19 @@ class fs_matrix_engine
   public:
     //- Types
     //
-    using engine_category = initable_matrix_engine_tag;
-    using element_type    = T;
-    using value_type      = remove_cv_t<T>;
-    using pointer         = element_type*;
-    using const_pointer   = element_type const*;
-    using reference       = element_type&;
-    using const_reference = element_type const&;
-    using difference_type = ptrdiff_t;
-    using index_type      = ptrdiff_t;
-    using index_tuple     = extents<R, C>;
-    using span_type       = mdspan<element_type, R, C>;
-    using const_span_type = mdspan<element_type const, R, C>;
+    using engine_category    = initable_matrix_engine_tag;
+    using owning_engine_type_t = fs_matrix_engine;
+    using value_type         = T;
+    using element_type       = value_type;
+    using pointer            = element_type*;
+    using const_pointer      = element_type const*;
+    using reference          = element_type&;
+    using const_reference    = element_type const&;
+    using difference_type    = ptrdiff_t;
+    using index_type         = ptrdiff_t;
+    using index_tuple_type   = tuple<index_type, index_type>;
+    using span_type          = mdspan<element_type, R, C>;
+    using const_span_type    = mdspan<element_type const, R, C>;
 
     //- Construct/copy/destroy
     //
@@ -58,15 +59,15 @@ class fs_matrix_engine
     template<class T2, detail::enable_if_convertible_element_type<T2,T> = true>
     constexpr fs_matrix_engine&     operator =(initializer_list<initializer_list<T2>> rhs);
 
-    //- Capacity
+    //- Size and capacity
     //
-    constexpr index_type    columns() const noexcept;
-    constexpr index_type    rows() const noexcept;
-    constexpr index_tuple   size() const noexcept;
+    static constexpr index_type         columns()noexcept;
+    static constexpr index_type         rows() noexcept;
+    static constexpr index_tuple_type   size() noexcept;
 
-    constexpr index_type    column_capacity() const noexcept;
-    constexpr index_type    row_capacity() const noexcept;
-    constexpr index_tuple   capacity() const noexcept;
+    static constexpr index_type         column_capacity() noexcept;
+    static constexpr index_type         row_capacity() noexcept;
+    static constexpr index_tuple_type   capacity() noexcept;
 
     //- Element access
     //
@@ -75,8 +76,11 @@ class fs_matrix_engine
 
     //- Data access
     //
-    constexpr span_type         span() noexcept;
-    constexpr const_span_type   span() const noexcept;
+    constexpr fs_matrix_engine&         owning_engine() noexcept;
+    constexpr fs_matrix_engine const&   owning_engine() const noexcept;
+
+    constexpr span_type                 span() noexcept;
+    constexpr const_span_type           span() const noexcept;
 
     //- Modifiers
     //
@@ -161,44 +165,44 @@ fs_matrix_engine<T,R,C>::operator =(initializer_list<initializer_list<T2>> rhs)
 //
 template<class T, ptrdiff_t R, ptrdiff_t C> constexpr
 typename fs_matrix_engine<T,R,C>::index_type
-fs_matrix_engine<T,R,C>::columns() const noexcept
+fs_matrix_engine<T,R,C>::columns() noexcept
 {
     return C;
 }
 
 template<class T, ptrdiff_t R, ptrdiff_t C> constexpr
 typename fs_matrix_engine<T,R,C>::index_type
-fs_matrix_engine<T,R,C>::rows() const noexcept
+fs_matrix_engine<T,R,C>::rows() noexcept
 {
     return R;
 }
 
 template<class T, ptrdiff_t R, ptrdiff_t C> constexpr
-typename fs_matrix_engine<T,R,C>::index_tuple
-fs_matrix_engine<T,R,C>::size() const noexcept
+typename fs_matrix_engine<T,R,C>::index_tuple_type
+fs_matrix_engine<T,R,C>::size() noexcept
 {
-    return index_tuple{};
+    return index_tuple_type{R, C};
 }
 
 template<class T, ptrdiff_t R, ptrdiff_t C> constexpr
 typename fs_matrix_engine<T,R,C>::index_type
-fs_matrix_engine<T,R,C>::column_capacity() const noexcept
+fs_matrix_engine<T,R,C>::column_capacity() noexcept
 {
     return C;
 }
 
 template<class T, ptrdiff_t R, ptrdiff_t C> constexpr
 typename fs_matrix_engine<T,R,C>::index_type
-fs_matrix_engine<T,R,C>::row_capacity() const noexcept
+fs_matrix_engine<T,R,C>::row_capacity() noexcept
 {
     return R;
 }
 
 template<class T, ptrdiff_t R, ptrdiff_t C> constexpr
-typename fs_matrix_engine<T,R,C>::index_tuple
-fs_matrix_engine<T,R,C>::capacity() const noexcept
+typename fs_matrix_engine<T,R,C>::index_tuple_type
+fs_matrix_engine<T,R,C>::capacity() noexcept
 {
-    return index_tuple{};
+    return index_tuple_type{R, C};
 }
 
 //----------------
@@ -221,6 +225,20 @@ fs_matrix_engine<T,R,C>::operator ()(index_type i, index_type j) const
 //-------------
 //- Data access
 //
+template<class T, ptrdiff_t R, ptrdiff_t C> constexpr
+fs_matrix_engine<T,R,C>&
+fs_matrix_engine<T,R,C>::owning_engine() noexcept
+{
+    return *this;
+}
+
+template<class T, ptrdiff_t R, ptrdiff_t C> constexpr
+fs_matrix_engine<T,R,C> const&
+fs_matrix_engine<T,R,C>::owning_engine() const noexcept
+{
+    return *this;
+}
+
 template<class T, ptrdiff_t R, ptrdiff_t C> constexpr
 typename fs_matrix_engine<T,R,C>::span_type
 fs_matrix_engine<T,R,C>::span() noexcept

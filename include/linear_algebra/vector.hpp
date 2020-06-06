@@ -117,6 +117,8 @@ class vector
     //- Types
     //
     using engine_type          = ET;
+//    using direct_engine_type   = ET;
+//    using owning_engine_type   = typename ET::owning_engine_type;
     using element_type         = typename engine_type::element_type;
     using value_type           = typename engine_type::value_type;
     using difference_type      = typename engine_type::difference_type;
@@ -127,16 +129,13 @@ class vector
     using const_reference      = typename engine_type::const_reference;
     using subvector_type       = vector<vector_subset_engine<engine_type, possibly_writable_vector_tag>, OT>;
     using const_subvector_type = vector<vector_subset_engine<engine_type, readable_vector_engine_tag>, OT>;
+    using const_negation_type  = vector<vector_negation_engine<engine_type>, OT>;
     using transpose_type       = vector&;
     using const_transpose_type = vector const&;
     using hermitian_type       = conditional_t<has_cx_elem, vector, transpose_type>;
     using const_hermitian_type = conditional_t<has_cx_elem, vector, const_transpose_type>;
     using span_type            = detail::engine_span_t<ET>;
     using const_span_type      = detail::engine_const_span_t<ET>;
-
-#ifdef LA_NEGATION_AS_VIEW
-    using const_negation_type  = vector<vector_negation_engine<engine_type>, OT>;
-#endif
 
     //- Construct/copy/destroy
     //
@@ -181,10 +180,8 @@ class vector
     constexpr reference             operator ()(index_type i);
     constexpr const_reference       operator [](index_type i) const;
     constexpr const_reference       operator ()(index_type i) const;
-
-#ifdef LA_NEGATION_AS_VIEW
     constexpr const_negation_type   operator -() const noexcept;
-#endif
+
     constexpr subvector_type        subvector(index_type i, index_type n) noexcept;
     constexpr const_subvector_type  subvector(index_type i, index_type n) const noexcept;
     constexpr transpose_type        t();
@@ -345,14 +342,12 @@ vector<ET,OT>::operator ()(index_type i) const
     return m_engine(i);
 }
 
-#ifdef LA_NEGATION_AS_VIEW
 template<class ET, class OT> constexpr
 typename vector<ET, OT>::const_negation_type
 vector<ET,OT>::operator -() const noexcept
 {
     return const_negation_type(detail::special_ctor_tag(), m_engine);
 }
-#endif
 
 template<class ET, class OT> constexpr
 typename vector<ET,OT>::subvector_type

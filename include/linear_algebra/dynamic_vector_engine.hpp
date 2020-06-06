@@ -20,18 +20,19 @@ class dr_vector_engine
   public:
     //- Types
     //
-    using engine_category = resizable_vector_engine_tag;
-    using element_type    = T;
-    using value_type      = remove_cv_t<T>;
-    using allocator_type  = AT;
-    using pointer         = typename allocator_traits<AT>::pointer;
-    using const_pointer   = typename allocator_traits<AT>::const_pointer;
-    using reference       = element_type&;
-    using const_reference = element_type const&;
-    using difference_type = ptrdiff_t;
-    using index_type      = ptrdiff_t;
-    using span_type       = mdspan<element_type, dynamic_extent>;
-    using const_span_type = mdspan<element_type const, dynamic_extent>;
+    using engine_category    = resizable_vector_engine_tag;
+    using owning_engine_type = dr_vector_engine;
+    using value_type         = T;
+    using allocator_type     = AT;
+    using element_type       = value_type;
+    using pointer            = typename allocator_traits<AT>::pointer;
+    using const_pointer      = typename allocator_traits<AT>::const_pointer;
+    using reference          = element_type&;
+    using const_reference    = element_type const&;
+    using difference_type    = ptrdiff_t;
+    using index_type         = ptrdiff_t;
+    using span_type          = mdspan<element_type, dynamic_extent>;
+    using const_span_type    = mdspan<element_type const, dynamic_extent>;
 
     //- Construct/copy/destroy
     //
@@ -56,8 +57,8 @@ class dr_vector_engine
 
     //- Capacity
     //
-    index_type  capacity() const noexcept;
     index_type  size() const noexcept;
+    index_type  capacity() const noexcept;
 
     void        reserve(index_type cap);
     void        resize(index_type elems);
@@ -65,13 +66,16 @@ class dr_vector_engine
 
     //- Element access
     //
-    reference       operator ()(index_type i);
-    const_reference operator ()(index_type i) const;
+    reference           operator ()(index_type i);
+    const_reference     operator ()(index_type i) const;
 
     //- Data access
     //
-    span_type       span() noexcept;
-    const_span_type span() const noexcept;
+    dr_vector_engine&       owning_engine() noexcept;
+    dr_vector_engine const& owning_engine() const noexcept;
+
+    span_type               span() noexcept;
+    const_span_type         span() const noexcept;
 
     //- Modifiers
     //
@@ -250,6 +254,20 @@ dr_vector_engine<T,AT>::operator ()(index_type i) const
 //-------------
 //- Data access
 //
+template<class T, class AT> inline
+dr_vector_engine<T,AT>&
+dr_vector_engine<T,AT>::owning_engine() noexcept
+{
+    return *this;
+}
+
+template<class T, class AT> inline
+dr_vector_engine<T,AT> const&
+dr_vector_engine<T,AT>::owning_engine() const noexcept
+{
+    return *this;
+}
+
 template<class T, class AT> inline
 typename dr_vector_engine<T,AT>::span_type
 dr_vector_engine<T,AT>::span() noexcept

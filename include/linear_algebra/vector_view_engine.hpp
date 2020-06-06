@@ -8,10 +8,9 @@
 #define LINEAR_ALGEBRA_SUBVECTOR_ENGINE_HPP_DEFINED
 
 namespace STD_LA {
-#ifdef LA_NEGATION_AS_VIEW
 //=================================================================================================
-//  Vector negation engine, meant to act as "view" of the negation of a vector in expressions
-//  so as to help avoid unnecessary allocation and/or element copying.
+//  Vector negation engine, meant to act as read-only view of a vector's negation in expressions,
+//  to help avoid unnecessary allocation and/or element copying.
 //==================================================================================================
 //
 template<class ET>
@@ -23,17 +22,18 @@ class vector_view_engine<ET, readable_vector_engine_tag, negation_view_tag>
   public:
     //- Types
     //
-    using engine_category = readable_vector_engine_tag;
-    using element_type    = typename ET::element_type;
-    using value_type      = typename ET::value_type;
-    using pointer         = typename ET::const_pointer;
-    using const_pointer   = typename ET::const_pointer;
-    using reference       = typename ET::element_type;
-    using const_reference = typename ET::element_type;
-    using difference_type = typename ET::difference_type;
-    using index_type      = typename ET::index_type;
-    using span_type       = detail::noe_mdspan_negation_t<detail::noe_const_mdspan_t<ET, readable_vector_engine_tag>>;
-    using const_span_type = detail::noe_mdspan_negation_t<detail::noe_const_mdspan_t<ET, readable_vector_engine_tag>>;
+    using engine_category    = readable_vector_engine_tag;
+    using owning_engine_type = typename ET::owning_engine_type;
+    using element_type       = typename ET::element_type;
+    using value_type         = typename ET::value_type;
+    using pointer            = typename ET::const_pointer;
+    using const_pointer      = typename ET::const_pointer;
+    using reference          = typename ET::element_type;
+    using const_reference    = typename ET::element_type;
+    using difference_type    = typename ET::difference_type;
+    using index_type         = typename ET::index_type;
+    using span_type          = detail::noe_mdspan_negation_t<detail::noe_const_mdspan_t<ET, readable_vector_engine_tag>>;
+    using const_span_type    = detail::noe_mdspan_negation_t<detail::noe_const_mdspan_t<ET, readable_vector_engine_tag>>;
 
     //- Construct/copy/destroy
     //
@@ -66,7 +66,7 @@ class vector_view_engine<ET, readable_vector_engine_tag, negation_view_tag>
   private:
     template<class ET2, class OT2>  friend class vector;
 
-    using referent_type = detail::noe_referent_t<ET, readable_vector_engine_tag>;
+    using referent_type = detail::noe_engine_t<ET, readable_vector_engine_tag>;
 
     referent_type*  mp_other;
 
@@ -136,7 +136,7 @@ vector_view_engine<ET, readable_vector_engine_tag, negation_view_tag>::vector_vi
 :   mp_other(&eng)
 {}
 
-#endif
+
 //=================================================================================================
 //  Sub-vector engine, meant to act as "view" of a portion of a vector in expressions so as to
 //  help avoid unnecessary allocation and/or element copying.
@@ -151,17 +151,18 @@ class vector_view_engine<ET, VCT, subset_view_tag>
   public:
     //- Types
     //
-    using engine_category = VCT;
-    using element_type    = typename ET::element_type;
-    using value_type      = typename ET::value_type;
-    using pointer         = detail::noe_pointer_t<ET, VCT>;
-    using const_pointer   = typename ET::const_pointer;
-    using reference       = detail::noe_reference_t<ET, VCT>;
-    using const_reference = typename ET::const_reference;
-    using difference_type = typename ET::difference_type;
-    using index_type      = typename ET::index_type;
-    using span_type       = detail::noe_mdspan_subvector_t<detail::noe_mdspan_t<ET, VCT>>;
-    using const_span_type = detail::noe_mdspan_subvector_t<detail::noe_const_mdspan_t<ET, VCT>>;
+    using engine_category    = VCT;
+    using owning_engine_type = typename ET::owning_engine_type;
+    using element_type       = typename ET::element_type;
+    using value_type         = typename ET::value_type;
+    using pointer            = detail::noe_pointer_t<ET, VCT>;
+    using const_pointer      = typename ET::const_pointer;
+    using reference          = detail::noe_reference_t<ET, VCT>;
+    using const_reference    = typename ET::const_reference;
+    using difference_type    = typename ET::difference_type;
+    using index_type         = typename ET::index_type;
+    using span_type          = detail::noe_mdspan_subvector_t<detail::noe_mdspan_t<ET, VCT>>;
+    using const_span_type    = detail::noe_mdspan_subvector_t<detail::noe_const_mdspan_t<ET, VCT>>;
 
     //- Construct/copy/destroy
     //
@@ -199,7 +200,7 @@ class vector_view_engine<ET, VCT, subset_view_tag>
   private:
     template<class ET2, class OT2>  friend class vector;
 
-    using referent_type = detail::noe_referent_t<ET, VCT>;
+    using referent_type = detail::noe_engine_t<ET, VCT>;
 
     referent_type*  mp_other;
     index_type      m_start;
@@ -312,17 +313,18 @@ class vector_view_engine<ET, VCT, column_view_tag>
   public:
     //- Types
     //
-    using engine_category = VCT;
-    using element_type    = typename ET::element_type;
-    using value_type      = typename ET::value_type;
-    using pointer         = detail::noe_pointer_t<ET, VCT>;
-    using const_pointer   = typename ET::const_pointer;
-    using reference       = detail::noe_reference_t<ET, VCT>;
-    using const_reference = typename ET::const_reference;
-    using difference_type = typename ET::difference_type;
-    using index_type      = typename ET::index_type;
-    using span_type       = detail::noe_mdspan_rowcolumn_t<detail::noe_mdspan_t<ET, VCT>>;
-    using const_span_type = detail::noe_mdspan_rowcolumn_t<detail::noe_const_mdspan_t<ET, VCT>>;
+    using engine_category    = VCT;
+    using owning_engine_type = typename ET::owning_engine_type;
+    using element_type       = typename ET::element_type;
+    using value_type         = typename ET::value_type;
+    using pointer            = detail::noe_pointer_t<ET, VCT>;
+    using const_pointer      = typename ET::const_pointer;
+    using reference          = detail::noe_reference_t<ET, VCT>;
+    using const_reference    = typename ET::const_reference;
+    using difference_type    = typename ET::difference_type;
+    using index_type         = typename ET::index_type;
+    using span_type          = detail::noe_mdspan_rowcolumn_t<detail::noe_mdspan_t<ET, VCT>>;
+    using const_span_type    = detail::noe_mdspan_rowcolumn_t<detail::noe_const_mdspan_t<ET, VCT>>;
 
     //- Construct/copy/destroy
     //
@@ -360,7 +362,7 @@ class vector_view_engine<ET, VCT, column_view_tag>
   private:
     template<class ET2, class OT2>  friend class vector;
 
-    using referent_type = detail::noe_referent_t<ET, VCT>;
+    using referent_type = detail::noe_engine_t<ET, VCT>;
 
     referent_type*  mp_other;
     index_type      m_column;
@@ -469,17 +471,18 @@ class vector_view_engine<ET, VCT, row_view_tag>
   public:
     //- Types
     //
-    using engine_category = VCT;
-    using element_type    = typename ET::element_type;
-    using value_type      = typename ET::value_type;
-    using pointer         = detail::noe_pointer_t<ET, VCT>;
-    using const_pointer   = typename ET::const_pointer;
-    using reference       = detail::noe_reference_t<ET, VCT>;
-    using const_reference = typename ET::const_reference;
-    using difference_type = typename ET::difference_type;
-    using index_type      = typename ET::index_type;
-    using span_type       = detail::noe_mdspan_rowcolumn_t<detail::noe_mdspan_t<ET, VCT>>;
-    using const_span_type = detail::noe_mdspan_rowcolumn_t<detail::noe_const_mdspan_t<ET, VCT>>;
+    using engine_category    = VCT;
+    using owning_engine_type = typename ET::owning_engine_type;
+    using element_type       = typename ET::element_type;
+    using value_type         = typename ET::value_type;
+    using pointer            = detail::noe_pointer_t<ET, VCT>;
+    using const_pointer      = typename ET::const_pointer;
+    using reference          = detail::noe_reference_t<ET, VCT>;
+    using const_reference    = typename ET::const_reference;
+    using difference_type    = typename ET::difference_type;
+    using index_type         = typename ET::index_type;
+    using span_type          = detail::noe_mdspan_rowcolumn_t<detail::noe_mdspan_t<ET, VCT>>;
+    using const_span_type    = detail::noe_mdspan_rowcolumn_t<detail::noe_const_mdspan_t<ET, VCT>>;
 
     //- Construct/copy/destroy
     //
@@ -517,7 +520,7 @@ class vector_view_engine<ET, VCT, row_view_tag>
   private:
     template<class ET2, class OT2>  friend class vector;
 
-    using referent_type = detail::noe_referent_t<ET, VCT>;
+    using referent_type = detail::noe_engine_t<ET, VCT>;
 
     referent_type*  mp_other;
     index_type      m_row;

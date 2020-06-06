@@ -86,5 +86,6 @@ template<class ET1, class ET2> inline constexpr
 bool    engines_are_similar_v = detail::engines_match_v<ET1, ET2>;
 
 
+
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_PUBLIC_SUPPORT_HPP_DEFINED
