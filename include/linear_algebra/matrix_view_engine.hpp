@@ -23,7 +23,6 @@ template<class ET>
 class matrix_view_engine<ET, readable_matrix_engine_tag, negation_view_tag>
 {
     static_assert(is_matrix_engine_v<ET>);
-
     using engine_const_span_type = detail::noe_const_mdspan_t<ET, readable_matrix_engine_tag>;
 
   public:
@@ -208,9 +207,7 @@ template<class ET, class MCT, class VFT>
 class matrix_view_engine<matrix_view_engine<ET,MCT,VFT>, readable_matrix_engine_tag, negation_view_tag>
 {
     static_assert(is_matrix_engine_v<ET>);
-
-    using engine_const_span_type =
-            detail::noe_const_mdspan_t<matrix_view_engine<ET,MCT,VFT>, readable_matrix_engine_tag>;
+    using engine_const_span_type = typename matrix_view_engine<ET,MCT,VFT>::const_span_type;
 
   public:
     //- Type aliases pertaining to the underlying engine type.
@@ -402,7 +399,6 @@ template<class ET>
 class matrix_view_engine<ET, readable_matrix_engine_tag, transpose_view_tag>
 {
     static_assert(is_matrix_engine_v<ET>);
-
     using engine_const_span_type = detail::noe_const_mdspan_t<ET, readable_matrix_engine_tag>;
 
   public:
@@ -591,9 +587,8 @@ template<class ET, class MCT, class VFT>
 class matrix_view_engine<matrix_view_engine<ET,MCT,VFT>, readable_matrix_engine_tag, transpose_view_tag>
 {
     static_assert(is_matrix_engine_v<ET>);
+    using engine_const_span_type = typename matrix_view_engine<ET,MCT,VFT>::const_span_type;
 
-    using engine_const_span_type = detail::noe_const_mdspan_t<matrix_view_engine<ET,MCT,VFT>,
-                                                              readable_matrix_engine_tag>;
   public:
     //- Type aliases pertaining to the underlying engine type.
     //

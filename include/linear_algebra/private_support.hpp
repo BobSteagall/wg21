@@ -639,7 +639,7 @@ struct noe_mdspan_traits<basic_mdspan<T, extents<X0>, L, A>>
     using element_type        = T;
 };
 
-//- This partial specialization is used when an engine is two-dimensional.
+//- These partial specializations are used when an engine is two-dimensional.
 //
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
 struct noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
@@ -650,6 +650,19 @@ struct noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
     using rowcolumn_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, A>;
     using transpose_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, passthru_accessor<T, A>>;
     using submatrix_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, A>;
+    using index_type          = typename source_span_type::index_type;
+    using element_type        = T;
+};
+
+template<class T, ptrdiff_t X0, ptrdiff_t X1, class L>
+struct noe_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, MDSPAN_NS::accessor_basic<T>>>
+{
+    using source_span_type    = basic_mdspan<T, extents<X0, X1>, L, MDSPAN_NS::accessor_basic<T>>;
+    using negation_span_type  = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, negation_accessor<T, MDSPAN_NS::accessor_basic<T>>>;
+    using hermitian_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, conjugation_accessor<T, MDSPAN_NS::accessor_basic<T>>>;
+    using rowcolumn_span_type = basic_mdspan<T, dyn_vec_extents, dyn_vec_layout, MDSPAN_NS::accessor_basic<T>>;
+    using transpose_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, MDSPAN_NS::accessor_basic<T>>;
+    using submatrix_span_type = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout, MDSPAN_NS::accessor_basic<T>>;
     using index_type          = typename source_span_type::index_type;
     using element_type        = T;
 };

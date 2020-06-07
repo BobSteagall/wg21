@@ -25,7 +25,10 @@ type_name()                //- From StackOverflow...
 #ifdef __clang__
     string_view p = __PRETTY_FUNCTION__;
 //    return string_view(p.data() + 59, p.size() - 59 - 1);
-    return string_view(p.data(), p.size());
+    auto    n1 = p.find('[', 0) + 4;
+    auto    n2 = p.find(']', n1);
+    return string_view(p.data() + n1, n2 - n1);
+//    return string_view(p.data(), p.size());
 #elif defined(__GNUC__)
     string_view p = __PRETTY_FUNCTION__;
     # if __cplusplus < 201402
@@ -129,8 +132,9 @@ clean_type_name(basic_string<C,T,A> tname)
     static basic_string<C,T,A> const   ns = MATRIX_STRINGIFY(STD_LA) "::";
     static basic_string<C,T,A> const   sl = "std::";
     static basic_string<C,T,A> const   ex = "experimental::";
+    static basic_string<C,T,A> const   dl = "detail::";
     static basic_string<C,T,A> const   aa = "> >";
-#if 0
+
     for (auto pos = string::npos;  (pos = tname.rfind(ns, pos)) != string::npos; )
     {
         tname.erase(pos, ns.size());
@@ -145,7 +149,12 @@ clean_type_name(basic_string<C,T,A> tname)
     {
         tname.erase(pos, ex.size());
     }
-#endif
+
+    for (auto pos = string::npos;  (pos = tname.rfind(dl, pos)) != string::npos; )
+    {
+        tname.erase(pos, dl.size());
+    }
+
     for (auto pos = string::npos;  (pos = tname.rfind(aa, pos)) != string::npos; )
     {
         tname.replace(pos, 3u, ">>");

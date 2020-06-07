@@ -288,6 +288,10 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     PRINT((-m1).t().t().span());
     PRINT((-((-m1).t()).t()).span());
 
+    auto    xx = (-((-m1).t())).t();
+    PRINT(xx);
+    PRINT(xx.span());
+
     PRINT(-sub1);
     PRINT((-sub1).span());
     PRINT(-row1);
