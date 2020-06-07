@@ -30,7 +30,7 @@ class matrix
     //- Types
     //
     using engine_type          = ET;
-    using owning_engine_type   = detail::select_owning_engine_type_t<ET>; //typename ET::owning_engine_type;
+    using owning_engine_type   = detail::select_owning_engine_type_t<ET>;
     using element_type         = typename engine_type::element_type;
     using value_type           = typename engine_type::value_type;
     using reference            = typename engine_type::reference;
@@ -43,7 +43,6 @@ class matrix
 
     using const_negation_type  = matrix<matrix_negation_engine<engine_type>, OT>;
     using const_transpose_type = matrix<matrix_transpose_engine<engine_type>, OT>;
-    using hermitian_type       = conditional_t<has_cx_elem, matrix, const_transpose_type>;
     using const_hermitian_type = conditional_t<has_cx_elem, matrix, const_transpose_type>;
 
     using column_type          = vector<matrix_column_engine<engine_type, possibly_writable_vector_tag>, OT>;

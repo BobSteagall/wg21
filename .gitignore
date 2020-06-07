@@ -6,7 +6,9 @@ packages/
 tmp
 x64*
 x86*
+pgen*
 wg21*
+*/pgen*
 */x64*
 */x86*
 */wg21*

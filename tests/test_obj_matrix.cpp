@@ -140,7 +140,7 @@ void t001()
 
 constexpr double t002()
 {
-#if 0
+#if 1
     fsm_double_35   fsm  = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}};
 
     fsv_double_5    fsv  = {11, 12, 13, 14, 15};
@@ -152,8 +152,8 @@ constexpr double t002()
     double    d1 = fsm(1,2);
     double    d2 = fsv(3);
 
-    fsm.column(2) = {0, 0, 0};
-    fsm.row(1)    = {17, 17, 17, 17, 17};
+//    fsm.column(2) = {0, 0, 0};
+//    fsm.row(1)    = {17, 17, 17, 17, 17};
 
     STD_LA::detail::la_swap(d1, d2);
 
@@ -390,7 +390,7 @@ t003Y()
 
     STD_LA::detail::check_source_init_list({{0, 1, 2}, {3, 4, 5}});
     STD_LA::detail::check_source_init_list({{0, 1, 2}, {3, 4, 5}}, 2, 3);
-//    STD_LA::detail::check_source_init_list({{0, 1, 2}, {3, 4, 5}}, 2, 4);
+    //STD_LA::detail::check_source_init_list({{0, 1, 2}, {3, 4, 5}}, 2, 4);
 
     fsm_double_35   fsm  = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}};
     fsv_double_5    fsv  = {11, 12, 13, 14, 15};

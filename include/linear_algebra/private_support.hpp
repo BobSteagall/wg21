@@ -1002,7 +1002,6 @@ struct noe_traits
     static constexpr bool   is_writable = is_writable_tag_v<NEWCAT>;
 
     using engine          = conditional_t<is_writable, ET, ET const>;
-    using element         = conditional_t<is_writable, typename ET::element_type, typename ET::element_type const>;
     using reference       = conditional_t<is_writable, typename ET::reference, typename ET::const_reference>;
     using pointer         = conditional_t<is_writable, typename ET::pointer, typename ET::const_pointer>;
     using span_type       = conditional_t<is_writable, engine_span_t<ET>, engine_const_span_t<ET>>;
@@ -1014,9 +1013,6 @@ struct noe_traits
 //
 template<class ET, class NEWCAT>
 using noe_engine_t = typename noe_traits<ET, NEWCAT>::engine;
-
-template<class ET, class NEWCAT>
-using noe_element_t = typename noe_traits<ET, NEWCAT>::element;
 
 template<class ET, class NEWCAT>
 using noe_reference_t = typename noe_traits<ET, NEWCAT>::reference;
