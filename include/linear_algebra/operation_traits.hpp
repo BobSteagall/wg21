@@ -59,7 +59,7 @@ struct matrix_operation_traits
     template<class OTR, class OP1, class OP2>
     using multiplication_arithmetic_traits = matrix_multiplication_arithmetic_traits<OTR, OP1, OP2>;
 
-    //- Default arithmetic operation traits.
+    //- Division
     //
     template<class T1, class T2>
     using division_element_traits = matrix_division_element_traits<T1, T2>;

@@ -296,6 +296,37 @@ void t002X(drm_double const& m1, fsm_double_36 const& m2)
     PRINT((-sub1).span());
     PRINT(-row1);
 //    PRINT((-row1).span());
+
+    auto    m4(m1);
+    auto    sub4 = m4.submatrix(2, 4, 3, 6);
+
+    PRINT(m4);
+    PRINT_TYPE(decltype(m4));
+    PRINT(sub4);
+    PRINT_TYPE(decltype(sub4));
+
+    sub4 = {{ 1,  1,  1,  1,  1,  1},
+            { 1,  1,  1,  1,  1,  1},
+            { 1,  1,  1,  1,  1,  1},
+            { 1,  1,  1,  1,  1,  1}};
+    PRINT(m4);
+
+    sub4.submatrix(1, 2, 1, 4) = {{2, 2, 2, 2},
+                                  {2, 2, 2, 2}};
+    PRINT(m4);
+    PRINT_TYPE(decltype(sub4.submatrix(1, 2, 1, 4)));
+
+    PRINT(m4.span());
+    PRINT(sub4.span());
+    PRINT(sub4.submatrix(1, 2, 1, 4).span());
+
+    sub4.submatrix(1, 2, 1, 4).span()(0, 0) = 999.0f;
+    PRINT(m4.span());
+
+    PRINT_TYPE(decltype(m4.engine()));
+    PRINT_TYPE(decltype(m4.owning_engine()));
+    PRINT_TYPE(decltype(sub4.engine()));
+    PRINT_TYPE(decltype(sub4.owning_engine()));
 }
 
 void t001X()

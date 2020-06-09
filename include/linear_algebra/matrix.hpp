@@ -21,8 +21,10 @@ class matrix
     static_assert(is_matrix_engine_v<ET>);
     static_assert(detail::has_valid_span_alias_form_v<ET>);
 
-    using possibly_writable_vector_tag = detail::noe_category_t<ET, writable_vector_engine_tag>;
+//    using possibly_writable_vector_tag = detail::noe_category_t<ET, writable_vector_engine_tag>;
+    using possibly_writable_vector_tag = conditional_t<is_writable_engine_v<ET>, writable_vector_engine_tag,readable_vector_engine_tag>;
     using possibly_writable_matrix_tag = detail::noe_category_t<ET, writable_matrix_engine_tag>;
+    using hermitian_view_type          = matrix<matrix_hermitian_engine<ET>, OT>;
 
     static constexpr bool   has_cx_elem = detail::is_complex_v<typename ET::value_type>;
 
@@ -30,7 +32,7 @@ class matrix
     //- Types
     //
     using engine_type          = ET;
-    using owning_engine_type   = detail::select_owning_engine_type_t<ET>;
+    using owning_engine_type   = detail::determine_owning_engine_type_t<ET>;
     using element_type         = typename engine_type::element_type;
     using value_type           = typename engine_type::value_type;
     using reference            = typename engine_type::reference;
@@ -43,7 +45,7 @@ class matrix
 
     using const_negation_type  = matrix<matrix_negation_engine<engine_type>, OT>;
     using const_transpose_type = matrix<matrix_transpose_engine<engine_type>, OT>;
-    using const_hermitian_type = conditional_t<has_cx_elem, matrix, const_transpose_type>;
+    using const_hermitian_type = conditional_t<has_cx_elem, hermitian_view_type, const_transpose_type>;
 
     using column_type          = vector<matrix_column_engine<engine_type, possibly_writable_vector_tag>, OT>;
     using const_column_type    = vector<matrix_column_engine<engine_type, readable_vector_engine_tag>, OT>;
@@ -83,13 +85,13 @@ class matrix
 
     //- Capacity
     //
-    constexpr index_type    columns() const noexcept;
-    constexpr index_type    rows() const noexcept;
-    constexpr index_tuple_type   size() const noexcept;
+    constexpr index_type        columns() const noexcept;
+    constexpr index_type        rows() const noexcept;
+    constexpr index_tuple_type  size() const noexcept;
 
-    constexpr index_type    column_capacity() const noexcept;
-    constexpr index_type    row_capacity() const noexcept;
-    constexpr index_tuple_type   capacity() const noexcept;
+    constexpr index_type        column_capacity() const noexcept;
+    constexpr index_type        row_capacity() const noexcept;
+    constexpr index_tuple_type  capacity() const noexcept;
 
     template<class ET2 = ET, detail::enable_if_resizable_engine<ET, ET2> = true>
     constexpr void      reserve(index_tuple_type cap);
@@ -417,14 +419,28 @@ template<class ET, class OT> constexpr
 typename matrix<ET,OT>::owning_engine_type&
 matrix<ET,OT>::owning_engine() noexcept
 {
-    return m_engine.owning_engine();
+    if constexpr (detail::is_owning_engine_v<ET>)
+    {
+        return m_engine;
+    }
+    else
+    {
+        return m_engine.owning_engine();
+    }
 }
 
 template<class ET, class OT> constexpr
 typename matrix<ET,OT>::owning_engine_type const&
 matrix<ET,OT>::owning_engine() const noexcept
 {
-    return m_engine.owning_engine();
+    if constexpr (detail::is_owning_engine_v<ET>)
+    {
+        return m_engine;
+    }
+    else
+    {
+        return m_engine.owning_engine();
+    }
 }
 
 template<class ET, class OT>

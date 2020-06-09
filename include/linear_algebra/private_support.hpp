@@ -316,7 +316,7 @@ using enable_if_convertible_engine =
 //  elements it contains.
 //
 template<class ET, typename = void>
-struct determine_owning_engine_type
+struct has_owning_engine_type_alias
 :   public false_type
 {
     static constexpr bool   is_owning = true;
@@ -324,7 +324,7 @@ struct determine_owning_engine_type
 };
 
 template<class ET>
-struct determine_owning_engine_type<ET, void_t<typename ET::owning_engine_type>>
+struct has_owning_engine_type_alias<ET, void_t<typename ET::owning_engine_type>>
 :   public true_type
 {
     static constexpr bool   is_owning = false;
@@ -332,13 +332,14 @@ struct determine_owning_engine_type<ET, void_t<typename ET::owning_engine_type>>
 };
 
 template<class ET> inline constexpr
-bool    is_owning_engine_v = determine_owning_engine_type<ET>::is_owning;
+bool    is_owning_engine_v = is_engine_v<ET> && has_owning_engine_type_alias<ET>::is_owning;
 
 template<class ET> inline constexpr
-bool    is_non_owning_engine_v = !determine_owning_engine_type<ET>::is_owning;
+bool    is_non_owning_engine_v = is_engine_v<ET> && !has_owning_engine_type_alias<ET>::is_owning;
 
 template<class ET>
-using select_owning_engine_type_t = typename determine_owning_engine_type<ET>::owning_engine_type;
+using determine_owning_engine_type_t =
+        typename has_owning_engine_type_alias<ET>::owning_engine_type;
 
 template<class ET1>
 using enable_if_engine_types_differ =
@@ -348,7 +349,7 @@ using enable_if_engine_types_differ =
 //- The following are used to determine whether or not an engine type actually has constexpr
 //  size member functions.  This technique relies on the facts that: (1) a lambda can be
 //  constexpr in C++17; (2) a capture-less lambda can be default-constructed (C++20); and (3),
-//  engine types must have default constructor.
+//  engine types must have a default constructor.
 //
 //  The detection code comes directly from a very cool technique described on StackOverflow at:
 //  https://stackoverflow.com/questions/55288555/c-check-if-statement-can-be-evaluated-constexpr.

@@ -111,6 +111,7 @@ class vector
     static_assert(detail::has_valid_span_alias_form_v<ET>);
 
     using possibly_writable_vector_tag = detail::noe_category_t<ET, writable_vector_engine_tag>;
+    using hermitian_view_type          = matrix<matrix_hermitian_engine<ET>, OT>;
     static constexpr bool   has_cx_elem  = detail::is_complex_v<typename ET::value_type>;
 
   public:
@@ -118,7 +119,7 @@ class vector
     //
     using engine_type          = ET;
 //    using direct_engine_type   = ET;
-//    using owning_engine_type   = typename ET::owning_engine_type;
+    using owning_engine_type   = detail::determine_owning_engine_type_t<ET>;
     using element_type         = typename engine_type::element_type;
     using value_type           = typename engine_type::value_type;
     using difference_type      = typename engine_type::difference_type;
@@ -127,15 +128,16 @@ class vector
     using const_pointer        = typename engine_type::const_pointer;
     using reference            = typename engine_type::reference;
     using const_reference      = typename engine_type::const_reference;
-    using subvector_type       = vector<vector_subset_engine<engine_type, possibly_writable_vector_tag>, OT>;
-    using const_subvector_type = vector<vector_subset_engine<engine_type, readable_vector_engine_tag>, OT>;
+    using span_type            = detail::engine_span_t<ET>;
+    using const_span_type      = detail::engine_const_span_t<ET>;
+
     using const_negation_type  = vector<vector_negation_engine<engine_type>, OT>;
     using transpose_type       = vector&;
     using const_transpose_type = vector const&;
     using hermitian_type       = conditional_t<has_cx_elem, vector, transpose_type>;
     using const_hermitian_type = conditional_t<has_cx_elem, vector, const_transpose_type>;
-    using span_type            = detail::engine_span_t<ET>;
-    using const_span_type      = detail::engine_const_span_t<ET>;
+    using subvector_type       = vector<vector_subset_engine<engine_type, possibly_writable_vector_tag>, OT>;
+    using const_subvector_type = vector<vector_subset_engine<engine_type, readable_vector_engine_tag>, OT>;
 
     //- Construct/copy/destroy
     //

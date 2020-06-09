@@ -57,8 +57,8 @@ class fs_vector_engine
 
     //- Capacity
     //
-    static constexpr    index_type size() noexcept;
-    static constexpr    index_type capacity() noexcept;
+    static constexpr index_type size() noexcept;
+    static constexpr index_type capacity() noexcept;
 
     //- Element access
     //

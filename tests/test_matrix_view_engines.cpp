@@ -23,7 +23,7 @@ TEST(FFF, YYY)
 {
     static_assert(STD_LA::detail::is_owning_engine_v<mat_engine_34>);
 
-    using t1 = STD_LA::detail::select_owning_engine_type_t<mat_engine_34>;
+    using t1 = STD_LA::detail::determine_owning_engine_type_t<mat_engine_34>;
 
     static_assert(STD_LA::detail::is_non_owning_engine_v<r_neg_engine_34>);
     static_assert(STD_LA::detail::is_non_owning_engine_v<r_tr_engine_34>);
@@ -305,7 +305,7 @@ constexpr auto tf()
     bool b1 = ne1.is_valid();
     bool b2 = ne3b.is_valid();
 
-    return ne2b.rows();
+    return ne3b.rows();
 }
 
 TEST(FFF, XXX)

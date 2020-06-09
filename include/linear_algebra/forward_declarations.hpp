@@ -42,8 +42,8 @@ template<class T, ptrdiff_t R, ptrdiff_t C> class fs_matrix_engine;
 
 //- Non-owning, view-style engines (NOEs).
 //
-template<class ET, class VCT, class VFT>   class vector_view_engine;
-template<class ET, class MCT, class VFT>   class matrix_view_engine;
+template<class ET, class VCT, class VFT>    class vector_view_engine;
+template<class ET, class MCT, class VFT>    class matrix_view_engine;
 
 //- Non-owning view engine functionality tag types, used to specify the functionality of a view.
 //
@@ -58,6 +58,9 @@ struct hermitian_view_tag {};
 //
 template<class ET>
 using vector_negation_engine = vector_view_engine<ET, readable_vector_engine_tag, negation_view_tag>;
+
+template<class ET>
+using vector_hermitian_engine = vector_view_engine<ET, readable_vector_engine_tag, hermitian_view_tag>;
 
 template<class ET, class VCT>
 using vector_subset_engine = vector_view_engine<ET, VCT, subset_view_tag>;

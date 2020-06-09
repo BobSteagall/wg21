@@ -43,6 +43,7 @@ class fs_matrix_engine
     constexpr fs_matrix_engine();
     constexpr fs_matrix_engine(fs_matrix_engine&&) noexcept = default;
     constexpr fs_matrix_engine(fs_matrix_engine const&) = default;
+
     template<class T2, ptrdiff_t R2, ptrdiff_t C2>
     constexpr fs_matrix_engine(fs_matrix_engine<T2, R2, C2> const& rhs);
     template<class ET2, detail::enable_if_engine_has_convertible_element_type<ET2,T> = true>
@@ -52,6 +53,7 @@ class fs_matrix_engine
 
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine&&) noexcept = default;
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine const&) = default;
+
     template<class T2, ptrdiff_t R2, ptrdiff_t C2>
     constexpr fs_matrix_engine&     operator =(fs_matrix_engine<T2, R2, C2> const& rhs);
     template<class ET2, detail::enable_if_engine_has_convertible_element_type<ET2,T> = true>
