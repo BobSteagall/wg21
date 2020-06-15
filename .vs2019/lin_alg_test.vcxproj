@@ -46,6 +46,7 @@
     <ClInclude Include="..\tests\test_new_number.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\linear_algebra\matrix_storage_engine.hpp" />
     <ClCompile Include="..\tests\test_01.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

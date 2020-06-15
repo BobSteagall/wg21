@@ -39,7 +39,7 @@ class dr_matrix_engine
     //
     ~dr_matrix_engine() noexcept;
 
-    dr_matrix_engine();
+    constexpr dr_matrix_engine();
     dr_matrix_engine(dr_matrix_engine&& rhs) noexcept;
     dr_matrix_engine(dr_matrix_engine const& rhs);
     dr_matrix_engine(index_type rows, index_type cols);
@@ -59,7 +59,7 @@ class dr_matrix_engine
     //- Capacity
     //
     index_type          columns() const noexcept;
-    index_type          rows() const noexcept;
+    constexpr index_type          rows() const noexcept;
     index_tuple_type    size() const noexcept;
 
     index_type          column_capacity() const noexcept;
@@ -117,7 +117,7 @@ dr_matrix_engine<T,AT>::~dr_matrix_engine() noexcept
     detail::deallocate(m_alloc, mp_elems, m_rowcap*m_colcap);
 }
 
-template<class T, class AT>
+template<class T, class AT> inline constexpr
 dr_matrix_engine<T,AT>::dr_matrix_engine()
 :   mp_elems(nullptr)
 ,   m_rows(0)
@@ -218,7 +218,7 @@ dr_matrix_engine<T,AT>::columns() const noexcept
     return m_cols;
 }
 
-template<class T, class AT> inline
+template<class T, class AT> inline constexpr
 typename dr_matrix_engine<T,AT>::index_type
 dr_matrix_engine<T,AT>::rows() const noexcept
 {

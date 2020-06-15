@@ -8,6 +8,25 @@
 #ifndef LINEAR_ALGEBRA_HPP_DEFINED
 #define LINEAR_ALGEBRA_HPP_DEFINED
 
+//- Detect the compiler.
+//
+#if defined __clang__
+    #if (__clang_major__ < 10)
+        #error unsupported version of Clang
+    #endif
+    #define LA_COMPILER_CLANG
+
+#elif defined __GNUG__
+    #if (__GNUG__ < 9)
+        #error unsupported version of GCC
+    #endif
+    #define LA_COMPILER_GCC
+    #define LA_GCC_VERSION  __GNUG__
+
+#elif defined _MSC_VER
+    #define LA_COMPILER_MS
+#endif
+
 //- Namespace alternatives for testing and also for detecting ADL issues.  Pick a pair
 //  and attempt to build.
 //
@@ -23,7 +42,8 @@
 #define MDSPAN_NS   std::experimental
 
 #include <cstdint>
-#include <array>
+
+//#include <array>
 #include <complex>
 #include <initializer_list>
 #include <memory>
@@ -32,27 +52,35 @@
 
 //- Disable some unnecessary compiler warnings coming from mdspan.
 //
-#if defined __clang__
+#if defined LA_COMPILER_CLANG
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-#elif defined __GNUG__
+#elif defined LA_COMPILER_GCC
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
-#elif defined _MSC_VER
+#elif defined LA_COMPILER_MS
     #pragma warning(push)
     #pragma warning(disable: 4100)
 #endif
 
 #include <experimental/mdspan>
-using std::experimental::dynamic_extent;
+
+namespace STD_LA
+{
+    using MDSPAN_NS::extents;
+    using MDSPAN_NS::dynamic_extent;
+    using MDSPAN_NS::layout_left;
+    using MDSPAN_NS::layout_left;
+    using MDSPAN_NS::layout_stride;
+}
 
 //- Restore the compiler's diagnostic state.
 //
-#if defined __clang__
+#if defined LA_COMPILER_CLANG
     #pragma clang diagnostic pop
-#elif defined __GNUG__
+#elif defined LA_COMPILER_GCC
     #pragma GCC diagnostic pop
-#elif defined _MSC_VER
+#elif defined LA_COMPILER_MS
     #pragma warning(pop)
 #endif
 
@@ -79,5 +107,7 @@ using std::experimental::dynamic_extent;
 #include "linear_algebra/division_traits.hpp"
 #include "linear_algebra/operation_traits.hpp"
 #include "linear_algebra/arithmetic_operators.hpp"
+
+#include "linear_algebra/matrix_storage_engine.hpp"
 
 #endif  //- LINEAR_ALGEBRA_HPP_DEFINED

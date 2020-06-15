@@ -305,6 +305,8 @@ constexpr auto tf()
     bool b1 = ne1.is_valid();
     bool b2 = ne3b.is_valid();
 
+    //dr_matrix_engine<float> fe;
+
     return ne3b.rows();
 }
 
@@ -315,6 +317,10 @@ TEST(FFF, XXX)
     std::integral_constant<ptrdiff_t, tf()>     x;
 
     static_assert(x.value == i);
+
+    static_assert(STD_LA::detail::is_constexpr([]{fs_matrix_engine<int,1,1>().rows();}));
+    static_assert(!STD_LA::detail::is_constexpr([]{dr_matrix_engine<int>().rows();}));
+
 /*
     static_assert(auto_size_test<mat_engine_34>::value == true);
     //static_assert(auto_size_test<dr_matrix_engine<float>>::value == true);
@@ -359,5 +365,17 @@ TEST(FFF, XXX)
     //constexpr tvob<r_tr_engine_34>      v2;
     //static_assert(v2.engine().rows() == 4);
     */
+}
+
+TEST(GGG, HHH)
+{
+    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<float>, STD_LA::engine_attribute::row_major>       m1;
+    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<float>, STD_LA::engine_attribute::column_major>    m2;
+//    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<float>, STD_LA::engine_attribute::general_layout>  m3;
+//    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<double>, STD_LA::engine_attribute::column_major>   m4;
+
+    STD_LA::matrix_storage_engine<float, extents<3, 3>, void, STD_LA::engine_attribute::row_major>      m21;
+    STD_LA::matrix_storage_engine<float, extents<4, 4>, void, STD_LA::engine_attribute::column_major>   m22;
+
 }
 #endif
