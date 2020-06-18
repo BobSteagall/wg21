@@ -45,7 +45,7 @@ template<class T, ptrdiff_t R, ptrdiff_t C> class fs_matrix_engine;
 template<class ET, class VCT, class VFT>    class vector_view_engine;
 template<class ET, class MCT, class VFT>    class matrix_view_engine;
 
-template<class T, class DX, class AT, class EL>  class matrix_storage_engine;
+//template<class T, class X, class A, class L>    class matrix_storage_engine;
 
 //- Non-owning view engine functionality tag types, used to specify the functionality of a view.
 //

@@ -14,7 +14,7 @@ namespace STD_LA {
 
 struct engine_attribute
 {
-    //- Tags describing an engine's purpose.
+    //- Tags describing an engine's representational category.
     //
     struct dense_matrix {};
     struct dense_column_matrix {};
@@ -27,6 +27,8 @@ struct engine_attribute
     struct readable {};
     struct writable {};
     struct initable {};
+    struct column_resizable {};
+    struct row_resizable {};
     struct resizable {};
 
     //- Tags describing the layout of an engine's elements.
@@ -54,117 +56,110 @@ template<typename T, typename U>
 concept same_types = is_same_v<T, U>;
 
 template<typename T, typename U>
-concept convertible_element = is_convertible_v<T, U>;
+concept returns = is_same_v<T, U>;
 
 template<typename T, typename U>
-concept returns = is_same_v<T, U>;
+concept convertible_element = is_convertible_v<T, U>;
 
 template<ptrdiff_t N>
 concept non_negative = requires { N > 0; };
 
-template<typename T>
-concept non_void = requires { requires !is_same_v<T, void>; };
 
-//- GCC 9/10 appear to have some problems parsing concept definitions related to allocator_traits
-//  that Clang and VS accept, so we break them out with
+//- This concept, and its supporting traits type, is used to validate the second template
+//  argument of a specialization of matrix_storage_engine, the extents type.  It must be
+//  one- or two-dimensional, and the value of each dimension must have certain values.
 //
-#if defined(LA_COMPILER_GCC)
-    //- Neither GCC 9 nor GCC 10 can parse the type requirement 'ATT::template rebind_alloc<T>',
+template<class X>
+struct is_valid_matrix_extents : public false_type {};
+
+template<ptrdiff_t N>
+struct is_valid_matrix_extents<extents<N>>
+{
+    static constexpr bool   value = (N == -1 || N > 0);
+};
+
+template<ptrdiff_t R, ptrdiff_t C>
+struct is_valid_matrix_extents<extents<R,C>>
+{
+    static constexpr bool   value = (R == -1 || R > 0) && (C == -1 || C > 0);
+};
+
+template<typename X>
+concept valid_extents = is_valid_matrix_extents<X>::value;
+
+
+//- The following three concepts are used to help validate the third template argument of
+//  a specialization of matrix_storage_engine, the allocator type.  It must be void, or it
+//  must be possible to instatiate a specialization of allocator_traits with it that meets
+//  certain requirements.
+//
+template<typename T>
+concept no_allocator = requires { requires is_same_v<T, void>; };
+
+#if defined(LA_COMPILER_GCC) && ((LA_GCC_VERSION == 9) || (LA_GCC_VERSION == 10))
+    //- Neither GCC 9 nor GCC 10 can parse the type requirement 'AT::template rebind_alloc<T>',
     //  so we add a level of indirection and hoist it up into its own alias template.
     //
-    template<class ATT, class T>
-    using att_rebind_alloc_t = typename ATT::template rebind_alloc<T>;
+    template<class AT, class T>
+    using at_rebind_alloc_t = typename AT::template rebind_alloc<T>;
 
-    #if (LA_GCC_VERSION == 10)
-        //- GCC 10 will correctly parse the nested requirements expression pertaining to
-        //  ATT::allocate() shown below.
-        //
-        template<typename ATT, typename T>
-        concept valid_allocator_traits =
-            requires
-            {
-                typename ATT::allocator_type;
-                typename ATT::value_type;
-                typename ATT::size_type;
-                typename ATT::pointer;
-                typename att_rebind_alloc_t<ATT, T>;
-                requires is_same_v<T, typename ATT::value_type>;
-                requires
-                    requires (typename ATT::allocator_type  a,
-                              typename ATT::pointer         p,
-                              typename ATT::size_type       n)
-                    {
-                        ATT::deallocate(a, p, n);
-                        { ATT::allocate(a, n) } -> returns<typename ATT::pointer>;
-                    };
-            };
-
-        template<typename AT, typename T>
-        concept valid_allocator = non_void<AT> && valid_allocator_traits<allocator_traits<AT>, T>;
-
-    #elif (LA_GCC_VERSION == 9)
-        //- GCC 9 cannot correctly parse the nested requirements expression that GCC 10 does
-        //  above in valid_allocator_traits.  Specifically, it reports a compilation error on
-        //  the compound requirement for ATT::allocate().  Therefore, we break out a separate
-        //  concept just for that subset of the desired set of constraints.
-        //
-        template<typename ATT, typename T>
-        concept valid_allocator_traits_aliases =
-            requires
-            {
-                typename ATT::allocator_type;
-                typename ATT::value_type;
-                typename ATT::size_type;
-                typename ATT::pointer;
-                typename att_rebind_alloc_t<ATT, T>;
-                requires is_same_v<T, typename ATT::value_type>;
-            };
-
-        template<typename ATT>
-        concept valid_allocator_traits_functions =
-            requires (typename ATT::allocator_type  a,
-                      typename ATT::pointer         p,
-                      typename ATT::size_type       n)
-            {
-                ATT::deallocate(a, p, n);
-                { ATT::allocate(a, n) } -> returns<typename ATT::pointer>;
-            };
-
-        template<typename AT, typename T>
-        concept valid_allocator =
-//                    non_void<AT>                                            and
-                    valid_allocator_traits_aliases<allocator_traits<AT>, T> and
-                    valid_allocator_traits_functions<allocator_traits<AT>>;
-    #endif
-#else
-    //- Clang 10 and VC++ seem to accept the following without any problems.
-    //
-    template<typename ATT, typename T>
+    template<typename AT, typename T>
     concept valid_allocator_traits =
         requires
         {
-            typename ATT::allocator_type;
-            typename ATT::value_type;
-            typename ATT::size_type;
-            typename ATT::pointer;
-            typename ATT::template rebind_alloc<T>;
-            requires is_same_v<T, typename ATT::value_type>;
-            requires
-                requires (typename ATT::allocator_type  a,
-                          typename ATT::pointer         p,
-                          typename ATT::size_type       n)
-                {
-                    ATT::deallocate(a, p, n);
-                    { ATT::allocate(a, n) } -> returns<typename ATT::pointer>;
-                };
+            typename AT::allocator_type;
+            typename AT::value_type;
+            typename AT::size_type;
+            typename AT::pointer;
+            typename at_rebind_alloc_t<AT, T>;
+            requires is_same_v<T, typename AT::value_type>;
+        }
+        and
+        requires (typename AT::allocator_type a, typename AT::pointer p, typename AT::size_type n)
+        {
+            { AT::deallocate(a, p, n) };
+            { AT::allocate(a, n) } -> returns<typename AT::pointer>;
+            { static_cast<T*>(p) };
+    #if (LA_GCC_VERSION == 9)
+            requires is_same_v<decltype(*p), T&>;
+            requires is_same_v<decltype(p[n]), T&>;
+    #else
+            { *p   } -> returns<T&>;
+            { p[n] } -> returns<T&>;
+    #endif
         };
-
+#else
+    //- Clang 10 and VC++ accept the following without any problems.
+    //
     template<typename AT, typename T>
-    concept valid_allocator = non_void<AT> and valid_allocator_traits<allocator_traits<AT>, T>;
-
+    concept valid_allocator_traits =
+        requires
+        {
+            typename AT::allocator_type;
+            typename AT::value_type;
+            typename AT::size_type;
+            typename AT::pointer;
+            typename AT::template rebind_alloc<T>;
+            requires is_same_v<T, typename AT::value_type>;
+        }
+        and
+        requires (typename AT::allocator_type a, typename AT::pointer p, typename AT::size_type n)
+        {
+            { AT::deallocate(a, p, n) };
+            { AT::allocate(a, n) } -> returns<typename AT::pointer>;
+            { static_cast<T*>(p) };
+            { *p   } -> returns<T&>;
+            { p[n] } -> returns<T&>;
+        };
 #endif
 
-//- Concepts pertaining to element layout in dense engines.
+template<typename A, typename T>
+concept valid_allocator = no_allocator<A> or valid_allocator_traits<allocator_traits<A>, T>;
+
+
+//- The following three concepts are used to validate the fourth template argument of a
+//  specialization of matrix_storage_engine, the layout.  This must be row-major or
+//  column-major.
 //
 template<typename EL>
 concept row_major = is_same_v<EL, engine_attribute::row_major>;
@@ -174,6 +169,7 @@ concept column_major = is_same_v<EL, engine_attribute::column_major>;
 
 template<typename EL>
 concept row_or_column_major = row_major<EL> or column_major<EL>;
+
 
 //- Concepts pertaining to engines.
 //
@@ -204,15 +200,256 @@ concept readable_matrix_engine =
 
 }   //- namespace detail
 
+
+template<class T, class X, class A, class L>    struct mse_traits;
+template<class T, class X, class A, class L>    struct mse_data;
+template<class T, class X, class A, class L>    struct mse_indexer;
+
+
+//--------------------------------------
+//- Single-element matrix engine (1 x 1)
+//
+template<class T, class L>
+struct mse_traits<T, extents<1, 1>, void, L>
+{
+};
+
+//---------------------------
+//- Row matrix engine (1 x C)
+//
+template<class T, ptrdiff_t C, class L>
+struct mse_traits<T, extents<1, C>, void, L>
+{
+    using shape_category     = engine_attribute::dense_row_matrix;
+    using interface_category = engine_attribute::initable;
+    using layout_category    = L;
+
+    using storage_type = mse_data<T, extents<1, C>, void, L>;
+    using indexer_type = mse_indexer<T, extents<1, C>, void, L>;
+};
+
+template<class T, ptrdiff_t C, class A, class L>
+struct mse_traits<T, extents<1, C>, A, L>
+{
+    using shape_category     = engine_attribute::dense_row_matrix;
+    using interface_category = engine_attribute::initable;
+    using layout_category    = L;
+
+    using storage_type = mse_data<T, extents<1, C>, A, L>;
+    using indexer_type = mse_indexer<T, extents<1, C>, A, L>;
+};
+
+template<class T, class A, class L>
+struct mse_traits<T, extents<1, dynamic_extent>, A, L>
+{
+    using shape_category     = engine_attribute::dense_row_matrix;
+    using interface_category = engine_attribute::row_resizable;
+    using layout_category    = L;
+
+    using storage_type = mse_data<T, extents<1, dynamic_extent>, A, L>;
+    using indexer_type = mse_indexer<T, extents<1, dynamic_extent>, A, L>;
+};
+
+//------------------------------
+//- Column matrix engine (R x 1)
+//
+template<class T, ptrdiff_t R, class L>
+struct mse_traits<T, extents<R, 1>, void, L>
+{
+    using shape_category     = engine_attribute::dense_column_matrix;
+    using interface_category = engine_attribute::initable;
+    using layout_category    = L;
+
+    using storage_type = mse_data<T, extents<R, 1>, void, L>;
+    using indexer_type = mse_indexer<T, extents<R, 1>, void, L>;
+};
+
+template<class T, ptrdiff_t R, class A, class L>
+struct mse_traits<T, extents<R, 1>, A, L>
+{
+    using shape_category     = engine_attribute::dense_column_matrix;
+    using interface_category = engine_attribute::initable;
+    using layout_category    = L;
+
+    using storage_type = mse_data<T, extents<R, 1>, A, L>;
+    using indexer_type = mse_indexer<T, extents<R, 1>, A, L>;
+};
+
+template<class T, class A, class L>
+struct mse_traits<T, extents<dynamic_extent, 1>, A, L>
+{
+    using shape_category     = engine_attribute::dense_column_matrix;
+    using interface_category = engine_attribute::column_resizable;
+    using layout_category    = L;
+
+    using storage_type = mse_data<T, extents<dynamic_extent, 1>, A, L>;
+    using indexer_type = mse_indexer<T, extents<dynamic_extent, 1>, A, L>;
+};
+
+//------------------------------
+//- General matrix engine (R, C)
+//
+template<class T, ptrdiff_t R, ptrdiff_t C, class L>
+struct mse_traits<T, extents<R, C>, void, L>
+{
+    using shape_category     = engine_attribute::dense_matrix;
+    using interface_category = engine_attribute::initable;
+    using layout_category    = L;
+
+    using storage_type = mse_data<T, extents<R, C>, void, L>;
+    using indexer_type = mse_indexer<T, extents<R, C>, void, L>;
+};
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
+struct mse_traits<T, extents<R, C>, A, L>
+{
+    using shape_category     = engine_attribute::dense_matrix;
+    using interface_category = engine_attribute::initable;
+    using layout_category    = L;
+
+    using storage_type = mse_data<T, extents<R, C>, A, L>;
+    using indexer_type = mse_indexer<T, extents<R, C>, A, L>;
+};
+
+template<class T, ptrdiff_t C, class A, class L>
+struct mse_traits<T, extents<dynamic_extent, C>, A, L>
+{
+    using shape_category     = engine_attribute::dense_matrix;
+    using interface_category = engine_attribute::row_resizable;
+    using layout_category    = L;
+
+    using storage_type = mse_data<T, extents<dynamic_extent, C>, A, L>;
+    using indexer_type = mse_indexer<T, extents<dynamic_extent, C>, A, L>;
+};
+
+template<class T, ptrdiff_t R, class A, class L>
+struct mse_traits<T, extents<R, dynamic_extent>, A, L>
+{
+    using shape_category     = engine_attribute::dense_matrix;
+    using interface_category = engine_attribute::column_resizable;
+    using layout_category    = L;
+
+    using storage_type = mse_data<T, extents<R, dynamic_extent>, A, L>;
+    using indexer_type = mse_indexer<T, extents<R, dynamic_extent>, A, L>;
+};
+
+template<class T, class A, class L>
+struct mse_traits<T, extents<dynamic_extent, dynamic_extent>, A, L>
+{
+    using shape_category     = engine_attribute::dense_matrix;
+    using interface_category = engine_attribute::resizable;
+    using layout_category    = L;
+
+    using storage_type = mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>;
+    using indexer_type = mse_indexer<T, extents<dynamic_extent, dynamic_extent>, A, L>;
+};
+
+
+
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class L>
+struct mse_data<T, extents<R, C>, void, L>
+{
+    array<T, R*C>   ma_elems;
+};
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
+struct mse_data<T, extents<R, C>, A, L>
+{};
+
+template<class T, ptrdiff_t R, class A, class L>
+struct mse_data<T, extents<R, dynamic_extent>, A, L>
+{};
+
+template<class T, ptrdiff_t C, class A, class L>
+struct mse_data<T, extents<dynamic_extent, C>, A, L>
+{};
+
+template<class T, class A, class L>
+struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
+{
+    using pointer = typename allocator_traits<A>::pointer;
+
+    pointer         mp_elems;
+    index_type      m_rows;
+    index_type      m_cols;
+    index_type      m_rowcap;
+    index_type      m_colcap;
+    allocator_type  m_alloc;
+};
+
+
+
+
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class A>
+struct mse_indexer<T, extents<R, C>, A, engine_attribute::row_major>
+{
+    using storage_type = mse_traits<T, extents<R, C>, A, engine_attribute::row_major>;
+
+    static inline constexpr T&     
+    offset(storage_type& s, ptrdiff_t i, ptrdiff_t r)
+    {
+        return s.ma_data[i*C + j];
+    }
+};
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class A>
+struct mse_indexer<T, extents<R, C>, A, engine_attribute::column_major>
+{
+    using storage_type = mse_traits<T, extents<R, C>, A, engine_attribute::column_major>;
+
+    static inline constexpr T&     
+    offset(storage_type& s, ptrdiff_t i, ptrdiff_t r)
+    {
+        return s.ma_data[i + j*R];
+    }
+};
+
+template<class T, ptrdiff_t R, class A>
+struct mse_indexer<T, extents<R, dynamic_extent>, A, engine_attribute::row_major>
+{};
+
+template<class T, ptrdiff_t R, class A>
+struct mse_indexer<T, extents<R, dynamic_extent>, A, engine_attribute::column_major>
+{};
+
+template<class T, ptrdiff_t C, class A>
+struct mse_indexer<T, extents<dynamic_extent, C>, A, engine_attribute::row_major>
+{};
+
+template<class T, ptrdiff_t C, class A>
+struct mse_indexer<T, extents<dynamic_extent, C>, A, engine_attribute::column_major>
+{};
+
+template<class T, class A>
+struct mse_indexer<T, extents<dynamic_extent, dynamic_extent>, A, engine_attribute::row_major>
+{};
+
+template<class T, class A>
+struct mse_indexer<T, extents<dynamic_extent, dynamic_extent>, A, engine_attribute::column_major>
+{};
+
+
+
+
+template<class T, class X, class A, class L>
+    requires
+        detail::valid_extents<X>        and
+        detail::valid_allocator<A, T>   and
+        detail::row_or_column_major<L>
+class matrix_storage_engine
+{
+};
+
 //- Matrix engines.
 //
+/*
 template<class T, class AT, class EL>
-    requires
-//        detail::valid_allocator<AT, T>  and
-        detail::row_or_column_major<EL>
 class matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, AT, EL>
 {
-    static_assert(requires {detail::valid_allocator<AT, T>;});
+    static_assert(detail::valid_allocator<AT, T>);
+    static_assert(detail::row_or_column_major<EL>);
 
   public:
     using engine_category  = engine_attribute::dense_matrix;
@@ -260,6 +497,8 @@ class matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, AT, EL>
     }
 
     matrix_storage_engine(index_type rows, index_type cols)
+        requires
+            detail::valid_allocator<AT, T>
     :   matrix_storage_engine()
     {
         alloc_new(rows, cols, rows, cols);
@@ -596,12 +835,14 @@ class matrix_storage_engine<T, extents<R, dynamic_extent>, AT, EL>
 
 template<class T, ptrdiff_t R, ptrdiff_t C, class AT, class EL>
     requires
+        detail::non_negative<R>         and
         detail::non_negative<C>         and
-//        detail::valid_allocator<AT, T>  and
+        detail::valid_allocator<AT, T>  and
         detail::row_or_column_major<EL>
 class matrix_storage_engine<T, extents<R, C>, AT, EL>
 {
-/*
+    static_assert(detail::valid_allocator<AT, T>);
+
   public:
     //- Types
     //
@@ -611,8 +852,8 @@ class matrix_storage_engine<T, extents<R, C>, AT, EL>
     using value_type       = T;
     using allocator_type   = AT;
     using element_type     = value_type;
-    using pointer          = element_type*;
-    using const_pointer    = element_type const*;
+    using pointer          = typename allocator_traits<AT>::pointer;
+    using const_pointer    = typename allocator_traits<AT>::const_pointer;
     using reference        = element_type&;
     using const_reference  = element_type const&;
     using difference_type  = ptrdiff_t;
@@ -624,11 +865,11 @@ class matrix_storage_engine<T, extents<R, C>, AT, EL>
     //- Construct/copy/destroy
     //
     ~matrix_storage_engine() noexcept = default;
+    constexpr matrix_storage_engine(matrix_storage_engine&&) noexcept = delete;
+    constexpr matrix_storage_engine&    operator =(matrix_storage_engine&&) noexcept = delete;
 
-    constexpr matrix_storage_engine(matrix_storage_engine&&) noexcept = default;
     constexpr matrix_storage_engine(matrix_storage_engine const&) = default;
 
-    constexpr matrix_storage_engine&    operator =(matrix_storage_engine&&) noexcept = default;
     constexpr matrix_storage_engine&    operator =(matrix_storage_engine const&) = default;
 
     constexpr matrix_storage_engine()
@@ -793,6 +1034,8 @@ class matrix_storage_engine<T, extents<R, C>, AT, EL>
 
   private:
     array<T, R*C>   ma_elems;
+    pointer         mp_elems;
+
 
     template<class ET2>
     constexpr void  assign(ET2 const& rhs)
@@ -807,7 +1050,6 @@ class matrix_storage_engine<T, extents<R, C>, AT, EL>
         detail::check_source_init_list(rhs, R, C);
         detail::assign_from_matrix_initlist(*this, rhs);
     }
-    */
 };
 
 template<class T, ptrdiff_t R, ptrdiff_t C, class EL>
@@ -1071,6 +1313,7 @@ template<class T, ptrdiff_t R>
         detail::non_negative<R>
 class matrix_storage_engine<T, extents<R, 1>, void, engine_attribute::column_major>
 {};
+*/
 
 template<class OT,
          class T1, ptrdiff_t R1, ptrdiff_t C1, class AT1, class EL1,

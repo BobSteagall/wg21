@@ -367,6 +367,7 @@ TEST(FFF, XXX)
     */
 }
 
+
 TEST(GGG, HHH)
 {
     STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<float>, STD_LA::engine_attribute::row_major>       m1;
@@ -377,5 +378,15 @@ TEST(GGG, HHH)
     STD_LA::matrix_storage_engine<float, extents<3, 3>, void, STD_LA::engine_attribute::row_major>      m21;
     STD_LA::matrix_storage_engine<float, extents<4, 4>, void, STD_LA::engine_attribute::column_major>   m22;
 
+//    STD_LA::matrix_storage_engine<float, extents<3, 3>, std::allocator<float>, STD_LA::engine_attribute::row_major>      m31(3, 4);
+    STD_LA::matrix_storage_engine<float, extents<4, 4>, std::allocator<float>, STD_LA::engine_attribute::column_major>   m32;
+
+    static_assert(STD_LA::detail::valid_extents<extents<10>>);
+    static_assert(STD_LA::detail::valid_extents<extents<2,2>>);
+    static_assert(!STD_LA::detail::valid_extents<extents<>>);
+    static_assert(!STD_LA::detail::valid_extents<extents<2,2,2>>);
+    static_assert(!STD_LA::detail::valid_extents<extents<-5>>);
+    static_assert(!STD_LA::detail::valid_extents<extents<-5,0>>);
+    static_assert(!STD_LA::detail::valid_extents<int>);
 }
 #endif
