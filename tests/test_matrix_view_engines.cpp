@@ -368,6 +368,9 @@ TEST(FFF, XXX)
 }
 
 
+template<class T, int R, int C>
+using fs_test_engine = STD_LA::matrix_storage_engine<T, extents<R,C>, void, STD_LA::engine_attribute::row_major>;
+
 TEST(GGG, HHH)
 {
     STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<float>, STD_LA::engine_attribute::row_major>       m1(2, 2, 4, 4);
@@ -380,6 +383,11 @@ TEST(GGG, HHH)
 
 //    STD_LA::matrix_storage_engine<float, extents<3, 3>, std::allocator<float>, STD_LA::engine_attribute::row_major>      m31(3, 4);
     STD_LA::matrix_storage_engine<float, extents<4, 4>, std::allocator<float>, STD_LA::engine_attribute::column_major>   m32;
+
+
+    static_assert(STD_LA::detail::is_constexpr([]{fs_test_engine<float,2,2>().rows();}));
+
+    m2.resize(10, 15, 20, 20);
 
     static_assert(STD_LA::detail::valid_extents<extents<10>>);
     static_assert(STD_LA::detail::valid_extents<extents<2,2>>);

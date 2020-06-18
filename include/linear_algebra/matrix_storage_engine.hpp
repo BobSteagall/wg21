@@ -757,14 +757,35 @@ class matrix_storage_engine
         }
     }
 
-    inline constexpr void    swap_columns(index_type c1, index_type c2) noexcept;
-    inline constexpr void    swap_rows(index_type r1, index_type r2) noexcept;
+    inline constexpr void
+    swap_columns(index_type c1, index_type c2) noexcept
+    {
+        if (c1 != c2)
+        {
+            for (index_type i = 0;  i < m_data.m_rows;  ++i)
+            {
+                detail::la_swap((*this)(i, c1), (*this)(i, c2));
+            }
+        }
+    }
+
+    inline constexpr void
+    swap_rows(index_type r1, index_type r2) noexcept
+    {
+        if (r1 != r2)
+        {
+            for (index_type j = 0;  j < m_data.m_cols;  ++j)
+            {
+                detail::la_swap((*this)(r1, j), (*this)(r2, j));
+            }
+        }
+    }
 
   private:
     storage_type    m_data;
 
     static constexpr void
-    assign(this_type& dst, this_type const& src, index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi)
+    move_elements(this_type& dst, this_type const& src, index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi)
     {
         if constexpr (detail::row_major<element_layout>)
         {
@@ -772,7 +793,7 @@ class matrix_storage_engine
             {
                 for (index_type j = j_lo;  j < j_hi;  ++j)
                 {
-                    dst(i, j) = src(i, j);
+                    dst(i, j) = std::move(src(i, j));
                 }
             }
         }
@@ -782,7 +803,7 @@ class matrix_storage_engine
             {
                 for (index_type i = i_lo;  i < i_hi;  ++i)
                 {
-                    dst(i, j) = src(i, j);
+                    dst(i, j) = std::move(src(i, j));
                 }
             }
         }
@@ -823,21 +844,12 @@ class matrix_storage_engine
     void
     reshape_rows(index_type rows, index_type rowcap)
         requires detail::resizable_rows<engine_interface>
-    {}
-
-    void
-    reshape(index_type rows, index_type cols, index_type rowcap, index_type colcap)
-        requires detail::resizable_columns_and_rows<engine_interface>
     {
-        detail::check_sizes(rows, cols);
-        detail::check_capacities(rowcap, colcap);
-
-        if (rows   >  m_data.m_rowcap  ||  cols   >  m_data.m_colcap  ||
-            rowcap != m_data.m_rowcap  ||  colcap != m_data.m_colcap)
+        if (rows > m_data.m_rowcap  ||  rowcap != m_data.m_rowcap)
         {
-            this_type   tmp(rows, cols, rowcap, colcap);
+            this_type   tmp(rows, m_data.m_cols, rowcap, m_data.m_colcap);
             index_type  dst_rows = min(rows, m_data.m_rows);
-            index_type  dst_cols = min(cols, m_data.m_cols);
+            index_type  dst_cols = m_data.m_cols;
 
             assign(tmp, *this, 0, 0, dst_rows, dst_cols);
             detail::la_swap(m_data, tmp.m_data);
@@ -848,12 +860,51 @@ class matrix_storage_engine
             {
                 zero(rows, 0, m_data.m_rows, m_data.m_cols);
             }
+            m_data.m_rows = rows;
+        }
+    }
 
+    void
+    reshape(index_type rows, index_type cols, index_type rowcap, index_type colcap)
+        requires detail::resizable_columns_and_rows<engine_interface>
+    {
+        detail::check_sizes(rows, cols);
+        detail::check_capacities(rowcap, colcap);
+
+        //- Only reallocate new storage if we have to.
+        //
+        if (rows   >  m_data.m_rowcap  ||  cols   >  m_data.m_colcap  ||
+            rowcap != m_data.m_rowcap  ||  colcap != m_data.m_colcap)
+        {
+            //- Prepare a new, temporary engine that will receive elements from this one.
+            //
+            this_type   tmp;
+
+            tmp.m_data.m_elems.resize(rowcap*colcap);
+            tmp.m_data.m_rows   = rows;
+            tmp.m_data.m_cols   = cols;
+            tmp.m_data.m_rowcap = rowcap;
+            tmp.m_data.m_colcap = colcap;
+
+            //- Move the appropriate subset of elements from this engine into the temporary one.
+            //
+            index_type  dst_rows = min(rows, m_data.m_rows);
+            index_type  dst_cols = min(cols, m_data.m_cols);
+
+            move_elements(tmp, *this, 0, 0, dst_rows, dst_cols);
+
+            detail::la_swap(m_data, tmp.m_data);
+        }
+        else
+        {
+            if (rows < m_data.m_rows)
+            {
+                zero(*this, rows, 0, m_data.m_rows, m_data.m_cols);
+            }
             if (cols < m_data.m_cols)
             {
-                zero(0, cols, min(rows, m_data.m_rows), m_data.m_cols);
+                zero(*this, 0, cols, min(rows, m_data.m_rows), m_data.m_cols);
             }
-
             m_data.m_rows = rows;
             m_data.m_cols = cols;
         }
