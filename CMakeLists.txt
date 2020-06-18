@@ -31,7 +31,7 @@ cmake_dependent_option(LA_BUILD_DEB "Create a DEB" ON "LA_BUILD_PACKAGE" OFF)
 cmake_dependent_option(LA_BUILD_RPM "Create a RPM" ON "LA_BUILD_PACKAGE" OFF)
 
 option(MDSPAN_ENABLE_CONCEPTS "" OFF)
-FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git)
+FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git GIT_TAG stable)
 FetchContent_MakeAvailable(mdspan)
 
 set(CMAKE_CXX_STANDARD 20)
