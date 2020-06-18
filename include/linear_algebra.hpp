@@ -43,12 +43,13 @@
 
 #include <cstdint>
 
-//#include <array>
+#include <array>
 #include <complex>
 #include <initializer_list>
 #include <memory>
 #include <tuple>
 #include <type_traits>
+#include <vector>
 
 //- Disable some unnecessary compiler warnings coming from mdspan.
 //

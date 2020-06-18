@@ -370,7 +370,7 @@ TEST(FFF, XXX)
 
 TEST(GGG, HHH)
 {
-    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<float>, STD_LA::engine_attribute::row_major>       m1;
+    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<float>, STD_LA::engine_attribute::row_major>       m1(2, 2, 4, 4);
     STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<float>, STD_LA::engine_attribute::column_major>    m2;
 //    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<float>, STD_LA::engine_attribute::general_layout>  m3;
 //    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<double>, STD_LA::engine_attribute::column_major>   m4;
