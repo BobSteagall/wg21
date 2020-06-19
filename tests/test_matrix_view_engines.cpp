@@ -387,7 +387,7 @@ TEST(GGG, HHH)
 
     static_assert(STD_LA::detail::is_constexpr([]{fs_test_engine<float,2,2>().rows();}));
 
-    m2.resize(10, 15, 20, 20);
+    m1.resize(4, 4, 20, 20);
 
     static_assert(STD_LA::detail::valid_extents<extents<10>>);
     static_assert(STD_LA::detail::valid_extents<extents<2,2>>);

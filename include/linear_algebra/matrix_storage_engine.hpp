@@ -440,7 +440,6 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
     ,   m_cols(0)
     ,   m_colcap(0)
     {}
-
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
@@ -472,7 +471,6 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
     ,   m_rows(0)
     ,   m_rowcap(0)
     {}
-
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
@@ -505,20 +503,6 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
     ,   m_rowcap(0)
     ,   m_colcap(0)
     {}
-
-    inline constexpr
-    mse_data(ptrdiff_t rows, ptrdiff_t cols, ptrdiff_t rowcap, ptrdiff_t colcap)
-    :   m_elems()
-    ,   m_rows(rows)
-    ,   m_cols(cols)
-    ,   m_rowcap(max(rows, rowcap))
-    ,   m_colcap(max(cols, colcap))
-    {
-        detail::check_sizes(rows, cols);
-        detail::check_capacities(rowcap, colcap);
-        m_elems.resize(m_rowcap*m_colcap, T());
-    }
-
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
@@ -543,7 +527,7 @@ class matrix_storage_engine
   public:
     using engine_category  = typename engine_traits::engine_category;
     using engine_interface = typename engine_traits::engine_interface;
-    using element_layout   = L;
+    using element_layout   = typename engine_traits::element_layout;
     using value_type       = T;
     using allocator_type   = A;
     using element_type     = value_type;
@@ -578,8 +562,10 @@ class matrix_storage_engine
     inline constexpr
     matrix_storage_engine(index_type rows, index_type cols, index_type rowcap, index_type colcap)
         requires detail::resizable_columns_and_rows<engine_interface>
-    :   m_data(rows, cols, rowcap, colcap)
-    {}
+    :   m_data()
+    {
+        reshape(rows, cols, rowcap, colcap);
+    }
 
     //- Assignment.
     //
@@ -839,26 +825,66 @@ class matrix_storage_engine
     void
     reshape_columns(index_type cols, index_type colcap)
         requires detail::resizable_columns<engine_interface>
-    {}
+    {
+        //- Only reallocate new storage if we have to.
+        //
+        if (cols > m_data.m_colcap  ||  colcap != m_data.m_colcap)
+        {
+            //- Prepare a temporary engine to receive elements from this one.
+            //
+            this_type   tmp;
+
+            tmp.m_data.m_elems.resize(m_data.m_rowcap*colcap);
+            tmp.m_data.m_cols   = cols;
+            tmp.m_data.m_colcap = colcap;
+
+            //- Move the appropriate subset of elements into the temporary engine, then swap.
+            //
+            index_type  dst_rows = m_data.m_rows;
+            index_type  dst_cols = min(cols, m_data.m_cols);
+
+            move_elements(tmp, *this, 0, 0, dst_rows, dst_cols);
+            detail::la_swap(m_data, tmp.m_data);
+        }
+        else
+        {
+            if (cols < m_data.m_cols)
+            {
+                zero(*this, 0, cols, m_data.m_rows, min(cols, m_data.m_cols));
+            }
+            m_data.m_cols = cols;
+        }
+    }
 
     void
     reshape_rows(index_type rows, index_type rowcap)
         requires detail::resizable_rows<engine_interface>
     {
+        //- Only reallocate new storage if we have to.
+        //
         if (rows > m_data.m_rowcap  ||  rowcap != m_data.m_rowcap)
         {
-            this_type   tmp(rows, m_data.m_cols, rowcap, m_data.m_colcap);
+            //- Prepare a temporary engine to receive elements from this one.
+            //
+            this_type   tmp;
+
+            tmp.m_data.m_elems.resize(rowcap*m_data.m_colcap);
+            tmp.m_data.m_rows   = rows;
+            tmp.m_data.m_rowcap = rowcap;
+
+            //- Move the appropriate subset of elements into the temporary engine, then swap.
+            //
             index_type  dst_rows = min(rows, m_data.m_rows);
             index_type  dst_cols = m_data.m_cols;
 
-            assign(tmp, *this, 0, 0, dst_rows, dst_cols);
+            move_elements(tmp, *this, 0, 0, dst_rows, dst_cols);
             detail::la_swap(m_data, tmp.m_data);
         }
         else
         {
             if (rows < m_data.m_rows)
             {
-                zero(rows, 0, m_data.m_rows, m_data.m_cols);
+                zero(*this, rows, 0, m_data.m_rows, m_data.m_cols);
             }
             m_data.m_rows = rows;
         }
@@ -876,7 +902,7 @@ class matrix_storage_engine
         if (rows   >  m_data.m_rowcap  ||  cols   >  m_data.m_colcap  ||
             rowcap != m_data.m_rowcap  ||  colcap != m_data.m_colcap)
         {
-            //- Prepare a new, temporary engine that will receive elements from this one.
+            //- Prepare a temporary engine to receive elements from this one.
             //
             this_type   tmp;
 
@@ -886,13 +912,12 @@ class matrix_storage_engine
             tmp.m_data.m_rowcap = rowcap;
             tmp.m_data.m_colcap = colcap;
 
-            //- Move the appropriate subset of elements from this engine into the temporary one.
+            //- Move the appropriate subset of elements into the temporary engine, then swap.
             //
             index_type  dst_rows = min(rows, m_data.m_rows);
             index_type  dst_cols = min(cols, m_data.m_cols);
 
             move_elements(tmp, *this, 0, 0, dst_rows, dst_cols);
-
             detail::la_swap(m_data, tmp.m_data);
         }
         else
