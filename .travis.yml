@@ -35,9 +35,9 @@ matrix:
       #  env: CONAN_CLANG_VERSIONS=9 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/clang9
       - <<: *linux
         env: CONAN_CLANG_VERSIONS=10 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/clang10
-      - <<: *osx
-        osx_image: xcode11.4
-        env: CONAN_APPLE_CLANG_VERSIONS=11.0
+      #- <<: *osx
+      #  osx_image: xcode11.4
+      #  env: CONAN_APPLE_CLANG_VERSIONS=11.0
 
 install:
   - ./.travis/install.sh
