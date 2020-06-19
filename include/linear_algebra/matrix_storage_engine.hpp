@@ -246,6 +246,33 @@ check_capacities(ptrdiff_t rowcap, ptrdiff_t colcap)
 template<class T, class X, class A, class L>    struct mse_traits;
 
 
+//---------------------------
+//- Vector engine (1 x N)
+//
+template<class T, ptrdiff_t N, class L>
+struct mse_traits<T, extents<N>, void, L>
+{
+    using engine_category  = engine_attribute::dense_vector;
+    using engine_interface = engine_attribute::initable;
+    using element_layout   = engine_attribute::general_layout;
+};
+
+template<class T, ptrdiff_t N, class A, class L>
+struct mse_traits<T, extents<N>, A, L>
+{
+    using engine_category  = engine_attribute::dense_vector;
+    using engine_interface = engine_attribute::initable;
+    using element_layout   = engine_attribute::general_layout;
+};
+
+template<class T, class A, class L>
+struct mse_traits<T, extents<dynamic_extent>, A, L>
+{
+    using engine_category  = engine_attribute::dense_vector;
+    using engine_interface = engine_attribute::resizable;
+    using element_layout   = engine_attribute::general_layout;
+};
+
 //--------------------------------------
 //- Single-element matrix engine (1 x 1)
 //
@@ -365,6 +392,77 @@ struct mse_traits<T, extents<dynamic_extent, dynamic_extent>, A, L>
 template<class T, class X, class A, class L>    struct mse_data;
 
 
+//---------------------------------------------------------------------
+//- Fixed elements.  Elements contained as member data in a std::array.
+//
+template<class T, ptrdiff_t N, class L>
+struct mse_data<T, extents<N>, void, L>
+{
+    using array_type = std::array<T, N>;
+
+    static constexpr ptrdiff_t  m_size = N;
+    static constexpr ptrdiff_t  m_cap  = N;
+
+    array_type  m_elems;
+
+    ~mse_data() = default;
+    constexpr mse_data() = default;
+    constexpr mse_data(mse_data&&) noexcept = default;
+    constexpr mse_data(mse_data const&) = default;
+    constexpr mse_data&     operator =(mse_data&&) noexcept = default;
+    constexpr mse_data&     operator =(mse_data const&) = default;
+};
+
+
+//----------------------------------------------------------------------
+//- Fixed elements.  Elements contained as member data in a std::vector.
+//
+template<class T, ptrdiff_t N, class A, class L>
+struct mse_data<T, extents<N>, A, L>
+{
+    using array_type = std::vector<T, A>;
+
+    static constexpr ptrdiff_t  m_size = N;
+    static constexpr ptrdiff_t  m_cap  = N;
+
+    array_type  m_elems;
+
+    ~mse_data() = default;
+    inline constexpr mse_data()
+    :   m_elems(N)
+    {}
+    constexpr mse_data(mse_data&&) noexcept = default;
+    constexpr mse_data(mse_data const&) = default;
+    constexpr mse_data&     operator =(mse_data&&) noexcept = default;
+    constexpr mse_data&     operator =(mse_data const&) = default;
+};
+
+
+//------------------------------------------------------------------------
+//- Dynamic elements.  Elements contained as member data in a std::vector.
+//
+template<class T, class A, class L>
+struct mse_data<T, extents<dynamic_extent>, A, L>
+{
+    using array_type = std::vector<T, A>;
+
+    array_type  m_elems;
+    ptrdiff_t   m_size;
+    ptrdiff_t   m_cap;
+
+    ~mse_data() = default;
+    inline constexpr mse_data()
+    :   m_elems()
+    ,   m_size(0)
+    ,   m_cap(0)
+    {}
+    constexpr mse_data(mse_data&&) noexcept = default;
+    constexpr mse_data(mse_data const&) = default;
+    constexpr mse_data&     operator =(mse_data&&) noexcept = default;
+    constexpr mse_data&     operator =(mse_data const&) = default;
+};
+
+
 //---------------------------------------------------------------------------------
 //- Fixed rows / fixed columns.  Elements contained as member data in a std::array.
 //
@@ -407,7 +505,10 @@ struct mse_data<T, extents<R, C>, A, L>
     //- Construct/copy/destroy.
     //
     ~mse_data() = default;
-    constexpr mse_data() = default;
+
+    inline constexpr mse_data()
+    :   m_elems(R*C)
+    {}
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
