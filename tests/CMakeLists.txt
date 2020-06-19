@@ -11,6 +11,16 @@ if(NOT gtest_POPULATED)
     add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
 endif()
 
+target_compile_options(gtest
+    PRIVATE
+        $<$<OR:$<CXX_COMPILER_ID:Clang>>:-stdlib=libc++>
+)
+
+target_compile_options(gtest_main
+    PRIVATE
+        $<$<OR:$<CXX_COMPILER_ID:Clang>>:-stdlib=libc++>
+)
+
 if(LA_BUILD_USING_PCH)
     target_precompile_headers(la_test
         PRIVATE
@@ -51,10 +61,15 @@ target_link_libraries(la_test
 target_compile_options(la_test
     PRIVATE
         $<$<OR:$<CXX_COMPILER_ID:GNU>>:-fconcepts -Wall -pedantic -Wextra  -Wno-unused-function -Wno-unused-variable -W -Wno-unused-but-set-variable -Wno-unused-local-typedefs -fmax-errors=10>
-        $<$<OR:$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function -Wno-unused-local-typedefs>
+        $<$<OR:$<CXX_COMPILER_ID:Clang>>:-stdlib=libc++ -Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function -Wno-unused-local-typedefs>
         $<$<OR:$<CXX_COMPILER_ID:MSVC>>:/permissive->
+        $<$<OR:$<CXX_COMPILER_ID:AppleClang>>:-Wall -pedantic -Wextra -Wno-unused-parameter -Wno-unused-function -Wno-unused-local-typedefs>
 )
 
+target_link_options(la_test
+    PRIVATE
+        $<$<OR:$<CXX_COMPILER_ID:Clang>>:-stdlib=libc++>
+)
 
 if (LA_ENABLE_SANITIZERS)
     set(SANITIZER_FLAGS_ASAN "-fsanitize=address -fno-omit-frame-pointer")
