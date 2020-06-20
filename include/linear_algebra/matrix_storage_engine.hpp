@@ -14,7 +14,7 @@ namespace STD_LA {
 
 struct engine_attribute
 {
-    //- Tags describing an engine's representational category.
+    //- Tags describing a storage engine's representational category.
     //
     struct dense_matrix {};
     struct dense_column_matrix {};
@@ -36,21 +36,20 @@ struct engine_attribute
     struct general_layout {};
     struct row_major : public layout_right {};
     struct column_major : public layout_left {};
-};
 
-struct view_function
-{
-    struct negation {};
-    struct hermitian {};
-    struct transpose {};
-    struct subset {};
-    struct row {};
-    struct column {};
-
+    //- Tags describing a view engine's purpose.
+    //
+    struct negation_view {};
+    struct hermitian_view {};
+    struct transpose_view {};
+    struct subset_view {};
+    struct row_view {};
+    struct column_view {};
 };
 
 namespace detail {
-//- Some simple utility concepts, to be re-evaluated later.
+//- These are some simple utility concepts, used by the other concepts below, and perhaps
+//  to be re-evaluated later.
 //
 template<typename T, typename U>
 concept same_types = is_same_v<T, U>;
@@ -63,6 +62,25 @@ concept convertible_element = is_convertible_v<T, U>;
 
 template<ptrdiff_t N>
 concept non_negative = requires { N > 0; };
+
+
+template<typename EA>
+concept readable_interface = same_types<EA, engine_attribute::readable>;
+
+template<typename EA>
+concept writable_interface = same_types<EA, engine_attribute::writable>;
+
+template<typename EA>
+concept initable_interface = same_types<EA, engine_attribute::initable>;
+
+template<typename EA>
+concept column_resizable_interface = same_types<EA, engine_attribute::column_resizable>;
+
+template<typename EA>
+concept row_resizable_interface = same_types<EA, engine_attribute::row_resizable>;
+
+template<typename EA>
+concept resizable_interface = same_types<EA, engine_attribute::resizable>;
 
 
 //- This concept, and its supporting traits type, is used to validate the second template
@@ -90,7 +108,7 @@ concept valid_extents = is_valid_matrix_extents<X>::value;
 
 //- The following three concepts are used to help validate the third template argument of
 //  a specialization of matrix_storage_engine, the allocator type.  It must be void, or it
-//  must be possible to instatiate a specialization of allocator_traits with it that meets
+//  must be possible to instantiate a specialization of allocator_traits with it that meets
 //  certain requirements.
 //
 template<typename T>
@@ -161,6 +179,9 @@ concept valid_allocator = no_allocator<A> or valid_allocator_traits<allocator_tr
 //  specialization of matrix_storage_engine, the layout.  This must be row-major or
 //  column-major.
 //
+template<typename EL>
+concept general_layout = is_same_v<EL, engine_attribute::general_layout>;
+
 template<typename EL>
 concept row_major = is_same_v<EL, engine_attribute::row_major>;
 
@@ -643,22 +664,22 @@ class matrix_storage_engine
   public:
     inline ~matrix_storage_engine() = default;
 
-    //- Construction.
+    //- Construct / assign.
     //
+    constexpr matrix_storage_engine() = default;
+    constexpr matrix_storage_engine(matrix_storage_engine&& rhs) noexcept = default;
+    constexpr matrix_storage_engine(matrix_storage_engine const& rhs) = default;
+
+    constexpr matrix_storage_engine&    operator =(matrix_storage_engine&& rhs) noexcept = default;
+    constexpr matrix_storage_engine&    operator =(matrix_storage_engine const& rhs) = default;
+
     inline constexpr
-    matrix_storage_engine()
+    matrix_storage_engine(index_type rows, index_type cols)
+        requires detail::resizable_columns_and_rows<engine_interface>
     :   m_data()
-    {}
-
-    inline constexpr
-    matrix_storage_engine(matrix_storage_engine&& rhs) noexcept
-    :   m_data(std::move(rhs))
-    {}
-
-    inline constexpr
-    matrix_storage_engine(matrix_storage_engine const& rhs)
-    :   m_data(rhs)
-    {}
+    {
+        reshape(rows, cols, rows, cols);
+    }
 
     inline constexpr
     matrix_storage_engine(index_type rows, index_type cols, index_type rowcap, index_type colcap)
@@ -668,20 +689,32 @@ class matrix_storage_engine
         reshape(rows, cols, rowcap, colcap);
     }
 
-    //- Assignment.
-    //
-    inline constexpr matrix_storage_engine&
-    operator =(matrix_storage_engine&& rhs) noexcept
+    template<class ET2> inline constexpr
+    matrix_storage_engine(ET2 const& rhs)
+    :   m_data()
     {
-        m_data = std::move(rhs.m_data);
-        return *this;
+        assign(rhs);
     }
 
-    inline constexpr matrix_storage_engine&
-    operator =(matrix_storage_engine const& rhs)
+    template<class T2> inline constexpr
+    matrix_storage_engine(initializer_list<initializer_list<T2>> rhs)
+    :   m_data()
     {
-        m_data = rhs.m_data;
-        return *this;
+        assign(rhs);
+    }
+
+    template<class ET2>
+    inline constexpr matrix_storage_engine&
+    operator =(ET2 const& rhs)
+    {
+        assign(rhs);
+    }
+
+    template<class T2>
+    inline constexpr matrix_storage_engine&
+    operator =(initializer_list<initializer_list<T2>> rhs)
+    {
+        assign(rhs);
     }
 
     //- Size and capacity reporting.
@@ -732,17 +765,44 @@ class matrix_storage_engine
     }
 
     inline void
-    resize_columns(index_type cols, index_type colcap)
-        requires detail::resizable_columns<engine_interface>
-    {
-        reshape_columns(cols, colcap);
-    }
-
-    inline void
     reserve_columns(index_type colcap)
         requires detail::resizable_columns<engine_interface>
     {
         reshape_columns(m_data.m_cols, colcap);
+    }
+
+    void
+    reshape_columns(index_type cols, index_type colcap)
+        requires detail::resizable_columns<engine_interface>
+    {
+        //- Only reallocate new storage if we have to.
+        //
+        if (cols > m_data.m_colcap  ||  colcap != m_data.m_colcap)
+        {
+            //- Prepare a temporary engine to receive elements from this one.
+            //
+            this_type   tmp;
+
+            tmp.m_data.m_elems.resize(m_data.m_rowcap*colcap);
+            tmp.m_data.m_cols   = cols;
+            tmp.m_data.m_colcap = colcap;
+
+            //- Move the appropriate subset of elements into the temporary engine, then swap.
+            //
+            index_type  dst_rows = m_data.m_rows;
+            index_type  dst_cols = min(cols, m_data.m_cols);
+
+            move_elements(tmp, *this, 0, 0, dst_rows, dst_cols);
+            detail::la_swap(m_data, tmp.m_data);
+        }
+        else
+        {
+            if (cols < m_data.m_cols)
+            {
+                zero(*this, 0, cols, m_data.m_rows, min(cols, m_data.m_cols));
+            }
+            m_data.m_cols = cols;
+        }
     }
 
     //- Setting row size and capacity.
@@ -755,17 +815,44 @@ class matrix_storage_engine
     }
 
     inline void
-    resize_rows(index_type rows, index_type rowcap)
-        requires detail::resizable_rows<engine_interface>
-    {
-        reshape_rows(rows, rowcap);
-    }
-
-    inline void
     reserve_rows(index_type rowcap)
         requires detail::resizable_rows<engine_interface>
     {
         reshape_rows(m_data.m_rows, rowcap);
+    }
+
+    void
+    reshape_rows(index_type rows, index_type rowcap)
+        requires detail::resizable_rows<engine_interface>
+    {
+        //- Only reallocate new storage if we have to.
+        //
+        if (rows > m_data.m_rowcap  ||  rowcap != m_data.m_rowcap)
+        {
+            //- Prepare a temporary engine to receive elements from this one.
+            //
+            this_type   tmp;
+
+            tmp.m_data.m_elems.resize(rowcap*m_data.m_colcap);
+            tmp.m_data.m_rows   = rows;
+            tmp.m_data.m_rowcap = rowcap;
+
+            //- Move the appropriate subset of elements into the temporary engine, then swap.
+            //
+            index_type  dst_rows = min(rows, m_data.m_rows);
+            index_type  dst_cols = m_data.m_cols;
+
+            move_elements(tmp, *this, 0, 0, dst_rows, dst_cols);
+            detail::la_swap(m_data, tmp.m_data);
+        }
+        else
+        {
+            if (rows < m_data.m_rows)
+            {
+                zero(*this, rows, 0, m_data.m_rows, m_data.m_cols);
+            }
+            m_data.m_rows = rows;
+        }
     }
 
     //- Setting overall size and capacity.
@@ -778,17 +865,55 @@ class matrix_storage_engine
     }
 
     inline void
-    resize(index_type rows, index_type cols, index_type rowcap, index_type colcap)
-        requires detail::resizable_columns_and_rows<engine_interface>
-    {
-        reshape(rows, cols, rowcap, colcap);
-    }
-
-    inline void
     reserve(index_type rowcap, index_type colcap)
         requires detail::resizable_columns_and_rows<engine_interface>
     {
         reshape(m_data.m_rows, m_data.m_cols, rowcap, colcap);
+    }
+
+    void
+    reshape(index_type rows, index_type cols, index_type rowcap, index_type colcap)
+        requires detail::resizable_columns_and_rows<engine_interface>
+    {
+        detail::check_sizes(rows, cols);
+        detail::check_capacities(rowcap, colcap);
+
+        //- Only reallocate new storage if we have to.
+        //
+        if (rows   >  m_data.m_rowcap  ||  cols   >  m_data.m_colcap  ||
+            rowcap != m_data.m_rowcap  ||  colcap != m_data.m_colcap)
+        {
+            //- Prepare a temporary engine to receive elements from this one.
+            //
+            this_type   tmp;
+
+            tmp.m_data.m_elems.resize(rowcap*colcap);
+            tmp.m_data.m_rows   = rows;
+            tmp.m_data.m_cols   = cols;
+            tmp.m_data.m_rowcap = rowcap;
+            tmp.m_data.m_colcap = colcap;
+
+            //- Move the appropriate subset of elements into the temporary engine, then swap.
+            //
+            index_type  dst_rows = min(rows, m_data.m_rows);
+            index_type  dst_cols = min(cols, m_data.m_cols);
+
+            move_elements(tmp, *this, 0, 0, dst_rows, dst_cols);
+            detail::la_swap(m_data, tmp.m_data);
+        }
+        else
+        {
+            if (rows < m_data.m_rows)
+            {
+                zero(*this, rows, 0, m_data.m_rows, m_data.m_cols);
+            }
+            if (cols < m_data.m_cols)
+            {
+                zero(*this, 0, cols, min(rows, m_data.m_rows), m_data.m_cols);
+            }
+            m_data.m_rows = rows;
+            m_data.m_cols = cols;
+        }
     }
 
     //- Element access
@@ -871,6 +996,11 @@ class matrix_storage_engine
   private:
     storage_type    m_data;
 
+    template<class ET2>
+    constexpr void  assign(ET2 const& rhs);
+    template<class T2>
+    constexpr void  assign(initializer_list<initializer_list<T2>> rhs);
+
     static constexpr void
     move_elements(this_type& dst, this_type const& src, index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi)
     {
@@ -923,118 +1053,6 @@ class matrix_storage_engine
         }
     }
 
-    void
-    reshape_columns(index_type cols, index_type colcap)
-        requires detail::resizable_columns<engine_interface>
-    {
-        //- Only reallocate new storage if we have to.
-        //
-        if (cols > m_data.m_colcap  ||  colcap != m_data.m_colcap)
-        {
-            //- Prepare a temporary engine to receive elements from this one.
-            //
-            this_type   tmp;
-
-            tmp.m_data.m_elems.resize(m_data.m_rowcap*colcap);
-            tmp.m_data.m_cols   = cols;
-            tmp.m_data.m_colcap = colcap;
-
-            //- Move the appropriate subset of elements into the temporary engine, then swap.
-            //
-            index_type  dst_rows = m_data.m_rows;
-            index_type  dst_cols = min(cols, m_data.m_cols);
-
-            move_elements(tmp, *this, 0, 0, dst_rows, dst_cols);
-            detail::la_swap(m_data, tmp.m_data);
-        }
-        else
-        {
-            if (cols < m_data.m_cols)
-            {
-                zero(*this, 0, cols, m_data.m_rows, min(cols, m_data.m_cols));
-            }
-            m_data.m_cols = cols;
-        }
-    }
-
-    void
-    reshape_rows(index_type rows, index_type rowcap)
-        requires detail::resizable_rows<engine_interface>
-    {
-        //- Only reallocate new storage if we have to.
-        //
-        if (rows > m_data.m_rowcap  ||  rowcap != m_data.m_rowcap)
-        {
-            //- Prepare a temporary engine to receive elements from this one.
-            //
-            this_type   tmp;
-
-            tmp.m_data.m_elems.resize(rowcap*m_data.m_colcap);
-            tmp.m_data.m_rows   = rows;
-            tmp.m_data.m_rowcap = rowcap;
-
-            //- Move the appropriate subset of elements into the temporary engine, then swap.
-            //
-            index_type  dst_rows = min(rows, m_data.m_rows);
-            index_type  dst_cols = m_data.m_cols;
-
-            move_elements(tmp, *this, 0, 0, dst_rows, dst_cols);
-            detail::la_swap(m_data, tmp.m_data);
-        }
-        else
-        {
-            if (rows < m_data.m_rows)
-            {
-                zero(*this, rows, 0, m_data.m_rows, m_data.m_cols);
-            }
-            m_data.m_rows = rows;
-        }
-    }
-
-    void
-    reshape(index_type rows, index_type cols, index_type rowcap, index_type colcap)
-        requires detail::resizable_columns_and_rows<engine_interface>
-    {
-        detail::check_sizes(rows, cols);
-        detail::check_capacities(rowcap, colcap);
-
-        //- Only reallocate new storage if we have to.
-        //
-        if (rows   >  m_data.m_rowcap  ||  cols   >  m_data.m_colcap  ||
-            rowcap != m_data.m_rowcap  ||  colcap != m_data.m_colcap)
-        {
-            //- Prepare a temporary engine to receive elements from this one.
-            //
-            this_type   tmp;
-
-            tmp.m_data.m_elems.resize(rowcap*colcap);
-            tmp.m_data.m_rows   = rows;
-            tmp.m_data.m_cols   = cols;
-            tmp.m_data.m_rowcap = rowcap;
-            tmp.m_data.m_colcap = colcap;
-
-            //- Move the appropriate subset of elements into the temporary engine, then swap.
-            //
-            index_type  dst_rows = min(rows, m_data.m_rows);
-            index_type  dst_cols = min(cols, m_data.m_cols);
-
-            move_elements(tmp, *this, 0, 0, dst_rows, dst_cols);
-            detail::la_swap(m_data, tmp.m_data);
-        }
-        else
-        {
-            if (rows < m_data.m_rows)
-            {
-                zero(*this, rows, 0, m_data.m_rows, m_data.m_cols);
-            }
-            if (cols < m_data.m_cols)
-            {
-                zero(*this, 0, cols, min(rows, m_data.m_rows), m_data.m_cols);
-            }
-            m_data.m_rows = rows;
-            m_data.m_cols = cols;
-        }
-    }
 };
 
 
