@@ -109,6 +109,7 @@ namespace STD_LA
 #include "linear_algebra/operation_traits.hpp"
 #include "linear_algebra/arithmetic_operators.hpp"
 
+#include "linear_algebra/engine_support.hpp"
 #include "linear_algebra/matrix_storage_engine.hpp"
 
 #endif  //- LINEAR_ALGEBRA_HPP_DEFINED

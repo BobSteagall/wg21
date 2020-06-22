@@ -25,6 +25,7 @@
     <ClInclude Include="..\include\linear_algebra\division_traits.hpp" />
     <ClInclude Include="..\include\linear_algebra\dynamic_matrix_engine.hpp" />
     <ClInclude Include="..\include\linear_algebra\dynamic_vector_engine.hpp" />
+    <ClInclude Include="..\include\linear_algebra\engine_support.hpp" />
     <ClInclude Include="..\include\linear_algebra\fixed_size_matrix_engine.hpp" />
     <ClInclude Include="..\include\linear_algebra\fixed_size_vector_engine.hpp" />
     <ClInclude Include="..\include\linear_algebra\matrix_view_engine.hpp" />

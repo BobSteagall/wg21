@@ -92,6 +92,12 @@
     <ClInclude Include="..\include\linear_algebra\division_traits.hpp">
       <Filter>Library Implementation Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\matrix_storage_engine.hpp">
+      <Filter>Library Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\engine_support.hpp">
+      <Filter>Library Implementation Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tests\test_01.cpp">
@@ -135,9 +141,6 @@
     </ClCompile>
     <ClCompile Include="..\tests\test_matrix_view_engines.cpp">
       <Filter>Unit Test Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\include\linear_algebra\matrix_storage_engine.hpp">
-      <Filter>Library Implementation Headers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
