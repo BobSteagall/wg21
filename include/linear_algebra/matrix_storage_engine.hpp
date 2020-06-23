@@ -10,564 +10,31 @@
 
 namespace STD_LA {
 
-//template<class T, class DX, class AT, class DL>  class matrix_storage_engine {};
-
-struct engine_attribute
-{
-    //- Tags describing a storage engine's representational category.
-    //
-    struct dense_matrix {};
-    struct dense_column_matrix {};
-    struct dense_row_matrix {};
-    struct dense_vector {};
-    struct sparse_matrix {};
-
-    //- Tags describing an engine's interface category.
-    //
-    struct readable {};
-    struct writable {};
-    struct initable {};
-    struct column_resizable {};
-    struct row_resizable {};
-    struct resizable {};
-
-    //- Tags describing the layout of an engine's elements.
-    //
-    struct general_layout {};
-    struct row_major : public layout_right {};
-    struct column_major : public layout_left {};
-
-    //- Tags describing a view engine's purpose.
-    //
-    struct negation_view {};
-    struct hermitian_view {};
-    struct transpose_view {};
-    struct subset_view {};
-    struct row_view {};
-    struct column_view {};
-};
-
-namespace detail {
-//- These are some simple utility concepts, used by the other concepts below, and perhaps
-//  to be re-evaluated later.
-//
-template<typename T, typename U>
-concept same_types = is_same_v<T, U>;
-
-template<typename T, typename U>
-concept returns = is_same_v<T, U>;
-
-template<typename T, typename U>
-concept convertible_element = is_convertible_v<T, U>;
-
-template<ptrdiff_t N>
-concept non_negative = requires { N > 0; };
-
-
-template<typename EA>
-concept readable_interface = same_types<EA, engine_attribute::readable>;
-
-template<typename EA>
-concept writable_interface = same_types<EA, engine_attribute::writable>;
-
-template<typename EA>
-concept initable_interface = same_types<EA, engine_attribute::initable>;
-
-template<typename EA>
-concept column_resizable_interface = same_types<EA, engine_attribute::column_resizable>;
-
-template<typename EA>
-concept row_resizable_interface = same_types<EA, engine_attribute::row_resizable>;
-
-template<typename EA>
-concept resizable_interface = same_types<EA, engine_attribute::resizable>;
-
-
-//- The following three concepts are used to validate the fourth template argument of a
-//  specialization of matrix_storage_engine, the layout.  This must be row-major or
-//  column-major.
-//
-template<typename EL>
-concept general_layout = is_same_v<EL, engine_attribute::general_layout>;
-
-template<typename EL>
-concept row_major = is_same_v<EL, engine_attribute::row_major>;
-
-template<typename EL>
-concept column_major = is_same_v<EL, engine_attribute::column_major>;
-
-template<typename EL>
-concept row_or_column_major = row_major<EL> or column_major<EL>;
-
-
-template<typename EC>
-concept resizable_columns =
-    same_types<EC, engine_attribute::column_resizable> or
-    same_types<EC, engine_attribute::resizable>;
-
-template<typename EC>
-concept resizable_rows =
-    same_types<EC, engine_attribute::row_resizable> or
-    same_types<EC, engine_attribute::resizable>;
-
-template<typename EC>
-concept resizable_rows_and_columns = same_types<EC, engine_attribute::resizable>;
-
-template<typename EC>
-concept resizable_columns_and_rows = same_types<EC, engine_attribute::resizable>;
-
-
-template<typename EC>
-concept column_or_row_matrix =
-    same_types<EC, engine_attribute::dense_column_matrix> or
-    same_types<EC, engine_attribute::dense_row_matrix>;
-
-
-//- Concepts pertaining to engines.
-//
-template<class ET>
-concept has_engine_aliases =
-    requires
-    {
-        typename ET::engine_category;
-        typename ET::engine_interface;
-        typename ET::element_layout;
-        typename ET::value_type;
-        typename ET::element_type;
-        typename ET::index_type;
-        typename ET::index_tuple_type;
-        typename ET::reference;
-        typename ET::const_reference;
-    };
-
-template<class ET>
-concept readable_matrix_engine =
-    has_engine_aliases<ET> and
-    requires (ET const& eng, typename ET::index_type i)
-    {
-        { eng.columns() } -> returns<typename ET::index_type>;
-        { eng.rows()    } -> returns<typename ET::index_type>;
-        { eng(i, i)     } -> returns<typename ET::const_reference>;
-    };
-
-inline void
-check_sizes(ptrdiff_t rows, ptrdiff_t cols)
-{
-    if (rows < 1  || cols < 1)
-    {
-        throw runtime_error("invalid size");
-    }
-}
-
-inline void
-check_capacities(ptrdiff_t rowcap, ptrdiff_t colcap)
-{
-    if (rowcap < 0  || colcap < 0)
-    {
-        throw runtime_error("invalid capacity");
-    }
-}
-
-}   //- namespace detail
-
-
-//-
-template<class T, class X, class A, class L>    struct mse_traits;
-
-
-//---------------------------
-//- Vector engine (1 x N)
-//
-template<class T, ptrdiff_t N, class L>
-struct mse_traits<T, extents<N>, void, L>
-{
-    using engine_category  = engine_attribute::dense_vector;
-    using engine_interface = engine_attribute::initable;
-    using element_layout   = engine_attribute::general_layout;
-};
-
-template<class T, ptrdiff_t N, class A, class L>
-struct mse_traits<T, extents<N>, A, L>
-{
-    using engine_category  = engine_attribute::dense_vector;
-    using engine_interface = engine_attribute::initable;
-    using element_layout   = engine_attribute::general_layout;
-};
-
-template<class T, class A, class L>
-struct mse_traits<T, extents<dynamic_extent>, A, L>
-{
-    using engine_category  = engine_attribute::dense_vector;
-    using engine_interface = engine_attribute::resizable;
-    using element_layout   = engine_attribute::general_layout;
-};
-
-//--------------------------------------
-//- Single-element matrix engine (1 x 1)
-//
-template<class T, class L>
-struct mse_traits<T, extents<1, 1>, void, L>
-{
-};
-
-//---------------------------
-//- Row matrix engine (1 x C)
-//
-template<class T, ptrdiff_t C, class L>
-struct mse_traits<T, extents<1, C>, void, L>
-{
-    using engine_category  = engine_attribute::dense_row_matrix;
-    using engine_interface = engine_attribute::initable;
-    using element_layout   = L;
-};
-
-template<class T, ptrdiff_t C, class A, class L>
-struct mse_traits<T, extents<1, C>, A, L>
-{
-    using engine_category  = engine_attribute::dense_row_matrix;
-    using engine_interface = engine_attribute::initable;
-    using element_layout   = L;
-};
-
-template<class T, class A, class L>
-struct mse_traits<T, extents<1, dynamic_extent>, A, L>
-{
-    using engine_category  = engine_attribute::dense_row_matrix;
-    using engine_interface = engine_attribute::row_resizable;
-    using element_layout   = L;
-};
-
-//------------------------------
-//- Column matrix engine (R x 1)
-//
-template<class T, ptrdiff_t R, class L>
-struct mse_traits<T, extents<R, 1>, void, L>
-{
-    using engine_category  = engine_attribute::dense_column_matrix;
-    using engine_interface = engine_attribute::initable;
-    using element_layout   = L;
-};
-
-template<class T, ptrdiff_t R, class A, class L>
-struct mse_traits<T, extents<R, 1>, A, L>
-{
-    using engine_category  = engine_attribute::dense_column_matrix;
-    using engine_interface = engine_attribute::initable;
-    using element_layout   = L;
-};
-
-template<class T, class A, class L>
-struct mse_traits<T, extents<dynamic_extent, 1>, A, L>
-{
-    using engine_category  = engine_attribute::dense_column_matrix;
-    using engine_interface = engine_attribute::column_resizable;
-    using element_layout   = L;
-};
-
-//------------------------------
-//- General matrix engine (R, C)
-//
-template<class T, ptrdiff_t R, ptrdiff_t C, class L>
-struct mse_traits<T, extents<R, C>, void, L>
-{
-    using engine_category  = engine_attribute::dense_matrix;
-    using engine_interface = engine_attribute::initable;
-    using element_layout   = L;
-};
-
-template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
-struct mse_traits<T, extents<R, C>, A, L>
-{
-    using engine_category  = engine_attribute::dense_matrix;
-    using engine_interface = engine_attribute::initable;
-    using element_layout   = L;
-};
-
-template<class T, ptrdiff_t C, class A, class L>
-struct mse_traits<T, extents<dynamic_extent, C>, A, L>
-{
-    using engine_category  = engine_attribute::dense_matrix;
-    using engine_interface = engine_attribute::row_resizable;
-    using element_layout   = L;
-};
-
-template<class T, ptrdiff_t R, class A, class L>
-struct mse_traits<T, extents<R, dynamic_extent>, A, L>
-{
-    using engine_category  = engine_attribute::dense_matrix;
-    using engine_interface = engine_attribute::column_resizable;
-    using element_layout   = L;
-};
-
-template<class T, class A, class L>
-struct mse_traits<T, extents<dynamic_extent, dynamic_extent>, A, L>
-{
-    using engine_category  = engine_attribute::dense_matrix;
-    using engine_interface = engine_attribute::resizable;
-    using element_layout   = L;
-};
-
-
-//==================================================================================================
-//  Partial specializations of class template mse_data contain and manage elements on behalf
-//  of matrix_storage_engine.
-//
-//  Note that, in this implementation, all dynamically-allocated memory is default-constructed.
-//  This means that elements lying in (currently) unused capacity are also initialized.
-//
-//  This state of affairs might not be present in the final version.
-//==================================================================================================
-//
-template<class T, class X, class A, class L>    struct mse_data;
-
-
-//---------------------------------------------------------------------
-//- Fixed elements.  Elements contained as member data in a std::array.
-//
-template<class T, ptrdiff_t N, class L>
-struct mse_data<T, extents<N>, void, L>
-{
-    using array_type = std::array<T, N>;
-
-    static constexpr ptrdiff_t  m_size = N;
-    static constexpr ptrdiff_t  m_cap  = N;
-
-    array_type  m_elems;
-
-    ~mse_data() = default;
-    constexpr mse_data() = default;
-    constexpr mse_data(mse_data&&) noexcept = default;
-    constexpr mse_data(mse_data const&) = default;
-    constexpr mse_data&     operator =(mse_data&&) noexcept = default;
-    constexpr mse_data&     operator =(mse_data const&) = default;
-};
-
-
-//----------------------------------------------------------------------
-//- Fixed elements.  Elements contained as member data in a std::vector.
-//
-template<class T, ptrdiff_t N, class A, class L>
-struct mse_data<T, extents<N>, A, L>
-{
-    using array_type = std::vector<T, A>;
-
-    static constexpr ptrdiff_t  m_size = N;
-    static constexpr ptrdiff_t  m_cap  = N;
-
-    array_type  m_elems;
-
-    ~mse_data() = default;
-    inline constexpr mse_data()
-    :   m_elems(N)
-    {}
-    constexpr mse_data(mse_data&&) noexcept = default;
-    constexpr mse_data(mse_data const&) = default;
-    constexpr mse_data&     operator =(mse_data&&) noexcept = default;
-    constexpr mse_data&     operator =(mse_data const&) = default;
-};
-
-
-//------------------------------------------------------------------------
-//- Dynamic elements.  Elements contained as member data in a std::vector.
-//
-template<class T, class A, class L>
-struct mse_data<T, extents<dynamic_extent>, A, L>
-{
-    using array_type = std::vector<T, A>;
-
-    array_type  m_elems;
-    ptrdiff_t   m_size;
-    ptrdiff_t   m_cap;
-
-    ~mse_data() = default;
-    inline constexpr mse_data()
-    :   m_elems()
-    ,   m_size(0)
-    ,   m_cap(0)
-    {}
-    constexpr mse_data(mse_data&&) noexcept = default;
-    constexpr mse_data(mse_data const&) = default;
-    constexpr mse_data&     operator =(mse_data&&) noexcept = default;
-    constexpr mse_data&     operator =(mse_data const&) = default;
-};
-
-
-//---------------------------------------------------------------------------------
-//- Fixed rows / fixed columns.  Elements contained as member data in a std::array.
-//
-template<class T, ptrdiff_t R, ptrdiff_t C, class L>
-struct mse_data<T, extents<R, C>, void, L>
-{
-    using array_type = std::array<T, R*C>;
-
-    static constexpr ptrdiff_t  m_rows   = R;
-    static constexpr ptrdiff_t  m_cols   = C;
-    static constexpr ptrdiff_t  m_rowcap = R;
-    static constexpr ptrdiff_t  m_colcap = C;
-
-    array_type  m_elems;
-
-    ~mse_data() = default;
-    constexpr mse_data() = default;
-    constexpr mse_data(mse_data&&) noexcept = default;
-    constexpr mse_data(mse_data const&) = default;
-    constexpr mse_data&     operator =(mse_data&&) noexcept = default;
-    constexpr mse_data&     operator =(mse_data const&) = default;
-};
-
-
-//-------------------------------------------------------------------------------
-//- Fixed rows / fixed columns.  Elements dynamically allocated in a std::vector.
-//
-template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
-struct mse_data<T, extents<R, C>, A, L>
-{
-    using array_type = std::vector<T, A>;
-
-    static constexpr ptrdiff_t  m_rows   = R;
-    static constexpr ptrdiff_t  m_cols   = C;
-    static constexpr ptrdiff_t  m_rowcap = R;
-    static constexpr ptrdiff_t  m_colcap = C;
-
-    array_type  m_elems;
-
-    //- Construct/copy/destroy.
-    //
-    ~mse_data() = default;
-
-    inline constexpr mse_data()
-    :   m_elems(R*C)
-    {}
-    constexpr mse_data(mse_data&&) noexcept = default;
-    constexpr mse_data(mse_data const&) = default;
-    constexpr mse_data&     operator =(mse_data&&) noexcept = default;
-    constexpr mse_data&     operator =(mse_data const&) = default;
-};
-
-
-//---------------------------------------------------------------------------------
-//- Fixed rows / dynamic columns.  Elements dynamically allocated in a std::vector.
-//
-template<class T, ptrdiff_t R, class A, class L>
-struct mse_data<T, extents<R, dynamic_extent>, A, L>
-{
-    using array_type = std::vector<T, A>;
-
-    static constexpr ptrdiff_t  m_rows   = R;
-    static constexpr ptrdiff_t  m_rowcap = R;
-
-    array_type  m_elems;
-    ptrdiff_t   m_cols;
-    ptrdiff_t   m_colcap;
-
-    //- Construct/copy/destroy.
-    //
-    ~mse_data() = default;
-
-    inline constexpr
-    mse_data()
-    :   m_elems()
-    ,   m_cols(0)
-    ,   m_colcap(0)
-    {}
-    constexpr mse_data(mse_data&&) noexcept = default;
-    constexpr mse_data(mse_data const&) = default;
-    constexpr mse_data&     operator =(mse_data&&) noexcept = default;
-    constexpr mse_data&     operator =(mse_data const&) = default;
-};
-
-//---------------------------------------------------------------------------------
-//- Dynamic rows / fixed columns.  Elements dynamically allocated in a std::vector.
-//
-template<class T, ptrdiff_t C, class A, class L>
-struct mse_data<T, extents<dynamic_extent, C>, A, L>
-{
-    using array_type = std::vector<T, A>;
-
-    static constexpr ptrdiff_t  m_cols   = C;
-    static constexpr ptrdiff_t  m_colcap = C;
-
-    array_type  m_elems;
-    ptrdiff_t   m_rows;
-    ptrdiff_t   m_rowcap;
-
-    //- Construct/copy/destroy.
-    //
-    ~mse_data() = default;
-
-    inline constexpr
-    mse_data()
-    :   m_elems()
-    ,   m_rows(0)
-    ,   m_rowcap(0)
-    {}
-    constexpr mse_data(mse_data&&) noexcept = default;
-    constexpr mse_data(mse_data const&) = default;
-    constexpr mse_data&     operator =(mse_data&&) noexcept = default;
-    constexpr mse_data&     operator =(mse_data const&) = default;
-};
-
-//-----------------------------------------------------------------------------------
-//- Dynamic rows / dynamic columns.  Elements dynamically allocated in a std::vector.
-//
-template<class T, class A, class L>
-struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
-{
-    using array_type = std::vector<T, A>;
-
-    array_type  m_elems;
-    ptrdiff_t   m_rows;
-    ptrdiff_t   m_cols;
-    ptrdiff_t   m_rowcap;
-    ptrdiff_t   m_colcap;
-
-    //- Construct/copy/destroy.
-    //
-    inline ~mse_data() = default;
-
-    inline constexpr
-    mse_data()
-    :   m_elems()
-    ,   m_rows(0)
-    ,   m_cols(0)
-    ,   m_rowcap(0)
-    ,   m_colcap(0)
-    {}
-    constexpr mse_data(mse_data&&) noexcept = default;
-    constexpr mse_data(mse_data const&) = default;
-    constexpr mse_data&     operator =(mse_data&&) noexcept = default;
-    constexpr mse_data&     operator =(mse_data const&) = default;
-};
-
-
-
-
-
 template<class T, class X, class A, class L>
+class matrix_storage_engine;
+
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
     requires
-        detail::valid_extents<X>        and
-        detail::valid_allocator<A, T>   and
-        detail::row_or_column_major<L>
-class matrix_storage_engine
+        detail::valid_mse_extents<extents<R, C>>  and
+        detail::valid_mse_allocator<A, T>         and
+        detail::valid_mse_layout<L>
+class matrix_storage_engine<T, extents<R, C>, A, L>
 {
     using this_type     = matrix_storage_engine;
-    using engine_traits = mse_traits<T, X, A, L>;
-    using storage_type  = mse_data<T, X, A, L>;
+    using engine_traits = detail::mse_traits<T, extents<R, C>, A, L>;
+    using storage_type  = detail::mse_data<T, extents<R, C>, A, L>;
 
   public:
-    using engine_category  = typename engine_traits::engine_category;
-    using engine_interface = typename engine_traits::engine_interface;
-    using element_layout   = typename engine_traits::element_layout;
     using value_type       = T;
     using allocator_type   = A;
     using element_type     = value_type;
     using reference        = element_type&;
     using const_reference  = element_type const&;
-    using difference_type  = ptrdiff_t;
     using index_type       = ptrdiff_t;
     using index_tuple_type = tuple<index_type, index_type>;
-//    using span_type          = basic_mdspan<T, detail::dyn_mat_extents, detail::dyn_mat_layout>;
-//    using const_span_type    = basic_mdspan<T const, detail::dyn_mat_extents, detail::dyn_mat_layout>;
+    using span_type        = typename engine_traits::span_type;
+    using const_span_type  = typename engine_traits::const_span_type;
 
   public:
     inline ~matrix_storage_engine() = default;
@@ -583,7 +50,7 @@ class matrix_storage_engine
 
     inline constexpr
     matrix_storage_engine(index_type rows, index_type cols)
-        requires detail::resizable_columns_and_rows<engine_interface>
+        requires engine_traits::is_resizable
     :   m_data()
     {
         reshape(rows, cols, rows, cols);
@@ -591,7 +58,7 @@ class matrix_storage_engine
 
     inline constexpr
     matrix_storage_engine(index_type rows, index_type cols, index_type rowcap, index_type colcap)
-        requires detail::resizable_columns_and_rows<engine_interface>
+        requires engine_traits::is_resizable
     :   m_data()
     {
         reshape(rows, cols, rowcap, colcap);
@@ -616,6 +83,7 @@ class matrix_storage_engine
     operator =(ET2 const& rhs)
     {
         assign(rhs);
+        return *this;
     }
 
     template<class T2>
@@ -623,6 +91,7 @@ class matrix_storage_engine
     operator =(initializer_list<initializer_list<T2>> rhs)
     {
         assign(rhs);
+        return *this;
     }
 
     //- Size and capacity reporting.
@@ -667,21 +136,21 @@ class matrix_storage_engine
     //
     inline void
     resize_columns(index_type cols)
-        requires detail::resizable_columns<engine_interface>
+        requires engine_traits::is_column_resizable
     {
         reshape_columns(cols, m_data.m_colcap);
     }
 
     inline void
     reserve_columns(index_type colcap)
-        requires detail::resizable_columns<engine_interface>
+        requires engine_traits::is_column_resizable
     {
         reshape_columns(m_data.m_cols, colcap);
     }
 
     void
     reshape_columns(index_type cols, index_type colcap)
-        requires detail::resizable_columns<engine_interface>
+        requires engine_traits::is_column_resizable
     {
         //- Only reallocate new storage if we have to.
         //
@@ -700,14 +169,14 @@ class matrix_storage_engine
             index_type  dst_rows = m_data.m_rows;
             index_type  dst_cols = min(cols, m_data.m_cols);
 
-            move_elements(tmp, *this, 0, 0, dst_rows, dst_cols);
+            move_from(*this, 0, 0, dst_rows, dst_cols);
             detail::la_swap(m_data, tmp.m_data);
         }
         else
         {
             if (cols < m_data.m_cols)
             {
-                zero(*this, 0, cols, m_data.m_rows, min(cols, m_data.m_cols));
+                fill(0, cols, m_data.m_rows, min(cols, m_data.m_cols), T{});
             }
             m_data.m_cols = cols;
         }
@@ -717,21 +186,21 @@ class matrix_storage_engine
     //
     inline void
     resize_rows(index_type rows)
-        requires detail::resizable_rows<engine_interface>
+        requires engine_traits::is_row_resizable
     {
         reshape_rows(rows, m_data.m_rowcap);
     }
 
     inline void
     reserve_rows(index_type rowcap)
-        requires detail::resizable_rows<engine_interface>
+        requires engine_traits::is_row_resizable
     {
         reshape_rows(m_data.m_rows, rowcap);
     }
 
     void
     reshape_rows(index_type rows, index_type rowcap)
-        requires detail::resizable_rows<engine_interface>
+        requires engine_traits::is_row_resizable
     {
         //- Only reallocate new storage if we have to.
         //
@@ -750,14 +219,14 @@ class matrix_storage_engine
             index_type  dst_rows = min(rows, m_data.m_rows);
             index_type  dst_cols = m_data.m_cols;
 
-            move_elements(tmp, *this, 0, 0, dst_rows, dst_cols);
+            tmp.move_from(*this, 0, 0, dst_rows, dst_cols);
             detail::la_swap(m_data, tmp.m_data);
         }
         else
         {
             if (rows < m_data.m_rows)
             {
-                zero(*this, rows, 0, m_data.m_rows, m_data.m_cols);
+                fill(rows, 0, m_data.m_rows, m_data.m_cols, T{});
             }
             m_data.m_rows = rows;
         }
@@ -767,30 +236,35 @@ class matrix_storage_engine
     //
     inline void
     resize(index_type rows, index_type cols)
-        requires detail::resizable_columns_and_rows<engine_interface>
+        requires engine_traits::is_resizable
     {
         reshape(rows, cols, m_data.m_rowcap, m_data.m_colcap);
     }
 
     inline void
     reserve(index_type rowcap, index_type colcap)
-        requires detail::resizable_columns_and_rows<engine_interface>
+        requires engine_traits::is_resizable
     {
         reshape(m_data.m_rows, m_data.m_cols, rowcap, colcap);
     }
 
     void
     reshape(index_type rows, index_type cols, index_type rowcap, index_type colcap)
-        requires detail::resizable_columns_and_rows<engine_interface>
+        requires engine_traits::is_resizable
     {
-        detail::check_sizes(rows, cols);
-        detail::check_capacities(rowcap, colcap);
+        detail::check_size(rows);
+        detail::check_size(cols);
+        detail::check_capacity(rowcap);
+        detail::check_capacity(colcap);
 
         //- Only reallocate new storage if we have to.
         //
         if (rows   >  m_data.m_rowcap  ||  cols   >  m_data.m_colcap  ||
             rowcap != m_data.m_rowcap  ||  colcap != m_data.m_colcap)
         {
+            rowcap = max(rows, rowcap);
+            colcap = max(cols, colcap);
+
             //- Prepare a temporary engine to receive elements from this one.
             //
             this_type   tmp;
@@ -806,18 +280,18 @@ class matrix_storage_engine
             index_type  dst_rows = min(rows, m_data.m_rows);
             index_type  dst_cols = min(cols, m_data.m_cols);
 
-            move_elements(tmp, *this, 0, 0, dst_rows, dst_cols);
+            tmp.move_from(*this, 0, 0, dst_rows, dst_cols);
             detail::la_swap(m_data, tmp.m_data);
         }
         else
         {
             if (rows < m_data.m_rows)
             {
-                zero(*this, rows, 0, m_data.m_rows, m_data.m_cols);
+                fill(rows, 0, m_data.m_rows, m_data.m_cols, T{});
             }
             if (cols < m_data.m_cols)
             {
-                zero(*this, 0, cols, min(rows, m_data.m_rows), m_data.m_cols);
+                fill(0, cols, min(rows, m_data.m_rows), m_data.m_cols, T{});
             }
             m_data.m_rows = rows;
             m_data.m_cols = cols;
@@ -828,14 +302,14 @@ class matrix_storage_engine
     //
     inline constexpr reference
     operator ()(index_type i)
-        requires detail::column_or_row_matrix<engine_category>
+        requires (engine_traits::is_column_matrix || engine_traits::is_row_matrix)
     {
         return m_data.m_elems[i];
     }
 
     inline constexpr const_reference
     operator ()(index_type i) const
-        requires detail::column_or_row_matrix<engine_category>
+        requires (engine_traits::is_column_matrix || engine_traits::is_row_matrix)
     {
         return m_data.m_elems[i];
     }
@@ -843,7 +317,7 @@ class matrix_storage_engine
     inline constexpr reference
     operator ()(index_type i, index_type j)
     {
-        if constexpr (is_same_v<element_layout, engine_attribute::row_major>)
+        if constexpr (engine_traits::is_row_major)
         {
             return m_data.m_elems[i*m_data.m_colcap + j];
         }
@@ -856,7 +330,7 @@ class matrix_storage_engine
     inline constexpr const_reference
     operator ()(index_type i, index_type j) const
     {
-        if constexpr (detail::row_major<element_layout>)
+        if constexpr (engine_traits::is_row_major)
         {
             return m_data.m_elems[i*m_data.m_colcap + j];
         }
@@ -864,6 +338,18 @@ class matrix_storage_engine
         {
             return m_data.m_elems[i + j*m_data.m_rowcap];
         }
+    }
+
+    inline constexpr span_type
+    span() noexcept
+    {
+        return detail::make_matrix_mdspan<span_type, engine_traits>(m_data);
+    }
+
+    inline constexpr const_span_type
+    span() const noexcept
+    {
+        return detail::make_matrix_mdspan<const_span_type, engine_traits>(m_data);
     }
 
     //- Modifiers
@@ -905,62 +391,304 @@ class matrix_storage_engine
     storage_type    m_data;
 
     template<class ET2>
+    constexpr void  assign(ET2 const& rhs)
+    {
+        detail::check_source_engine_size(rhs, m_data.m_rows, m_data.m_cols);
+        detail::assign_from_matrix_engine(*this, rhs);
+    }
+
+    template<class T2>
+    constexpr void
+    assign(initializer_list<initializer_list<T2>> rhs)
+        requires (!engine_traits::is_column_resizable && !engine_traits::is_row_resizable)
+    {
+        detail::check_source_init_list(rhs, m_data.m_rows, m_data.m_cols);
+        detail::assign_from_matrix_initlist(*this, rhs);
+    }
+
+    template<class T2>
+    constexpr void
+    assign(initializer_list<initializer_list<T2>> rhs)
+        requires (engine_traits::is_column_resizable && !engine_traits::is_row_resizable)
+    {
+        detail::check_source_init_list(rhs);
+        static_assert(m_data.m_rows == static_cast<index_type>(rhs.size()));
+
+        this_type     tmp;
+        index_type    cols = static_cast<index_type>(rhs.begin()->size());
+
+        tmp.resize_columns(cols);
+        detail::assign_from_matrix_initlist(tmp, rhs);
+        tmp.swap(*this);
+    }
+
+    template<class T2>
+    constexpr void
+    assign(initializer_list<initializer_list<T2>> rhs)
+        requires (!engine_traits::is_column_resizable && engine_traits::is_row_resizable)
+    {
+        detail::check_source_init_list(rhs);
+        static_assert(m_data.m_cols == static_cast<index_type>(rhs.begin()->size()));
+
+        this_type     tmp;
+        index_type    rows = static_cast<index_type>(rhs.size());
+
+        tmp.resize_rows(rows);
+        detail::assign_from_matrix_initlist(tmp, rhs);
+        tmp.swap(*this);
+    }
+
+    template<class T2>
+    constexpr void
+    assign(initializer_list<initializer_list<T2>> rhs)
+        requires (engine_traits::is_column_resizable && engine_traits::is_row_resizable)
+    {
+        detail::check_source_init_list(rhs);
+
+        this_type     tmp;
+        index_type    rows = static_cast<index_type>(rhs.size());
+        index_type    cols = static_cast<index_type>(rhs.begin()->size());
+
+        tmp.resize(rows, cols);
+        detail::assign_from_matrix_initlist(tmp, rhs);
+        tmp.swap(*this);
+    }
+
+    constexpr void
+    move_from(this_type const& src, index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi)
+        requires engine_traits::is_row_major
+    {
+        for (index_type i = i_lo;  i < i_hi;  ++i)
+        {
+            for (index_type j = j_lo;  j < j_hi;  ++j)
+            {
+                (*this)(i, j) = std::move(src(i, j));
+            }
+        }
+    }
+
+    constexpr void
+    move_from(this_type const& src, index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi)
+        requires engine_traits::is_column_major
+    {
+        for (index_type j = j_lo;  j < j_hi;  ++j)
+        {
+            for (index_type i = i_lo;  i < i_hi;  ++i)
+            {
+                (*this)(i, j) = std::move(src(i, j));
+            }
+        }
+    }
+
+    constexpr void
+    fill(index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi, value_type const& t)
+        requires engine_traits::is_row_major
+    {
+        for (index_type i = i_lo;  i < i_hi;  ++i)
+        {
+            for (index_type j = j_lo;  j < j_hi;  ++j)
+            {
+                (*this)(i, j) = t;
+            }
+        }
+    }
+
+    constexpr void
+    fill(index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi, value_type const& t)
+        requires engine_traits::is_column_major
+    {
+        for (index_type j = j_lo;  j < j_hi;  ++j)
+        {
+            for (index_type i = i_lo;  i < i_hi;  ++i)
+            {
+                (*this)(i, j) = t;
+            }
+        }
+    }
+};
+
+
+template<class T, ptrdiff_t N, class A, class L>
+    requires
+        detail::valid_mse_extents<extents<N>>  and
+        detail::valid_mse_allocator<A, T>      and
+        detail::valid_mse_layout<L>
+class matrix_storage_engine<T, extents<N>, A, L>
+{
+    using this_type     = matrix_storage_engine;
+    using engine_traits = detail::mse_traits<T, extents<N>, A, L>;
+    using storage_type  = detail::mse_data<T, extents<N>, A, L>;
+
+  public:
+    using value_type       = T;
+    using allocator_type   = A;
+    using element_type     = value_type;
+    using reference        = element_type&;
+    using const_reference  = element_type const&;
+    using index_type       = ptrdiff_t;
+    using span_type        = typename engine_traits::span_type;
+    using const_span_type  = typename engine_traits::const_span_type;
+
+  public:
+    inline ~matrix_storage_engine() = default;
+
+    //- Construct / assign.
+    //
+    constexpr matrix_storage_engine() = default;
+    constexpr matrix_storage_engine(matrix_storage_engine&& rhs) noexcept = default;
+    constexpr matrix_storage_engine(matrix_storage_engine const& rhs) = default;
+
+    constexpr matrix_storage_engine&    operator =(matrix_storage_engine&& rhs) noexcept = default;
+    constexpr matrix_storage_engine&    operator =(matrix_storage_engine const& rhs) = default;
+
+    inline constexpr
+    matrix_storage_engine(index_type rows, index_type cols)
+        requires engine_traits::is_resizable
+    :   m_data()
+    {
+        reshape(rows, cols, rows, cols);
+    }
+
+    template<class ET2> inline constexpr
+    matrix_storage_engine(ET2 const& rhs)
+    :   m_data()
+    {
+        assign(rhs);
+    }
+
+    template<class T2> inline constexpr
+    matrix_storage_engine(initializer_list<initializer_list<T2>> rhs)
+    :   m_data()
+    {
+        assign(rhs);
+    }
+
+    template<class ET2>
+    inline constexpr matrix_storage_engine&
+    operator =(ET2 const& rhs)
+    {
+        assign(rhs);
+    }
+
+    template<class T2>
+    inline constexpr matrix_storage_engine&
+    operator =(initializer_list<initializer_list<T2>> rhs)
+    {
+        assign(rhs);
+    }
+
+    //- Size and capacity reporting.
+    //
+    inline constexpr index_type
+    size() const noexcept
+    {
+        return index_tuple_type(m_data.m_rows, m_data.m_cols);
+    }
+
+    inline constexpr index_type
+    capacity() const noexcept
+    {
+        return index_tuple_type(m_data.m_rowcap, m_data.m_colcap);
+    }
+
+    //- Setting overall size and capacity.
+    //
+    inline void
+    resize(index_type size)
+        requires engine_traits::is_resizable
+    {
+        reshape(size, m_data.m_cap);
+    }
+
+    inline void
+    reserve(index_type cap)
+        requires engine_traits::is_resizable
+    {
+        reshape(m_data.m_size, cap);
+    }
+
+    void
+    reshape(index_type newsize, index_type newcap)
+        requires engine_traits::is_resizable
+    {
+
+        detail::check_size(newsize);
+        detail::check_capacity(newcap);
+
+        //- Only reallocate new storage if we have to.
+        //
+        if (newsize > m_data.m_cap  ||  newcap != m_data.m_cap)
+        {
+            //- Prepare a temporary engine to receive elements from this one.
+            //
+            this_type   tmp;
+
+            tmp.m_data.m_elems.resize(newcap);
+            tmp.m_data.m_size = newsize;
+            tmp.m_data.m_cap  = newcap;
+
+            //- Move the appropriate subset of elements into the temporary engine, then swap.
+            //
+            index_type  dst_count = min(newsize, m_data.m_size);
+
+            move_elements(tmp, *this, 0, dst_count);
+            detail::la_swap(m_data, tmp.m_data);
+        }
+        else
+        {
+            if (newsize < m_data.m_size)
+            {
+                zero(*this, newsize, m_data.m_size);
+            }
+            m_data.m_size = newsize;
+        }
+    }
+
+    //- Element access
+    //
+    inline constexpr reference
+    operator ()(index_type i)
+    {
+        return m_data.m_elems[i];
+    }
+
+    inline constexpr const_reference
+    operator ()(index_type i) const
+    {
+        return m_data.m_elems[i];
+    }
+
+
+    inline constexpr span_type
+    span() noexcept
+    {
+        return detail::make_matrix_mdspan<span_type, engine_traits>(m_data);
+    }
+
+    inline constexpr const_span_type
+    span() const noexcept
+    {
+        return detail::make_matrix_mdspan<const_span_type, engine_traits>(m_data);
+    }
+
+    //- Modifiers
+    //
+    inline constexpr void
+    swap(matrix_storage_engine& rhs) noexcept
+    {
+        if (&rhs != this)
+        {
+            detail::la_swap(m_data, rhs.m_data);
+        }
+    }
+
+  private:
+    storage_type    m_data;
+
+    template<class ET2>
     constexpr void  assign(ET2 const& rhs);
     template<class T2>
     constexpr void  assign(initializer_list<initializer_list<T2>> rhs);
-
-    static constexpr void
-    move_elements(this_type& dst, this_type const& src, index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi)
-    {
-        if constexpr (detail::row_major<element_layout>)
-        {
-            for (index_type i = i_lo;  i < i_hi;  ++i)
-            {
-                for (index_type j = j_lo;  j < j_hi;  ++j)
-                {
-                    dst(i, j) = std::move(src(i, j));
-                }
-            }
-        }
-        else    //- column_major
-        {
-            for (index_type j = j_lo;  j < j_hi;  ++j)
-            {
-                for (index_type i = i_lo;  i < i_hi;  ++i)
-                {
-                    dst(i, j) = std::move(src(i, j));
-                }
-            }
-        }
-    }
-
-    static constexpr void
-    zero(this_type& dst, index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi)
-    {
-        value_type  t{};
-
-        if constexpr (detail::row_major<element_layout>)
-        {
-            for (index_type i = i_lo;  i < i_hi;  ++i)
-            {
-                for (index_type j = j_lo;  j < j_hi;  ++j)
-                {
-                    dst(i, j) = t;
-                }
-            }
-        }
-        else    //- column_major
-        {
-            for (index_type j = j_lo;  j < j_hi;  ++j)
-            {
-                for (index_type i = i_lo;  i < i_hi;  ++i)
-                {
-                    dst(i, j) = t;
-                }
-            }
-        }
-    }
-
 };
 
 

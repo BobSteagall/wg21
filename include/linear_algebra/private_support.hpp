@@ -1390,7 +1390,7 @@ v_cmp_eq(ET const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
 //  MATRIX COMPARISON HELPERS
 //==================================================================================================
 //  These helper functions are used to compare the contents of matrix engines with that of other
-//  matix engines, 2-D mdspans, and 2-D initializer lists.
+//  matrix engines, 2-D mdspans, and 2-D initializer lists.
 //==================================================================================================
 //
 template<class ET1, class ET2> constexpr

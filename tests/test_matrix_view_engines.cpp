@@ -369,35 +369,60 @@ TEST(FFF, XXX)
 
 
 template<class T, int R, int C>
-using fs_test_engine = STD_LA::matrix_storage_engine<T, extents<R,C>, void, STD_LA::engine_attribute::row_major>;
+using fs_test_engine = STD_LA::matrix_storage_engine<T, extents<R,C>, void, STD_LA::row_major>;
 
 TEST(GGG, HHH)
 {
-    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<float>, STD_LA::engine_attribute::row_major>       m1(2, 2, 4, 4);
-    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<float>, STD_LA::engine_attribute::column_major>    m2;
-//    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<float>, STD_LA::engine_attribute::general_layout>  m3;
-//    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<double>, STD_LA::engine_attribute::column_major>   m4;
+    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<float>, STD_LA::row_major>       m1(2, 2, 4, 4);
+    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<float>, STD_LA::column_major>    m2;
+//    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<float>, STD_LA::general_layout>  m3;
+//    STD_LA::matrix_storage_engine<float, extents<-1, -1>, std::allocator<double>, STD_LA::column_major>   m4;
 
-    STD_LA::matrix_storage_engine<float, extents<3, 3>, void, STD_LA::engine_attribute::row_major>      m21;
-    STD_LA::matrix_storage_engine<float, extents<4, 4>, void, STD_LA::engine_attribute::column_major>   m22;
+    STD_LA::matrix_storage_engine<float, extents<3, 3>, void, STD_LA::row_major>      m21;
+    STD_LA::matrix_storage_engine<float, extents<4, 4>, void, STD_LA::column_major>   m22;
 
-//    STD_LA::matrix_storage_engine<float, extents<3, 3>, std::allocator<float>, STD_LA::engine_attribute::row_major>      m31(3, 4);
-    STD_LA::matrix_storage_engine<float, extents<4, 4>, std::allocator<float>, STD_LA::engine_attribute::column_major>   m32;
+//    STD_LA::matrix_storage_engine<float, extents<3, 3>, std::allocator<float>, STD_LA::row_major>      m31(3, 4);
+    STD_LA::matrix_storage_engine<float, extents<4, 4>, std::allocator<float>, STD_LA::column_major>   m32;
 
 
     static_assert(STD_LA::detail::is_constexpr([]{fs_test_engine<float,2,2>().rows();}));
 
-    m1.reshape(4, 4, 20, 20);
+    static_assert(STD_LA::detail::mse_traits<float, extents<-1, -1>, std::allocator<float>, STD_LA::row_major>::is_resizable);
+
+    m2.reshape(4, 4, 20, 20);
     m1.reserve(25, 25);
+
+    m2.span();
+    m22.span();
+
+    auto const&     m2cr = m2;
+    auto const&     m22cr = m22;
+
+    m2cr.span();
+    m22cr.span();
+
+
+    m32 = LST_44_1;
+    m22 = LST_44_1;
+    m2  = LST_34_2;
+
+    dr_matrix_engine<float>         dr1 = LST_44_2;
+    fs_matrix_engine<float, 4, 4>   fs1 = LST_44_2;
+
+    m32 = dr1;
+    m32 = fs1;
+
+    m22 = dr1;
+    m22 = fs1;
 
 //    m32.reserve(10, 10);
 
-    static_assert(STD_LA::detail::valid_extents<extents<10>>);
-    static_assert(STD_LA::detail::valid_extents<extents<2,2>>);
-    static_assert(!STD_LA::detail::valid_extents<extents<>>);
-    static_assert(!STD_LA::detail::valid_extents<extents<2,2,2>>);
-    static_assert(!STD_LA::detail::valid_extents<extents<-5>>);
-    static_assert(!STD_LA::detail::valid_extents<extents<-5,0>>);
-    static_assert(!STD_LA::detail::valid_extents<int>);
+    static_assert(STD_LA::detail::valid_mse_extents<extents<10>>);
+    static_assert(STD_LA::detail::valid_mse_extents<extents<2,2>>);
+    static_assert(!STD_LA::detail::valid_mse_extents<extents<>>);
+    static_assert(!STD_LA::detail::valid_mse_extents<extents<2,2,2>>);
+    static_assert(!STD_LA::detail::valid_mse_extents<extents<-5>>);
+    static_assert(!STD_LA::detail::valid_mse_extents<extents<-5,0>>);
+    static_assert(!STD_LA::detail::valid_mse_extents<int>);
 }
 #endif
