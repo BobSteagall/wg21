@@ -169,7 +169,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
             index_type  dst_rows = m_data.m_rows;
             index_type  dst_cols = min(cols, m_data.m_cols);
 
-            move_from(*this, 0, 0, dst_rows, dst_cols);
+            move_from(0, 0, dst_rows, dst_cols, *this);
             detail::la_swap(m_data, tmp.m_data);
         }
         else
@@ -219,7 +219,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
             index_type  dst_rows = min(rows, m_data.m_rows);
             index_type  dst_cols = m_data.m_cols;
 
-            tmp.move_from(*this, 0, 0, dst_rows, dst_cols);
+            tmp.move_from(0, 0, dst_rows, dst_cols, *this);
             detail::la_swap(m_data, tmp.m_data);
         }
         else
@@ -280,7 +280,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
             index_type  dst_rows = min(rows, m_data.m_rows);
             index_type  dst_cols = min(cols, m_data.m_cols);
 
-            tmp.move_from(*this, 0, 0, dst_rows, dst_cols);
+            tmp.move_from(0, 0, dst_rows, dst_cols, *this);
             detail::la_swap(m_data, tmp.m_data);
         }
         else
@@ -394,36 +394,54 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     template<class FN>
     constexpr void
-    apply(index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi, FN fn)
-        requires engine_traits::is_row_major
+    apply(index_type i0, index_type j0, index_type i1, index_type j1, FN fn)
     {
-        for (index_type i = i_lo;  i < i_hi;  ++i)
+        if constexpr (engine_traits::is_row_major)
         {
-            for (index_type j = j_lo;  j < j_hi;  ++j)
+            for (index_type i = i0;  i < i1;  ++i)
             {
-                (*this)(i, j) = fn(i, j);
+                for (index_type j = j0;  j < j1;  ++j)
+                {
+                    (*this)(i, j) = fn(i, j);
+                }
+            }
+        }
+        else
+        {
+            for (index_type j = j0;  j < j1;  ++j)
+            {
+                for (index_type i = i0;  i < i1;  ++i)
+                {
+                    (*this)(i, j) = fn(i, j);
+                }
             }
         }
     }
 
-    template<class FN>
-    constexpr void
-    apply(index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi, FN fn)
-        requires engine_traits::is_column_major
+
+    template<class ET2>
+    inline constexpr void
+    assign_from(index_type i0, index_type j0, index_type i1, index_type j1, ET2 const& rhs)
     {
-        for (index_type j = j_lo;  j < j_hi;  ++j)
-        {
-            for (index_type i = i_lo;  i < i_hi;  ++i)
-            {
-                (*this)(i, j) = fn(i, j);
-            }
-        }
+        apply(i0, j0, i1, j1, [&rhs](index_type i, index_type j){ return rhs(i, j); });
+    }
+
+    inline constexpr void
+    move_from(index_type i0, index_type j0, index_type i1, index_type j1, this_type const& rhs)
+    {
+        apply(i0, j0, i1, j1, [&rhs](index_type i, index_type j){ return std::move(rhs(i, j)); });
+    }
+
+    inline constexpr void
+    fill(index_type i0, index_type j0, index_type i1, index_type j1, value_type const& t)
+    {
+        apply(i0, j0, i1, j1, [&t](index_type, index_type){ return t; });
     }
 
     template<class ET2>
     constexpr void
     assign(ET2 const& rhs)
-        requires (!engine_traits::is_column_resizable && !engine_traits::is_row_resizable)
+        requires (!engine_traits::is_column_resizable  &&  !engine_traits::is_row_resizable)
     {
         detail::check_source_engine_size(rhs, m_data.m_rows, m_data.m_cols);
         detail::assign_from_matrix_engine(*this, rhs);
@@ -432,15 +450,13 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     template<class ET2>
     constexpr void
     assign(ET2 const& rhs)
-        requires (engine_traits::is_column_resizable && engine_traits::is_row_resizable)
+        requires (engine_traits::is_column_resizable  &&  engine_traits::is_row_resizable)
     {
         index_type  rows = static_cast<index_type>(rhs.rows());
         index_type  cols = static_cast<index_type>(rhs.columns());
-        this_type   tmp;
 
-        tmp.reshape(rows, cols);
-        detail::assign_from_matrix_initlist(tmp, rhs);
-        tmp.swap(*this);
+        reshape(rows, cols, m_data.m_rowcap, m_data.m_colcap);
+        assign_from(0, 0, rows, cols, rhs);
     }
 
     template<class T2>
@@ -498,60 +514,6 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         tmp.resize(rows, cols);
         detail::assign_from_matrix_initlist(tmp, rhs);
         tmp.swap(*this);
-    }
-
-    constexpr void
-    move_from(this_type const& src, index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi)
-        requires engine_traits::is_row_major
-    {
-        for (index_type i = i_lo;  i < i_hi;  ++i)
-        {
-            for (index_type j = j_lo;  j < j_hi;  ++j)
-            {
-                (*this)(i, j) = std::move(src(i, j));
-            }
-        }
-        apply(i_lo, j_lo, i_hi, j_hi, [&src](index_type i, index_type j){ return std::move(src(i, j));});
-    }
-
-    constexpr void
-    move_from(this_type const& src, index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi)
-        requires engine_traits::is_column_major
-    {
-        for (index_type j = j_lo;  j < j_hi;  ++j)
-        {
-            for (index_type i = i_lo;  i < i_hi;  ++i)
-            {
-                (*this)(i, j) = std::move(src(i, j));
-            }
-        }
-    }
-
-    constexpr void
-    fill(index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi, value_type const& t)
-        requires engine_traits::is_row_major
-    {
-        for (index_type i = i_lo;  i < i_hi;  ++i)
-        {
-            for (index_type j = j_lo;  j < j_hi;  ++j)
-            {
-                (*this)(i, j) = t;
-            }
-        }
-        apply(i_lo, j_lo, i_hi, j_hi, [&t](index_type, index_type){ return t;});
-    }
-
-    constexpr void
-    fill(index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi, value_type const& t)
-        requires engine_traits::is_column_major
-    {
-        for (index_type j = j_lo;  j < j_hi;  ++j)
-        {
-            for (index_type i = i_lo;  i < i_hi;  ++i)
-            {
-                (*this)(i, j) = t;
-            }
-        }
     }
 };
 

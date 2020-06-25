@@ -90,6 +90,7 @@ namespace STD_LA
 #include "linear_algebra/forward_declarations.hpp"
 #include "linear_algebra/private_support.hpp"
 #include "linear_algebra/public_support.hpp"
+
 #include "linear_algebra/fixed_size_vector_engine.hpp"
 #include "linear_algebra/fixed_size_matrix_engine.hpp"
 #include "linear_algebra/dynamic_vector_engine.hpp"
@@ -110,6 +111,7 @@ namespace STD_LA
 #include "linear_algebra/arithmetic_operators.hpp"
 
 #include "linear_algebra/engine_support.hpp"
+#include "linear_algebra/matrix_storage_engine_support.hpp"
 #include "linear_algebra/matrix_storage_engine.hpp"
 
 #endif  //- LINEAR_ALGEBRA_HPP_DEFINED
