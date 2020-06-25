@@ -316,28 +316,30 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     inline constexpr reference
     operator ()(index_type i, index_type j)
+        requires engine_traits::is_row_major
     {
-        if constexpr (engine_traits::is_row_major)
-        {
-            return m_data.m_elems[i*m_data.m_colcap + j];
-        }
-        else
-        {
-            return m_data.m_elems[i + j*m_data.m_rowcap];
-        }
+        return m_data.m_elems[i*m_data.m_colcap + j];
+    }
+
+    inline constexpr reference
+    operator ()(index_type i, index_type j)
+        requires engine_traits::is_column_major
+    {
+        return m_data.m_elems[i + j*m_data.m_rowcap];
     }
 
     inline constexpr const_reference
     operator ()(index_type i, index_type j) const
+        requires engine_traits::is_row_major
     {
-        if constexpr (engine_traits::is_row_major)
-        {
-            return m_data.m_elems[i*m_data.m_colcap + j];
-        }
-        else
-        {
-            return m_data.m_elems[i + j*m_data.m_rowcap];
-        }
+        return m_data.m_elems[i*m_data.m_colcap + j];
+    }
+
+    inline constexpr const_reference
+    operator ()(index_type i, index_type j) const
+        requires engine_traits::is_column_major
+    {
+        return m_data.m_elems[i + j*m_data.m_rowcap];
     }
 
     inline constexpr span_type
@@ -363,7 +365,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         }
     }
 
-    inline constexpr void
+    constexpr void
     swap_columns(index_type c1, index_type c2) noexcept
     {
         if (c1 != c2)
@@ -375,7 +377,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         }
     }
 
-    inline constexpr void
+    constexpr void
     swap_rows(index_type r1, index_type r2) noexcept
     {
         if (r1 != r2)
@@ -390,11 +392,55 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
   private:
     storage_type    m_data;
 
+    template<class FN>
+    constexpr void
+    apply(index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi, FN fn)
+        requires engine_traits::is_row_major
+    {
+        for (index_type i = i_lo;  i < i_hi;  ++i)
+        {
+            for (index_type j = j_lo;  j < j_hi;  ++j)
+            {
+                (*this)(i, j) = fn(i, j);
+            }
+        }
+    }
+
+    template<class FN>
+    constexpr void
+    apply(index_type i_lo, index_type j_lo, index_type i_hi, index_type j_hi, FN fn)
+        requires engine_traits::is_column_major
+    {
+        for (index_type j = j_lo;  j < j_hi;  ++j)
+        {
+            for (index_type i = i_lo;  i < i_hi;  ++i)
+            {
+                (*this)(i, j) = fn(i, j);
+            }
+        }
+    }
+
     template<class ET2>
-    constexpr void  assign(ET2 const& rhs)
+    constexpr void
+    assign(ET2 const& rhs)
+        requires (!engine_traits::is_column_resizable && !engine_traits::is_row_resizable)
     {
         detail::check_source_engine_size(rhs, m_data.m_rows, m_data.m_cols);
         detail::assign_from_matrix_engine(*this, rhs);
+    }
+
+    template<class ET2>
+    constexpr void
+    assign(ET2 const& rhs)
+        requires (engine_traits::is_column_resizable && engine_traits::is_row_resizable)
+    {
+        index_type  rows = static_cast<index_type>(rhs.rows());
+        index_type  cols = static_cast<index_type>(rhs.columns());
+        this_type   tmp;
+
+        tmp.reshape(rows, cols);
+        detail::assign_from_matrix_initlist(tmp, rhs);
+        tmp.swap(*this);
     }
 
     template<class T2>
@@ -465,6 +511,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
                 (*this)(i, j) = std::move(src(i, j));
             }
         }
+        apply(i_lo, j_lo, i_hi, j_hi, [&src](index_type i, index_type j){ return std::move(src(i, j));});
     }
 
     constexpr void
@@ -491,6 +538,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
                 (*this)(i, j) = t;
             }
         }
+        apply(i_lo, j_lo, i_hi, j_hi, [&t](index_type, index_type){ return t;});
     }
 
     constexpr void
