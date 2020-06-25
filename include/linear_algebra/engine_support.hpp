@@ -59,12 +59,11 @@ using dynamic_vector_mdspan_t = mdspan<T, dynamic_extent>;
 
 
 //--------------------------------------------------------------------------------------------------
-//  Traits Type:    is_valid_storage_extents<X>
+//  Concept:    valid_mse_extents<X>
 //
-//  This supporting, private traits type is used to validate the second template argument of a
-//  specialization of matrix_storage_engine, the engine's extents type.  It must be a one- or
-//  two-dimensional extents type, and each dimension's template argument may have only a certain
-//  set of values.
+//  This private concept is used to validate the second template argument of a specialization of 
+//  matrix_storage_engine, the engine's extents type.  It must be a one- or two-dimensional extents 
+//  type, and each dimension's template argument may have only a certain set of values.
 //--------------------------------------------------------------------------------------------------
 //
 template<class X>
@@ -86,9 +85,83 @@ struct is_valid_storage_extents<extents<R,C>>
     static constexpr bool   value = (R == dynamic_extent || R > 0) && (C == dynamic_extent || C > 0);
 };
 
+//- Concept definition.
+//
+template<typename X>
+concept valid_mse_extents = is_valid_storage_extents<X>::value;
 
-template<class X> inline constexpr
-bool    is_valid_storage_extents_v = is_valid_storage_extents<X>::value;
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    valid_mse_extents<X>
+//
+//  This private concept is used to validate the third template argument of matrix_storage_engine, 
+//  the allocator type.  It must be void, or it must be possible to instantiate a specialization of 
+//  allocator_traits with it that meets certain requirements.
+//--------------------------------------------------------------------------------------------------
+//
+template<typename T>
+concept no_allocator = requires { requires is_same_v<T, void>; };
+
+#if defined(LA_COMPILER_GCC) && ((LA_GCC_VERSION == 9) || (LA_GCC_VERSION == 10))
+    //- Neither GCC 9 nor GCC 10 can parse the type requirement 'AT::template rebind_alloc<T>',
+    //  so we add a level of indirection and hoist it up into its own alias template.
+    //
+    template<class AT, class T>
+    using at_rebind_alloc_t = typename AT::template rebind_alloc<T>;
+
+    template<typename AT, typename T>
+    concept valid_allocator_traits =
+        requires
+        {
+            typename AT::allocator_type;
+            typename AT::value_type;
+            typename AT::size_type;
+            typename AT::pointer;
+            typename at_rebind_alloc_t<AT, T>;
+            requires is_same_v<T, typename AT::value_type>;
+        }
+        and
+        requires (typename AT::allocator_type a, typename AT::pointer p, typename AT::size_type n)
+        {
+            { AT::deallocate(a, p, n) };
+            { AT::allocate(a, n) } -> returns<typename AT::pointer>;
+            { static_cast<T*>(p) };
+    #if (LA_GCC_VERSION == 9)
+            requires is_same_v<decltype(*p), T&>;
+            requires is_same_v<decltype(p[n]), T&>;
+    #else
+            { *p   } -> returns<T&>;
+            { p[n] } -> returns<T&>;
+    #endif
+        };
+#else
+    //- Clang 10 and VC++ accept the following without any problems.
+    //
+    template<typename AT, typename T>
+    concept valid_allocator_traits =
+        requires
+        {
+            typename AT::allocator_type;
+            typename AT::value_type;
+            typename AT::size_type;
+            typename AT::pointer;
+            typename AT::template rebind_alloc<T>;
+            requires is_same_v<T, typename AT::value_type>;
+        }
+        and
+        requires (typename AT::allocator_type a, typename AT::pointer p, typename AT::size_type n)
+        {
+            { AT::deallocate(a, p, n) };
+            { AT::allocate(a, n) } -> returns<typename AT::pointer>;
+            { static_cast<T*>(p) };
+            { *p   } -> returns<T&>;
+            { p[n] } -> returns<T&>;
+        };
+#endif
+
+template<typename A, typename T>
+concept valid_mse_allocator = no_allocator<A> or valid_allocator_traits<allocator_traits<A>, T>;
+
 
 
 //--------------------------------------------------------------------------------------------------
@@ -100,7 +173,7 @@ bool    is_valid_storage_extents_v = is_valid_storage_extents<X>::value;
 template<class T, class X, class A, class L>
 struct mse_traits
 {
-    struct null;
+    struct null_type;
 
     static constexpr bool   is_column_matrix    = false;
     static constexpr bool   is_row_matrix       = false;
@@ -117,8 +190,8 @@ struct mse_traits
     static constexpr bool   is_column_major     = false;
     static constexpr bool   is_row_major        = false;
 
-    using span_type       = null;
-    using const_span_type = null;
+    using span_type       = null_type;
+    using const_span_type = null_type;
 };
 
 
@@ -425,12 +498,14 @@ struct mse_traits<T, extents<dynamic_extent, dynamic_extent>, A, L>
 //--------------------------------------------------------------------------------------------------
 //  Class Template:     mse_data<T, X, A, L>
 //
-//  Partial specializations of class template mse_data contain and manage elements on behalf
-//  of matrix_storage_engine.
+//  Type that contains and manages elements on behalf of matrix_storage_engine<T,X,A,L>.
+//
+//  Partial specializations of this class template are tailored to specific corresponding partial
+//  specializations of matrix_storage_engine.
 //
 //  The implementation assumes that all dynamically-allocated memory is default-constructed, with
-//  consequence that elements lying in (currently) unused capacity are also initialized.  This
-//  assumption may be absent in the final version.
+//  consequence that elements lying in (currently) unused capacity are also constructed.  This
+//  assumption makes implementation easy, but may be absent in the final version.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, class X, class A, class L>    struct mse_data;
@@ -713,79 +788,6 @@ concept column_major_layout = is_same_v<EL, column_major>;
 template<typename EL>
 concept valid_mse_layout = row_major_layout<EL> or column_major_layout<EL>;
 
-
-template<typename X>
-concept valid_mse_extents = is_valid_storage_extents<X>::value;
-
-//--------------------------------------------------------------------------------------------------
-//- The following three concepts are used to help validate the third template argument of
-//  a specialization of matrix_storage_engine, the allocator type.  It must be void, or it
-//  must be possible to instantiate a specialization of allocator_traits with it that meets
-//  certain requirements.
-//--------------------------------------------------------------------------------------------------
-//
-template<typename T>
-concept no_allocator = requires { requires is_same_v<T, void>; };
-
-#if defined(LA_COMPILER_GCC) && ((LA_GCC_VERSION == 9) || (LA_GCC_VERSION == 10))
-    //- Neither GCC 9 nor GCC 10 can parse the type requirement 'AT::template rebind_alloc<T>',
-    //  so we add a level of indirection and hoist it up into its own alias template.
-    //
-    template<class AT, class T>
-    using at_rebind_alloc_t = typename AT::template rebind_alloc<T>;
-
-    template<typename AT, typename T>
-    concept valid_allocator_traits =
-        requires
-        {
-            typename AT::allocator_type;
-            typename AT::value_type;
-            typename AT::size_type;
-            typename AT::pointer;
-            typename at_rebind_alloc_t<AT, T>;
-            requires is_same_v<T, typename AT::value_type>;
-        }
-        and
-        requires (typename AT::allocator_type a, typename AT::pointer p, typename AT::size_type n)
-        {
-            { AT::deallocate(a, p, n) };
-            { AT::allocate(a, n) } -> returns<typename AT::pointer>;
-            { static_cast<T*>(p) };
-    #if (LA_GCC_VERSION == 9)
-            requires is_same_v<decltype(*p), T&>;
-            requires is_same_v<decltype(p[n]), T&>;
-    #else
-            { *p   } -> returns<T&>;
-            { p[n] } -> returns<T&>;
-    #endif
-        };
-#else
-    //- Clang 10 and VC++ accept the following without any problems.
-    //
-    template<typename AT, typename T>
-    concept valid_allocator_traits =
-        requires
-        {
-            typename AT::allocator_type;
-            typename AT::value_type;
-            typename AT::size_type;
-            typename AT::pointer;
-            typename AT::template rebind_alloc<T>;
-            requires is_same_v<T, typename AT::value_type>;
-        }
-        and
-        requires (typename AT::allocator_type a, typename AT::pointer p, typename AT::size_type n)
-        {
-            { AT::deallocate(a, p, n) };
-            { AT::allocate(a, n) } -> returns<typename AT::pointer>;
-            { static_cast<T*>(p) };
-            { *p   } -> returns<T&>;
-            { p[n] } -> returns<T&>;
-        };
-#endif
-
-template<typename A, typename T>
-concept valid_mse_allocator = no_allocator<A> or valid_allocator_traits<allocator_traits<A>, T>;
 
 
 template<class ET>
