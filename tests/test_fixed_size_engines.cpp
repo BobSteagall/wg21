@@ -967,3 +967,13 @@ TEST(FsMatrixEngine, Span)
     EXPECT_EQ(e1(2, 2), 333.0f);
     EXPECT_EQ(e1(3, 3), 444.0f);
 }
+
+
+TEST(FsVectorEngine, VecInst)
+{
+    auto    a = fs_vector<double, 3>{ 1, 2, 3 };
+
+    EXPECT_EQ(a(0), 1.0f);
+    EXPECT_EQ(a(1), 2.0f);
+    EXPECT_EQ(a(2), 3.0f);
+}
