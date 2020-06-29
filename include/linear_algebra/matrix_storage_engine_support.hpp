@@ -119,7 +119,7 @@ concept valid_mse_allocator = no_allocator<A> or valid_allocator_traits<allocato
 
 
 //--------------------------------------------------------------------------------------------------
-//  Concept:    valid_mse_layout<L>
+//  Concept:    valid_mse_matrix_layout<L>, valid_mse_vector_layout<L>
 //
 //  This private concept is used to validate the fourth template argument of a specialization of
 //  matrix_storage_engine, the engine's layout type.  It must be either row_major or column_major.
@@ -128,18 +128,24 @@ concept valid_mse_allocator = no_allocator<A> or valid_allocator_traits<allocato
 template<typename EL>
 concept valid_mse_layout = (is_same_v<EL, row_major> || is_same_v<EL, column_major>);
 
+template<typename EL>
+concept valid_mse_matrix_layout = (is_same_v<EL, row_major> || is_same_v<EL, column_major>);
+
+template<typename EL>
+concept valid_mse_vector_layout = is_same_v<EL, unoriented>;
+
 
 //--------------------------------------------------------------------------------------------------
 //  MDSPAN Support:     fixed_matrix_mdspan_t<T, R, C, L>
 //                      dynamic_matrix_mdspan_t<T>
-//                      make_matric_mdspan()
+//                      make_matrix_mdspan()
 //
 //                      fixed_vector_mdspan_t<T, N>
 //                      dynamic_vector_mdspan_t<T>
 //                      make_vector_mdspan()
 //
 //  These alias templates and function templates, are used by mse_traits<T, X, A, L> and
-//  matrix_storage_engine<T, X, A, L> to declare approptiate mdspan types and return correct
+//  matrix_storage_engine<T, X, A, L> to declare appropriate mdspan types and return correct
 //  mdspan instances, respectively.
 //--------------------------------------------------------------------------------------------------
 //
@@ -208,6 +214,21 @@ make_matrix_mdspan(MseData& rep)
 
             return SpanType(rep.m_elems.data(), mapping);
         }
+    }
+    else
+    {
+        return SpanType(rep.m_elems.data());
+    }
+}
+
+
+template<class SpanType, class EngineTraits, class MseData> inline constexpr
+SpanType
+make_vector_mdspan(MseData& rep)
+{
+    if constexpr (EngineTraits::is_resizable)
+    {
+        return SpanType(rep.m_elems.data(), rep.m_size);
     }
     else
     {
@@ -557,10 +578,11 @@ struct mse_traits<T, extents<dynamic_extent, dynamic_extent>, A, L>
 //  Type that contains and manages elements on behalf of matrix_storage_engine<T,X,A,L>.
 //
 //  Partial specializations of this class template are tailored to specific corresponding partial
-//  specializations of matrix_storage_engine.
+//  specializations of matrix_storage_engine.  They provide only the special member functions,
+//  and all other manipulation of their internal state is performed by matrix_storage_engine.
 //
-//  The implementation assumes that all dynamically-allocated memory is default-constructed, with
-//  consequence that elements lying in (currently) unused capacity are also constructed.  This
+//  The implementation assumes that all dynamically-allocated memory is default-constructed,
+//  with the consequence that elements lying in unused capacity are also constructed.  This
 //  assumption makes implementation easy, but may be absent in the final version.
 //--------------------------------------------------------------------------------------------------
 //
@@ -580,7 +602,14 @@ struct mse_data<T, extents<N>, void, L>
     array_type  m_elems;
 
     ~mse_data() = default;
-    constexpr mse_data() = default;
+    constexpr mse_data()
+    :   m_elems()
+    {
+        if constexpr (!is_class_v<T>)
+        {
+            m_elems.fill(T{});
+        }
+    }
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;

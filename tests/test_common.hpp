@@ -56,6 +56,27 @@ namespace STD_LA
 }
 #endif
 
+using vi_init_list = std::initializer_list<int>;
+using vf_init_list = std::initializer_list<float>;
+
+#define LST_4_0     {  0,   0,   0,   0}
+#define LST_4_1     {  1,   2,   3,   4}
+#define LST_4_2     { 11,  22,  33,  44}
+#define LST_4_3     {101, 202, 303, 404}
+
+static const vi_init_list   il_4_0 = LST_4_0;
+static const vf_init_list   fl_4_0 = LST_4_0;
+
+static const vi_init_list   il_4_1 = LST_4_1;
+static const vf_init_list   fl_4_1 = LST_4_1;
+
+static const vi_init_list   il_4_2 = LST_4_2;
+static const vf_init_list   fl_4_2 = LST_4_2;
+
+static const vi_init_list   il_4_3 = LST_4_3;
+static const vf_init_list   fl_4_3 = LST_4_3;
+
+
 inline constexpr index_tuple_type     st_33(3, 3);
 inline constexpr index_tuple_type     st_34(3, 4);
 inline constexpr index_tuple_type     st_43(4, 3);

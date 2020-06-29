@@ -4,7 +4,7 @@ if(NOT DEFINED PROJECT_NAME)
     set(LA_IS_PRIMARY_PROJECT ON)
 endif()
 
-project(wg21_linear_algebra VERSION 0.7.0)
+project(wg21_linear_algebra VERSION 0.7.1)
 
 if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
     include(${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)

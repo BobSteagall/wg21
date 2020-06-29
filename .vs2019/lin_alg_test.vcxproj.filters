@@ -98,6 +98,9 @@
     <ClInclude Include="..\include\linear_algebra\engine_support.hpp">
       <Filter>Library Implementation Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\matrix_storage_engine_support.hpp">
+      <Filter>Library Implementation Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tests\test_01.cpp">
@@ -140,6 +143,9 @@
       <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_matrix_view_engines.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_matrix_storage_engines.cpp">
       <Filter>Unit Test Source Files</Filter>
     </ClCompile>
   </ItemGroup>

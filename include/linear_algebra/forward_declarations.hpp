@@ -45,6 +45,7 @@ template<class T, ptrdiff_t R, ptrdiff_t C> class fs_matrix_engine;
 template<class ET, class VCT, class VFT>    class vector_view_engine;
 template<class ET, class MCT, class VFT>    class matrix_view_engine;
 
+struct unoriented {};
 struct row_major {};
 struct column_major {};
 template<class T, class X, class A, class L>    class matrix_storage_engine;

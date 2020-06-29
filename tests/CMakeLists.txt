@@ -5,6 +5,7 @@ FetchContent_GetProperties(gtest)
 option(BUILD_GMOCK "" OFF)
 option(INSTALL_GTEST "" OFF)
 option(gtest_force_shared_crt "" ON)
+add_compile_options(-U__cpp_char8_t)
 
 if(NOT gtest_POPULATED)
     FetchContent_Populate(gtest)
@@ -38,6 +39,7 @@ target_sources(la_test
         test_new_number.hpp
         test_dynamic_engines.cpp
         test_fixed_size_engines.cpp
+        test_matrix_storage_engines.cpp
         test_matrix_view_engines.cpp
         test_vector_view_engines.cpp
         test_obj_matrix.cpp

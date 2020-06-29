@@ -28,6 +28,7 @@
     <ClInclude Include="..\include\linear_algebra\engine_support.hpp" />
     <ClInclude Include="..\include\linear_algebra\fixed_size_matrix_engine.hpp" />
     <ClInclude Include="..\include\linear_algebra\fixed_size_vector_engine.hpp" />
+    <ClInclude Include="..\include\linear_algebra\matrix_storage_engine_support.hpp" />
     <ClInclude Include="..\include\linear_algebra\matrix_view_engine.hpp" />
     <ClInclude Include="..\include\linear_algebra\private_support.hpp" />
     <ClInclude Include="..\include\linear_algebra\forward_declarations.hpp" />
@@ -63,6 +64,7 @@
     <ClCompile Include="..\tests\test_dynamic_engines.cpp" />
     <ClCompile Include="..\tests\test_fixed_size_engines.cpp" />
     <ClCompile Include="..\tests\test_main.cpp" />
+    <ClCompile Include="..\tests\test_matrix_storage_engines.cpp" />
     <ClCompile Include="..\tests\test_matrix_view_engines.cpp" />
     <ClCompile Include="..\tests\test_obj_matrix.cpp" />
     <ClCompile Include="..\tests\test_op_add_traits.cpp" />
