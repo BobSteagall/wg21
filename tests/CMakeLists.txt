@@ -5,7 +5,7 @@ FetchContent_GetProperties(gtest)
 option(BUILD_GMOCK "" OFF)
 option(INSTALL_GTEST "" OFF)
 option(gtest_force_shared_crt "" ON)
-add_compile_options(-fno-char8_t)
+add_compile_options(-U__cpp_char8_t)
 
 if(NOT gtest_POPULATED)
     FetchContent_Populate(gtest)
