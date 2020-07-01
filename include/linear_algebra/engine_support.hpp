@@ -91,7 +91,7 @@ concept initable_vector_engine =
 
 template<class ET>
 concept resizable_vector_engine =
-    initable_vector_engine<ET>
+    readable_vector_engine<ET>
     and
     requires (ET& eng, typename ET::index_type i)
     {

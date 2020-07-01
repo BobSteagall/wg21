@@ -39,8 +39,12 @@ target_sources(la_test
         test_new_number.hpp
         test_dynamic_engines.cpp
         test_fixed_size_engines.cpp
-        test_matrix_storage_engines.cpp
         test_matrix_view_engines.cpp
+        test_mse_00.cpp
+        test_mse_01.cpp
+        test_mse_02.cpp
+        test_mse_03.cpp
+        test_mse_04.cpp
         test_vector_view_engines.cpp
         test_obj_matrix.cpp
         test_op_add_traits.cpp

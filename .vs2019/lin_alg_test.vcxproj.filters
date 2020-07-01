@@ -145,7 +145,19 @@
     <ClCompile Include="..\tests\test_matrix_view_engines.cpp">
       <Filter>Unit Test Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\tests\test_matrix_storage_engines.cpp">
+    <ClCompile Include="..\tests\test_mse_01.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_mse_02.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_mse_03.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_mse_04.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_mse_00.cpp">
       <Filter>Unit Test Source Files</Filter>
     </ClCompile>
   </ItemGroup>

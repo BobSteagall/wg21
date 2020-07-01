@@ -1212,11 +1212,20 @@ check_source_init_list(initializer_list<initializer_list<T>> list, ST rows, ST c
         }
     }
 
+#if 1
+    if ((rows != dynamic_extent  &&  list.size() != static_cast<size_t>(rows)) ||
+        (cols != dynamic_extent  &&  first_row_size != static_cast<size_t>(cols)))
+    {
+        throw runtime_error("source 2-D initializer_list size does not match "
+                            "destination matrix engine size");
+    }
+#else
     if (list.size() != static_cast<size_t>(rows)  ||  first_row_size != static_cast<size_t>(cols))
     {
         throw runtime_error("source 2-D initializer_list size does not match "
                             "destination matrix engine size");
     }
+#endif
 }
 
 //==================================================================================================
@@ -1418,7 +1427,7 @@ m_cmp_eq(ET1 const& lhs, ET2 const& rhs)
 
         for (;  j1 < c1;  ++j1, ++j2)
         {
-            if (lhs(i1, j1) != rhs(i2, j2)) return false;
+            if (not (lhs(i1, j1) == rhs(i2, j2))) return false;
         }
     }
     return true;
@@ -1457,7 +1466,7 @@ m_cmp_eq(ET const& lhs, initializer_list<initializer_list<U>> rhs)
 
         for (;  ej < ec;  ++ej, ++cp)
         {
-            if (lhs(ei, ej) != *cp) return false;
+            if (not (lhs(ei, ej) == *cp)) return false;
         }
     }
     return true;
@@ -1488,7 +1497,7 @@ m_cmp_eq(ET const& lhs, basic_mdspan<T, extents<X0, X1>, L, A> const& rhs)
 
         for (;  j1 < c1;  ++j1, ++j2)
         {
-            if (lhs(i1, j1) != rhs(i2, j2)) return false;
+            if (not (lhs(i1, j1) == rhs(i2, j2))) return false;
         }
     }
     return true;

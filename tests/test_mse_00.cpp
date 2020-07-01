@@ -7,7 +7,6 @@ using fve_type_v = matrix_storage_engine<float, extents<4>, void, unoriented>;
 using fve_type_a = matrix_storage_engine<float, extents<4>, allocator<float>, unoriented>;
 using dve_type   = matrix_storage_engine<float, extents<dynamic_extent>, allocator<float>, unoriented>;
 
-
 //==================================================================================================
 //  Unit tests for vector engine.
 //==================================================================================================
@@ -217,7 +216,7 @@ TEST(MSE_Vector, CopyCtor)
     EXPECT_TRUE(v_cmp_eq(e2, l1));
     EXPECT_TRUE(v_cmp_eq(e3, l1));
 
-    //- Construct new engines via move ctor and verify their initial state.
+    //- Construct new engines via copy ctor and verify their initial state.
     //
     fve_type_v      e1b(e1);
     fve_type_a      e2b(e2);
@@ -278,7 +277,7 @@ TEST(MSE_Vector, ListAssign)
     EXPECT_EQ(e3a.size(), 0);
     EXPECT_TRUE(v_cmp_eq(e3b, fl_4_3));
 
-    //- Assign and verify.
+    //- List assign and verify.
     //
     e1a = l0;
     e1b = l0;
@@ -321,7 +320,7 @@ TEST(MSE_Vector, MoveAssign)
     EXPECT_TRUE(v_cmp_eq(e3c, fl_4_2));
     EXPECT_TRUE(v_cmp_eq(e3d, fl_4_3));
 
-    //- Move and verify.
+    //- Move assign and verify.
     //
     e1a = std::move(e1c);
     e1b = std::move(e1d);
@@ -361,7 +360,7 @@ TEST(MSE_Vector, CopyAssign)
     EXPECT_TRUE(v_cmp_eq(e3c, fl_4_2));
     EXPECT_TRUE(v_cmp_eq(e3d, fl_4_3));
 
-    //- Copy and verify.
+    //- Copy assign and verify.
     //
     e1a = e1c;
     e1b = e1d;
@@ -407,7 +406,7 @@ TEST(MSE_Vector, EngineAssign)
     EXPECT_TRUE(v_cmp_eq(e3c, fl_4_2));
     EXPECT_TRUE(v_cmp_eq(e3d, fl_4_3));
 
-    //- Copy and verify.
+    //- Engine assign and verify.
     //
     e1a = e2c;
     e1b = e2d;
@@ -551,5 +550,3 @@ TEST(MSE_Vector, Span)
     sp3(3) = 14.0f;
     EXPECT_TRUE(v_cmp_eq(e3, {11, 12, 13, 14}));
 }
-
-

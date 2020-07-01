@@ -243,6 +243,8 @@ make_vector_mdspan(MseData& rep)
 //  This supporting, private traits type is used to ...
 //--------------------------------------------------------------------------------------------------
 //
+//- Case 0: primary template
+//
 template<class T, class X, class A, class L>
 struct mse_traits
 {
@@ -269,10 +271,10 @@ struct mse_traits
 
 
 //-----------------------
-//- Vector engine (1 x N)
+//- Case 1: vector engine (1 x N)
 //
 template<class T, ptrdiff_t N, class L>
-struct mse_traits<T, extents<N>, void, L>
+struct mse_traits<T, extents<N>, void, L>                       //- Case 1A
 {
     static constexpr bool   is_column_matrix    = false;
     static constexpr bool   is_row_matrix       = false;
@@ -289,7 +291,7 @@ struct mse_traits<T, extents<N>, void, L>
 };
 
 template<class T, ptrdiff_t N, class A, class L>
-struct mse_traits<T, extents<N>, A, L>
+struct mse_traits<T, extents<N>, A, L>                          //- Case 1B
 {
     static constexpr bool   is_column_matrix    = false;
     static constexpr bool   is_row_matrix       = false;
@@ -306,7 +308,7 @@ struct mse_traits<T, extents<N>, A, L>
 };
 
 template<class T, class A, class L>
-struct mse_traits<T, extents<dynamic_extent>, A, L>
+struct mse_traits<T, extents<dynamic_extent>, A, L>             //- Case 1C
 {
     static constexpr bool   is_vector           = true;
     static constexpr bool   is_matrix           = false;
@@ -321,10 +323,10 @@ struct mse_traits<T, extents<dynamic_extent>, A, L>
 };
 
 //---------------------------
-//- Row matrix engine (1 x C)
+//- Case 2: row matrix engine (1 x C)
 //
 template<class T, ptrdiff_t C, class L>
-struct mse_traits<T, extents<1, C>, void, L>
+struct mse_traits<T, extents<1, C>, void, L>                    //- Case 2A
 {
     static constexpr bool   is_column_matrix    = false;
     static constexpr bool   is_row_matrix       = true;
@@ -346,7 +348,7 @@ struct mse_traits<T, extents<1, C>, void, L>
 };
 
 template<class T, ptrdiff_t C, class A, class L>
-struct mse_traits<T, extents<1, C>, A, L>
+struct mse_traits<T, extents<1, C>, A, L>                       //- Case 2B
 {
     static constexpr bool   is_column_matrix    = false;
     static constexpr bool   is_row_matrix       = true;
@@ -368,7 +370,7 @@ struct mse_traits<T, extents<1, C>, A, L>
 };
 
 template<class T, class A, class L>
-struct mse_traits<T, extents<1, dynamic_extent>, A, L>
+struct mse_traits<T, extents<1, dynamic_extent>, A, L>          //- Case 2C
 {
     static constexpr bool   is_column_matrix    = false;
     static constexpr bool   is_row_matrix       = true;
@@ -390,10 +392,10 @@ struct mse_traits<T, extents<1, dynamic_extent>, A, L>
 };
 
 //------------------------------
-//- Column matrix engine (R x 1)
+//- Case 3: column matrix engine (R x 1)
 //
 template<class T, ptrdiff_t R, class L>
-struct mse_traits<T, extents<R, 1>, void, L>
+struct mse_traits<T, extents<R, 1>, void, L>                    //- Case 3A
 {
     static constexpr bool   is_column_matrix    = true;
     static constexpr bool   is_row_matrix       = false;
@@ -415,7 +417,7 @@ struct mse_traits<T, extents<R, 1>, void, L>
 };
 
 template<class T, ptrdiff_t R, class A, class L>
-struct mse_traits<T, extents<R, 1>, A, L>
+struct mse_traits<T, extents<R, 1>, A, L>                       //- Case 3B
 {
     static constexpr bool   is_column_matrix    = true;
     static constexpr bool   is_row_matrix       = false;
@@ -437,7 +439,7 @@ struct mse_traits<T, extents<R, 1>, A, L>
 };
 
 template<class T, class A, class L>
-struct mse_traits<T, extents<dynamic_extent, 1>, A, L>
+struct mse_traits<T, extents<dynamic_extent, 1>, A, L>          //- Case 3C
 {
     static constexpr bool   is_column_matrix    = true;
     static constexpr bool   is_row_matrix       = false;
@@ -459,10 +461,10 @@ struct mse_traits<T, extents<dynamic_extent, 1>, A, L>
 };
 
 //------------------------------
-//- General matrix engine (R, C)
+//- Case 4: general matrix engine (R, C)
 //
 template<class T, ptrdiff_t R, ptrdiff_t C, class L>
-struct mse_traits<T, extents<R, C>, void, L>
+struct mse_traits<T, extents<R, C>, void, L>                    //- Case 4A
 {
     static constexpr bool   is_column_matrix    = false;
     static constexpr bool   is_row_matrix       = false;
@@ -484,7 +486,7 @@ struct mse_traits<T, extents<R, C>, void, L>
 };
 
 template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
-struct mse_traits<T, extents<R, C>, A, L>
+struct mse_traits<T, extents<R, C>, A, L>                       //- Case 4B
 {
     static constexpr bool   is_column_matrix    = false;
     static constexpr bool   is_row_matrix       = false;
@@ -506,7 +508,7 @@ struct mse_traits<T, extents<R, C>, A, L>
 };
 
 template<class T, ptrdiff_t C, class A, class L>
-struct mse_traits<T, extents<dynamic_extent, C>, A, L>
+struct mse_traits<T, extents<dynamic_extent, C>, A, L>          //- Case 4C
 {
     static constexpr bool   is_column_matrix    = false;
     static constexpr bool   is_row_matrix       = false;
@@ -528,7 +530,7 @@ struct mse_traits<T, extents<dynamic_extent, C>, A, L>
 };
 
 template<class T, ptrdiff_t R, class A, class L>
-struct mse_traits<T, extents<R, dynamic_extent>, A, L>
+struct mse_traits<T, extents<R, dynamic_extent>, A, L>          //- Case 4D
 {
     static constexpr bool   is_column_matrix    = false;
     static constexpr bool   is_row_matrix       = false;
@@ -550,7 +552,7 @@ struct mse_traits<T, extents<R, dynamic_extent>, A, L>
 };
 
 template<class T, class A, class L>
-struct mse_traits<T, extents<dynamic_extent, dynamic_extent>, A, L>
+struct mse_traits<T, extents<dynamic_extent, dynamic_extent>, A, L>     //- Case 4E
 {
     static constexpr bool   is_column_matrix    = false;
     static constexpr bool   is_row_matrix       = false;
@@ -679,7 +681,16 @@ struct mse_data<T, extents<R, C>, void, L>
     array_type  m_elems;
 
     ~mse_data() = default;
-    constexpr mse_data() = default;
+
+    constexpr mse_data()
+    :   m_elems()
+    {
+        if constexpr (!is_class_v<T>)
+        {
+            m_elems.fill(T{});
+        }
+    }
+
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
@@ -708,6 +719,7 @@ struct mse_data<T, extents<R, C>, A, L>
     inline constexpr mse_data()
     :   m_elems(R*C)
     {}
+
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
@@ -739,10 +751,18 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
     ,   m_cols(0)
     ,   m_colcap(0)
     {}
+
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
+
+    constexpr void
+    update_extents(ptrdiff_t, ptrdiff_t cols, ptrdiff_t, ptrdiff_t colcap) noexcept
+    {
+        m_cols   = cols;
+        m_colcap = colcap;
+    }
 };
 
 //---------------------------------------------------------------------------------
@@ -770,10 +790,18 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
     ,   m_rows(0)
     ,   m_rowcap(0)
     {}
+
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
+
+    constexpr void
+    update_extents(ptrdiff_t rows, ptrdiff_t, ptrdiff_t rowcap, ptrdiff_t) noexcept
+    {
+        m_rows   = rows;
+        m_rowcap = rowcap;
+    }
 };
 
 //-----------------------------------------------------------------------------------
@@ -802,10 +830,20 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
     ,   m_rowcap(0)
     ,   m_colcap(0)
     {}
+
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
+
+    constexpr void
+    update_extents(ptrdiff_t rows, ptrdiff_t cols, ptrdiff_t rowcap, ptrdiff_t colcap) noexcept
+    {
+        m_rows   = rows;
+        m_cols   = cols;
+        m_rowcap = rowcap;
+        m_colcap = colcap;
+    }
 };
 
 }       //- detail namespace

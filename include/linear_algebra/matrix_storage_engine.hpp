@@ -150,20 +150,6 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     //- Setting column size and capacity.
     //
-    inline void
-    resize_columns(index_type cols)
-        requires engine_traits::is_column_resizable
-    {
-        reshape_columns(cols, m_data.m_colcap);
-    }
-
-    inline void
-    reserve_columns(index_type colcap)
-        requires engine_traits::is_column_resizable
-    {
-        reshape_columns(m_data.m_cols, colcap);
-    }
-
     void
     reshape_columns(index_type cols, index_type colcap)
         requires engine_traits::is_column_resizable
@@ -176,16 +162,16 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
             //
             this_type   tmp;
 
+            colcap = max(cols, colcap);
             tmp.m_data.m_elems.resize(m_data.m_rowcap*colcap);
-            tmp.m_data.m_cols   = cols;
-            tmp.m_data.m_colcap = colcap;
+            tmp.m_data.update_extents(m_data.m_rows, cols, m_data.m_rowcap, colcap);
 
             //- Move the appropriate subset of elements into the temporary engine, then swap.
             //
             index_type  dst_rows = m_data.m_rows;
             index_type  dst_cols = min(cols, m_data.m_cols);
 
-            move_from(0, 0, dst_rows, dst_cols, *this);
+            tmp.move_from(0, 0, dst_rows, dst_cols, *this);
             detail::la_swap(m_data, tmp.m_data);
         }
         else
@@ -200,20 +186,6 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     //- Setting row size and capacity.
     //
-    inline void
-    resize_rows(index_type rows)
-        requires engine_traits::is_row_resizable
-    {
-        reshape_rows(rows, m_data.m_rowcap);
-    }
-
-    inline void
-    reserve_rows(index_type rowcap)
-        requires engine_traits::is_row_resizable
-    {
-        reshape_rows(m_data.m_rows, rowcap);
-    }
-
     void
     reshape_rows(index_type rows, index_type rowcap)
         requires engine_traits::is_row_resizable
@@ -226,9 +198,9 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
             //
             this_type   tmp;
 
+            rowcap = max(rows, rowcap);
             tmp.m_data.m_elems.resize(rowcap*m_data.m_colcap);
-            tmp.m_data.m_rows   = rows;
-            tmp.m_data.m_rowcap = rowcap;
+            tmp.m_data.update_extents(rows, m_data.m_cols, rowcap, m_data.m_colcap);
 
             //- Move the appropriate subset of elements into the temporary engine, then swap.
             //
@@ -250,20 +222,6 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     //- Setting overall size and capacity.
     //
-    inline void
-    resize(index_type rows, index_type cols)
-        requires engine_traits::is_resizable
-    {
-        reshape(rows, cols, m_data.m_rowcap, m_data.m_colcap);
-    }
-
-    inline void
-    reserve(index_type rowcap, index_type colcap)
-        requires engine_traits::is_resizable
-    {
-        reshape(m_data.m_rows, m_data.m_cols, rowcap, colcap);
-    }
-
     void
     reshape(index_type rows, index_type cols, index_type rowcap, index_type colcap)
         requires engine_traits::is_resizable
@@ -278,18 +236,14 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         if (rows   >  m_data.m_rowcap  ||  cols   >  m_data.m_colcap  ||
             rowcap != m_data.m_rowcap  ||  colcap != m_data.m_colcap)
         {
-            rowcap = max(rows, rowcap);
-            colcap = max(cols, colcap);
-
             //- Prepare a temporary engine to receive elements from this one.
             //
             this_type   tmp;
 
+            rowcap = max(rows, rowcap);
+            colcap = max(cols, colcap);
             tmp.m_data.m_elems.resize(rowcap*colcap);
-            tmp.m_data.m_rows   = rows;
-            tmp.m_data.m_cols   = cols;
-            tmp.m_data.m_rowcap = rowcap;
-            tmp.m_data.m_colcap = colcap;
+            tmp.m_data.update_extents(rows, cols, rowcap, colcap);
 
             //- Move the appropriate subset of elements into the temporary engine, then swap.
             //
@@ -440,7 +394,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     inline constexpr void
     assign_from(index_type i0, index_type j0, index_type i1, index_type j1, ET2 const& rhs)
     {
-        apply(i0, j0, i1, j1, [&rhs](index_type i, index_type j){ return rhs(i, j); });
+        apply(i0, j0, i1, j1, [&rhs](index_type i, index_type j){ return static_cast<element_type>(rhs(i, j)); });
     }
 
     inline constexpr void
@@ -450,7 +404,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
     inline constexpr void
-    fill(index_type i0, index_type j0, index_type i1, index_type j1, value_type const& t)
+    fill(index_type i0, index_type j0, index_type i1, index_type j1, element_type const& t)
     {
         apply(i0, j0, i1, j1, [&t](index_type, index_type){ return t; });
     }
@@ -490,13 +444,12 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     assign(initializer_list<initializer_list<T2>> rhs)
         requires (engine_traits::is_column_resizable  &&  !engine_traits::is_row_resizable)
     {
-        detail::check_source_init_list(rhs);
-        static_assert(m_data.m_rows == static_cast<index_type>(rhs.size()));
+        detail::check_source_init_list(rhs, m_data.m_rows, dynamic_extent);
 
         this_type   tmp;
         index_type  cols = static_cast<index_type>(rhs.begin()->size());
 
-        tmp.resize_columns(cols);
+        tmp.reshape_columns(cols, cols);
         detail::assign_from_matrix_initlist(tmp, rhs);
         tmp.swap(*this);
     }
@@ -506,13 +459,12 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     assign(initializer_list<initializer_list<T2>> rhs)
         requires (!engine_traits::is_column_resizable  &&  engine_traits::is_row_resizable)
     {
-        detail::check_source_init_list(rhs);
-        static_assert(m_data.m_cols == static_cast<index_type>(rhs.begin()->size()));
+        detail::check_source_init_list(rhs, dynamic_extent, m_data.m_cols);
 
         this_type   tmp;
         index_type  rows = static_cast<index_type>(rhs.size());
 
-        tmp.resize_rows(rows);
+        tmp.reshape_rows(rows, rows);
         detail::assign_from_matrix_initlist(tmp, rhs);
         tmp.swap(*this);
     }
@@ -520,7 +472,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     template<class T2>
     constexpr void
     assign(initializer_list<initializer_list<T2>> rhs)
-        requires (engine_traits::is_column_resizable && engine_traits::is_row_resizable)
+        requires engine_traits::is_resizable
     {
         detail::check_source_init_list(rhs);
 
@@ -528,7 +480,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         index_type  rows = static_cast<index_type>(rhs.size());
         index_type  cols = static_cast<index_type>(rhs.begin()->size());
 
-        tmp.resize(rows, cols);
+        tmp.reshape(rows, cols, rows, cols);
         detail::assign_from_matrix_initlist(tmp, rhs);
         tmp.swap(*this);
     }
