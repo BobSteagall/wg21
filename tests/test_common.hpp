@@ -63,7 +63,7 @@ using vf_init_list = std::initializer_list<float>;
 
 #define LST_4_0     {  0,   0,   0,   0}
 #define LST_4_1     {  1,   2,   3,   4}
-#define LST_4_2     { 11,  22,  33,  44}
+#define LST_4_2     { 11,  12,  13,  14}
 #define LST_4_3     {101, 202, 303, 404}
 
 static const vi_init_list   il_4_0 = LST_4_0;
@@ -85,6 +85,15 @@ inline constexpr index_tuple_type     st_43(4, 3);
 inline constexpr index_tuple_type     st_44(4, 4);
 inline constexpr index_tuple_type     st_55(5, 5);
 
+#define LST_14_0       {{0, 0, 0, 0}}
+#define LST_14_1       {{1, 2, 3, 4}}
+#define LST_14_2       {{11, 12, 13, 14}}
+
+#define LST_41_0       {{0}, {0}, {0}, {0}}
+#define LST_41_1       {{1}, {2}, {3}, {4}}
+#define LST_41_2       {{11}, {12}, {13}, {14}}
+
+
 #define LST_33_0       {{ 0, 0, 0 },        \
                         { 0, 0, 0 },        \
                         { 0, 0, 0 }}
@@ -105,12 +114,12 @@ inline constexpr index_tuple_type     st_55(5, 5);
                         { 21, 22, 23 },     \
                         { 31, 32, 33 }}
 
-#define LST_34_0       {{ 0, 0, 0, 0 },         \
-                        { 0, 0, 0, 0 },         \
+#define LST_34_0       {{ 0, 0, 0, 0 },     \
+                        { 0, 0, 0, 0 },     \
                         { 0, 0, 0, 0 }}
 
-#define LST_34_1       {{ 11, 12, 13, 14 },     \
-                        { 21, 22, 23, 24 },     \
+#define LST_34_1       {{ 11, 12, 13, 14 }, \
+                        { 21, 22, 23, 24 }, \
                         { 31, 32, 33, 34 }}
 
 #define LST_34_1_N     {{ -11, -12, -13, -14 }, \
@@ -220,6 +229,20 @@ inline constexpr index_tuple_type     st_55(5, 5);
 
 using mi_init_list = std::initializer_list<std::initializer_list<int>>;
 using mf_init_list = std::initializer_list<std::initializer_list<float>>;
+
+static const mi_init_list   il_14_0 = LST_14_0;
+static const mf_init_list   fl_14_0 = LST_14_0;
+static const mi_init_list   il_14_1 = LST_14_1;
+static const mf_init_list   fl_14_1 = LST_14_1;
+static const mi_init_list   il_14_2 = LST_14_2;
+static const mf_init_list   fl_14_2 = LST_14_2;
+
+static const mi_init_list   il_41_0 = LST_41_0;
+static const mf_init_list   fl_41_0 = LST_41_0;
+static const mi_init_list   il_41_1 = LST_41_1;
+static const mf_init_list   fl_41_1 = LST_41_1;
+static const mi_init_list   il_41_2 = LST_41_2;
+static const mf_init_list   fl_41_2 = LST_41_2;
 
 static const mi_init_list   il_33_0 = LST_33_0;
 static const mf_init_list   fl_33_0 = LST_33_0;

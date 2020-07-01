@@ -148,16 +148,40 @@
     <ClCompile Include="..\tests\test_mse_01.cpp">
       <Filter>Unit Test Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\tests\test_mse_02.cpp">
-      <Filter>Unit Test Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tests\test_mse_03.cpp">
-      <Filter>Unit Test Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tests\test_mse_04.cpp">
-      <Filter>Unit Test Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\tests\test_mse_00.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_mse_4A.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_mse_4B.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_mse_4C.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_mse_4D.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_mse_4E.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_mse_2A.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_mse_3A.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_mse_2B.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_mse_2C.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_mse_3B.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_mse_3C.cpp">
       <Filter>Unit Test Source Files</Filter>
     </ClCompile>
   </ItemGroup>

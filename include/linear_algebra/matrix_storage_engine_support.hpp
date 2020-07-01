@@ -380,8 +380,8 @@ struct mse_traits<T, extents<1, dynamic_extent>, A, L>          //- Case 2C
     static constexpr bool   is_readable         = true;
     static constexpr bool   is_writable         = true;
     static constexpr bool   is_initable         = true;
-    static constexpr bool   is_column_resizable = false;
-    static constexpr bool   is_row_resizable    = true;
+    static constexpr bool   is_column_resizable = true;
+    static constexpr bool   is_row_resizable    = false;
     static constexpr bool   is_resizable        = false;
 
     static constexpr bool   is_column_major     = is_same_v<L, column_major>;
@@ -449,8 +449,8 @@ struct mse_traits<T, extents<dynamic_extent, 1>, A, L>          //- Case 3C
     static constexpr bool   is_readable         = true;
     static constexpr bool   is_writable         = true;
     static constexpr bool   is_initable         = true;
-    static constexpr bool   is_column_resizable = true;
-    static constexpr bool   is_row_resizable    = false;
+    static constexpr bool   is_column_resizable = false;
+    static constexpr bool   is_row_resizable    = true;
     static constexpr bool   is_resizable        = false;
 
     static constexpr bool   is_column_major     = is_same_v<L, column_major>;

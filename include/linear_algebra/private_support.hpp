@@ -1167,7 +1167,8 @@ template<class ET, class ST> inline constexpr
 void
 check_source_engine_size(ET const& engine, ST rows, ST cols)
 {
-    if (engine.rows() != rows  ||  engine.columns() != cols)
+    if ((engine.rows() != rows) || 
+        (engine.columns() != cols))
     {
         throw runtime_error("source engine size does not match destination matrix engine size");
     }
@@ -1290,6 +1291,42 @@ assign_from_vector_initlist(ET& dst, initializer_list<T> src)
 
     index_type_dst  di = 0;
     index_type_dst  dn = dst.size();
+    elem_iter_src   ep = src.begin();
+
+    for (;  di < dn;  ++di, ++ep)
+    {
+        dst(di) = static_cast<elem_type_dst>(*ep);
+    }
+}
+
+template<class ET, class T> constexpr
+void
+assign_row_matrix_from_vector_initlist(ET& dst, initializer_list<T> src)
+{
+    using elem_type_dst  = typename ET::element_type;
+    using index_type_dst = typename ET::index_type;
+    using elem_iter_src  = decltype(src.begin());
+
+    index_type_dst  di = 0;
+    index_type_dst  dn = dst.columns();
+    elem_iter_src   ep = src.begin();
+
+    for (;  di < dn;  ++di, ++ep)
+    {
+        dst(di) = static_cast<elem_type_dst>(*ep);
+    }
+}
+
+template<class ET, class T> constexpr
+void
+assign_column_matrix_from_vector_initlist(ET& dst, initializer_list<T> src)
+{
+    using elem_type_dst  = typename ET::element_type;
+    using index_type_dst = typename ET::index_type;
+    using elem_iter_src  = decltype(src.begin());
+
+    index_type_dst  di = 0;
+    index_type_dst  dn = dst.rows();
     elem_iter_src   ep = src.begin();
 
     for (;  di < dn;  ++di, ++ep)

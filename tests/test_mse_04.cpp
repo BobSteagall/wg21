@@ -1567,7 +1567,7 @@ TEST(MSE_Matrix_4C, ListCtor)
     EXPECT_TRUE(m_cmp_eq(e3, e1));
 }
 
-/*
+
 TEST(MSE_Matrix_4C, EngineCtor)
 {
     //- Construct new engines via direct engine ctor and verify their initial states.
@@ -1614,8 +1614,9 @@ TEST(MSE_Matrix_4C, MoveAssign)
 {
     //- Default construct and verify initial state.
     //
-    mse_f_df_rm     e1(4, 4);
+    mse_f_df_rm     e1;
 
+    e1.reshape_rows(4, 0);
     EXPECT_EQ(e1.rows(), 4);
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 4);
@@ -1643,8 +1644,9 @@ TEST(MSE_Matrix_4C, CopyAssign)
 {
     //- Default construct and verify initial state.
     //
-    mse_f_df_rm     e1(4, 4);
+    mse_f_df_rm     e1;
 
+    e1.reshape_rows(4, 0);
     EXPECT_EQ(e1.rows(), 4);
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 4);
@@ -1672,14 +1674,16 @@ TEST(MSE_Matrix_4C, EngineAssign)
 {
     //- Default construct and verify initial state.
     //
-    mse_f_df_rm     e1(4, 4), e2{4, 4};
+    mse_f_df_rm     e1, e2;
 
+    e1.reshape_rows(4, 0);
     EXPECT_EQ(e1.rows(), 4);
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
     EXPECT_TRUE(m_cmp_eq(e1, LST_44_0));
 
+    e2.reshape_rows(4, 0);
     EXPECT_EQ(e2.rows(), 4);
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
@@ -1721,9 +1725,10 @@ TEST(MSE_Matrix_4C, ListAssign)
 {
     //- Default construct and verify initial state.
     //
-    mse_f_df_rm     e1(4, 4);
+    mse_f_df_rm     e1;
     mse_f_df_rm     e2{il_44_1};
 
+    e1.reshape_rows(4, 0);
     EXPECT_EQ(e1.rows(), 4);
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 4);
@@ -1748,13 +1753,6 @@ TEST(MSE_Matrix_4C, ListAssign)
     EXPECT_TRUE(m_cmp_eq(e1, LST_44_0));
     EXPECT_TRUE(m_cmp_eq(e1, il_44_0));
     EXPECT_TRUE(m_cmp_eq(e1, fl_44_0));
-    EXPECT_TRUE(m_cmp_eq(e1, mse_f_df_rm(4, 4)));
-
-    e1 = fl_33_1;
-    EXPECT_EQ(e1.size(), st_33);
-    EXPECT_EQ(e1.row_capacity(), 3);
-    EXPECT_EQ(e1.column_capacity(), 3);
-    EXPECT_TRUE(m_cmp_eq(e1, fl_33_1));
 }
 
 
@@ -1850,16 +1848,19 @@ TEST(MSE_Matrix_4C, Swap)
 {
     //- Default construct and verify initial state.
     //
-    mse_f_df_rm     e1(4, 4);
+    mse_f_df_rm     e1;
 
-    EXPECT_EQ(e1.size(), st_44);
+    e1.reshape_rows(4, 0);
+    EXPECT_EQ(e1.rows(), 4);
+    EXPECT_EQ(e1.columns(), 4);
     EXPECT_TRUE(m_cmp_eq(e1, fl_44_0));
 
     //- List construct and verify initial state.
     //
     mse_f_df_rm     e2(fl_44_2);
 
-    EXPECT_EQ(e2.size(), st_44);
+    EXPECT_EQ(e2.rows(), 4);
+    EXPECT_EQ(e2.columns(), 4);
     EXPECT_TRUE(m_cmp_eq(e2, fl_44_2));
 
     //- Swap contents and verify.
@@ -1887,11 +1888,16 @@ TEST(MSE_Matrix_4C, Swap)
 
 TEST(MSE_Matrix_4C, Span)
 {
-    mse_f_df_rm         e1(il_44_2), e2{4, 4}, e3{e1};
+    mse_f_df_rm         e1(il_44_2), e2, e3{e1};
     mse_f_df_rm const&  ce1 = e1;
 
     auto    sp1  = e1.span();
     auto    csp1 = ce1.span();
+
+    e2.reshape_rows(4, 0);
+    EXPECT_EQ(e2.rows(), 4);
+    EXPECT_EQ(e2.columns(), 4);
+    EXPECT_TRUE(m_cmp_eq(e2, fl_44_0));
 
     //- Const and mutable spans should have different types.
     //
@@ -1953,7 +1959,7 @@ TEST(MSE_Matrix_4C, Span)
     EXPECT_EQ(e1(2, 2), 333.0f);
     EXPECT_EQ(e1(3, 3), 444.0f);
 }
-*/
+
 
 //==================================================================================================
 //  Unit tests for dynamically-resizeable matrix engine, Case 4E

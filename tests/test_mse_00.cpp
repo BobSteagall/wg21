@@ -65,9 +65,9 @@ TEST(MSE_Vector, ListCtor)
     EXPECT_EQ(e1.size(), 4);
     EXPECT_GE(e1.capacity(), 4);
     EXPECT_EQ(e1(0), 11.0f);
-    EXPECT_EQ(e1(1), 22.0f);
-    EXPECT_EQ(e1(2), 33.0f);
-    EXPECT_EQ(e1(3), 44.0f);
+    EXPECT_EQ(e1(1), 12.0f);
+    EXPECT_EQ(e1(2), 13.0f);
+    EXPECT_EQ(e1(3), 14.0f);
 
     dve_type    e2 = il_4_3;
 
