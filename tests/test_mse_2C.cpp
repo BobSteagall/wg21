@@ -12,9 +12,16 @@ using mse_f_fd_rm = matrix_storage_engine<float, extents<1, dynamic_extent>, all
 using mse_i_fd_cm = matrix_storage_engine<int, extents<1, dynamic_extent>, allocator<int>, column_major>;
 using mse_d_fd_rm = matrix_storage_engine<double, extents<1, dynamic_extent>, allocator<double>, column_major>;
 
-TEST(MSE_Matrix_2C, DirectCtor)
+TEST(MSE_Matrix_2C, DefaultCtor)
 {
     mse_f_fd_rm    e1;
+
+    EXPECT_EQ(e1.rows(), 1);
+    EXPECT_EQ(e1.columns(), 0);
+    EXPECT_EQ(e1.size(), itup_t(1, 0));
+    EXPECT_EQ(e1.row_capacity(), 1);
+    EXPECT_EQ(e1.column_capacity(), 0);
+    EXPECT_EQ(e1.capacity(), itup_t(1, 0));
 
     e1.reshape_columns(4, 0);
     EXPECT_EQ(e1.rows(), 1);

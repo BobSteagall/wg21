@@ -201,7 +201,7 @@ make_matrix_mdspan(MseData& rep)
         if constexpr (EngineTraits::is_row_major)
         {
             dyn_extents     extents(rep.m_rows, rep.m_cols);
-            dyn_strides     strides{rep.m_rowcap, 1};
+            dyn_strides     strides{rep.m_colcap, 1};
             dyn_mapping     mapping(extents, strides);
 
             return SpanType(rep.m_elems.data(), mapping);
@@ -209,7 +209,7 @@ make_matrix_mdspan(MseData& rep)
         else if constexpr (EngineTraits::is_column_major)
         {
             dyn_extents     extents(rep.m_rows, rep.m_cols);
-            dyn_strides     strides{1, rep.m_colcap};
+            dyn_strides     strides{1, rep.m_rowcap};
             dyn_mapping     mapping(extents, strides);
 
             return SpanType(rep.m_elems.data(), mapping);

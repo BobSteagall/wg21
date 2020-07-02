@@ -12,7 +12,7 @@ using mse_f_ffa_rm = matrix_storage_engine<float, extents<1, 4>, allocator<float
 using mse_i_ffa_cm = matrix_storage_engine<int, extents<1, 4>, allocator<int>, column_major>;
 using mse_d_ffa_rm = matrix_storage_engine<double, extents<1, 4>, allocator<double>, column_major>;
 
-TEST(MSE_Matrix_2B, DirectCtor)
+TEST(MSE_Matrix_2B, DefaultCtor)
 {
     mse_f_ffa_rm    e1;
 

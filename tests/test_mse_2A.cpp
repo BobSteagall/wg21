@@ -12,7 +12,7 @@ using mse_f_ffv_rm = matrix_storage_engine<float, extents<1, 4>, void, row_major
 using mse_i_ffv_cm = matrix_storage_engine<int, extents<1, 4>, void, column_major>;
 using mse_d_ffv_rm = matrix_storage_engine<double, extents<1, 4>, void, column_major>;
 
-TEST(MSE_Matrix_2A, DirectCtor)
+TEST(MSE_Matrix_2A, DefaultCtor)
 {
     mse_f_ffv_rm    e1;
 

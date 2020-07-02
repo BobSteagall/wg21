@@ -543,16 +543,29 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         index_type  cols = static_cast<index_type>(rhs.size());
 
         tmp.reshape_columns(cols, cols);
-        detail::assign_row_matrix_from_vector_initlist(*this, rhs);
+        detail::assign_row_matrix_from_vector_initlist(tmp, rhs);
         tmp.swap(*this);
     }
 
     template<class T2>
     constexpr void
     assign(initializer_list<T2> rhs)
-        requires engine_traits::is_column_matrix
+        requires (engine_traits::is_column_matrix  &&  !engine_traits::is_row_resizable)
     {
         detail::assign_column_matrix_from_vector_initlist(*this, rhs);
+    }
+
+    template<class T2>
+    constexpr void
+    assign(initializer_list<T2> rhs)
+        requires (engine_traits::is_column_matrix  &&  engine_traits::is_row_resizable)
+    {
+        this_type   tmp;
+        index_type  rows = static_cast<index_type>(rhs.size());
+
+        tmp.reshape_rows(rows, rows);
+        detail::assign_column_matrix_from_vector_initlist(tmp, rhs);
+        tmp.swap(*this);
     }
 };
 
