@@ -42,9 +42,17 @@ target_sources(la_test
         test_matrix_view_engines.cpp
         test_mse_00.cpp
         test_mse_01.cpp
-        test_mse_02.cpp
-        test_mse_03.cpp
-        test_mse_04.cpp
+        test_mse_2A.cpp
+        test_mse_2B.cpp
+        test_mse_2C.cpp
+        test_mse_3A.cpp
+        test_mse_3B.cpp
+        test_mse_3C.cpp
+        test_mse_4A.cpp
+        test_mse_4B.cpp
+        test_mse_4C.cpp
+        test_mse_4D.cpp
+        test_mse_4E.cpp
         test_vector_view_engines.cpp
         test_obj_matrix.cpp
         test_op_add_traits.cpp

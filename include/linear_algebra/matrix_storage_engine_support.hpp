@@ -79,16 +79,16 @@ concept no_allocator = requires { requires is_same_v<T, void>; };
             { AT::deallocate(a, p, n) };
             { AT::allocate(a, n) } -> returns<typename AT::pointer>;
             { static_cast<T*>(p) };
-    #if (LA_GCC_VERSION == 9)
-            requires is_same_v<decltype(*p), T&>;
-            requires is_same_v<decltype(p[n]), T&>;
-    #else
+        #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
             { *p   } -> returns<T&>;
             { p[n] } -> returns<T&>;
-    #endif
+        #else
+            requires is_same_v<decltype(*p), T&>;
+            requires is_same_v<decltype(p[n]), T&>;
+        #endif
         };
 #else
-    //- Clang 10 and VC++ accept the following without any problems.
+    //- Clang 10 and VC++ 16.5 accept the following without any problems.
     //
     template<typename AT, typename T>
     concept valid_allocator_traits =

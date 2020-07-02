@@ -8,6 +8,7 @@
 #ifndef LINEAR_ALGEBRA_HPP_DEFINED
 #define LINEAR_ALGEBRA_HPP_DEFINED
 
+
 //- Detect the compiler.
 //
 #if defined __clang__
@@ -15,16 +16,20 @@
         #error unsupported version of Clang
     #endif
     #define LA_COMPILER_CLANG
+    #define LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
 
 #elif defined __GNUG__
     #if (__GNUG__ < 9)
         #error unsupported version of GCC
+    #elif (__GNUG__ > 9)
+        #define LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
     #endif
     #define LA_COMPILER_GCC
     #define LA_GCC_VERSION  __GNUG__
 
 #elif defined _MSC_VER
     #define LA_COMPILER_MS
+    #define LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
 #endif
 
 //- Namespace alternatives for testing and also for detecting ADL issues.  Pick a pair

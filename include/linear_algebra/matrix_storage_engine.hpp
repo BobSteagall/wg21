@@ -185,7 +185,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
             tmp.m_data.m_elems.resize(m_data.m_rowcap*colcap);
             tmp.m_data.update_extents(m_data.m_rows, cols, m_data.m_rowcap, colcap);
 
-            //- Move the appropriate subset of elements into the temporary engine, then swap.
+            //- Move the appropriate subset of elements into the temporary engine and swap.
             //
             index_type  dst_rows = m_data.m_rows;
             index_type  dst_cols = min(cols, m_data.m_cols);
@@ -221,7 +221,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
             tmp.m_data.m_elems.resize(rowcap*m_data.m_colcap);
             tmp.m_data.update_extents(rows, m_data.m_cols, rowcap, m_data.m_colcap);
 
-            //- Move the appropriate subset of elements into the temporary engine, then swap.
+            //- Move the appropriate subset of elements into the temporary engine and swap.
             //
             index_type  dst_rows = min(rows, m_data.m_rows);
             index_type  dst_cols = m_data.m_cols;
@@ -264,7 +264,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
             tmp.m_data.m_elems.resize(rowcap*colcap);
             tmp.m_data.update_extents(rows, cols, rowcap, colcap);
 
-            //- Move the appropriate subset of elements into the temporary engine, then swap.
+            //- Move the appropriate subset of elements into the temporary engine and swap.
             //
             index_type  dst_rows = min(rows, m_data.m_rows);
             index_type  dst_cols = min(cols, m_data.m_cols);

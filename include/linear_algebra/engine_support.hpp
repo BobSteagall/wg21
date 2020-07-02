@@ -64,8 +64,13 @@ concept readable_vector_engine =
     and
     requires (ET const& eng, typename ET::index_type i)
     {
+    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { eng.size() } -> returns<typename ET::index_type>;
         { eng(i)     } -> returns<typename ET::const_reference>;
+    #else
+        requires is_same_v<decltype(eng.size()), typename ET::index_type>;
+        requires is_same_v<decltype(eng(i)), typename ET::const_reference>;
+    #endif
     };
 
 template<class ET>
@@ -75,8 +80,12 @@ concept writable_vector_engine =
     requires (ET& eng, typename ET::index_type i, typename ET::element_type v)
     {
         requires is_same_v<typename ET::reference, typename ET::element_type&>;
-        { eng(i)     } -> returns<typename ET::reference>;
         { eng(i) = v };
+    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
+        { eng(i)     } -> returns<typename ET::reference>;
+    #else
+        requires is_same_v<decltype(eng(i)), typename ET::reference>;
+    #endif
     };
 
 template<class ET>
@@ -109,8 +118,13 @@ concept spannable_vector_engine =
         typename ET::const_span_type;
         requires is_mdspan_v<typename ET::span_type>;
         requires is_mdspan_v<typename ET::const_span_type>;
+    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { meng.span() } -> returns<typename ET::span_type>;
         { ceng.span() } -> returns<typename ET::const_span_type>;
+    #else
+        requires is_same_v<decltype(meng.span()), typename ET::span_type>;
+        requires is_same_v<decltype(ceng.span()), typename ET::const_span_type>;
+    #endif
     };
 
 //--------------------------------------------------------------------------------------------------
@@ -141,12 +155,18 @@ concept readable_matrix_engine =
     and
     requires (ET const& eng, typename ET::index_type i)
     {
+    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { eng.columns() } -> returns<typename ET::index_type>;
         { eng.rows()    } -> returns<typename ET::index_type>;
         { eng.size()    } -> returns<typename ET::index_tuple_type>;
         { eng(i, i)     } -> returns<typename ET::const_reference>;
+    #else
+        requires is_same_v<decltype(eng.columns()), typename ET::index_type>;
+        requires is_same_v<decltype(eng.rows()), typename ET::index_type>;
+        requires is_same_v<decltype(eng.size()), typename ET::index_tuple_type>;
+        requires is_same_v<decltype(eng(i, i)), typename ET::const_reference>;
+    #endif
     };
-
 
 template<class ET>
 concept writable_matrix_engine =
@@ -155,8 +175,12 @@ concept writable_matrix_engine =
     requires (ET& eng, typename ET::index_type i, typename ET::element_type v)
     {
         requires is_same_v<typename ET::reference, typename ET::element_type&>;
-        { eng(i, i)     } -> returns<typename ET::reference>;
         { eng(i, i) = v };
+    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
+        { eng(i, i)     } -> returns<typename ET::reference>;
+    #else
+        requires is_same_v<decltype(eng(i, i)), typename ET::reference>;
+    #endif
     };
 
 template<class ET>
@@ -207,10 +231,14 @@ concept spannable_matrix_engine =
         typename ET::const_span_type;
         requires is_mdspan_v<typename ET::span_type>;
         requires is_mdspan_v<typename ET::const_span_type>;
+    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { meng.span() } -> returns<typename ET::span_type>;
         { ceng.span() } -> returns<typename ET::const_span_type>;
+    #else
+        requires is_same_v<decltype(meng.span()), typename ET::span_type>;
+        requires is_same_v<decltype(ceng.span()), typename ET::const_span_type>;
+    #endif
     };
-
 
 
 inline void
