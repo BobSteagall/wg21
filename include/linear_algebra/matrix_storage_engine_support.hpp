@@ -626,24 +626,13 @@ struct mse_support_base
         size_t  rows = list.size();
         size_t  cols = list.begin()->size();
 
-        if (std::is_constant_evaluated())
+        for (auto&& row : list)
         {
-            for (auto const row : list)
+            if (row.size() != cols)
             {
-                static_assert(row.size() != cols, "matrix initializer_list has invalid shape");
+                throw runtime_error("matrix initializer_list has invalid shape");
             }
         }
-        else
-        {
-            for (auto const row : list)
-            {
-                if (row.size() != cols)
-                {
-                    throw runtime_error("matrix initializer_list has invalid shape");
-                }
-            }
-        }
-
         return {static_cast<ptrdiff_t>(rows), static_cast<ptrdiff_t>(cols)};
     }
 };
@@ -706,7 +695,7 @@ struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public mse_support_base
     static inline constexpr void
     move_elements(mse_type& dst, mse_type const& src, ptrdiff_t rows, ptrdiff_t cols)
     {
-        apply(dst, src, 0, 0, rows, cols,
+        apply(dst, 0, 0, rows, cols,
                 [&src](ptrdiff_t i, ptrdiff_t j){  return std::move(src.at(i, j));  });
     }
 
@@ -714,7 +703,7 @@ struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public mse_support_base
     static constexpr void
     copy_list(mse_type& dst, initializer_list<U> src)
     {
-        transform(src.begin(), src.end(), dst.m_data.begin(),
+        transform(src.begin(), src.end(), dst.m_elems.begin(),
                     [](U const& u){  return static_cast<T>(u);  });
     }
 
@@ -741,7 +730,7 @@ struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public mse_support_base
     }
 
     static inline constexpr void
-    swap(mse_type& m1, mse_type& m2)
+    swap(mse_type& m1, mse_type& m2) noexcept
     {
         mse_type    m0(std::move(m1));
         m1 = std::move(m2);
@@ -974,7 +963,7 @@ struct mse_data<T, extents<R, C>, void, L>
     inline constexpr T&
     at(ptrdiff_t i, ptrdiff_t j)
     {
-        if constexpr (is_same_v<L, row_major>)
+        if constexpr (this_type::is_row_major)
             return m_elems[i*m_colcap + j];
         else
             return m_elems[i + j*m_rowcap];
@@ -983,39 +972,10 @@ struct mse_data<T, extents<R, C>, void, L>
     inline constexpr T const&
     at(ptrdiff_t i, ptrdiff_t j) const
     {
-        if constexpr (is_same_v<L, row_major>)
+        if constexpr (this_type::is_row_major)
             return m_elems[i*m_colcap + j];
         else
             return m_elems[i + j*m_rowcap];
-    }
-
-    template<class U>
-    constexpr void
-    assign(initializer_list<U> src)
-        requires this_type::is_linear_matrix
-    {
-        ptrdiff_t   size = static_cast<ptrdiff_t>(src.size());
-        static_assert((m_rows == 1  &&  m_cols == size) || (m_rows == size  &&  m_cols == 1));
-        support::copy_list(*this, src);
-    }
-
-    template<class U>
-    constexpr void
-    assign(initializer_list<initializer_list<U>> src)
-    {
-        auto    [rows, cols] = support::verify_list(src);
-        static_assert(rows == m_rows);
-        static_assert(cols == m_cols);
-        support::copy_list(*this, src);
-    }
-
-    template<class ET>
-    constexpr void
-    assign(ET const& eng)
-    {
-        support::verify_size(static_cast<ptrdiff_t>(eng.rows()), m_rows);
-        support::verify_size(static_cast<ptrdiff_t>(eng.columns()), m_cols);
-        support::copy_engine(*this, eng);
     }
 
     inline span_type
@@ -1028,6 +988,54 @@ struct mse_data<T, extents<R, C>, void, L>
     span() const noexcept
     {
         return support::make_const_span(*this);
+    }
+
+    template<class U>
+    constexpr void
+    assign(initializer_list<U> src)
+        requires this_type::is_column_matrix
+    {
+        ptrdiff_t   rows = static_cast<ptrdiff_t>(src.size());
+        support::verify_size(rows, m_rows);
+        support::copy_list(*this, src);
+    }
+
+    template<class U>
+    constexpr void
+    assign(initializer_list<U> src)
+        requires this_type::is_row_matrix
+    {
+        ptrdiff_t   cols = static_cast<ptrdiff_t>(src.size());
+        support::verify_size(cols, m_cols);
+        support::copy_list(*this, src);
+    }
+
+    template<class U>
+    constexpr void
+    assign(initializer_list<initializer_list<U>> src)
+    {
+        auto    [rows, cols] = support::verify_list(src);
+        support::verify_size(cols, m_cols);
+        support::verify_size(rows, m_rows);
+        support::copy_list(*this, src);
+    }
+
+    template<class ET>
+    constexpr void
+    assign(ET const& eng)
+    {
+        support::verify_size(static_cast<ptrdiff_t>(eng.rows()), m_rows);
+        support::verify_size(static_cast<ptrdiff_t>(eng.columns()), m_cols);
+        support::copy_engine(*this, eng);
+    }
+
+    inline void
+    swap(mse_data& rhs) noexcept
+    {
+        if (&rhs != this)
+        {
+            support::swap(*this, rhs);
+        }
     }
 };
 
@@ -1088,7 +1096,7 @@ struct mse_data<T, extents<R, C>, A, L>
     inline T&
     at(ptrdiff_t i, ptrdiff_t j)
     {
-        if constexpr (is_same_v<L, row_major>)
+        if constexpr (this_type::is_row_major)
             return m_elems[i*m_colcap + j];
         else
             return m_elems[i + j*m_rowcap];
@@ -1097,19 +1105,41 @@ struct mse_data<T, extents<R, C>, A, L>
     inline T const&
     at(ptrdiff_t i, ptrdiff_t j) const
     {
-        if constexpr (is_same_v<L, row_major>)
+        if constexpr (this_type::is_row_major)
             return m_elems[i*m_colcap + j];
         else
             return m_elems[i + j*m_rowcap];
     }
 
+    inline span_type
+    span() noexcept
+    {
+        return support::make_span(*this);
+    }
+
+    inline const_span_type
+    span() const noexcept
+    {
+        return support::make_const_span(*this);
+    }
+
     template<class U>
     constexpr void
     assign(initializer_list<U> src)
-        requires this_type::is_linear_matrix
+        requires this_type::is_column_matrix
     {
-        ptrdiff_t   size = static_cast<ptrdiff_t>(src.size());
-        static_assert((m_rows == 1  &&  m_cols == size) || (m_rows == size  &&  m_cols == 1));
+        ptrdiff_t   rows = static_cast<ptrdiff_t>(src.size());
+        support::verify_size(rows, m_rows);
+        support::copy_list(*this, src);
+    }
+
+    template<class U>
+    constexpr void
+    assign(initializer_list<U> src)
+        requires this_type::is_row_matrix
+    {
+        ptrdiff_t   cols = static_cast<ptrdiff_t>(src.size());
+        support::verify_size(cols, m_cols);
         support::copy_list(*this, src);
     }
 
@@ -1132,16 +1162,13 @@ struct mse_data<T, extents<R, C>, A, L>
         support::copy_engine(*this, eng);
     }
 
-    inline span_type
-    span() noexcept
+    inline void
+    swap(mse_data& rhs) noexcept
     {
-        return support::make_span(*this);
-    }
-
-    inline const_span_type
-    span() const noexcept
-    {
-        return support::make_const_span(*this);
+        if (&rhs != this)
+        {
+            support::swap(*this, rhs);
+        }
     }
 };
 
@@ -1225,6 +1252,18 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
             return m_elems[i + j*m_rowcap];
     }
 
+    inline span_type
+    span() noexcept
+    {
+        return support::make_span(*this);
+    }
+
+    inline const_span_type
+    span() const noexcept
+    {
+        return support::make_const_span(*this);
+    }
+
     template<class U>
     constexpr void
     assign(initializer_list<U> src)
@@ -1249,8 +1288,8 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
     void
     assign(ET const& eng)
     {
-        support::verify_size(static_cast<ptrdiff_t>(eng.columns()), m_cols);
-        reshape_columns(eng.rows(), m_rowcap);
+        support::verify_size(static_cast<ptrdiff_t>(eng.rows()), m_rows);
+        reshape_columns(static_cast<ptrdiff_t>(eng.columns()), m_colcap);
         support::copy_engine(*this, eng);
     }
 
@@ -1291,16 +1330,13 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
         }
     }
 
-    inline span_type
-    span() noexcept
+    inline void
+    swap(mse_data& rhs) noexcept
     {
-        return support::make_span(*this);
-    }
-
-    inline const_span_type
-    span() const noexcept
-    {
-        return support::make_const_span(*this);
+        if (&rhs != this)
+        {
+            support::swap(*this, rhs);
+        }
     }
 };
 
@@ -1384,6 +1420,18 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
             return m_elems[i + j*m_rowcap];
     }
 
+    inline span_type
+    span() noexcept
+    {
+        return support::make_span(*this);
+    }
+
+    inline const_span_type
+    span() const noexcept
+    {
+        return support::make_const_span(*this);
+    }
+
     template<class U>
     constexpr void
     assign(initializer_list<U> src)
@@ -1399,7 +1447,7 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
     assign(initializer_list<initializer_list<U>> src)
     {
         auto    [rows, cols] = support::verify_list(src);
-        verify_size(cols, m_cols);
+        support::verify_size(cols, m_cols);
         reshape_rows(rows, m_rowcap);
         support::copy_list(*this, src);
     }
@@ -1409,7 +1457,7 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
     assign(ET const& eng)
     {
         support::verify_size(static_cast<ptrdiff_t>(eng.columns()), m_cols);
-        reshape_rows(eng.rows(), m_rowcap);
+        reshape_rows(static_cast<ptrdiff_t>(eng.rows()), m_rowcap);
         support::copy_engine(*this, eng);
     }
 
@@ -1450,16 +1498,13 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
         }
     }
 
-    inline span_type
-    span() noexcept
+    inline void
+    swap(mse_data& rhs) noexcept
     {
-        return support::make_span(*this);
-    }
-
-    inline const_span_type
-    span() const noexcept
-    {
-        return support::make_const_span(*this);
+        if (&rhs != this)
+        {
+            support::swap(*this, rhs);
+        }
     }
 };
 
@@ -1528,6 +1573,18 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
             return m_elems[i*m_colcap + j];
         else
             return m_elems[i + j*m_rowcap];
+    }
+
+    inline span_type
+    span() noexcept
+    {
+        return support::make_span(*this);
+    }
+
+    inline const_span_type
+    span() const noexcept
+    {
+        return support::make_const_span(*this);
     }
 
     template<class U>
@@ -1607,16 +1664,13 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
         }
     }
 
-    inline span_type
-    span() noexcept
+    inline void
+    swap(mse_data& rhs) noexcept
     {
-        return support::make_span(*this);
-    }
-
-    inline const_span_type
-    span() const noexcept
-    {
-        return support::make_const_span(*this);
+        if (&rhs != this)
+        {
+            support::swap(*this, rhs);
+        }
     }
 };
 

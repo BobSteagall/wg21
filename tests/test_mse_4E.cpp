@@ -539,8 +539,8 @@ TEST(MSE_Matrix_4E, ListAssign)
 
     e1 = fl_33_1;
     EXPECT_EQ(e1.size(), st_33);
-    EXPECT_EQ(e1.row_capacity(), 3);
-    EXPECT_EQ(e1.column_capacity(), 3);
+    EXPECT_GE(e1.row_capacity(), 3);
+    EXPECT_GE(e1.column_capacity(), 3);
     EXPECT_TRUE(m_cmp_eq(e1, fl_33_1));
 }
 
