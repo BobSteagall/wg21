@@ -21,11 +21,12 @@
 #elif defined __GNUG__
     #if (__GNUG__ < 9)
         #error unsupported version of GCC
-    #elif (__GNUG__ > 9)
-        #define LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
     #endif
     #define LA_COMPILER_GCC
     #define LA_GCC_VERSION  __GNUG__
+    #if (__GNUG__ > 9)
+        #define LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
+    #endif
 
 #elif defined _MSC_VER
     #define LA_COMPILER_MS
