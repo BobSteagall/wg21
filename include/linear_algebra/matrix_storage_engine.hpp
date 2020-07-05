@@ -292,9 +292,8 @@ template<class T, ptrdiff_t N, class A, class L>
         detail::valid_mse_vector_layout<L>
 class matrix_storage_engine<T, extents<N>, A, L>
 {
-    using this_type     = matrix_storage_engine;
-    using engine_traits = detail::mse_traits<T, extents<N>, A, L>;
-    using storage_type  = detail::mse_data<T, extents<N>, A, L>;
+    using this_type    = matrix_storage_engine;
+    using storage_type = detail::mse_data<T, extents<N>, A, L>;
 
   public:
     using value_type       = T;
@@ -303,8 +302,8 @@ class matrix_storage_engine<T, extents<N>, A, L>
     using reference        = element_type&;
     using const_reference  = element_type const&;
     using index_type       = ptrdiff_t;
-    using span_type        = typename engine_traits::span_type;
-    using const_span_type  = typename engine_traits::const_span_type;
+    using span_type        = typename storage_type::span_type;
+    using const_span_type  = typename storage_type::const_span_type;
 
   public:
     inline ~matrix_storage_engine() = default;
@@ -314,16 +313,15 @@ class matrix_storage_engine<T, extents<N>, A, L>
     constexpr matrix_storage_engine() = default;
     constexpr matrix_storage_engine(matrix_storage_engine&& rhs) noexcept = default;
     constexpr matrix_storage_engine(matrix_storage_engine const& rhs) = default;
-
     constexpr matrix_storage_engine&    operator =(matrix_storage_engine&& rhs) noexcept = default;
     constexpr matrix_storage_engine&    operator =(matrix_storage_engine const& rhs) = default;
 
     inline constexpr
     matrix_storage_engine(index_type size)
-        requires engine_traits::is_resizable
+        requires storage_type::is_resizable
     :   m_data()
     {
-        reshape(size, size);
+        m_data.reshape(size, size);
     }
 
     template<class ET2> inline constexpr
@@ -331,7 +329,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
         requires detail::readable_vector_engine<ET2>
     :   m_data()
     {
-        assign(rhs);
+        m_data.assign(rhs);
     }
 
     template<class T2> inline constexpr
@@ -339,7 +337,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
         requires detail::convertibility<T2, T>
     :   m_data()
     {
-        assign(rhs);
+        m_data.assign(rhs);
     }
 
     template<class ET2>
@@ -347,7 +345,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
     operator =(ET2 const& rhs)
         requires detail::readable_vector_engine<ET2>
     {
-        assign(rhs);
+        m_data.assign(rhs);
         return *this;
     }
 
@@ -356,7 +354,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
     operator =(initializer_list<T2> rhs)
         requires detail::convertibility<T2, T>
     {
-        assign(rhs);
+        m_data.assign(rhs);
         return *this;
     }
 
@@ -376,57 +374,11 @@ class matrix_storage_engine<T, extents<N>, A, L>
 
     //- Setting overall size and capacity.
     //
-    inline void
-    resize(index_type size)
-        requires engine_traits::is_resizable
-    {
-        reshape(size, m_data.m_cap);
-    }
-
-    inline void
-    reserve(index_type cap)
-        requires engine_traits::is_resizable
-    {
-        reshape(m_data.m_size, cap);
-    }
-
     void
     reshape(index_type newsize, index_type newcap)
-        requires engine_traits::is_resizable
+        requires storage_type::is_resizable
     {
-
-        detail::check_size(newsize);
-        detail::check_capacity(newcap);
-
-        //- Only reallocate new storage if we have to.
-        //
-        if (newsize > m_data.m_cap  ||  newcap != m_data.m_cap)
-        {
-            newcap = max(newsize, newcap);
-
-            //- Prepare a temporary engine to receive elements from this one.
-            //
-            this_type   tmp;
-
-            tmp.m_data.m_elems.resize(newcap);
-            tmp.m_data.m_size = newsize;
-            tmp.m_data.m_cap  = newcap;
-
-            //- Move the appropriate subset of elements into the temporary engine, then swap.
-            //
-            index_type  dst_size = min(newsize, m_data.m_size);
-
-            tmp.move_from(0, dst_size, *this);
-            detail::la_swap(m_data, tmp.m_data);
-        }
-        else
-        {
-            if (newsize < m_data.m_size)
-            {
-                fill(newsize, m_data.m_size, T{});
-            }
-            m_data.m_size = newsize;
-        }
+        m_data.reshape(newsize, newcap);
     }
 
     //- Element access
@@ -434,26 +386,26 @@ class matrix_storage_engine<T, extents<N>, A, L>
     inline constexpr reference
     operator ()(index_type i)
     {
-        return m_data.m_elems[i];
+        return m_data.at(i);
     }
 
     inline constexpr const_reference
     operator ()(index_type i) const
     {
-        return m_data.m_elems[i];
+        return m_data.at(i);
     }
 
 
     inline constexpr span_type
     span() noexcept
     {
-        return detail::make_vector_mdspan<span_type, engine_traits>(m_data);
+        return m_data.span();
     }
 
     inline constexpr const_span_type
     span() const noexcept
     {
-        return detail::make_vector_mdspan<const_span_type, engine_traits>(m_data);
+        return m_data.span();
     }
 
     //- Modifiers
@@ -461,86 +413,11 @@ class matrix_storage_engine<T, extents<N>, A, L>
     inline constexpr void
     swap(matrix_storage_engine& rhs) noexcept
     {
-        if (&rhs != this)
-        {
-            detail::la_swap(m_data, rhs.m_data);
-        }
+        m_data.swap(rhs.m_data);
     }
 
   private:
     storage_type    m_data;
-
-    template<class FN>
-    constexpr void
-    apply(index_type i0, index_type i1, FN fn)
-    {
-        for (index_type i = i0;  i < i1;  ++i)
-        {
-            (*this)(i) = fn(i);
-        }
-    }
-
-    template<class ET2>
-    inline constexpr void
-    assign_from(index_type i0, index_type i1, ET2 const& rhs)
-    {
-        apply(i0, i1, [&rhs](index_type i){ return rhs(i); });
-    }
-
-    inline constexpr void
-    move_from(index_type i0, index_type i1, this_type const& rhs)
-    {
-        apply(i0, i1, [&rhs](index_type i){ return std::move(rhs(i)); });
-    }
-
-    inline constexpr void
-    fill(index_type i0, index_type i1, value_type const& t)
-    {
-        apply(i0, i1, [&t](index_type){ return t; });
-    }
-
-    template<class ET2>
-    constexpr void
-    assign(ET2 const& rhs)
-        requires (!engine_traits::is_resizable)
-    {
-        detail::check_source_engine_size(rhs, N);
-        detail::assign_from_vector_engine(*this, rhs);
-    }
-
-    template<class ET2>
-    constexpr void
-    assign(ET2 const& rhs)
-        requires (engine_traits::is_resizable)
-    {
-        this_type   tmp;
-
-        tmp.reshape(static_cast<index_type>(rhs.size()), m_data.m_cap);
-        detail::assign_from_vector_engine(tmp, rhs);
-        tmp.swap(*this);
-    }
-
-    template<class T2>
-    constexpr void
-    assign(initializer_list<T2> rhs)
-        requires (!engine_traits::is_resizable)
-    {
-        detail::check_source_init_list(rhs, m_data.m_size);
-        detail::assign_from_vector_initlist(*this, rhs);
-    }
-
-    template<class T2>
-    constexpr void
-    assign(initializer_list<T2> rhs)
-        requires (engine_traits::is_resizable)
-    {
-        this_type     tmp;
-        index_type    size = static_cast<index_type>(rhs.size());
-
-        tmp.reshape(size, m_data.m_cap);
-        detail::assign_from_vector_initlist(tmp, rhs);
-        tmp.swap(*this);
-    }
 };
 
 

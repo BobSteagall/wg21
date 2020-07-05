@@ -37,7 +37,7 @@ TEST(MSE_Vector, DefaultCtor)
 
     EXPECT_EQ(e2.size(), 0);
     EXPECT_GE(e2.capacity(), 0);
-    e2.resize(4);
+    e2.reshape(4, 0);
     EXPECT_EQ(e2.size(), 4);
     EXPECT_GE(e2.capacity(), 4);
     EXPECT_EQ(e2(0), 0.0f);
