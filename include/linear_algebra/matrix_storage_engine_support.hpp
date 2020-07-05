@@ -134,445 +134,6 @@ concept valid_mse_matrix_layout = (is_same_v<EL, row_major> || is_same_v<EL, col
 template<typename EL>
 concept valid_mse_vector_layout = is_same_v<EL, unoriented>;
 
-
-//--------------------------------------------------------------------------------------------------
-//  MDSPAN Support:     fixed_matrix_mdspan_t<T, R, C, L>
-//                      dynamic_matrix_mdspan_t<T>
-//                      make_matrix_mdspan()
-//
-//                      fixed_vector_mdspan_t<T, N>
-//                      dynamic_vector_mdspan_t<T>
-//                      make_vector_mdspan()
-//
-//  These alias templates and function templates, are used by mse_traits<T, X, A, L> and
-//  matrix_storage_engine<T, X, A, L> to declare appropriate mdspan types and return correct
-//  mdspan instances, respectively.
-//--------------------------------------------------------------------------------------------------
-//
-//- Simple traits type and alias template to convert row_major/column_major tags into
-//  corresponding mdspan layout types.
-//
-template<class L>
-struct mdspan_fixed_layout;
-
-template<>
-struct mdspan_fixed_layout<row_major>
-{
-    using type = layout_right;
-};
-
-template<>
-struct mdspan_fixed_layout<column_major>
-{
-    using type = layout_left;
-};
-
-
-//- Alias templates for fixed/dynamic matrix/vector mdspan types, used by mse_data<T,X,A,L>.
-//
-template<class T, ptrdiff_t R, ptrdiff_t C, class L>
-using fixed_matrix_mdspan_t = basic_mdspan<T, extents<R,C>, typename mdspan_fixed_layout<L>::type>;
-
-template<class T>
-using dynamic_matrix_mdspan_t = basic_mdspan<T,
-                                             extents<dynamic_extent, dynamic_extent>,
-                                             layout_stride<dynamic_extent, dynamic_extent>>;
-
-template<class T, ptrdiff_t N>
-using fixed_vector_mdspan_t = mdspan<T, N>;
-
-template<class T>
-using dynamic_vector_mdspan_t = mdspan<T, dynamic_extent>;
-
-
-//- Functions for creating matrix/vector mdspan objects, used by matrix_storage_engine<T,X,A,L>.
-//
-template<class SpanType, class EngineTraits, class MseData> inline constexpr
-SpanType
-make_matrix_mdspan(MseData& rep)
-{
-    using dyn_extents = extents<dynamic_extent, dynamic_extent>;
-    using dyn_layout  = layout_stride<dynamic_extent, dynamic_extent>;
-    using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
-    using dyn_strides = array<typename dyn_extents::index_type, 2>;
-
-    if constexpr (EngineTraits::is_column_resizable  ||  EngineTraits::is_row_resizable)
-    {
-        if constexpr (EngineTraits::is_row_major)
-        {
-            dyn_extents     extents(rep.m_rows, rep.m_cols);
-            dyn_strides     strides{rep.m_colcap, 1};
-            dyn_mapping     mapping(extents, strides);
-
-            return SpanType(rep.m_elems.data(), mapping);
-        }
-        else if constexpr (EngineTraits::is_column_major)
-        {
-            dyn_extents     extents(rep.m_rows, rep.m_cols);
-            dyn_strides     strides{1, rep.m_rowcap};
-            dyn_mapping     mapping(extents, strides);
-
-            return SpanType(rep.m_elems.data(), mapping);
-        }
-    }
-    else
-    {
-        return SpanType(rep.m_elems.data());
-    }
-}
-
-
-template<class SpanType, class EngineTraits, class MseData> inline constexpr
-SpanType
-make_vector_mdspan(MseData& rep)
-{
-    if constexpr (EngineTraits::is_resizable)
-    {
-        return SpanType(rep.m_elems.data(), rep.m_size);
-    }
-    else
-    {
-        return SpanType(rep.m_elems.data());
-    }
-}
-
-
-//--------------------------------------------------------------------------------------------------
-//  Traits Type:    mse_traitx<T, X, A, L>
-//
-//  This supporting, private traits type is used to ...
-//--------------------------------------------------------------------------------------------------
-//
-//- Case 0: primary template
-//
-template<class T, class X, class A, class L>
-struct mse_traits
-{
-    struct null_type;
-
-    static constexpr bool   is_column_matrix    = false;
-    static constexpr bool   is_row_matrix       = false;
-    static constexpr bool   is_matrix           = false;
-    static constexpr bool   is_vector           = false;
-
-    static constexpr bool   is_readable         = false;
-    static constexpr bool   is_writable         = false;
-    static constexpr bool   is_initable         = false;
-    static constexpr bool   is_column_resizable = false;
-    static constexpr bool   is_row_resizable    = false;
-    static constexpr bool   is_resizable        = false;
-
-    static constexpr bool   is_column_major     = false;
-    static constexpr bool   is_row_major        = false;
-
-    using span_type       = null_type;
-    using const_span_type = null_type;
-};
-
-
-//-----------------------
-//- Case 1: vector engine (1 x N)
-//
-template<class T, ptrdiff_t N, class L>
-struct mse_traits<T, extents<N>, void, L>                       //- Case 1A
-{
-    static constexpr bool   is_column_matrix    = false;
-    static constexpr bool   is_row_matrix       = false;
-    static constexpr bool   is_matrix           = false;
-    static constexpr bool   is_vector           = true;
-
-    static constexpr bool   is_readable         = true;
-    static constexpr bool   is_writable         = true;
-    static constexpr bool   is_initable         = true;
-    static constexpr bool   is_resizable        = false;
-
-    using span_type       = fixed_vector_mdspan_t<T, N>;
-    using const_span_type = fixed_vector_mdspan_t<T const, N>;
-};
-
-template<class T, ptrdiff_t N, class A, class L>
-struct mse_traits<T, extents<N>, A, L>                          //- Case 1B
-{
-    static constexpr bool   is_column_matrix    = false;
-    static constexpr bool   is_row_matrix       = false;
-    static constexpr bool   is_matrix           = false;
-    static constexpr bool   is_vector           = true;
-
-    static constexpr bool   is_readable         = true;
-    static constexpr bool   is_writable         = true;
-    static constexpr bool   is_initable         = true;
-    static constexpr bool   is_resizable        = false;
-
-    using span_type       = fixed_vector_mdspan_t<T, N>;
-    using const_span_type = fixed_vector_mdspan_t<T const, N>;
-};
-
-template<class T, class A, class L>
-struct mse_traits<T, extents<dynamic_extent>, A, L>             //- Case 1C
-{
-    static constexpr bool   is_vector           = true;
-    static constexpr bool   is_matrix           = false;
-
-    static constexpr bool   is_readable         = true;
-    static constexpr bool   is_writable         = true;
-    static constexpr bool   is_initable         = true;
-    static constexpr bool   is_resizable        = true;
-
-    using span_type       = dynamic_vector_mdspan_t<T>;
-    using const_span_type = dynamic_vector_mdspan_t<T const>;
-};
-
-//---------------------------
-//- Case 2: row matrix engine (1 x C)
-//
-template<class T, ptrdiff_t C, class L>
-struct mse_traits<T, extents<1, C>, void, L>                    //- Case 2A
-{
-    static constexpr bool   is_column_matrix    = false;
-    static constexpr bool   is_row_matrix       = true;
-    static constexpr bool   is_matrix           = true;
-    static constexpr bool   is_vector           = false;
-
-    static constexpr bool   is_readable         = true;
-    static constexpr bool   is_writable         = true;
-    static constexpr bool   is_initable         = true;
-    static constexpr bool   is_column_resizable = false;
-    static constexpr bool   is_row_resizable    = false;
-    static constexpr bool   is_resizable        = false;
-
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
-
-    using span_type       = fixed_matrix_mdspan_t<T, 1, C, L>;
-    using const_span_type = fixed_matrix_mdspan_t<T const, 1, C, L>;
-};
-
-template<class T, ptrdiff_t C, class A, class L>
-struct mse_traits<T, extents<1, C>, A, L>                       //- Case 2B
-{
-    static constexpr bool   is_column_matrix    = false;
-    static constexpr bool   is_row_matrix       = true;
-    static constexpr bool   is_matrix           = true;
-    static constexpr bool   is_vector           = false;
-
-    static constexpr bool   is_readable         = true;
-    static constexpr bool   is_writable         = true;
-    static constexpr bool   is_initable         = true;
-    static constexpr bool   is_column_resizable = false;
-    static constexpr bool   is_row_resizable    = false;
-    static constexpr bool   is_resizable        = false;
-
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
-
-    using span_type       = fixed_matrix_mdspan_t<T, 1, C, L>;
-    using const_span_type = fixed_matrix_mdspan_t<T const, 1, C, L>;
-};
-
-template<class T, class A, class L>
-struct mse_traits<T, extents<1, dynamic_extent>, A, L>          //- Case 2C
-{
-    static constexpr bool   is_column_matrix    = false;
-    static constexpr bool   is_row_matrix       = true;
-    static constexpr bool   is_matrix           = true;
-    static constexpr bool   is_vector           = false;
-
-    static constexpr bool   is_readable         = true;
-    static constexpr bool   is_writable         = true;
-    static constexpr bool   is_initable         = true;
-    static constexpr bool   is_column_resizable = true;
-    static constexpr bool   is_row_resizable    = false;
-    static constexpr bool   is_resizable        = false;
-
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
-
-    using span_type       = dynamic_matrix_mdspan_t<T>;
-    using const_span_type = dynamic_matrix_mdspan_t<T const>;
-};
-
-//------------------------------
-//- Case 3: column matrix engine (R x 1)
-//
-template<class T, ptrdiff_t R, class L>
-struct mse_traits<T, extents<R, 1>, void, L>                    //- Case 3A
-{
-    static constexpr bool   is_column_matrix    = true;
-    static constexpr bool   is_row_matrix       = false;
-    static constexpr bool   is_matrix           = true;
-    static constexpr bool   is_vector           = false;
-
-    static constexpr bool   is_readable         = true;
-    static constexpr bool   is_writable         = true;
-    static constexpr bool   is_initable         = true;
-    static constexpr bool   is_column_resizable = false;
-    static constexpr bool   is_row_resizable    = false;
-    static constexpr bool   is_resizable        = false;
-
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
-
-    using span_type       = fixed_matrix_mdspan_t<T, R, 1, L>;
-    using const_span_type = fixed_matrix_mdspan_t<T const, R, 1, L>;
-};
-
-template<class T, ptrdiff_t R, class A, class L>
-struct mse_traits<T, extents<R, 1>, A, L>                       //- Case 3B
-{
-    static constexpr bool   is_column_matrix    = true;
-    static constexpr bool   is_row_matrix       = false;
-    static constexpr bool   is_matrix           = true;
-    static constexpr bool   is_vector           = false;
-
-    static constexpr bool   is_readable         = true;
-    static constexpr bool   is_writable         = true;
-    static constexpr bool   is_initable         = true;
-    static constexpr bool   is_column_resizable = false;
-    static constexpr bool   is_row_resizable    = false;
-    static constexpr bool   is_resizable        = false;
-
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
-
-    using span_type       = fixed_matrix_mdspan_t<T, R, 1, L>;
-    using const_span_type = fixed_matrix_mdspan_t<T const, R, 1, L>;
-};
-
-template<class T, class A, class L>
-struct mse_traits<T, extents<dynamic_extent, 1>, A, L>          //- Case 3C
-{
-    static constexpr bool   is_column_matrix    = true;
-    static constexpr bool   is_row_matrix       = false;
-    static constexpr bool   is_matrix           = true;
-    static constexpr bool   is_vector           = false;
-
-    static constexpr bool   is_readable         = true;
-    static constexpr bool   is_writable         = true;
-    static constexpr bool   is_initable         = true;
-    static constexpr bool   is_column_resizable = false;
-    static constexpr bool   is_row_resizable    = true;
-    static constexpr bool   is_resizable        = false;
-
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
-
-    using span_type       = dynamic_matrix_mdspan_t<T>;
-    using const_span_type = dynamic_matrix_mdspan_t<T const>;
-};
-
-//------------------------------
-//- Case 4: general matrix engine (R, C)
-//
-template<class T, ptrdiff_t R, ptrdiff_t C, class L>
-struct mse_traits<T, extents<R, C>, void, L>                    //- Case 4A
-{
-    static constexpr bool   is_column_matrix    = false;
-    static constexpr bool   is_row_matrix       = false;
-    static constexpr bool   is_matrix           = true;
-    static constexpr bool   is_vector           = false;
-
-    static constexpr bool   is_readable         = true;
-    static constexpr bool   is_writable         = true;
-    static constexpr bool   is_initable         = true;
-    static constexpr bool   is_column_resizable = false;
-    static constexpr bool   is_row_resizable    = false;
-    static constexpr bool   is_resizable        = false;
-
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
-
-    using span_type       = fixed_matrix_mdspan_t<T, R, C, L>;
-    using const_span_type = fixed_matrix_mdspan_t<T const, R, C, L>;
-};
-
-template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
-struct mse_traits<T, extents<R, C>, A, L>                       //- Case 4B
-{
-    static constexpr bool   is_column_matrix    = false;
-    static constexpr bool   is_row_matrix       = false;
-    static constexpr bool   is_matrix           = true;
-    static constexpr bool   is_vector           = false;
-
-    static constexpr bool   is_readable         = true;
-    static constexpr bool   is_writable         = true;
-    static constexpr bool   is_initable         = true;
-    static constexpr bool   is_column_resizable = false;
-    static constexpr bool   is_row_resizable    = false;
-    static constexpr bool   is_resizable        = false;
-
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
-
-    using span_type       = fixed_matrix_mdspan_t<T, R, C, L>;
-    using const_span_type = fixed_matrix_mdspan_t<T const, R, C, L>;
-};
-
-template<class T, ptrdiff_t C, class A, class L>
-struct mse_traits<T, extents<dynamic_extent, C>, A, L>          //- Case 4C
-{
-    static constexpr bool   is_column_matrix    = false;
-    static constexpr bool   is_row_matrix       = false;
-    static constexpr bool   is_matrix           = true;
-    static constexpr bool   is_vector           = false;
-
-    static constexpr bool   is_readable         = true;
-    static constexpr bool   is_writable         = true;
-    static constexpr bool   is_initable         = true;
-    static constexpr bool   is_column_resizable = false;
-    static constexpr bool   is_row_resizable    = true;
-    static constexpr bool   is_resizable        = false;
-
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
-
-    using span_type       = dynamic_matrix_mdspan_t<T>;
-    using const_span_type = dynamic_matrix_mdspan_t<T const>;
-};
-
-template<class T, ptrdiff_t R, class A, class L>
-struct mse_traits<T, extents<R, dynamic_extent>, A, L>          //- Case 4D
-{
-    static constexpr bool   is_column_matrix    = false;
-    static constexpr bool   is_row_matrix       = false;
-    static constexpr bool   is_matrix           = true;
-    static constexpr bool   is_vector           = false;
-
-    static constexpr bool   is_readable         = true;
-    static constexpr bool   is_writable         = true;
-    static constexpr bool   is_initable         = true;
-    static constexpr bool   is_column_resizable = true;
-    static constexpr bool   is_row_resizable    = false;
-    static constexpr bool   is_resizable        = false;
-
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
-
-    using span_type       = dynamic_matrix_mdspan_t<T>;
-    using const_span_type = dynamic_matrix_mdspan_t<T const>;
-};
-
-template<class T, class A, class L>
-struct mse_traits<T, extents<dynamic_extent, dynamic_extent>, A, L>     //- Case 4E
-{
-    static constexpr bool   is_column_matrix    = false;
-    static constexpr bool   is_row_matrix       = false;
-    static constexpr bool   is_matrix           = true;
-    static constexpr bool   is_vector           = false;
-
-    static constexpr bool   is_readable         = true;
-    static constexpr bool   is_writable         = true;
-    static constexpr bool   is_initable         = true;
-    static constexpr bool   is_column_resizable = true;
-    static constexpr bool   is_row_resizable    = true;
-    static constexpr bool   is_resizable        = true;
-
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
-
-    using span_type       = dynamic_matrix_mdspan_t<T>;
-    using const_span_type = dynamic_matrix_mdspan_t<T const>;
-};
-
 template<class MSE>                             struct mse_support;
 template<class T, class X, class A, class L>    struct mse_data;
 
@@ -638,7 +199,7 @@ struct mse_support_base
 };
 
 template<class T, ptrdiff_t N, class A, class L>
-struct mse_support<mse_data<T, extents<N>, A, L>>  : public mse_support_base
+struct mse_support<mse_data<T, extents<N>, A, L>> : public mse_support_base
 {
     //- Engine representation type.
     //
@@ -650,7 +211,7 @@ struct mse_support<mse_data<T, extents<N>, A, L>>  : public mse_support_base
     {
         for (ptrdiff_t i = i0;  i < i1;  ++i)
         {
-            dst.at(i) = fn(i);
+            dst.m_elems[i] = fn(i);
         }
     }
 
@@ -676,9 +237,9 @@ struct mse_support<mse_data<T, extents<N>, A, L>>  : public mse_support_base
     }
 
     static inline constexpr void
-    move_elements(mse_type& dst, mse_type const& src, ptrdiff_t size)
+    move_elements(mse_type& dst, mse_type& src, ptrdiff_t size)
     {
-        apply(dst, 0, size, [&src](ptrdiff_t i){ return std::move(src.at(i)); });
+        apply(dst, 0, size, [&src](ptrdiff_t i){ return std::move(src.m_elems[i]); });
     }
 
     static inline constexpr void
@@ -690,29 +251,6 @@ struct mse_support<mse_data<T, extents<N>, A, L>>  : public mse_support_base
             m1 = std::move(m2);
             m2 = std::move(m0);
         }
-    }
-
-    //- Support for mdspan -- types and functions.
-    //
-    using span_type       = mdspan<T, N>;
-    using const_span_type = mdspan<T const, N>;
-
-    static inline constexpr span_type
-    make_span(mse_type& rep)
-    {
-        if constexpr (N == dynamic_extent)
-            return span_type(rep.m_elems.data(), rep.m_size);
-        else
-            return span_type(rep.m_elems.data());
-    }
-
-    static inline constexpr const_span_type
-    make_const_span(mse_type const& rep)
-    {
-        if constexpr (N == dynamic_extent)
-            return const_span_type(rep.m_elems.data(), rep.m_size);
-        else
-            return const_span_type(rep.m_elems.data());
     }
 };
 
@@ -733,7 +271,7 @@ struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public mse_support_base
             {
                 for (ptrdiff_t j = j0;  j < j1;  ++j)
                 {
-                    dst.at(i, j) = fn(i, j);
+                    element(dst, i, j) = fn(i, j);
                 }
             }
         }
@@ -743,10 +281,19 @@ struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public mse_support_base
             {
                 for (ptrdiff_t i = i0;  i < i1;  ++i)
                 {
-                    dst.at(i, j) = fn(i, j);
+                    element(dst, i, j) = fn(i, j);
                 }
             }
         }
+    }
+
+    static inline constexpr T&
+    element(mse_type& dst, ptrdiff_t i, ptrdiff_t j)
+    {
+        if constexpr (mse_type::is_row_major)
+            return dst.m_elems[i*dst.m_colcap + j];
+        else
+            return dst.m_elems[i + j*dst.m_rowcap];
     }
 
     template<class ET>
@@ -782,7 +329,7 @@ struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public mse_support_base
 
             for (;  dj < dst.m_cols;  ++dj, ++cp)
             {
-                dst.at(di, dj) = static_cast<T>(*cp);
+                element(dst, di, dj) = static_cast<T>(*cp);
             }
         }
     }
@@ -802,10 +349,10 @@ struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public mse_support_base
     }
 
     static inline constexpr void
-    move_elements(mse_type& dst, mse_type const& src, ptrdiff_t rows, ptrdiff_t cols)
+    move_elements(mse_type& dst, mse_type& src, ptrdiff_t rows, ptrdiff_t cols)
     {
         apply(dst, 0, 0, rows, cols,
-                [&src](ptrdiff_t i, ptrdiff_t j){  return std::move(src.at(i, j));  });
+                [&src](ptrdiff_t i, ptrdiff_t j){  return std::move(element(src, i, j));  });
     }
 
     static inline constexpr void
@@ -919,8 +466,8 @@ struct mse_data<T, extents<N>, void, L>
     using this_type       = mse_data;
     using array_type      = std::array<T, N>;
     using support         = mse_support<this_type>;
-    using span_type       = typename support::span_type;
-    using const_span_type = typename support::const_span_type;
+    using span_type       = mdspan<T, N>;
+    using const_span_type = mdspan<T const, N>;
 
     static constexpr bool   is_resizable = false;
 
@@ -943,28 +490,16 @@ struct mse_data<T, extents<N>, void, L>
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
 
-    inline constexpr T&
-    at(ptrdiff_t i)
-    {
-        return m_elems[i];
-    }
-
-    inline constexpr T const&
-    at(ptrdiff_t i) const
-    {
-        return m_elems[i];
-    }
-
     inline constexpr span_type
     span() noexcept
     {
-        return support::make_span(*this);
+        return span_type(m_elems.data());
     }
 
     inline constexpr const_span_type
     span() const noexcept
     {
-        return support::make_const_span(*this);
+        return const_span_type(m_elems.data());
     }
 
     template<class U>
@@ -1000,8 +535,8 @@ struct mse_data<T, extents<N>, A, L>
     using this_type       = mse_data;
     using array_type      = std::vector<T, A>;
     using support         = mse_support<this_type>;
-    using span_type       = typename support::span_type;
-    using const_span_type = typename support::const_span_type;
+    using span_type       = mdspan<T, N>;
+    using const_span_type = mdspan<T const, N>;
 
     static constexpr bool   is_resizable = false;
 
@@ -1019,28 +554,16 @@ struct mse_data<T, extents<N>, A, L>
     mse_data&   operator =(mse_data&&) noexcept = default;
     mse_data&   operator =(mse_data const&) = default;
 
-    inline T&
-    at(ptrdiff_t i)
-    {
-        return m_elems[i];
-    }
-
-    inline T const&
-    at(ptrdiff_t i) const
-    {
-        return m_elems[i];
-    }
-
     inline span_type
     span() noexcept
     {
-        return support::make_span(*this);
+        return span_type(m_elems.data());
     }
 
     inline const_span_type
     span() const noexcept
     {
-        return support::make_const_span(*this);
+        return const_span_type(m_elems.data());
     }
 
     template<class U>
@@ -1076,8 +599,8 @@ struct mse_data<T, extents<dynamic_extent>, A, L>
     using this_type       = mse_data;
     using array_type      = std::vector<T, A>;
     using support         = mse_support<this_type>;
-    using span_type       = typename support::span_type;
-    using const_span_type = typename support::const_span_type;
+    using span_type       = mdspan<T, dynamic_extent>;
+    using const_span_type = mdspan<T const, dynamic_extent>;
 
     static constexpr bool   is_resizable = true;
 
@@ -1094,36 +617,23 @@ struct mse_data<T, extents<dynamic_extent>, A, L>
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
 
-    inline constexpr T&
-    at(ptrdiff_t i)
-    {
-        return m_elems[i];
-    }
-
-    inline constexpr T const&
-    at(ptrdiff_t i) const
-    {
-        return m_elems[i];
-    }
-
-    inline span_type
+    inline constexpr span_type
     span() noexcept
     {
-        return support::make_span(*this);
+        return span_type(m_elems.data(), m_size);
     }
 
-    inline const_span_type
+    inline constexpr const_span_type
     span() const noexcept
     {
-        return support::make_const_span(*this);
+        return const_span_type(m_elems.data(), m_size);
     }
 
     template<class U>
     constexpr void
     assign(initializer_list<U> src)
     {
-        ptrdiff_t   size = static_cast<ptrdiff_t>(src.size());
-        reshape(size, m_cap);
+        reshape(static_cast<ptrdiff_t>(src.size()), m_cap);
         support::copy_list(*this, src);
     }
 
@@ -1131,14 +641,15 @@ struct mse_data<T, extents<dynamic_extent>, A, L>
     constexpr void
     assign(ET const& eng)
     {
-        ptrdiff_t   size = static_cast<ptrdiff_t>(eng.size());
-        reshape(size, m_cap);
+        reshape(static_cast<ptrdiff_t>(eng.size()), m_cap);
         support::copy_engine(*this, eng);
     }
 
     void
     reshape(ptrdiff_t newsize, ptrdiff_t newcap)
     {
+        if (newsize == m_size) return;
+
         support::verify_size(newsize);
         support::verify_capacity(newcap);
 
@@ -1222,38 +733,6 @@ struct mse_data<T, extents<R, C>, void, L>
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
-
-    inline constexpr T&
-    at(ptrdiff_t i)
-        requires this_type::is_linear_matrix
-    {
-        return m_elems[i];
-    }
-
-    inline constexpr T const&
-    at(ptrdiff_t i) const
-        requires this_type::is_linear_matrix
-    {
-        return m_elems[i];
-    }
-
-    inline constexpr T&
-    at(ptrdiff_t i, ptrdiff_t j)
-    {
-        if constexpr (this_type::is_row_major)
-            return m_elems[i*m_colcap + j];
-        else
-            return m_elems[i + j*m_rowcap];
-    }
-
-    inline constexpr T const&
-    at(ptrdiff_t i, ptrdiff_t j) const
-    {
-        if constexpr (this_type::is_row_major)
-            return m_elems[i*m_colcap + j];
-        else
-            return m_elems[i + j*m_rowcap];
-    }
 
     inline span_type
     span() noexcept
@@ -1353,38 +832,6 @@ struct mse_data<T, extents<R, C>, A, L>
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
 
-    inline T&
-    at(ptrdiff_t i)
-        requires this_type::is_linear_matrix
-    {
-        return m_elems[i];
-    }
-
-    inline T const&
-    at(ptrdiff_t i) const
-        requires this_type::is_linear_matrix
-    {
-        return m_elems[i];
-    }
-
-    inline T&
-    at(ptrdiff_t i, ptrdiff_t j)
-    {
-        if constexpr (this_type::is_row_major)
-            return m_elems[i*m_colcap + j];
-        else
-            return m_elems[i + j*m_rowcap];
-    }
-
-    inline T const&
-    at(ptrdiff_t i, ptrdiff_t j) const
-    {
-        if constexpr (this_type::is_row_major)
-            return m_elems[i*m_colcap + j];
-        else
-            return m_elems[i + j*m_rowcap];
-    }
-
     inline span_type
     span() noexcept
     {
@@ -1483,45 +930,6 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
-
-    constexpr void
-    update_extents(ptrdiff_t, ptrdiff_t cols, ptrdiff_t, ptrdiff_t colcap) noexcept
-    {
-        m_cols   = cols;
-        m_colcap = colcap;
-    }
-
-    inline T&
-    at(ptrdiff_t i)
-        requires this_type::is_row_matrix
-    {
-        return m_elems[i];
-    }
-
-    inline T const&
-    at(ptrdiff_t i) const
-        requires this_type::is_row_matrix
-    {
-        return m_elems[i];
-    }
-
-    inline T&
-    at(ptrdiff_t i, ptrdiff_t j)
-    {
-        if constexpr (this_type::is_row_major)
-            return m_elems[i*m_colcap + j];
-        else
-            return m_elems[i + j*m_rowcap];
-    }
-
-    inline T const&
-    at(ptrdiff_t i, ptrdiff_t j) const
-    {
-        if constexpr (this_type::is_row_major)
-            return m_elems[i*m_colcap + j];
-        else
-            return m_elems[i + j*m_rowcap];
-    }
 
     inline span_type
     span() noexcept
@@ -1649,45 +1057,6 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
 
-    constexpr void
-    update_extents(ptrdiff_t rows, ptrdiff_t, ptrdiff_t rowcap, ptrdiff_t) noexcept
-    {
-        m_rows   = rows;
-        m_rowcap = rowcap;
-    }
-
-    inline T&
-    at(ptrdiff_t i)
-        requires this_type::is_column_matrix
-    {
-        return m_elems[i];
-    }
-
-    inline T const&
-    at(ptrdiff_t i) const
-        requires this_type::is_column_matrix
-    {
-        return m_elems[i];
-    }
-
-    inline T&
-    at(ptrdiff_t i, ptrdiff_t j)
-    {
-        if constexpr (this_type::is_row_major)
-            return m_elems[i*m_colcap + j];
-        else
-            return m_elems[i + j*m_rowcap];
-    }
-
-    inline T const&
-    at(ptrdiff_t i, ptrdiff_t j) const
-    {
-        if constexpr (this_type::is_row_major)
-            return m_elems[i*m_colcap + j];
-        else
-            return m_elems[i + j*m_rowcap];
-    }
-
     inline span_type
     span() noexcept
     {
@@ -1812,33 +1181,6 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
     mse_data(mse_data const&) = default;
     mse_data&   operator =(mse_data&&) noexcept = default;
     mse_data&   operator =(mse_data const&) = default;
-
-    inline void
-    update_extents(ptrdiff_t rows, ptrdiff_t cols, ptrdiff_t rowcap, ptrdiff_t colcap) noexcept
-    {
-        m_rows   = rows;
-        m_cols   = cols;
-        m_rowcap = rowcap;
-        m_colcap = colcap;
-    }
-
-    inline T&
-    at(ptrdiff_t i, ptrdiff_t j)
-    {
-        if constexpr (this_type::is_row_major)
-            return m_elems[i*m_colcap + j];
-        else
-            return m_elems[i + j*m_rowcap];
-    }
-
-    inline T const&
-    at(ptrdiff_t i, ptrdiff_t j) const
-    {
-        if constexpr (this_type::is_row_major)
-            return m_elems[i*m_colcap + j];
-        else
-            return m_elems[i + j*m_rowcap];
-    }
 
     inline span_type
     span() noexcept
