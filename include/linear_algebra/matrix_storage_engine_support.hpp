@@ -700,8 +700,9 @@ struct mse_data<T, extents<R, C>, void, L>
     using this_type       = mse_data;
     using array_type      = std::array<T, R*C>;
     using support         = mse_support<this_type>;
-    using span_type       = typename support::span_type;
-    using const_span_type = typename support::const_span_type;
+    using fixed_layout    = conditional_t<is_same_v<L, row_major>, layout_right, layout_left>;
+    using span_type       = basic_mdspan<T, extents<R, C>, fixed_layout>;
+    using const_span_type = basic_mdspan<T const, extents<R, C>, fixed_layout>;
 
     static constexpr bool   is_column_matrix    = (C == 1);
     static constexpr bool   is_row_matrix       = (R == 1);
@@ -737,13 +738,13 @@ struct mse_data<T, extents<R, C>, void, L>
     inline span_type
     span() noexcept
     {
-        return support::make_span(*this);
+        return span_type(m_elems.data());
     }
 
     inline const_span_type
     span() const noexcept
     {
-        return support::make_const_span(*this);
+        return const_span_type(m_elems.data());
     }
 
     template<class U>
@@ -801,8 +802,9 @@ struct mse_data<T, extents<R, C>, A, L>
     using this_type       = mse_data;
     using array_type      = std::vector<T, A>;
     using support         = mse_support<this_type>;
-    using span_type       = typename support::span_type;
-    using const_span_type = typename support::const_span_type;
+    using fixed_layout    = conditional_t<is_same_v<L, row_major>, layout_right, layout_left>;
+    using span_type       = basic_mdspan<T, extents<R, C>, fixed_layout>;
+    using const_span_type = basic_mdspan<T const, extents<R, C>, fixed_layout>;
 
     static constexpr bool   is_column_matrix    = (C == 1);
     static constexpr bool   is_row_matrix       = (R == 1);
@@ -835,13 +837,13 @@ struct mse_data<T, extents<R, C>, A, L>
     inline span_type
     span() noexcept
     {
-        return support::make_span(*this);
+        return span_type(m_elems.data());
     }
 
     inline const_span_type
     span() const noexcept
     {
-        return support::make_const_span(*this);
+        return const_span_type(m_elems.data());
     }
 
     template<class U>
