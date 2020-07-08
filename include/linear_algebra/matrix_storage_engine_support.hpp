@@ -457,8 +457,11 @@ struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public mse_support_base
 //  assumption makes implementation easy, but may be absent in the final version.
 //--------------------------------------------------------------------------------------------------
 //
-//-----------------------------------------------------------------
-//- Fixed size.  Elements contained as member data in a std::array.
+//  Partial Specialization:     mse_data<T, extents<N>, void, L>
+//
+//  Manages elements representing a fixed-size unoriented vector of N elements.  Its elements are
+//  implemented as member data in a std::array.
+//--------------------------------------------------------------------------------------------------
 //
 template<class T, ptrdiff_t N, class L>
 struct mse_data<T, extents<N>, void, L>
@@ -526,8 +529,13 @@ struct mse_data<T, extents<N>, void, L>
     }
 };
 
-//------------------------------------------------------------------
-//- Fixed size.  Elements contained as member data in a std::vector.
+
+//--------------------------------------------------------------------------------------------------
+//  Specialization:     mse_data<T, extents<N>, A, L>
+//
+//  Manages elements representing a fixed-size unoriented vector of N elements.  Its elements are
+//  implemented as member data in a std::vector.
+//--------------------------------------------------------------------------------------------------
 //
 template<class T, ptrdiff_t N, class A, class L>
 struct mse_data<T, extents<N>, A, L>
@@ -590,8 +598,13 @@ struct mse_data<T, extents<N>, A, L>
     }
 };
 
-//--------------------------------------------------------------------
-//- Dynamic size.  Elements contained as member data in a std::vector.
+
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     mse_data<T, extents<dynamic_extent>, A, L>
+//
+//  Manages elements representing a dynamically-resizable unoriented vector.  Its elements are
+//  implemented as member data in a std::vector.
+//--------------------------------------------------------------------------------------------------
 //
 template<class T, class A, class L>
 struct mse_data<T, extents<dynamic_extent>, A, L>
@@ -691,8 +704,13 @@ struct mse_data<T, extents<dynamic_extent>, A, L>
     }
 };
 
-//---------------------------------------------------------------------------------
-//- Fixed rows / fixed columns.  Elements contained as member data in a std::array.
+
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     mse_data<T, extents<R, C>, void, L>
+//
+//  Manages elements representing a fixed-size matrix of R rows and C columns.  Its elements are
+//  implemented as member data in a std::array.
+//--------------------------------------------------------------------------------------------------
 //
 template<class T, ptrdiff_t R, ptrdiff_t C, class L>
 struct mse_data<T, extents<R, C>, void, L>
@@ -793,8 +811,13 @@ struct mse_data<T, extents<R, C>, void, L>
     }
 };
 
-//-------------------------------------------------------------------------------
-//- Fixed rows / fixed columns.  Elements dynamically allocated in a std::vector.
+
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     mse_data<T, extents<R, C>, A, L>
+//
+//  Manages elements representing a fixed-size matrix of R rows and C columns.  Its elements are
+//  implemented as member data in a std::vector.
+//--------------------------------------------------------------------------------------------------
 //
 template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
 struct mse_data<T, extents<R, C>, A, L>
@@ -892,8 +915,13 @@ struct mse_data<T, extents<R, C>, A, L>
     }
 };
 
-//---------------------------------------------------------------------------------
-//- Fixed rows / dynamic columns.  Elements dynamically allocated in a std::vector.
+
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     mse_data<T, extents<R, dynamic_extent>, A, L>
+//
+//  Manages elements representing a matrix having a fixed number of R rows and a dynamically-
+//  resizable number of columns.  Its elements are implemented as member data in a std::vector.
+//--------------------------------------------------------------------------------------------------
 //
 template<class T, ptrdiff_t R, class A, class L>
 struct mse_data<T, extents<R, dynamic_extent>, A, L>
@@ -1018,8 +1046,13 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
     }
 };
 
-//---------------------------------------------------------------------------------
-//- Dynamic rows / fixed columns.  Elements dynamically allocated in a std::vector.
+
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     mse_data<T, extents<dynamic_extent, C>, A, L>
+//
+//  Manages elements representing a matrix having a dynamically-resizable number of rows and a
+//  fixed number of C columns.  Its elements are implemented as member data in a std::vector.
+//--------------------------------------------------------------------------------------------------
 //
 template<class T, ptrdiff_t C, class A, class L>
 struct mse_data<T, extents<dynamic_extent, C>, A, L>
@@ -1144,8 +1177,14 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
     }
 };
 
-//-----------------------------------------------------------------------------------
-//- Dynamic rows / dynamic columns.  Elements dynamically allocated in a std::vector.
+
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
+//
+//  Manages elements representing a matrix having a dynamically-resizable number of rows and a
+//  dynamically-resizable number of columns.  Its elements are implemented as member data in a
+//  std::vector.
+//--------------------------------------------------------------------------------------------------
 //
 template<class T, class A, class L>
 struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
