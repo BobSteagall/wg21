@@ -370,10 +370,9 @@ struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public mse_support_base
     //
     static constexpr bool   use_dyn_span = (R == dynamic_extent || C == dynamic_extent);
 
-    using fixed_extents = extents<R, C>;
     using fixed_layout  = conditional_t<is_same_v<L, row_major>, layout_right, layout_left>;
-    using fixed_mdspan  = basic_mdspan<T, fixed_extents, fixed_layout>;
-    using fixed_cmdspan = basic_mdspan<T const, fixed_extents, fixed_layout>;
+    using fixed_mdspan  = basic_mdspan<T, extents<R, C>, fixed_layout>;
+    using fixed_cmdspan = basic_mdspan<T const, extents<R, C>, fixed_layout>;
 
     using dyn_extents = extents<dynamic_extent, dynamic_extent>;
     using dyn_layout  = layout_stride<dynamic_extent, dynamic_extent>;
