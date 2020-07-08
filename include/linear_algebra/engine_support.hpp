@@ -111,7 +111,8 @@ concept resizable_vector_engine =
 
 template<class ET>
 concept spannable_vector_engine =
-    readable_vector_engine<ET>  and
+    readable_vector_engine<ET>  
+    and
     requires (ET const& ceng, ET& meng)
     {
         typename ET::span_type;
@@ -185,7 +186,8 @@ concept writable_matrix_engine =
 
 template<class ET>
 concept initable_matrix_engine =
-    writable_matrix_engine<ET>  and
+    writable_matrix_engine<ET>  
+    and
     requires (ET& eng, initializer_list<initializer_list<typename ET::element_type>> l)
     {
         { ET::ET(l) };
@@ -194,37 +196,35 @@ concept initable_matrix_engine =
 
 template<class ET>
 concept column_resizable_matrix_engine =
-    initable_matrix_engine<ET>  and
+    initable_matrix_engine<ET>  
+    and
     requires (ET& eng, typename ET::element_type i)
     {
-        { eng.resize_columns(i)     };
-        { eng.reserve_columns(i)    };
         { eng.reshape_columns(i, i) };
     };
 
 template<class ET>
 concept row_resizable_matrix_engine =
-    initable_matrix_engine<ET>  and
+    initable_matrix_engine<ET>  
+    and
     requires (ET& eng, typename ET::element_type i)
     {
-        { eng.resize_rows(i)     };
-        { eng.reserve_rows(i)    };
         { eng.reshape_rows(i, i) };
     };
 
 template<class ET>
 concept resizable_matrix_engine =
-    initable_matrix_engine<ET>  and
+    initable_matrix_engine<ET>  
+    and
     requires (ET& eng, typename ET::element_type i)
     {
-        { eng.resize(i, i)        };
-        { eng.reserve(i, i)       };
         { eng.reshape(i, i, i, i) };
     };
 
 template<class ET>
 concept spannable_matrix_engine =
-    readable_matrix_engine<ET>  and
+    readable_matrix_engine<ET>  
+    and
     requires (ET const& ceng, ET& meng)
     {
         typename ET::span_type;
@@ -239,43 +239,6 @@ concept spannable_matrix_engine =
         requires is_same_v<decltype(ceng.span()), typename ET::const_span_type>;
     #endif
     };
-
-
-inline void
-check_sizes(ptrdiff_t rows, ptrdiff_t cols)
-{
-    if (rows < 1  || cols < 1)
-    {
-        throw runtime_error("invalid size");
-    }
-}
-
-inline void
-check_capacities(ptrdiff_t rowcap, ptrdiff_t colcap)
-{
-    if (rowcap < 0  || colcap < 0)
-    {
-        throw runtime_error("invalid capacity");
-    }
-}
-
-inline void
-check_size(ptrdiff_t size)
-{
-    if (size < 1)
-    {
-        throw runtime_error("invalid size");
-    }
-}
-
-inline void
-check_capacity(ptrdiff_t capy)
-{
-    if (capy < 0)
-    {
-        throw runtime_error("invalid capacity");
-    }
-}
 
 
 }       //- detail namespace
