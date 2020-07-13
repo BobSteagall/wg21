@@ -1,8 +1,8 @@
 //==================================================================================================
 //  File:       engine_support.hpp
 //
-//  Summary:    This header defines various common types, traits, concepts, and functions used
-//              by matrix_storage_engine and matrix_view_engine.
+//  Summary:    This header defines various types, traits, concepts, and functions used across
+//              the entire library.
 //==================================================================================================
 //
 #ifndef LINEAR_ALGEBRA_ENGINE_SUPPORT_HPP_DEFINED
@@ -36,7 +36,12 @@ template<typename T, typename U>
 concept returns = is_same_v<T, U>;
 
 template<typename T, typename U>
-concept convertibility = is_convertible_v<T, U>;
+concept element_convertibility = is_convertible_v<T, U>;
+
+#if !defined(LA_STD_CONCEPTS_HEADER_SUPPORTED)
+    template<typename T, typename U>
+    concept same_as = is_same_v<T, U>;
+#endif
 
 
 //--------------------------------------------------------------------------------------------------
@@ -53,17 +58,14 @@ concept convertibility = is_convertible_v<T, U>;
 //
 template<class ET>
 concept readable_vector_engine =
-    requires
+    requires (ET const& eng, typename ET::index_type i)
     {
         typename ET::element_type;
         typename ET::index_type;
         typename ET::reference;
         typename ET::const_reference;
         requires is_lvalue_reference_v<typename ET::reference>;
-    }
-    and
-    requires (ET const& eng, typename ET::index_type i)
-    {
+
     #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { eng.size() } -> returns<typename ET::index_type>;
         { eng(i)     } -> returns<typename ET::const_reference>;
@@ -81,6 +83,7 @@ concept writable_vector_engine =
     {
         requires is_same_v<typename ET::reference, typename ET::element_type&>;
         { eng(i) = v };
+
     #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { eng(i)     } -> returns<typename ET::reference>;
     #else
@@ -111,7 +114,7 @@ concept resizable_vector_engine =
 
 template<class ET>
 concept spannable_vector_engine =
-    readable_vector_engine<ET>  
+    readable_vector_engine<ET>
     and
     requires (ET const& ceng, ET& meng)
     {
@@ -119,6 +122,7 @@ concept spannable_vector_engine =
         typename ET::const_span_type;
         requires is_mdspan_v<typename ET::span_type>;
         requires is_mdspan_v<typename ET::const_span_type>;
+
     #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { meng.span() } -> returns<typename ET::span_type>;
         { ceng.span() } -> returns<typename ET::const_span_type>;
@@ -144,7 +148,7 @@ concept spannable_vector_engine =
 //
 template<class ET>
 concept readable_matrix_engine =
-    requires
+    requires (ET const& eng, typename ET::index_type i)
     {
         typename ET::element_type;
         typename ET::index_type;
@@ -152,10 +156,7 @@ concept readable_matrix_engine =
         typename ET::reference;
         typename ET::const_reference;
         requires is_lvalue_reference_v<typename ET::reference>;
-    }
-    and
-    requires (ET const& eng, typename ET::index_type i)
-    {
+
     #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { eng.columns() } -> returns<typename ET::index_type>;
         { eng.rows()    } -> returns<typename ET::index_type>;
@@ -177,6 +178,7 @@ concept writable_matrix_engine =
     {
         requires is_same_v<typename ET::reference, typename ET::element_type&>;
         { eng(i, i) = v };
+
     #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { eng(i, i)     } -> returns<typename ET::reference>;
     #else
@@ -186,7 +188,7 @@ concept writable_matrix_engine =
 
 template<class ET>
 concept initable_matrix_engine =
-    writable_matrix_engine<ET>  
+    writable_matrix_engine<ET>
     and
     requires (ET& eng, initializer_list<initializer_list<typename ET::element_type>> l)
     {
@@ -196,7 +198,7 @@ concept initable_matrix_engine =
 
 template<class ET>
 concept column_resizable_matrix_engine =
-    initable_matrix_engine<ET>  
+    initable_matrix_engine<ET>
     and
     requires (ET& eng, typename ET::element_type i)
     {
@@ -205,7 +207,7 @@ concept column_resizable_matrix_engine =
 
 template<class ET>
 concept row_resizable_matrix_engine =
-    initable_matrix_engine<ET>  
+    initable_matrix_engine<ET>
     and
     requires (ET& eng, typename ET::element_type i)
     {
@@ -214,7 +216,7 @@ concept row_resizable_matrix_engine =
 
 template<class ET>
 concept resizable_matrix_engine =
-    initable_matrix_engine<ET>  
+    initable_matrix_engine<ET>
     and
     requires (ET& eng, typename ET::element_type i)
     {
@@ -223,7 +225,7 @@ concept resizable_matrix_engine =
 
 template<class ET>
 concept spannable_matrix_engine =
-    readable_matrix_engine<ET>  
+    readable_matrix_engine<ET>
     and
     requires (ET const& ceng, ET& meng)
     {
@@ -231,6 +233,7 @@ concept spannable_matrix_engine =
         typename ET::const_span_type;
         requires is_mdspan_v<typename ET::span_type>;
         requires is_mdspan_v<typename ET::const_span_type>;
+
     #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { meng.span() } -> returns<typename ET::span_type>;
         { ceng.span() } -> returns<typename ET::const_span_type>;
@@ -240,6 +243,59 @@ concept spannable_matrix_engine =
     #endif
     };
 
+
+//--------------------------------------------------------------------------------------------------
+//  Class Template:     engine_support_base
+//
+//  Policy/traits base type that provides various types and functions for verification.
+//--------------------------------------------------------------------------------------------------
+//
+struct engine_support_base
+{
+    static inline constexpr void
+    verify_capacity(ptrdiff_t c)
+    {
+        if (c < 0)
+        {
+            throw runtime_error("invalid capacity parameter");
+        }
+    }
+
+    template<class U>
+    static constexpr tuple<ptrdiff_t, ptrdiff_t>
+    verify_list(initializer_list<initializer_list<U>> list)
+    {
+        size_t  rows = list.size();
+        size_t  cols = list.begin()->size();
+
+        for (auto&& row : list)
+        {
+            if (row.size() != cols)
+            {
+                throw runtime_error("matrix initializer_list has invalid shape");
+            }
+        }
+        return {static_cast<ptrdiff_t>(rows), static_cast<ptrdiff_t>(cols)};
+    }
+
+    static inline constexpr void
+    verify_size(ptrdiff_t s)
+    {
+        if (s < 1)
+        {
+            throw runtime_error("invalid size parameter");
+        }
+    }
+
+    static inline constexpr void
+    verify_size(ptrdiff_t s1, ptrdiff_t s2)
+    {
+        if (s1 != s2)
+        {
+            throw runtime_error("invalid size parameter");
+        }
+    }
+};
 
 }       //- detail namespace
 }       //- STD_LA namespace

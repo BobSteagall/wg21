@@ -29,8 +29,10 @@ namespace STD_LA {
 //
 template<class T, ptrdiff_t N, class A, class L>
     requires
-        detail::valid_mse_extents<extents<N>>  and
-        detail::valid_mse_allocator<A, T>      and
+        detail::valid_mse_extents<extents<N>>
+        and
+        detail::valid_mse_allocator<A, T>
+        and
         detail::valid_mse_vector_layout<L>
 class matrix_storage_engine<T, extents<N>, A, L>
 {
@@ -48,7 +50,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
     using const_span_type  = typename storage_type::const_span_type;
 
   public:
-    inline ~matrix_storage_engine() = default;
+    ~matrix_storage_engine() = default;
 
     //- Construct / assign.
     //
@@ -60,7 +62,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
 
     inline constexpr
     matrix_storage_engine(index_type size)
-        requires storage_type::is_resizable
+        requires detail::resizable<storage_type>
     :   m_data()
     {
         m_data.reshape(size, size);
@@ -76,7 +78,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
 
     template<class T2> inline constexpr
     matrix_storage_engine(initializer_list<T2> rhs)
-        requires detail::convertibility<T2, T>
+        requires detail::element_convertibility<T2, T>
     :   m_data()
     {
         m_data.assign(rhs);
@@ -94,7 +96,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
     template<class T2>
     inline constexpr matrix_storage_engine&
     operator =(initializer_list<T2> rhs)
-        requires detail::convertibility<T2, T>
+        requires detail::element_convertibility<T2, T>
     {
         m_data.assign(rhs);
         return *this;
@@ -118,7 +120,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
     //
     void
     reshape(index_type newsize, index_type newcap)
-        requires storage_type::is_resizable
+        requires detail::resizable<storage_type>
     {
         m_data.reshape(newsize, newcap);
     }
@@ -182,8 +184,10 @@ class matrix_storage_engine<T, extents<N>, A, L>
 //
 template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
     requires
-        detail::valid_mse_extents<extents<R, C>>  and
-        detail::valid_mse_allocator<A, T>         and
+        detail::valid_mse_extents<extents<R, C>>
+        and
+        detail::valid_mse_allocator<A, T>
+        and
         detail::valid_mse_matrix_layout<L>
 class matrix_storage_engine<T, extents<R, C>, A, L>
 {
@@ -202,7 +206,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     using const_span_type  = typename storage_type::const_span_type;
 
   public:
-    inline ~matrix_storage_engine() = default;
+    ~matrix_storage_engine() = default;
 
     //- Construct / assign.
     //
@@ -214,7 +218,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     inline constexpr
     matrix_storage_engine(index_type rows, index_type cols)
-        requires storage_type::is_resizable
+        requires detail::resizable<storage_type>
     :   m_data()
     {
         reshape(rows, cols, rows, cols);
@@ -222,7 +226,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     inline constexpr
     matrix_storage_engine(index_type rows, index_type cols, index_type rowcap, index_type colcap)
-        requires storage_type::is_resizable
+        requires detail::resizable<storage_type>
     :   m_data()
     {
         reshape(rows, cols, rowcap, colcap);
@@ -238,7 +242,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     template<class T2> inline constexpr
     matrix_storage_engine(initializer_list<initializer_list<T2>> rhs)
-        requires detail::convertibility<T2, T>
+        requires detail::element_convertibility<T2, T>
     :   m_data()
     {
         m_data.assign(rhs);
@@ -246,7 +250,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     template<class T2> inline constexpr
     matrix_storage_engine(initializer_list<T2> rhs)
-        requires (detail::convertibility<T2, T> && (storage_type::is_linear_matrix))
+        requires detail::element_convertibility<T2, T> and detail::linear_matrix<storage_type>
     :   m_data()
     {
         m_data.assign(rhs);
@@ -264,7 +268,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     template<class T2>
     inline constexpr matrix_storage_engine&
     operator =(initializer_list<initializer_list<T2>> rhs)
-        requires detail::convertibility<T2, T>
+        requires detail::element_convertibility<T2, T>
     {
         m_data.assign(rhs);
         return *this;
@@ -273,7 +277,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     template<class T2>
     inline constexpr matrix_storage_engine&
     operator =(initializer_list<T2> rhs)
-        requires (detail::convertibility<T2, T> && (storage_type::is_linear_matrix))
+        requires detail::element_convertibility<T2, T> and detail::linear_matrix<storage_type>
     {
         m_data.assign(rhs);
         return *this;
@@ -321,7 +325,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //
     constexpr void
     reshape_columns(index_type cols, index_type colcap)
-        requires storage_type::is_column_resizable
+        requires detail::column_resizable<storage_type>
     {
         m_data.reshape_columns(cols, colcap);
     }
@@ -330,7 +334,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //
     void
     reshape_rows(index_type rows, index_type rowcap)
-        requires storage_type::is_row_resizable
+        requires detail::row_resizable<storage_type>
     {
         m_data.reshape_rows(rows, rowcap);
     }
@@ -339,7 +343,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //
     void
     reshape(index_type rows, index_type cols, index_type rowcap, index_type colcap)
-        requires storage_type::is_resizable
+        requires detail::resizable<storage_type>
     {
         m_data.reshape(rows, cols, rowcap, colcap);
     }
@@ -348,14 +352,14 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //
     inline constexpr reference
     operator ()(index_type i)
-        requires (storage_type::is_linear_matrix)
+        requires  detail::linear_matrix<storage_type>
     {
         return m_data.m_elems[i];
     }
 
     inline constexpr const_reference
     operator ()(index_type i) const
-        requires (storage_type::is_linear_matrix)
+        requires  detail::linear_matrix<storage_type>
     {
         return m_data.m_elems[i];
     }

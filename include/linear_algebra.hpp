@@ -27,10 +27,16 @@
     #if (__GNUG__ > 9)
         #define LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
     #endif
+    #if (__GNUG__ == 10)
+        #define LA_STD_CONCEPTS_HEADER_SUPPORTED
+    #endif
 
 #elif defined _MSC_VER
     #define LA_COMPILER_MS
     #define LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
+    #if (_MSC_VER >= 1925)
+        #define LA_STD_CONCEPTS_HEADER_SUPPORTED
+    #endif
 #endif
 
 //- Namespace alternatives for testing and also for detecting ADL issues.  Pick a pair
@@ -56,6 +62,10 @@
 #include <tuple>
 #include <type_traits>
 #include <vector>
+
+#if defined(LA_STD_CONCEPTS_HEADER_SUPPORTED)
+    #include <concepts>
+#endif
 
 //- Disable some unnecessary compiler warnings coming from mdspan.
 //
@@ -118,6 +128,7 @@ namespace STD_LA
 
 #include "linear_algebra/engine_support.hpp"
 #include "linear_algebra/matrix_storage_engine_support.hpp"
+#include "linear_algebra/matrix_storage_engine_data.hpp"
 #include "linear_algebra/matrix_storage_engine.hpp"
 
 #endif  //- LINEAR_ALGEBRA_HPP_DEFINED
