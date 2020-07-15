@@ -29,10 +29,8 @@ namespace STD_LA {
 //
 template<class T, ptrdiff_t N, class A, class L>
     requires
-        detail::valid_mse_extents<extents<N>>
-        and
-        detail::valid_mse_allocator<A, T>
-        and
+        detail::valid_mse_extents<extents<N>>   and
+        detail::valid_mse_allocator<A, T>       and
         detail::valid_mse_vector_layout<L>
 class matrix_storage_engine<T, extents<N>, A, L>
 {
@@ -55,10 +53,11 @@ class matrix_storage_engine<T, extents<N>, A, L>
     //- Construct / assign.
     //
     constexpr matrix_storage_engine() = default;
-    constexpr matrix_storage_engine(matrix_storage_engine&& rhs) noexcept = default;
-    constexpr matrix_storage_engine(matrix_storage_engine const& rhs) = default;
-    constexpr matrix_storage_engine&    operator =(matrix_storage_engine&& rhs) noexcept = default;
-    constexpr matrix_storage_engine&    operator =(matrix_storage_engine const& rhs) = default;
+    constexpr matrix_storage_engine(matrix_storage_engine&&) noexcept = default;
+    constexpr matrix_storage_engine(matrix_storage_engine const&) = default;
+
+    constexpr matrix_storage_engine&    operator =(matrix_storage_engine&&) noexcept = default;
+    constexpr matrix_storage_engine&    operator =(matrix_storage_engine const&) = default;
 
     inline constexpr
     matrix_storage_engine(index_type size)
@@ -184,10 +183,8 @@ class matrix_storage_engine<T, extents<N>, A, L>
 //
 template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
     requires
-        detail::valid_mse_extents<extents<R, C>>
-        and
-        detail::valid_mse_allocator<A, T>
-        and
+        detail::valid_mse_extents<extents<R, C>>    and
+        detail::valid_mse_allocator<A, T>           and
         detail::valid_mse_matrix_layout<L>
 class matrix_storage_engine<T, extents<R, C>, A, L>
 {
@@ -201,7 +198,6 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     using reference        = element_type&;
     using const_reference  = element_type const&;
     using index_type       = ptrdiff_t;
-    using index_tuple_type = tuple<index_type, index_type>;
     using span_type        = typename storage_type::span_type;
     using const_span_type  = typename storage_type::const_span_type;
 
@@ -211,11 +207,14 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //- Construct / assign.
     //
     constexpr matrix_storage_engine() = default;
-    constexpr matrix_storage_engine(matrix_storage_engine&& rhs) noexcept = default;
-    constexpr matrix_storage_engine(matrix_storage_engine const& rhs) = default;
-    constexpr matrix_storage_engine&    operator =(matrix_storage_engine&& rhs) noexcept = default;
-    constexpr matrix_storage_engine&    operator =(matrix_storage_engine const& rhs) = default;
+    constexpr matrix_storage_engine(matrix_storage_engine&&) noexcept = default;
+    constexpr matrix_storage_engine(matrix_storage_engine const&) = default;
 
+    constexpr matrix_storage_engine&    operator =(matrix_storage_engine&&) noexcept = default;
+    constexpr matrix_storage_engine&    operator =(matrix_storage_engine const&) = default;
+
+    //- Other constructors.
+    //
     inline constexpr
     matrix_storage_engine(index_type rows, index_type cols)
         requires detail::resizable<storage_type>
@@ -256,6 +255,8 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         m_data.assign(rhs);
     }
 
+    //- Other assignment operators.
+    //
     template<class ET2>
     inline constexpr matrix_storage_engine&
     operator =(ET2 const& rhs)
@@ -297,10 +298,10 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         return m_data.m_rows;
     }
 
-    inline constexpr index_tuple_type
+    inline constexpr index_type
     size() const noexcept
     {
-        return index_tuple_type(m_data.m_rows, m_data.m_cols);
+        return m_data.m_rows * m_data.m_cols;
     }
 
     inline constexpr index_type
@@ -315,37 +316,10 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         return m_data.m_rowcap;
     }
 
-    inline constexpr index_tuple_type
+    inline constexpr index_type
     capacity() const noexcept
     {
-        return index_tuple_type(m_data.m_rowcap, m_data.m_colcap);
-    }
-
-    //- Setting column size and capacity.
-    //
-    constexpr void
-    reshape_columns(index_type cols, index_type colcap)
-        requires detail::column_resizable<storage_type>
-    {
-        m_data.reshape_columns(cols, colcap);
-    }
-
-    //- Setting row size and capacity.
-    //
-    void
-    reshape_rows(index_type rows, index_type rowcap)
-        requires detail::row_resizable<storage_type>
-    {
-        m_data.reshape_rows(rows, rowcap);
-    }
-
-    //- Setting overall size and capacity.
-    //
-    void
-    reshape(index_type rows, index_type cols, index_type rowcap, index_type colcap)
-        requires detail::resizable<storage_type>
-    {
-        m_data.reshape(rows, cols, rowcap, colcap);
+        return m_data.m_rowcap * m_data.m_colcap;
     }
 
     //- Element access
@@ -394,36 +368,39 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         return m_data.span();
     }
 
-    //- Modifiers
+    //- Setting column size and capacity.
+    //
+    constexpr void
+    reshape_columns(index_type cols, index_type colcap)
+        requires detail::column_resizable<storage_type>
+    {
+        m_data.reshape_columns(cols, colcap);
+    }
+
+    //- Setting row size and capacity.
+    //
+    void
+    reshape_rows(index_type rows, index_type rowcap)
+        requires detail::row_resizable<storage_type>
+    {
+        m_data.reshape_rows(rows, rowcap);
+    }
+
+    //- Setting overall size and capacity.
+    //
+    void
+    reshape(index_type rows, index_type cols, index_type rowcap, index_type colcap)
+        requires detail::resizable<storage_type>
+    {
+        m_data.reshape(rows, cols, rowcap, colcap);
+    }
+
+    //- Other modifiers
     //
     inline constexpr void
     swap(matrix_storage_engine& rhs) noexcept
     {
         m_data.swap(rhs.m_data);
-    }
-
-    constexpr void
-    swap_columns(index_type c1, index_type c2) noexcept
-    {
-        if (c1 != c2)
-        {
-            for (index_type i = 0;  i < m_data.m_rows;  ++i)
-            {
-                detail::la_swap((*this)(i, c1), (*this)(i, c2));
-            }
-        }
-    }
-
-    constexpr void
-    swap_rows(index_type r1, index_type r2) noexcept
-    {
-        if (r1 != r2)
-        {
-            for (index_type j = 0;  j < m_data.m_cols;  ++j)
-            {
-                detail::la_swap((*this)(r1, j), (*this)(r2, j));
-            }
-        }
     }
 
   private:
@@ -441,7 +418,6 @@ struct matrix_multiplication_engine_traits<OT,
     using alloc_type   = detail::rebind_alloc_t<AT1, element_type>;
     using engine_type  = matrix_storage_engine<element_type, extents<R1, C2>, alloc_type, EL1>;
 };
-
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_MATRIX_STORAGE_ENGINE_HPP_DEFINED

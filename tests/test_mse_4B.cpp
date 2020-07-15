@@ -18,10 +18,8 @@ TEST(MSE_Matrix_4B, DirectCtor)
 
     EXPECT_EQ(e1.rows(), 4);
     EXPECT_EQ(e1.columns(), 4);
-    EXPECT_EQ(e1.size(), itup_t(4, 4));
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_EQ(e1.capacity(), itup_t(4, 4));
 
     //- Verify elements are value initialized.
     //
@@ -52,10 +50,8 @@ TEST(MSE_Matrix_4B, CmpEq)
     //
     EXPECT_EQ(e1.rows(), 4);
     EXPECT_EQ(e1.columns(), 4);
-    EXPECT_EQ(e1.size(), itup_t(4, 4));
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_EQ(e1.capacity(), itup_t(4, 4));
 
 
     EXPECT_EQ(e1(0, 0), 0.0f);
@@ -515,14 +511,16 @@ TEST(MSE_Matrix_4B, Swap)
     //
     mse_f_ffa_rm    e1;
 
-    EXPECT_EQ(e1.size(), st_44);
+    EXPECT_EQ(e1.rows(), 4);
+    EXPECT_EQ(e1.columns(), 4);
     EXPECT_TRUE(m_cmp_eq(e1, fl_44_0));
 
     //- List construct and verify initial state.
     //
     mse_f_ffa_rm    e2(fl_44_2);
 
-    EXPECT_EQ(e2.size(), st_44);
+    EXPECT_EQ(e2.rows(), 4);
+    EXPECT_EQ(e2.columns(), 4);
     EXPECT_TRUE(m_cmp_eq(e2, fl_44_2));
 
     //- Swap contents and verify.
@@ -534,17 +532,6 @@ TEST(MSE_Matrix_4B, Swap)
     e2.swap(e1);
     EXPECT_TRUE(m_cmp_eq(e1, il_44_0));
     EXPECT_TRUE(m_cmp_eq(e2, il_44_2));
-
-    //- Swap some elements and verify.
-    //
-    e2.swap_columns(0, 2);
-    EXPECT_TRUE(m_cmp_eq(e2, LST_44_2CS));
-
-    e2 = LST_44_2;
-    EXPECT_TRUE(m_cmp_eq(e2, LST_44_2));
-
-    e2.swap_rows(1, 2);
-    EXPECT_TRUE(m_cmp_eq(e2, LST_44_2RS));
 }
 
 

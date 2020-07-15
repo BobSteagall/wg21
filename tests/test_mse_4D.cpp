@@ -30,7 +30,6 @@ TEST(MSE_Matrix_4D, DirectCtor)
     e1.reshape_columns(4, 0);
     EXPECT_EQ(e1.rows(), 4);
     EXPECT_EQ(e1.columns(), 4);
-    EXPECT_EQ(e1.size(), st_44);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
 
@@ -304,7 +303,6 @@ TEST(MSE_Matrix_4D, CopyCtor)
 
     EXPECT_EQ(e4.rows(), 4);
     EXPECT_EQ(e4.columns(), 4);
-    EXPECT_EQ(e4.size(), st_44);
     EXPECT_EQ(e4.row_capacity(), 4);
     EXPECT_EQ(e4.column_capacity(), 4);
     EXPECT_TRUE(m_cmp_eq(e4, e1));
@@ -471,24 +469,11 @@ TEST(MSE_Matrix_4D, EngineAssign)
     EXPECT_EQ(e3.column_capacity(), 4);
     EXPECT_TRUE(m_cmp_eq(e3, il_44_1));
 
-    fs_matrix_engine<int, 4, 4> e4 LST_44_2 ;
-
-    EXPECT_EQ(e4.rows(), 4);
-    EXPECT_EQ(e4.columns(), 4);
-    EXPECT_EQ(e4.capacity(), st_44);
-    EXPECT_TRUE(m_cmp_eq(e4, il_44_2));
-
-    EXPECT_FALSE(m_cmp_eq(e3, e4));
-
     //- Assign and verify.
     //
     e1 = e3;
     EXPECT_TRUE(m_cmp_eq(e1, fl_44_1));
     EXPECT_TRUE(m_cmp_eq(e1, e3));
-
-    e2 = e4;
-    EXPECT_TRUE(m_cmp_eq(e2, fl_44_2));
-    EXPECT_TRUE(m_cmp_eq(e2, e4));
 }
 
 
@@ -643,17 +628,6 @@ TEST(MSE_Matrix_4D, Swap)
     e2.swap(e1);
     EXPECT_TRUE(m_cmp_eq(e1, il_44_0));
     EXPECT_TRUE(m_cmp_eq(e2, il_44_2));
-
-    //- Swap some elements and verify.
-    //
-    e2.swap_columns(0, 2);
-    EXPECT_TRUE(m_cmp_eq(e2, LST_44_2CS));
-
-    e2 = LST_44_2;
-    EXPECT_TRUE(m_cmp_eq(e2, LST_44_2));
-
-    e2.swap_rows(1, 2);
-    EXPECT_TRUE(m_cmp_eq(e2, LST_44_2RS));
 }
 
 
@@ -729,4 +703,29 @@ TEST(MSE_Matrix_4D, Span)
     EXPECT_EQ(e1(1, 1), 222.0f);
     EXPECT_EQ(e1(2, 2), 333.0f);
     EXPECT_EQ(e1(3, 3), 444.0f);
+}
+
+TEST(BasicMatrix, Sanity)
+{
+    fs_dyn_matrix<float, 4, 4>  m1;
+    dr_matrix<float>            m2(4, 4);
+
+    fs_dyn_matrix<float, 4, 4>  m3(il_44_2);
+
+    EXPECT_EQ(m3(0, 0), 11.0f);
+    EXPECT_EQ(m3(0, 1), 12.0f);
+    EXPECT_EQ(m3(0, 2), 13.0f);
+    EXPECT_EQ(m3(0, 3), 14.0f);
+    EXPECT_EQ(m3(1, 0), 21.0f);
+    EXPECT_EQ(m3(1, 1), 22.0f);
+    EXPECT_EQ(m3(1, 2), 23.0f);
+    EXPECT_EQ(m3(1, 3), 24.0f);
+    EXPECT_EQ(m3(2, 0), 31.0f);
+    EXPECT_EQ(m3(2, 1), 32.0f);
+    EXPECT_EQ(m3(2, 2), 33.0f);
+    EXPECT_EQ(m3(2, 3), 34.0f);
+    EXPECT_EQ(m3(3, 0), 41.0f);
+    EXPECT_EQ(m3(3, 1), 42.0f);
+    EXPECT_EQ(m3(3, 2), 43.0f);
+    EXPECT_EQ(m3(3, 3), 44.0f);
 }

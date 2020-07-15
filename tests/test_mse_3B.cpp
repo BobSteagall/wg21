@@ -18,10 +18,8 @@ TEST(MSE_Matrix_3B, DefaultCtor)
 
     EXPECT_EQ(e1.rows(), 4);
     EXPECT_EQ(e1.columns(), 1);
-    EXPECT_EQ(e1.size(), itup_t(4, 1));
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 1);
-    EXPECT_EQ(e1.capacity(), itup_t(4, 1));
 
     //- Verify elements are value initialized.
     //
@@ -44,10 +42,8 @@ TEST(MSE_Matrix_3B, CmpEq)
     //
     EXPECT_EQ(e1.rows(), 4);
     EXPECT_EQ(e1.columns(), 1);
-    EXPECT_EQ(e1.size(), itup_t(4, 1));
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 1);
-    EXPECT_EQ(e1.capacity(), itup_t(4, 1));
 
     EXPECT_EQ(e1(0, 0), 0.0f);
     EXPECT_EQ(e1(1, 0), 0.0f);

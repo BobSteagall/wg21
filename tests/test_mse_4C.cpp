@@ -30,7 +30,6 @@ TEST(MSE_Matrix_4C, DirectCtor)
     e1.reshape_rows(4, 0);
     EXPECT_EQ(e1.rows(), 4);
     EXPECT_EQ(e1.columns(), 4);
-    EXPECT_EQ(e1.size(), st_44);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
 
@@ -304,7 +303,6 @@ TEST(MSE_Matrix_4C, CopyCtor)
 
     EXPECT_EQ(e4.rows(), 4);
     EXPECT_EQ(e4.columns(), 4);
-    EXPECT_EQ(e4.size(), st_44);
     EXPECT_EQ(e4.row_capacity(), 4);
     EXPECT_EQ(e4.column_capacity(), 4);
     EXPECT_TRUE(m_cmp_eq(e4, e1));
@@ -471,24 +469,11 @@ TEST(MSE_Matrix_4C, EngineAssign)
     EXPECT_EQ(e3.column_capacity(), 4);
     EXPECT_TRUE(m_cmp_eq(e3, il_44_1));
 
-    fs_matrix_engine<int, 4, 4> e4 LST_44_2 ;
-
-    EXPECT_EQ(e4.rows(), 4);
-    EXPECT_EQ(e4.columns(), 4);
-    EXPECT_EQ(e4.capacity(), st_44);
-    EXPECT_TRUE(m_cmp_eq(e4, il_44_2));
-
-    EXPECT_FALSE(m_cmp_eq(e3, e4));
-
     //- Assign and verify.
     //
     e1 = e3;
     EXPECT_TRUE(m_cmp_eq(e1, fl_44_1));
     EXPECT_TRUE(m_cmp_eq(e1, e3));
-
-    e2 = e4;
-    EXPECT_TRUE(m_cmp_eq(e2, fl_44_2));
-    EXPECT_TRUE(m_cmp_eq(e2, e4));
 }
 
 
@@ -643,17 +628,6 @@ TEST(MSE_Matrix_4C, Swap)
     e2.swap(e1);
     EXPECT_TRUE(m_cmp_eq(e1, il_44_0));
     EXPECT_TRUE(m_cmp_eq(e2, il_44_2));
-
-    //- Swap some elements and verify.
-    //
-    e2.swap_columns(0, 2);
-    EXPECT_TRUE(m_cmp_eq(e2, LST_44_2CS));
-
-    e2 = LST_44_2;
-    EXPECT_TRUE(m_cmp_eq(e2, LST_44_2));
-
-    e2.swap_rows(1, 2);
-    EXPECT_TRUE(m_cmp_eq(e2, LST_44_2RS));
 }
 
 

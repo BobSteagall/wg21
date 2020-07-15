@@ -58,11 +58,7 @@ concept valid_mse_extents = is_valid_storage_extents<X>::value;
 //--------------------------------------------------------------------------------------------------
 //
 template<typename T>
-concept no_allocator =
-    requires
-    {
-        requires is_same_v<T, void>;
-    };
+concept no_allocator = same_as<T, void>;
 
 #if defined(LA_COMPILER_GCC) && ((LA_GCC_VERSION == 9) || (LA_GCC_VERSION == 10))
     //- Neither GCC 9 nor GCC 10 can parse the type requirement 'AT::template rebind_alloc<T>',
