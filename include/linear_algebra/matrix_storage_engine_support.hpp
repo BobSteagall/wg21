@@ -116,32 +116,43 @@ concept valid_mse_allocator = no_allocator<A> or valid_allocator_traits<allocato
 
 
 //--------------------------------------------------------------------------------------------------
-//  Concept:    valid_mse_matrix_layout<L>, valid_mse_vector_layout<L>
+//  Concepts:   valid_mse_matrix_layout<L>
+//              valid_mse_vector_layout<L>
 //
-//  This private concept is used to validate the fourth template argument of a specialization of
-//  matrix_storage_engine, the engine's layout type.  It must be either row_major or column_major.
+//  These private concepts are used to validate the fourth template argument of a specialization
+//  of matrix_storage_engine, the engine's layout type.  It must be row_major or column_major for
+//  matrix engines, and unoriented for vector engines.
 //--------------------------------------------------------------------------------------------------
 //
-template<typename L>
-concept valid_mse_layout = (is_same_v<L, row_major> || is_same_v<L, column_major>);
-
 template<typename L>
 concept valid_mse_matrix_layout = (is_same_v<L, row_major> || is_same_v<L, column_major>);
 
 template<typename L>
 concept valid_mse_vector_layout = is_same_v<L, unoriented>;
 
+
+//--------------------------------------------------------------------------------------------------
+//  Concepts:   linearly_indexable<MSD>
+//              reshapable<MSD>
+//              column_reshapable<MSD>
+//              row_reshapable<MSD>
+//
+//  These private concepts are used to probe various properties of matrix_storage_data
+//  specializations.
+//--------------------------------------------------------------------------------------------------
+//
 template<typename MSD>
-concept resizable = MSD::is_resizable;
+concept linearly_indexable_msd = MSD::is_linearly_indexable;
 
 template<typename MSD>
-concept column_resizable = MSD::is_column_resizable;
+concept reshapable_msd = MSD::is_reshapable;
 
 template<typename MSD>
-concept row_resizable = MSD::is_row_resizable;
+concept column_reshapable_msd = MSD::is_column_reshapable;
 
 template<typename MSD>
-concept linear_matrix = MSD::is_linear_matrix;
+concept row_reshapable_msd = MSD::is_row_reshapable;
+
 
 //--------------------------------------------------------------------------------------------------
 //  Partial Specialization:     mse_support<T, extents<N>, A, L>
@@ -155,7 +166,7 @@ concept linear_matrix = MSD::is_linear_matrix;
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, ptrdiff_t N, class A, class L>
-struct mse_support<mse_data<T, extents<N>, A, L>> : public engine_support_base
+struct mse_support<mse_data<T, extents<N>, A, L>> : public engine_support
 {
     //- Engine representation type.
     //
@@ -235,7 +246,7 @@ struct mse_support<mse_data<T, extents<N>, A, L>> : public engine_support_base
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
-struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public engine_support_base
+struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public engine_support
 {
     //- Important types.
     //
@@ -302,7 +313,8 @@ struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public engine_support_ba
             return dst.m_elems[i + j*dst.m_rowcap];
     }
 
-    //- Apply a transformation to all elements, with the order governed by the elements' layout.
+    //- Apply a transformation to all elements, with the order governed by the destination
+    //  MSE's element layout.
     //
     template<class FN>
     static constexpr void
@@ -356,16 +368,13 @@ struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public engine_support_ba
     static constexpr void
     copy_list(mse_type& dst, initializer_list<initializer_list<T2>> src)
     {
-        using row_iter = decltype(src.begin());
-        using col_iter = decltype(src.begin()->begin());
-
         ptrdiff_t   di = 0;
-        row_iter    rp = src.begin();
+        auto        rp = src.begin();
 
         for (;  di < dst.m_rows;  ++di, ++rp)
         {
             ptrdiff_t   dj = 0;
-            col_iter    cp = rp->begin();
+            auto        cp = rp->begin();
 
             for (;  dj < dst.m_cols;  ++dj, ++cp)
             {

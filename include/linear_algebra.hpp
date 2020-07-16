@@ -91,6 +91,15 @@ namespace std
 
     template<class T>
     concept copyable = true;
+
+    template <class T>
+    concept destructible = is_nothrow_destructible_v<T>;
+
+    template<class T, class... Args>
+    concept constructible_from = destructible<T> and is_constructible_v<T, Args...>;
+
+    template<class DST, class SRC>
+    concept assignable_from = is_assignable_v<DST, SRC>;
 }
 #endif
 

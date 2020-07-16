@@ -38,8 +38,7 @@ struct mse_data<T, extents<N>, void, L>
     using span_type       = mdspan<T, N>;
     using const_span_type = mdspan<T const, N>;
 
-    static constexpr bool   is_resizable = false;
-
+    static constexpr bool       is_reshapable = false;
     static constexpr ptrdiff_t  m_size = N;
     static constexpr ptrdiff_t  m_cap  = N;
 
@@ -112,8 +111,7 @@ struct mse_data<T, extents<N>, A, L>
     using span_type       = mdspan<T, N>;
     using const_span_type = mdspan<T const, N>;
 
-    static constexpr bool   is_resizable = false;
-
+    static constexpr bool       is_reshapable = false;
     static constexpr ptrdiff_t  m_size = N;
     static constexpr ptrdiff_t  m_cap  = N;
 
@@ -181,7 +179,7 @@ struct mse_data<T, extents<dynamic_extent>, A, L>
     using span_type       = mdspan<T, dynamic_extent>;
     using const_span_type = mdspan<T const, dynamic_extent>;
 
-    static constexpr bool   is_resizable = true;
+    static constexpr bool   is_reshapable = true;
 
     array_type  m_elems;
     ptrdiff_t   m_size;
@@ -288,14 +286,14 @@ struct mse_data<T, extents<R, C>, void, L>
     using span_type       = basic_mdspan<T, extents<R, C>, this_layout>;
     using const_span_type = basic_mdspan<T const, extents<R, C>, this_layout>;
 
-    static constexpr bool   is_column_matrix    = (C == 1);
-    static constexpr bool   is_row_matrix       = (R == 1);
-    static constexpr bool   is_linear_matrix    = (is_column_matrix || is_row_matrix);
-    static constexpr bool   is_column_resizable = false;
-    static constexpr bool   is_row_resizable    = false;
-    static constexpr bool   is_resizable        = false;
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
+    static constexpr bool   is_column_matrix      = (C == 1);
+    static constexpr bool   is_row_matrix         = (R == 1);
+    static constexpr bool   is_linearly_indexable = (is_column_matrix || is_row_matrix);
+    static constexpr bool   is_column_reshapable  = false;
+    static constexpr bool   is_row_reshapable     = false;
+    static constexpr bool   is_reshapable         = false;
+    static constexpr bool   is_column_major       = is_same_v<L, column_major>;
+    static constexpr bool   is_row_major          = is_same_v<L, row_major>;
 
     static constexpr ptrdiff_t  m_rows   = R;
     static constexpr ptrdiff_t  m_cols   = C;
@@ -395,14 +393,14 @@ struct mse_data<T, extents<R, C>, A, L>
     using span_type       = basic_mdspan<T, extents<R, C>, this_layout>;
     using const_span_type = basic_mdspan<T const, extents<R, C>, this_layout>;
 
-    static constexpr bool   is_column_matrix    = (C == 1);
-    static constexpr bool   is_row_matrix       = (R == 1);
-    static constexpr bool   is_linear_matrix    = (is_column_matrix || is_row_matrix);
-    static constexpr bool   is_column_resizable = false;
-    static constexpr bool   is_row_resizable    = false;
-    static constexpr bool   is_resizable        = false;
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
+    static constexpr bool   is_column_matrix      = (C == 1);
+    static constexpr bool   is_row_matrix         = (R == 1);
+    static constexpr bool   is_linearly_indexable = (is_column_matrix || is_row_matrix);
+    static constexpr bool   is_column_reshapable  = false;
+    static constexpr bool   is_row_reshapable     = false;
+    static constexpr bool   is_reshapable         = false;
+    static constexpr bool   is_column_major       = is_same_v<L, column_major>;
+    static constexpr bool   is_row_major          = is_same_v<L, row_major>;
 
     static constexpr ptrdiff_t  m_rows   = R;
     static constexpr ptrdiff_t  m_cols   = C;
@@ -498,14 +496,14 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
     using span_type       = typename support::dyn_span_type;
     using const_span_type = typename support::const_dyn_span_type;
 
-    static constexpr bool   is_column_matrix    = false;
-    static constexpr bool   is_row_matrix       = (R == 1);
-    static constexpr bool   is_linear_matrix    = is_row_matrix;
-    static constexpr bool   is_column_resizable = true;
-    static constexpr bool   is_row_resizable    = false;
-    static constexpr bool   is_resizable        = false;
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
+    static constexpr bool   is_column_matrix      = false;
+    static constexpr bool   is_row_matrix         = (R == 1);
+    static constexpr bool   is_linearly_indexable = is_row_matrix;
+    static constexpr bool   is_column_reshapable  = true;
+    static constexpr bool   is_row_reshapable     = false;
+    static constexpr bool   is_reshapable         = false;
+    static constexpr bool   is_column_major       = is_same_v<L, column_major>;
+    static constexpr bool   is_row_major          = is_same_v<L, row_major>;
 
     static constexpr ptrdiff_t  m_rows   = R;
     static constexpr ptrdiff_t  m_rowcap = R;
@@ -629,14 +627,14 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
     using span_type       = typename support::dyn_span_type;
     using const_span_type = typename support::const_dyn_span_type;
 
-    static constexpr bool   is_column_matrix    = (C == 1);
-    static constexpr bool   is_row_matrix       = false;
-    static constexpr bool   is_linear_matrix    = is_column_matrix;
-    static constexpr bool   is_column_resizable = false;
-    static constexpr bool   is_row_resizable    = true;
-    static constexpr bool   is_resizable        = false;
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
+    static constexpr bool   is_column_matrix      = (C == 1);
+    static constexpr bool   is_row_matrix         = false;
+    static constexpr bool   is_linearly_indexable = is_column_matrix;
+    static constexpr bool   is_column_reshapable  = false;
+    static constexpr bool   is_row_reshapable     = true;
+    static constexpr bool   is_reshapable         = false;
+    static constexpr bool   is_column_major       = is_same_v<L, column_major>;
+    static constexpr bool   is_row_major          = is_same_v<L, row_major>;
 
     static constexpr ptrdiff_t  m_cols   = C;
     static constexpr ptrdiff_t  m_colcap = C;
@@ -761,14 +759,14 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
     using span_type       = typename support::dyn_span_type;
     using const_span_type = typename support::const_dyn_span_type;
 
-    static constexpr bool   is_linear_matrix    = false;
-    static constexpr bool   is_column_matrix    = false;
-    static constexpr bool   is_row_matrix       = false;
-    static constexpr bool   is_column_resizable = true;
-    static constexpr bool   is_row_resizable    = true;
-    static constexpr bool   is_resizable        = true;
-    static constexpr bool   is_column_major     = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major        = is_same_v<L, row_major>;
+    static constexpr bool   is_column_matrix      = false;
+    static constexpr bool   is_row_matrix         = false;
+    static constexpr bool   is_linearly_indexable = false;
+    static constexpr bool   is_column_reshapable  = true;
+    static constexpr bool   is_row_reshapable     = true;
+    static constexpr bool   is_reshapable         = true;
+    static constexpr bool   is_column_major       = is_same_v<L, column_major>;
+    static constexpr bool   is_row_major          = is_same_v<L, row_major>;
 
     array_type  m_elems;
     ptrdiff_t   m_rows;

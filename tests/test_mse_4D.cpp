@@ -705,6 +705,10 @@ TEST(MSE_Matrix_4D, Span)
     EXPECT_EQ(e1(3, 3), 444.0f);
 }
 
+
+template<class T, ptrdiff_t R, ptrdiff_t C>
+using test_fs_matrix = STD_LA::basic_matrix<test_fs_matrix_engine<T, R, C>, STD_LA::matrix_operation_traits>;
+
 TEST(BasicMatrix, Sanity)
 {
     fs_dyn_matrix<float, 4, 4>  m1;
@@ -728,4 +732,26 @@ TEST(BasicMatrix, Sanity)
     EXPECT_EQ(m3(3, 1), 42.0f);
     EXPECT_EQ(m3(3, 2), 43.0f);
     EXPECT_EQ(m3(3, 3), 44.0f);
+
+    m2 = il_44_2;
+
+    dyn_row_vector<float>   rv1 = { 1, 3, 2, 4 };
+    dyn_col_vector<float>   cv1 = { {1}, {3}, {2}, {4} };
+
+    m2 = m3;
+    m1 = m2;
+
+    fs_dyn_matrix<float, 4, 4>      m5(m2);
+    dr_matrix<float>                m6(m1);
+
+
+    test_fs_matrix<float, 4, 4>     m7;
+    test_fs_matrix<float, 4, 4>     m8 = il_44_2;
+
+    static_assert(!STD_LA::detail::spannable_engine<test_fs_matrix_engine<float,4,4>>);
+
+    auto    s3 = m3.span();
+    auto&&  e3 = m3.engine();
+
+    EXPECT_TRUE(STD_LA::detail::engine_support::matrix_compare(e3, s3));
 }
