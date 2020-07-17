@@ -564,7 +564,7 @@ struct engine_support
     requires
         writable_matrix_engine<ET>  and
         convertible_from<typename ET::element_type, T>
-    static constexpr bool
+    static constexpr void
     matrix_assign_from(ET const& dst, basic_mdspan<T, extents<X0, X1>, L, A> const& src)
     {
         using index_type_dst = typename ET::index_type;
