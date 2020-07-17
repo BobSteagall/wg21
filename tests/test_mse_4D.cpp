@@ -746,7 +746,7 @@ TEST(BasicMatrix, Sanity)
 
 
     test_fs_matrix<float, 4, 4>     m7;
-    test_fs_matrix<float, 4, 4>     m8 = il_44_2;
+    test_fs_matrix<float, 4, 4>     m8 = il_44_1;
 
     static_assert(!STD_LA::detail::spannable_engine<test_fs_matrix_engine<float,4,4>>);
 
@@ -754,4 +754,10 @@ TEST(BasicMatrix, Sanity)
     auto&&  e3 = m3.engine();
 
     EXPECT_TRUE(STD_LA::detail::engine_support::matrix_compare(e3, s3));
+
+    m1 = m8;
+    m2 = m8;
+    m8 = il_44_1;
+
+    EXPECT_TRUE(m_cmp_eq(m1.engine(), m2.engine()));
 }

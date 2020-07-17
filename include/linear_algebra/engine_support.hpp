@@ -89,6 +89,10 @@ template<class DST, class SRC>
 concept assignable_from_2d_list = assignable_from<DST, initializer_list<initializer_list<SRC>>>;
 
 
+template<class ET>
+concept matrix_engine_lifetime = default_initializable<ET> and copyable<ET>;
+
+
 //--------------------------------------------------------------------------------------------------
 //  Concepts:   readable_vector_engine<ET>
 //              readable_matrix_engine<ET>
@@ -308,10 +312,11 @@ concept row_reshapable_matrix_engine =
 //
 struct engine_support
 {
+    template<class IT>
     static inline constexpr void
-    verify_capacity(ptrdiff_t c)
+    verify_capacity(IT c)
     {
-        if (c < 0)
+        if (c < static_cast<IT>(0))
         {
             throw runtime_error("invalid capacity parameter");
         }
@@ -334,19 +339,23 @@ struct engine_support
         return {static_cast<ptrdiff_t>(rows), static_cast<ptrdiff_t>(cols)};
     }
 
+    template<class IT>
     static inline constexpr void
-    verify_size(ptrdiff_t s)
+    verify_size(IT s)
     {
-        if (s < 1)
+        if (s < static_cast<IT>(1))
         {
             throw runtime_error("invalid size parameter");
         }
     }
 
+    template<class IT1, class IT2>
     static inline constexpr void
-    verify_size(ptrdiff_t s1, ptrdiff_t s2)
+    verify_size(IT1 s1, IT2 s2)
     {
-        if (s1 != s2)
+        using cmp_type = common_type_t<IT1, IT2, ptrdiff_t>;
+
+        if (static_cast<cmp_type>(s1) != static_cast<cmp_type>(s2))
         {
             throw runtime_error("invalid size parameter");
         }
@@ -359,17 +368,25 @@ struct engine_support
             writable_vector_engine<ET1>     and
             readable_vector_engine<ET2>
     {
-        using elem_type_dst  = typename ET1::element_type;
         using index_type_dst = typename ET1::index_type;
         using index_type_src = typename ET2::index_type;
 
         index_type_dst  di = 0;
         index_type_src  si = 0;
-        index_type_src  ni = src.size();
+        index_type_src  sn = src.size();
 
-        for (;  si < ni;  ++di, ++si)
+        if constexpr (reshapable_vector_engine<ET1>)
         {
-            dst(di) = static_cast<elem_type_dst>(src(si));
+            dst.reshape(sn, dst.capacity());
+        }
+        else
+        {
+            verify_size(dst.size(), sn);
+        }
+
+        for (;  si < sn;  ++di, ++si)
+        {
+            dst(di) = static_cast<typename ET1::element_type>(src(si));
         }
     }
 
@@ -380,7 +397,6 @@ struct engine_support
             writable_matrix_engine<ET1>     and
             readable_matrix_engine<ET2>
     {
-        using elem_type_dst  = typename ET1::element_type;
         using index_type_dst = typename ET1::index_type;
         using index_type_src = typename ET2::index_type;
 
@@ -389,6 +405,26 @@ struct engine_support
         index_type_src  rows = src.rows();
         index_type_src  cols = src.columns();
 
+        if constexpr (reshapable_matrix_engine<ET1>)
+        {
+            dst.reshape(rows, cols, dst.row_capacity(), dst.column_capacity());
+        }
+        else if constexpr (column_reshapable_matrix_engine<ET1>)
+        {
+            verify_size(dst.rows(), rows);
+            dst.reshape_columns(cols, dst.column_capacity());
+        }
+        else if constexpr (row_reshapable_matrix_engine<ET1>)
+        {
+            verify_size(dst.columns(), cols);
+            dst.reshape_rows(rows, dst.row_capacity());
+        }
+        else
+        {
+            verify_size(dst.rows(), rows);
+            verify_size(dst.columns(), cols);
+        }
+
         for (; si < rows;  ++di, ++si)
         {
             index_type_dst  dj = 0;
@@ -396,7 +432,7 @@ struct engine_support
 
             for (; sj < cols;  ++dj, ++sj)
             {
-                dst(di, dj) = static_cast<elem_type_dst>(src(si, sj));
+                dst(di, dj) = static_cast<typename ET1::element_type>(src(si, sj));
             }
         }
     }
@@ -414,6 +450,16 @@ struct engine_support
         index_type_dst  di = 0;
         index_type_dst  dn = dst.size();
         elem_iter_src   ep = src.begin();
+        index_type_dst  sn = static_cast<index_type_dst>(src.size());
+
+        if constexpr (reshapable_vector_engine<ET>)
+        {
+            dst.reshape(sn, dst.capacity());
+        }
+        else
+        {
+            verify_size(dn, sn);
+        }
 
         for (;  di < dn;  ++di, ++ep)
         {
@@ -423,26 +469,47 @@ struct engine_support
 
     template<class ET, class T>
     static constexpr void
-    assign_from_matrix_initlist(ET& engine, initializer_list<initializer_list<T>> rhs)
+    assign_from_matrix_initlist(ET& dst, initializer_list<initializer_list<T>> src)
         requires
             writable_matrix_engine<ET>      and
             convertible_from<typename ET::element_type, T>
     {
         using index_type_dst = typename ET::index_type;
-        using row_iter_src   = decltype(rhs.begin());
-        using col_iter_src   = decltype(rhs.begin()->begin());
+        using row_iter_src   = decltype(src.begin());
+        using col_iter_src   = decltype(src.begin()->begin());
 
         index_type_dst  di = 0;
-        row_iter_src    rp = rhs.begin();
+        row_iter_src    rp = src.begin();
+        auto            [rows, cols] = verify_list(src);
 
-        for (;  di < engine.rows();  ++di, ++rp)
+        if constexpr (reshapable_matrix_engine<ET>)
+        {
+            dst.reshape(rows, cols, dst.row_capacity(), dst.column_capacity());
+        }
+        else if constexpr (column_reshapable_matrix_engine<ET>)
+        {
+            verify_size(dst.rows(), rows);
+            dst.reshape_columns(cols, dst.column_capacity());
+        }
+        else if constexpr (row_reshapable_matrix_engine<ET>)
+        {
+            verify_size(dst.columns(), cols);
+            dst.reshape_rows(rows, dst.row_capacity());
+        }
+        else
+        {
+            verify_size(dst.rows(), rows);
+            verify_size(dst.columns(), cols);
+        }
+
+        for (;  di < dst.rows();  ++di, ++rp)
         {
             index_type_dst  dj = 0;
             col_iter_src    cp = rp->begin();
 
-            for (;  dj < engine.columns();  ++dj, ++cp)
+            for (;  dj < dst.columns();  ++dj, ++cp)
             {
-                engine(di, dj) = static_cast<typename ET::element_type>(*cp);
+                dst(di, dj) = static_cast<typename ET::element_type>(*cp);
             }
         }
     }
