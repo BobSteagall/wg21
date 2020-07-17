@@ -261,7 +261,7 @@ fs_vector_engine<T,N>::assign(ET2 const& rhs)
 {
     static_assert(is_vector_engine_v<ET2>);
     detail::check_source_engine_size(rhs, N);
-    detail::assign_from_vector_engine(*this, rhs);
+    detail::vector_assign_from(*this, rhs);
 }
 
 template<class T, ptrdiff_t N>
@@ -270,7 +270,7 @@ void
 fs_vector_engine<T,N>::assign(initializer_list<T2> rhs)
 {
     detail::check_source_init_list(rhs, N);
-    detail::assign_from_vector_initlist(*this, rhs);
+    detail::vector_assign_from(*this, rhs);
 }
 
 }       //- STD_LA namespace

@@ -1258,7 +1258,7 @@ matrix_view_engine<ET, writable_matrix_engine_tag, subset_view_tag>::operator =(
 -> matrix_view_engine&
 {
     detail::check_source_engine_size(rhs, rows(), columns());
-    detail::assign_from_matrix_engine(*this, rhs);
+    detail::matrix_assign_from(*this, rhs);
     return *this;
 }
 
@@ -1269,7 +1269,7 @@ matrix_view_engine<ET, writable_matrix_engine_tag, subset_view_tag>::operator =
 -> matrix_view_engine&
 {
     detail::check_source_init_list(rhs, m_row_count, m_col_count);
-    detail::assign_from_matrix_initlist(*this, rhs);
+    detail::matrix_assign_from(*this, rhs);
     return *this;
 }
 
@@ -1698,7 +1698,7 @@ matrix_view_engine<LA_MVET2, writable_matrix_engine_tag, subset_view_tag>::opera
 -> matrix_view_engine&
 {
     detail::check_source_engine_size(rhs, rows(), columns());
-    detail::assign_from_matrix_engine(*this, rhs);
+    detail::matrix_assign_from(*this, rhs);
     return *this;
 }
 
@@ -1709,7 +1709,7 @@ matrix_view_engine<LA_MVET2, writable_matrix_engine_tag, subset_view_tag>::opera
 -> matrix_view_engine&
 {
     detail::check_source_init_list(rhs, m_row_count, m_col_count);
-    detail::assign_from_matrix_initlist(*this, rhs);
+    detail::matrix_assign_from(*this, rhs);
     return *this;
 }
 

@@ -1167,7 +1167,7 @@ template<class ET, class ST> inline constexpr
 void
 check_source_engine_size(ET const& engine, ST rows, ST cols)
 {
-    if ((engine.rows() != rows) || 
+    if ((engine.rows() != rows) ||
         (engine.columns() != cols))
     {
         throw runtime_error("source engine size does not match destination matrix engine size");
@@ -1238,7 +1238,7 @@ check_source_init_list(initializer_list<initializer_list<T>> list, ST rows, ST c
 //
 template<class ET1, class ET2> constexpr
 void
-assign_from_vector_engine(ET1& dst, ET2 const& src)
+vector_assign_from(ET1& dst, ET2 const& src)
 {
     using elem_type_dst  = typename ET1::element_type;
     using index_type_dst = typename ET1::index_type;
@@ -1256,7 +1256,7 @@ assign_from_vector_engine(ET1& dst, ET2 const& src)
 
 template<class ET1, class ET2> constexpr
 void
-assign_from_matrix_engine(ET1& dst, ET2 const& src)
+matrix_assign_from(ET1& dst, ET2 const& src)
 {
     using elem_type_dst  = typename ET1::element_type;
     using index_type_dst = typename ET1::index_type;
@@ -1283,7 +1283,7 @@ assign_from_matrix_engine(ET1& dst, ET2 const& src)
 //
 template<class ET, class T> constexpr
 void
-assign_from_vector_initlist(ET& dst, initializer_list<T> src)
+vector_assign_from(ET& dst, initializer_list<T> src)
 {
     using elem_type_dst  = typename ET::element_type;
     using index_type_dst = typename ET::index_type;
@@ -1337,7 +1337,7 @@ assign_column_matrix_from_vector_initlist(ET& dst, initializer_list<T> src)
 
 template<class ET, class T> constexpr
 void
-assign_from_matrix_initlist(ET& engine, initializer_list<initializer_list<T>> rhs)
+matrix_assign_from(ET& engine, initializer_list<initializer_list<T>> rhs)
 {
     using elem_type_dst  = typename ET::element_type;
     using index_type_dst = typename ET::index_type;

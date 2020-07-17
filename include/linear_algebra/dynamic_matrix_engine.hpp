@@ -414,7 +414,7 @@ dr_matrix_engine<T,AT>::assign(ET2 const& rhs)
     typename ET2::index_type    cols = static_cast<index_type>(rhs.columns());
     dr_matrix_engine            tmp(rows, cols);
 
-    detail::assign_from_matrix_engine(tmp, rhs);
+    detail::matrix_assign_from(tmp, rhs);
     tmp.swap(*this);
 }
 
@@ -429,7 +429,7 @@ dr_matrix_engine<T,AT>::assign(initializer_list<initializer_list<T2>> rhs)
     index_type const    cols = static_cast<index_type>(rhs.begin()->size());
     dr_matrix_engine    tmp(rows, cols);
 
-    detail::assign_from_matrix_initlist(tmp, rhs);
+    detail::matrix_assign_from(tmp, rhs);
     tmp.swap(*this);
 }
 

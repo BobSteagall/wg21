@@ -225,7 +225,7 @@ vector_view_engine<ET, VCT, subset_view_tag>&
 vector_view_engine<ET, VCT, subset_view_tag>::operator =(ET2 const& rhs)
 {
     detail::check_source_engine_size(rhs, size());
-    detail::assign_from_vector_engine(*this, rhs);
+    detail::vector_assign_from(*this, rhs);
     return *this;
 }
 
@@ -235,7 +235,7 @@ vector_view_engine<ET, VCT, subset_view_tag>&
 vector_view_engine<ET, VCT, subset_view_tag>::operator =(initializer_list<U> rhs)
 {
     detail::check_source_init_list(rhs, size());
-    detail::assign_from_vector_initlist(*this, rhs);
+    detail::vector_assign_from(*this, rhs);
     return *this;
 }
 
@@ -385,7 +385,7 @@ vector_view_engine<ET, VCT, column_view_tag>&
 vector_view_engine<ET, VCT, column_view_tag>::operator =(ET2 const& rhs)
 {
     detail::check_source_engine_size(rhs, size());
-    detail::assign_from_vector_engine(*this, rhs);
+    detail::vector_assign_from(*this, rhs);
     return *this;
 }
 
@@ -395,7 +395,7 @@ vector_view_engine<ET, VCT, column_view_tag>&
 vector_view_engine<ET, VCT, column_view_tag>::operator =(initializer_list<U> rhs)
 {
     detail::check_source_init_list(rhs, size());
-    detail::assign_from_vector_initlist(*this, rhs);
+    detail::vector_assign_from(*this, rhs);
     return *this;
 }
 
@@ -543,7 +543,7 @@ vector_view_engine<ET, VCT, row_view_tag>&
 vector_view_engine<ET, VCT, row_view_tag>::operator =(ET2 const& rhs)
 {
     detail::check_source_engine_size(rhs, size());
-    detail::assign_from_vector_engine(*this, rhs);
+    detail::vector_assign_from(*this, rhs);
     return *this;
 }
 
@@ -553,7 +553,7 @@ vector_view_engine<ET, VCT, row_view_tag>&
 vector_view_engine<ET, VCT, row_view_tag>::operator =(initializer_list<U> rhs)
 {
     detail::check_source_init_list(rhs, size());
-    detail::assign_from_vector_initlist(*this, rhs);
+    detail::vector_assign_from(*this, rhs);
     return *this;
 }
 

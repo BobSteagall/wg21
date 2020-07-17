@@ -347,7 +347,7 @@ dr_vector_engine<T,AT>::assign(ET2 const& rhs)
 
     dr_vector_engine    tmp(static_cast<index_type>(rhs.size()));
 
-    detail::assign_from_vector_engine(tmp, rhs);
+    detail::vector_assign_from(tmp, rhs);
     tmp.swap(*this);
 }
 
@@ -358,7 +358,7 @@ dr_vector_engine<T,AT>::assign(initializer_list<T2> rhs)
 {
     dr_vector_engine    tmp(static_cast<index_type>(rhs.size()));
 
-    detail::assign_from_vector_initlist(tmp, rhs);
+    detail::vector_assign_from(tmp, rhs);
     tmp.swap(*this);
 }
 

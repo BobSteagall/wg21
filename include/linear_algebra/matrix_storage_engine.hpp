@@ -248,20 +248,22 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         m_data.assign(rhs);
     }
 
-    template<class T2> inline constexpr
-    matrix_storage_engine(initializer_list<initializer_list<T2>> rhs)
+    template<class U>
         requires
-            detail::convertible_from<T, T2>
+            detail::convertible_from<T, U>
+    inline constexpr
+    matrix_storage_engine(initializer_list<initializer_list<U>> rhs)
     :   m_data()
     {
         m_data.assign(rhs);
     }
 
-    template<class T2> inline constexpr
-    matrix_storage_engine(initializer_list<T2> rhs)
+    template<class U>
         requires
-            detail::convertible_from<T, T2>     and
+            detail::convertible_from<T, U> and
             detail::linearly_indexable_msd<storage_type>
+    inline constexpr
+    matrix_storage_engine(initializer_list<U> rhs)
     :   m_data()
     {
         m_data.assign(rhs);
@@ -270,31 +272,31 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //- Other assignment operators.
     //
     template<class ET2>
-    inline constexpr matrix_storage_engine&
-    operator =(ET2 const& rhs)
         requires
             detail::readable_matrix_engine<ET2>
+    inline constexpr matrix_storage_engine&
+    operator =(ET2 const& rhs)
     {
         m_data.assign(rhs);
         return *this;
     }
 
-    template<class T2>
-    inline constexpr matrix_storage_engine&
-    operator =(initializer_list<initializer_list<T2>> rhs)
+    template<class U>
         requires
-            detail::convertible_from<T, T2>
+            detail::convertible_from<T, U>
+    inline constexpr matrix_storage_engine&
+    operator =(initializer_list<initializer_list<U>> rhs)
     {
         m_data.assign(rhs);
         return *this;
     }
 
-    template<class T2>
-    inline constexpr matrix_storage_engine&
-    operator =(initializer_list<T2> rhs)
+    template<class U>
         requires
-            detail::convertible_from<T, T2>     and
+            detail::convertible_from<T, U>     and
             detail::linearly_indexable_msd<storage_type>
+    inline constexpr matrix_storage_engine&
+    operator =(initializer_list<U> rhs)
     {
         m_data.assign(rhs);
         return *this;

@@ -321,7 +321,7 @@ fs_matrix_engine<T,R,C>::assign(ET2 const& rhs)
 {
     static_assert(is_matrix_engine_v<ET2>);
     detail::check_source_engine_size(rhs, R, C);
-    detail::assign_from_matrix_engine(*this, rhs);
+    detail::matrix_assign_from(*this, rhs);
 }
 
 template<class T, ptrdiff_t R, ptrdiff_t C>
@@ -330,7 +330,7 @@ void
 fs_matrix_engine<T,R,C>::assign(initializer_list<initializer_list<T2>> rhs)
 {
     detail::check_source_init_list(rhs, R, C);
-    detail::assign_from_matrix_initlist(*this, rhs);
+    detail::matrix_assign_from(*this, rhs);
 }
 
 }       //- STD_LA namespace
