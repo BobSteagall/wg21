@@ -760,4 +760,6 @@ TEST(BasicMatrix, Sanity)
     m8 = il_44_1;
 
     EXPECT_TRUE(m_cmp_eq(m1.engine(), m2.engine()));
+
+    dr_matrix<float>    m9(s3);
 }

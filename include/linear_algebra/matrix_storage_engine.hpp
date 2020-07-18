@@ -28,10 +28,10 @@ namespace STD_LA {
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, ptrdiff_t N, class A, class L>
-    requires
-        detail::valid_mse_extents<extents<N>>   and
-        detail::valid_mse_allocator<A, T>       and
-        detail::valid_mse_vector_layout<L>
+requires
+    detail::valid_mse_extents<extents<N>>   and
+    detail::valid_mse_allocator<A, T>       and
+    detail::valid_mse_vector_layout<L>
 class matrix_storage_engine<T, extents<N>, A, L>
 {
     using this_type    = matrix_storage_engine;
@@ -61,8 +61,8 @@ class matrix_storage_engine<T, extents<N>, A, L>
 
     inline constexpr
     matrix_storage_engine(index_type size)
-        requires
-            detail::reshapable_msd<storage_type>
+    requires
+        detail::reshapable_msd<storage_type>
     :   m_data()
     {
         m_data.reshape(size, size);
@@ -70,8 +70,8 @@ class matrix_storage_engine<T, extents<N>, A, L>
 
     template<class ET2> inline constexpr
     matrix_storage_engine(ET2 const& rhs)
-        requires
-            detail::readable_vector_engine<ET2>
+    requires
+        detail::readable_vector_engine<ET2>
     :   m_data()
     {
         m_data.assign(rhs);
@@ -79,8 +79,8 @@ class matrix_storage_engine<T, extents<N>, A, L>
 
     template<class T2> inline constexpr
     matrix_storage_engine(initializer_list<T2> rhs)
-        requires
-            detail::convertible_from<T, T2>
+    requires
+        detail::convertible_from<T, T2>
     :   m_data()
     {
         m_data.assign(rhs);
@@ -89,8 +89,8 @@ class matrix_storage_engine<T, extents<N>, A, L>
     template<class ET2>
     inline constexpr matrix_storage_engine&
     operator =(ET2 const& rhs)
-        requires
-            detail::readable_vector_engine<ET2>
+    requires
+        detail::readable_vector_engine<ET2>
     {
         m_data.assign(rhs);
         return *this;
@@ -99,8 +99,8 @@ class matrix_storage_engine<T, extents<N>, A, L>
     template<class T2>
     inline constexpr matrix_storage_engine&
     operator =(initializer_list<T2> rhs)
-        requires
-            detail::convertible_from<T, T2>
+    requires
+        detail::convertible_from<T, T2>
     {
         m_data.assign(rhs);
         return *this;
@@ -124,8 +124,8 @@ class matrix_storage_engine<T, extents<N>, A, L>
     //
     void
     reshape(index_type newsize, index_type newcap)
-        requires
-            detail::reshapable_msd<storage_type>
+    requires
+        detail::reshapable_msd<storage_type>
     {
         m_data.reshape(newsize, newcap);
     }
@@ -188,10 +188,10 @@ class matrix_storage_engine<T, extents<N>, A, L>
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
-    requires
-        detail::valid_mse_extents<extents<R, C>>    and
-        detail::valid_mse_allocator<A, T>           and
-        detail::valid_mse_matrix_layout<L>
+requires
+    detail::valid_mse_extents<extents<R, C>>    and
+    detail::valid_mse_allocator<A, T>           and
+    detail::valid_mse_matrix_layout<L>
 class matrix_storage_engine<T, extents<R, C>, A, L>
 {
     using this_type    = matrix_storage_engine;
@@ -223,8 +223,8 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //
     inline constexpr
     matrix_storage_engine(index_type rows, index_type cols)
-        requires
-            detail::reshapable_msd<storage_type>
+    requires
+        detail::reshapable_msd<storage_type>
     :   m_data()
     {
         reshape(rows, cols, rows, cols);
@@ -232,8 +232,8 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     inline constexpr
     matrix_storage_engine(index_type rows, index_type cols, index_type rowcap, index_type colcap)
-        requires
-            detail::reshapable_msd<storage_type>
+    requires
+        detail::reshapable_msd<storage_type>
     :   m_data()
     {
         reshape(rows, cols, rowcap, colcap);
@@ -241,29 +241,29 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     template<class ET2> inline constexpr
     matrix_storage_engine(ET2 const& rhs)
-        requires
-            detail::readable_matrix_engine<ET2>
+    requires
+        detail::readable_matrix_engine<ET2>
     :   m_data()
     {
         m_data.assign(rhs);
     }
 
     template<class U>
-        requires
-            detail::convertible_from<T, U>
     inline constexpr
     matrix_storage_engine(initializer_list<initializer_list<U>> rhs)
+    requires
+        detail::convertible_from<T, U>
     :   m_data()
     {
         m_data.assign(rhs);
     }
 
     template<class U>
-        requires
-            detail::convertible_from<T, U> and
-            detail::linearly_indexable_msd<storage_type>
     inline constexpr
     matrix_storage_engine(initializer_list<U> rhs)
+    requires
+        detail::convertible_from<T, U> and
+        detail::linearly_indexable_msd<storage_type>
     :   m_data()
     {
         m_data.assign(rhs);
@@ -272,31 +272,31 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //- Other assignment operators.
     //
     template<class ET2>
-        requires
-            detail::readable_matrix_engine<ET2>
     inline constexpr matrix_storage_engine&
     operator =(ET2 const& rhs)
+    requires
+        detail::readable_matrix_engine<ET2>
     {
         m_data.assign(rhs);
         return *this;
     }
 
     template<class U>
-        requires
-            detail::convertible_from<T, U>
     inline constexpr matrix_storage_engine&
     operator =(initializer_list<initializer_list<U>> rhs)
+    requires
+        detail::convertible_from<T, U>
     {
         m_data.assign(rhs);
         return *this;
     }
 
     template<class U>
-        requires
-            detail::convertible_from<T, U>     and
-            detail::linearly_indexable_msd<storage_type>
     inline constexpr matrix_storage_engine&
     operator =(initializer_list<U> rhs)
+    requires
+        detail::convertible_from<T, U>     and
+        detail::linearly_indexable_msd<storage_type>
     {
         m_data.assign(rhs);
         return *this;
@@ -344,16 +344,16 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //
     inline constexpr reference
     operator ()(index_type i)
-        requires
-            detail::linearly_indexable_msd<storage_type>
+    requires
+        detail::linearly_indexable_msd<storage_type>
     {
         return m_data.m_elems[i];
     }
 
     inline constexpr const_reference
     operator ()(index_type i) const
-        requires
-            detail::linearly_indexable_msd<storage_type>
+    requires
+        detail::linearly_indexable_msd<storage_type>
     {
         return m_data.m_elems[i];
     }
@@ -392,8 +392,8 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //
     constexpr void
     reshape_columns(index_type cols, index_type colcap)
-        requires
-            detail::column_reshapable_msd<storage_type>
+    requires
+        detail::column_reshapable_msd<storage_type>
     {
         m_data.reshape_columns(cols, colcap);
     }
@@ -402,8 +402,8 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //
     void
     reshape_rows(index_type rows, index_type rowcap)
-        requires
-            detail::row_reshapable_msd<storage_type>
+    requires
+        detail::row_reshapable_msd<storage_type>
     {
         m_data.reshape_rows(rows, rowcap);
     }
@@ -412,8 +412,8 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //
     void
     reshape(index_type rows, index_type cols, index_type rowcap, index_type colcap)
-        requires
-            detail::reshapable_msd<storage_type>
+    requires
+        detail::reshapable_msd<storage_type>
     {
         m_data.reshape(rows, cols, rowcap, colcap);
     }

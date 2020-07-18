@@ -72,6 +72,12 @@ concept convertible_from = convertible_to<SRC, DST>;
 template<class DST, class SRC>
 concept constructible_from_engine = constructible_from<DST, SRC>;
 
+template<class DST, class T, ptrdiff_t X0, class L, class A>
+concept constructible_from_1d_mdspan = constructible_from<DST, basic_mdspan<T, extents<X0>, L, A>>;
+
+template<class DST, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+concept constructible_from_2d_mdspan = constructible_from<DST, basic_mdspan<T, extents<X0, X1>, L, A>>;
+
 template<class DST, class SRC>
 concept constructible_from_1d_list = constructible_from<DST, initializer_list<SRC>>;
 
@@ -81,6 +87,12 @@ concept constructible_from_2d_list = constructible_from<DST, initializer_list<in
 
 template<class DST, class SRC>
 concept assignable_from_engine = assignable_from<DST, SRC>;
+
+template<class DST, class T, ptrdiff_t X0, class L, class A>
+concept assignable_from_1d_mdspan = assignable_from<DST, basic_mdspan<T, extents<X0>, L, A>>;
+
+template<class DST, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+concept assignable_from_2d_mdspan = assignable_from<DST, basic_mdspan<T, extents<X0, X1>, L, A>>;
 
 template<class DST, class SRC>
 concept assignable_from_1d_list = assignable_from<DST, initializer_list<SRC>>;
@@ -395,10 +407,10 @@ struct engine_support
     //----------------------------------------------------------------------------------------------
     //
     template<class ET, class IT>
-    requires
-        writable_vector_engine<ET>
     static inline constexpr void
     verify_and_reshape(ET& dst, IT src_elems)
+    requires
+        writable_vector_engine<ET>
     {
         auto    elems = static_cast<typename ET::index_type>(src_elems);
 
@@ -413,10 +425,10 @@ struct engine_support
     }
 
     template<class ET, class IT>
-    requires
-        writable_matrix_engine<ET>
     static inline constexpr void
     verify_and_reshape(ET& dst, IT src_rows, IT src_cols)
+    requires
+        writable_matrix_engine<ET>
     {
         auto    rows = static_cast<typename ET::index_type>(src_rows);
         auto    cols = static_cast<typename ET::index_type>(src_cols);
@@ -457,11 +469,11 @@ struct engine_support
     //----------------------------------------------------------------------------------------------
     //
     template<class ET1, class ET2>
+    static constexpr void
+    vector_assign_from(ET1& dst, ET2 const& src)
     requires
         writable_vector_engine<ET1> and
         readable_vector_engine<ET2>
-    static constexpr void
-    vector_assign_from(ET1& dst, ET2 const& src)
     {
         using index_type_dst = typename ET1::index_type;
         using index_type_src = typename ET2::index_type;
@@ -480,11 +492,11 @@ struct engine_support
     }
 
     template<class ET, class T, ptrdiff_t X0, class L, class A>
+    static constexpr void
+    vector_assign_from(ET const& dst, basic_mdspan<T, extents<X0>, L, A> const& src)
     requires
         readable_vector_engine<ET>  and
         convertible_from<typename ET::element_type, T>
-    static constexpr void
-    vector_assign_from(ET const& dst, basic_mdspan<T, extents<X0>, L, A> const& src)
     {
         using index_type_dst = typename ET::index_type;
         using index_type_src = typename basic_mdspan<T, extents<X0>, L, A>::index_type;
@@ -504,11 +516,11 @@ struct engine_support
 
 
     template<class ET, class T>
+    static constexpr void
+    vector_assign_from(ET& dst, initializer_list<T> src)
     requires
         writable_vector_engine<ET> and
         convertible_from<typename ET::element_type, T>
-    static constexpr void
-    vector_assign_from(ET& dst, initializer_list<T> src)
     {
         using index_type_dst = typename ET::index_type;
 
@@ -530,12 +542,12 @@ struct engine_support
     //----------------------------------------------------------------------------------------------
     //
     template<class ET1, class ET2>
+    static constexpr void
+    matrix_assign_from(ET1& dst, ET2 const& src)
     requires
         writable_matrix_engine<ET1> and
         readable_matrix_engine<ET2> and
         convertible_from<typename ET1::element_type, typename ET2::element_type>
-    static constexpr void
-    matrix_assign_from(ET1& dst, ET2 const& src)
     {
         using index_type_dst = typename ET1::index_type;
         using index_type_src = typename ET2::index_type;
@@ -561,11 +573,11 @@ struct engine_support
     }
 
     template<class ET, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+    static constexpr void
+    matrix_assign_from(ET& dst, basic_mdspan<T, extents<X0, X1>, L, A> const& src)
     requires
         writable_matrix_engine<ET>  and
         convertible_from<typename ET::element_type, T>
-    static constexpr void
-    matrix_assign_from(ET const& dst, basic_mdspan<T, extents<X0, X1>, L, A> const& src)
     {
         using index_type_dst = typename ET::index_type;
         using index_type_src = typename basic_mdspan<T, extents<X0, X1>, L, A>::index_type;
@@ -591,11 +603,11 @@ struct engine_support
     }
 
     template<class ET, class T>
+    static constexpr void
+    matrix_assign_from(ET& dst, initializer_list<initializer_list<T>> src)
     requires
         writable_matrix_engine<ET>  and
         convertible_from<typename ET::element_type, T>
-    static constexpr void
-    matrix_assign_from(ET& dst, initializer_list<initializer_list<T>> src)
     {
         using index_type_dst = typename ET::index_type;
 
@@ -624,12 +636,12 @@ struct engine_support
     //----------------------------------------------------------------------------------------------
     //
     template<class ET1, class ET2>
+    static constexpr bool
+    vector_compare(ET1 const& lhs, ET2 const& rhs)
     requires
         readable_vector_engine<ET1> and
         readable_vector_engine<ET2> and
         comparable_types<typename ET1::element_type, typename ET2::element_type>
-    static constexpr bool
-    vector_compare(ET1 const& lhs, ET2 const& rhs)
     {
         using index_type_lhs = typename ET1::index_type;
         using index_type_rhs = typename ET2::index_type;
@@ -650,11 +662,11 @@ struct engine_support
     }
 
     template<class ET, class T, ptrdiff_t X0, class L, class A>
+    static constexpr bool
+    vector_compare(ET const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
     requires
         readable_vector_engine<ET>  and
         comparable_types<typename ET::element_type, T>
-    static constexpr bool
-    vector_compare(ET const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
     {
         using index_type_lhs = typename ET::index_type;
         using index_type_rhs = typename basic_mdspan<T, extents<X0>, L, A>::index_type;
@@ -675,11 +687,11 @@ struct engine_support
     }
 
     template<class ET, class U>
+    static constexpr bool
+    vector_compare(ET const& lhs, initializer_list<U> rhs)
     requires
         readable_vector_engine<ET>  and
         comparable_types<typename ET::element_type, U>
-    static constexpr bool
-    vector_compare(ET const& lhs, initializer_list<U> rhs)
     {
         using index_type_lhs = typename ET::index_type;
 
@@ -704,12 +716,12 @@ struct engine_support
     //----------------------------------------------------------------------------------------------
     //
     template<class ET1, class ET2>
+    static constexpr bool
+    matrix_compare(ET1 const& lhs, ET2 const& rhs)
     requires
         readable_matrix_engine<ET1> and
         readable_matrix_engine<ET2> and
         comparable_types<typename ET1::element_type, typename ET2::element_type>
-    static constexpr bool
-    matrix_compare(ET1 const& lhs, ET2 const& rhs)
     {
         using index_type_lhs = typename ET1::index_type;
         using index_type_rhs = typename ET2::index_type;
@@ -738,11 +750,11 @@ struct engine_support
     }
 
     template<class ET, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+    static constexpr bool
+    matrix_compare(ET const& lhs, basic_mdspan<T, extents<X0, X1>, L, A> const& rhs)
     requires
         readable_matrix_engine<ET>  and
         comparable_types<typename ET::element_type, T>
-    static constexpr bool
-    matrix_compare(ET const& lhs, basic_mdspan<T, extents<X0, X1>, L, A> const& rhs)
     {
         using index_type_lhs = typename ET::index_type;
         using index_type_rhs = typename basic_mdspan<T, extents<X0, X1>, L, A>::index_type;
@@ -771,11 +783,11 @@ struct engine_support
     }
 
     template<class ET, class U>
+    static constexpr bool
+    matrix_compare(ET const& lhs, initializer_list<initializer_list<U>> rhs)
     requires
         readable_matrix_engine<ET>  and
         comparable_types<typename ET::element_type, U>
-    static constexpr bool
-    matrix_compare(ET const& lhs, initializer_list<initializer_list<U>> rhs)
     {
         using index_type_lhs = typename ET::index_type;
 
