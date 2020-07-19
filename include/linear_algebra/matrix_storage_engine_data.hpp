@@ -598,8 +598,8 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
             if (cols < m_cols)
             {
                 support::fill_columns(*this, cols, m_cols, T{});
+                m_cols = cols;
             }
-            m_cols = cols;
         }
     }
 
@@ -729,8 +729,8 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
             if (rows < m_rows)
             {
                 support::fill_rows(*this, rows, m_rows, T{});
+                m_rows = rows;
             }
-            m_rows = rows;
         }
     }
 
@@ -866,13 +866,13 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
             if (rows < m_rows)
             {
                 support::fill_rows(*this, rows, m_rows, T{});
+                m_rows = rows;
             }
             if (cols < m_cols)
             {
                 support::fill_columns(*this, cols, m_cols, T{});
+                m_cols = cols;
             }
-            m_rows = rows;
-            m_cols = cols;
         }
     }
 

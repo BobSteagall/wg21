@@ -36,6 +36,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
 {
     using this_type    = matrix_storage_engine;
     using storage_type = detail::mse_data<T, extents<N>, A, L>;
+    using support      = detail::engine_support;
 
   public:
     using value_type       = T;
@@ -196,6 +197,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 {
     using this_type    = matrix_storage_engine;
     using storage_type = detail::mse_data<T, extents<R, C>, A, L>;
+    using support      = detail::engine_support;
 
   public:
     using value_type       = T;
@@ -415,7 +417,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     requires
         detail::reshapable_msd<storage_type>
     {
-        m_data.reshape(rows, cols, rowcap, colcap);
+        do_reshape(rows, cols, rowcap, colcap);
     }
 
     //- Other modifiers
@@ -423,11 +425,134 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     inline constexpr void
     swap(matrix_storage_engine& rhs) noexcept
     {
-        m_data.swap(rhs.m_data);
+        support::swap(m_data, rhs.m_data);
     }
 
   private:
     storage_type    m_data;
+
+    void
+    do_reshape(ptrdiff_t rows, ptrdiff_t cols, ptrdiff_t rowcap, ptrdiff_t colcap)
+    {
+        support::verify_size(rows);
+        support::verify_size(cols);
+        support::verify_capacity(rowcap);
+        support::verify_capacity(colcap);
+
+        //- Only reallocate new storage if we have to.
+        //
+        if (rows > m_data.m_rowcap  ||  rowcap != m_data.m_rowcap  ||
+            cols > m_data.m_colcap  ||  colcap != m_data.m_colcap)
+        {
+            //- Normalize requested new capacities.
+            //
+            rowcap = max(rows, rowcap);
+            colcap = max(cols, colcap);
+
+            //- Prepare a temporary object to receive elements from this one.
+            //
+            this_type   tmp;
+            tmp.m_data.m_elems.resize(rowcap * colcap);
+            tmp.m_data.m_rows   = rows;
+            tmp.m_data.m_cols   = cols;
+            tmp.m_data.m_rowcap = rowcap;
+            tmp.m_data.m_colcap = colcap;
+
+            //- Move the appropriate subset of elements into the temporary engine and swap.
+            //
+            ptrdiff_t   dst_rows = min(rows, m_data.m_rows);
+            ptrdiff_t   dst_cols = min(cols, m_data.m_cols);
+            support::move_elements(tmp, *this, dst_rows, dst_cols);
+            support::swap(m_data, tmp.m_data);
+        }
+        else
+        {
+            if (rows < m_data.m_rows)
+            {
+                support::fill_rows(*this, rows, m_data.m_rows, T{});
+                m_data.m_rows = rows;
+            }
+            if (cols < m_data.m_cols)
+            {
+                support::fill_columns(*this, cols, m_data.m_cols, T{});
+                m_data.m_cols = cols;
+            }
+        }
+    }
+
+    void
+    do_reshape_columns(ptrdiff_t cols, ptrdiff_t colcap)
+    {
+        support::verify_size(cols);
+        support::verify_capacity(colcap);
+
+        //- Only reallocate new storage if we have to.
+        //
+        if (cols > m_data.m_colcap  ||  colcap != m_data.m_colcap)
+        {
+            //- Normalize requested new capacity.
+            //
+            colcap = max(cols, colcap);
+
+            //- Prepare a temporary object to receive elements from this one.
+            //
+            this_type   tmp;
+            tmp.m_data.m_elems.resize(m_data.m_rowcap * colcap);
+            tmp.m_data.m_cols   = cols;
+            tmp.m_data.m_colcap = colcap;
+
+            //- Move the appropriate subset of elements into the temporary engine and swap.
+            //
+            ptrdiff_t   dst_cols = min(cols, m_data.m_cols);
+            support::move_elements(tmp, *this, m_data.m_rows, dst_cols);
+            support::swap(*this, tmp);
+        }
+        else
+        {
+            if (cols < m_data.m_cols)
+            {
+                support::fill_columns(*this, cols, m_data.m_cols, T{});
+                m_data.m_cols = cols;
+            }
+        }
+    }
+
+    void
+    do_reshape_rows(ptrdiff_t rows, ptrdiff_t rowcap)
+    {
+        support::verify_size(rows);
+        support::verify_capacity(rowcap);
+
+        //- Only reallocate new storage if we have to.
+        //
+        if (rows > m_data.m_rowcap  ||  rowcap != m_data.m_rowcap)
+        {
+            //- Normalize requested new capacity.
+            //
+            rowcap = max(rows, rowcap);
+
+            //- Prepare a temporary object to receive elements from this one.
+            //
+            this_type   tmp;
+            tmp.m_data.m_elems.resize(rowcap * m_data.m_colcap);
+            tmp.m_data.m_rows   = rows;
+            tmp.m_data.m_rowcap = rowcap;
+
+            //- Move the appropriate subset of elements into the temporary engine and swap.
+            //
+            ptrdiff_t   dst_rows = min(rows, m_data.m_rows);
+            support::move_elements(tmp, *this, dst_rows, m_data.m_cols);
+            support::swap(*this, tmp);
+        }
+        else
+        {
+            if (rows < m_data.m_rows)
+            {
+                support::fill_rows(*this, rows, m_data.m_rows, T{});
+                m_data.m_rows = rows;
+            }
+        }
+    }
 };
 
 template<class OT,

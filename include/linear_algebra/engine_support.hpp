@@ -232,6 +232,8 @@ concept writable_matrix_engine =
 template<class ET>
 concept writable_engine = writable_matrix_engine<ET> or writable_vector_engine<ET>;
 
+template<class ET>
+concept row_major_engine = true;
 
 //--------------------------------------------------------------------------------------------------
 //  Concepts:   spannable_vector_engine<ET>
@@ -767,8 +769,8 @@ struct engine_support
         if (sizes_differ(r1, c1, r2, c2)) return false;
 
         index_type_lhs  i1 = 0;
-
         index_type_rhs  i2 = 0;
+
         for (;  i1 < r1;  ++i1, ++i2)
         {
             index_type_lhs  j1 = 0;
@@ -811,6 +813,99 @@ struct engine_support
             }
         }
         return true;
+    }
+
+
+    template<class ET, class IT, class FN>
+    static constexpr void
+    apply(ET& dst, IT i0, IT j0, IT i1, IT j1, FN fn)
+    requires
+        writable_matrix_engine<ET>
+    {
+        if constexpr (row_major_engine<ET>)
+        {
+            for (auto i = i0;  i < i1;  ++i)
+            {
+                for (auto j = j0;  j < j1;  ++j)
+                {
+                    dst(i, j) = fn(i, j);
+                }
+            }
+        }
+        else
+        {
+            for (auto j = j0;  j < j1;  ++j)
+            {
+                for (auto i = i0;  i < i1;  ++i)
+                {
+                    dst(i, j) = fn(i, j);
+                }
+            }
+        }
+    }
+
+    //- Fill the specified range of columns of an MSE with some value.
+    //
+    template<class ET, class JT0, class JT1, class T>
+    static inline constexpr void
+    fill_columns(ET& dst, JT0 c0, JT1 c1, T const& t)
+    requires
+        writable_matrix_engine<ET>  and
+        same_as<typename ET::element_type, T>
+    {
+        using index_type = typename ET::index_type;
+
+        auto    i0 = static_cast<index_type>(0);
+        auto    j0 = static_cast<index_type>(c0);
+        auto    i1 = dst.rows();
+        auto    j1 = static_cast<index_type>(c1);
+
+        apply(dst, i0, j0, i1, j1, [&t](index_type, index_type){  return t;  });
+    }
+
+    //- Fill the specified range of rows of an MSE with some value.
+    //
+    template<class ET, class IT0, class IT1, class T>
+    static inline constexpr void
+    fill_rows(ET& dst, IT0 r0, IT1 r1, T const& t)
+    requires
+        writable_matrix_engine<ET>  and
+        same_as<typename ET::element_type, T>
+    {
+        using index_type = typename ET::index_type;
+
+        auto    i0 = static_cast<index_type>(r0);
+        auto    j0 = static_cast<index_type>(0);
+        auto    i1 = static_cast<index_type>(r1);
+        auto    j1 = dst.columns();
+
+        apply(dst, i0, j0, i1, j1, [&t](index_type, index_type){  return t;  });
+    }
+
+    //- Move elements from a source MSE into a destination MSE.
+    //
+    template<class ET, class IT, class JT>
+    static inline constexpr void
+    move_elements(ET& dst, ET& src, IT rows, JT cols)
+    {
+        using index_type = typename ET::index_type;
+
+        auto    i0 = static_cast<index_type>(0);
+        auto    j0 = static_cast<index_type>(0);
+        auto    i1 = static_cast<index_type>(rows);
+        auto    j1 = static_cast<index_type>(cols);
+
+        apply(dst, i0, j0, i1, j1,
+              [&src](index_type i, index_type j){  return std::move(src(i, j));  });
+    }
+
+    template<class T>
+    static inline constexpr void
+    swap(T& t0, T& t1) noexcept(is_nothrow_movable_v<T>)
+    {
+        T   t2(std::move(t0));
+        t0 = std::move(t1);
+        t1 = std::move(t2);
     }
 };
 
