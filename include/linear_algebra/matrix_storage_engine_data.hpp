@@ -282,6 +282,7 @@ struct mse_data<T, extents<R, C>, void, L>
     using this_type       = mse_data;
     using array_type      = std::array<T, R*C>;
     using support         = mse_support<this_type>;
+
     using this_layout     = conditional_t<is_same_v<L, row_major>, layout_right, layout_left>;
     using span_type       = basic_mdspan<T, extents<R, C>, this_layout>;
     using const_span_type = basic_mdspan<T const, extents<R, C>, this_layout>;
@@ -289,6 +290,7 @@ struct mse_data<T, extents<R, C>, void, L>
     static constexpr bool   is_column_matrix      = (C == 1);
     static constexpr bool   is_row_matrix         = (R == 1);
     static constexpr bool   is_linearly_indexable = (is_column_matrix || is_row_matrix);
+    static constexpr bool   is_fixed_size         = true;
     static constexpr bool   is_column_reshapable  = false;
     static constexpr bool   is_row_reshapable     = false;
     static constexpr bool   is_reshapable         = false;
@@ -389,6 +391,7 @@ struct mse_data<T, extents<R, C>, A, L>
     using this_type       = mse_data;
     using array_type      = std::vector<T, A>;
     using support         = mse_support<this_type>;
+
     using this_layout     = conditional_t<is_same_v<L, row_major>, layout_right, layout_left>;
     using span_type       = basic_mdspan<T, extents<R, C>, this_layout>;
     using const_span_type = basic_mdspan<T const, extents<R, C>, this_layout>;
@@ -396,6 +399,7 @@ struct mse_data<T, extents<R, C>, A, L>
     static constexpr bool   is_column_matrix      = (C == 1);
     static constexpr bool   is_row_matrix         = (R == 1);
     static constexpr bool   is_linearly_indexable = (is_column_matrix || is_row_matrix);
+    static constexpr bool   is_fixed_size         = true;
     static constexpr bool   is_column_reshapable  = false;
     static constexpr bool   is_row_reshapable     = false;
     static constexpr bool   is_reshapable         = false;
@@ -493,12 +497,18 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
     using this_type       = mse_data;
     using array_type      = std::vector<T, A>;
     using support         = mse_support<this_type>;
-    using span_type       = typename support::dyn_span_type;
-    using const_span_type = typename support::const_dyn_span_type;
+
+    using dyn_extents     = extents<dynamic_extent, dynamic_extent>;
+    using dyn_layout      = layout_stride<dynamic_extent, dynamic_extent>;
+    using dyn_strides     = array<typename dyn_extents::index_type, 2>;
+    using dyn_mapping     = typename dyn_layout::template mapping<dyn_extents>;
+    using span_type       = basic_mdspan<T, dyn_extents, dyn_layout>;
+    using const_span_type = basic_mdspan<T const, dyn_extents, dyn_layout>;
 
     static constexpr bool   is_column_matrix      = false;
     static constexpr bool   is_row_matrix         = (R == 1);
     static constexpr bool   is_linearly_indexable = is_row_matrix;
+    static constexpr bool   is_fixed_size         = false;
     static constexpr bool   is_column_reshapable  = true;
     static constexpr bool   is_row_reshapable     = false;
     static constexpr bool   is_reshapable         = false;
@@ -624,12 +634,18 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
     using this_type       = mse_data;
     using array_type      = std::vector<T, A>;
     using support         = mse_support<this_type>;
-    using span_type       = typename support::dyn_span_type;
-    using const_span_type = typename support::const_dyn_span_type;
+
+    using dyn_extents     = extents<dynamic_extent, dynamic_extent>;
+    using dyn_layout      = layout_stride<dynamic_extent, dynamic_extent>;
+    using dyn_strides     = array<typename dyn_extents::index_type, 2>;
+    using dyn_mapping     = typename dyn_layout::template mapping<dyn_extents>;
+    using span_type       = basic_mdspan<T, dyn_extents, dyn_layout>;
+    using const_span_type = basic_mdspan<T const, dyn_extents, dyn_layout>;
 
     static constexpr bool   is_column_matrix      = (C == 1);
     static constexpr bool   is_row_matrix         = false;
     static constexpr bool   is_linearly_indexable = is_column_matrix;
+    static constexpr bool   is_fixed_size         = false;
     static constexpr bool   is_column_reshapable  = false;
     static constexpr bool   is_row_reshapable     = true;
     static constexpr bool   is_reshapable         = false;
@@ -756,12 +772,18 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
     using this_type       = mse_data;
     using array_type      = std::vector<T, A>;
     using support         = mse_support<this_type>;
-    using span_type       = typename support::dyn_span_type;
-    using const_span_type = typename support::const_dyn_span_type;
+
+    using dyn_extents     = extents<dynamic_extent, dynamic_extent>;
+    using dyn_layout      = layout_stride<dynamic_extent, dynamic_extent>;
+    using dyn_strides     = array<typename dyn_extents::index_type, 2>;
+    using dyn_mapping     = typename dyn_layout::template mapping<dyn_extents>;
+    using span_type       = basic_mdspan<T, dyn_extents, dyn_layout>;
+    using const_span_type = basic_mdspan<T const, dyn_extents, dyn_layout>;
 
     static constexpr bool   is_column_matrix      = false;
     static constexpr bool   is_row_matrix         = false;
     static constexpr bool   is_linearly_indexable = false;
+    static constexpr bool   is_fixed_size         = false;
     static constexpr bool   is_column_reshapable  = true;
     static constexpr bool   is_row_reshapable     = true;
     static constexpr bool   is_reshapable         = true;

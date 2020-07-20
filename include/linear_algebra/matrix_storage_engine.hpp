@@ -199,6 +199,19 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     using storage_type = detail::mse_data<T, extents<R, C>, A, L>;
     using support      = detail::engine_support;
 
+    using this_layout = conditional_t<storage_type::is_row_major, layout_right, layout_left>;
+    using fxd_span    = basic_mdspan<T, extents<R, C>, this_layout>;
+    using c_fxd_span  = basic_mdspan<T const, extents<R, C>, this_layout>;
+
+    using dyn_extents = extents<dynamic_extent, dynamic_extent>;
+    using dyn_layout  = layout_stride<dynamic_extent, dynamic_extent>;
+    using dyn_strides = array<typename dyn_extents::index_type, 2>;
+    using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
+    using dyn_span    = basic_mdspan<T, dyn_extents, dyn_layout>;
+    using c_dyn_span  = basic_mdspan<T const, dyn_extents, dyn_layout>;
+
+    storage_type    m_data;
+
   public:
     using value_type       = T;
     using allocator_type   = A;
@@ -206,8 +219,8 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     using reference        = element_type&;
     using const_reference  = element_type const&;
     using index_type       = ptrdiff_t;
-    using span_type        = typename storage_type::span_type;
-    using const_span_type  = typename storage_type::const_span_type;
+    using span_type        = conditional_t<storage_type::is_fixed_size, fxd_span, dyn_span>;
+    using const_span_type  = conditional_t<storage_type::is_fixed_size, c_fxd_span, c_dyn_span>;
 
   public:
     ~matrix_storage_engine() = default;
@@ -247,7 +260,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         detail::readable_matrix_engine<ET2>
     :   m_data()
     {
-        m_data.assign(rhs);
+        support::matrix_assign_from(*this, rhs);
     }
 
     template<class U>
@@ -257,7 +270,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         detail::convertible_from<T, U>
     :   m_data()
     {
-        m_data.assign(rhs);
+        support::matrix_assign_from(*this, rhs);
     }
 
     template<class U>
@@ -269,6 +282,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     :   m_data()
     {
         m_data.assign(rhs);
+        //support::vector_assign_from(*this, rhs);
     }
 
     //- Other assignment operators.
@@ -279,7 +293,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     requires
         detail::readable_matrix_engine<ET2>
     {
-        m_data.assign(rhs);
+        support::matrix_assign_from(*this, rhs);
         return *this;
     }
 
@@ -289,7 +303,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     requires
         detail::convertible_from<T, U>
     {
-        m_data.assign(rhs);
+        support::matrix_assign_from(*this, rhs);
         return *this;
     }
 
@@ -301,6 +315,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         detail::linearly_indexable_msd<storage_type>
     {
         m_data.assign(rhs);
+        //support::vector_assign_from(*this, rhs);
         return *this;
     }
 
@@ -382,42 +397,50 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     span() noexcept
     {
         return m_data.span();
+        //return make_mdspan<span_type, element_type>(m_data.m_elems.data(), m_data);
     }
 
     inline constexpr const_span_type
     span() const noexcept
     {
         return m_data.span();
-    }
-
-    //- Setting column size and capacity.
-    //
-    constexpr void
-    reshape_columns(index_type cols, index_type colcap)
-    requires
-        detail::column_reshapable_msd<storage_type>
-    {
-        m_data.reshape_columns(cols, colcap);
-    }
-
-    //- Setting row size and capacity.
-    //
-    void
-    reshape_rows(index_type rows, index_type rowcap)
-    requires
-        detail::row_reshapable_msd<storage_type>
-    {
-        m_data.reshape_rows(rows, rowcap);
+        //return make_mdspan<const_span_type, element_type const>(m_data.m_elems.data(), m_data);
     }
 
     //- Setting overall size and capacity.
     //
-    void
+    inline constexpr void
     reshape(index_type rows, index_type cols, index_type rowcap, index_type colcap)
     requires
         detail::reshapable_msd<storage_type>
     {
         do_reshape(rows, cols, rowcap, colcap);
+    }
+
+    //- Setting column size and capacity.
+    //
+    inline constexpr void
+    reshape_columns(index_type cols, index_type colcap)
+    requires
+        detail::column_reshapable_msd<storage_type>
+    {
+        if constexpr (detail::reshapable_msd<storage_type>)
+            do_reshape(m_data.m_rows, cols, m_data.m_rowcap, colcap);
+        else
+            do_reshape_columns(cols, colcap);
+    }
+
+    //- Setting row size and capacity.
+    //
+    inline constexpr void
+    reshape_rows(index_type rows, index_type rowcap)
+    requires
+        detail::row_reshapable_msd<storage_type>
+    {
+        if constexpr (detail::reshapable_msd<storage_type>)
+            do_reshape(rows, m_data.m_cols, rowcap, m_data.m_colcap);
+        else
+            do_reshape_rows(rows, rowcap);
     }
 
     //- Other modifiers
@@ -429,10 +452,40 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
   private:
-    storage_type    m_data;
+    template<class ST, class U>
+    static inline constexpr ST
+    make_mdspan(U* pdata, storage_type const& rep)
+    {
+        if constexpr (storage_type::is_fixed_size)
+        {
+            return ST(pdata);
+        }
+        else
+        {
+            if constexpr (storage_type::is_row_major)
+            {
+                dyn_extents     extents(rep.m_rows, rep.m_cols);
+                dyn_strides     strides{rep.m_colcap, 1};
+                dyn_mapping     mapping(extents, strides);
+
+                return ST(pdata, mapping);
+            }
+            else
+            {
+                dyn_extents     extents(rep.m_rows, rep.m_cols);
+                dyn_strides     strides{1, rep.m_rowcap};
+                dyn_mapping     mapping(extents, strides);
+
+                return ST(pdata, mapping);
+            }
+        }
+    }
+
 
     void
     do_reshape(ptrdiff_t rows, ptrdiff_t cols, ptrdiff_t rowcap, ptrdiff_t colcap)
+    requires
+        detail::reshapable_msd<storage_type>
     {
         support::verify_size(rows);
         support::verify_size(cols);
@@ -482,6 +535,9 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     void
     do_reshape_columns(ptrdiff_t cols, ptrdiff_t colcap)
+    requires
+        detail::column_reshapable_msd<storage_type>     and
+        (not detail::reshapable_msd<storage_type>)
     {
         support::verify_size(cols);
         support::verify_capacity(colcap);
@@ -519,6 +575,9 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     void
     do_reshape_rows(ptrdiff_t rows, ptrdiff_t rowcap)
+    requires
+        detail::row_reshapable_msd<storage_type>     and
+        (not detail::reshapable_msd<storage_type>)
     {
         support::verify_size(rows);
         support::verify_capacity(rowcap);

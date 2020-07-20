@@ -444,16 +444,14 @@ struct engine_support
         }
         else if constexpr (column_reshapable_matrix_engine<ET>)
         {
-            verify_size(dst.rows(), rows);
-            if (cols != dst.columns())
+            if (verify_size(dst.rows(), rows);  cols != dst.columns())
             {
                 dst.reshape_columns(cols, dst.column_capacity());
             }
         }
         else if constexpr (row_reshapable_matrix_engine<ET>)
         {
-            verify_size(dst.columns(), cols);
-            if (rows != dst.rows)
+            if (verify_size(dst.columns(), cols);  rows != dst.rows())
             {
                 dst.reshape_rows(rows, dst.row_capacity());
             }
@@ -906,6 +904,24 @@ struct engine_support
         T   t2(std::move(t0));
         t0 = std::move(t1);
         t1 = std::move(t2);
+    }
+
+    using dyn_extents = extents<dynamic_extent, dynamic_extent>;
+    using dyn_layout  = layout_stride<dynamic_extent, dynamic_extent>;
+    using dyn_strides = array<typename dyn_extents::index_type, 2>;
+    using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
+
+    template<class T, class ST> inline constexpr
+    basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>
+    make_dynamic_span(T* pdata, ST rows, ST cols, ST row_stride, ST col_stride)
+    {
+        using idx_t = typename dyn_mat_extents::index_type;
+
+        dyn_mat_extents     extents(static_cast<idx_t>(rows), static_cast<idx_t>(cols));
+        dyn_mat_strides     strides{static_cast<idx_t>(row_stride), static_cast<idx_t>(col_stride)};
+        dyn_mat_mapping     mapping(extents, strides);
+
+        return basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>(pdata, mapping);
     }
 };
 
