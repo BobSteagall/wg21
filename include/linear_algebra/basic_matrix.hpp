@@ -18,7 +18,7 @@ class basic_matrix
 {
     static constexpr bool   engine_has_mdspan = detail::spannable_matrix_engine<ET>;
 
-    using engine_support = detail::engine_support;
+    using engine_support = detail::matrix_engine_support;
 
   public:
     using engine_type          = ET;
@@ -170,7 +170,7 @@ class basic_matrix
         detail::convertible_from<element_type, T2>
     :   m_engine()
     {
-        engine_support::vector_assign_from(m_engine, rhs);
+        engine_support::matrix_assign_from(m_engine, rhs);
     }
 
     //-------------------------------------------------
@@ -245,7 +245,7 @@ class basic_matrix
         (not detail::assignable_from_1d_mdspan<engine_type, T2, X0, L, A>)  and
         detail::convertible_from<element_type, T2>
     {
-        engine_support::vector_assign_from(m_engine, rhs);
+        engine_support::matrix_assign_from(m_engine, rhs);
         return *this;
     }
 
@@ -295,7 +295,7 @@ class basic_matrix
         (not detail::assignable_from_1d_list<engine_type, T2>)      and
         detail::convertible_from<element_type, T2>
     {
-        engine_support::vector_assign_from(m_engine, rhs);
+        engine_support::matrix_assign_from(m_engine, rhs);
         return *this;
     }
 

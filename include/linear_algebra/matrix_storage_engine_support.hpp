@@ -166,7 +166,7 @@ concept row_reshapable_msd = MSD::is_row_reshapable;
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, ptrdiff_t N, class A, class L>
-struct mse_support<mse_data<T, extents<N>, A, L>> : public engine_support
+struct mse_support<mse_data<T, extents<N>, A, L>> : public vector_engine_support
 {
     //- Engine representation type.
     //
@@ -233,7 +233,7 @@ struct mse_support<mse_data<T, extents<N>, A, L>> : public engine_support
     }
 };
 
-
+/*
 //--------------------------------------------------------------------------------------------------
 //  Partial Specialization:     mse_support<T, extents<R, C>, A, L>
 //
@@ -246,7 +246,7 @@ struct mse_support<mse_data<T, extents<N>, A, L>> : public engine_support
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
-struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public engine_support
+struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public matrix_engine_support
 {
     //- Important types.
     //
@@ -423,7 +423,7 @@ struct mse_support<mse_data<T, extents<R, C>, A, L>>  : public engine_support
         }
     }
 };
-
+*/
 }       //- detail namespace
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_MATRIX_STORAGE_ENGINE_SUPPORT_HPP_DEFINED

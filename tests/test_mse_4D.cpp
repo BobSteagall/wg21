@@ -753,7 +753,7 @@ TEST(BasicMatrix, Sanity)
     auto    s3 = m3.span();
     auto&&  e3 = m3.engine();
 
-    EXPECT_TRUE(STD_LA::detail::engine_support::matrix_compare(e3, s3));
+    EXPECT_TRUE(STD_LA::detail::matrix_engine_support::matrix_compare(e3, s3));
 
     m1 = m8;
     m2 = m8;
