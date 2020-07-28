@@ -15,12 +15,13 @@ namespace detail {
 //  Type that contains and manages elements on behalf of matrix_storage_engine<T,X,A,L>.
 //
 //  Partial specializations of this class template are tailored to specific corresponding partial
-//  specializations of matrix_storage_engine.  They provide the special member functions, as well
-//  as other manipulation of internal state, that make sense for each set of template arguments.
+//  specializations of matrix_storage_engine.  They provide the special member functions that make
+//  sense for each valid set of template arguments.
 //
 //  The implementation assumes that all dynamically-allocated memory is default-constructed,
 //  with the consequence that elements lying in unused capacity are also constructed.  This
 //  assumption makes implementation easy, but may be absent in the final version.
+//--------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------
 //  Specialization:     mse_data<T, extents<N>, void, L>
 //
@@ -31,11 +32,7 @@ namespace detail {
 template<class T, ptrdiff_t N, class L>
 struct mse_data<T, extents<N>, void, L>
 {
-    using this_type       = mse_data;
-    using array_type      = std::array<T, N>;
-    using support         = mse_support<this_type>;
-    using span_type       = mdspan<T, N>;
-    using const_span_type = mdspan<T const, N>;
+    using array_type = std::array<T, N>;
 
     static constexpr bool   is_fixed_size = true;
     static constexpr bool   is_reshapable = false;
@@ -58,41 +55,6 @@ struct mse_data<T, extents<N>, void, L>
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
-
-    inline constexpr span_type
-    span() noexcept
-    {
-        return span_type(m_elems.data());
-    }
-
-    inline constexpr const_span_type
-    span() const noexcept
-    {
-        return const_span_type(m_elems.data());
-    }
-
-    template<class U>
-    constexpr void
-    assign(initializer_list<U> src)
-    {
-        ptrdiff_t   size = static_cast<ptrdiff_t>(src.size());
-        support::verify_size(size, m_size);
-        support::copy_list(*this, src);
-    }
-
-    template<class ET>
-    constexpr void
-    assign(ET const& eng)
-    {
-        support::verify_size(static_cast<ptrdiff_t>(eng.size()), m_size);
-        support::copy_engine(*this, eng);
-    }
-
-    inline constexpr void
-    swap(mse_data& rhs) noexcept
-    {
-        support::swap(*this, rhs);
-    }
 };
 
 
@@ -106,11 +68,7 @@ struct mse_data<T, extents<N>, void, L>
 template<class T, ptrdiff_t N, class A, class L>
 struct mse_data<T, extents<N>, A, L>
 {
-    using this_type       = mse_data;
-    using array_type      = std::vector<T, A>;
-    using support         = mse_support<this_type>;
-    using span_type       = mdspan<T, N>;
-    using const_span_type = mdspan<T const, N>;
+    using array_type = std::vector<T, A>;
 
     static constexpr bool   is_fixed_size = true;
     static constexpr bool   is_reshapable = false;
@@ -128,41 +86,6 @@ struct mse_data<T, extents<N>, A, L>
     mse_data(mse_data const&) = default;
     mse_data&   operator =(mse_data&&) noexcept = default;
     mse_data&   operator =(mse_data const&) = default;
-
-    inline span_type
-    span() noexcept
-    {
-        return span_type(m_elems.data());
-    }
-
-    inline const_span_type
-    span() const noexcept
-    {
-        return const_span_type(m_elems.data());
-    }
-
-    template<class U>
-    constexpr void
-    assign(initializer_list<U> src)
-    {
-        ptrdiff_t   size = static_cast<ptrdiff_t>(src.size());
-        support::verify_size(size, m_size);
-        support::copy_list(*this, src);
-    }
-
-    template<class ET>
-    constexpr void
-    assign(ET const& eng)
-    {
-        support::verify_size(static_cast<ptrdiff_t>(eng.size()), m_size);
-        support::copy_engine(*this, eng);
-    }
-
-    inline void
-    swap(mse_data& rhs) noexcept
-    {
-        support::swap(*this, rhs);
-    }
 };
 
 
@@ -176,11 +99,7 @@ struct mse_data<T, extents<N>, A, L>
 template<class T, class A, class L>
 struct mse_data<T, extents<dynamic_extent>, A, L>
 {
-    using this_type       = mse_data;
-    using array_type      = std::vector<T, A>;
-    using support         = mse_support<this_type>;
-    using span_type       = mdspan<T, dynamic_extent>;
-    using const_span_type = mdspan<T const, dynamic_extent>;
+    using array_type = std::vector<T, A>;
 
     static constexpr bool   is_fixed_size = false;
     static constexpr bool   is_reshapable = true;
@@ -197,79 +116,6 @@ struct mse_data<T, extents<dynamic_extent>, A, L>
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
-
-    inline constexpr span_type
-    span() noexcept
-    {
-        return span_type(m_elems.data(), m_size);
-    }
-
-    inline constexpr const_span_type
-    span() const noexcept
-    {
-        return const_span_type(m_elems.data(), m_size);
-    }
-
-    template<class U>
-    constexpr void
-    assign(initializer_list<U> src)
-    {
-        reshape(static_cast<ptrdiff_t>(src.size()), m_cap);
-        support::copy_list(*this, src);
-    }
-
-    template<class ET>
-    constexpr void
-    assign(ET const& eng)
-    {
-        reshape(static_cast<ptrdiff_t>(eng.size()), m_cap);
-        support::copy_engine(*this, eng);
-    }
-
-    void
-    reshape(ptrdiff_t newsize, ptrdiff_t newcap)
-    {
-        if (newsize == m_size) return;
-
-        support::verify_size(newsize);
-        support::verify_capacity(newcap);
-
-        //- Only reallocate new storage if we have to.
-        //
-        if (newsize > m_cap  ||  newcap != m_cap)
-        {
-            //- Normalize requested new capacity.
-            //
-            newcap = max(newsize, newcap);
-
-            //- Prepare a temporary engine to receive elements from this one.
-            //
-            this_type   tmp;
-            tmp.m_elems.resize(newcap);
-            tmp.m_size = newsize;
-            tmp.m_cap  = newcap;
-
-            //- Move the appropriate subset of elements into the temporary engine, then swap.
-            //
-            ptrdiff_t   dst_size = min(newsize, m_size);
-            support::move_elements(tmp, *this, dst_size);
-            support::swap(*this, tmp);
-        }
-        else
-        {
-            if (newsize < m_size)
-            {
-                support::fill(*this, newsize, m_size, T{});
-            }
-            m_size = newsize;
-        }
-    }
-
-    inline void
-    swap(mse_data& rhs) noexcept
-    {
-        support::swap(*this, rhs);
-    }
 };
 
 

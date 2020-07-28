@@ -36,17 +36,22 @@ class matrix_storage_engine<T, extents<N>, A, L>
 {
     using this_type    = matrix_storage_engine;
     using storage_type = detail::mse_data<T, extents<N>, A, L>;
-    using support      = detail::vector_engine_support;
+    using support_type = detail::vector_engine_support;
+
+    using fxd_span     = mdspan<T, N>;
+    using c_fxd_span   = mdspan<T const, N>;
+    using dyn_span     = mdspan<T, dynamic_extent>;
+    using c_dyn_span   = mdspan<T const, dynamic_extent>;
 
   public:
-    using value_type       = T;
-    using allocator_type   = A;
-    using element_type     = value_type;
-    using reference        = element_type&;
-    using const_reference  = element_type const&;
-    using index_type       = ptrdiff_t;
-    using span_type        = typename storage_type::span_type;
-    using const_span_type  = typename storage_type::const_span_type;
+    using value_type      = T;
+    using allocator_type  = A;
+    using element_type    = value_type;
+    using reference       = element_type&;
+    using const_reference = element_type const&;
+    using index_type      = ptrdiff_t;
+    using span_type       = conditional_t<storage_type::is_fixed_size, fxd_span, dyn_span>;
+    using const_span_type = conditional_t<storage_type::is_fixed_size, c_fxd_span, c_dyn_span>;
 
   public:
     ~matrix_storage_engine() = default;
@@ -66,7 +71,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
         detail::reshapable_msd<storage_type>
     :   m_data()
     {
-        m_data.reshape(size, size);
+        do_reshape(size, size);
     }
 
     template<class ET2> inline constexpr
@@ -75,7 +80,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
         detail::readable_vector_engine<ET2>
     :   m_data()
     {
-        m_data.assign(rhs);
+        support_type::vector_assign_from(*this, rhs);
     }
 
     template<class T2> inline constexpr
@@ -84,7 +89,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
         detail::convertible_from<T, T2>
     :   m_data()
     {
-        m_data.assign(rhs);
+        support_type::vector_assign_from(*this, rhs);
     }
 
     template<class ET2>
@@ -93,7 +98,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
     requires
         detail::readable_vector_engine<ET2>
     {
-        m_data.assign(rhs);
+        support_type::vector_assign_from(*this, rhs);
         return *this;
     }
 
@@ -103,7 +108,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
     requires
         detail::convertible_from<T, T2>
     {
-        m_data.assign(rhs);
+        support_type::vector_assign_from(*this, rhs);
         return *this;
     }
 
@@ -128,7 +133,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
     requires
         detail::reshapable_msd<storage_type>
     {
-        m_data.reshape(newsize, newcap);
+        do_reshape(newsize, newcap);
     }
 
     //- Element access
@@ -163,7 +168,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
     inline constexpr void
     swap(matrix_storage_engine& rhs) noexcept
     {
-        support::swap(m_data, rhs.m_data);
+        support_type::swap(m_data, rhs.m_data);
     }
 
   private:
@@ -183,6 +188,44 @@ class matrix_storage_engine<T, extents<N>, A, L>
         }
     }
 
+    void
+    do_reshape(ptrdiff_t newsize, ptrdiff_t newcap)
+    {
+        if (newsize == m_data.m_size) return;
+
+        support_type::verify_size(newsize);
+        support_type::verify_capacity(newcap);
+
+        //- Only reallocate new storage if we have to.
+        //
+        if (newsize > m_data.m_cap  ||  newcap != m_data.m_cap)
+        {
+            //- Normalize requested new capacity.
+            //
+            newcap = max(newsize, newcap);
+
+            //- Prepare a temporary engine to receive elements from this one.
+            //
+            this_type   tmp;
+            tmp.m_data.m_elems.resize(newcap);
+            tmp.m_data.m_size = newsize;
+            tmp.m_data.m_cap  = newcap;
+
+            //- Move the appropriate subset of elements into the temporary engine, then swap.
+            //
+            ptrdiff_t   dst_size = min(newsize, m_data.m_size);
+            support_type::move_elements(tmp, *this, dst_size);
+            support_type::swap(m_data, tmp.m_data);
+        }
+        else
+        {
+            if (newsize < m_data.m_size)
+            {
+                support_type::fill(*this, newsize, m_data.m_size, T{});
+                m_data.m_size = newsize;
+            }
+        }
+    }
 };
 
 
@@ -448,10 +491,16 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     requires
         detail::row_reshapable_msd<storage_type>
     {
-        if constexpr (detail::reshapable_msd<storage_type>)
-            do_reshape(rows, m_data.m_cols, rowcap, m_data.m_colcap);
-        else
-            do_reshape_rows(rows, rowcap);
+        do_reshape_rows(rows, rowcap);
+    }
+
+    inline constexpr void
+    reshape_rows(index_type rows, index_type rowcap)
+    requires
+        detail::row_reshapable_msd<storage_type>    and
+        detail::reshapable_msd<storage_type>
+    {
+        do_reshape(rows, m_data.m_cols, rowcap, m_data.m_colcap);
     }
 
     //- Other modifiers

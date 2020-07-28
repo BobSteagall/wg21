@@ -462,7 +462,7 @@ struct vector_engine_support : public common_engine_support
     {
         auto    elems = static_cast<typename ET::index_type>(src_elems);
 
-        if constexpr (reshapable_matrix_engine<ET>)
+        if constexpr (reshapable_vector_engine<ET>)
         {
             dst.reshape(elems, dst.capacity());
         }
@@ -571,7 +571,7 @@ struct vector_engine_support : public common_engine_support
 
         for (;  i1 < n1;  ++i1, ++i2)
         {
-            if (lhs(i1) != rhs(i2)) return false;
+            if (not (lhs(i1) == rhs(i2))) return false;
         }
         return true;
     }
@@ -596,7 +596,7 @@ struct vector_engine_support : public common_engine_support
 
         for (;  i1 < n1;  ++i1, ++i2)
         {
-            if (lhs(i1) != rhs(i2)) return false;
+            if (not (lhs(i1) == rhs(i2))) return false;
         }
         return true;
     }
@@ -620,110 +620,46 @@ struct vector_engine_support : public common_engine_support
 
         for (;  i1 < n1;  ++i1, ++i2)
         {
-            if (lhs(i1) != *i2) return false;
+            if (not (lhs(i1) == rhs(i2))) return false;
         }
         return true;
     }
 
-    template<class ET, class IT, class FN>
-    static constexpr void
-    apply(ET& dst, IT i0, IT j0, IT i1, IT j1, FN fn)
-    requires
-        writable_matrix_engine<ET>
-    {
-        if constexpr (row_major_engine<ET>)
-        {
-            for (auto i = i0;  i < i1;  ++i)
-            {
-                for (auto j = j0;  j < j1;  ++j)
-                {
-                    dst(i, j) = fn(i, j);
-                }
-            }
-        }
-        else
-        {
-            for (auto j = j0;  j < j1;  ++j)
-            {
-                for (auto i = i0;  i < i1;  ++i)
-                {
-                    dst(i, j) = fn(i, j);
-                }
-            }
-        }
-    }
-
-    //- Fill the specified range of columns of an MSE with some value.
+    //- Fill the specified range of element of a writable vector engine with some value.
     //
     template<class ET, class JT0, class JT1, class T>
     static inline constexpr void
-    fill_columns(ET& dst, JT0 c0, JT1 c1, T const& t)
+    fill(ET& dst, JT0 e0, JT1 e1, T const& t)
     requires
-        writable_matrix_engine<ET>  and
+        writable_vector_engine<ET>  and
         same_as<typename ET::element_type, T>
     {
         using index_type = typename ET::index_type;
 
-        auto    i0 = static_cast<index_type>(0);
-        auto    j0 = static_cast<index_type>(c0);
-        auto    i1 = dst.rows();
-        auto    j1 = static_cast<index_type>(c1);
+        auto    i0 = static_cast<index_type>(e0);
+        auto    i1 = static_cast<index_type>(e1);
 
-        apply(dst, i0, j0, i1, j1, [&t](index_type, index_type){  return t;  });
+        for (auto i = i0;  i < i1;  ++i)
+        {
+            dst(i) = t;
+        }
     }
 
-    //- Fill the specified range of rows of an MSE with some value.
+    //- Move the specified range of element of a writable vector engine with some value.
     //
-    template<class ET, class IT0, class IT1, class T>
+    template<class ET, class IT>
     static inline constexpr void
-    fill_rows(ET& dst, IT0 r0, IT1 r1, T const& t)
-    requires
-        writable_matrix_engine<ET>  and
-        same_as<typename ET::element_type, T>
-    {
-        using index_type = typename ET::index_type;
-
-        auto    i0 = static_cast<index_type>(r0);
-        auto    j0 = static_cast<index_type>(0);
-        auto    i1 = static_cast<index_type>(r1);
-        auto    j1 = dst.columns();
-
-        apply(dst, i0, j0, i1, j1, [&t](index_type, index_type){  return t;  });
-    }
-
-    //- Move elements from a source MSE into a destination MSE.
-    //
-    template<class ET, class IT, class JT>
-    static inline constexpr void
-    move_elements(ET& dst, ET& src, IT rows, JT cols)
+    move_elements(ET& dst, ET& src, IT size)
     {
         using index_type = typename ET::index_type;
 
         auto    i0 = static_cast<index_type>(0);
-        auto    j0 = static_cast<index_type>(0);
-        auto    i1 = static_cast<index_type>(rows);
-        auto    j1 = static_cast<index_type>(cols);
+        auto    i1 = static_cast<index_type>(size);
 
-        apply(dst, i0, j0, i1, j1,
-              [&src](index_type i, index_type j){  return std::move(src(i, j));  });
-    }
-
-    using dyn_extents = extents<dynamic_extent, dynamic_extent>;
-    using dyn_layout  = layout_stride<dynamic_extent, dynamic_extent>;
-    using dyn_strides = array<typename dyn_extents::index_type, 2>;
-    using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
-
-    template<class T, class ST> inline constexpr
-    basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>
-    make_dynamic_span(T* pdata, ST rows, ST cols, ST row_stride, ST col_stride)
-    {
-        using idx_t = typename dyn_mat_extents::index_type;
-
-        dyn_mat_extents     extents(static_cast<idx_t>(rows), static_cast<idx_t>(cols));
-        dyn_mat_strides     strides{static_cast<idx_t>(row_stride), static_cast<idx_t>(col_stride)};
-        dyn_mat_mapping     mapping(extents, strides);
-
-        return basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>(pdata, mapping);
+        for (auto i = i0;  i < i1;  ++i)
+        {
+            dst(i) = std::move(src(i));
+        }
     }
 };
 
