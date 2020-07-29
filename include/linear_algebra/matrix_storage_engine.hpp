@@ -476,12 +476,19 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     inline constexpr void
     reshape_columns(index_type cols, index_type colcap)
     requires
-        detail::column_reshapable_msd<storage_type>
+        detail::column_reshapable_msd<storage_type> and
+        (not detail::reshapable_msd<storage_type>)
     {
-        if constexpr (detail::reshapable_msd<storage_type>)
-            do_reshape(m_data.m_rows, cols, m_data.m_rowcap, colcap);
-        else
-            do_reshape_columns(cols, colcap);
+        do_reshape_columns(cols, colcap);
+    }
+
+    inline constexpr void
+    reshape_columns(index_type cols, index_type colcap)
+    requires
+        detail::column_reshapable_msd<storage_type> and
+        detail::reshapable_msd<storage_type>
+    {
+        do_reshape(m_data.m_rows, cols, m_data.m_rowcap, colcap);
     }
 
     //- Setting row size and capacity.
@@ -489,7 +496,8 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     inline constexpr void
     reshape_rows(index_type rows, index_type rowcap)
     requires
-        detail::row_reshapable_msd<storage_type>
+        detail::row_reshapable_msd<storage_type>    and
+        (not detail::reshapable_msd<storage_type>)
     {
         do_reshape_rows(rows, rowcap);
     }

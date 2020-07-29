@@ -1,7 +1,7 @@
 //==================================================================================================
 //  File:       engine_support.hpp
 //
-//  Summary:    This header defines various types, traits, concepts, and functions used across
+//  Summary:    This header defines various traits, concepts, types, and functions used across
 //              the entire library.
 //==================================================================================================
 //
@@ -10,66 +10,171 @@
 
 namespace STD_LA {
 namespace detail {
-
+//==================================================================================================
+//  TRAITS DEFINITIONS
+//==================================================================================================
+//
+//- Forward declaration of struct mse_data<T, X, A, L>, which contains the element data used by
+//  specializations of matrix_storage_engine<T, X, A, L>.
+//
 template<class T, class X, class A, class L>    struct mse_data;
 
-//------
+
+//--------------------------------------------------------------------------------------------------
+//  Traits:     is_mse_data<T>
+//
+//  This private traits type determines whether its template parameter is a specialization of
+//  mse_data<T, X, A, L> with an extents type (i.e., X) that is one- or two-dimensional.
+//--------------------------------------------------------------------------------------------------
 //
 template<class T>
-struct is_one_d_mdspan : public false_type
+struct is_mse_data : public false_type
+{};
+
+template<class T, ptrdiff_t N, class A, class L>
+struct is_mse_data<mse_data<T, extents<N>, A, L>> : public true_type
+{};
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
+struct is_mse_data<mse_data<T, extents<R, C>, A, L>> : public true_type
+{};
+
+template<class T> inline constexpr
+bool    is_mse_data_v = is_mse_data<T>::value;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Traits: is_valid_engine_extents<X>
+//
+//  This private traits type is used to validate an engine's extents template argument.  The
+//  extents parameter must be a one- or two-dimensional, and each dimension's template argument
+//  may have only a certain set of values.
+//--------------------------------------------------------------------------------------------------
+//
+template<class X>
+struct is_valid_engine_extents : public false_type {};
+
+template<ptrdiff_t N>
+struct is_valid_engine_extents<extents<N>>
+{
+    static constexpr bool   value = (N == dynamic_extent || N > 0);
+};
+
+template<ptrdiff_t R, ptrdiff_t C>
+struct is_valid_engine_extents<extents<R,C>>
+{
+    static constexpr bool   value = (R == dynamic_extent || R > 0) && (C == dynamic_extent || C > 0);
+};
+
+template<class T> inline constexpr
+bool    is_valid_engine_extents_v = is_valid_engine_extents<T>::value;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Traits:     is_1d_mdspan<T>
+//
+//  This private traits type determines whether its template parameter is a specialization of
+//  basic_mdspan<T, X, L, A> with a one-dimensional extents template parameter.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T>
+struct is_1d_mdspan : public false_type
 {};
 
 template<class T, class L, class A, ptrdiff_t N>
-struct is_one_d_mdspan<basic_mdspan<T, extents<N>, L, A>> : public true_type
+struct is_1d_mdspan<basic_mdspan<T, extents<N>, L, A>> : public true_type
 {};
 
 template<class T> inline constexpr
-bool    is_one_d_mdspan_v = is_one_d_mdspan<T>::value;
+bool    is_1d_mdspan_v = is_1d_mdspan<T>::value;
 
-//------
+
+//--------------------------------------------------------------------------------------------------
+//  Traits:     is_2d_mdspan<T>
+//
+//  This private traits type determines whether its template parameter is a specialization of
+//  basic_mdspan<T, X, L, A> with a two-dimensional extents template parameter.
+//--------------------------------------------------------------------------------------------------
 //
 template<class T>
-struct is_two_d_mdspan : public false_type
+struct is_2d_mdspan : public false_type
 {};
 
 template<class T, class L, class A, ptrdiff_t R, ptrdiff_t C>
-struct is_two_d_mdspan<basic_mdspan<T, extents<R, C>, L, A>> : public true_type
+struct is_2d_mdspan<basic_mdspan<T, extents<R, C>, L, A>> : public true_type
 {};
 
 template<class T> inline constexpr
-bool    is_two_d_mdspan_v = is_two_d_mdspan<T>::value;
+bool    is_2d_mdspan_v = is_2d_mdspan<T>::value;
 
-//------
+
+//--------------------------------------------------------------------------------------------------
+//  Traits:     nested_mdspan_types<T>
+//  Aliases:    engine_mdspan_t<T> and const_engine_mdspan_t<T>
+//
+//  This private traits type and the associated alias templates determine whether or not the
+//  template parameter type has nested type aliases "span_type" and "const_span_type".  If both
+//  aliases are present, then the associated aliases templates refer to the corresponding types.
+//  Otherwise, the alias templates refer to the void type.
+//--------------------------------------------------------------------------------------------------
 //
 template<class ET, class = void>
-struct engine_mdspan_types
+struct nested_mdspan_types
 {
     using span_type       = void;
     using const_span_type = void;
 };
 
 template<class ET>
-struct engine_mdspan_types<ET, void_t<typename ET::span_type, typename ET::const_span_type>>
+struct nested_mdspan_types<ET, void_t<typename ET::span_type, typename ET::const_span_type>>
 {
     using span_type       = typename ET::span_type;
     using const_span_type = typename ET::const_span_type;
 };
 
 template<class ET>
-using engine_mdspan_t = typename engine_mdspan_types<ET>::span_type;
+using engine_mdspan_t = typename nested_mdspan_types<ET>::span_type;
 
 template<class ET>
-using engine_const_mdspan_t = typename engine_mdspan_types<ET>::const_span_type;
+using engine_const_mdspan_t = typename nested_mdspan_types<ET>::const_span_type;
 
 
+//==================================================================================================
+//  CONCEPT DEFINITIONS
+//==================================================================================================
 //--------------------------------------------------------------------------------------------------
-//  Concepts:   same_types<T, U>,  same_as<T, U>,  convertible_element<T, U>
+//  Concepts:   convertible_from<DST, SRC>
+//              constructible_from<DST, SRC>
+//              assignable_from<DST, SRC>
 //
-//  These are some simple private utility concepts, used by the other concepts below.
+//              not_convertible_from<DST, SRC>
+//              not_constructible_from<DST, SRC>
+//              not_assignable_from<DST, SRC>
+//
+//  These are some simple private concepts, and their logical complements, that simply wrap
+//  corresponding standard concepts from namespace std.
 //--------------------------------------------------------------------------------------------------
 //
 template<class DST, class SRC>
-concept convertible_from = convertible_to<SRC, DST>;
+concept convertible_from = std::convertible_to<SRC, DST>;
+
+template<class DST, class SRC>
+concept constructible_from = std::constructible_from<DST, SRC>;
+
+template<class DST, class SRC>
+concept assignable_from = std::assignable_from<DST, SRC>;
+
+
+template<class DST, class SRC>
+concept not_convertible_from = not std::convertible_to<SRC, DST>;
+
+template<class DST, class SRC>
+concept not_constructible_from = not std::constructible_from<DST, SRC>;
+
+template<class DST, class SRC>
+concept not_assignable_from = not std::assignable_from<DST, SRC>;
+
+
 
 
 template<class DST, class SRC>
@@ -103,16 +208,83 @@ concept assignable_from_1d_list = assignable_from<DST, initializer_list<SRC>>;
 template<class DST, class SRC>
 concept assignable_from_2d_list = assignable_from<DST, initializer_list<initializer_list<SRC>>>;
 
+//--------------------------------------------------------------------------------------------------
+//  Concept:    valid_mse_allocator<A, T>
+//
+//  This private concept is used to validate the third template argument of matrix_storage_engine,
+//  the allocator type.  It must be void, or it must be possible to instantiate a specialization
+//  of allocator_traits<A> that meets certain requirements relative to element type T, such as
+//  allocator_traits<A>::value_type is the same type as T.
+//--------------------------------------------------------------------------------------------------
+//
+template<typename T>
+concept no_allocator = same_as<T, void>;
+
+#if defined(LA_COMPILER_GCC) && ((LA_GCC_VERSION == 9) || (LA_GCC_VERSION == 10))
+    //- Neither GCC 9 nor GCC 10 can parse the type requirement 'AT::template rebind_alloc<T>',
+    //  so we add a level of indirection and hoist it up into its own alias template.
+    //
+    template<class AT, class T>
+    using at_rebind_alloc_t = typename AT::template rebind_alloc<T>;
+
+    template<typename AT, typename T>
+    concept valid_allocator_traits =
+        requires (typename AT::allocator_type a, typename AT::pointer p, typename AT::size_type n)
+        {
+            typename AT::allocator_type;
+            typename AT::value_type;
+            typename AT::size_type;
+            typename AT::pointer;
+            typename at_rebind_alloc_t<AT, T>;
+            requires is_same_v<T, typename AT::value_type>;
+            { AT::deallocate(a, p, n) };
+            { AT::allocate(a, n) } -> same_as<typename AT::pointer>;
+            { static_cast<T*>(p) };
+        #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
+            { *p   } -> same_as<T&>;
+            { p[n] } -> same_as<T&>;
+        #else
+            requires is_same_v<decltype(*p), T&>;
+            requires is_same_v<decltype(p[n]), T&>;
+        #endif
+        };
+#else
+    //- Clang 10 and VC++ 16.5 accept the following without any problems.
+    //
+    template<typename AT, typename T>
+    concept valid_allocator_traits =
+        requires (typename AT::allocator_type a, typename AT::pointer p, typename AT::size_type n)
+        {
+            typename AT::allocator_type;
+            typename AT::value_type;
+            typename AT::size_type;
+            typename AT::pointer;
+            typename AT::template rebind_alloc<T>;
+            requires is_same_v<T, typename AT::value_type>;
+            { AT::deallocate(a, p, n) };
+            { AT::allocate(a, n) } -> same_as<typename AT::pointer>;
+            { static_cast<T*>(p) };
+            { *p   } -> same_as<T&>;
+            { p[n] } -> same_as<T&>;
+        };
+#endif
+
+//- Concept definition.
+//
+template<typename A, typename T>
+concept valid_mse_allocator = no_allocator<A> or valid_allocator_traits<allocator_traits<A>, T>;
+
+
 
 template<class ET>
-concept one_d_indexable =
+concept indexable_in_1d =
     requires (ET& eng, typename ET::index_type i)
     {
         { eng(i) };
     };
 
 template<class ET>
-concept two_d_indexable =
+concept indexable_in_2d =
     requires (ET& eng, typename ET::index_type i)
     {
         { eng(i, i) };
@@ -166,7 +338,26 @@ concept readable_vector_engine =
         requires is_same_v<decltype(eng.capacity()), typename ET::index_type>;
         requires is_same_v<decltype(eng(i)), typename ET::const_reference>;
     #endif
-    };
+    }
+    /*or
+    requires (ET const& eng, typename ET::size_type i)
+    {
+        typename ET::value_type;
+        typename ET::size_type;
+        typename ET::reference;
+        typename ET::const_reference;
+        requires is_lvalue_reference_v<typename ET::reference>;
+
+    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
+        { eng.size() } -> same_as<typename ET::size_type>;
+        { eng[i]     } -> same_as<typename ET::const_reference>;
+    #else
+        requires is_same_v<decltype(eng.size()), typename ET::size_type>;
+        requires is_same_v<decltype(eng[i]), typename ET::const_reference>;
+    #endif
+    }*/
+    ;
+
 
 template<class ET>
 concept readable_matrix_engine =
@@ -201,10 +392,10 @@ template<class ET>
 concept readable_engine = readable_matrix_engine<ET> or readable_vector_engine<ET>;
 
 template<class ET>
-concept readable_vector_engine_only = readable_vector_engine<ET> and (not two_d_indexable<ET>);
+concept readable_vector_engine_only = readable_vector_engine<ET> and (not indexable_in_2d<ET>);
 
 template<class ET>
-concept readable_matrix_engine_only = readable_matrix_engine<ET> and (not one_d_indexable<ET>);
+concept readable_matrix_engine_only = readable_matrix_engine<ET> and (not indexable_in_1d<ET>);
 
 
 //--------------------------------------------------------------------------------------------------
@@ -275,8 +466,8 @@ concept spannable_vector_engine =
     {
         typename ET::span_type;
         typename ET::const_span_type;
-        requires is_one_d_mdspan_v<typename ET::span_type>;
-        requires is_one_d_mdspan_v<typename ET::const_span_type>;
+        requires is_1d_mdspan_v<typename ET::span_type>;
+        requires is_1d_mdspan_v<typename ET::const_span_type>;
 
     #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { meng.span() } -> same_as<typename ET::span_type>;
@@ -294,8 +485,8 @@ concept spannable_matrix_engine =
     {
         typename ET::span_type;
         typename ET::const_span_type;
-        requires is_two_d_mdspan_v<typename ET::span_type>;
-        requires is_two_d_mdspan_v<typename ET::const_span_type>;
+        requires is_2d_mdspan_v<typename ET::span_type>;
+        requires is_2d_mdspan_v<typename ET::const_span_type>;
 
     #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { meng.span() } -> same_as<typename ET::span_type>;
@@ -352,6 +543,9 @@ concept row_reshapable_matrix_engine =
     };
 
 
+//==================================================================================================
+//  TYPE DEFINITIONS
+//==================================================================================================
 //---------------------------------------------------//--------------------------------------------------------------------------------------------------
 //  Class Template:     common_engine_support
 //
@@ -487,12 +681,11 @@ struct vector_engine_support : public common_engine_support
         using index_type_dst = typename ET1::index_type;
         using index_type_src = typename ET2::index_type;
 
+        index_type_dst  di = 0;
+        index_type_src  si = 0;
         index_type_src  sn = src.size();
 
         verify_and_reshape(dst, sn);
-
-        index_type_dst  di = 0;
-        index_type_src  si = 0;
 
         for (;  si < sn;  ++di, ++si)
         {
@@ -510,12 +703,11 @@ struct vector_engine_support : public common_engine_support
         using index_type_dst = typename ET::index_type;
         using index_type_src = typename basic_mdspan<T, extents<X0>, L, A>::index_type;
 
+        index_type_dst  di = 0;
+        index_type_src  si = 0;
         index_type_src  sn = src.extent(0);
 
         verify_and_reshape(dst, sn);
-
-        index_type_dst  di = 0;
-        index_type_src  si = 0;
 
         for (;  si < sn;  ++di, ++si)
         {

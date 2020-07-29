@@ -12,8 +12,9 @@ namespace STD_LA {
 
 template<class ET, class OT>
 requires
-    detail::matrix_engine_lifetime<ET>  and
-    detail::readable_matrix_engine<ET>
+    copyable<ET>
+    and default_initializable<ET>
+    and detail::readable_matrix_engine<ET>
 class basic_matrix
 {
     static constexpr bool   engine_has_mdspan = detail::spannable_matrix_engine<ET>;
@@ -65,7 +66,7 @@ class basic_matrix
     basic_matrix(basic_matrix<ET2, OT2> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>                 and
-        detail::constructible_from_engine<engine_type, ET2>
+        detail::constructible_from<engine_type, ET2>
     :   m_engine(rhs)
     {}
 
@@ -74,7 +75,7 @@ class basic_matrix
     basic_matrix(basic_matrix<ET2, OT2> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>                 and
-        (not detail::constructible_from_engine<engine_type, ET2>)   and
+        detail::not_constructible_from<engine_type, ET2>   and
         detail::convertible_from<element_type, typename ET2::element_type>
     :   m_engine()
     {
@@ -88,7 +89,7 @@ class basic_matrix
     basic_matrix(basic_mdspan<T2, extents<X0, X1>, L, A> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>                 and
-        detail::assignable_from_2d_mdspan<engine_type, T2, X0, X1, L, A>
+        detail::constructible_from_2d_mdspan<engine_type, T2, X0, X1, L, A>
     :   m_engine(rhs)
     {}
 
@@ -97,7 +98,7 @@ class basic_matrix
     basic_matrix(basic_mdspan<T2, extents<X0, X1>, L, A> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>                             and
-        (not detail::assignable_from_2d_mdspan<engine_type, T2, X0, X1, L, A>)  and
+        detail::not_assignable_from<engine_type, decltype(rhs)>  and
         detail::convertible_from<element_type, T2>
     :   m_engine()
     {
@@ -527,8 +528,9 @@ class basic_matrix
   private:
     template<class ET2, class OT2>
     requires
-        detail::matrix_engine_lifetime<ET2>   and
-        detail::readable_matrix_engine<ET2>
+        copyable<ET2>
+        and default_initializable<ET2>
+        and detail::readable_matrix_engine<ET2>
     friend class basic_matrix;
 
     //template<class ET2, class OT2> friend class basic_vector;

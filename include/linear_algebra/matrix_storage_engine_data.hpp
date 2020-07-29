@@ -18,10 +18,11 @@ namespace detail {
 //  specializations of matrix_storage_engine.  They provide the special member functions that make
 //  sense for each valid set of template arguments.
 //
-//  The implementation assumes that all dynamically-allocated memory is default-constructed,
-//  with the consequence that elements lying in unused capacity are also constructed.  This
-//  assumption makes implementation easy, but may be absent in the final version.
-//--------------------------------------------------------------------------------------------------
+//  This implementation assumes that all dynamically-allocated memory is default-constructed,
+//  with the consequence that elements lying in unused capacity are also constructed with value
+//  equal to that of a value-initialized element (i.e., "0").
+//
+//  This assumption makes implementation easy, but may be absent in the final version.
 //--------------------------------------------------------------------------------------------------
 //  Specialization:     mse_data<T, extents<N>, void, L>
 //
@@ -338,6 +339,30 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
     mse_data&   operator =(mse_data&&) noexcept = default;
     mse_data&   operator =(mse_data const&) = default;
 };
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concepts:   linearly_indexable<MSD>
+//              reshapable<MSD>
+//              column_reshapable<MSD>
+//              row_reshapable<MSD>
+//
+//  These private concepts are used to probe various properties of the mse_data specializations
+//  defined above.
+//--------------------------------------------------------------------------------------------------
+//
+template<typename MSD>
+concept linearly_indexable_msd = MSD::is_linearly_indexable;
+
+template<typename MSD>
+concept reshapable_msd = MSD::is_reshapable;
+
+template<typename MSD>
+concept column_reshapable_msd = MSD::is_column_reshapable;
+
+template<typename MSD>
+concept row_reshapable_msd = MSD::is_row_reshapable;
+
 
 }       //- detail namespace
 }       //- STD_LA namespace
