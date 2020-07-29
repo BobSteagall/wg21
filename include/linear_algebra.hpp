@@ -57,6 +57,7 @@
 
 #include <array>
 #include <complex>
+#include <deque>
 #include <initializer_list>
 #include <memory>
 #include <tuple>
@@ -65,42 +66,6 @@
 
 #if defined(LA_STD_CONCEPTS_HEADER_SUPPORTED)
     #include <concepts>
-#else
-namespace std
-{
-    template<class T, class U>
-    concept same_as_helper = is_same_v<T, U>;
-
-    template<class T, class U>
-    concept same_as = same_as_helper<T, U> and same_as_helper<U, T>;
-
-    template <class From, class To>
-    concept convertible_to =
-        is_convertible_v<From, To> and
-        requires(add_rvalue_reference_t<From>(&f)())
-        {
-            static_cast<To>(f());
-        };
-
-    //- Rather than try to re-implement these complex library concepts here, there are instead
-    //  implemented as tautologies for compilers which don't yet have complete implementations
-    //  of the standard concepts defined in <concepts>.
-    //
-    template<class T>
-    concept default_initializable = true;
-
-    template<class T>
-    concept copyable = true;
-
-    template <class T>
-    concept destructible = is_nothrow_destructible_v<T>;
-
-    template<class T, class... Args>
-    concept constructible_from = destructible<T> and is_constructible_v<T, Args...>;
-
-    template<class DST, class SRC>
-    concept assignable_from = is_assignable_v<DST, SRC>;
-}
 #endif
 
 //- Disable some unnecessary compiler warnings coming from mdspan.
@@ -163,7 +128,6 @@ namespace STD_LA
 #include "linear_algebra/arithmetic_operators.hpp"
 
 #include "linear_algebra/engine_support.hpp"
-#include "linear_algebra/matrix_storage_engine_support.hpp"
 #include "linear_algebra/matrix_storage_engine_data.hpp"
 #include "linear_algebra/matrix_storage_engine.hpp"
 #include "linear_algebra/basic_matrix.hpp"

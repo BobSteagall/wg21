@@ -29,9 +29,9 @@ namespace STD_LA {
 //
 template<class T, ptrdiff_t N, class A, class L>
 requires
-    detail::valid_mse_extents<extents<N>>   and
-    detail::valid_mse_allocator<A, T>       and
-    detail::valid_mse_vector_layout<L>
+    detail::valid_engine_extents<extents<N>>   and
+    detail::valid_engine_allocator<A, T>       and
+    detail::valid_layout_for_1d_storage_engine<L>
 class matrix_storage_engine<T, extents<N>, A, L>
 {
     using this_type    = matrix_storage_engine;
@@ -248,9 +248,9 @@ class matrix_storage_engine<T, extents<N>, A, L>
 //
 template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
 requires
-    detail::valid_mse_extents<extents<R, C>>    and
-    detail::valid_mse_allocator<A, T>           and
-    detail::valid_mse_matrix_layout<L>
+    detail::valid_engine_extents<extents<R, C>>    and
+    detail::valid_engine_allocator<A, T>           and
+    detail::valid_layout_for_2d_storage_engine<L>
 class matrix_storage_engine<T, extents<R, C>, A, L>
 {
     using this_type    = matrix_storage_engine;

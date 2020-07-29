@@ -21,7 +21,8 @@ template<class T, class X, class A, class L>    struct mse_data;
 
 
 //--------------------------------------------------------------------------------------------------
-//  Traits:     is_mse_data<T>
+//  Trait:      is_mse_data<T>
+//  Alias:      is_mse_data_v<T>
 //
 //  This private traits type determines whether its template parameter is a specialization of
 //  mse_data<T, X, A, L> with an extents type (i.e., X) that is one- or two-dimensional.
@@ -44,11 +45,12 @@ bool    is_mse_data_v = is_mse_data<T>::value;
 
 
 //--------------------------------------------------------------------------------------------------
-//  Traits: is_valid_engine_extents<X>
+//  Trait:      is_valid_engine_extents<X>
+//  Alias:      is_valid_engine_extents_v<X>
 //
 //  This private traits type is used to validate an engine's extents template argument.  The
-//  extents parameter must be a one- or two-dimensional, and each dimension's template argument
-//  may have only a certain set of values.
+//  extents parameter must be one- or two-dimensional, and each dimension's template argument
+//  may have only a specific set of values.
 //--------------------------------------------------------------------------------------------------
 //
 template<class X>
@@ -71,7 +73,8 @@ bool    is_valid_engine_extents_v = is_valid_engine_extents<T>::value;
 
 
 //--------------------------------------------------------------------------------------------------
-//  Traits:     is_1d_mdspan<T>
+//  Trait:      is_1d_mdspan<T>
+//  Alias:      is_1d_mdspan_v<T>
 //
 //  This private traits type determines whether its template parameter is a specialization of
 //  basic_mdspan<T, X, L, A> with a one-dimensional extents template parameter.
@@ -109,7 +112,7 @@ bool    is_2d_mdspan_v = is_2d_mdspan<T>::value;
 
 
 //--------------------------------------------------------------------------------------------------
-//  Traits:     nested_mdspan_types<T>
+//  Trait:      nested_mdspan_types<T>
 //  Aliases:    engine_mdspan_t<T> and const_engine_mdspan_t<T>
 //
 //  This private traits type and the associated alias templates determine whether or not the
@@ -139,6 +142,34 @@ template<class ET>
 using engine_const_mdspan_t = typename nested_mdspan_types<ET>::const_span_type;
 
 
+//--------------------------------------------------------------------------------------------------
+//  Trait:      is_indexable_standard_sequence<X>
+//  Alias:      is_indexable_standard_sequence_v<X>
+//
+//  This private traits type determines whether the template parameter is a specialization
+//  of std::array, std::deque, or std::vector.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T>
+struct is_indexable_standard_sequence : public false_type
+{};
+
+template<class T, std::size_t N>
+struct is_indexable_standard_sequence<std::array<T, N>> : public true_type
+{};
+
+template<class T, class A>
+struct is_indexable_standard_sequence<std::deque<T, A>> : public true_type
+{};
+
+template<class T, class A>
+struct is_indexable_standard_sequence<std::vector<T, A>> : public true_type
+{};
+
+template<class T> inline constexpr
+bool    is_indexable_standard_sequence_v = is_indexable_standard_sequence<T>::value;
+
+
 //==================================================================================================
 //  CONCEPT DEFINITIONS
 //==================================================================================================
@@ -152,127 +183,154 @@ using engine_const_mdspan_t = typename nested_mdspan_types<ET>::const_span_type;
 //              not_assignable_from<DST, SRC>
 //
 //  These are some simple private concepts, and their logical complements, that simply wrap
-//  corresponding standard concepts from namespace std.
+//  corresponding standard concepts from namespace std.  This wrapping occurs because some of
+//  the tested compilers do not yet implement the standard concepts library in <concepts>.
+//
+//  If <concepts> exists, this implementation wraps the concepts it uses; if <concepts> does not
+//  exist, then we fake it.  The first reason for wrapping is consistencey and readability; the
+//  second reason is to keep the temporary "fake" concepts out of the std namespace.
 //--------------------------------------------------------------------------------------------------
 //
-template<class DST, class SRC>
-concept convertible_from = std::convertible_to<SRC, DST>;
+#if defined(LA_STD_CONCEPTS_HEADER_SUPPORTED)
 
-template<class DST, class SRC>
-concept constructible_from = std::constructible_from<DST, SRC>;
+    template<class T, class U>
+    concept same_as = std::same_as<T, U>;
 
-template<class DST, class SRC>
-concept assignable_from = std::assignable_from<DST, SRC>;
+    template<class T>
+    concept default_initializable = std::default_initializable<T>;
 
+    template<class T>
+    concept copyable = std::copyable<T>;
 
-template<class DST, class SRC>
-concept not_convertible_from = not std::convertible_to<SRC, DST>;
+    template<class DST, class SRC>
+    concept convertible_from = std::convertible_to<SRC, DST>;
 
-template<class DST, class SRC>
-concept not_constructible_from = not std::constructible_from<DST, SRC>;
+    template<class DST, class SRC>
+    concept constructible_from = std::constructible_from<DST, SRC>;
 
-template<class DST, class SRC>
-concept not_assignable_from = not std::assignable_from<DST, SRC>;
+    template<class DST, class SRC>
+    concept assignable_from = std::assignable_from<DST, SRC>;
 
+    template<class DST, class SRC>
+    concept not_convertible_from = not std::convertible_to<SRC, DST>;
 
+    template<class DST, class SRC>
+    concept not_constructible_from = not std::constructible_from<DST, SRC>;
 
+    template<class DST, class SRC>
+    concept not_assignable_from = not std::assignable_from<DST, SRC>;
 
-template<class DST, class SRC>
-concept constructible_from_engine = constructible_from<DST, SRC>;
+#else
 
-template<class DST, class T, ptrdiff_t X0, class L, class A>
-concept constructible_from_1d_mdspan = constructible_from<DST, basic_mdspan<T, extents<X0>, L, A>>;
+    template<class T, class U>
+    concept same_as_helper = is_same_v<T, U>;
 
-template<class DST, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
-concept constructible_from_2d_mdspan = constructible_from<DST, basic_mdspan<T, extents<X0, X1>, L, A>>;
+    template<class T, class U>
+    concept same_as = same_as_helper<T, U> and same_as_helper<U, T>;
 
-template<class DST, class SRC>
-concept constructible_from_1d_list = constructible_from<DST, initializer_list<SRC>>;
+    template <class From, class To>
+    concept convertible_to =
+        is_convertible_v<From, To> and
+        requires(add_rvalue_reference_t<From>(&f)())
+        {
+            static_cast<To>(f());
+        };
 
-template<class DST, class SRC>
-concept constructible_from_2d_list = constructible_from<DST, initializer_list<initializer_list<SRC>>>;
+    template<class DST, class SRC>
+    concept convertible_from = convertible_to<SRC, DST>;
 
+    //- Rather than try to re-implement these complex library concepts here, there are instead
+    //  implemented as tautologies for compilers which don't yet have complete implementations
+    //  of the standard concepts defined in <concepts>.
+    //
+    template<class T>
+    concept default_initializable = true;
 
-template<class DST, class SRC>
-concept assignable_from_engine = assignable_from<DST, SRC>;
+    template<class T>
+    concept copyable = true;
 
-template<class DST, class T, ptrdiff_t X0, class L, class A>
-concept assignable_from_1d_mdspan = assignable_from<DST, basic_mdspan<T, extents<X0>, L, A>>;
+    template <class T>
+    concept destructible = std::is_nothrow_destructible_v<T>;
 
-template<class DST, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
-concept assignable_from_2d_mdspan = assignable_from<DST, basic_mdspan<T, extents<X0, X1>, L, A>>;
+    template<class T, class... Args>
+    concept constructible_from = destructible<T> and std::is_constructible_v<T, Args...>;
 
-template<class DST, class SRC>
-concept assignable_from_1d_list = assignable_from<DST, initializer_list<SRC>>;
+    template<class DST, class SRC>
+    concept assignable_from = std::is_assignable_v<DST, SRC>;
 
-template<class DST, class SRC>
-concept assignable_from_2d_list = assignable_from<DST, initializer_list<initializer_list<SRC>>>;
+    template<class DST, class SRC>
+    concept not_convertible_from = not convertible_from<DST, SRC>;
+
+    template<class DST, class SRC>
+    concept not_constructible_from = not constructible_from<DST, SRC>;
+
+    template<class DST, class SRC>
+    concept not_assignable_from = not assignable_from<DST, SRC>;
+
+#endif
+
 
 //--------------------------------------------------------------------------------------------------
-//  Concept:    valid_mse_allocator<A, T>
+//  Concept:    comparable_types<T1, T2>
 //
-//  This private concept is used to validate the third template argument of matrix_storage_engine,
-//  the allocator type.  It must be void, or it must be possible to instantiate a specialization
-//  of allocator_traits<A> that meets certain requirements relative to element type T, such as
-//  allocator_traits<A>::value_type is the same type as T.
+//  This private concept determines whether two objects, of potentially different types, may
+//  be compared using equality operator.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T1, class T2>
+concept comparable_types =
+    requires (T1 t1, T2 t2)
+    {
+    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
+        { t1 == t2 } -> same_as<bool>;
+        { t2 == t1 } -> same_as<bool>;
+    #else
+        requires is_same_v<decltype(t1 == t2), bool>;
+        requires is_same_v<decltype(t2 == t1), bool>;
+    #endif
+    };
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    valid_engine_allocator<A, T>
+//
+//  This private concept determines whether a given type A is an acceptable allocator of type T.
+//  Prospective allocator type A must either: be void; or, it must be possible to instantiate a
+//  specialization of allocator_traits<A> that meets certain requirements relative to allocated
+//  type T, such as allocator_traits<A>::value_type is the same type as T, etc.
 //--------------------------------------------------------------------------------------------------
 //
 template<typename T>
 concept no_allocator = same_as<T, void>;
 
-#if defined(LA_COMPILER_GCC) && ((LA_GCC_VERSION == 9) || (LA_GCC_VERSION == 10))
-    //- Neither GCC 9 nor GCC 10 can parse the type requirement 'AT::template rebind_alloc<T>',
-    //  so we add a level of indirection and hoist it up into its own alias template.
-    //
-    template<class AT, class T>
-    using at_rebind_alloc_t = typename AT::template rebind_alloc<T>;
+template<typename AT, typename T>
+concept valid_allocator_traits =
+    requires
+    {
+        typename AT::allocator_type;
+        typename AT::value_type;
+        typename AT::size_type;
+        typename AT::pointer;
+        typename AT::template rebind_alloc<T>;
+        requires is_same_v<T, typename AT::value_type>;
+    }
+    and
+    requires (typename AT::allocator_type a, typename AT::pointer p, typename AT::size_type n)
+    {
+        { AT::deallocate(a, p, n) };
+        { AT::allocate(a, n) } -> same_as<typename AT::pointer>;
+        { static_cast<T*>(p) };
+    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
+        { *p   } -> same_as<T&>;
+        { p[n] } -> same_as<T&>;
+    #else
+        requires is_same_v<decltype(*p), T&>;
+        requires is_same_v<decltype(p[n]), T&>;
+    #endif
+    };
 
-    template<typename AT, typename T>
-    concept valid_allocator_traits =
-        requires (typename AT::allocator_type a, typename AT::pointer p, typename AT::size_type n)
-        {
-            typename AT::allocator_type;
-            typename AT::value_type;
-            typename AT::size_type;
-            typename AT::pointer;
-            typename at_rebind_alloc_t<AT, T>;
-            requires is_same_v<T, typename AT::value_type>;
-            { AT::deallocate(a, p, n) };
-            { AT::allocate(a, n) } -> same_as<typename AT::pointer>;
-            { static_cast<T*>(p) };
-        #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
-            { *p   } -> same_as<T&>;
-            { p[n] } -> same_as<T&>;
-        #else
-            requires is_same_v<decltype(*p), T&>;
-            requires is_same_v<decltype(p[n]), T&>;
-        #endif
-        };
-#else
-    //- Clang 10 and VC++ 16.5 accept the following without any problems.
-    //
-    template<typename AT, typename T>
-    concept valid_allocator_traits =
-        requires (typename AT::allocator_type a, typename AT::pointer p, typename AT::size_type n)
-        {
-            typename AT::allocator_type;
-            typename AT::value_type;
-            typename AT::size_type;
-            typename AT::pointer;
-            typename AT::template rebind_alloc<T>;
-            requires is_same_v<T, typename AT::value_type>;
-            { AT::deallocate(a, p, n) };
-            { AT::allocate(a, n) } -> same_as<typename AT::pointer>;
-            { static_cast<T*>(p) };
-            { *p   } -> same_as<T&>;
-            { p[n] } -> same_as<T&>;
-        };
-#endif
-
-//- Concept definition.
-//
 template<typename A, typename T>
-concept valid_mse_allocator = no_allocator<A> or valid_allocator_traits<allocator_traits<A>, T>;
+concept valid_engine_allocator = no_allocator<A> or valid_allocator_traits<allocator_traits<A>, T>;
 
 
 
@@ -290,45 +348,43 @@ concept indexable_in_2d =
         { eng(i, i) };
     };
 
-template<class ET>
-concept matrix_engine_lifetime = default_initializable<ET> and copyable<ET>;
-
-
-template<class T1, class T2>
-concept comparable_types =
-    requires (T1 const& t1, T2 const& t2)
-    {
-    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
-        { t1 == t2 } -> same_as<bool>;
-    #else
-        requires is_same_v<decltype(t1 == t2), bool>;
-    #endif
-    };
 
 //--------------------------------------------------------------------------------------------------
-//  Concepts:   readable_vector_engine<ET>
-//              readable_matrix_engine<ET>
-//              readable_engine<ET>
+//  Concept:    readable_engine_nested_types<ET>
 //
-//  These concepts describe the fundamental element readability interface that must be provided
-//  by all vector and matrix engine types in order to function correctly with the most basic
-//  subset of services provided by basic_vector<ET, OT> and basic_matrix<ET, OT>, respectively.
-//
-//  Engines that fulfill these concepts may have the value of their elements read via indexing,
-//  their element sizes and capacities read, and publicly declare several critical nested type
-//  aliases.
+//  This private concept determines whether a prospective vector/matrix engine type provides the
+//  minimum set of public nested type aliases required by all engines.
 //--------------------------------------------------------------------------------------------------
 //
 template<class ET>
-concept readable_vector_engine =
-    requires (ET const& eng, typename ET::index_type i)
+concept readable_engine_nested_types =
+    requires
     {
         typename ET::element_type;
         typename ET::index_type;
         typename ET::reference;
         typename ET::const_reference;
         requires is_lvalue_reference_v<typename ET::reference>;
+    };
 
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    readable_vector_engine<ET>
+//
+//  This private concept determines whether a prospective vector engine type provides the
+//  readability interface required to function correctly with basic_vector<ET, OT>.
+//
+//  Engine types that fulfill this concept may have the value of their elements read via one-
+//  dimensional indexing, their element sizes and capacities read, and publicly declare several
+//  important nested type aliases.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET>
+concept readable_vector_engine =
+    readable_engine_nested_types<ET>
+    and
+    requires (ET const& eng, typename ET::index_type i)
+    {
     #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { eng.size()     } -> same_as<typename ET::index_type>;
         { eng.capacity() } -> same_as<typename ET::index_type>;
@@ -338,37 +394,26 @@ concept readable_vector_engine =
         requires is_same_v<decltype(eng.capacity()), typename ET::index_type>;
         requires is_same_v<decltype(eng(i)), typename ET::const_reference>;
     #endif
-    }
-    /*or
-    requires (ET const& eng, typename ET::size_type i)
-    {
-        typename ET::value_type;
-        typename ET::size_type;
-        typename ET::reference;
-        typename ET::const_reference;
-        requires is_lvalue_reference_v<typename ET::reference>;
-
-    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
-        { eng.size() } -> same_as<typename ET::size_type>;
-        { eng[i]     } -> same_as<typename ET::const_reference>;
-    #else
-        requires is_same_v<decltype(eng.size()), typename ET::size_type>;
-        requires is_same_v<decltype(eng[i]), typename ET::const_reference>;
-    #endif
-    }*/
-    ;
+    };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Concept:    readable_matrix_engine<ET>
+//
+//  This private concept determines whether a prospective matrix engine type provides the
+//  readability interface required to function correctly with basic_matrix<ET, OT>.
+//
+//  Engine types that fulfill this concept may have the value of their elements read via two-
+//  dimensional indexing, their row and column sizes and capacities read, their overall sizes
+//  and capacities read, and publicly declare several important nested type aliases.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 concept readable_matrix_engine =
+    readable_engine_nested_types<ET>
+    and
     requires (ET const& eng, typename ET::index_type i)
     {
-        typename ET::element_type;
-        typename ET::index_type;
-        typename ET::reference;
-        typename ET::const_reference;
-        requires is_lvalue_reference_v<typename ET::reference>;
-
     #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { eng.columns()         } -> same_as<typename ET::index_type>;
         { eng.rows()            } -> same_as<typename ET::index_type>;
@@ -388,8 +433,29 @@ concept readable_matrix_engine =
     #endif
     };
 
+//--------------------------------------------------------------------------------------------------
+//  Concept:    readable_and_1d_indexable_matrix_engine<ET>
+//
+//  This private concept determines whether a prospective matrix engine type fulfills all the
+//  requirements of readable_matrix_engine<ET> and additionally provides one-dimensional read
+//  indexing.  Such engine types may be used to represent matrices whose number of rows/columns
+//  is fixed at 1 at compile-time.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
-concept readable_engine = readable_matrix_engine<ET> or readable_vector_engine<ET>;
+concept readable_and_1d_indexable_matrix_engine =
+    readable_matrix_engine<ET>
+    and
+    requires (ET const& eng, typename ET::index_type i)
+    {
+    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
+        { eng(i) } -> same_as<typename ET::const_reference>;
+    #else
+        requires is_same_v<decltype(eng(i)), typename ET::const_reference>;
+    #endif
+    };
+
+
 
 template<class ET>
 concept readable_vector_engine_only = readable_vector_engine<ET> and (not indexable_in_2d<ET>);
@@ -399,69 +465,102 @@ concept readable_matrix_engine_only = readable_matrix_engine<ET> and (not indexa
 
 
 //--------------------------------------------------------------------------------------------------
-//  Concepts:   writable_vector_engine<ET>
-//              writable_matrix_engine<ET>
-//              writable_engine<ET>
+//  Concept:    writable_vector_engine<ET>
 //
-//  These concepts describe the element writability interface that may be provided by vector
-//  and matrix engine types in order to function correctly the basic_vector<ET, OT> and
-//  basic_matrix<ET, OT> member functions that support element writability.
+//  This private concept determines whether a prospective vector engine type provides the
+//  writability interface required to function correctly with basic_vector<ET, OT>.
 //
-//  Engines that fulfill these concepts fulfill the corresponding readable_*_engine concepts,
-//  and additionally may have the value of their elements changed via indexing.
+//  Engine types that fulfill this concept fulfill the corresponding readable_vector_engine<ET>
+//  concept, and also permit the value of their elements to be changed via indexing.
 //--------------------------------------------------------------------------------------------------
 //
 template<class ET>
 concept writable_vector_engine =
-    readable_vector_engine<ET>  and
+    readable_vector_engine<ET>
+    and
     requires (ET& eng, typename ET::index_type i, typename ET::element_type v)
     {
         requires is_same_v<typename ET::reference, typename ET::element_type&>;
 
     #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
-        { eng(i) } -> same_as<typename ET::reference>;
+        { eng(i)     } -> same_as<typename ET::reference>;
+        { eng(i) = v } -> same_as<typename ET::reference>;
     #else
         requires is_same_v<decltype(eng(i)), typename ET::reference>;
+        requires is_same_v<decltype(eng(i) = v), typename ET::reference>;
     #endif
-
-        { eng(i) = v };
     };
 
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    writable_matrix_engine<ET>
+//
+//  This private concept determines whether a prospective matrix engine type provides the
+//  writability interface required to function correctly with basic_matrix<ET, OT>.
+//
+//  Engine types that fulfill this concept fulfill the corresponding readable_matrix_engine<ET>
+//  concept, and also permit the value of their elements to be changed via indexing.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 concept writable_matrix_engine =
-    readable_matrix_engine<ET>  and
+    readable_matrix_engine<ET>
+    and
     requires (ET& eng, typename ET::index_type i, typename ET::element_type v)
     {
         requires is_same_v<typename ET::reference, typename ET::element_type&>;
 
     #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
-        { eng(i, i) } -> same_as<typename ET::reference>;
+        { eng(i, i)     } -> same_as<typename ET::reference>;
+        { eng(i, i) = v } -> same_as<typename ET::reference>;
     #else
         requires is_same_v<decltype(eng(i, i)), typename ET::reference>;
+        requires is_same_v<decltype(eng(i, i) = v), typename ET::reference>;
     #endif
-
-        { eng(i, i) = v };
     };
 
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    writable_and_1d_indexable_matrix_engine<ET>
+//
+//  This private concept determines whether a prospective matrix engine type fulfills all the
+//  requirements of writable_matrix_engine<ET>, readable_and_1d_indexable_matrix_engine<ET>,
+//  and additionally provides one-dimensional write indexing.  Such engine types may be used
+//  to represent matrices whose number of rows/columns is fixed at 1 at compile-time.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
-concept writable_engine = writable_matrix_engine<ET> or writable_vector_engine<ET>;
+concept writable_and_1d_indexable_matrix_engine =
+    writable_matrix_engine<ET>
+    and
+    readable_and_1d_indexable_matrix_engine<ET>
+    and
+    requires (ET& eng, typename ET::index_type i, typename ET::element_type v)
+    {
+    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
+        { eng(i)     } -> same_as<typename ET::reference>;
+        { eng(i) = v } -> same_as<typename ET::reference>;
+    #else
+        requires is_same_v<decltype(eng(i)), typename ET::reference>;
+        requires is_same_v<decltype(eng(i) = v), typename ET::reference>;
+    #endif
+    };
+
 
 template<class ET>
 concept row_major_engine = true;
 
 //--------------------------------------------------------------------------------------------------
-//  Concepts:   spannable_vector_engine<ET>
-//              spannable_matrix_engine<ET>
-//              spannable_engine<ET>
+//  Concept:    spannable_vector_engine<ET>
 //
-//  These concepts describe the mdspan interface that may be provided by vector and matrix engine
-//  types in order to function correctly the basic_vector<ET, OT> and basic_matrix<ET, OT> member
-//  functions that return mdspan objects.
+//  This private concept determines whether a prospective vector engine type provides the
+//  correct nested mdspan types optionally required by basic_vector<ET, OT>.
 //--------------------------------------------------------------------------------------------------
 //
 template<class ET>
 concept spannable_vector_engine =
-    readable_vector_engine<ET>  and
+    readable_vector_engine<ET>
+    and
     requires (ET const& ceng, ET& meng)
     {
         typename ET::span_type;
@@ -478,9 +577,18 @@ concept spannable_vector_engine =
     #endif
     };
 
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    spannable_matrix_engine<ET>
+//
+//  This private concept determines whether a prospective matrix engine type provides the
+//  correct nested mdspan types optionally required by basic_matrix<ET, OT>.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 concept spannable_matrix_engine =
-    readable_matrix_engine<ET>  and
+    readable_matrix_engine<ET>
+    and
     requires (ET const& ceng, ET& meng)
     {
         typename ET::span_type;
@@ -503,24 +611,33 @@ concept spannable_engine = spannable_matrix_engine<ET> or spannable_vector_engin
 
 //--------------------------------------------------------------------------------------------------
 //  Concepts:   reshapable_vector_engine<ET>
-//              reshapable_matrix_engine<ET>
-//              column_reshapable_matrix_engine<ET>
-//              row_reshapable_matrix_engine<ET>
 //
-//  These concepts specify the interfaces of vector and matrix engines that provde reshaping.
+//  This private concept determines whether a prospective vector engine type provides an interface
+//  for overall reshaping.
 //--------------------------------------------------------------------------------------------------
 //
 template<class ET>
 concept reshapable_vector_engine =
-    writable_vector_engine<ET>  and
+    writable_vector_engine<ET>
+    and
     requires (ET& eng, typename ET::index_type i)
     {
         { eng.reshape(i, i) };
     };
 
+//--------------------------------------------------------------------------------------------------
+//  Concepts:   reshapable_matrix_engine<ET>
+//              column_reshapable_matrix_engine<ET>
+//              row_reshapable_matrix_engine<ET>
+//
+//  These private concepts determine whether a prospective matrix engine type provides interfaces
+//  for overall reshaping, column reshaping, and/or row reshaping.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 concept reshapable_matrix_engine =
-    writable_matrix_engine<ET>  and
+    writable_matrix_engine<ET>
+    and
     requires (ET& eng, typename ET::index_type i)
     {
         { eng.reshape(i, i, i, i) };
@@ -528,7 +645,8 @@ concept reshapable_matrix_engine =
 
 template<class ET>
 concept column_reshapable_matrix_engine =
-    writable_matrix_engine<ET>  and
+    writable_matrix_engine<ET>
+    and
     requires (ET& eng, typename ET::index_type i)
     {
         { eng.reshape_columns(i, i) };
@@ -536,17 +654,45 @@ concept column_reshapable_matrix_engine =
 
 template<class ET>
 concept row_reshapable_matrix_engine =
-    writable_matrix_engine<ET>  and
+    writable_matrix_engine<ET>
+    and
     requires (ET& eng, typename ET::index_type i)
     {
         { eng.reshape_rows(i, i) };
     };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Concepts:   valid_engine_extents<X>
+//
+//  This private concept is used to validate the second template parameter of a specialization
+//  of matrix_storage_engine, the engine's extents type.
+//--------------------------------------------------------------------------------------------------
+//
+template<typename X>
+concept valid_engine_extents = is_valid_engine_extents_v<X>;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concepts:   valid_layout_for_2d_storage_engine<L>
+//              valid_layout_for_1d_storage_engine<L>
+//
+//  These private concepts are used to validate the fourth template parameter of a specialization
+//  of matrix_storage_engine, the engine's layout type.  It must be row_major or column_major for
+//  matrix storage engines, and unoriented for vector storage engines.
+//--------------------------------------------------------------------------------------------------
+//
+template<typename L>
+concept valid_layout_for_2d_storage_engine = (is_same_v<L, row_major> || is_same_v<L, column_major>);
+
+template<typename L>
+concept valid_layout_for_1d_storage_engine = is_same_v<L, unoriented>;
+
+
 //==================================================================================================
 //  TYPE DEFINITIONS
 //==================================================================================================
-//---------------------------------------------------//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 //  Class Template:     common_engine_support
 //
 //  Policy/traits base type that provides various types and functions for verification.

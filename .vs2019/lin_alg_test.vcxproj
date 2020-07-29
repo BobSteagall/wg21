@@ -30,7 +30,6 @@
     <ClInclude Include="..\include\linear_algebra\fixed_size_matrix_engine.hpp" />
     <ClInclude Include="..\include\linear_algebra\fixed_size_vector_engine.hpp" />
     <ClInclude Include="..\include\linear_algebra\matrix_storage_engine_data.hpp" />
-    <ClInclude Include="..\include\linear_algebra\matrix_storage_engine_support.hpp" />
     <ClInclude Include="..\include\linear_algebra\matrix_view_engine.hpp" />
     <ClInclude Include="..\include\linear_algebra\private_support.hpp" />
     <ClInclude Include="..\include\linear_algebra\forward_declarations.hpp" />
