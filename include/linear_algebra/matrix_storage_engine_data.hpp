@@ -24,6 +24,11 @@ namespace detail {
 //
 //  This assumption makes implementation easy, but may be absent in the final version.
 //--------------------------------------------------------------------------------------------------
+//
+template<class T, class X, class A, class L>    struct mse_data;
+
+
+//--------------------------------------------------------------------------------------------------
 //  Specialization:     mse_data<T, extents<N>, void, L>
 //
 //  Manages elements representing a fixed-size unoriented vector of N elements.  Its elements are
@@ -134,11 +139,11 @@ struct mse_data<T, extents<R, C>, void, L>
 
     static constexpr bool   is_column_matrix      = (C == 1);
     static constexpr bool   is_row_matrix         = (R == 1);
-    static constexpr bool   is_linearly_indexable = (is_column_matrix || is_row_matrix);
+    static constexpr bool   is_1d_indexable       = (is_column_matrix || is_row_matrix);
     static constexpr bool   is_fixed_size         = true;
     static constexpr bool   is_column_reshapable  = false;
     static constexpr bool   is_row_reshapable     = false;
-    static constexpr bool   is_reshapable         = false;
+    static constexpr bool   is_overall_reshapable = false;
     static constexpr bool   is_column_major       = is_same_v<L, column_major>;
     static constexpr bool   is_row_major          = is_same_v<L, row_major>;
 
@@ -180,11 +185,11 @@ struct mse_data<T, extents<R, C>, A, L>
 
     static constexpr bool   is_column_matrix      = (C == 1);
     static constexpr bool   is_row_matrix         = (R == 1);
-    static constexpr bool   is_linearly_indexable = (is_column_matrix || is_row_matrix);
+    static constexpr bool   is_1d_indexable       = (is_column_matrix || is_row_matrix);
     static constexpr bool   is_fixed_size         = true;
     static constexpr bool   is_column_reshapable  = false;
     static constexpr bool   is_row_reshapable     = false;
-    static constexpr bool   is_reshapable         = false;
+    static constexpr bool   is_overall_reshapable = false;
     static constexpr bool   is_column_major       = is_same_v<L, column_major>;
     static constexpr bool   is_row_major          = is_same_v<L, row_major>;
 
@@ -223,11 +228,11 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
 
     static constexpr bool   is_column_matrix      = false;
     static constexpr bool   is_row_matrix         = (R == 1);
-    static constexpr bool   is_linearly_indexable = is_row_matrix;
+    static constexpr bool   is_1d_indexable       = is_row_matrix;
     static constexpr bool   is_fixed_size         = false;
     static constexpr bool   is_column_reshapable  = true;
     static constexpr bool   is_row_reshapable     = false;
-    static constexpr bool   is_reshapable         = false;
+    static constexpr bool   is_overall_reshapable = false;
     static constexpr bool   is_column_major       = is_same_v<L, column_major>;
     static constexpr bool   is_row_major          = is_same_v<L, row_major>;
 
@@ -267,11 +272,11 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
 
     static constexpr bool   is_column_matrix      = (C == 1);
     static constexpr bool   is_row_matrix         = false;
-    static constexpr bool   is_linearly_indexable = is_column_matrix;
+    static constexpr bool   is_1d_indexable       = is_column_matrix;
     static constexpr bool   is_fixed_size         = false;
     static constexpr bool   is_column_reshapable  = false;
     static constexpr bool   is_row_reshapable     = true;
-    static constexpr bool   is_reshapable         = false;
+    static constexpr bool   is_overall_reshapable = false;
     static constexpr bool   is_column_major       = is_same_v<L, column_major>;
     static constexpr bool   is_row_major          = is_same_v<L, row_major>;
 
@@ -312,11 +317,11 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
 
     static constexpr bool   is_column_matrix      = false;
     static constexpr bool   is_row_matrix         = false;
-    static constexpr bool   is_linearly_indexable = false;
+    static constexpr bool   is_1d_indexable       = false;
     static constexpr bool   is_fixed_size         = false;
-    static constexpr bool   is_column_reshapable  = true;
-    static constexpr bool   is_row_reshapable     = true;
-    static constexpr bool   is_reshapable         = true;
+    static constexpr bool   is_column_reshapable  = false;
+    static constexpr bool   is_row_reshapable     = false;
+    static constexpr bool   is_overall_reshapable = true;
     static constexpr bool   is_column_major       = is_same_v<L, column_major>;
     static constexpr bool   is_row_major          = is_same_v<L, row_major>;
 
@@ -339,30 +344,6 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
     mse_data&   operator =(mse_data&&) noexcept = default;
     mse_data&   operator =(mse_data const&) = default;
 };
-
-
-//--------------------------------------------------------------------------------------------------
-//  Concepts:   linearly_indexable<MSD>
-//              reshapable<MSD>
-//              column_reshapable<MSD>
-//              row_reshapable<MSD>
-//
-//  These private concepts are used to probe various properties of the mse_data specializations
-//  defined above.
-//--------------------------------------------------------------------------------------------------
-//
-template<typename MSD>
-concept linearly_indexable_msd = MSD::is_linearly_indexable;
-
-template<typename MSD>
-concept reshapable_msd = MSD::is_reshapable;
-
-template<typename MSD>
-concept column_reshapable_msd = MSD::is_column_reshapable;
-
-template<typename MSD>
-concept row_reshapable_msd = MSD::is_row_reshapable;
-
 
 }       //- detail namespace
 }       //- STD_LA namespace
