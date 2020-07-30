@@ -29,8 +29,10 @@ namespace STD_LA {
 //
 template<class T, ptrdiff_t N, class A, class L>
 requires
-    detail::valid_engine_extents<extents<N>>   and
-    detail::valid_engine_allocator<A, T>       and
+    detail::valid_engine_extents<extents<N>>
+    and
+    detail::valid_engine_allocator<A, T>
+    and
     detail::valid_layout_for_1d_storage_engine<L>
 class matrix_storage_engine<T, extents<N>, A, L>
 {
@@ -77,17 +79,18 @@ class matrix_storage_engine<T, extents<N>, A, L>
     template<class ET2> inline constexpr
     matrix_storage_engine(ET2 const& rhs)
     requires
-        detail::readable_vector_engine<ET2>  and
+        detail::readable_vector_engine<ET2>
+        and
         detail::convertible_from<element_type, typename ET2::element_type>
     :   m_data()
     {
         support_type::vector_assign_from(*this, rhs);
     }
 
-    template<class T2> inline constexpr
-    matrix_storage_engine(initializer_list<T2> rhs)
+    template<class U> inline constexpr
+    matrix_storage_engine(initializer_list<U> rhs)
     requires
-        detail::convertible_from<element_type, T2>
+        detail::convertible_from<element_type, U>
     :   m_data()
     {
         support_type::vector_assign_from(*this, rhs);
@@ -97,18 +100,19 @@ class matrix_storage_engine<T, extents<N>, A, L>
     inline constexpr matrix_storage_engine&
     operator =(ET2 const& rhs)
     requires
-        detail::readable_vector_engine<ET2>  and
+        detail::readable_vector_engine<ET2>
+        and
         detail::convertible_from<element_type, typename ET2::element_type>
     {
         support_type::vector_assign_from(*this, rhs);
         return *this;
     }
 
-    template<class T2>
+    template<class U>
     inline constexpr matrix_storage_engine&
-    operator =(initializer_list<T2> rhs)
+    operator =(initializer_list<U> rhs)
     requires
-        detail::convertible_from<element_type, T2>
+        detail::convertible_from<element_type, U>
     {
         support_type::vector_assign_from(*this, rhs);
         return *this;
@@ -176,6 +180,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
   private:
     storage_type    m_data;
 
+  private:
     template<class ST, class U>
     static inline constexpr ST
     make_mdspan(U* pdata, storage_type const& rep)
@@ -200,7 +205,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
         support_type::verify_size(newsize);
         support_type::verify_capacity(newcap);
 
-        //- Only reallocate new storage if we have to.
+        //- Only allocate new storage if it is needed.
         //
         if (newsize > m_data.m_cap  ||  newcap != m_data.m_cap)
         {
@@ -252,8 +257,10 @@ class matrix_storage_engine<T, extents<N>, A, L>
 //
 template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
 requires
-    detail::valid_engine_extents<extents<R, C>>    and
-    detail::valid_engine_allocator<A, T>           and
+    detail::valid_engine_extents<extents<R, C>>
+    and
+    detail::valid_engine_allocator<A, T>
+    and
     detail::valid_layout_for_2d_storage_engine<L>
 class matrix_storage_engine<T, extents<R, C>, A, L>
 {
@@ -272,17 +279,18 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     using dyn_span    = basic_mdspan<T, dyn_extents, dyn_layout>;
     using c_dyn_span  = basic_mdspan<T const, dyn_extents, dyn_layout>;
 
+  private:
     storage_type    m_data;
 
   public:
-    using value_type       = T;
-    using allocator_type   = A;
-    using element_type     = value_type;
-    using reference        = element_type&;
-    using const_reference  = element_type const&;
-    using index_type       = ptrdiff_t;
-    using span_type        = conditional_t<storage_type::is_fixed_size, fxd_span, dyn_span>;
-    using const_span_type  = conditional_t<storage_type::is_fixed_size, c_fxd_span, c_dyn_span>;
+    using value_type      = T;
+    using allocator_type  = A;
+    using element_type    = value_type;
+    using reference       = element_type&;
+    using const_reference = element_type const&;
+    using index_type      = ptrdiff_t;
+    using span_type       = conditional_t<storage_type::is_fixed_size, fxd_span, dyn_span>;
+    using const_span_type = conditional_t<storage_type::is_fixed_size, c_fxd_span, c_dyn_span>;
 
   public:
     ~matrix_storage_engine() = default;
@@ -320,6 +328,8 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     matrix_storage_engine(ET2 const& rhs)
     requires
         detail::readable_matrix_engine<ET2>
+        and
+        detail::convertible_from<element_type, typename ET2::element_type>
     :   m_data()
     {
         support_type::matrix_assign_from(*this, rhs);
@@ -339,7 +349,8 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     inline constexpr
     matrix_storage_engine(initializer_list<U> rhs)
     requires
-        storage_type::is_1d_indexable   and
+        storage_type::is_1d_indexable
+        and
         detail::convertible_from<element_type, U>
     :   m_data()
     {
@@ -353,6 +364,8 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     operator =(ET2 const& rhs)
     requires
         detail::readable_matrix_engine<ET2>
+        and
+        detail::convertible_from<element_type, typename ET2::element_type>
     {
         support_type::matrix_assign_from(*this, rhs);
         return *this;
@@ -362,7 +375,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     inline constexpr matrix_storage_engine&
     operator =(initializer_list<initializer_list<U>> rhs)
     requires
-        detail::convertible_from<T, U>
+        detail::convertible_from<element_type, U>
     {
         support_type::matrix_assign_from(*this, rhs);
         return *this;
@@ -372,8 +385,9 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     inline constexpr matrix_storage_engine&
     operator =(initializer_list<U> rhs)
     requires
-        storage_type::is_1d_indexable   and
-        detail::convertible_from<T, U>
+        storage_type::is_1d_indexable
+        and
+        detail::convertible_from<element_type, U>
     {
         support_type::matrix_assign_from(*this, rhs);
         return *this;
@@ -559,7 +573,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         support_type::verify_capacity(rowcap);
         support_type::verify_capacity(colcap);
 
-        //- Only reallocate new storage if we have to.
+        //- Only allocate new storage if we need to.
         //
         if (rows > m_data.m_rowcap  ||  rowcap != m_data.m_rowcap  ||
             cols > m_data.m_colcap  ||  colcap != m_data.m_colcap)
@@ -608,7 +622,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         support_type::verify_size(cols);
         support_type::verify_capacity(colcap);
 
-        //- Only reallocate new storage if we have to.
+        //- Only allocate new storage if we need to.
         //
         if (cols > m_data.m_colcap  ||  colcap != m_data.m_colcap)
         {
@@ -647,7 +661,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         support_type::verify_size(rows);
         support_type::verify_capacity(rowcap);
 
-        //- Only reallocate new storage if we have to.
+        //- Only allocate new storage if we need to.
         //
         if (rows > m_data.m_rowcap  ||  rowcap != m_data.m_rowcap)
         {
