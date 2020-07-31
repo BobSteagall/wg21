@@ -79,7 +79,7 @@ class basic_matrix
         detail::convertible_from<element_type, typename ET2::element_type>
     :   m_engine()
     {
-        engine_support::matrix_assign_from(m_engine, rhs.m_engine);
+        engine_support::assign_from(m_engine, rhs.m_engine);
     }
 
     //- Construction from a 2D mdspan.
@@ -98,11 +98,11 @@ class basic_matrix
     basic_matrix(basic_mdspan<T2, extents<X0, X1>, L, A> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>                             and
-        detail::not_assignable_from<engine_type, decltype(rhs)>  and
+        detail::not_constructible_from<engine_type, decltype(rhs)>  and
         detail::convertible_from<element_type, T2>
     :   m_engine()
     {
-        engine_support::matrix_assign_from(m_engine, rhs);
+        engine_support::assign_from(m_engine, rhs);
     }
 
     //- Construction from a 1D mdspan.
@@ -125,10 +125,10 @@ class basic_matrix
         detail::convertible_from<element_type, T2>
     :   m_engine()
     {
-        engine_support::matrix_assign_from(m_engine, rhs);
+        engine_support::assign_from(m_engine, rhs);
     }
 
-    //- Construction from a 2D initializtion list.
+    //- Construction from a 2D initialization list.
     //
     template<class T2>
     inline constexpr
@@ -148,10 +148,10 @@ class basic_matrix
         detail::convertible_from<element_type, T2>
     :   m_engine()
     {
-        engine_support::matrix_assign_from(m_engine, rhs);
+        engine_support::assign_from(m_engine, rhs);
     }
 
-    //- Construction from a 1D initializtion list.
+    //- Construction from a 1D initialization list.
     //
     template<class T2>
     inline constexpr
@@ -171,7 +171,7 @@ class basic_matrix
         detail::convertible_from<element_type, T2>
     :   m_engine()
     {
-        engine_support::matrix_assign_from(m_engine, rhs);
+        engine_support::assign_from(m_engine, rhs);
     }
 
     //-------------------------------------------------
@@ -196,7 +196,7 @@ class basic_matrix
         (not detail::assignable_from<engine_type, ET2>)      and
         detail::convertible_from<element_type, typename ET2::element_type>
     {
-        engine_support::matrix_assign_from(m_engine, rhs.m_engine);
+        engine_support::assign_from(m_engine, rhs.m_engine);
         return *this;
     }
 
@@ -221,7 +221,7 @@ class basic_matrix
         (not detail::assignable_from<engine_type, decltype(rhs)>)  and
         detail::convertible_from<element_type, T2>
     {
-        engine_support::matrix_assign_from(m_engine, rhs);
+        engine_support::assign_from(m_engine, rhs);
         return *this;
     }
 
@@ -246,7 +246,7 @@ class basic_matrix
         (not detail::assignable_from<engine_type, decltype(rhs)>)  and
         detail::convertible_from<element_type, T2>
     {
-        engine_support::matrix_assign_from(m_engine, rhs);
+        engine_support::assign_from(m_engine, rhs);
         return *this;
     }
 
@@ -271,7 +271,7 @@ class basic_matrix
         (not detail::assignable_from<engine_type, decltype(rhs)>)      and
         detail::convertible_from<element_type, T2>
     {
-        engine_support::matrix_assign_from(m_engine, rhs);
+        engine_support::assign_from(m_engine, rhs);
         return *this;
     }
 
@@ -296,7 +296,7 @@ class basic_matrix
         (not detail::assignable_from<engine_type, decltype(rhs)>)      and
         detail::convertible_from<element_type, T2>
     {
-        engine_support::matrix_assign_from(m_engine, rhs);
+        engine_support::assign_from(m_engine, rhs);
         return *this;
     }
 

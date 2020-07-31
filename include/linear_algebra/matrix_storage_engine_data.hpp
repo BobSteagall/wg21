@@ -137,15 +137,15 @@ struct mse_data<T, extents<R, C>, void, L>
 {
     using array_type = std::array<T, R*C>;
 
-    static constexpr bool   is_column_matrix      = (C == 1);
-    static constexpr bool   is_row_matrix         = (R == 1);
-    static constexpr bool   is_1d_indexable       = (is_column_matrix || is_row_matrix);
-    static constexpr bool   is_fixed_size         = true;
-    static constexpr bool   is_column_reshapable  = false;
-    static constexpr bool   is_row_reshapable     = false;
-    static constexpr bool   is_overall_reshapable = false;
-    static constexpr bool   is_column_major       = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major          = is_same_v<L, row_major>;
+    static constexpr bool   is_column_matrix     = (C == 1);
+    static constexpr bool   is_row_matrix        = (R == 1);
+    static constexpr bool   is_1d_indexable      = (is_column_matrix || is_row_matrix);
+    static constexpr bool   is_fixed_size        = true;
+    static constexpr bool   is_column_reshapable = false;
+    static constexpr bool   is_row_reshapable    = false;
+    static constexpr bool   is_two_d_reshapable  = false;
+    static constexpr bool   is_column_major      = is_same_v<L, column_major>;
+    static constexpr bool   is_row_major         = is_same_v<L, row_major>;
 
     static constexpr ptrdiff_t  m_rows   = R;
     static constexpr ptrdiff_t  m_cols   = C;
@@ -183,15 +183,15 @@ struct mse_data<T, extents<R, C>, A, L>
 {
     using array_type = std::vector<T, A>;
 
-    static constexpr bool   is_column_matrix      = (C == 1);
-    static constexpr bool   is_row_matrix         = (R == 1);
-    static constexpr bool   is_1d_indexable       = (is_column_matrix || is_row_matrix);
-    static constexpr bool   is_fixed_size         = true;
-    static constexpr bool   is_column_reshapable  = false;
-    static constexpr bool   is_row_reshapable     = false;
-    static constexpr bool   is_overall_reshapable = false;
-    static constexpr bool   is_column_major       = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major          = is_same_v<L, row_major>;
+    static constexpr bool   is_column_matrix     = (C == 1);
+    static constexpr bool   is_row_matrix        = (R == 1);
+    static constexpr bool   is_1d_indexable      = (is_column_matrix || is_row_matrix);
+    static constexpr bool   is_fixed_size        = true;
+    static constexpr bool   is_column_reshapable = false;
+    static constexpr bool   is_row_reshapable    = false;
+    static constexpr bool   is_two_d_reshapable  = false;
+    static constexpr bool   is_column_major      = is_same_v<L, column_major>;
+    static constexpr bool   is_row_major         = is_same_v<L, row_major>;
 
     static constexpr ptrdiff_t  m_rows   = R;
     static constexpr ptrdiff_t  m_cols   = C;
@@ -226,15 +226,15 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
 {
     using array_type = std::vector<T, A>;
 
-    static constexpr bool   is_column_matrix      = false;
-    static constexpr bool   is_row_matrix         = (R == 1);
-    static constexpr bool   is_1d_indexable       = is_row_matrix;
-    static constexpr bool   is_fixed_size         = false;
-    static constexpr bool   is_column_reshapable  = true;
-    static constexpr bool   is_row_reshapable     = false;
-    static constexpr bool   is_overall_reshapable = false;
-    static constexpr bool   is_column_major       = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major          = is_same_v<L, row_major>;
+    static constexpr bool   is_column_matrix     = false;
+    static constexpr bool   is_row_matrix        = (R == 1);
+    static constexpr bool   is_1d_indexable      = is_row_matrix;
+    static constexpr bool   is_fixed_size        = false;
+    static constexpr bool   is_column_reshapable = true;
+    static constexpr bool   is_row_reshapable    = false;
+    static constexpr bool   is_two_d_reshapable  = false;
+    static constexpr bool   is_column_major      = is_same_v<L, column_major>;
+    static constexpr bool   is_row_major         = is_same_v<L, row_major>;
 
     static constexpr ptrdiff_t  m_rows   = R;
     static constexpr ptrdiff_t  m_rowcap = R;
@@ -270,15 +270,15 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
 {
     using array_type = std::vector<T, A>;
 
-    static constexpr bool   is_column_matrix      = (C == 1);
-    static constexpr bool   is_row_matrix         = false;
-    static constexpr bool   is_1d_indexable       = is_column_matrix;
-    static constexpr bool   is_fixed_size         = false;
-    static constexpr bool   is_column_reshapable  = false;
-    static constexpr bool   is_row_reshapable     = true;
-    static constexpr bool   is_overall_reshapable = false;
-    static constexpr bool   is_column_major       = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major          = is_same_v<L, row_major>;
+    static constexpr bool   is_column_matrix     = (C == 1);
+    static constexpr bool   is_row_matrix        = false;
+    static constexpr bool   is_1d_indexable      = is_column_matrix;
+    static constexpr bool   is_fixed_size        = false;
+    static constexpr bool   is_column_reshapable = false;
+    static constexpr bool   is_row_reshapable    = true;
+    static constexpr bool   is_two_d_reshapable  = false;
+    static constexpr bool   is_column_major      = is_same_v<L, column_major>;
+    static constexpr bool   is_row_major         = is_same_v<L, row_major>;
 
     static constexpr ptrdiff_t  m_cols   = C;
     static constexpr ptrdiff_t  m_colcap = C;
@@ -315,15 +315,15 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
 {
     using array_type = std::vector<T, A>;
 
-    static constexpr bool   is_column_matrix      = false;
-    static constexpr bool   is_row_matrix         = false;
-    static constexpr bool   is_1d_indexable       = false;
-    static constexpr bool   is_fixed_size         = false;
-    static constexpr bool   is_column_reshapable  = false;
-    static constexpr bool   is_row_reshapable     = false;
-    static constexpr bool   is_overall_reshapable = true;
-    static constexpr bool   is_column_major       = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major          = is_same_v<L, row_major>;
+    static constexpr bool   is_column_matrix     = false;
+    static constexpr bool   is_row_matrix        = false;
+    static constexpr bool   is_1d_indexable      = false;
+    static constexpr bool   is_fixed_size        = false;
+    static constexpr bool   is_column_reshapable = false;
+    static constexpr bool   is_row_reshapable    = false;
+    static constexpr bool   is_two_d_reshapable  = true;
+    static constexpr bool   is_column_major      = is_same_v<L, column_major>;
+    static constexpr bool   is_row_major         = is_same_v<L, row_major>;
 
     array_type  m_elems;
     ptrdiff_t   m_rows;

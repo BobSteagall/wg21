@@ -2,6 +2,7 @@
 
 using namespace STD_LA;
 using namespace STD_LA::detail;
+using namespace MDSPAN_NS;
 
 //==================================================================================================
 //  Unit tests for dynamically-resizeable matrix engine, Case 4E
@@ -11,6 +12,8 @@ using mse_f_dd_cm = matrix_storage_engine<float, extents<dynamic_extent, dynamic
 using mse_f_dd_rm = matrix_storage_engine<float, extents<dynamic_extent, dynamic_extent>, allocator<float>, row_major>;
 using mse_i_dd_cm = matrix_storage_engine<int, extents<dynamic_extent, dynamic_extent>, allocator<int>, column_major>;
 using mse_d_dd_rm = matrix_storage_engine<double, extents<dynamic_extent, dynamic_extent>, allocator<double>, column_major>;
+
+using msupport = matrix_engine_support;
 
 TEST(MSE_Matrix_4E, DefaultCtor)
 {
@@ -83,21 +86,21 @@ TEST(MSE_Matrix_4E, CmpEq)
 
     //- Verify expected equality of default-constructed engines.
     //
-    EXPECT_TRUE(m_cmp_eq(e1, e1));
-    EXPECT_TRUE(m_cmp_eq(e1, e2));
-    EXPECT_TRUE(m_cmp_eq(e1, e3));
+    EXPECT_TRUE(msupport::compare(e1, e1));
+    EXPECT_TRUE(msupport::compare(e1, e2));
+    EXPECT_TRUE(msupport::compare(e1, e3));
 
     //- Verify equality against an init-list of equivalent values.
     //
-    EXPECT_TRUE(m_cmp_eq(e1, LST_44_0));
-    EXPECT_TRUE(m_cmp_eq(e1, il_44_0));
-    EXPECT_TRUE(m_cmp_eq(e1, fl_44_0));
+    EXPECT_TRUE(msupport::compare(e1, LST_44_0));
+    EXPECT_TRUE(msupport::compare(e1, il_44_0));
+    EXPECT_TRUE(msupport::compare(e1, fl_44_0));
 
     //- Verify inequality against an init-list of different values.
     //
-    EXPECT_FALSE(m_cmp_eq(e1, LST_44_1));
-    EXPECT_FALSE(m_cmp_eq(e1, il_44_1));
-    EXPECT_FALSE(m_cmp_eq(e1, fl_44_1));
+    EXPECT_FALSE(msupport::compare(e1, LST_44_1));
+    EXPECT_FALSE(msupport::compare(e1, il_44_1));
+    EXPECT_FALSE(msupport::compare(e1, fl_44_1));
 
     //- Assign new element values via mutable indexing and verify them.
     //
@@ -133,7 +136,7 @@ TEST(MSE_Matrix_4E, CmpEq)
     EXPECT_EQ(e2(3, 1), 42.0f);
     EXPECT_EQ(e2(3, 2), 43.0f);
     EXPECT_EQ(e2(3, 3), 44.0f);
-    EXPECT_FALSE(m_cmp_eq(e1, e2));
+    EXPECT_FALSE(msupport::compare(e1, e2));
 
     e3(0, 0) = 11.0f;
     e3(0, 1) = 12.0f;
@@ -167,35 +170,35 @@ TEST(MSE_Matrix_4E, CmpEq)
     EXPECT_EQ(e3(3, 1), 42.0f);
     EXPECT_EQ(e3(3, 2), 43.0f);
     EXPECT_EQ(e3(3, 3), 44.0f);
-    EXPECT_FALSE(m_cmp_eq(e1, e3));
+    EXPECT_FALSE(msupport::compare(e1, e3));
 
     //- Verify expected equality of various argument combinations.
     //
-    EXPECT_TRUE(m_cmp_eq(e2, e3));
+    EXPECT_TRUE(msupport::compare(e2, e3));
 
-    EXPECT_TRUE(m_cmp_eq(e2, LST_44_2));
-    EXPECT_TRUE(m_cmp_eq(e2, il_44_2));
-    EXPECT_TRUE(m_cmp_eq(e2, fl_44_2));
+    EXPECT_TRUE(msupport::compare(e2, LST_44_2));
+    EXPECT_TRUE(msupport::compare(e2, il_44_2));
+    EXPECT_TRUE(msupport::compare(e2, fl_44_2));
 
-    EXPECT_TRUE(m_cmp_eq(e3, LST_44_2));
-    EXPECT_TRUE(m_cmp_eq(e3, il_44_2));
-    EXPECT_TRUE(m_cmp_eq(e3, fl_44_2));
+    EXPECT_TRUE(msupport::compare(e3, LST_44_2));
+    EXPECT_TRUE(msupport::compare(e3, il_44_2));
+    EXPECT_TRUE(msupport::compare(e3, fl_44_2));
 
-    EXPECT_TRUE(m_cmp_eq(e2, e3));
-    EXPECT_FALSE(m_cmp_eq(e2, e1));
-    EXPECT_FALSE(m_cmp_eq(e1, e3));
+    EXPECT_TRUE(msupport::compare(e2, e3));
+    EXPECT_FALSE(msupport::compare(e2, e1));
+    EXPECT_FALSE(msupport::compare(e1, e3));
 
     //- Verify expected inequality when compared to init-lists of incorrect size.
     //
-    EXPECT_FALSE(m_cmp_eq(e3, LST_33_0));
-    EXPECT_FALSE(m_cmp_eq(e3, il_33_1));
-    EXPECT_FALSE(m_cmp_eq(e3, fl_33_2));
+    EXPECT_FALSE(msupport::compare(e3, LST_33_0));
+    EXPECT_FALSE(msupport::compare(e3, il_33_1));
+    EXPECT_FALSE(msupport::compare(e3, fl_33_2));
 
     //- Verify expected inequality against init-lists and engines having different contents.
     //
-    EXPECT_FALSE(m_cmp_eq(e3, fl_44_0));
-    EXPECT_FALSE(m_cmp_eq(e3, il_44_1));
-    EXPECT_FALSE(m_cmp_eq(e3, mse_f_dd_rm(LST_44_1)));
+    EXPECT_FALSE(msupport::compare(e3, fl_44_0));
+    EXPECT_FALSE(msupport::compare(e3, il_44_1));
+    EXPECT_FALSE(msupport::compare(e3, mse_f_dd_rm(LST_44_1)));
 
     //- Verify size, capacity, initial values.
     //
@@ -208,14 +211,14 @@ TEST(MSE_Matrix_4E, CmpEq)
 
     //- Verify expected default values.
     //
-    EXPECT_TRUE(m_cmp_eq(e4, LST_33_0));
-    EXPECT_TRUE(m_cmp_eq(e4, il_33_0));
-    EXPECT_TRUE(m_cmp_eq(e4, fl_33_0));
+    EXPECT_TRUE(msupport::compare(e4, LST_33_0));
+    EXPECT_TRUE(msupport::compare(e4, il_33_0));
+    EXPECT_TRUE(msupport::compare(e4, fl_33_0));
 
     //- Verify expected results comparing engines of different sizes.
     //
-    EXPECT_FALSE(m_cmp_eq(e4, e3));
-    EXPECT_FALSE(m_cmp_eq(e3, e4));
+    EXPECT_FALSE(msupport::compare(e4, e3));
+    EXPECT_FALSE(msupport::compare(e3, e4));
 }
 
 
@@ -229,7 +232,7 @@ TEST(MSE_Matrix_4E, MoveCtor)
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e1, LST_44_0));
+    EXPECT_TRUE(msupport::compare(e1, LST_44_0));
 
     //- Assign new element values and verify them.
     //
@@ -249,7 +252,7 @@ TEST(MSE_Matrix_4E, MoveCtor)
     e1(3, 1) = 42.0f;
     e1(3, 2) = 43.0f;
     e1(3, 3) = 44.0f;
-    EXPECT_TRUE(m_cmp_eq(e1, fl_44_2));
+    EXPECT_TRUE(msupport::compare(e1, fl_44_2));
 
     //- Construct a new engine via move ctor and verify that its initial state is as expected.
     //
@@ -259,7 +262,7 @@ TEST(MSE_Matrix_4E, MoveCtor)
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
     EXPECT_EQ(e2.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, fl_44_2));
+    EXPECT_TRUE(msupport::compare(e2, fl_44_2));
 }
 
 
@@ -273,7 +276,7 @@ TEST(MSE_Matrix_4E, CopyCtor)
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e1, LST_44_0));
+    EXPECT_TRUE(msupport::compare(e1, LST_44_0));
 
     //- Assign new element values and verify them.
     //
@@ -293,7 +296,7 @@ TEST(MSE_Matrix_4E, CopyCtor)
     e1(3, 1) = 42.0f;
     e1(3, 2) = 43.0f;
     e1(3, 3) = 44.0f;
-    EXPECT_TRUE(m_cmp_eq(e1, fl_44_2));
+    EXPECT_TRUE(msupport::compare(e1, fl_44_2));
 
     //- Construct new engines via copy ctors and verify their initial states.
     //
@@ -303,7 +306,7 @@ TEST(MSE_Matrix_4E, CopyCtor)
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
     EXPECT_EQ(e2.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, e1));
+    EXPECT_TRUE(msupport::compare(e2, e1));
 
     mse_f_dd_rm     e3 = e1;
 
@@ -311,7 +314,7 @@ TEST(MSE_Matrix_4E, CopyCtor)
     EXPECT_EQ(e3.columns(), 4);
     EXPECT_EQ(e3.row_capacity(), 4);
     EXPECT_EQ(e3.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e3, e1));
+    EXPECT_TRUE(msupport::compare(e3, e1));
 
     mse_f_dd_rm     e4{e1};
 
@@ -319,7 +322,7 @@ TEST(MSE_Matrix_4E, CopyCtor)
     EXPECT_EQ(e4.columns(), 4);
     EXPECT_EQ(e4.row_capacity(), 4);
     EXPECT_EQ(e4.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e4, e1));
+    EXPECT_TRUE(msupport::compare(e4, e1));
 }
 
 
@@ -335,19 +338,19 @@ TEST(MSE_Matrix_4E, ListCtor)
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e1, LST_44_1));
+    EXPECT_TRUE(msupport::compare(e1, LST_44_1));
 
     EXPECT_EQ(e2.rows(), 4);
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
     EXPECT_EQ(e2.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, e1));
+    EXPECT_TRUE(msupport::compare(e2, e1));
 
     EXPECT_EQ(e3.rows(), 4);
     EXPECT_EQ(e3.columns(), 4);
     EXPECT_EQ(e3.row_capacity(), 4);
     EXPECT_EQ(e3.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e3, e1));
+    EXPECT_TRUE(msupport::compare(e3, e1));
 }
 
 
@@ -365,31 +368,31 @@ TEST(MSE_Matrix_4E, EngineCtor)
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e1, il_44_2));
+    EXPECT_TRUE(msupport::compare(e1, il_44_2));
 
     EXPECT_EQ(e2.rows(), 4);
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
     EXPECT_EQ(e2.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, e1));
+    EXPECT_TRUE(msupport::compare(e2, e1));
 
     EXPECT_EQ(e3.rows(), 4);
     EXPECT_EQ(e3.columns(), 4);
     EXPECT_EQ(e3.row_capacity(), 4);
     EXPECT_EQ(e3.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e3, e1));
+    EXPECT_TRUE(msupport::compare(e3, e1));
 
     EXPECT_EQ(e4.rows(), 4);
     EXPECT_EQ(e4.columns(), 4);
     EXPECT_EQ(e4.row_capacity(), 4);
     EXPECT_EQ(e4.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e4, e1));
+    EXPECT_TRUE(msupport::compare(e4, e1));
 
     EXPECT_EQ(e5.rows(), 4);
     EXPECT_EQ(e5.columns(), 4);
     EXPECT_EQ(e5.row_capacity(), 4);
     EXPECT_EQ(e5.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e5, e1));
+    EXPECT_TRUE(msupport::compare(e5, e1));
 }
 
 
@@ -403,7 +406,7 @@ TEST(MSE_Matrix_4E, MoveAssign)
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e1, il_44_0));
+    EXPECT_TRUE(msupport::compare(e1, il_44_0));
 
     //- List construct and verify initial state.
     //
@@ -413,12 +416,12 @@ TEST(MSE_Matrix_4E, MoveAssign)
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
     EXPECT_EQ(e2.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, fl_44_1));
+    EXPECT_TRUE(msupport::compare(e2, fl_44_1));
 
     //- Move-assign and verify.
     //
     e1 = std::move(e2);
-    EXPECT_TRUE(m_cmp_eq(e1, fl_44_1));
+    EXPECT_TRUE(msupport::compare(e1, fl_44_1));
 }
 
 
@@ -432,7 +435,7 @@ TEST(MSE_Matrix_4E, CopyAssign)
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e1, il_44_0));
+    EXPECT_TRUE(msupport::compare(e1, il_44_0));
 
     //- List construct and verify initial state.
     //
@@ -442,12 +445,12 @@ TEST(MSE_Matrix_4E, CopyAssign)
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
     EXPECT_EQ(e2.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, fl_44_1));
+    EXPECT_TRUE(msupport::compare(e2, fl_44_1));
 
     //- Copy-assign and verify.
     //
     e1 = e2;
-    EXPECT_TRUE(m_cmp_eq(e1, fl_44_1));
+    EXPECT_TRUE(msupport::compare(e1, fl_44_1));
 }
 
 
@@ -461,13 +464,13 @@ TEST(MSE_Matrix_4E, EngineAssign)
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e1, LST_44_0));
+    EXPECT_TRUE(msupport::compare(e1, LST_44_0));
 
     EXPECT_EQ(e2.rows(), 4);
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
     EXPECT_EQ(e2.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, fl_44_0));
+    EXPECT_TRUE(msupport::compare(e2, fl_44_0));
 
     //- List construct and verify initial state.
     //
@@ -477,13 +480,13 @@ TEST(MSE_Matrix_4E, EngineAssign)
     EXPECT_EQ(e3.columns(), 4);
     EXPECT_EQ(e3.row_capacity(), 4);
     EXPECT_EQ(e3.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e3, il_44_1));
+    EXPECT_TRUE(msupport::compare(e3, il_44_1));
 
     //- Assign and verify.
     //
     e1 = e3;
-    EXPECT_TRUE(m_cmp_eq(e1, fl_44_1));
-    EXPECT_TRUE(m_cmp_eq(e1, e3));
+    EXPECT_TRUE(msupport::compare(e1, fl_44_1));
+    EXPECT_TRUE(msupport::compare(e1, e3));
 }
 
 
@@ -498,32 +501,32 @@ TEST(MSE_Matrix_4E, ListAssign)
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e1, LST_44_0));
+    EXPECT_TRUE(msupport::compare(e1, LST_44_0));
 
     EXPECT_EQ(e2.rows(), 4);
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
     EXPECT_EQ(e2.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, LST_44_1));
+    EXPECT_TRUE(msupport::compare(e2, LST_44_1));
 
     //- Assign and verify.
     //
     e1 = LST_44_1;
-    EXPECT_TRUE(m_cmp_eq(e1, LST_44_1));
-    EXPECT_TRUE(m_cmp_eq(e1, il_44_1));
-    EXPECT_TRUE(m_cmp_eq(e1, fl_44_1));
-    EXPECT_TRUE(m_cmp_eq(e1, e2));
+    EXPECT_TRUE(msupport::compare(e1, LST_44_1));
+    EXPECT_TRUE(msupport::compare(e1, il_44_1));
+    EXPECT_TRUE(msupport::compare(e1, fl_44_1));
+    EXPECT_TRUE(msupport::compare(e1, e2));
 
     e1 = fl_44_0;
-    EXPECT_TRUE(m_cmp_eq(e1, LST_44_0));
-    EXPECT_TRUE(m_cmp_eq(e1, il_44_0));
-    EXPECT_TRUE(m_cmp_eq(e1, fl_44_0));
-    EXPECT_TRUE(m_cmp_eq(e1, mse_f_dd_rm(4, 4)));
+    EXPECT_TRUE(msupport::compare(e1, LST_44_0));
+    EXPECT_TRUE(msupport::compare(e1, il_44_0));
+    EXPECT_TRUE(msupport::compare(e1, fl_44_0));
+    EXPECT_TRUE(msupport::compare(e1, mse_f_dd_rm(4, 4)));
 
     e1 = fl_33_1;
     EXPECT_GE(e1.row_capacity(), 3);
     EXPECT_GE(e1.column_capacity(), 3);
-    EXPECT_TRUE(m_cmp_eq(e1, fl_33_1));
+    EXPECT_TRUE(msupport::compare(e1, fl_33_1));
 }
 
 
@@ -537,7 +540,7 @@ TEST(MSE_Matrix_4E, ReshapeColumns)
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e1, LST_44_2));
+    EXPECT_TRUE(msupport::compare(e1, LST_44_2));
 
     //- Resize upward and verify.
     //
@@ -546,7 +549,7 @@ TEST(MSE_Matrix_4E, ReshapeColumns)
     EXPECT_EQ(e1.columns(), 6);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 6);
-    EXPECT_TRUE(m_cmp_eq(e1, LST_44_2_CR3));
+    EXPECT_TRUE(msupport::compare(e1, LST_44_2_CR3));
 
     //- Resize downward and verify.
     //
@@ -555,7 +558,7 @@ TEST(MSE_Matrix_4E, ReshapeColumns)
     EXPECT_EQ(e1.columns(), 2);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 6);
-    EXPECT_TRUE(m_cmp_eq(e1, LST_44_2_CR1));
+    EXPECT_TRUE(msupport::compare(e1, LST_44_2_CR1));
 
     //- List construct and verify initial state.
     //
@@ -565,7 +568,7 @@ TEST(MSE_Matrix_4E, ReshapeColumns)
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
     EXPECT_EQ(e2.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, il_44_2));
+    EXPECT_TRUE(msupport::compare(e2, il_44_2));
 
     //- Reserve extra space and verify.
     //
@@ -574,7 +577,7 @@ TEST(MSE_Matrix_4E, ReshapeColumns)
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
     EXPECT_EQ(e2.column_capacity(), 8);
-    EXPECT_TRUE(m_cmp_eq(e2, il_44_2));
+    EXPECT_TRUE(msupport::compare(e2, il_44_2));
 
     //- Release extra space and verify.
     //
@@ -583,7 +586,7 @@ TEST(MSE_Matrix_4E, ReshapeColumns)
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
     EXPECT_EQ(e2.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, il_44_2));
+    EXPECT_TRUE(msupport::compare(e2, il_44_2));
 
     //- List construct and verify initial state.
     //
@@ -593,7 +596,7 @@ TEST(MSE_Matrix_4E, ReshapeColumns)
     EXPECT_EQ(e3.columns(), 4);
     EXPECT_EQ(e3.row_capacity(), 4);
     EXPECT_EQ(e3.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e3, LST_44_2));
+    EXPECT_TRUE(msupport::compare(e3, LST_44_2));
 
     //- Resize upward and verify.
     //
@@ -602,7 +605,7 @@ TEST(MSE_Matrix_4E, ReshapeColumns)
     EXPECT_EQ(e3.columns(), 6);
     EXPECT_EQ(e3.row_capacity(), 4);
     EXPECT_EQ(e3.column_capacity(), 8);
-    EXPECT_TRUE(m_cmp_eq(e3, LST_44_2_CR3));
+    EXPECT_TRUE(msupport::compare(e3, LST_44_2_CR3));
 
     //- Resize downward and verify.
     //
@@ -611,7 +614,7 @@ TEST(MSE_Matrix_4E, ReshapeColumns)
     EXPECT_EQ(e3.columns(), 2);
     EXPECT_EQ(e3.row_capacity(), 4);
     EXPECT_EQ(e3.column_capacity(), 8);
-    EXPECT_TRUE(m_cmp_eq(e3, LST_44_2_CR1));
+    EXPECT_TRUE(msupport::compare(e3, LST_44_2_CR1));
 }
 
 
@@ -625,7 +628,7 @@ TEST(MSE_Matrix_4E, ReshapeRows)
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e1, LST_44_2));
+    EXPECT_TRUE(msupport::compare(e1, LST_44_2));
 
     //- Resize upward and verify.
     //
@@ -634,7 +637,7 @@ TEST(MSE_Matrix_4E, ReshapeRows)
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 6);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e1, LST_44_2_RR3));
+    EXPECT_TRUE(msupport::compare(e1, LST_44_2_RR3));
 
     //- Resize downward and verify.
     //
@@ -643,7 +646,7 @@ TEST(MSE_Matrix_4E, ReshapeRows)
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 6);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e1, LST_44_2_RR1));
+    EXPECT_TRUE(msupport::compare(e1, LST_44_2_RR1));
 
     //- List construct and verify initial state.
     //
@@ -653,7 +656,7 @@ TEST(MSE_Matrix_4E, ReshapeRows)
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
     EXPECT_EQ(e2.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, il_44_2));
+    EXPECT_TRUE(msupport::compare(e2, il_44_2));
 
     //- Reserve extra space and verify.
     //
@@ -662,7 +665,7 @@ TEST(MSE_Matrix_4E, ReshapeRows)
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 8);
     EXPECT_EQ(e2.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, il_44_2));
+    EXPECT_TRUE(msupport::compare(e2, il_44_2));
 
     //- Release extra space and verify.
     //
@@ -671,7 +674,7 @@ TEST(MSE_Matrix_4E, ReshapeRows)
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
     EXPECT_EQ(e2.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, il_44_2));
+    EXPECT_TRUE(msupport::compare(e2, il_44_2));
 
     //- List construct and verify initial state.
     //
@@ -681,7 +684,7 @@ TEST(MSE_Matrix_4E, ReshapeRows)
     EXPECT_EQ(e3.columns(), 4);
     EXPECT_EQ(e3.row_capacity(), 4);
     EXPECT_EQ(e3.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e3, LST_44_2));
+    EXPECT_TRUE(msupport::compare(e3, LST_44_2));
 
     //- Resize upward and verify.
     //
@@ -690,7 +693,7 @@ TEST(MSE_Matrix_4E, ReshapeRows)
     EXPECT_EQ(e3.columns(), 4);
     EXPECT_EQ(e3.row_capacity(), 8);
     EXPECT_EQ(e3.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e3, LST_44_2_RR3));
+    EXPECT_TRUE(msupport::compare(e3, LST_44_2_RR3));
 
     //- Resize downward and verify.
     //
@@ -699,7 +702,7 @@ TEST(MSE_Matrix_4E, ReshapeRows)
     EXPECT_EQ(e3.columns(), 4);
     EXPECT_EQ(e3.row_capacity(), 8);
     EXPECT_EQ(e3.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e3, LST_44_2_RR1));
+    EXPECT_TRUE(msupport::compare(e3, LST_44_2_RR1));
 }
 
 
@@ -713,7 +716,7 @@ TEST(MSE_Matrix_4E, Reshape)
     EXPECT_EQ(e1.columns(), 4);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e1, LST_44_2));
+    EXPECT_TRUE(msupport::compare(e1, LST_44_2));
 
     //- Resize downward and verify.
     //
@@ -722,7 +725,7 @@ TEST(MSE_Matrix_4E, Reshape)
     EXPECT_EQ(e1.columns(), 3);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e1, LST_33_3));
+    EXPECT_TRUE(msupport::compare(e1, LST_33_3));
 
     //- Resize upward and verify.
     //
@@ -731,7 +734,7 @@ TEST(MSE_Matrix_4E, Reshape)
     EXPECT_EQ(e1.columns(), 5);
     EXPECT_EQ(e1.row_capacity(), 5);
     EXPECT_EQ(e1.column_capacity(), 5);
-    EXPECT_TRUE(m_cmp_eq(e1, LST_55_3));
+    EXPECT_TRUE(msupport::compare(e1, LST_55_3));
 
     //- List construct and verify initial state.
     //
@@ -741,7 +744,7 @@ TEST(MSE_Matrix_4E, Reshape)
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
     EXPECT_EQ(e2.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, il_44_2));
+    EXPECT_TRUE(msupport::compare(e2, il_44_2));
 
     //- Reserve extra space and verify.
     //
@@ -750,7 +753,7 @@ TEST(MSE_Matrix_4E, Reshape)
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 32);
     EXPECT_EQ(e2.column_capacity(), 32);
-    EXPECT_TRUE(m_cmp_eq(e2, il_44_2));
+    EXPECT_TRUE(msupport::compare(e2, il_44_2));
 
     //- Reduce extra space and verify.
     //
@@ -759,7 +762,7 @@ TEST(MSE_Matrix_4E, Reshape)
     EXPECT_EQ(e2.columns(), 4);
     EXPECT_EQ(e2.row_capacity(), 4);
     EXPECT_EQ(e2.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, il_44_2));
+    EXPECT_TRUE(msupport::compare(e2, il_44_2));
 
     //- List construct and verify initial state.
     //
@@ -769,7 +772,7 @@ TEST(MSE_Matrix_4E, Reshape)
     EXPECT_EQ(e3.columns(), 4);
     EXPECT_EQ(e3.row_capacity(), 4);
     EXPECT_EQ(e3.column_capacity(), 4);
-    EXPECT_TRUE(m_cmp_eq(e3, LST_44_2));
+    EXPECT_TRUE(msupport::compare(e3, LST_44_2));
 
     //- Reshape downward and verify.
     //
@@ -778,7 +781,7 @@ TEST(MSE_Matrix_4E, Reshape)
     EXPECT_EQ(e3.columns(), 3);
     EXPECT_EQ(e3.row_capacity(), 6);
     EXPECT_EQ(e3.column_capacity(), 6);
-    EXPECT_TRUE(m_cmp_eq(e3, LST_33_3));
+    EXPECT_TRUE(msupport::compare(e3, LST_33_3));
 
     //- Reshape upward and verify.
     //
@@ -787,7 +790,7 @@ TEST(MSE_Matrix_4E, Reshape)
     EXPECT_EQ(e3.columns(), 5);
     EXPECT_EQ(e3.row_capacity(), 8);
     EXPECT_EQ(e3.column_capacity(), 8);
-    EXPECT_TRUE(m_cmp_eq(e3, LST_55_3));
+    EXPECT_TRUE(msupport::compare(e3, LST_55_3));
 }
 
 
@@ -799,7 +802,7 @@ TEST(MSE_Matrix_4E, Swap)
 
     EXPECT_EQ(e1.rows(), 4);
     EXPECT_EQ(e1.columns(), 4);
-    EXPECT_TRUE(m_cmp_eq(e1, fl_44_0));
+    EXPECT_TRUE(msupport::compare(e1, fl_44_0));
 
     //- List construct and verify initial state.
     //
@@ -807,17 +810,17 @@ TEST(MSE_Matrix_4E, Swap)
 
     EXPECT_EQ(e2.rows(), 4);
     EXPECT_EQ(e2.columns(), 4);
-    EXPECT_TRUE(m_cmp_eq(e2, fl_44_2));
+    EXPECT_TRUE(msupport::compare(e2, fl_44_2));
 
     //- Swap contents and verify.
     //
     e1.swap(e2);
-    EXPECT_TRUE(m_cmp_eq(e1, fl_44_2));
-    EXPECT_TRUE(m_cmp_eq(e2, fl_44_0));
+    EXPECT_TRUE(msupport::compare(e1, fl_44_2));
+    EXPECT_TRUE(msupport::compare(e2, fl_44_0));
 
     e2.swap(e1);
-    EXPECT_TRUE(m_cmp_eq(e1, il_44_0));
-    EXPECT_TRUE(m_cmp_eq(e2, il_44_2));
+    EXPECT_TRUE(msupport::compare(e1, il_44_0));
+    EXPECT_TRUE(msupport::compare(e2, il_44_2));
 }
 
 
@@ -871,12 +874,12 @@ TEST(MSE_Matrix_4E, Span)
 
     //- Whole-object comparison between engines and spans should work as expected.
     //
-    EXPECT_TRUE(m_cmp_eq(e1, sp1));
-    EXPECT_TRUE(m_cmp_eq(e1, csp1));
-    EXPECT_TRUE(m_cmp_eq(e3, sp1));
-    EXPECT_TRUE(m_cmp_eq(e3, csp1));
-    EXPECT_FALSE(m_cmp_eq(e2, sp1));
-    EXPECT_FALSE(m_cmp_eq(e2, csp1));
+    EXPECT_TRUE(msupport::compare(e1, sp1));
+    EXPECT_TRUE(msupport::compare(e1, csp1));
+    EXPECT_TRUE(msupport::compare(e3, sp1));
+    EXPECT_TRUE(msupport::compare(e3, csp1));
+    EXPECT_FALSE(msupport::compare(e2, sp1));
+    EXPECT_FALSE(msupport::compare(e2, csp1));
 
     //- Setting values of individual span elements should be reflected in the owning engine.
     //

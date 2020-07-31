@@ -30,10 +30,8 @@ namespace STD_LA {
 template<class T, ptrdiff_t N, class A, class L>
 requires
     detail::valid_engine_extents<extents<N>>
-    and
-    detail::valid_engine_allocator<A, T>
-    and
-    detail::valid_layout_for_1d_storage_engine<L>
+    and detail::valid_engine_allocator<A, T>
+    and detail::valid_layout_for_1d_storage_engine<L>
 class matrix_storage_engine<T, extents<N>, A, L>
 {
     using this_type    = matrix_storage_engine;
@@ -45,6 +43,12 @@ class matrix_storage_engine<T, extents<N>, A, L>
     using dyn_span     = mdspan<T, dynamic_extent>;
     using c_dyn_span   = mdspan<T const, dynamic_extent>;
 
+    static constexpr bool   is_fixed_size = storage_type::is_fixed_size;
+    static constexpr bool   is_reshapable = storage_type::is_reshapable;
+
+  private:
+    storage_type    m_data;
+
   public:
     using value_type      = T;
     using allocator_type  = A;
@@ -52,8 +56,8 @@ class matrix_storage_engine<T, extents<N>, A, L>
     using reference       = element_type&;
     using const_reference = element_type const&;
     using index_type      = ptrdiff_t;
-    using span_type       = conditional_t<storage_type::is_fixed_size, fxd_span, dyn_span>;
-    using const_span_type = conditional_t<storage_type::is_fixed_size, c_fxd_span, c_dyn_span>;
+    using span_type       = conditional_t<this_type::is_fixed_size, fxd_span, dyn_span>;
+    using const_span_type = conditional_t<this_type::is_fixed_size, c_fxd_span, c_dyn_span>;
 
   public:
     ~matrix_storage_engine() = default;
@@ -67,16 +71,19 @@ class matrix_storage_engine<T, extents<N>, A, L>
     constexpr matrix_storage_engine&    operator =(matrix_storage_engine&&) noexcept = default;
     constexpr matrix_storage_engine&    operator =(matrix_storage_engine const&) = default;
 
-    inline constexpr
+    //- Heterogeneous constructors.
+    //
+    constexpr
     matrix_storage_engine(index_type size)
     requires
-        storage_type::is_reshapable
+        this_type::is_reshapable
     :   m_data()
     {
         do_reshape(size, size);
     }
 
-    template<class ET2> inline constexpr
+    template<class ET2>
+    constexpr
     matrix_storage_engine(ET2 const& rhs)
     requires
         detail::readable_vector_engine<ET2>
@@ -84,49 +91,96 @@ class matrix_storage_engine<T, extents<N>, A, L>
         detail::convertible_from<element_type, typename ET2::element_type>
     :   m_data()
     {
-        support_type::vector_assign_from(*this, rhs);
+        support_type::assign_from(*this, rhs);
     }
 
-    template<class U> inline constexpr
+    template<class CT>
+    constexpr
+    matrix_storage_engine(CT const& rhs)
+    requires
+        detail::random_access_standard_container<CT>
+        and
+        detail::convertible_from<element_type, typename CT::value_type>
+    :   m_data()
+    {
+        support_type::assign_from(*this, rhs);
+    }
+
+    template<class U, ptrdiff_t X0, class SL, class SA>
+    constexpr
+    matrix_storage_engine(basic_mdspan<U, extents<X0>, SL, SA> const& rhs)
+    requires
+        detail::convertible_from<element_type, U>
+    :   m_data()
+    {
+        support_type::assign_from(*this, rhs);
+    }
+
+    template<class U>
+    constexpr
     matrix_storage_engine(initializer_list<U> rhs)
     requires
         detail::convertible_from<element_type, U>
     :   m_data()
     {
-        support_type::vector_assign_from(*this, rhs);
+        support_type::assign_from(*this, rhs);
     }
 
+    //- Heterogeneous assignment operators.
+    //
     template<class ET2>
-    inline constexpr matrix_storage_engine&
+    constexpr matrix_storage_engine&
     operator =(ET2 const& rhs)
     requires
         detail::readable_vector_engine<ET2>
         and
         detail::convertible_from<element_type, typename ET2::element_type>
     {
-        support_type::vector_assign_from(*this, rhs);
+        support_type::assign_from(*this, rhs);
+        return *this;
+    }
+
+    template<class CT>
+    constexpr matrix_storage_engine&
+    operator =(CT const& rhs)
+    requires
+        detail::random_access_standard_container<CT>
+        and
+        detail::convertible_from<element_type, typename CT::value_type>
+    {
+        support_type::assign_from(*this, rhs);
+        return *this;
+    }
+
+    template<class U, ptrdiff_t X0, class SL, class SA>
+    constexpr matrix_storage_engine&
+    operator =(basic_mdspan<U, extents<X0>, SL, SA> const& rhs)
+    requires
+        detail::convertible_from<element_type, U>
+    {
+        support_type::assign_from(*this, rhs);
         return *this;
     }
 
     template<class U>
-    inline constexpr matrix_storage_engine&
+    constexpr matrix_storage_engine&
     operator =(initializer_list<U> rhs)
     requires
         detail::convertible_from<element_type, U>
     {
-        support_type::vector_assign_from(*this, rhs);
+        support_type::assign_from(*this, rhs);
         return *this;
     }
 
     //- Size and capacity reporting.
     //
-    inline constexpr index_type
+    constexpr index_type
     size() const noexcept
     {
         return m_data.m_size;
     }
 
-    inline constexpr index_type
+    constexpr index_type
     capacity() const noexcept
     {
         return m_data.m_cap;
@@ -137,33 +191,32 @@ class matrix_storage_engine<T, extents<N>, A, L>
     void
     reshape(index_type newsize, index_type newcap)
     requires
-        storage_type::is_reshapable
+        this_type::is_reshapable
     {
         do_reshape(newsize, newcap);
     }
 
     //- Element access
     //
-    inline constexpr reference
+    constexpr reference
     operator ()(index_type i)
     {
         return m_data.m_elems[i];
     }
 
-    inline constexpr const_reference
+    constexpr const_reference
     operator ()(index_type i) const
     {
         return m_data.m_elems[i];
     }
 
-
-    inline constexpr span_type
+    constexpr span_type
     span() noexcept
     {
         return make_mdspan<span_type, element_type>(m_data.m_elems.data(), m_data);
     }
 
-    inline constexpr const_span_type
+    constexpr const_span_type
     span() const noexcept
     {
         return make_mdspan<const_span_type, element_type const>(m_data.m_elems.data(), m_data);
@@ -171,18 +224,15 @@ class matrix_storage_engine<T, extents<N>, A, L>
 
     //- Modifiers
     //
-    inline constexpr void
+    constexpr void
     swap(matrix_storage_engine& rhs) noexcept
     {
         support_type::swap(m_data, rhs.m_data);
     }
 
   private:
-    storage_type    m_data;
-
-  private:
     template<class ST, class U>
-    static inline constexpr ST
+    static constexpr ST
     make_mdspan(U* pdata, storage_type const& rep)
     {
         if constexpr (storage_type::is_fixed_size)
@@ -198,7 +248,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
     void
     do_reshape(ptrdiff_t newsize, ptrdiff_t newcap)
     requires
-        storage_type::is_reshapable
+        this_type::is_reshapable
     {
         if (newsize == m_data.m_size) return;
 
@@ -258,10 +308,8 @@ class matrix_storage_engine<T, extents<N>, A, L>
 template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
 requires
     detail::valid_engine_extents<extents<R, C>>
-    and
-    detail::valid_engine_allocator<A, T>
-    and
-    detail::valid_layout_for_2d_storage_engine<L>
+    and detail::valid_engine_allocator<A, T>
+    and detail::valid_layout_for_2d_storage_engine<L>
 class matrix_storage_engine<T, extents<R, C>, A, L>
 {
     using this_type    = matrix_storage_engine;
@@ -279,6 +327,14 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     using dyn_span    = basic_mdspan<T, dyn_extents, dyn_layout>;
     using c_dyn_span  = basic_mdspan<T const, dyn_extents, dyn_layout>;
 
+    static constexpr bool   is_fixed_size        = storage_type::is_fixed_size;
+    static constexpr bool   is_1d_indexable      = storage_type::is_1d_indexable;
+    static constexpr bool   is_column_major      = storage_type::is_column_major;
+    static constexpr bool   is_row_major         = storage_type::is_row_major;
+    static constexpr bool   is_two_d_reshapable = storage_type::is_two_d_reshapable;
+    static constexpr bool   is_column_reshapable = storage_type::is_column_reshapable;
+    static constexpr bool   is_row_reshapable    = storage_type::is_row_reshapable;
+
   private:
     storage_type    m_data;
 
@@ -289,8 +345,8 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     using reference       = element_type&;
     using const_reference = element_type const&;
     using index_type      = ptrdiff_t;
-    using span_type       = conditional_t<storage_type::is_fixed_size, fxd_span, dyn_span>;
-    using const_span_type = conditional_t<storage_type::is_fixed_size, c_fxd_span, c_dyn_span>;
+    using span_type       = conditional_t<this_type::is_fixed_size, fxd_span, dyn_span>;
+    using const_span_type = conditional_t<this_type::is_fixed_size, c_fxd_span, c_dyn_span>;
 
   public:
     ~matrix_storage_engine() = default;
@@ -304,27 +360,30 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     constexpr matrix_storage_engine&    operator =(matrix_storage_engine&&) noexcept = default;
     constexpr matrix_storage_engine&    operator =(matrix_storage_engine const&) = default;
 
-    //- Other constructors.
+    //- Rehsaping constructors.
     //
-    inline constexpr
+    constexpr
     matrix_storage_engine(index_type rows, index_type cols)
     requires
-        storage_type::is_overall_reshapable
+        this_type::is_two_d_reshapable
     :   m_data()
     {
         do_reshape(rows, cols, rows, cols);
     }
 
-    inline constexpr
+    constexpr
     matrix_storage_engine(index_type rows, index_type cols, index_type rowcap, index_type colcap)
     requires
-        storage_type::is_overall_reshapable
+        this_type::is_two_d_reshapable
     :   m_data()
     {
         do_reshape(rows, cols, rowcap, colcap);
     }
 
-    template<class ET2> inline constexpr
+    //- Heterogeneous construction from two-dimensional sources.
+    //
+    template<class ET2>
+    constexpr
     matrix_storage_engine(ET2 const& rhs)
     requires
         detail::readable_matrix_engine<ET2>
@@ -332,100 +391,204 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         detail::convertible_from<element_type, typename ET2::element_type>
     :   m_data()
     {
-        support_type::matrix_assign_from(*this, rhs);
+        support_type::assign_from(*this, rhs);
+    }
+
+    template<class U, ptrdiff_t X0, ptrdiff_t X1, class SL, class SA>
+    constexpr
+    matrix_storage_engine(basic_mdspan<U, extents<X0, X1>, SL, SA> const& rhs)
+    requires
+        detail::convertible_from<element_type, U>
+    :   m_data()
+    {
+        support_type::assign_from(*this, rhs);
     }
 
     template<class U>
-    inline constexpr
+    constexpr
     matrix_storage_engine(initializer_list<initializer_list<U>> rhs)
     requires
         detail::convertible_from<T, U>
     :   m_data()
     {
-        support_type::matrix_assign_from(*this, rhs);
+        support_type::assign_from(*this, rhs);
     }
 
-    template<class U>
-    inline constexpr
-    matrix_storage_engine(initializer_list<U> rhs)
+    //- Heterogeneous construction from one-dimensional sources.
+    //
+    template<class ET2>
+    constexpr
+    matrix_storage_engine(ET2 const& rhs)
     requires
-        storage_type::is_1d_indexable
+        this_type::is_1d_indexable
+        and
+        detail::readable_1d_vector_engine<ET2>
+        and
+        detail::convertible_from<element_type, typename ET2::element_type>
+    :   m_data()
+    {
+        support_type::assign_from(*this, rhs);
+    }
+
+    template<class CT>
+    constexpr
+    matrix_storage_engine(CT const& rhs)
+    requires
+        this_type::is_1d_indexable
+        and
+        detail::random_access_standard_container<CT>
+        and
+        detail::convertible_from<element_type, typename CT::value_type>
+    :   m_data()
+    {
+        support_type::assign_from(*this, rhs);
+    }
+
+    template<class U, ptrdiff_t X0, class SL, class SA>
+    constexpr
+    matrix_storage_engine(basic_mdspan<U, extents<X0>, SL, SA> const& rhs)
+    requires
+        this_type::is_1d_indexable
         and
         detail::convertible_from<element_type, U>
     :   m_data()
     {
-        support_type::matrix_assign_from(*this, rhs);
+        support_type::assign_from(*this, rhs);
     }
 
-    //- Other assignment operators.
+    template<class U>
+    constexpr
+    matrix_storage_engine(initializer_list<U> rhs)
+    requires
+        this_type::is_1d_indexable
+        and
+        detail::convertible_from<element_type, U>
+    :   m_data()
+    {
+        support_type::assign_from(*this, rhs);
+    }
+
+    //- Heterogeneous assignment from two-dimensional sources.
     //
     template<class ET2>
-    inline constexpr matrix_storage_engine&
+    constexpr matrix_storage_engine&
     operator =(ET2 const& rhs)
     requires
         detail::readable_matrix_engine<ET2>
         and
         detail::convertible_from<element_type, typename ET2::element_type>
     {
-        support_type::matrix_assign_from(*this, rhs);
+        support_type::assign_from(*this, rhs);
+        return *this;
+    }
+
+    template<class U, ptrdiff_t X0, ptrdiff_t X1, class SL, class SA>
+    constexpr matrix_storage_engine&
+    operator =(basic_mdspan<U, extents<X0, X1>, SL, SA> const& rhs)
+    requires
+        detail::convertible_from<element_type, U>
+    {
+        support_type::assign_from(*this, rhs);
         return *this;
     }
 
     template<class U>
-    inline constexpr matrix_storage_engine&
+    constexpr matrix_storage_engine&
     operator =(initializer_list<initializer_list<U>> rhs)
     requires
         detail::convertible_from<element_type, U>
     {
-        support_type::matrix_assign_from(*this, rhs);
+        support_type::assign_from(*this, rhs);
+        return *this;
+    }
+
+    //- Heterogeneous assignment from one-dimensional sources.
+    //
+    template<class ET2>
+    constexpr matrix_storage_engine&
+    operator =(ET2 const& rhs)
+    requires
+        this_type::is_1d_indexable
+        and
+        detail::readable_1d_vector_engine<ET2>
+        and
+        detail::convertible_from<element_type, typename ET2::element_type>
+    {
+        support_type::assign_from(*this, rhs);
+        return *this;
+    }
+
+    template<class CT>
+    constexpr matrix_storage_engine&
+    operator =(CT const& rhs)
+    requires
+        this_type::is_1d_indexable
+        and
+        detail::random_access_standard_container<CT>
+        and
+        detail::convertible_from<element_type, typename CT::value_type>
+    {
+        support_type::assign_from(*this, rhs);
+        return *this;
+    }
+
+    template<class U, ptrdiff_t X0, class SL, class SA>
+    constexpr matrix_storage_engine&
+    operator =(basic_mdspan<U, extents<X0>, SL, SA> const& rhs)
+    requires
+        this_type::is_1d_indexable
+        and
+        detail::convertible_from<element_type, U>
+    {
+        support_type::assign_from(*this, rhs);
         return *this;
     }
 
     template<class U>
-    inline constexpr matrix_storage_engine&
+    constexpr matrix_storage_engine&
     operator =(initializer_list<U> rhs)
     requires
-        storage_type::is_1d_indexable
+        this_type::is_1d_indexable
         and
         detail::convertible_from<element_type, U>
     {
-        support_type::matrix_assign_from(*this, rhs);
+        support_type::assign_from(*this, rhs);
         return *this;
     }
 
     //- Size and capacity reporting.
     //
-    inline constexpr index_type
+    constexpr index_type
     columns() const noexcept
     {
         return m_data.m_cols;
     }
 
-    inline constexpr index_type
+    constexpr index_type
     rows() const noexcept
     {
         return m_data.m_rows;
     }
 
-    inline constexpr index_type
+    constexpr index_type
     size() const noexcept
     {
         return m_data.m_rows * m_data.m_cols;
     }
 
-    inline constexpr index_type
+    constexpr index_type
     column_capacity() const noexcept
     {
         return m_data.m_colcap;
     }
 
-    inline constexpr index_type
+    constexpr index_type
     row_capacity() const noexcept
     {
         return m_data.m_rowcap;
     }
 
-    inline constexpr index_type
+    constexpr index_type
     capacity() const noexcept
     {
         return m_data.m_rowcap * m_data.m_colcap;
@@ -433,47 +596,61 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     //- Element access
     //
-    inline constexpr reference
+    constexpr reference
     operator ()(index_type i)
     requires
-        storage_type::is_1d_indexable
+        this_type::is_1d_indexable
     {
         return m_data.m_elems[i];
     }
 
-    inline constexpr const_reference
+    constexpr const_reference
     operator ()(index_type i) const
     requires
-        storage_type::is_1d_indexable
+        this_type::is_1d_indexable
     {
         return m_data.m_elems[i];
     }
 
-    inline constexpr reference
+    constexpr reference
     operator ()(index_type i, index_type j)
+    requires
+        this_type::is_row_major
     {
-        if constexpr (storage_type::is_row_major)
-            return m_data.m_elems[(i * m_data.m_colcap) + j];
-        else
-            return m_data.m_elems[i + (j * m_data.m_rowcap)];
+        return m_data.m_elems[(i * m_data.m_colcap) + j];
     }
 
-    inline constexpr const_reference
+    constexpr reference
+    operator ()(index_type i, index_type j)
+    requires
+        this_type::is_column_major
+    {
+         return m_data.m_elems[i + (j * m_data.m_rowcap)];
+    }
+
+    constexpr const_reference
     operator ()(index_type i, index_type j) const
+    requires
+        this_type::is_row_major
     {
-        if constexpr (storage_type::is_row_major)
-            return m_data.m_elems[(i * m_data.m_colcap) + j];
-        else
-            return m_data.m_elems[i + (j * m_data.m_rowcap)];
+        return m_data.m_elems[(i * m_data.m_colcap) + j];
     }
 
-    inline constexpr span_type
+    constexpr const_reference
+    operator ()(index_type i, index_type j) const
+    requires
+        this_type::is_column_major
+    {
+         return m_data.m_elems[i + (j * m_data.m_rowcap)];
+    }
+
+    constexpr span_type
     span() noexcept
     {
         return make_mdspan<span_type, element_type>(m_data.m_elems.data(), m_data);
     }
 
-    inline constexpr const_span_type
+    constexpr const_span_type
     span() const noexcept
     {
         return make_mdspan<const_span_type, element_type const>(m_data.m_elems.data(), m_data);
@@ -481,53 +658,53 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     //- Setting overall size and capacity.
     //
-    inline constexpr void
+    constexpr void
     reshape(index_type rows, index_type cols, index_type rowcap, index_type colcap)
     requires
-        storage_type::is_overall_reshapable
+        this_type::is_two_d_reshapable
     {
         do_reshape(rows, cols, rowcap, colcap);
     }
 
     //- Setting column size and capacity.
     //
-    inline constexpr void
+    constexpr void
     reshape_columns(index_type cols, index_type colcap)
     requires
-        storage_type::is_column_reshapable
+        this_type::is_column_reshapable
     {
         do_reshape_columns(cols, colcap);
     }
 
-    inline constexpr void
+    constexpr void
     reshape_columns(index_type cols, index_type colcap)
     requires
-        storage_type::is_overall_reshapable
+        this_type::is_two_d_reshapable
     {
         do_reshape(m_data.m_rows, cols, m_data.m_rowcap, colcap);
     }
 
     //- Setting row size and capacity.
     //
-    inline constexpr void
+    constexpr void
     reshape_rows(index_type rows, index_type rowcap)
     requires
-        storage_type::is_row_reshapable
+        this_type::is_row_reshapable
     {
         do_reshape_rows(rows, rowcap);
     }
 
-    inline constexpr void
+    constexpr void
     reshape_rows(index_type rows, index_type rowcap)
     requires
-        storage_type::is_overall_reshapable
+        this_type::is_two_d_reshapable
     {
         do_reshape(rows, m_data.m_cols, rowcap, m_data.m_colcap);
     }
 
-    //- Other modifiers
+    //- Other modifiers.
     //
-    inline constexpr void
+    constexpr void
     swap(matrix_storage_engine& rhs) noexcept
     {
         support_type::swap(m_data, rhs.m_data);
@@ -535,16 +712,16 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
   private:
     template<class ST, class U>
-    static inline constexpr ST
+    static constexpr ST
     make_mdspan(U* pdata, storage_type const& rep)
     {
-        if constexpr (storage_type::is_fixed_size)
+        if constexpr (this_type::is_fixed_size)
         {
             return ST(pdata);
         }
         else
         {
-            if constexpr (storage_type::is_row_major)
+            if constexpr (this_type::is_row_major)
             {
                 dyn_extents     extents(rep.m_rows, rep.m_cols);
                 dyn_strides     strides{rep.m_colcap, 1};
@@ -566,7 +743,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     void
     do_reshape(ptrdiff_t rows, ptrdiff_t cols, ptrdiff_t rowcap, ptrdiff_t colcap)
     requires
-        storage_type::is_overall_reshapable
+        this_type::is_two_d_reshapable
     {
         support_type::verify_size(rows);
         support_type::verify_size(cols);
@@ -617,7 +794,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     void
     do_reshape_columns(ptrdiff_t cols, ptrdiff_t colcap)
     requires
-        storage_type::is_column_reshapable
+        this_type::is_column_reshapable
     {
         support_type::verify_size(cols);
         support_type::verify_capacity(colcap);
@@ -656,7 +833,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     void
     do_reshape_rows(ptrdiff_t rows, ptrdiff_t rowcap)
     requires
-        storage_type::is_row_reshapable
+        this_type::is_row_reshapable
     {
         support_type::verify_size(rows);
         support_type::verify_capacity(rowcap);

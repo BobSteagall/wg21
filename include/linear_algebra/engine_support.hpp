@@ -31,7 +31,7 @@ struct is_valid_engine_extents<extents<N>>
 };
 
 template<ptrdiff_t R, ptrdiff_t C>
-struct is_valid_engine_extents<extents<R,C>>
+struct is_valid_engine_extents<extents<R, C>>
 {
     static constexpr bool   value = (R == dynamic_extent || R > 0) && (C == dynamic_extent || C > 0);
 };
@@ -52,8 +52,8 @@ template<class T>
 struct is_1d_mdspan : public false_type
 {};
 
-template<class T, class L, class A, ptrdiff_t N>
-struct is_1d_mdspan<basic_mdspan<T, extents<N>, L, A>> : public true_type
+template<class T, ptrdiff_t X0, class SL, class SA>
+struct is_1d_mdspan<basic_mdspan<T, extents<X0>, SL, SA>> : public true_type
 {};
 
 template<class T> inline constexpr
@@ -72,8 +72,8 @@ template<class T>
 struct is_2d_mdspan : public false_type
 {};
 
-template<class T, class L, class A, ptrdiff_t R, ptrdiff_t C>
-struct is_2d_mdspan<basic_mdspan<T, extents<R, C>, L, A>> : public true_type
+template<class T, ptrdiff_t X0, ptrdiff_t X1, class SL, class SA>
+struct is_2d_mdspan<basic_mdspan<T, extents<X0, X1>, SL, SA>> : public true_type
 {};
 
 template<class T> inline constexpr
@@ -373,8 +373,8 @@ concept readable_vector_engine =
 //
 //  This private concept determines whether a prospective vector engine type provides only the
 //  readability interface required to function correctly with basic_vector<ET, OT>.  Most
-//  importantly, engine types that fulfill this concept one-dimensional indexing only, and thus
-//  cannot also be matrix engines.
+//  importantly, engine types that fulfill this concept perform one-dimensional indexing only,
+//  and therefore cannot also be matrix engines.
 //--------------------------------------------------------------------------------------------------
 //
 template<class ET>
@@ -686,7 +686,7 @@ concept valid_layout_for_1d_storage_engine = std::is_same_v<L, unoriented>;
 struct common_engine_support
 {
     template<class IT1, class IT2>
-    static inline constexpr bool
+    static constexpr bool
     sizes_differ(IT1 n1, IT2 n2) noexcept
     {
         using cmp_type = common_type_t<IT1, IT2, ptrdiff_t>;
@@ -695,7 +695,7 @@ struct common_engine_support
     }
 
     template<class ITR1, class ITC1, class ITR2, class ITC2>
-    static inline constexpr bool
+    static constexpr bool
     sizes_differ(ITR1 r1, ITC1 c1, ITR2 r2, ITC2 c2) noexcept
     {
         using cmp_type = common_type_t<ITR1, ITC1, ITR2, ITC2, ptrdiff_t>;
@@ -705,7 +705,7 @@ struct common_engine_support
     }
 
     template<class IT>
-    static inline constexpr void
+    static constexpr void
     verify_capacity(IT c)
     {
         if (c < static_cast<IT>(0))
@@ -732,7 +732,7 @@ struct common_engine_support
     }
 
     template<class IT>
-    static inline constexpr void
+    static constexpr void
     verify_size(IT s)
     {
         if (s < static_cast<IT>(1))
@@ -742,7 +742,7 @@ struct common_engine_support
     }
 
     template<class IT1, class IT2>
-    static inline constexpr void
+    static constexpr void
     verify_size(IT1 s1, IT2 s2)
     {
         if (sizes_differ(s1, s2))
@@ -752,7 +752,7 @@ struct common_engine_support
     }
 
     template<class T>
-    static inline constexpr void
+    static constexpr void
     swap(T& t0, T& t1)
         noexcept(std::is_nothrow_move_constructible_v<T>  &&  std::is_nothrow_move_assignable_v<T>)
     {
@@ -781,7 +781,7 @@ struct vector_engine_support : public common_engine_support
     //----------------------------------------------------------------------------------------------
     //
     template<class ET, class IT>
-    static inline constexpr void
+    static constexpr void
     verify_and_reshape(ET& dst, IT src_elems)
     requires
         writable_vector_engine<ET>
@@ -805,7 +805,7 @@ struct vector_engine_support : public common_engine_support
     //
     template<class ET1, class ET2>
     static constexpr void
-    vector_assign_from(ET1& dst, ET2 const& src)
+    assign_from(ET1& dst, ET2 const& src)
     requires
         writable_vector_engine<ET1>
         and
@@ -830,7 +830,7 @@ struct vector_engine_support : public common_engine_support
 
     template<class ET, class CT>
     static constexpr void
-    vector_assign_from(ET& dst, CT const& src)
+    assign_from(ET& dst, CT const& src)
     requires
         writable_vector_engine<ET>
         and
@@ -853,16 +853,16 @@ struct vector_engine_support : public common_engine_support
         }
     }
 
-    template<class ET, class U, ptrdiff_t X0, class L, class A>
+    template<class ET, class U, ptrdiff_t X0, class SL, class SA>
     static constexpr void
-    vector_assign_from(ET const& dst, basic_mdspan<U, extents<X0>, L, A> const& src)
+    assign_from(ET& dst, basic_mdspan<U, extents<X0>, SL, SA> const& src)
     requires
         readable_vector_engine<ET>
         and
         convertible_from<typename ET::element_type, U>
     {
         using index_type_dst = typename ET::index_type;
-        using index_type_src = typename basic_mdspan<U, extents<X0>, L, A>::index_type;
+        using index_type_src = typename basic_mdspan<U, extents<X0>, SL, SA>::index_type;
 
         index_type_dst  di = 0;
         index_type_src  si = 0;
@@ -879,7 +879,7 @@ struct vector_engine_support : public common_engine_support
 
     template<class ET, class U>
     static constexpr void
-    vector_assign_from(ET& dst, initializer_list<U> src)
+    assign_from(ET& dst, initializer_list<U> src)
     requires
         writable_vector_engine<ET>
         and
@@ -904,7 +904,7 @@ struct vector_engine_support : public common_engine_support
     //----------------------------------------------------------------------------------------------
     //
     template<class ET, class JT0, class JT1, class T>
-    static inline constexpr void
+    static constexpr void
     fill(ET& dst, JT0 e0, JT1 e1, T const& t)
     requires
         writable_vector_engine<ET>
@@ -923,7 +923,7 @@ struct vector_engine_support : public common_engine_support
     }
 
     template<class ET, class IT>
-    static inline constexpr void
+    static constexpr void
     move_elements(ET& dst, ET& src, IT size)
     requires
         writable_vector_engine<ET>
@@ -946,7 +946,7 @@ struct vector_engine_support : public common_engine_support
     //
     template<class ET1, class ET2>
     static constexpr bool
-    vector_compare(ET1 const& lhs, ET2 const& rhs)
+    compare(ET1 const& lhs, ET2 const& rhs)
     requires
         readable_vector_engine<ET1>
         and
@@ -974,7 +974,7 @@ struct vector_engine_support : public common_engine_support
 
     template<class ET, class CT>
     static constexpr bool
-    vector_compare(ET const& lhs, CT const& rhs)
+    compare(ET const& lhs, CT const& rhs)
     requires
         readable_vector_engine<ET>
         and
@@ -1000,16 +1000,16 @@ struct vector_engine_support : public common_engine_support
         return true;
     }
 
-    template<class ET, class U, ptrdiff_t X0, class L, class A>
+    template<class ET, class U, ptrdiff_t X0, class SL, class SA>
     static constexpr bool
-    vector_compare(ET const& lhs, basic_mdspan<U, extents<X0>, L, A> const& rhs)
+    compare(ET const& lhs, basic_mdspan<U, extents<X0>, SL, SA> const& rhs)
     requires
         readable_vector_engine<ET>
         and
         comparable_types<typename ET::element_type, U>
     {
         using index_type_lhs = typename ET::index_type;
-        using index_type_rhs = typename basic_mdspan<U, extents<X0>, L, A>::index_type;
+        using index_type_rhs = typename basic_mdspan<U, extents<X0>, SL, SA>::index_type;
 
         index_type_lhs  n1 = lhs.size();
         index_type_rhs  n2 = rhs.extent(0);
@@ -1028,7 +1028,7 @@ struct vector_engine_support : public common_engine_support
 
     template<class ET, class U>
     static constexpr bool
-    vector_compare(ET const& lhs, initializer_list<U> rhs)
+    compare(ET const& lhs, initializer_list<U> rhs)
     requires
         readable_vector_engine<ET>
         and
@@ -1046,7 +1046,7 @@ struct vector_engine_support : public common_engine_support
 
         for (;  i1 < n1;  ++i1, ++i2)
         {
-            if (not (lhs(i1) == rhs(i2))) return false;
+            if (not (lhs(i1) == *i2)) return false;
         }
         return true;
     }
@@ -1067,7 +1067,7 @@ struct matrix_engine_support : public common_engine_support
     //----------------------------------------------------------------------------------------------
     //
     template<class ET, class IT1, class IT2>
-    static inline constexpr void
+    static constexpr void
     verify_and_reshape(ET& dst, IT1 src_rows, IT2 src_cols)
     requires
         writable_matrix_engine<ET>
@@ -1104,7 +1104,7 @@ struct matrix_engine_support : public common_engine_support
     }
 
     template<class ET, class IT>
-    static inline constexpr void
+    static constexpr void
     verify_and_reshape(ET& dst, IT src_size)
     requires
         writable_and_1d_indexable_matrix_engine<ET>
@@ -1138,7 +1138,7 @@ struct matrix_engine_support : public common_engine_support
     //
     template<class ET1, class ET2>
     static constexpr void
-    matrix_assign_from(ET1& dst, ET2 const& src)
+    assign_from(ET1& dst, ET2 const& src)
     requires
         writable_matrix_engine<ET1>
         and
@@ -1169,16 +1169,16 @@ struct matrix_engine_support : public common_engine_support
         }
     }
 
-    template<class ET, class U, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+    template<class ET, class U, ptrdiff_t X0, ptrdiff_t X1, class SL, class SA>
     static constexpr void
-    matrix_assign_from(ET& dst, basic_mdspan<U, extents<X0, X1>, L, A> const& src)
+    assign_from(ET& dst, basic_mdspan<U, extents<X0, X1>, SL, SA> const& src)
     requires
         writable_matrix_engine<ET>
         and
         convertible_from<typename ET::element_type, U>
     {
         using index_type_dst = typename ET::index_type;
-        using index_type_src = typename basic_mdspan<U, extents<X0, X1>, L, A>::index_type;
+        using index_type_src = typename basic_mdspan<U, extents<X0, X1>, SL, SA>::index_type;
 
         index_type_src  rows = src.extent(0);
         index_type_src  cols = src.extent(1);
@@ -1202,7 +1202,7 @@ struct matrix_engine_support : public common_engine_support
 
     template<class ET, class U>
     static constexpr void
-    matrix_assign_from(ET& dst, initializer_list<initializer_list<U>> src)
+    assign_from(ET& dst, initializer_list<initializer_list<U>> src)
     requires
         writable_matrix_engine<ET>
         and
@@ -1237,7 +1237,7 @@ struct matrix_engine_support : public common_engine_support
     //
     template<class ET1, class ET2>
     static constexpr void
-    matrix_assign_from(ET1& dst, ET2 const& src)
+    assign_from(ET1& dst, ET2 const& src)
     requires
         writable_and_1d_indexable_matrix_engine<ET1>
         and
@@ -1262,7 +1262,7 @@ struct matrix_engine_support : public common_engine_support
 
     template<class ET, class CT>
     static constexpr void
-    matrix_assign_from(ET& dst, CT const& src)
+    assign_from(ET& dst, CT const& src)
     requires
         writable_and_1d_indexable_matrix_engine<ET>
         and
@@ -1285,16 +1285,16 @@ struct matrix_engine_support : public common_engine_support
         }
     }
 
-    template<class ET, class T, ptrdiff_t X0, class L, class A>
+    template<class ET, class T, ptrdiff_t X0, class SL, class SA>
     static constexpr void
-    matrix_assign_from(ET const& dst, basic_mdspan<T, extents<X0>, L, A> const& src)
+    assign_from(ET& dst, basic_mdspan<T, extents<X0>, SL, SA> const& src)
     requires
         writable_and_1d_indexable_matrix_engine<ET>
         and
         convertible_from<typename ET::element_type, T>
     {
         using index_type_dst = typename ET::index_type;
-        using index_type_src = typename basic_mdspan<T, extents<X0>, L, A>::index_type;
+        using index_type_src = typename basic_mdspan<T, extents<X0>, SL, SA>::index_type;
 
         index_type_dst  di = 0;
         index_type_src  si = 0;
@@ -1310,7 +1310,7 @@ struct matrix_engine_support : public common_engine_support
 
     template<class ET, class T>
     static constexpr void
-    matrix_assign_from(ET& dst, initializer_list<T> src)
+    assign_from(ET& dst, initializer_list<T> src)
     requires
         writable_and_1d_indexable_matrix_engine<ET>
         and
@@ -1336,7 +1336,7 @@ struct matrix_engine_support : public common_engine_support
     //----------------------------------------------------------------------------------------------
     //
     template<class ET, class JT0, class JT1, class T>
-    static inline constexpr void
+    static constexpr void
     fill_columns(ET& dst, JT0 c0, JT1 c1, T const& t)
     requires
         writable_matrix_engine<ET>
@@ -1375,7 +1375,7 @@ struct matrix_engine_support : public common_engine_support
     //- Fill the specified range of rows of a writable engine with some value.
     //
     template<class ET, class IT0, class IT1, class T>
-    static inline constexpr void
+    static constexpr void
     fill_rows(ET& dst, IT0 r0, IT1 r1, T const& t)
     requires
         writable_matrix_engine<ET>
@@ -1412,7 +1412,7 @@ struct matrix_engine_support : public common_engine_support
     }
 
     template<class ET, class IT, class JT>
-    static inline constexpr void
+    static constexpr void
     move_elements(ET& dst, ET& src, IT rows, JT cols)
     requires
         writable_matrix_engine<ET>
@@ -1453,7 +1453,7 @@ struct matrix_engine_support : public common_engine_support
     //
     template<class ET1, class ET2>
     static constexpr bool
-    matrix_compare(ET1 const& lhs, ET2 const& rhs)
+    compare(ET1 const& lhs, ET2 const& rhs)
     requires
         readable_matrix_engine<ET1>
         and
@@ -1487,16 +1487,16 @@ struct matrix_engine_support : public common_engine_support
         return true;
     }
 
-    template<class ET, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+    template<class ET, class T, ptrdiff_t X0, ptrdiff_t X1, class SL, class SA>
     static constexpr bool
-    matrix_compare(ET const& lhs, basic_mdspan<T, extents<X0, X1>, L, A> const& rhs)
+    compare(ET const& lhs, basic_mdspan<T, extents<X0, X1>, SL, SA> const& rhs)
     requires
         readable_matrix_engine<ET>
         and
         comparable_types<typename ET::element_type, T>
     {
         using index_type_lhs = typename ET::index_type;
-        using index_type_rhs = typename basic_mdspan<T, extents<X0, X1>, L, A>::index_type;
+        using index_type_rhs = typename basic_mdspan<T, extents<X0, X1>, SL, SA>::index_type;
 
         index_type_lhs  r1 = lhs.rows();
         index_type_lhs  c1 = lhs.columns();
@@ -1523,7 +1523,7 @@ struct matrix_engine_support : public common_engine_support
 
     template<class ET, class U>
     static constexpr bool
-    matrix_compare(ET const& lhs, initializer_list<initializer_list<U>> rhs)
+    compare(ET const& lhs, initializer_list<initializer_list<U>> rhs)
     requires
         readable_matrix_engine<ET>
         and
@@ -1543,9 +1543,9 @@ struct matrix_engine_support : public common_engine_support
         for (;  i1 < r1;  ++i1, ++i2)
         {
             index_type_lhs  j1 = 0;
-            auto            j2 = i1->begin();
+            auto            j2 = i2->begin();
 
-            for (;  j1 < jn;  ++j1, ++j2)
+            for (;  j1 < c1;  ++j1, ++j2)
             {
                 if (not (lhs(i1, j1) == *j2)) return false;
             }
@@ -1560,7 +1560,7 @@ struct matrix_engine_support : public common_engine_support
     //
     template<class ET1, class ET2>
     static constexpr bool
-    matrix_compare(ET1 const& lhs, ET2 const& rhs)
+    compare(ET1 const& lhs, ET2 const& rhs)
     requires
         readable_and_1d_indexable_matrix_engine<ET1>
         and
@@ -1588,7 +1588,7 @@ struct matrix_engine_support : public common_engine_support
 
     template<class ET, class CT>
     static constexpr bool
-    matrix_compare(ET const& lhs, CT const& rhs)
+    compare(ET const& lhs, CT const& rhs)
     requires
         readable_and_1d_indexable_matrix_engine<ET>
         and
@@ -1616,7 +1616,7 @@ struct matrix_engine_support : public common_engine_support
 
     template<class ET, class T, ptrdiff_t X0, class L, class A>
     static constexpr bool
-    matrix_compare(ET const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
+    compare(ET const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
     requires
         readable_matrix_engine<ET>
         and
@@ -1644,7 +1644,7 @@ struct matrix_engine_support : public common_engine_support
 
     template<class ET, class U>
     static constexpr bool
-    matrix_compare(ET const& lhs, initializer_list<U> rhs)
+    compare(ET const& lhs, initializer_list<U> rhs)
     requires
         readable_matrix_engine<ET>
         and
