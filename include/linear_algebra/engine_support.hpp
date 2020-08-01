@@ -1530,6 +1530,7 @@ struct matrix_engine_support : public common_engine_support
         comparable_types<typename ET::element_type, U>
     {
         using index_type_lhs = typename ET::index_type;
+        using index_type_rhs = typename initializer_list<initializer_list<U>>::size_type;
 
         index_type_lhs  r1 = lhs.rows();
         index_type_lhs  c1 = lhs.columns();
@@ -1618,9 +1619,7 @@ struct matrix_engine_support : public common_engine_support
     static constexpr bool
     compare(ET const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
     requires
-        readable_matrix_engine<ET>
-        and
-        readable_vector_engine<ET>
+        readable_and_1d_indexable_matrix_engine<ET>
         and
         comparable_types<typename ET::element_type, T>
     {
@@ -1646,16 +1645,15 @@ struct matrix_engine_support : public common_engine_support
     static constexpr bool
     compare(ET const& lhs, initializer_list<U> rhs)
     requires
-        readable_matrix_engine<ET>
-        and
-        readable_vector_engine<ET>
+        readable_and_1d_indexable_matrix_engine<ET>
         and
         comparable_types<typename ET::element_type, U>
     {
         using index_type_lhs = typename ET::index_type;
+        using index_type_rhs = typename initializer_list<U>::size_type;
 
         index_type_lhs  n1 = lhs.size();
-        auto            n2 = rhs.size();
+        index_type_rhs  n2 = rhs.size();
 
         if (sizes_differ(n1, n2)) return false;
 

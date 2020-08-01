@@ -66,6 +66,8 @@ using vf_init_list = std::initializer_list<float>;
 #define LST_4_2     { 11,  12,  13,  14}
 #define LST_4_3     {101, 202, 303, 404}
 
+#define LST_5_2     {  1,   2,   3,   4,  5}
+
 static const vi_init_list   il_4_0 = LST_4_0;
 static const vf_init_list   fl_4_0 = LST_4_0;
 
@@ -88,11 +90,12 @@ inline constexpr index_tuple_type     st_55(5, 5);
 #define LST_14_0       {{0, 0, 0, 0}}
 #define LST_14_1       {{1, 2, 3, 4}}
 #define LST_14_2       {{11, 12, 13, 14}}
+#define LST_15_2       {{1, 2, 3, 4, 5}}
 
 #define LST_41_0       {{0}, {0}, {0}, {0}}
 #define LST_41_1       {{1}, {2}, {3}, {4}}
 #define LST_41_2       {{11}, {12}, {13}, {14}}
-
+#define LST_51_2       {{1}, {2}, {3}, {4}, {5}}
 
 #define LST_33_0       {{ 0, 0, 0 },        \
                         { 0, 0, 0 },        \
@@ -236,6 +239,7 @@ static const mi_init_list   il_14_1 = LST_14_1;
 static const mf_init_list   fl_14_1 = LST_14_1;
 static const mi_init_list   il_14_2 = LST_14_2;
 static const mf_init_list   fl_14_2 = LST_14_2;
+static const mf_init_list   fl_15_2 = LST_15_2;
 
 static const mi_init_list   il_41_0 = LST_41_0;
 static const mf_init_list   fl_41_0 = LST_41_0;
@@ -243,6 +247,7 @@ static const mi_init_list   il_41_1 = LST_41_1;
 static const mf_init_list   fl_41_1 = LST_41_1;
 static const mi_init_list   il_41_2 = LST_41_2;
 static const mf_init_list   fl_41_2 = LST_41_2;
+static const mf_init_list   fl_51_2 = LST_51_2;
 
 static const mi_init_list   il_33_0 = LST_33_0;
 static const mf_init_list   fl_33_0 = LST_33_0;

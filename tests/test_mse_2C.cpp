@@ -47,6 +47,18 @@ TEST(MSE_Matrix_2C, CmpEq)
 {
     mse_f_fd_rm    e1, e2, e3;
 
+    std::array<float, 4>    a1 = LST_4_0;
+    mdspan<float, 4>        s1(a1.data());
+
+    std::array<float, 4>    a2 = LST_4_2;
+    mdspan<float, 4>        s2(a2.data());
+
+    std::array<float, 5>    a3 = LST_5_2;
+    mdspan<float, 5>        s3(a2.data());
+
+    std::array<float, 4>    a4 = LST_4_3;
+    mdspan<float, 4>        s4(a4.data());
+
     e1.reshape_columns(4, 0);
     e2.reshape_columns(4, 0);
     e3.reshape_columns(4, 0);
@@ -78,12 +90,16 @@ TEST(MSE_Matrix_2C, CmpEq)
     EXPECT_TRUE(msupport::compare(e1, LST_14_0));
     EXPECT_TRUE(msupport::compare(e1, il_14_0));
     EXPECT_TRUE(msupport::compare(e1, fl_14_0));
+    EXPECT_TRUE(msupport::compare(e1, a1));
+    EXPECT_TRUE(msupport::compare(e1, s1));
 
     //- Verify inequality against an init-list of different values.
     //
     EXPECT_FALSE(msupport::compare(e1, LST_14_1));
     EXPECT_FALSE(msupport::compare(e1, il_14_1));
     EXPECT_FALSE(msupport::compare(e1, fl_14_1));
+    EXPECT_FALSE(msupport::compare(e1, a2));
+    EXPECT_FALSE(msupport::compare(e1, s2));
 
     //- Assign new element values via mutable indexing and verify them.
     //
@@ -114,10 +130,14 @@ TEST(MSE_Matrix_2C, CmpEq)
     EXPECT_TRUE(msupport::compare(e2, LST_14_2));
     EXPECT_TRUE(msupport::compare(e2, il_14_2));
     EXPECT_TRUE(msupport::compare(e2, fl_14_2));
+    EXPECT_TRUE(msupport::compare(e2, a2));
+    EXPECT_TRUE(msupport::compare(e2, s2));
 
     EXPECT_TRUE(msupport::compare(e3, LST_14_2));
     EXPECT_TRUE(msupport::compare(e3, il_14_2));
     EXPECT_TRUE(msupport::compare(e3, fl_14_2));
+    EXPECT_TRUE(msupport::compare(e3, a2));
+    EXPECT_TRUE(msupport::compare(e3, s2));
 
     EXPECT_TRUE(msupport::compare(e2, e3));
     EXPECT_FALSE(msupport::compare(e2, e1));
@@ -128,12 +148,16 @@ TEST(MSE_Matrix_2C, CmpEq)
     EXPECT_FALSE(msupport::compare(e3, LST_33_0));
     EXPECT_FALSE(msupport::compare(e3, il_33_1));
     EXPECT_FALSE(msupport::compare(e3, fl_33_2));
+    EXPECT_FALSE(msupport::compare(e3, a3));
+    EXPECT_FALSE(msupport::compare(e3, s3));
 
     //- Verify expected inequality against init-lists and engines having different contents.
     //
     EXPECT_FALSE(msupport::compare(e3, fl_14_0));
     EXPECT_FALSE(msupport::compare(e3, il_14_1));
     EXPECT_FALSE(msupport::compare(e3, mse_f_fd_rm(LST_14_1)));
+    EXPECT_FALSE(msupport::compare(e3, a4));
+    EXPECT_FALSE(msupport::compare(e3, s4));
 }
 
 
@@ -311,6 +335,32 @@ TEST(MSE_Matrix_2C, EngineCtor)
 }
 
 
+TEST(MSE_Matrix_2C, OtherCtor)
+{
+    //- Construct new engines via other ctors and verify their initial state.
+    //
+    std::array<float, 4>    o1 = LST_4_1;
+    std::vector<float>      o2 = fl_4_2;
+    std::deque<float>       o3 = fl_4_3;
+    mdspan<float, 4>        o4(o1.data());
+
+    mse_f_fd_rm     e1(o1);
+    mse_f_fd_rm     e2(o2);
+    mse_f_fd_rm     e3(o3);
+    mse_f_fd_rm     e4(o4);
+
+    EXPECT_TRUE(msupport::compare(e1, o1));
+    EXPECT_TRUE(msupport::compare(e2, o2));
+    EXPECT_TRUE(msupport::compare(e3, o3));
+    EXPECT_TRUE(msupport::compare(e4, o4));
+
+    EXPECT_TRUE(msupport::compare(e1, fl_4_1));
+    EXPECT_TRUE(msupport::compare(e2, fl_4_2));
+    EXPECT_TRUE(msupport::compare(e3, fl_4_3));
+    EXPECT_TRUE(msupport::compare(e4, fl_4_1));
+}
+
+
 TEST(MSE_Matrix_2C, MoveAssign)
 {
     //- Default construct and verify initial state.
@@ -466,6 +516,51 @@ TEST(MSE_Matrix_2C, ListAssign)
     EXPECT_TRUE(msupport::compare(e1, LST_14_0));
     EXPECT_TRUE(msupport::compare(e1, il_14_0));
     EXPECT_TRUE(msupport::compare(e1, fl_14_0));
+}
+
+
+TEST(MSE_Matrix_2C, OtherAssign)
+{
+    //- Default construct and verify initial state.
+    //
+    mse_f_fd_rm      e1;
+    mse_f_fd_cm      e2 = LST_5_2;
+
+    e1.reshape_columns(4, 0);
+    EXPECT_EQ(e1.rows(), 1);
+    EXPECT_EQ(e1.columns(), 4);
+    EXPECT_EQ(e1.row_capacity(), 1);
+    EXPECT_EQ(e1.column_capacity(), 4);
+    EXPECT_TRUE(msupport::compare(e1, LST_14_0));
+
+    EXPECT_EQ(e2.rows(), 1);
+    EXPECT_EQ(e2.columns(), 5);
+    EXPECT_EQ(e2.row_capacity(), 1);
+    EXPECT_EQ(e2.column_capacity(), 5);
+    EXPECT_TRUE(msupport::compare(e2, fl_15_2));
+
+    //- Assign and verify.
+    //
+    std::array<float, 4>    o1 = LST_4_1;
+    std::vector<float>      o2 = fl_4_2;
+    std::deque<float>       o3 = fl_4_3;
+    mdspan<float, 4>        o4(o1.data());
+
+    e1 = o1;
+    EXPECT_TRUE(msupport::compare(e1, o1));
+    EXPECT_TRUE(msupport::compare(e1, fl_4_1));
+
+    e2 = o2;
+    EXPECT_TRUE(msupport::compare(e2, o2));
+    EXPECT_TRUE(msupport::compare(e2, fl_4_2));
+
+    e1 = o3;
+    EXPECT_TRUE(msupport::compare(e1, o3));
+    EXPECT_TRUE(msupport::compare(e1, fl_4_3));
+
+    e2 = o4;
+    EXPECT_TRUE(msupport::compare(e2, o4));
+    EXPECT_TRUE(msupport::compare(e2, fl_4_1));
 }
 
 

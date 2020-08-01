@@ -39,7 +39,19 @@ TEST(MSE_Matrix_3A, DefaultCtor)
 
 TEST(MSE_Matrix_3A, CmpEq)
 {
-    mse_f_ffv_rm    e1, e2, e3;
+    mse_f_ffv_rm            e1, e2, e3;
+
+    std::array<float, 4>    a1 = LST_4_0;
+    mdspan<float, 4>        s1(a1.data());
+
+    std::array<float, 4>    a2 = LST_4_2;
+    mdspan<float, 4>        s2(a2.data());
+
+    std::array<float, 5>    a3 = LST_5_2;
+    mdspan<float, 5>        s3(a2.data());
+
+    std::array<float, 4>    a4 = LST_4_3;
+    mdspan<float, 4>        s4(a4.data());
 
     //- Verify size, capacity, initial values.
     //
@@ -63,17 +75,21 @@ TEST(MSE_Matrix_3A, CmpEq)
     EXPECT_TRUE(msupport::compare(e1, e2));
     EXPECT_TRUE(msupport::compare(e1, e3));
 
-    //- Verify equality against an init-list of equivalent values.
+    //- Verify equality against an init-list, array, and mdspan of equivalent values.
     //
     EXPECT_TRUE(msupport::compare(e1, LST_41_0));
     EXPECT_TRUE(msupport::compare(e1, il_41_0));
     EXPECT_TRUE(msupport::compare(e1, fl_41_0));
+    EXPECT_TRUE(msupport::compare(e1, a1));
+    EXPECT_TRUE(msupport::compare(e1, s1));
 
-    //- Verify inequality against an init-list of different values.
+    //- Verify inequality against an init-list, array, and mdspan of different values.
     //
     EXPECT_FALSE(msupport::compare(e1, LST_41_1));
     EXPECT_FALSE(msupport::compare(e1, il_41_1));
     EXPECT_FALSE(msupport::compare(e1, fl_41_1));
+    EXPECT_FALSE(msupport::compare(e1, a2));
+    EXPECT_FALSE(msupport::compare(e1, s2));
 
     //- Assign new element values via mutable indexing and verify them.
     //
@@ -104,10 +120,14 @@ TEST(MSE_Matrix_3A, CmpEq)
     EXPECT_TRUE(msupport::compare(e2, LST_41_2));
     EXPECT_TRUE(msupport::compare(e2, il_41_2));
     EXPECT_TRUE(msupport::compare(e2, fl_41_2));
+    EXPECT_TRUE(msupport::compare(e2, a2));
+    EXPECT_TRUE(msupport::compare(e2, s2));
 
     EXPECT_TRUE(msupport::compare(e3, LST_41_2));
     EXPECT_TRUE(msupport::compare(e3, il_41_2));
     EXPECT_TRUE(msupport::compare(e3, fl_41_2));
+    EXPECT_TRUE(msupport::compare(e3, a2));
+    EXPECT_TRUE(msupport::compare(e3, s2));
 
     EXPECT_TRUE(msupport::compare(e2, e3));
     EXPECT_FALSE(msupport::compare(e2, e1));
@@ -118,12 +138,16 @@ TEST(MSE_Matrix_3A, CmpEq)
     EXPECT_FALSE(msupport::compare(e3, LST_33_0));
     EXPECT_FALSE(msupport::compare(e3, il_33_1));
     EXPECT_FALSE(msupport::compare(e3, fl_33_2));
+    EXPECT_FALSE(msupport::compare(e3, a3));
+    EXPECT_FALSE(msupport::compare(e3, s3));
 
     //- Verify expected inequality against init-lists and engines having different contents.
     //
     EXPECT_FALSE(msupport::compare(e3, fl_41_0));
     EXPECT_FALSE(msupport::compare(e3, il_41_1));
     EXPECT_FALSE(msupport::compare(e3, mse_f_ffv_rm(LST_41_1)));
+    EXPECT_FALSE(msupport::compare(e3, a4));
+    EXPECT_FALSE(msupport::compare(e3, s4));
 }
 
 
@@ -299,6 +323,32 @@ TEST(MSE_Matrix_3A, EngineCtor)
 }
 
 
+TEST(MSE_Matrix_3A, OtherCtor)
+{
+    //- Construct new engines via other ctors and verify their initial state.
+    //
+    std::array<float, 4>    o1 = LST_4_1;
+    std::vector<float>      o2 = fl_4_2;
+    std::deque<float>       o3 = fl_4_3;
+    mdspan<float, 4>        o4(o1.data());
+
+    mse_f_ffv_rm    e1(o1);
+    mse_f_ffv_cm    e2(o2);
+    mse_f_ffv_rm    e3(o3);
+    mse_f_ffv_cm    e4(o4);
+
+    EXPECT_TRUE(msupport::compare(e1, o1));
+    EXPECT_TRUE(msupport::compare(e2, o2));
+    EXPECT_TRUE(msupport::compare(e3, o3));
+    EXPECT_TRUE(msupport::compare(e4, o4));
+
+    EXPECT_TRUE(msupport::compare(e1, fl_4_1));
+    EXPECT_TRUE(msupport::compare(e2, fl_4_2));
+    EXPECT_TRUE(msupport::compare(e3, fl_4_3));
+    EXPECT_TRUE(msupport::compare(e4, fl_4_1));
+}
+
+
 TEST(MSE_Matrix_3A, MoveAssign)
 {
     //- Default construct and verify initial state.
@@ -451,6 +501,50 @@ TEST(MSE_Matrix_3A, ListAssign)
     EXPECT_TRUE(msupport::compare(e1, il_41_0));
     EXPECT_TRUE(msupport::compare(e1, fl_41_0));
     EXPECT_TRUE(msupport::compare(e1, mse_f_ffv_rm()));
+}
+
+
+TEST(MSE_Matrix_3A, OtherAssign)
+{
+    //- Default construct and verify initial state.
+    //
+    mse_f_ffv_rm     e1;
+    mse_f_ffv_cm     e2(il_4_1);
+
+    EXPECT_EQ(e1.rows(), 4);
+    EXPECT_EQ(e1.columns(), 1);
+    EXPECT_EQ(e1.row_capacity(), 4);
+    EXPECT_EQ(e1.column_capacity(), 1);
+    EXPECT_TRUE(msupport::compare(e1, LST_41_0));
+
+    EXPECT_EQ(e2.rows(), 4);
+    EXPECT_EQ(e2.columns(), 1);
+    EXPECT_EQ(e2.row_capacity(), 4);
+    EXPECT_EQ(e2.column_capacity(), 1);
+    EXPECT_TRUE(msupport::compare(e2, LST_41_1));
+
+    //- Assign and verify.
+    //
+    std::array<float, 4>    o1 = LST_4_1;
+    std::vector<float>      o2 = fl_4_2;
+    std::deque<float>       o3 = fl_4_3;
+    mdspan<float, 4>        o4(o1.data());
+
+    e1 = o1;
+    EXPECT_TRUE(msupport::compare(e1, o1));
+    EXPECT_TRUE(msupport::compare(e1, fl_4_1));
+
+    e2 = o2;
+    EXPECT_TRUE(msupport::compare(e2, o2));
+    EXPECT_TRUE(msupport::compare(e2, fl_4_2));
+
+    e1 = o3;
+    EXPECT_TRUE(msupport::compare(e1, o3));
+    EXPECT_TRUE(msupport::compare(e1, fl_4_3));
+
+    e2 = o4;
+    EXPECT_TRUE(msupport::compare(e2, o4));
+    EXPECT_TRUE(msupport::compare(e2, fl_4_1));
 }
 
 

@@ -295,8 +295,8 @@ class matrix_storage_engine<T, extents<N>, A, L>
 //  for use by class template basic_matrix<ET, OT>.  Specifically, it models a mathematical
 //  matrix with R rows and C columns, employing allocator A, and having element layout L.
 //
-//  Sizes R and C may be positive integers, or have the value "dynamic_extent" (defined by the
-//  mdspan facilities).  Allocator type A may be void, which indicates internal non-heap element
+//  Sizes R and C may be positive integers, or have the value "dynamic_extent" (defined in the
+//  <mdspan> header).  Allocator type A may be void, which indicates internal non-heap element
 //  storage, or it may be an allocator type that fulfills all the requirements imposed by
 //  std::allocator_traits.  Layout type L must be "row_major" or "column_major".
 //
@@ -331,7 +331,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     static constexpr bool   is_1d_indexable      = storage_type::is_1d_indexable;
     static constexpr bool   is_column_major      = storage_type::is_column_major;
     static constexpr bool   is_row_major         = storage_type::is_row_major;
-    static constexpr bool   is_two_d_reshapable = storage_type::is_two_d_reshapable;
+    static constexpr bool   is_two_d_reshapable  = storage_type::is_two_d_reshapable;
     static constexpr bool   is_column_reshapable = storage_type::is_column_reshapable;
     static constexpr bool   is_row_reshapable    = storage_type::is_row_reshapable;
 

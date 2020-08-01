@@ -295,7 +295,7 @@ TEST(MSE_Vector, OtherCtor)
 
     //- Construct new engines via other ctors and verify their initial state.
     //
-    std::array<float, 4>    o1 LST_4_1;
+    std::array<float, 4>    o1 = LST_4_1;
     std::vector<float>      o2 = fl_4_2;
     std::deque<float>       o3 = fl_4_3;
     mdspan<float, 4>        o4(o1.data());
@@ -517,7 +517,7 @@ TEST(MSE_Vector, OtherAssign)
 
     //- Assign to engines via other assignment operators and verify.
     //
-    std::array<float, 4>    o1 LST_4_1;
+    std::array<float, 4>    o1 = LST_4_1;
     std::vector<float>      o2 = fl_4_2;
     std::deque<float>       o3 = fl_4_3;
     mdspan<float, 4>        o4(o1.data());
@@ -525,18 +525,42 @@ TEST(MSE_Vector, OtherAssign)
     e1a = o1;
     e2a = o1;
     e3a = o1;
+    EXPECT_TRUE(vsupport::compare(e1a, o1));
+    EXPECT_TRUE(vsupport::compare(e2a, o1));
+    EXPECT_TRUE(vsupport::compare(e3a, o1));
+    EXPECT_TRUE(vsupport::compare(e1a, e2a));
+    EXPECT_TRUE(vsupport::compare(e1a, e3a));
+    EXPECT_TRUE(vsupport::compare(e2a, e3a));
 
     e1b = o2;
     e2b = o2;
     e3b = o2;
+    EXPECT_TRUE(vsupport::compare(e1b, o2));
+    EXPECT_TRUE(vsupport::compare(e2b, o2));
+    EXPECT_TRUE(vsupport::compare(e3b, o2));
+    EXPECT_TRUE(vsupport::compare(e1b, e2b));
+    EXPECT_TRUE(vsupport::compare(e1b, e3b));
+    EXPECT_TRUE(vsupport::compare(e2b, e3b));
 
     e1c = o3;
     e2c = o3;
     e3c = o3;
+    EXPECT_TRUE(vsupport::compare(e1c, o3));
+    EXPECT_TRUE(vsupport::compare(e2c, o3));
+    EXPECT_TRUE(vsupport::compare(e3c, o3));
+    EXPECT_TRUE(vsupport::compare(e1c, e2c));
+    EXPECT_TRUE(vsupport::compare(e1c, e3c));
+    EXPECT_TRUE(vsupport::compare(e2c, e3c));
 
     e1d = o4;
     e2d = o4;
     e3d = o4;
+    EXPECT_TRUE(vsupport::compare(e1d, o4));
+    EXPECT_TRUE(vsupport::compare(e2d, o4));
+    EXPECT_TRUE(vsupport::compare(e3d, o4));
+    EXPECT_TRUE(vsupport::compare(e1d, e2d));
+    EXPECT_TRUE(vsupport::compare(e1d, e3d));
+    EXPECT_TRUE(vsupport::compare(e2d, e3d));
 }
 
 
