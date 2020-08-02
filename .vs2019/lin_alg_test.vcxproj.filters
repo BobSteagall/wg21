@@ -104,6 +104,9 @@
     <ClInclude Include="..\include\linear_algebra\basic_matrix.hpp">
       <Filter>Library Implementation Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\basic_vector.hpp">
+      <Filter>Library Implementation Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tests\test_01.cpp">

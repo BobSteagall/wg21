@@ -130,6 +130,7 @@ namespace STD_LA
 #include "linear_algebra/engine_support.hpp"
 #include "linear_algebra/matrix_storage_engine_data.hpp"
 #include "linear_algebra/matrix_storage_engine.hpp"
+#include "linear_algebra/basic_vector.hpp"
 #include "linear_algebra/basic_matrix.hpp"
 
 #endif  //- LINEAR_ALGEBRA_HPP_DEFINED
