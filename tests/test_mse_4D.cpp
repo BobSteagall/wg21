@@ -5,13 +5,13 @@ using namespace STD_LA::detail;
 using namespace MDSPAN_NS;
 
 //==================================================================================================
-//  Unit tests for dynamically-resizeable matrix engine, Case 4D
+//  Unit tests for dynamically column-resizeable matrix engine, Case 4D
 //==================================================================================================
 //
 using mse_f_fd_cm = matrix_storage_engine<float, extents<4, dynamic_extent>, allocator<float>, column_major>;
 using mse_f_fd_rm = matrix_storage_engine<float, extents<4, dynamic_extent>, allocator<float>, row_major>;
 using mse_i_fd_cm = matrix_storage_engine<int, extents<4, dynamic_extent>, allocator<int>, column_major>;
-using mse_d_fd_rm = matrix_storage_engine<double, extents<4, dynamic_extent>, allocator<double>, column_major>;
+using mse_d_fd_rm = matrix_storage_engine<double, extents<4, dynamic_extent>, allocator<double>, row_major>;
 
 using msupport = matrix_engine_support;
 

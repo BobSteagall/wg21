@@ -11,7 +11,7 @@ using namespace MDSPAN_NS;
 using mse_f_ffa_cm = matrix_storage_engine<float, extents<4, 4>, allocator<float>, column_major>;
 using mse_f_ffa_rm = matrix_storage_engine<float, extents<4, 4>, allocator<float>, row_major>;
 using mse_i_ffa_cm = matrix_storage_engine<int, extents<4, 4>, allocator<int>, column_major>;
-using mse_d_ffa_rm = matrix_storage_engine<double, extents<4, 4>, allocator<double>, column_major>;
+using mse_d_ffa_rm = matrix_storage_engine<double, extents<4, 4>, allocator<double>, row_major>;
 
 using msupport = matrix_engine_support;
 

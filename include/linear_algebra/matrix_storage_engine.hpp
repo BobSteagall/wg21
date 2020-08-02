@@ -29,9 +29,9 @@ namespace STD_LA {
 //
 template<class T, ptrdiff_t N, class A, class L>
 requires
-    detail::valid_engine_extents<extents<N>>
-    and detail::valid_engine_allocator<A, T>
-    and detail::valid_layout_for_1d_storage_engine<L>
+    detail::valid_engine_extents<extents<N>>  and
+    detail::valid_engine_allocator<A, T>  and
+    detail::valid_layout_for_1d_storage_engine<L>
 class matrix_storage_engine<T, extents<N>, A, L>
 {
     using this_type    = matrix_storage_engine;
@@ -80,6 +80,15 @@ class matrix_storage_engine<T, extents<N>, A, L>
     :   m_data()
     {
         do_reshape(size, size);
+    }
+
+    constexpr
+    matrix_storage_engine(index_type size, index_type cap)
+    requires
+        this_type::is_reshapable
+    :   m_data()
+    {
+        do_reshape(size, cap);
     }
 
     template<class ET2>

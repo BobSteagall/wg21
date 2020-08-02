@@ -11,7 +11,7 @@ using namespace MDSPAN_NS;
 using mse_f_dd_cm = matrix_storage_engine<float, extents<dynamic_extent, dynamic_extent>, allocator<float>, column_major>;
 using mse_f_dd_rm = matrix_storage_engine<float, extents<dynamic_extent, dynamic_extent>, allocator<float>, row_major>;
 using mse_i_dd_cm = matrix_storage_engine<int, extents<dynamic_extent, dynamic_extent>, allocator<int>, column_major>;
-using mse_d_dd_rm = matrix_storage_engine<double, extents<dynamic_extent, dynamic_extent>, allocator<double>, column_major>;
+using mse_d_dd_rm = matrix_storage_engine<double, extents<dynamic_extent, dynamic_extent>, allocator<double>, row_major>;
 
 using msupport = matrix_engine_support;
 

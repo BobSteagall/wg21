@@ -247,18 +247,18 @@ bool    is_random_access_standard_container_v = is_random_access_standard_contai
 //--------------------------------------------------------------------------------------------------
 //
 template<class T1, class T2>
-concept comparable_types =
+concept comparable_types_helper =
     requires (T1 t1, T2 t2)
     {
     #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { t1 == t2 } -> same_as<bool>;
-        { t2 == t1 } -> same_as<bool>;
     #else
         requires std::is_same_v<decltype(t1 == t2), bool>;
-        requires std::is_same_v<decltype(t2 == t1), bool>;
     #endif
     };
 
+template<class T1, class T2>
+concept comparable_types = comparable_types_helper<T1, T2> and comparable_types_helper<T2, T1>;
 
 //--------------------------------------------------------------------------------------------------
 //  Concept:    random_access_standard_container<CT>
@@ -721,7 +721,7 @@ struct common_engine_support
         size_t  rows = list.size();
         size_t  cols = list.begin()->size();
 
-        for (auto&& row : list)
+        for (auto row : list)
         {
             if (row.size() != cols)
             {

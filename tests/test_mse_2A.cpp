@@ -622,3 +622,9 @@ TEST(MSE_Matrix_2A, Span)
     EXPECT_EQ(e1(2), 333.0f);
     EXPECT_EQ(e1(3), 444.0f);
 }
+
+
+TEST(MSE_Matrix_2A, Constexpr)
+{
+    constexpr mse_f_ffv_rm  e1 = LST_14_2;
+}

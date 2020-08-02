@@ -1,8 +1,8 @@
 //==================================================================================================
-//  File:       matrix.hpp
+//  File:       basic_matrix.hpp
 //
-//  Summary:    This header defines the matrix class template, one of the two primary math
-//              objects provided by the library.
+//  Summary:    This header defines the basic_matrix class template, one of the two primary
+//              math objects provided by the library.
 //==================================================================================================
 //
 #ifndef LINEAR_ALGEBRA_BASIC_MATRIX_HPP_DEFINED
@@ -12,10 +12,8 @@ namespace STD_LA {
 
 template<class ET, class OT>
 requires
-    detail::copyable<ET>
-    and
-    detail::default_initializable<ET>
-    and
+    detail::copyable<ET>  and
+    detail::default_initializable<ET>  and
     detail::readable_matrix_engine<ET>
 class basic_matrix
 {
@@ -637,10 +635,8 @@ class basic_matrix
   private:
     template<class ET2, class OT2>
     requires
-        detail::copyable<ET2>
-        and
-        detail::default_initializable<ET2>
-        and
+        detail::copyable<ET2>  and
+        detail::default_initializable<ET2>  and
         detail::readable_matrix_engine<ET2>
     friend class basic_matrix;
 

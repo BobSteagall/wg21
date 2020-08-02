@@ -54,7 +54,7 @@ struct mse_data<T, extents<N>, void, L>
     {
         if constexpr (!is_class_v<T>)
         {
-            m_elems.fill(T{});
+            for (auto& elem : m_elems) elem = T{};
         }
     }
     constexpr mse_data(mse_data&&) noexcept = default;
@@ -161,7 +161,7 @@ struct mse_data<T, extents<R, C>, void, L>
     {
         if constexpr (!is_class_v<T>)
         {
-            m_elems.fill(T{});
+            for (auto& elem : m_elems) elem = T{};
         }
     }
     constexpr mse_data(mse_data&&) noexcept = default;
