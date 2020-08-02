@@ -747,7 +747,6 @@ TEST(BasicMatrix, Sanity)
     fs_dyn_matrix<float, 4, 4>      m5(m2);
     dr_matrix<float>                m6(m1);
 
-
     test_fs_matrix<float, 4, 4>     m7;
     test_fs_matrix<float, 4, 4>     m8 = il_44_1;
 
@@ -765,4 +764,39 @@ TEST(BasicMatrix, Sanity)
     EXPECT_TRUE(msupport::compare(m1.engine(), m2.engine()));
 
     dr_matrix<float>    m9(s3);
+
+    std::array<float, 4>    o1 = LST_4_1;
+    std::vector<float>      o2 = fl_4_2;
+    std::deque<float>       o3 = fl_4_3;
+    mdspan<float, 4>        o4(o1.data());
+
+    rv1 = o1;
+    EXPECT_TRUE(msupport::compare(rv1.engine(), o1));
+    rv1 = o4;
+    EXPECT_TRUE(msupport::compare(rv1.engine(), o4));
+
+    cv1 = o2;
+    EXPECT_TRUE(msupport::compare(cv1.engine(), o2));
+    cv1 = o4;
+    EXPECT_TRUE(msupport::compare(cv1.engine(), o4));
+
+    dyn_row_vector<float>   r1(o1);
+    EXPECT_TRUE(msupport::compare(r1.engine(), o1));
+    dyn_col_vector<float>   c1(o1);
+    EXPECT_TRUE(msupport::compare(c1.engine(), o1));
+
+    dyn_row_vector<float>   r2(o2);
+    EXPECT_TRUE(msupport::compare(r2.engine(), o2));
+    dyn_col_vector<float>   c2(o2);
+    EXPECT_TRUE(msupport::compare(c2.engine(), o2));
+
+    dyn_row_vector<float>   r3(o3);
+    EXPECT_TRUE(msupport::compare(r3.engine(), o3));
+    dyn_col_vector<float>   c3(o3);
+    EXPECT_TRUE(msupport::compare(c3.engine(), o3));
+
+    dyn_row_vector<float>   r4(o4);
+    EXPECT_TRUE(msupport::compare(r4.engine(), o4));
+    dyn_col_vector<float>   c4(o4);
+    EXPECT_TRUE(msupport::compare(c4.engine(), o4));
 }

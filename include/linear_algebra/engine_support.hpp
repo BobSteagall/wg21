@@ -178,7 +178,7 @@ bool    is_random_access_standard_container_v = is_random_access_standard_contai
     concept constructible_from = std::constructible_from<DST, SRC>;
 
     template<class DST, class SRC>
-    concept assignable_from = std::assignable_from<DST, SRC>;
+    concept assignable_from = std::assignable_from<DST&, SRC>;
 
     template<class DST, class SRC>
     concept not_convertible_from = not std::convertible_to<SRC, DST>;
@@ -187,7 +187,7 @@ bool    is_random_access_standard_container_v = is_random_access_standard_contai
     concept not_constructible_from = not std::constructible_from<DST, SRC>;
 
     template<class DST, class SRC>
-    concept not_assignable_from = not std::assignable_from<DST, SRC>;
+    concept not_assignable_from = not std::assignable_from<DST&, SRC>;
 
 #else
 
@@ -225,7 +225,7 @@ bool    is_random_access_standard_container_v = is_random_access_standard_contai
     concept constructible_from = destructible<T> and std::is_constructible_v<T, Args...>;
 
     template<class DST, class SRC>
-    concept assignable_from = std::is_assignable_v<DST, SRC>;
+    concept assignable_from = std::is_assignable_v<DST&, SRC>;
 
     template<class DST, class SRC>
     concept not_convertible_from = not convertible_from<DST, SRC>;

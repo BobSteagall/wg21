@@ -13,8 +13,10 @@ namespace STD_LA {
 template<class ET, class OT>
 requires
     detail::copyable<ET>
-    and detail::default_initializable<ET>
-    and detail::readable_matrix_engine<ET>
+    and
+    detail::default_initializable<ET>
+    and
+    detail::readable_matrix_engine<ET>
 class basic_matrix
 {
     static constexpr bool   engine_has_mdspan = detail::spannable_matrix_engine<ET>;
@@ -42,146 +44,200 @@ class basic_matrix
     basic_matrix&   operator =(basic_matrix&&) noexcept = default;
     basic_matrix&   operator =(basic_matrix const&) = default;
 
-    //---------------------
+    //----------------------------------------------------------
     //- Other constructors.
     //
-    inline constexpr
+    constexpr
     basic_matrix(index_type rows, index_type cols)
     requires
         detail::reshapable_matrix_engine<engine_type>
     :   m_engine(rows, cols, rows, cols)
     {}
 
-    inline constexpr
+    constexpr
     basic_matrix(index_type rows, index_type cols, index_type rowcap, index_type colcap)
     requires
         detail::reshapable_matrix_engine<engine_type>
     :   m_engine(rows, cols, rowcap, colcap)
     {}
 
-    //- Construction from a different matrix engine type.
+    //----------------------------------------------------------
+    //- Construction from a matrix of different engine type.
     //
     template<class ET2, class OT2>
-    inline constexpr
+    constexpr explicit
     basic_matrix(basic_matrix<ET2, OT2> const& rhs)
     requires
-        detail::writable_matrix_engine<engine_type>                 and
+        detail::writable_matrix_engine<engine_type>
+        and
         detail::constructible_from<engine_type, ET2>
     :   m_engine(rhs)
     {}
 
     template<class ET2, class OT2>
-    inline constexpr
+    constexpr explicit
     basic_matrix(basic_matrix<ET2, OT2> const& rhs)
     requires
-        detail::writable_matrix_engine<engine_type>                 and
-        detail::not_constructible_from<engine_type, ET2>   and
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::not_constructible_from<engine_type, ET2>
+        and
         detail::convertible_from<element_type, typename ET2::element_type>
     :   m_engine()
     {
         engine_support::assign_from(m_engine, rhs.m_engine);
     }
 
+    //----------------------------------------------------------
     //- Construction from a 2D mdspan.
     //
-    template<class T2, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
-    inline constexpr
-    basic_matrix(basic_mdspan<T2, extents<X0, X1>, L, A> const& rhs)
+    template<class U, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+    constexpr explicit
+    basic_matrix(basic_mdspan<U, extents<X0, X1>, L, A> const& rhs)
     requires
-        detail::writable_matrix_engine<engine_type>                 and
+        detail::writable_matrix_engine<engine_type>
+        and
         detail::constructible_from<engine_type, decltype(rhs)>
     :   m_engine(rhs)
     {}
 
-    template<class T2, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
-    inline constexpr
-    basic_matrix(basic_mdspan<T2, extents<X0, X1>, L, A> const& rhs)
+    template<class U, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+    constexpr explicit
+    basic_matrix(basic_mdspan<U, extents<X0, X1>, L, A> const& rhs)
     requires
-        detail::writable_matrix_engine<engine_type>                             and
-        detail::not_constructible_from<engine_type, decltype(rhs)>  and
-        detail::convertible_from<element_type, T2>
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::not_constructible_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
     :   m_engine()
     {
         engine_support::assign_from(m_engine, rhs);
     }
 
-    //- Construction from a 1D mdspan.
-    //
-    template<class T2, ptrdiff_t X0, class L, class A>
-    inline constexpr
-    basic_matrix(basic_mdspan<T2, extents<X0>, L, A> const& rhs)
-    requires
-        detail::writable_vector_engine<engine_type>                 and
-        detail::assignable_from<engine_type, decltype(rhs)>
-    :   m_engine(rhs)
-    {}
-
-    template<class T2, ptrdiff_t X0, class L, class A>
-    inline constexpr
-    basic_matrix(basic_mdspan<T2, extents<X0>, L, A> const& rhs)
-    requires
-        detail::writable_vector_engine<engine_type>                         and
-        (not detail::assignable_from<engine_type, decltype(rhs)>)  and
-        detail::convertible_from<element_type, T2>
-    :   m_engine()
-    {
-        engine_support::assign_from(m_engine, rhs);
-    }
-
+    //----------------------------------------------------------
     //- Construction from a 2D initialization list.
     //
-    template<class T2>
-    inline constexpr
-    basic_matrix(initializer_list<initializer_list<T2>> rhs)
+    template<class U>
+    constexpr
+    basic_matrix(initializer_list<initializer_list<U>> rhs)
     requires
-        detail::writable_matrix_engine<engine_type>                 and
+        detail::writable_matrix_engine<engine_type>
+        and
         detail::constructible_from<engine_type, decltype(rhs)>
     :   m_engine(rhs)
     {}
 
-    template<class T2>
-    inline constexpr
-    basic_matrix(initializer_list<initializer_list<T2>> rhs)
+    template<class U>
+    constexpr
+    basic_matrix(initializer_list<initializer_list<U>> rhs)
     requires
-        detail::writable_matrix_engine<engine_type>                 and
-        detail::not_constructible_from<engine_type, decltype(rhs)>   and
-        detail::convertible_from<element_type, T2>
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::not_constructible_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
     :   m_engine()
     {
         engine_support::assign_from(m_engine, rhs);
     }
 
+    //----------------------------------------------------------
+    //- Construction from a 1D standard sequence container.
+    //
+    template<class CT>
+    constexpr explicit
+    basic_matrix(CT const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<ET>
+        and
+        detail::random_access_standard_container<CT>
+        and
+        detail::constructible_from<engine_type, CT>
+        and
+        detail::convertible_from<typename ET::element_type, typename CT::value_type>
+    :   m_engine(rhs)
+    {}
+
+    template<class CT>
+    constexpr explicit
+    basic_matrix(CT const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<ET>
+        and
+        detail::random_access_standard_container<CT>
+        and
+        detail::not_constructible_from<engine_type, CT>
+        and
+        detail::convertible_from<typename ET::element_type, typename CT::value_type>
+    :   m_engine()
+    {
+        engine_support::assign_from(m_engine, rhs);
+    }
+
+    //----------------------------------------------------------
+    //- Construction from a 1D mdspan.
+    //
+    template<class U, ptrdiff_t X0, class L, class A>
+    constexpr explicit
+    basic_matrix(basic_mdspan<U, extents<X0>, L, A> const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::constructible_from<engine_type, decltype(rhs)>
+    :   m_engine(rhs)
+    {}
+
+    template<class U, ptrdiff_t X0, class L, class A>
+    constexpr explicit
+    basic_matrix(basic_mdspan<U, extents<X0>, L, A> const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::not_constructible_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
+    :   m_engine()
+    {
+        engine_support::assign_from(m_engine, rhs);
+    }
+
+    //----------------------------------------------------------
     //- Construction from a 1D initialization list.
     //
-    template<class T2>
-    inline constexpr
-    basic_matrix(initializer_list<T2> rhs)
+    template<class U>
+    constexpr
+    basic_matrix(initializer_list<U> rhs)
     requires
-        detail::writable_vector_engine<engine_type>                 and
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
         detail::constructible_from<engine_type, decltype(rhs)>
     :   m_engine(rhs)
     {}
 
-    template<class T2>
-    inline constexpr
-    basic_matrix(initializer_list<T2> rhs)
+    template<class U>
+    constexpr
+    basic_matrix(initializer_list<U> rhs)
     requires
-        detail::writable_vector_engine<engine_type>                 and
-        (not detail::constructible_from<engine_type, decltype(rhs)>)   and
-        detail::convertible_from<element_type, T2>
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::not_constructible_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
     :   m_engine()
     {
         engine_support::assign_from(m_engine, rhs);
     }
 
-    //-------------------------------------------------
+    //----------------------------------------------------------
     //- Assignment from a different matrix engine type.
     //
     template<class ET2, class OT2>
-    inline constexpr basic_matrix&
+    constexpr basic_matrix&
     operator =(basic_matrix<ET2, OT2> const& rhs)
     requires
-        detail::writable_matrix_engine<engine_type>                 and
+        detail::writable_matrix_engine<engine_type>
+        and
         detail::assignable_from<engine_type, ET2>
     {
         m_engine = rhs.m_engine;
@@ -189,178 +245,231 @@ class basic_matrix
     }
 
     template<class ET2, class OT2>
-    inline constexpr basic_matrix&
+    constexpr basic_matrix&
     operator =(basic_matrix<ET2, OT2> const& rhs)
     requires
-        detail::writable_matrix_engine<engine_type>                 and
-        (not detail::assignable_from<engine_type, ET2>)      and
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::not_assignable_from<engine_type, ET2>
+        and
         detail::convertible_from<element_type, typename ET2::element_type>
     {
         engine_support::assign_from(m_engine, rhs.m_engine);
         return *this;
     }
 
+    //----------------------------------------------------------
     //- Assignment from a 2D mdspan.
     //
-    template<class T2, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
-    inline constexpr basic_matrix&
-    operator =(basic_mdspan<T2, extents<X0, X1>, L, A> const& rhs)
+    template<class U, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+    constexpr basic_matrix&
+    operator =(basic_mdspan<U, extents<X0, X1>, L, A> const& rhs)
     requires
-        detail::writable_matrix_engine<engine_type>                 and
+        detail::writable_matrix_engine<engine_type>
+        and
         detail::assignable_from<engine_type, decltype(rhs)>
     {
         m_engine = rhs;
         return *this;
     }
 
-    template<class T2, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
-    inline constexpr basic_matrix&
-    operator =(basic_mdspan<T2, extents<X0, X1>, L, A> const& rhs)
+    template<class U, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+    constexpr basic_matrix&
+    operator =(basic_mdspan<U, extents<X0, X1>, L, A> const& rhs)
     requires
-        detail::writable_matrix_engine<engine_type>                             and
-        (not detail::assignable_from<engine_type, decltype(rhs)>)  and
-        detail::convertible_from<element_type, T2>
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::not_assignable_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
     {
         engine_support::assign_from(m_engine, rhs);
         return *this;
     }
 
-    //- Assignment from a 1D mdspan.
-    //
-    template<class T2, ptrdiff_t X0, class L, class A>
-    inline constexpr basic_matrix&
-    operator =(basic_mdspan<T2, extents<X0>, L, A> const& rhs)
-    requires
-        detail::writable_vector_engine<engine_type>                 and
-        detail::assignable_from<engine_type, decltype(rhs)>
-    {
-        m_engine = rhs;
-        return *this;
-    }
-
-    template<class T2, ptrdiff_t X0, class L, class A>
-    inline constexpr basic_matrix&
-    operator =(basic_mdspan<T2, extents<X0>, L, A> const& rhs)
-    requires
-        detail::writable_vector_engine<engine_type>                         and
-        (not detail::assignable_from<engine_type, decltype(rhs)>)  and
-        detail::convertible_from<element_type, T2>
-    {
-        engine_support::assign_from(m_engine, rhs);
-        return *this;
-    }
-
+    //----------------------------------------------------------
     //- Assignment from a 2D initializtion list.
     //
-    template<class T2>
-    inline constexpr basic_matrix&
-    operator =(initializer_list<initializer_list<T2>> rhs)
+    template<class U>
+    constexpr basic_matrix&
+    operator =(initializer_list<initializer_list<U>> rhs)
     requires
-        detail::writable_matrix_engine<engine_type>                 and
+        detail::writable_matrix_engine<engine_type>
+        and
         detail::assignable_from<engine_type, decltype(rhs)>
     {
         m_engine = rhs;
         return *this;
     }
 
-    template<class T2>
-    inline constexpr basic_matrix&
-    operator =(initializer_list<initializer_list<T2>> rhs)
+    template<class U>
+    constexpr basic_matrix&
+    operator =(initializer_list<initializer_list<U>> rhs)
     requires
-        detail::writable_matrix_engine<engine_type>                 and
-        (not detail::assignable_from<engine_type, decltype(rhs)>)      and
-        detail::convertible_from<element_type, T2>
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::not_assignable_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
     {
         engine_support::assign_from(m_engine, rhs);
         return *this;
     }
 
+    //----------------------------------------------------------
+    //- Assignment from a 1D standard sequence container.
+    //
+    template<class CT>
+    constexpr basic_matrix&
+    operator =(CT const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::random_access_standard_container<CT>
+        and
+        detail::assignable_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, typename CT::value_type>
+    {
+        m_engine = rhs;
+        return *this;
+    }
+
+    template<class CT>
+    constexpr basic_matrix&
+    operator =(CT const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<ET>
+        and
+        detail::random_access_standard_container<CT>
+        and
+        detail::not_assignable_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, typename CT::value_type>
+    {
+        engine_support::assign_from(m_engine, rhs);
+        return *this;
+    }
+
+    //----------------------------------------------------------
+    //- Assignment from a 1D mdspan.
+    //
+    template<class U, ptrdiff_t X0, class L, class A>
+    constexpr basic_matrix&
+    operator =(basic_mdspan<U, extents<X0>, L, A> const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::assignable_from<engine_type, decltype(rhs)>
+    {
+        m_engine = rhs;
+        return *this;
+    }
+
+    template<class U, ptrdiff_t X0, class L, class A>
+    constexpr basic_matrix&
+    operator =(basic_mdspan<U, extents<X0>, L, A> const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::not_assignable_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
+    {
+        engine_support::assign_from(m_engine, rhs);
+        return *this;
+    }
+
+    //----------------------------------------------------------
     //- Assignment from a 1D initializtion list.
     //
-    template<class T2>
-    inline constexpr basic_matrix&
-    operator =(initializer_list<T2> rhs)
+    template<class U>
+    constexpr basic_matrix&
+    operator =(initializer_list<U> rhs)
     requires
-        detail::writable_vector_engine<engine_type>                 and
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
         detail::assignable_from<engine_type, decltype(rhs)>
     {
         m_engine = rhs;
         return *this;
     }
 
-    template<class T2>
-    inline constexpr basic_matrix&
-    operator =(initializer_list<T2> rhs)
+    template<class U>
+    constexpr basic_matrix&
+    operator =(initializer_list<U> rhs)
     requires
-        detail::writable_vector_engine<engine_type>                 and
-        (not detail::assignable_from<engine_type, decltype(rhs)>)      and
-        detail::convertible_from<element_type, T2>
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::not_assignable_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
     {
         engine_support::assign_from(m_engine, rhs);
         return *this;
     }
 
-    //------------------------------
+    //----------------------------------------------------------
     //- Size and capacity reporting.
     //
-    inline constexpr index_type
+    constexpr index_type
     elements() const noexcept
     {
         return m_engine.elements();
     }
 
-    inline constexpr index_type
+    constexpr index_type
     columns() const noexcept
     {
         return m_engine.columns();
     }
 
-    inline constexpr index_type
+    constexpr index_type
     rows() const noexcept
     {
         return m_engine.rows();
     }
 
-    inline constexpr index_type
+    constexpr index_type
     size() const noexcept
     {
         return m_engine.size();
     }
 
-    inline constexpr index_type
+    constexpr index_type
     column_capacity() const noexcept
     {
         return m_engine.column_capacity();
     }
 
-    inline constexpr index_type
+    constexpr index_type
     row_capacity() const noexcept
     {
         return m_engine.row_capacity();
     }
 
-    inline constexpr index_type
+    constexpr index_type
     capacity() const noexcept
     {
         return m_engine.capacity();
     }
 
-    //-----------------
+    //----------------------------------------------------------
     //- Element access.
     //
-    inline constexpr reference
+    constexpr reference
     operator ()(index_type i, index_type j)
     {
         return m_engine(i, j);
     }
 
-    inline constexpr const_reference
+    constexpr const_reference
     operator ()(index_type i, index_type j) const
     {
         return m_engine(i, j);
     }
 
-    inline constexpr reference
+    constexpr reference
     operator ()(index_type i)
     requires
         detail::readable_vector_engine<engine_type>
@@ -368,7 +477,7 @@ class basic_matrix
         return m_engine(i);
     }
 
-    inline constexpr const_reference
+    constexpr const_reference
     operator ()(index_type i) const
     requires
         detail::readable_vector_engine<engine_type>
@@ -376,22 +485,22 @@ class basic_matrix
         return m_engine(i);
     }
 
-    //--------------
+    //----------------------------------------------------------
     //- Data access.
     //
-    inline constexpr engine_type&
+    constexpr engine_type&
     engine() noexcept
     {
         return m_engine;
     }
 
-    inline constexpr engine_type const&
+    constexpr engine_type const&
     engine() const noexcept
     {
         return m_engine;
     }
 
-    inline constexpr span_type
+    constexpr span_type
     span() noexcept
     requires
         detail::spannable_matrix_engine<engine_type>
@@ -399,7 +508,7 @@ class basic_matrix
         return m_engine.span();
     }
 
-    inline constexpr const_span_type
+    constexpr const_span_type
     span() const noexcept
     requires
         detail::spannable_matrix_engine<engine_type>
@@ -407,10 +516,10 @@ class basic_matrix
         return m_engine.span();
     }
 
-    //-----------------------------------
+    //----------------------------------------------------------
     //- Setting column size and capacity.
     //
-    inline constexpr void
+    constexpr void
     resize_columns(index_type cols)
     requires
         detail::column_reshapable_matrix_engine<engine_type>
@@ -418,7 +527,7 @@ class basic_matrix
         m_engine.reshape_columns(cols, m_engine.column_capacity());
     }
 
-    inline constexpr void
+    constexpr void
     reserve_columns(index_type colcap)
     requires
         detail::column_reshapable_matrix_engine<engine_type>
@@ -426,7 +535,7 @@ class basic_matrix
         m_engine.reshape_columns(m_engine.columns(), colcap);
     }
 
-    inline constexpr void
+    constexpr void
     reshape_columns(index_type cols, index_type colcap)
     requires
         detail::column_reshapable_matrix_engine<engine_type>
@@ -434,10 +543,10 @@ class basic_matrix
         m_engine.reshape_columns(cols, colcap);
     }
 
-    //--------------------------------
+    //----------------------------------------------------------
     //- Setting row size and capacity.
     //
-    inline constexpr void
+    constexpr void
     resize_rows(index_type rows)
     requires
         detail::row_reshapable_matrix_engine<engine_type>
@@ -445,7 +554,7 @@ class basic_matrix
         m_engine.reshape_rows(rows, m_engine.row_capacity());
     }
 
-    inline constexpr void
+    constexpr void
     reserve_rows(index_type rowcap)
     requires
         detail::row_reshapable_matrix_engine<engine_type>
@@ -453,7 +562,7 @@ class basic_matrix
         m_engine.reshape_rows(m_engine.rows(), rowcap);
     }
 
-    inline constexpr void
+    constexpr void
     reshape_rows(index_type rows, index_type rowcap)
     requires
         detail::row_reshapable_matrix_engine<engine_type>
@@ -461,10 +570,10 @@ class basic_matrix
         m_engine.reshape_rows(rows, rowcap);
     }
 
-    //------------------------------------
+    //----------------------------------------------------------
     //- Setting overall size and capacity.
     //
-    inline constexpr void
+    constexpr void
     resize(index_type rows, index_type cols)
     requires
         detail::reshapable_matrix_engine<engine_type>
@@ -472,7 +581,7 @@ class basic_matrix
         m_engine.reshape(rows, cols, m_engine.row_capacity(), m_engine.column_capacity());
     }
 
-    inline constexpr void
+    constexpr void
     reserve(index_type rowcap, index_type colcap)
     requires
         detail::reshapable_matrix_engine<engine_type>
@@ -480,7 +589,7 @@ class basic_matrix
         m_engine.reshape(m_engine.rows(), m_engine.columns(), rowcap, colcap);
     }
 
-    inline constexpr void
+    constexpr void
     reshape(index_type rows, index_type cols, index_type rowcap, index_type colcap)
     requires
         detail::reshapable_matrix_engine<engine_type>
@@ -488,10 +597,10 @@ class basic_matrix
         m_engine.reshape(rows, cols, rowcap, colcap);
     }
 
-    //------------------
+    //----------------------------------------------------------
     //- Other modifiers.
     //
-    inline constexpr void
+    constexpr void
     swap(basic_matrix& rhs) noexcept
     {
         m_engine.swap(rhs.m_engine);
@@ -506,7 +615,7 @@ class basic_matrix
         {
             for (index_type i = 0;  i < m_engine.rows();  ++i)
             {
-                detail::la_swap(m_engine(i, c1), m_engine(i, c2));
+                engine_support::swap(m_engine(i, c1), m_engine(i, c2));
             }
         }
     }
@@ -520,7 +629,7 @@ class basic_matrix
         {
             for (index_type j = 0;  j < m_engine.columns();  ++j)
             {
-                detail::la_swap(m_engine(r1, j), m_engine(r2, j));
+                engine_support::swap(m_engine(r1, j), m_engine(r2, j));
             }
         }
     }
@@ -529,8 +638,10 @@ class basic_matrix
     template<class ET2, class OT2>
     requires
         detail::copyable<ET2>
-        and detail::default_initializable<ET2>
-        and detail::readable_matrix_engine<ET2>
+        and
+        detail::default_initializable<ET2>
+        and
+        detail::readable_matrix_engine<ET2>
     friend class basic_matrix;
 
     engine_type     m_engine;
