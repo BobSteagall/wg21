@@ -69,7 +69,7 @@ class basic_matrix
         detail::writable_matrix_engine<engine_type>
         and
         detail::constructible_from<engine_type, ET2>
-    :   m_engine(rhs)
+    :   m_engine(rhs.engine())
     {}
 
     template<class ET2, class OT2>
@@ -83,7 +83,7 @@ class basic_matrix
         detail::convertible_from<element_type, typename ET2::element_type>
     :   m_engine()
     {
-        engine_support::assign_from(m_engine, rhs.m_engine);
+        engine_support::assign_from(m_engine, rhs.engine());
     }
 
     //----------------------------------------------------------
@@ -141,7 +141,34 @@ class basic_matrix
     }
 
     //----------------------------------------------------------
-    //- Construction from a 1D standard sequence container.
+    //- Construction from a basic_vector.
+    //
+    template<class ET2, class OT2>
+    constexpr explicit
+    basic_matrix(basic_vector<ET2, OT2> const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::constructible_from<engine_type, ET2>
+    :   m_engine(rhs.engine())
+    {}
+
+    template<class ET2, class OT2>
+    constexpr explicit
+    basic_matrix(basic_vector<ET2, OT2> const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::not_constructible_from<engine_type, ET2>
+        and
+        detail::convertible_from<element_type, typename ET2::element_type>
+    :   m_engine()
+    {
+        engine_support::assign_from(m_engine, rhs.engine());
+    }
+
+    //----------------------------------------------------------
+    //- Construction from a standard random-access container.
     //
     template<class CT>
     constexpr explicit
@@ -238,7 +265,7 @@ class basic_matrix
         and
         detail::assignable_from<engine_type, ET2>
     {
-        m_engine = rhs.m_engine;
+        m_engine = rhs.engine();
         return *this;
     }
 
@@ -252,7 +279,7 @@ class basic_matrix
         and
         detail::convertible_from<element_type, typename ET2::element_type>
     {
-        engine_support::assign_from(m_engine, rhs.m_engine);
+        engine_support::assign_from(m_engine, rhs.engine());
         return *this;
     }
 
@@ -315,7 +342,36 @@ class basic_matrix
     }
 
     //----------------------------------------------------------
-    //- Assignment from a 1D standard sequence container.
+    //- Assignment from a basic_vector.
+    //
+    template<class ET2, class OT2>
+    constexpr basic_matrix&
+    operator =(basic_vector<ET2, OT2> const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::assignable_from<engine_type, ET2>
+    {
+        m_engine = rhs.engine();
+        return *this;
+    }
+
+    template<class ET2, class OT2>
+    constexpr basic_matrix&
+    operator =(basic_vector<ET2, OT2> const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<ET>
+        and
+        detail::not_assignable_from<engine_type, ET2>
+        and
+        detail::convertible_from<element_type, typename ET2::element_type>
+    {
+        engine_support::assign_from(m_engine, rhs.engine());
+        return *this;
+    }
+
+    //----------------------------------------------------------
+    //- Assignment from a standard random-access container.
     //
     template<class CT>
     constexpr basic_matrix&
@@ -470,7 +526,7 @@ class basic_matrix
     constexpr reference
     operator ()(index_type i)
     requires
-        detail::readable_vector_engine<engine_type>
+        detail::readable_and_1d_indexable_matrix_engine<engine_type>
     {
         return m_engine(i);
     }
@@ -478,7 +534,7 @@ class basic_matrix
     constexpr const_reference
     operator ()(index_type i) const
     requires
-        detail::readable_vector_engine<engine_type>
+        detail::readable_and_1d_indexable_matrix_engine<engine_type>
     {
         return m_engine(i);
     }
@@ -601,7 +657,7 @@ class basic_matrix
     constexpr void
     swap(basic_matrix& rhs) noexcept
     {
-        m_engine.swap(rhs.m_engine);
+        m_engine.swap(rhs.engine());
     }
 
     constexpr void

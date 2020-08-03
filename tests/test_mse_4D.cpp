@@ -799,4 +799,7 @@ TEST(BasicMatrix, Sanity)
     EXPECT_TRUE(msupport::compare(r4.engine(), o4));
     dyn_col_vector<float>   c4(o4);
     EXPECT_TRUE(msupport::compare(c4.engine(), o4));
+
+    dyn_vec<float>  dv1(4);
+
 }

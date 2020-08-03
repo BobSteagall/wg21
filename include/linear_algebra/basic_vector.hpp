@@ -12,16 +12,20 @@ namespace STD_LA {
 
 template<class ET, class OT>
 requires
-    detail::copyable<ET>  and
-    detail::default_initializable<ET>  and
+    detail::copyable<ET>
+    and
+    detail::default_initializable<ET>
+    and
     detail::readable_matrix_engine<ET>
 class basic_matrix;
 
 
 template<class ET, class OT>
 requires
-    detail::copyable<ET>  and
-    detail::default_initializable<ET>  and
+    detail::copyable<ET>
+    and
+    detail::default_initializable<ET>
+    and
     detail::readable_vector_engine<ET>
 class basic_vector
 {
@@ -68,7 +72,7 @@ class basic_vector
     {}
 
     //----------------------------------------------------------
-    //- Construction from a matrix of different engine type.
+    //- Construction from a vector of different engine type.
     //
     template<class ET2, class OT2>
     constexpr explicit
@@ -91,7 +95,38 @@ class basic_vector
         detail::convertible_from<element_type, typename ET2::element_type>
     :   m_engine()
     {
-        engine_support::assign_from(m_engine, rhs.m_engine);
+        engine_support::assign_from(m_engine, rhs.engine());
+    }
+
+    //----------------------------------------------------------
+    //- Construction from a row/column basic_matrix.
+    //
+    template<class ET2, class OT2>
+    constexpr explicit
+    basic_vector(basic_matrix<ET2, OT2> const& rhs)
+    requires
+        detail::writable_vector_engine<engine_type>
+        and
+        detail::readable_and_1d_indexable_matrix_engine<ET2>
+        and
+        detail::constructible_from<engine_type, ET2>
+    :   m_engine(rhs.engine())
+    {}
+
+    template<class ET2, class OT2>
+    constexpr explicit
+    basic_vector(basic_matrix<ET2, OT2> const& rhs)
+    requires
+        detail::writable_vector_engine<engine_type>
+        and
+        detail::readable_and_1d_indexable_matrix_engine<ET2>
+        and
+        detail::not_constructible_from<engine_type, ET2>
+        and
+        detail::convertible_from<element_type, typename ET2::element_type>
+    :   m_engine()
+    {
+        engine_support::assign_from(m_engine, rhs.engine());
     }
 
     //----------------------------------------------------------
@@ -182,7 +217,7 @@ class basic_vector
     }
 
     //----------------------------------------------------------
-    //- Assignment from a different matrix engine type.
+    //- Assignment from a vector of different engine type.
     //
     template<class ET2, class OT2>
     constexpr basic_vector&
@@ -192,7 +227,7 @@ class basic_vector
         and
         detail::assignable_from<engine_type, ET2>
     {
-        m_engine = rhs.m_engine;
+        m_engine = rhs.engine();
         return *this;
     }
 
@@ -206,7 +241,40 @@ class basic_vector
         and
         detail::convertible_from<element_type, typename ET2::element_type>
     {
-        engine_support::assign_from(m_engine, rhs.m_engine);
+        engine_support::assign_from(m_engine, rhs.engine());
+        return *this;
+    }
+
+    //----------------------------------------------------------
+    //- Assignment from a row/column basic_matrix.
+    //
+    template<class ET2, class OT2>
+    constexpr basic_vector&
+    operator =(basic_matrix<ET2, OT2> const& rhs)
+    requires
+        detail::writable_vector_engine<engine_type>
+        and
+        detail::readable_and_1d_indexable_matrix_engine<ET2>
+        and
+        detail::assignable_from<engine_type, ET2>
+    {
+        m_engine = rhs.engine();
+        return *this;
+    }
+
+    template<class ET2, class OT2>
+    constexpr basic_vector&
+    operator =(basic_matrix<ET2, OT2> const& rhs)
+    requires
+        detail::writable_vector_engine<engine_type>
+        and
+        detail::readable_and_1d_indexable_matrix_engine<ET2>
+        and
+        detail::not_assignable_from<engine_type, ET2>
+        and
+        detail::convertible_from<element_type, typename ET2::element_type>
+    {
+        engine_support::assign_from(m_engine, rhs.engine());
         return *this;
     }
 
@@ -427,20 +495,24 @@ class basic_vector
     constexpr void
     swap(basic_vector& rhs) noexcept
     {
-        m_engine.swap(rhs.m_engine);
+        m_engine.swap(rhs.engine());
     }
 
   private:
     template<class ET2, class OT2>
     requires
-        detail::copyable<ET2>  and
-        detail::default_initializable<ET2>  and
+        detail::copyable<ET2>
+        and
+        detail::default_initializable<ET2>
+        and
         detail::readable_vector_engine<ET2>
     friend class basic_vector;
 
     engine_type     m_engine;
 };
 
+template<class T, class OT = matrix_operation_traits>
+using dyn_vec = basic_vector<matrix_storage_engine<T, extents<dynamic_extent>, allocator<T>, unoriented>, OT>;
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_BASIC_VECTOR_HPP_DEFINED
