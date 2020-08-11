@@ -878,7 +878,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         }
     }
 };
-
+/*
 template<class OT,
          class T1, ptrdiff_t R1, ptrdiff_t C1, class AT1, class EL1,
          class T2, ptrdiff_t R2, ptrdiff_t C2, class AT2, class EL2>
@@ -890,6 +890,6 @@ struct matrix_multiplication_engine_traits<OT,
     using alloc_type   = detail::rebind_alloc_t<AT1, element_type>;
     using engine_type  = matrix_storage_engine<element_type, extents<R1, C2>, alloc_type, EL1>;
 };
-
+*/
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_MATRIX_STORAGE_ENGINE_HPP_DEFINED

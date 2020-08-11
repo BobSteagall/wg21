@@ -108,6 +108,13 @@ namespace STD_LA
 #include "linear_algebra/private_support.hpp"
 #include "linear_algebra/public_support.hpp"
 
+#include "linear_algebra/engine_support.hpp"
+#include "linear_algebra/matrix_storage_engine_data.hpp"
+#include "linear_algebra/matrix_storage_engine.hpp"
+#include "linear_algebra/basic_vector.hpp"
+#include "linear_algebra/basic_matrix.hpp"
+#include "linear_algebra/traits_support.hpp"
+
 #include "linear_algebra/fixed_size_vector_engine.hpp"
 #include "linear_algebra/fixed_size_matrix_engine.hpp"
 #include "linear_algebra/dynamic_vector_engine.hpp"
@@ -126,11 +133,5 @@ namespace STD_LA
 #include "linear_algebra/division_traits.hpp"
 #include "linear_algebra/operation_traits.hpp"
 #include "linear_algebra/arithmetic_operators.hpp"
-
-#include "linear_algebra/engine_support.hpp"
-#include "linear_algebra/matrix_storage_engine_data.hpp"
-#include "linear_algebra/matrix_storage_engine.hpp"
-#include "linear_algebra/basic_vector.hpp"
-#include "linear_algebra/basic_matrix.hpp"
 
 #endif  //- LINEAR_ALGEBRA_HPP_DEFINED

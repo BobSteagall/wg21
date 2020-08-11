@@ -1,6 +1,10 @@
 //#define ENABLE_TEST_PRINTING
 #include "test_common.hpp"
 
+using namespace STD_LA;
+using namespace STD_LA::detail;
+using namespace MDSPAN_NS;
+
 //- A helper macro to assist in readability of test functions below.
 //
 #define ASSERT_A_ADD_B_EQ_C(A, B, C)    \
@@ -16,6 +20,24 @@
 //  declared in the operations traits type.
 //
 struct test_add_op_traits_empty {};
+
+struct test_add_op_00
+{
+    using addition_element_traits = int;
+};
+
+struct test_add_op_01
+{
+    template<class T1>
+    using addition_element_traits = T1;
+};
+
+struct test_add_op_02
+{
+    template<class OT, class T1>
+    using addition_element_traits = matrix_addition_element_traits<OT, T1, T1>;
+};
+
 
 
 //- This operation traits type has its element/engine/arithmetic nested traits type as ordinary
@@ -40,9 +62,9 @@ struct test_add_traits_ord
 
 struct test_add_op_traits_ord
 {
-    using addition_element_traits = test_element_add_traits_ord;
-    using addition_engine_traits  = test_engine_add_traits_ord;
-    using addition_arithmetic_traits         = test_add_traits_ord;
+    using addition_element_traits    = test_element_add_traits_ord;
+    using addition_engine_traits     = test_engine_add_traits_ord;
+    using addition_arithmetic_traits = test_add_traits_ord;
 };
 
 
@@ -51,7 +73,7 @@ struct test_add_op_traits_ord
 //
 //  Suffix "_nta" means "nested type alias"
 //
-template<class T1, class T2>
+template<class OT, class T1, class T2>
 struct test_element_add_traits_nta
 {
     using element_type = dummy_type;
@@ -71,8 +93,8 @@ struct test_add_traits_nta
 
 struct test_add_op_traits_nta
 {
-    template<class T1, class T2>
-    using addition_element_traits = test_element_add_traits_nta<T1, T2>;
+    template<class OT, class T1, class T2>
+    using addition_element_traits = test_element_add_traits_nta<OT, T1, T2>;
 
     template<class OT, class ET1, class ET2>
     using addition_engine_traits = test_engine_add_traits_nta<OT, ET1, ET2>;
@@ -88,7 +110,7 @@ struct test_add_op_traits_nta
 //
 struct test_add_op_traits_nct
 {
-    template<class T1, class T2>
+    template<class OT, class T1, class T2>
     struct addition_element_traits
     {
         using element_type = dummy_type;
@@ -115,6 +137,26 @@ struct test_add_op_traits_nct
 //
 void t100()
 {
+    static_assert(valid_addition_element_traits<test_add_op_traits_nta, int, int>);
+    static_assert(valid_addition_element_traits<test_add_op_traits_nct, int, int>);
+    static_assert(!valid_addition_element_traits<test_add_op_traits_ord, int, int>);
+
+    static_assert(!has_valid_addition_element_traits<int, int, int>);
+    static_assert(!has_nested_addition_element_traits<int>);
+
+    static_assert(valid_addition_engine_traits<test_add_op_traits_nta, int, int>);
+    static_assert(valid_addition_engine_traits<test_add_op_traits_nct, int, int>);
+    static_assert(!valid_addition_engine_traits<test_add_op_traits_ord, int, int>);
+
+    static_assert(valid_addition_arithmetic_traits<test_add_op_traits_nta, int, int>);
+    static_assert(valid_addition_arithmetic_traits<test_add_op_traits_nct, int, int>);
+    static_assert(!valid_addition_arithmetic_traits<test_add_op_traits_ord, int, int>);
+
+    static_assert(valid_addition_traits<test_add_op_traits_nta, int, int>);
+    static_assert(valid_addition_traits<test_add_op_traits_nct, int, int>);
+    static_assert(!valid_addition_traits<test_add_op_traits_ord, int, int>);
+    static_assert(!valid_addition_traits<int, int, int>);
+
     PRINT_FNAME();
 
     //- Detect element traits.
@@ -400,13 +442,13 @@ void t102()
 //--------------------------------------------------------------------------------------------------
 //  Suffix "_tst" means "test"
 //
-template<class T1, class T2>
+template<class OT, class T1, class T2>
 struct element_add_traits_tst;
 
 //- Promote any float/float addition to double.
 //
-template<>
-struct element_add_traits_tst<float, float>
+template<class OT>
+struct element_add_traits_tst<OT, float, float>
 {
     using element_type = double;
 };
@@ -488,8 +530,8 @@ struct addition_traits_tst<OTR,
 //
 struct test_add_op_traits_tst
 {
-     template<class T1, class T2>
-     using addition_element_traits = element_add_traits_tst<T1, T2>;
+     template<class OT, class T1, class T2>
+     using addition_element_traits = element_add_traits_tst<OT, T1, T2>;
 
      template<class OT, class ET1, class ET2>
      using addition_engine_traits = engine_add_traits_tst<OT, ET1, ET2>;

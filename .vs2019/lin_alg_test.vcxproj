@@ -41,6 +41,7 @@
     <ClInclude Include="..\include\linear_algebra\negation_traits.hpp" />
     <ClInclude Include="..\include\linear_algebra\operation_traits.hpp" />
     <ClInclude Include="..\include\linear_algebra\subtraction_traits.hpp" />
+    <ClInclude Include="..\include\linear_algebra\traits_support.hpp" />
     <ClInclude Include="..\include\linear_algebra\vector.hpp" />
     <ClInclude Include="..\include\linear_algebra\vector_iterators.hpp" />
     <ClInclude Include="..\include\linear_algebra\vector_view_engine.hpp" />

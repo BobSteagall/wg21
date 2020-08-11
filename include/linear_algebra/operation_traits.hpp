@@ -28,8 +28,8 @@ struct matrix_operation_traits
 {
     //- Addition
     //
-    template<class T1, class T2>
-    using addition_element_traits = matrix_addition_element_traits<T1, T2>;
+    template<class OTR, class T1, class T2>
+    using addition_element_traits = matrix_addition_element_traits<OTR, T1, T2>;
 
     template<class OTR, class ET1, class ET2>
     using addition_engine_traits = matrix_addition_engine_traits<OTR, ET1, ET2>;

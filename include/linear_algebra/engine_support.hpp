@@ -2,7 +2,7 @@
 //  File:       engine_support.hpp
 //
 //  Summary:    This header defines various traits, concepts, types, and functions used across
-//              the entire library.
+//              the entire library to support the provided engines.
 //==================================================================================================
 //
 #ifndef LINEAR_ALGEBRA_ENGINE_SUPPORT_HPP_DEFINED
@@ -259,6 +259,7 @@ concept comparable_types_helper =
 
 template<class T1, class T2>
 concept comparable_types = comparable_types_helper<T1, T2> and comparable_types_helper<T2, T1>;
+
 
 //--------------------------------------------------------------------------------------------------
 //  Concept:    random_access_standard_container<CT>

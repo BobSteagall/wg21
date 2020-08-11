@@ -116,7 +116,7 @@ using fs_matrix = matrix<fs_matrix_engine<T, R, C>>;
 
 //- Traits pertaining to addition.
 //
-template<class T1, class T2>                struct matrix_addition_element_traits;
+template<class OT, class T1, class T2>      struct matrix_addition_element_traits;
 template<class OT, class ET1, class ET2>    struct matrix_addition_engine_traits;
 template<class OT, class OP1, class OP2>    struct matrix_addition_arithmetic_traits;
 

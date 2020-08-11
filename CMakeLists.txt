@@ -71,6 +71,7 @@ target_sources(wg21_linear_algebra
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/private_support.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/public_support.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/subtraction_traits.hpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/traits_support.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/vector.hpp>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/linear_algebra/vector_view_engine.hpp>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra.hpp>
@@ -96,6 +97,7 @@ target_sources(wg21_linear_algebra
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/private_support.hpp>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/public_support.hpp>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/subtraction_traits.hpp>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/traits_support.hpp>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/vector.hpp>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/vector_view_engine.hpp>
 )
