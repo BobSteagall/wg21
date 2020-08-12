@@ -25,8 +25,8 @@ matrix:
       #  env: CONAN_GCC_VERSIONS=9 CONAN_ARCHS=armv8 CONAN_DOCKER_IMAGE=conanio/gcc9-armv8
       #- <<: *linux
       #  env: CONAN_GCC_VERSIONS=8 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/gcc8
-      - <<: *linux
-        env: CONAN_GCC_VERSIONS=9 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/gcc9
+      # - <<: *linux
+      #  env: CONAN_GCC_VERSIONS=9 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/gcc9
       - <<: *linux
         env: CONAN_GCC_VERSIONS=10 CONAN_ARCHS=x86_64 CONAN_DOCKER_IMAGE=conanio/gcc10
       #- <<: *linux
