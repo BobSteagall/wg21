@@ -51,7 +51,7 @@ struct test_mul_op_traits_ord
 //
 //  Suffix "_nta" means "nested type alias"
 //
-template<class T1, class T2>
+template<class OT, class T1, class T2>
 struct test_element_mul_traits_nta
 {
     using element_type = dummy_type;
@@ -71,8 +71,8 @@ struct test_mul_traits_nta
 
 struct test_mul_op_traits_nta
 {
-    template<class T1, class T2>
-    using multiplication_element_traits = test_element_mul_traits_nta<T1, T2>;
+    template<class OT, class T1, class T2>
+    using multiplication_element_traits = test_element_mul_traits_nta<OT, T1, T2>;
 
     template<class OT, class ET1, class ET2>
     using multiplication_engine_traits = test_engine_mul_traits_nta<OT, ET1, ET2>;
@@ -88,7 +88,7 @@ struct test_mul_op_traits_nta
 //
 struct test_mul_op_traits_nct
 {
-    template<class T1, class T2>
+    template<class OT, class T1, class T2>
     struct multiplication_element_traits
     {
         using element_type = dummy_type;
@@ -716,13 +716,13 @@ void t408()
 //--------------------------------------------------------------------------------------------------
 //  Suffix "_tst" means "test"
 //
-template<class T1, class T2>
+template<class OT, class T1, class T2>
 struct element_mul_traits_tst;
 
 //- Promote any float/float multiplication to double.
 //
-template<>
-struct element_mul_traits_tst<float, float>
+template<class OT>
+struct element_mul_traits_tst<OT, float, float>
 {
     using element_type = double;
 };
@@ -810,8 +810,8 @@ struct multiplication_traits_tst<OTR,
 //
 struct test_mul_op_traits_tst
 {
-     template<class T1, class T2>
-     using multiplication_element_traits = element_mul_traits_tst<T1, T2>;
+     template<class OT, class T1, class T2>
+     using multiplication_element_traits = element_mul_traits_tst<OT, T1, T2>;
 
      template<class OT, class ET1, class ET2>
      using multiplication_engine_traits = engine_mul_traits_tst<OT, ET1, ET2>;

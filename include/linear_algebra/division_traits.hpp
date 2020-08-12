@@ -51,7 +51,7 @@ struct detect_element_div_traits_f0<OT, void_t<element_div_result_f0_t<OT>>>
 //- Form 2 type detection of nested element division traits.
 //
 template<typename OT, typename T1, typename T2>
-using element_div_traits_f2_t = typename OT::template division_element_traits<T1, T2>;
+using element_div_traits_f2_t = typename OT::template division_element_traits<OT, T1, T2>;
 
 template<typename OT, typename T1, typename T2>
 using element_div_result_f2_t = typename element_div_traits_f2_t<OT, T1, T2>::element_type;
@@ -86,7 +86,7 @@ struct element_div_traits_chooser
 {
     using CT1 = typename detect_element_div_traits_f0<OT>::traits_type;
     using CT2 = typename detect_element_div_traits_f2<OT, T1, T2>::traits_type;
-    using DEF = matrix_division_element_traits<T1, T2>;
+    using DEF = matrix_division_element_traits<OT, T1, T2>;
 
     using traits_type = typename non_void_traits_chooser<CT1, CT2, DEF>::traits_type;
     using element_type = typename traits_type::element_type;
@@ -264,7 +264,7 @@ using select_matrix_division_element_t = detail::element_div_result_t<OT, T1, T2
 //- The standard element division traits type provides the default mechanism for determining
 //  the result of multiplying two elements of (possibly) different types.
 //
-template<class T1, class T2>
+template<class OT, class T1, class T2>
 struct matrix_division_element_traits
 {
     using element_type = decltype(declval<T1>() / declval<T2>());

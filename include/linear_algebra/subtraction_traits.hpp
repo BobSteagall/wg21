@@ -51,7 +51,7 @@ struct detect_element_sub_traits_f0<OT, void_t<element_sub_result_f0_t<OT>>>
 //- Form 2 type detection of nested element subtraction traits.
 //
 template<typename OT, typename T1, typename T2>
-using element_sub_traits_f2_t = typename OT::template subtraction_element_traits<T1, T2>;
+using element_sub_traits_f2_t = typename OT::template subtraction_element_traits<OT, T1, T2>;
 
 template<typename OT, typename T1, typename T2>
 using element_sub_result_f2_t = typename element_sub_traits_f2_t<OT, T1, T2>::element_type;
@@ -86,7 +86,7 @@ struct element_sub_traits_chooser
 {
     using CT1 = typename detect_element_sub_traits_f0<OT>::traits_type;
     using CT2 = typename detect_element_sub_traits_f2<OT, T1, T2>::traits_type;
-    using DEF = matrix_subtraction_element_traits<T1, T2>;
+    using DEF = matrix_subtraction_element_traits<OT, T1, T2>;
 
     using traits_type  = typename non_void_traits_chooser<CT1, CT2, DEF>::traits_type;
     using element_type = typename traits_type::element_type;
@@ -263,7 +263,7 @@ using select_matrix_subtraction_element_t = detail::element_sub_result_t<OT, T1,
 //- The standard element subtraction traits type provides the default mechanism for determining the
 //  result of subtracting two elements of (possibly) different types.
 //
-template<class T1, class T2>
+template<class OT, class T1, class T2>
 struct matrix_subtraction_element_traits
 {
     using element_type = decltype(declval<T1>() - declval<T2>());

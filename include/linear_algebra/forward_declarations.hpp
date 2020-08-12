@@ -122,19 +122,19 @@ template<class OT, class OP1, class OP2>    struct matrix_addition_arithmetic_tr
 
 //- Traits pertaining to subtraction.
 //
-template<class T1, class T2>                struct matrix_subtraction_element_traits;
+template<class OT, class T1, class T2>      struct matrix_subtraction_element_traits;
 template<class OT, class ET1, class ET2>    struct matrix_subtraction_engine_traits;
 template<class OT, class OP1, class OP2>    struct matrix_subtraction_arithmetic_traits;
 
 //- Traits pertaining to multiplication.
 //
-template<class T1, class T2>                struct matrix_multiplication_element_traits;
+template<class OT, class T1, class T2>      struct matrix_multiplication_element_traits;
 template<class OT, class ET1, class ET2>    struct matrix_multiplication_engine_traits;
 template<class OT, class OP1, class OP2>    struct matrix_multiplication_arithmetic_traits;
 
 //- Traits pertaining to scalar division.
 //
-template<class T1, class T2>                struct matrix_division_element_traits;
+template<class OT, class T1, class T2>      struct matrix_division_element_traits;
 template<class OT, class ET1, class ET2>    struct matrix_division_engine_traits;
 template<class OT, class OP1, class OP2>    struct matrix_division_arithmetic_traits;
 

@@ -39,8 +39,8 @@ struct matrix_operation_traits
 
     //- Subtraction
     //
-    template<class T1, class T2>
-    using subtraction_element_traits = matrix_subtraction_element_traits<T1, T2>;
+    template<class OTR, class T1, class T2>
+    using subtraction_element_traits = matrix_subtraction_element_traits<OTR, T1, T2>;
 
     template<class OTR, class ET1, class ET2>
     using subtraction_engine_traits = matrix_subtraction_engine_traits<OTR, ET1, ET2>;
@@ -50,8 +50,8 @@ struct matrix_operation_traits
 
     //- Multiplication
     //
-    template<class T1, class T2>
-    using multiplication_element_traits = matrix_multiplication_element_traits<T1, T2>;
+    template<class OTR, class T1, class T2>
+    using multiplication_element_traits = matrix_multiplication_element_traits<OTR, T1, T2>;
 
     template<class OTR, class ET1, class ET2>
     using multiplication_engine_traits = matrix_multiplication_engine_traits<OTR, ET1, ET2>;
@@ -61,8 +61,8 @@ struct matrix_operation_traits
 
     //- Division
     //
-    template<class T1, class T2>
-    using division_element_traits = matrix_division_element_traits<T1, T2>;
+    template<class OT, class T1, class T2>
+    using division_element_traits = matrix_division_element_traits<OT, T1, T2>;
 
     template<class OTR, class T1, class T2>
     using division_engine_traits = matrix_division_engine_traits<OTR, T1, T2>;
