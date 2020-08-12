@@ -19,25 +19,39 @@ using namespace MDSPAN_NS;
 //- This traits type is used to verify that default operations are selected when they are not
 //  declared in the operations traits type.
 //
-struct test_add_op_traits_empty {};
+struct test_add_op_traits_empty
+{};
 
-struct test_add_op_00
+struct test_add_op_traits_bad_00
 {
     using addition_element_traits = int;
+    using addition_engine_traits = int;
+    using addition_arithmetic_traits = int;
 };
 
-struct test_add_op_01
+struct test_add_op_traits_bad_01
 {
-    template<class T1>
-    using addition_element_traits = T1;
+    template<class OT>
+    using addition_element_traits = matrix_addition_element_traits<OT, int, int>;
+
+    template<class OT>
+    using addition_engine_traits = matrix_addition_engine_traits<OT, int, int>;
+
+    template<class OT>
+    using addition_arithmetic_traits = matrix_addition_arithmetic_traits<OT, int, int>;
 };
 
-struct test_add_op_02
+struct test_add_op_traits_bad_02
 {
     template<class OT, class T1>
     using addition_element_traits = matrix_addition_element_traits<OT, T1, T1>;
-};
 
+    template<class OT, class T1>
+    using addition_engine_traits = matrix_addition_engine_traits<OT, T1, T1>;
+
+    template<class OT, class T1>
+    using addition_arithmetic_traits = matrix_addition_arithmetic_traits<OT, T1, T1>;
+};
 
 
 //- This operation traits type has its element/engine/arithmetic nested traits type as ordinary
@@ -86,7 +100,7 @@ struct test_engine_add_traits_nta
 };
 
 template<class OT, class T1, class T2>
-struct test_add_traits_nta
+struct test_arithmetic_add_traits_nta
 {
     using result_type = dummy_type;
 };
@@ -100,7 +114,7 @@ struct test_add_op_traits_nta
     using addition_engine_traits = test_engine_add_traits_nta<OT, ET1, ET2>;
 
     template<class OT, class OP1, class OP2>
-    using addition_arithmetic_traits = test_add_traits_nta<OT, OP1, OP2>;
+    using addition_arithmetic_traits = test_arithmetic_add_traits_nta<OT, OP1, OP2>;
 };
 
 
@@ -131,32 +145,111 @@ struct test_add_op_traits_nct
 
 
 //--------------------------------------------------------------------------------------------------
+//  This test ensures that the nested traits associated with addition are properly validated.
+//  It exercises only the validation meta-functions.
+//
+//  Note that the types for the second and third template parameters are unimportant for these
+//  tests - it is the form of the nested template that is being validated (specifically, being
+//  instantiable with three template arguments).
+//--------------------------------------------------------------------------------------------------
+//
+TEST(AddTraits, Validation)
+{
+    static_assert(valid_addition_element_traits<test_add_op_traits_empty, int, int>);
+    static_assert(valid_addition_element_traits<test_add_op_traits_nta, int, int>);
+    static_assert(valid_addition_element_traits<test_add_op_traits_nct, int, int>);
+
+    static_assert(!valid_addition_element_traits<test_add_op_traits_bad_00, int, int>);
+    static_assert(!valid_addition_element_traits<test_add_op_traits_bad_01, int, int>);
+    static_assert(!valid_addition_element_traits<test_add_op_traits_bad_02, int, int>);
+
+    static_assert(valid_addition_engine_traits<test_add_op_traits_empty, int, int>);
+    static_assert(valid_addition_engine_traits<test_add_op_traits_nta, int, int>);
+    static_assert(valid_addition_engine_traits<test_add_op_traits_nct, int, int>);
+
+    static_assert(!valid_addition_engine_traits<test_add_op_traits_bad_00, int, int>);
+    static_assert(!valid_addition_engine_traits<test_add_op_traits_bad_01, int, int>);
+    static_assert(!valid_addition_engine_traits<test_add_op_traits_bad_02, int, int>);
+
+    static_assert(valid_addition_arithmetic_traits<test_add_op_traits_empty, int, int>);
+    static_assert(valid_addition_arithmetic_traits<test_add_op_traits_nta, int, int>);
+    static_assert(valid_addition_arithmetic_traits<test_add_op_traits_nct, int, int>);
+
+    static_assert(!valid_addition_arithmetic_traits<test_add_op_traits_bad_00, int, int>);
+    static_assert(!valid_addition_arithmetic_traits<test_add_op_traits_bad_01, int, int>);
+    static_assert(!valid_addition_arithmetic_traits<test_add_op_traits_bad_02, int, int>);
+
+    static_assert(valid_addition_traits<test_add_op_traits_empty, int, int>);
+    static_assert(valid_addition_traits<test_add_op_traits_nta, int, int>);
+    static_assert(valid_addition_traits<test_add_op_traits_nct, int, int>);
+
+    static_assert(!valid_addition_traits<test_add_op_traits_bad_00, int, int>);
+    static_assert(!valid_addition_traits<test_add_op_traits_bad_01, int, int>);
+    static_assert(!valid_addition_traits<test_add_op_traits_bad_02, int, int>);
+}
+
+
+//--------------------------------------------------------------------------------------------------
+//  This test ensures that the element/engine/arithmetic nested traits contained by *validated*
+//  operation traits types are properly extracted.  It exercises only the extraction meta-functions.
+//--------------------------------------------------------------------------------------------------
+//
+TEST(AddTraits, Extraction)
+{
+    //- Extracting from the library's default operation traits should yield library results.
+    //
+    static_assert(std::is_same_v<addition_element_traits_t<matrix_operation_traits, int, int>,
+                                 matrix_addition_element_traits<matrix_operation_traits, int, int>>);
+
+    static_assert(std::is_same_v<addition_engine_traits_t<matrix_operation_traits, int, int>,
+                                 matrix_addition_engine_traits<matrix_operation_traits, int, int>>);
+
+    static_assert(std::is_same_v<addition_arithmetic_traits_t<matrix_operation_traits, int, int>,
+                                 matrix_addition_arithmetic_traits<matrix_operation_traits, int, int>>);
+
+    //- Extracting from an empty operation traits type should yield library results.
+    //
+    static_assert(std::is_same_v<addition_element_traits_t<test_add_op_traits_empty, int, int>,
+                                 matrix_addition_element_traits<test_add_op_traits_empty, int, int>>);
+
+    static_assert(std::is_same_v<addition_engine_traits_t<test_add_op_traits_empty, int, int>,
+                                 matrix_addition_engine_traits<test_add_op_traits_empty, int, int>>);
+
+    static_assert(std::is_same_v<addition_arithmetic_traits_t<test_add_op_traits_empty, int, int>,
+                                 matrix_addition_arithmetic_traits<test_add_op_traits_empty, int, int>>);
+
+    //- Extracting nested alias template specialization from a custom operation traits type should
+    //  yield the specializations to which those aliases refer.
+    //
+    static_assert(std::is_same_v<addition_element_traits_t<test_add_op_traits_nta, int, int>,
+                                 test_element_add_traits_nta<test_add_op_traits_nta, int, int>>);
+
+    static_assert(std::is_same_v<addition_engine_traits_t<test_add_op_traits_nta, int, int>,
+                                 test_engine_add_traits_nta<test_add_op_traits_nta, int, int>>);
+
+    static_assert(std::is_same_v<addition_arithmetic_traits_t<test_add_op_traits_nta, int, int>,
+                                 test_arithmetic_add_traits_nta<test_add_op_traits_nta, int, int>>);
+
+    //- Extracting nested class template specialization from a custom operation traits type should
+    //  yield those same nested specializations.
+    //
+    static_assert(std::is_same_v<addition_element_traits_t<test_add_op_traits_nct, int, int>,
+                                 test_add_op_traits_nct::addition_element_traits<test_add_op_traits_nct, int, int>>);
+
+    static_assert(std::is_same_v<addition_engine_traits_t<test_add_op_traits_nct, int, int>,
+                                 test_add_op_traits_nct::addition_engine_traits<test_add_op_traits_nct, int, int>>);
+
+    static_assert(std::is_same_v<addition_arithmetic_traits_t<test_add_op_traits_nct, int, int>,
+                                 test_add_op_traits_nct::addition_arithmetic_traits<test_add_op_traits_nct, int, int>>);
+}
+
+//--------------------------------------------------------------------------------------------------
 //  This test ensures that the type detection meta-functions are working properly.  It exercises
 //  only the detection meta-functions.
 //--------------------------------------------------------------------------------------------------
 //
 void t100()
 {
-    static_assert(valid_addition_element_traits<test_add_op_traits_nta, int, int>);
-    static_assert(valid_addition_element_traits<test_add_op_traits_nct, int, int>);
-    static_assert(!valid_addition_element_traits<test_add_op_traits_ord, int, int>);
-
-    static_assert(!has_valid_addition_element_traits<int, int, int>);
-    static_assert(!has_nested_addition_element_traits<int>);
-
-    static_assert(valid_addition_engine_traits<test_add_op_traits_nta, int, int>);
-    static_assert(valid_addition_engine_traits<test_add_op_traits_nct, int, int>);
-    static_assert(!valid_addition_engine_traits<test_add_op_traits_ord, int, int>);
-
-    static_assert(valid_addition_arithmetic_traits<test_add_op_traits_nta, int, int>);
-    static_assert(valid_addition_arithmetic_traits<test_add_op_traits_nct, int, int>);
-    static_assert(!valid_addition_arithmetic_traits<test_add_op_traits_ord, int, int>);
-
-    static_assert(valid_addition_traits<test_add_op_traits_nta, int, int>);
-    static_assert(valid_addition_traits<test_add_op_traits_nct, int, int>);
-    static_assert(!valid_addition_traits<test_add_op_traits_ord, int, int>);
-    static_assert(!valid_addition_traits<int, int, int>);
-
     PRINT_FNAME();
 
     //- Detect element traits.
