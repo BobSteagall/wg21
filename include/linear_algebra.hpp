@@ -16,7 +16,6 @@
         #error unsupported version of Clang
     #endif
     #define LA_COMPILER_CLANG
-    #define LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
 
 #elif defined __GNUG__
     #if (__GNUG__ < 9)
@@ -24,16 +23,12 @@
     #endif
     #define LA_COMPILER_GCC
     #define LA_GCC_VERSION  __GNUG__
-    #if (__GNUG__ > 9)
-        #define LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
-    #endif
-    #if (__GNUG__ == 10)
+    #if (__GNUG__ >= 10)
         #define LA_STD_CONCEPTS_HEADER_SUPPORTED
     #endif
 
 #elif defined _MSC_VER
     #define LA_COMPILER_MS
-    #define LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
     #if (_MSC_VER >= 1925)
         #define LA_STD_CONCEPTS_HEADER_SUPPORTED
     #endif

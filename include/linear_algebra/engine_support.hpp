@@ -250,11 +250,7 @@ template<class T1, class T2>
 concept comparable_types_helper =
     requires (T1 t1, T2 t2)
     {
-    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { t1 == t2 } -> same_as<bool>;
-    #else
-        requires std::is_same_v<decltype(t1 == t2), bool>;
-    #endif
     };
 
 template<class T1, class T2>
@@ -301,13 +297,8 @@ concept valid_allocator =
         { AT::deallocate(a, p, n) };
         { AT::allocate(a, n) } -> same_as<typename AT::pointer>;
         { static_cast<T*>(p) };
-    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { *p   } -> same_as<T&>;
         { p[n] } -> same_as<T&>;
-    #else
-        requires std::is_same_v<decltype(*p), T&>;
-        requires std::is_same_v<decltype(p[n]), T&>;
-    #endif
     };
 
 template<typename A, typename T>
@@ -329,14 +320,8 @@ concept readable_engine_fundamentals =
         typename ET::reference;
         typename ET::const_reference;
         requires is_lvalue_reference_v<typename ET::reference>;
-
-    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { eng.size()     } -> same_as<typename ET::index_type>;
         { eng.capacity() } -> same_as<typename ET::index_type>;
-    #else
-        requires std::is_same_v<decltype(eng.size()), typename ET::index_type>;
-        requires std::is_same_v<decltype(eng.capacity()), typename ET::index_type>;
-    #endif
     };
 
 
@@ -361,11 +346,7 @@ concept readable_vector_engine =
     and
     requires (ET const& eng, typename ET::index_type i)
     {
-    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { eng(i) } -> same_as<typename ET::const_reference>;
-    #else
-        requires std::is_same_v<decltype(eng(i)), typename ET::const_reference>;
-    #endif
     };
 
 
@@ -405,14 +386,8 @@ concept spannable_vector_engine =
         typename ET::const_span_type;
         requires is_1d_mdspan_v<typename ET::span_type>;
         requires is_1d_mdspan_v<typename ET::const_span_type>;
-
-    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { meng.span() } -> same_as<typename ET::span_type>;
         { ceng.span() } -> same_as<typename ET::const_span_type>;
-    #else
-        requires std::is_same_v<decltype(meng.span()), typename ET::span_type>;
-        requires std::is_same_v<decltype(ceng.span()), typename ET::const_span_type>;
-    #endif
     };
 
 
@@ -434,14 +409,8 @@ concept writable_vector_engine =
     requires (ET& eng, typename ET::index_type i, typename ET::element_type v)
     {
         requires std::is_same_v<typename ET::reference, typename ET::element_type&>;
-
-    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { eng(i)     } -> same_as<typename ET::reference>;
         { eng(i) = v } -> same_as<typename ET::reference>;
-    #else
-        requires std::is_same_v<decltype(eng(i)), typename ET::reference>;
-        requires std::is_same_v<decltype(eng(i) = v), typename ET::reference>;
-    #endif
     };
 
 
@@ -464,19 +433,11 @@ concept readable_matrix_engine =
     and
     requires (ET const& eng, typename ET::index_type i)
     {
-    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { eng.columns()         } -> same_as<typename ET::index_type>;
         { eng.rows()            } -> same_as<typename ET::index_type>;
         { eng.column_capacity() } -> same_as<typename ET::index_type>;
         { eng.row_capacity()    } -> same_as<typename ET::index_type>;
         { eng(i, i)             } -> same_as<typename ET::const_reference>;
-    #else
-        requires std::is_same_v<decltype(eng.columns()), typename ET::index_type>;
-        requires std::is_same_v<decltype(eng.rows()), typename ET::index_type>;
-        requires std::is_same_v<decltype(eng.column_capacity()), typename ET::index_type>;
-        requires std::is_same_v<decltype(eng.row_capacity()), typename ET::index_type>;
-        requires std::is_same_v<decltype(eng(i, i)), typename ET::const_reference>;
-    #endif
     };
 
 
@@ -495,11 +456,7 @@ concept readable_and_1d_indexable_matrix_engine =
     and
     requires (ET const& eng, typename ET::index_type i)
     {
-    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { eng(i) } -> same_as<typename ET::const_reference>;
-    #else
-        requires std::is_same_v<decltype(eng(i)), typename ET::const_reference>;
-    #endif
     };
 
 
@@ -520,14 +477,8 @@ concept spannable_matrix_engine =
         typename ET::const_span_type;
         requires is_2d_mdspan_v<typename ET::span_type>;
         requires is_2d_mdspan_v<typename ET::const_span_type>;
-
-    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { meng.span() } -> same_as<typename ET::span_type>;
         { ceng.span() } -> same_as<typename ET::const_span_type>;
-    #else
-        requires std::is_same_v<decltype(meng.span()), typename ET::span_type>;
-        requires std::is_same_v<decltype(ceng.span()), typename ET::const_span_type>;
-    #endif
     };
 
 
@@ -549,14 +500,8 @@ concept writable_matrix_engine =
     requires (ET& eng, typename ET::index_type i, typename ET::element_type v)
     {
         requires std::is_same_v<typename ET::reference, typename ET::element_type&>;
-
-    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { eng(i, i)     } -> same_as<typename ET::reference>;
         { eng(i, i) = v } -> same_as<typename ET::reference>;
-    #else
-        requires std::is_same_v<decltype(eng(i, i)), typename ET::reference>;
-        requires std::is_same_v<decltype(eng(i, i) = v), typename ET::reference>;
-    #endif
     };
 
 
@@ -575,15 +520,9 @@ concept writable_and_1d_indexable_matrix_engine =
     and
     requires (ET const& ceng, ET& meng, typename ET::index_type i, typename ET::element_type v)
     {
-    #ifdef LA_COMPOUND_REQUIREMENT_SYNTAX_SUPPORTED
         { ceng(i)     } -> same_as<typename ET::const_reference>;
         { meng(i)     } -> same_as<typename ET::reference>;
         { meng(i) = v } -> same_as<typename ET::reference>;
-    #else
-        requires std::is_same_v<decltype(ceng(i)), typename ET::const_reference>;
-        requires std::is_same_v<decltype(meng(i)), typename ET::reference>;
-        requires std::is_same_v<decltype(meng(i) = v), typename ET::reference>;
-    #endif
     };
 
 
