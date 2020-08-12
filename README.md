@@ -2,21 +2,20 @@
  [![Travis Build Status](https://travis-ci.org/BobSteagall/wg21.svg?branch=master)](https://travis-ci.org/BobSteagall/wg21)
  [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/BobSteagall/wg21?svg=true&branch=master)](https://ci.appveyor.com/project/BobSteagall/wg21)
  
-Work on revision R7  of linear algebra proposal P1385 is currently underway in the `r7` branch.
+Work on revision R7 of linear algebra proposal P1385 is currently underway in the `r7` branch.  P1385 is targeted for C++23.
 
 ## Support
 
-P1385 is targeted for C++23.  Current compiler support is as follows, but will change as new compilers become available and catch up with implementing new language features for C++20.  Builds and unit testing have been successful on the following combinations of operating system and compiler:
+This reference implementation requires several C++20 capabilities which are only available in newer compiler releases.  
+
+Current compiler support is as follows, but will change as new compilers become available and catch up with implementing new language features for C++20.  Builds and unit testing have been successful on the following combinations of operating system and compiler:
 
 * Windows 10
   * Visual Studio 2019, Version 16.5.4 and higher
 
-* Mac OS 10.14
-  * Xcode 11.4 and higher
-
-* Ubuntu 18.04
-  * GCC 8.x, 9.x, 10.x
-  * Clang 8.x, 9.x, 10.x 
+* Linux (written and tested on Ubuntu 18.04)
+  * GCC 10.x
+  * Clang 10.x 
 
 ## Cloning the Repo
 
