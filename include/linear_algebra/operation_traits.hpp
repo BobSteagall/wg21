@@ -30,13 +30,19 @@ struct matrix_operation_traits
     //
     template<class OTR, class T1, class T2>
     using addition_element_traits = detail::addition_element_traits<OTR, T1, T2>;
-    //using addition_element_traits = matrix_addition_element_traits<OTR, T1, T2>;
+
+    template<class OTR, class AT1, class AT2, class T>
+    using addition_allocation_traits = detail::allocation_traits<OTR, AT1, AT2, T>;
+
+    template<class OTR, class LT1, class LT2>
+    using addition_layout_traits = detail::addition_layout_traits<OTR, LT1, LT2>;
 
     template<class OTR, class ET1, class ET2>
-    using addition_engine_traits = matrix_addition_engine_traits<OTR, ET1, ET2>;
+    using addition_engine_traits = detail::addition_engine_traits<OTR, ET1, ET2>;
 
     template<class OTR, class OP1, class OP2>
-    using addition_arithmetic_traits = matrix_addition_arithmetic_traits<OTR, OP1, OP2>;
+    using addition_arithmetic_traits = detail::addition_arithmetic_traits<OTR, OP1, OP2>;
+
 
     //- Subtraction
     //
@@ -70,6 +76,10 @@ struct matrix_operation_traits
 
     template<class OTR, class T1, class T2>
     using division_arithmetic_traits = matrix_division_arithmetic_traits<OTR, T1, T2>;
+
+
+    //- Allocation and layout
+    //
 };
 
 //==================================================================================================

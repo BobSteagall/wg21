@@ -20,9 +20,6 @@
 namespace STD_LA {
 namespace detail {
 
-template<class IT, class OP1, class OP2>    struct addition_arithmetic_traits;
-
-
 template<class OT, class T1, class T2>
 struct addition_element_traits
 {
@@ -34,18 +31,58 @@ struct addition_element_traits
 //  correct engine type for a matrix/matrix or vector/vector addition.
 //
 template<class OT, class ET1, class ET2>
-requires
-    similar_engines<ET1, ET2>
 struct addition_engine_traits
 {
+  private:
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
-    using element_traits = addition_element_traits_t<OT, element_type_1, element_type_2>;
-    using vector_engine  = dynamic_vector_engine<typename element_traits::element_type>;
-    using matrix_engine  = dynamic_matrix_engine<typename element_traits::element_type>;
+    using element_traits = get_addition_element_traits_t<OT, element_type_1, element_type_2>;
 
+  public:
     using element_type = typename element_traits::element_type;
-    using engine_type  = conditional_t<readable_matrix_engine<ET1>, matrix_engine, vector_engine>;
+    using engine_type  = conditional_t<readable_matrix_engine<ET1>,
+                                       dynamic_matrix_engine<element_type>,
+                                       dynamic_vector_engine<element_type>>;
+};
+
+
+template<class OT,
+         class T1, ptrdiff_t R1, ptrdiff_t C1, class AT1, class LT1,
+         class T2, ptrdiff_t R2, ptrdiff_t C2, class AT2, class LT2>
+struct addition_engine_traits<OT,
+                              matrix_storage_engine<T1, extents<R1, C1>, AT1, LT1>,
+                              matrix_storage_engine<T2, extents<R2, C2>, AT2, LT2>>
+{
+  private:
+    static constexpr ptrdiff_t  DYNX     = dynamic_extent;
+    static constexpr bool       dyn_rows = ((R1 == DYNX) || (R2 == DYNX));
+    static constexpr bool       dyn_cols = ((C1 == DYNX) || (C2 == DYNX));
+
+    //- Validate the size template parameters.
+    //
+    static_assert((R1 == R2 || dyn_rows), "mis-matched/invalid number of rows for addition");
+    static_assert((C1 == C2 || dyn_cols), "mis-matched/invalid number of columns for addition");
+
+    //- Compute the new extents.
+    //
+    static constexpr ptrdiff_t  RR = (dyn_rows) ? DYNX : R1;
+    static constexpr ptrdiff_t  CR = (dyn_cols) ? DYNX : C1;
+
+    //- Extract individual traits from the operation traits.
+    //
+    using element_traits    = get_addition_element_traits_t<OT, T1, T2>;
+    using allocation_traits = get_addition_allocation_traits_t<OT, AT1, AT2, typename element_traits::element_type>;
+    using layout_traits     = get_addition_layout_traits_t<OT, LT1, LT2>;
+
+    //- Determine required engine template parameters from the traits types.
+    //
+    using extents_type   = extents<RR, CR>;
+    using allocator_type = typename allocation_traits::allocator_type;
+    using layout_type    = typename layout_traits::layout_type;
+
+public:
+    using element_type = typename element_traits::element_type;
+    using engine_type  = matrix_storage_engine<element_type, extents_type, allocator_type, layout_type>;
 };
 
 
@@ -57,14 +94,16 @@ struct addition_engine_traits
 template<class OT, class ET1, class OT1, class ET2, class OT2>
 struct addition_arithmetic_traits<OT, basic_vector<ET1, OT1>, basic_vector<ET2, OT2>>
 {
+  private:
     using element_type_1  = typename ET1::element_type;
     using element_type_2  = typename ET2::element_type;
-    using element_traits  = addition_element_traits_t<OT, element_type_1, element_type_2>;
+    using element_traits  = get_addition_element_traits_t<OT, element_type_1, element_type_2>;
 
     using owning_engine_1 = typename basic_vector<ET1, OT1>::owning_engine_type;
     using owning_engine_2 = typename basic_vector<ET2, OT2>::owning_engine_type;
-    using engine_traits   = addition_engine_traits_t<OT, owning_engine_1, owning_engine_2>;
+    using engine_traits   = get_addition_engine_traits_t<OT, owning_engine_1, owning_engine_2>;
 
+  public:
     using element_type = typename element_traits::element_type;
     using engine_type  = typename engine_traits::engine_type;
     using result_type  = basic_vector<engine_type, OT>;
@@ -81,7 +120,7 @@ struct addition_arithmetic_traits<OT, basic_vector<ET1, OT1>, basic_vector<ET2, 
         index_type_r    elems = static_cast<index_type_r>(v1.size());
         result_type     vr;
 
-        if constexpr (is_resizable_engine_v<engine_type>)
+        if constexpr (detail::reshapable_vector_engine<engine_type>)
         {
             vr.resize(elems);
         }
@@ -105,16 +144,21 @@ struct addition_arithmetic_traits<OT, basic_vector<ET1, OT1>, basic_vector<ET2, 
 template<class OT, class ET1, class OT1, class ET2, class OT2>
 struct addition_arithmetic_traits<OT, basic_matrix<ET1, OT1>, basic_matrix<ET2, OT2>>
 {
+  private:
     using element_type_1  = typename ET1::element_type;
     using element_type_2  = typename ET2::element_type;
-    using element_traits  = addition_element_traits_t<OT, element_type_1, element_type_2>;
+    using element_traits  = get_addition_element_traits_t<OT, element_type_1, element_type_2>;
 
     using owning_engine_1 = typename basic_matrix<ET1, OT1>::owning_engine_type;
     using owning_engine_2 = typename basic_matrix<ET2, OT2>::owning_engine_type;
-    using engine_traits   = addition_engine_traits_t<OT, owning_engine_1, owning_engine_2>;
+    using engine_traits   = get_addition_engine_traits_t<OT, owning_engine_1, owning_engine_2>;
 
-    using engine_type = typename engine_traits::engine_type;
-    using result_type = basic_matrix<engine_type, OT>;
+  public:
+    using element_type = typename element_traits::element_type;
+    using engine_type  = typename engine_traits::engine_type;
+    using result_type  = basic_matrix<engine_type, OT>;
+
+    static_assert(std::is_same_v<element_type, typename engine_type::element_type>);
 
     static constexpr result_type
     add(basic_matrix<ET1, OT1> const& m1, basic_matrix<ET2, OT2> const& m2)
@@ -127,7 +171,7 @@ struct addition_arithmetic_traits<OT, basic_matrix<ET1, OT1>, basic_matrix<ET2, 
         index_type_r    cols = static_cast<index_type_r>(m1.columns());
         result_type		mr;
 
-        if constexpr (is_resizable_engine_v<engine_type>)
+        if constexpr (detail::reshapable_matrix_engine<engine_type>)
 	    {
 		    mr.resize(rows, cols);
         }

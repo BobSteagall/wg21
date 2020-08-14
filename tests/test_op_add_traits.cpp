@@ -165,51 +165,54 @@ TEST(AddTraits, Validation)
 //
 TEST(AddTraits, Extraction)
 {
+    using mat_t = fixed_size_matrix<float, 2, 3>;
+    using eng_t = typename mat_t::engine_type;
+
     //- Extracting from the library's default operation traits should yield library results.
     //
-    static_assert(std::is_same_v<addition_element_traits_t<matrix_operation_traits, int, int>,
-                                 STD_LA::detail::addition_element_traits<matrix_operation_traits, int, int>>);
+    static_assert(std::is_same_v<get_addition_element_traits_t<matrix_operation_traits, int, int>,
+                                 matrix_operation_traits::addition_element_traits<matrix_operation_traits, int, int>>);
 
-    static_assert(std::is_same_v<addition_engine_traits_t<matrix_operation_traits, int, int>,
-                                 matrix_addition_engine_traits<matrix_operation_traits, int, int>>);
+    static_assert(std::is_same_v<get_addition_engine_traits_t<matrix_operation_traits, eng_t, eng_t>,
+                                 matrix_operation_traits::addition_engine_traits<matrix_operation_traits, eng_t, eng_t>>);
 
-    static_assert(std::is_same_v<addition_arithmetic_traits_t<matrix_operation_traits, int, int>,
-                                 matrix_addition_arithmetic_traits<matrix_operation_traits, int, int>>);
+    static_assert(std::is_same_v<get_addition_arithmetic_traits_t<matrix_operation_traits, mat_t, mat_t>,
+                                 matrix_operation_traits::addition_arithmetic_traits<matrix_operation_traits, mat_t, mat_t>>);
 
     //- Extracting from an empty operation traits type should yield library results.
     //
-    static_assert(std::is_same_v<addition_element_traits_t<test_add_op_traits_empty, int, int>,
-                                 matrix_addition_element_traits<test_add_op_traits_empty, int, int>>);
+    static_assert(std::is_same_v<get_addition_element_traits_t<test_add_op_traits_empty, int, int>,
+                                 matrix_operation_traits::addition_element_traits<test_add_op_traits_empty, int, int>>);
 
-    static_assert(std::is_same_v<addition_engine_traits_t<test_add_op_traits_empty, int, int>,
-                                 matrix_addition_engine_traits<test_add_op_traits_empty, int, int>>);
+    static_assert(std::is_same_v<get_addition_engine_traits_t<test_add_op_traits_empty, eng_t, eng_t>,
+                                 matrix_operation_traits::addition_engine_traits<test_add_op_traits_empty, eng_t, eng_t>>);
 
-    static_assert(std::is_same_v<addition_arithmetic_traits_t<test_add_op_traits_empty, int, int>,
-                                 matrix_addition_arithmetic_traits<test_add_op_traits_empty, int, int>>);
+    static_assert(std::is_same_v<get_addition_arithmetic_traits_t<test_add_op_traits_empty, int, int>,
+                                 matrix_operation_traits::addition_arithmetic_traits<test_add_op_traits_empty, int, int>>);
 
     //- Extracting a nested alias template specialization from a custom operation traits type should
     //  yield the specializations to which those aliases refer.
     //
-    static_assert(std::is_same_v<addition_element_traits_t<test_add_op_traits_nta, int, int>,
+    static_assert(std::is_same_v<get_addition_element_traits_t<test_add_op_traits_nta, int, int>,
                                  test_element_add_traits_nta<test_add_op_traits_nta, int, int>>);
 
-    static_assert(std::is_same_v<addition_engine_traits_t<test_add_op_traits_nta, int, int>,
-                                 test_engine_add_traits_nta<test_add_op_traits_nta, int, int>>);
+    static_assert(std::is_same_v<get_addition_engine_traits_t<test_add_op_traits_nta, eng_t, eng_t>,
+                                 test_engine_add_traits_nta<test_add_op_traits_nta, eng_t, eng_t>>);
 
-    static_assert(std::is_same_v<addition_arithmetic_traits_t<test_add_op_traits_nta, int, int>,
-                                 test_arithmetic_add_traits_nta<test_add_op_traits_nta, int, int>>);
+    static_assert(std::is_same_v<get_addition_arithmetic_traits_t<test_add_op_traits_nta, mat_t, mat_t>,
+                                 test_arithmetic_add_traits_nta<test_add_op_traits_nta, mat_t, mat_t>>);
 
     //- Extracting a nested class template specialization from a custom operation traits type should
     //  yield those same nested specializations.
     //
-    static_assert(std::is_same_v<addition_element_traits_t<test_add_op_traits_nct, int, int>,
+    static_assert(std::is_same_v<get_addition_element_traits_t<test_add_op_traits_nct, int, int>,
                                  test_add_op_traits_nct::addition_element_traits<test_add_op_traits_nct, int, int>>);
 
-    static_assert(std::is_same_v<addition_engine_traits_t<test_add_op_traits_nct, int, int>,
-                                 test_add_op_traits_nct::addition_engine_traits<test_add_op_traits_nct, int, int>>);
+    static_assert(std::is_same_v<get_addition_engine_traits_t<test_add_op_traits_nct, eng_t, eng_t>,
+                                 test_add_op_traits_nct::addition_engine_traits<test_add_op_traits_nct, eng_t, eng_t>>);
 
-    static_assert(std::is_same_v<addition_arithmetic_traits_t<test_add_op_traits_nct, int, int>,
-                                 test_add_op_traits_nct::addition_arithmetic_traits<test_add_op_traits_nct, int, int>>);
+    static_assert(std::is_same_v<get_addition_arithmetic_traits_t<test_add_op_traits_nct, mat_t, mat_t>,
+                                 test_add_op_traits_nct::addition_arithmetic_traits<test_add_op_traits_nct, mat_t, mat_t>>);
 }
 
 
@@ -217,37 +220,111 @@ TEST(AddTraits, EnginePromotion)
 {
     PRINT_FNAME();
 
-    using fsm_float   = fixed_matrix_engine<float, 2, 3>;
-    using fsm_double  = fixed_matrix_engine<double, 2, 3>;
-    using fsm_new_num = fixed_matrix_engine<new_num, 2, 3>;
+    using fxd_float   = fixed_size_matrix<float, 2, 3>;
+    using fxd_double  = fixed_size_matrix<double, 2, 3>;
+    using fxd_new_num = fixed_size_matrix<new_num, 2, 3>;
 
-    using drm_float   = dynamic_matrix_engine<float>;
-    using drm_double  = dynamic_matrix_engine<double>;
-    using drm_new_num = dynamic_matrix_engine<new_num>;
+    using gen_float   = general_matrix<float, 2, 3>;
+    using gen_double  = general_matrix<double, 2, 3>;
+    using gen_new_num = general_matrix<new_num, 2, 3>;
 
-    PRINT_TYPE(fsm_float);
-    PRINT_TYPE(drm_float);
-/*
-    using drm_float      = STD_LA::dyn_matrix<float>;
-    using drm_double     = STD_LA::dyn_matrix<double>;
-    using drm_new_num    = STD_LA::dyn_matrix<new_num>;
-    using drm_float_tr   = decltype(std::declval<drm_float>().t());
-    using drm_double_tr  = decltype(std::declval<drm_double>().t());
-    using drm_new_num_tr = decltype(std::declval<drm_new_num>().t());
+    using dyn_float   = dynamic_matrix<float>;
+    using dyn_double  = dynamic_matrix<double>;
+    using dyn_new_num = dynamic_matrix<new_num>;
 
-    ASSERT_A_ADD_B_EQ_C(fsm_float,  fsm_float,       fsm_float);
-    ASSERT_A_ADD_B_EQ_C(fsm_float,  fsm_double,      fsm_double);
-    ASSERT_A_ADD_B_EQ_C(fsm_float,  fsm_new_num,     fsm_new_num);
-    ASSERT_A_ADD_B_EQ_C(fsm_float,  fsm_float_tr,    fsm_float);
-    ASSERT_A_ADD_B_EQ_C(fsm_float,  fsm_double_tr,   fsm_double);
-    ASSERT_A_ADD_B_EQ_C(fsm_float,  fsm_new_num_tr,  fsm_new_num);
-    ASSERT_A_ADD_B_EQ_C(fsm_float,  drm_float,       drm_float);
-    ASSERT_A_ADD_B_EQ_C(fsm_float,  drm_double,      drm_double);
-    ASSERT_A_ADD_B_EQ_C(fsm_float,  drm_new_num,     drm_new_num);
-    ASSERT_A_ADD_B_EQ_C(fsm_float,  drm_float_tr,    drm_float);
-    ASSERT_A_ADD_B_EQ_C(fsm_float,  drm_double_tr,   drm_double);
-    ASSERT_A_ADD_B_EQ_C(fsm_float,  drm_new_num_tr,  drm_new_num);
-*/
+    PRINT_TYPE(fxd_float);
+    PRINT_TYPE(gen_float);
+    PRINT_TYPE(dyn_float);
+
+    ASSERT_A_ADD_B_EQ_C(fxd_float,  fxd_float,    fxd_float);
+    ASSERT_A_ADD_B_EQ_C(fxd_float,  fxd_double,   fxd_double);
+    ASSERT_A_ADD_B_EQ_C(fxd_float,  fxd_new_num,  fxd_new_num);
+    ASSERT_A_ADD_B_EQ_C(fxd_float,  gen_float,    gen_float);
+    ASSERT_A_ADD_B_EQ_C(fxd_float,  gen_double,   gen_double);
+    ASSERT_A_ADD_B_EQ_C(fxd_float,  gen_new_num,  gen_new_num);
+    ASSERT_A_ADD_B_EQ_C(fxd_float,  dyn_float,    dyn_float);
+    ASSERT_A_ADD_B_EQ_C(fxd_float,  dyn_double,   dyn_double);
+    ASSERT_A_ADD_B_EQ_C(fxd_float,  dyn_new_num,  dyn_new_num);
+
+    ASSERT_A_ADD_B_EQ_C(fxd_double,  fxd_float,    fxd_double);
+    ASSERT_A_ADD_B_EQ_C(fxd_double,  fxd_double,   fxd_double);
+    ASSERT_A_ADD_B_EQ_C(fxd_double,  fxd_new_num,  fxd_new_num);
+    ASSERT_A_ADD_B_EQ_C(fxd_double,  gen_float,    gen_double);
+    ASSERT_A_ADD_B_EQ_C(fxd_double,  gen_double,   gen_double);
+    ASSERT_A_ADD_B_EQ_C(fxd_double,  gen_new_num,  gen_new_num);
+    ASSERT_A_ADD_B_EQ_C(fxd_double,  dyn_float,    dyn_double);
+    ASSERT_A_ADD_B_EQ_C(fxd_double,  dyn_double,   dyn_double);
+    ASSERT_A_ADD_B_EQ_C(fxd_double,  dyn_new_num,  dyn_new_num);
+
+    ASSERT_A_ADD_B_EQ_C(fxd_new_num,  fxd_float,    fxd_new_num);
+    ASSERT_A_ADD_B_EQ_C(fxd_new_num,  fxd_double,   fxd_new_num);
+    ASSERT_A_ADD_B_EQ_C(fxd_new_num,  fxd_new_num,  fxd_new_num);
+    ASSERT_A_ADD_B_EQ_C(fxd_new_num,  gen_float,    gen_new_num);
+    ASSERT_A_ADD_B_EQ_C(fxd_new_num,  gen_double,   gen_new_num);
+    ASSERT_A_ADD_B_EQ_C(fxd_new_num,  gen_new_num,  gen_new_num);
+    ASSERT_A_ADD_B_EQ_C(fxd_new_num,  dyn_float,    dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(fxd_new_num,  dyn_double,   dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(fxd_new_num,  dyn_new_num,  dyn_new_num);
+
+    ASSERT_A_ADD_B_EQ_C(gen_float,  fxd_float,    gen_float);
+    ASSERT_A_ADD_B_EQ_C(gen_float,  fxd_double,   gen_double);
+    ASSERT_A_ADD_B_EQ_C(gen_float,  fxd_new_num,  gen_new_num);
+    ASSERT_A_ADD_B_EQ_C(gen_float,  gen_float,    gen_float);
+    ASSERT_A_ADD_B_EQ_C(gen_float,  gen_double,   gen_double);
+    ASSERT_A_ADD_B_EQ_C(gen_float,  gen_new_num,  gen_new_num);
+    ASSERT_A_ADD_B_EQ_C(gen_float,  dyn_float,    dyn_float);
+    ASSERT_A_ADD_B_EQ_C(gen_float,  dyn_double,   dyn_double);
+    ASSERT_A_ADD_B_EQ_C(gen_float,  dyn_new_num,  dyn_new_num);
+
+    ASSERT_A_ADD_B_EQ_C(gen_double,  fxd_float,    gen_double);
+    ASSERT_A_ADD_B_EQ_C(gen_double,  fxd_double,   gen_double);
+    ASSERT_A_ADD_B_EQ_C(gen_double,  fxd_new_num,  gen_new_num);
+    ASSERT_A_ADD_B_EQ_C(gen_double,  gen_float,    gen_double);
+    ASSERT_A_ADD_B_EQ_C(gen_double,  gen_double,   gen_double);
+    ASSERT_A_ADD_B_EQ_C(gen_double,  gen_new_num,  gen_new_num);
+    ASSERT_A_ADD_B_EQ_C(gen_double,  dyn_float,    dyn_double);
+    ASSERT_A_ADD_B_EQ_C(gen_double,  dyn_double,   dyn_double);
+    ASSERT_A_ADD_B_EQ_C(gen_double,  dyn_new_num,  dyn_new_num);
+
+    ASSERT_A_ADD_B_EQ_C(gen_new_num,  fxd_float,    gen_new_num);
+    ASSERT_A_ADD_B_EQ_C(gen_new_num,  fxd_double,   gen_new_num);
+    ASSERT_A_ADD_B_EQ_C(gen_new_num,  fxd_new_num,  gen_new_num);
+    ASSERT_A_ADD_B_EQ_C(gen_new_num,  gen_float,    gen_new_num);
+    ASSERT_A_ADD_B_EQ_C(gen_new_num,  gen_double,   gen_new_num);
+    ASSERT_A_ADD_B_EQ_C(gen_new_num,  gen_new_num,  gen_new_num);
+    ASSERT_A_ADD_B_EQ_C(gen_new_num,  dyn_float,    dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(gen_new_num,  dyn_double,   dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(gen_new_num,  dyn_new_num,  dyn_new_num);
+
+    ASSERT_A_ADD_B_EQ_C(dyn_float,  fxd_float,    dyn_float);
+    ASSERT_A_ADD_B_EQ_C(dyn_float,  fxd_double,   dyn_double);
+    ASSERT_A_ADD_B_EQ_C(dyn_float,  fxd_new_num,  dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(dyn_float,  gen_float,    dyn_float);
+    ASSERT_A_ADD_B_EQ_C(dyn_float,  gen_double,   dyn_double);
+    ASSERT_A_ADD_B_EQ_C(dyn_float,  gen_new_num,  dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(dyn_float,  dyn_float,    dyn_float);
+    ASSERT_A_ADD_B_EQ_C(dyn_float,  dyn_double,   dyn_double);
+    ASSERT_A_ADD_B_EQ_C(dyn_float,  dyn_new_num,  dyn_new_num);
+
+    ASSERT_A_ADD_B_EQ_C(dyn_double,  fxd_float,    dyn_double);
+    ASSERT_A_ADD_B_EQ_C(dyn_double,  fxd_double,   dyn_double);
+    ASSERT_A_ADD_B_EQ_C(dyn_double,  fxd_new_num,  dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(dyn_double,  gen_float,    dyn_double);
+    ASSERT_A_ADD_B_EQ_C(dyn_double,  gen_double,   dyn_double);
+    ASSERT_A_ADD_B_EQ_C(dyn_double,  gen_new_num,  dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(dyn_double,  dyn_float,    dyn_double);
+    ASSERT_A_ADD_B_EQ_C(dyn_double,  dyn_double,   dyn_double);
+    ASSERT_A_ADD_B_EQ_C(dyn_double,  dyn_new_num,  dyn_new_num);
+
+    ASSERT_A_ADD_B_EQ_C(dyn_new_num,  fxd_float,    dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(dyn_new_num,  fxd_double,   dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(dyn_new_num,  fxd_new_num,  dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(dyn_new_num,  gen_float,    dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(dyn_new_num,  gen_double,   dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(dyn_new_num,  gen_new_num,  dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(dyn_new_num,  dyn_float,    dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(dyn_new_num,  dyn_double,   dyn_new_num);
+    ASSERT_A_ADD_B_EQ_C(dyn_new_num,  dyn_new_num,  dyn_new_num);
 }
 
 #if 0
