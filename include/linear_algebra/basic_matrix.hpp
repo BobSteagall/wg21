@@ -12,8 +12,10 @@ namespace STD_LA {
 
 template<class ET, class OT>
 requires
-    detail::copyable<ET>  and
-    detail::default_initializable<ET>  and
+    detail::copyable<ET>
+    and
+    detail::default_initializable<ET>
+    and
     detail::readable_matrix_engine<ET>
 class basic_matrix
 {
@@ -178,9 +180,9 @@ class basic_matrix
         and
         detail::random_access_standard_container<CT>
         and
-        detail::constructible_from<engine_type, CT>
-        and
         detail::convertible_from<typename ET::element_type, typename CT::value_type>
+        and
+        detail::constructible_from<engine_type, CT>
     :   m_engine(rhs)
     {}
 
@@ -192,9 +194,9 @@ class basic_matrix
         and
         detail::random_access_standard_container<CT>
         and
-        detail::not_constructible_from<engine_type, CT>
-        and
         detail::convertible_from<typename ET::element_type, typename CT::value_type>
+        and
+        detail::not_constructible_from<engine_type, CT>
     :   m_engine()
     {
         engine_support::assign_from(m_engine, rhs);
@@ -691,8 +693,10 @@ class basic_matrix
   private:
     template<class ET2, class OT2>
     requires
-        detail::copyable<ET2>  and
-        detail::default_initializable<ET2>  and
+        detail::copyable<ET2>
+        and
+        detail::default_initializable<ET2>
+        and
         detail::readable_matrix_engine<ET2>
     friend class basic_matrix;
 
@@ -712,6 +716,26 @@ using dyn_row_vector = basic_matrix<matrix_storage_engine<T, extents<1, dynamic_
 template<class T, class OT = matrix_operation_traits>
 using dyn_col_vector = basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, 1>, allocator<T>, column_major>, OT>;
 
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class OT = matrix_operation_traits>
+using fixed_matrix =
+        basic_matrix<matrix_storage_engine<T, extents<R, C>, void, row_major>, OT>;
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class OT = matrix_operation_traits>
+using sized_matrix =
+        basic_matrix<matrix_storage_engine<T, extents<R, C>, allocator<T>, row_major>, OT>;
+
+template<class T, class OT = matrix_operation_traits>
+using dynamic_matrix =
+        basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, allocator<T>, row_major>, OT>;
+
+template<class T, class OT = matrix_operation_traits>
+using dynamic_row_vector =
+        basic_matrix<matrix_storage_engine<T, extents<1, dynamic_extent>, allocator<T>, row_major>, OT>;
+
+template<class T, class OT = matrix_operation_traits>
+using dynamic_column_vector =
+        basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, 1>, allocator<T>, column_major>, OT>;
 
 
 }       //- STD_LA namespace

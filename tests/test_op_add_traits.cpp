@@ -1,4 +1,4 @@
-//#define ENABLE_TEST_PRINTING
+#define ENABLE_TEST_PRINTING
 #include "test_common.hpp"
 
 using namespace STD_LA;
@@ -15,76 +15,15 @@ using namespace MDSPAN_NS;
 //  The following are several traits types used to exercise the element, engine, and operation
 //  type detection meta-functions in the private implementation.  See test function t100() below.
 //--------------------------------------------------------------------------------------------------
-//
 //- This traits type is used to verify that default operations are selected when they are not
 //  declared in the operations traits type.
 //
 struct test_add_op_traits_empty
 {};
 
-struct test_add_op_traits_bad_00
-{
-    using addition_element_traits = int;
-    using addition_engine_traits = int;
-    using addition_arithmetic_traits = int;
-};
-
-struct test_add_op_traits_bad_01
-{
-    template<class OT>
-    using addition_element_traits = matrix_addition_element_traits<OT, int, int>;
-
-    template<class OT>
-    using addition_engine_traits = matrix_addition_engine_traits<OT, int, int>;
-
-    template<class OT>
-    using addition_arithmetic_traits = matrix_addition_arithmetic_traits<OT, int, int>;
-};
-
-struct test_add_op_traits_bad_02
-{
-    template<class OT, class T1>
-    using addition_element_traits = matrix_addition_element_traits<OT, T1, T1>;
-
-    template<class OT, class T1>
-    using addition_engine_traits = matrix_addition_engine_traits<OT, T1, T1>;
-
-    template<class OT, class T1>
-    using addition_arithmetic_traits = matrix_addition_arithmetic_traits<OT, T1, T1>;
-};
-
-
-//- This operation traits type has its element/engine/arithmetic nested traits type as ordinary
-//  (i.e., non-template) type aliases.
-//
-//  Suffix "_ord" means "ordinary"
-//
-struct test_element_add_traits_ord
-{
-    using element_type = dummy_type;
-};
-
-struct test_engine_add_traits_ord
-{
-    using engine_type = dummy_type;
-};
-
-struct test_add_traits_ord
-{
-    using result_type = dummy_type;
-};
-
-struct test_add_op_traits_ord
-{
-    using addition_element_traits    = test_element_add_traits_ord;
-    using addition_engine_traits     = test_engine_add_traits_ord;
-    using addition_arithmetic_traits = test_add_traits_ord;
-};
-
 
 //- This operation traits type is analogous to STD_LA::matrix_operation_traits, where its nested
 //  traits types for element/engine/arithmetic are alias templates.
-//
 //  Suffix "_nta" means "nested type alias"
 //
 template<class OT, class T1, class T2>
@@ -117,9 +56,7 @@ struct test_add_op_traits_nta
     using addition_arithmetic_traits = test_arithmetic_add_traits_nta<OT, OP1, OP2>;
 };
 
-
 //- This operation traits type has its element/engine/arithmetic traits as nested class templates.
-//
 //  Suffix "_nct" means "nested class type"
 //
 struct test_add_op_traits_nct
@@ -143,6 +80,38 @@ struct test_add_op_traits_nct
     };
 };
 
+//- The following are some invalid operation traits.
+//
+struct test_add_op_traits_bad_00
+{
+    using addition_element_traits = int;
+    using addition_engine_traits = int;
+    using addition_arithmetic_traits = int;
+};
+
+struct test_add_op_traits_bad_01
+{
+    template<class OT>
+    using addition_element_traits = matrix_addition_element_traits<OT, int, int>;
+
+    template<class OT>
+    using addition_engine_traits = matrix_addition_engine_traits<OT, int, int>;
+
+    template<class OT>
+    using addition_arithmetic_traits = matrix_addition_arithmetic_traits<OT, int, int>;
+};
+
+struct test_add_op_traits_bad_02
+{
+    template<class OT, class T1>
+    using addition_element_traits = matrix_addition_element_traits<OT, T1, T1>;
+
+    template<class OT, class T1>
+    using addition_engine_traits = matrix_addition_engine_traits<OT, T1, T1>;
+
+    template<class OT, class T1>
+    using addition_arithmetic_traits = matrix_addition_arithmetic_traits<OT, T1, T1>;
+};
 
 //--------------------------------------------------------------------------------------------------
 //  This test ensures that the nested traits associated with addition are properly validated.
@@ -199,7 +168,7 @@ TEST(AddTraits, Extraction)
     //- Extracting from the library's default operation traits should yield library results.
     //
     static_assert(std::is_same_v<addition_element_traits_t<matrix_operation_traits, int, int>,
-                                 matrix_addition_element_traits<matrix_operation_traits, int, int>>);
+                                 STD_LA::detail::addition_element_traits<matrix_operation_traits, int, int>>);
 
     static_assert(std::is_same_v<addition_engine_traits_t<matrix_operation_traits, int, int>,
                                  matrix_addition_engine_traits<matrix_operation_traits, int, int>>);
@@ -218,7 +187,7 @@ TEST(AddTraits, Extraction)
     static_assert(std::is_same_v<addition_arithmetic_traits_t<test_add_op_traits_empty, int, int>,
                                  matrix_addition_arithmetic_traits<test_add_op_traits_empty, int, int>>);
 
-    //- Extracting nested alias template specialization from a custom operation traits type should
+    //- Extracting a nested alias template specialization from a custom operation traits type should
     //  yield the specializations to which those aliases refer.
     //
     static_assert(std::is_same_v<addition_element_traits_t<test_add_op_traits_nta, int, int>,
@@ -230,7 +199,7 @@ TEST(AddTraits, Extraction)
     static_assert(std::is_same_v<addition_arithmetic_traits_t<test_add_op_traits_nta, int, int>,
                                  test_arithmetic_add_traits_nta<test_add_op_traits_nta, int, int>>);
 
-    //- Extracting nested class template specialization from a custom operation traits type should
+    //- Extracting a nested class template specialization from a custom operation traits type should
     //  yield those same nested specializations.
     //
     static_assert(std::is_same_v<addition_element_traits_t<test_add_op_traits_nct, int, int>,
@@ -242,6 +211,73 @@ TEST(AddTraits, Extraction)
     static_assert(std::is_same_v<addition_arithmetic_traits_t<test_add_op_traits_nct, int, int>,
                                  test_add_op_traits_nct::addition_arithmetic_traits<test_add_op_traits_nct, int, int>>);
 }
+
+
+TEST(AddTraits, EnginePromotion)
+{
+    PRINT_FNAME();
+
+    using fsm_float   = fixed_matrix_engine<float, 2, 3>;
+    using fsm_double  = fixed_matrix_engine<double, 2, 3>;
+    using fsm_new_num = fixed_matrix_engine<new_num, 2, 3>;
+
+    using drm_float   = dynamic_matrix_engine<float>;
+    using drm_double  = dynamic_matrix_engine<double>;
+    using drm_new_num = dynamic_matrix_engine<new_num>;
+
+    PRINT_TYPE(fsm_float);
+    PRINT_TYPE(drm_float);
+/*
+    using drm_float      = STD_LA::dyn_matrix<float>;
+    using drm_double     = STD_LA::dyn_matrix<double>;
+    using drm_new_num    = STD_LA::dyn_matrix<new_num>;
+    using drm_float_tr   = decltype(std::declval<drm_float>().t());
+    using drm_double_tr  = decltype(std::declval<drm_double>().t());
+    using drm_new_num_tr = decltype(std::declval<drm_new_num>().t());
+
+    ASSERT_A_ADD_B_EQ_C(fsm_float,  fsm_float,       fsm_float);
+    ASSERT_A_ADD_B_EQ_C(fsm_float,  fsm_double,      fsm_double);
+    ASSERT_A_ADD_B_EQ_C(fsm_float,  fsm_new_num,     fsm_new_num);
+    ASSERT_A_ADD_B_EQ_C(fsm_float,  fsm_float_tr,    fsm_float);
+    ASSERT_A_ADD_B_EQ_C(fsm_float,  fsm_double_tr,   fsm_double);
+    ASSERT_A_ADD_B_EQ_C(fsm_float,  fsm_new_num_tr,  fsm_new_num);
+    ASSERT_A_ADD_B_EQ_C(fsm_float,  drm_float,       drm_float);
+    ASSERT_A_ADD_B_EQ_C(fsm_float,  drm_double,      drm_double);
+    ASSERT_A_ADD_B_EQ_C(fsm_float,  drm_new_num,     drm_new_num);
+    ASSERT_A_ADD_B_EQ_C(fsm_float,  drm_float_tr,    drm_float);
+    ASSERT_A_ADD_B_EQ_C(fsm_float,  drm_double_tr,   drm_double);
+    ASSERT_A_ADD_B_EQ_C(fsm_float,  drm_new_num_tr,  drm_new_num);
+*/
+}
+
+#if 0
+//- This operation traits type has its element/engine/arithmetic nested traits type as ordinary
+//  (i.e., non-template) type aliases.
+//
+//  Suffix "_ord" means "ordinary"
+//
+struct test_element_add_traits_ord
+{
+    using element_type = dummy_type;
+};
+
+struct test_engine_add_traits_ord
+{
+    using engine_type = dummy_type;
+};
+
+struct test_add_traits_ord
+{
+    using result_type = dummy_type;
+};
+
+struct test_add_op_traits_ord
+{
+    using addition_element_traits    = test_element_add_traits_ord;
+    using addition_engine_traits     = test_engine_add_traits_ord;
+    using addition_arithmetic_traits = test_add_traits_ord;
+};
+
 
 //--------------------------------------------------------------------------------------------------
 //  This test ensures that the type detection meta-functions are working properly.  It exercises
@@ -716,3 +752,4 @@ TestGroup10()
     t103();
     t104();
 }
+#endif

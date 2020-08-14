@@ -41,6 +41,34 @@ bool    is_valid_engine_extents_v = is_valid_engine_extents<T>::value;
 
 
 //--------------------------------------------------------------------------------------------------
+//  Trait:      is_valid_fixed_engine_extents<X>
+//  Alias:      is_valid_fixed_engine_extents_v<X>
+//
+//  This private traits type is used to validate an engine's extents template argument.  The
+//  extents parameter must be one- or two-dimensional, and each dimension's template argument
+//  must be greater than zero.
+//--------------------------------------------------------------------------------------------------
+//
+template<class X>
+struct is_valid_fixed_engine_extents : public std::false_type {};
+
+template<ptrdiff_t N>
+struct is_valid_fixed_engine_extents<extents<N>>
+{
+    static constexpr bool   value = (N > 0);
+};
+
+template<ptrdiff_t R, ptrdiff_t C>
+struct is_valid_fixed_engine_extents<extents<R, C>>
+{
+    static constexpr bool   value = (R > 0) && (C > 0);
+};
+
+template<class X> inline constexpr
+bool    is_valid_fixed_engine_extents_v = is_valid_fixed_engine_extents<X>::value;
+
+
+//--------------------------------------------------------------------------------------------------
 //  Trait:      is_1d_mdspan<T>
 //  Alias:      is_1d_mdspan_v<T>
 //
@@ -139,9 +167,43 @@ template<class T> inline constexpr
 bool    is_random_access_standard_container_v = is_random_access_standard_container<T>::value;
 
 
+//--------------------------------------------------------------------------------------------------
+//  Trait:      get_size_type<T>
+//  Alias:      get_size_t<T>
+//
+//  This private traits type finds the nested alias size_type if it is present; otherwise, it
+//  returns size_t.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T, typename = void>
+struct get_size_type
+{
+    using type = std::size_t;
+};
+
+template<class T>
+struct get_size_type<T, std::void_t<typename T::size_type>>
+{
+    using type = typename T::size_type;
+};
+
+template<class A>
+using alloc_size_t = typename get_size_type<A>::type;
+
+
 //==================================================================================================
 //  CONCEPT DEFINITIONS
 //==================================================================================================
+//--------------------------------------------------------------------------------------------------
+//  Concept:    class_type<T>
+//
+//  This private concept determines whether its parameter is a non-union class type.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T>
+concept class_type = std::is_class_v<T>;
+
+
 //--------------------------------------------------------------------------------------------------
 //  Concepts:   convertible_from<DST, SRC>
 //              constructible_from<DST, SRC>
@@ -269,7 +331,29 @@ concept random_access_standard_container = is_random_access_standard_container_v
 
 
 //--------------------------------------------------------------------------------------------------
-//  Concept:    valid_engine_allocator<A, T>
+//  Concepts:   valid_engine_extents<X>
+//
+//  This private concept is used to validate the second template parameter of a specialization
+//  of matrix_storage_engine, the engine's extents type.
+//--------------------------------------------------------------------------------------------------
+//
+template<typename X>
+concept valid_engine_extents = is_valid_engine_extents_v<X>;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concepts:   valid_fixed_engine_extents<X>
+//
+//  This private concept is used to validate the second template parameter of a specialization
+//  of matrix_storage_engine, the engine's extents type for non-resizable engines
+//--------------------------------------------------------------------------------------------------
+//
+template<typename X>
+concept valid_fixed_engine_extents = is_valid_fixed_engine_extents_v<X>;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    valid_allocator<T, A>
 //
 //  This private concept determines whether a given type A is an acceptable allocator of type T.
 //  Prospective allocator type A must either: be void; or, it must be possible to instantiate a
@@ -277,11 +361,19 @@ concept random_access_standard_container = is_random_access_standard_container_v
 //  type T, such as allocator_traits<A>::value_type is the same type as T, etc.
 //--------------------------------------------------------------------------------------------------
 //
-template<typename T>
-concept no_allocator = same_as<T, void>;
+template<typename T, typename A>
+concept valid_allocator_interface =
+    requires (A a, alloc_size_t<A> n)
+    {
+        typename A::value_type;
+        requires std::is_same_v<T, typename A::value_type>;
+        { *(a.allocate(n))               } -> same_as<T&>;
+        { a.deallocate(a.allocate(n), n) };
+    };
 
-template<typename AT, typename T>
-concept valid_allocator =
+
+template<typename T, typename AT>
+concept valid_allocator_traits =
     requires
     {
         typename AT::allocator_type;
@@ -301,8 +393,45 @@ concept valid_allocator =
         { p[n] } -> same_as<T&>;
     };
 
-template<typename A, typename T>
-concept valid_engine_allocator = no_allocator<A> or valid_allocator<allocator_traits<A>, T>;
+template<typename AT>
+concept no_allocator = same_as<AT, void>;
+
+template<typename T, typename A>
+concept valid_allocator_arg = no_allocator<A> or valid_allocator_interface<T, A>;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    valid_engine_extents_and_allocator<T, X, A>
+//
+//  This private concept determines whether a given combination of element type T, allocator A,
+//  and extents X is acceptable for matrix_storage_engine.  There are valid two possibilities:
+//  1. There is no allocator and the extents are greater than zero in all dimensions;
+//  2. There is a valid allocator, the extent arguments are valid.
+//--------------------------------------------------------------------------------------------------
+//
+template<typename T, typename X, typename A>
+concept valid_engine_extents_and_allocator =
+    (no_allocator<A> and valid_fixed_engine_extents<X>)
+    or
+    (valid_allocator_interface<T, A> and valid_engine_extents<X>);
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concepts:   valid_layout_for_2d_storage_engine<L>
+//              valid_layout_for_1d_storage_engine<L>
+//
+//  These private concepts are used to validate the fourth template parameter of a specialization
+//  of matrix_storage_engine, the engine's layout type.  It must be row_major or column_major for
+//  matrix storage engines, and unoriented for vector storage engines.
+//--------------------------------------------------------------------------------------------------
+//
+template<typename L>
+concept valid_layout_for_2d_storage_engine =
+    (std::is_same_v<L, row_major> || std::is_same_v<L, column_major>);
+
+template<typename L>
+concept valid_layout_for_1d_storage_engine = std::is_same_v<L, unoriented>;
+
 
 //--------------------------------------------------------------------------------------------------
 //  Concept:    readable_engine_fundamentals<ET>
@@ -529,10 +658,6 @@ concept writable_and_1d_indexable_matrix_engine =
 template<class ET>
 concept row_major_engine = true;
 
-template<class ET>
-concept spannable_engine = spannable_matrix_engine<ET> or spannable_vector_engine<ET>;
-
-
 //--------------------------------------------------------------------------------------------------
 //  Concepts:   reshapable_vector_engine<ET>
 //
@@ -587,31 +712,29 @@ concept row_reshapable_matrix_engine =
 
 
 //--------------------------------------------------------------------------------------------------
-//  Concepts:   valid_engine_extents<X>
+//  Concept:    similar_engines<ET1, ET2>
 //
-//  This private concept is used to validate the second template parameter of a specialization
-//  of matrix_storage_engine, the engine's extents type.
+//  This private concept determines whether both prospective engine types represent matrix engines
+//  or vector engines.  The motivation for this concept is matrix/vector addition/subtraction where
+//  engine arities must match.
 //--------------------------------------------------------------------------------------------------
 //
-template<typename X>
-concept valid_engine_extents = is_valid_engine_extents_v<X>;
+template<class ET1, class ET2>
+concept similar_engines =
+    (readable_matrix_engine<ET1> and readable_matrix_engine<ET2>)
+    or
+    (readable_vector_engine<ET1> and readable_vector_engine<ET2>);
 
 
 //--------------------------------------------------------------------------------------------------
-//  Concepts:   valid_layout_for_2d_storage_engine<L>
-//              valid_layout_for_1d_storage_engine<L>
+//  Concept:    spannable_engine<ET>
 //
-//  These private concepts are used to validate the fourth template parameter of a specialization
-//  of matrix_storage_engine, the engine's layout type.  It must be row_major or column_major for
-//  matrix storage engines, and unoriented for vector storage engines.
+//  This private concept determines whether a prospective matrix engine type implements either
+//  the spannable_vector_engine<ET> or spannable_matrix_engine<ET> concepts.
 //--------------------------------------------------------------------------------------------------
 //
-template<typename L>
-concept valid_layout_for_2d_storage_engine =
-    (std::is_same_v<L, row_major> || std::is_same_v<L, column_major>);
-
-template<typename L>
-concept valid_layout_for_1d_storage_engine = std::is_same_v<L, unoriented>;
+template<class ET>
+concept spannable_engine = spannable_matrix_engine<ET> or spannable_vector_engine<ET>;
 
 
 //==================================================================================================

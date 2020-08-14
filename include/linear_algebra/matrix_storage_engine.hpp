@@ -9,6 +9,23 @@
 #define LINEAR_ALGEBRA_MATRIX_STORAGE_ENGINE_HPP_DEFINED
 
 namespace STD_LA {
+//--------------------------------------------------------------------------------------------------
+//  Class Template:     matrix_storage_engine<T, extents<N>, A, L>
+//
+//  This partial specialization of matrix_storage_engine<T,X,A,L> implements an owning engine
+//  for use by class template basic_vector<ET, OT>.  Specifically, it models a mathematical
+//  vector having N elements, employing allocator A, and having element layout L.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T, class X, class A, class L>
+class matrix_storage_engine
+{
+    static_assert(detail::valid_engine_extents<X>, "invalid extents parameter");
+    static_assert(detail::valid_allocator_arg<T, A>, "invalid allocator parameter");
+    static_assert(detail::valid_engine_extents_and_allocator<T, X, A>,
+                  "invalid combination of element type, extents, and allocator");
+};
+
 
 //--------------------------------------------------------------------------------------------------
 //  Partial Specialization:     matrix_storage_engine<T, extents<N>, A, L>
@@ -29,8 +46,8 @@ namespace STD_LA {
 //
 template<class T, ptrdiff_t N, class A, class L>
 requires
-    detail::valid_engine_extents<extents<N>>  and
-    detail::valid_engine_allocator<A, T>  and
+    detail::valid_engine_extents_and_allocator<T, extents<N>, A>
+    and
     detail::valid_layout_for_1d_storage_engine<L>
 class matrix_storage_engine<T, extents<N>, A, L>
 {
@@ -316,9 +333,9 @@ class matrix_storage_engine<T, extents<N>, A, L>
 //
 template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
 requires
-    detail::valid_engine_extents<extents<R, C>>
-    and detail::valid_engine_allocator<A, T>
-    and detail::valid_layout_for_2d_storage_engine<L>
+    detail::valid_engine_extents_and_allocator<T, extents<R, C>, A>
+    and
+    detail::valid_layout_for_2d_storage_engine<L>
 class matrix_storage_engine<T, extents<R, C>, A, L>
 {
     using this_type    = matrix_storage_engine;
@@ -878,18 +895,6 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         }
     }
 };
-/*
-template<class OT,
-         class T1, ptrdiff_t R1, ptrdiff_t C1, class AT1, class EL1,
-         class T2, ptrdiff_t R2, ptrdiff_t C2, class AT2, class EL2>
-struct matrix_multiplication_engine_traits<OT,
-                                           matrix_storage_engine<T1, extents<R1, C1>, AT1, EL1>,
-                                           matrix_storage_engine<T2, extents<R2, C2>, AT2, EL2>>
-{
-    using element_type = select_matrix_multiplication_element_t<OT, T1, T2>;
-    using alloc_type   = detail::rebind_alloc_t<AT1, element_type>;
-    using engine_type  = matrix_storage_engine<element_type, extents<R1, C2>, alloc_type, EL1>;
-};
-*/
+
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_MATRIX_STORAGE_ENGINE_HPP_DEFINED

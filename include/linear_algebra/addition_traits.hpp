@@ -19,6 +19,142 @@
 
 namespace STD_LA {
 namespace detail {
+
+template<class IT, class OP1, class OP2>    struct addition_arithmetic_traits;
+
+
+template<class OT, class T1, class T2>
+struct addition_element_traits
+{
+    using element_type = decltype(declval<T1>() + declval<T2>());
+};
+
+
+//- The standard engine addition traits type provides the default mechanism for determining the
+//  correct engine type for a matrix/matrix or vector/vector addition.
+//
+template<class OT, class ET1, class ET2>
+requires
+    similar_engines<ET1, ET2>
+struct addition_engine_traits
+{
+    using element_type_1 = typename ET1::element_type;
+    using element_type_2 = typename ET2::element_type;
+    using element_traits = addition_element_traits_t<OT, element_type_1, element_type_2>;
+    using vector_engine  = dynamic_vector_engine<typename element_traits::element_type>;
+    using matrix_engine  = dynamic_matrix_engine<typename element_traits::element_type>;
+
+    using element_type = typename element_traits::element_type;
+    using engine_type  = conditional_t<readable_matrix_engine<ET1>, matrix_engine, vector_engine>;
+};
+
+
+//- The standard addition traits type provides the default mechanism for computing the result
+//  of a matrix/matrix or vector/vector addition.
+//
+//- (vector + vector)
+//
+template<class OT, class ET1, class OT1, class ET2, class OT2>
+struct addition_arithmetic_traits<OT, basic_vector<ET1, OT1>, basic_vector<ET2, OT2>>
+{
+    using element_type_1  = typename ET1::element_type;
+    using element_type_2  = typename ET2::element_type;
+    using element_traits  = addition_element_traits_t<OT, element_type_1, element_type_2>;
+
+    using owning_engine_1 = typename basic_vector<ET1, OT1>::owning_engine_type;
+    using owning_engine_2 = typename basic_vector<ET2, OT2>::owning_engine_type;
+    using engine_traits   = addition_engine_traits_t<OT, owning_engine_1, owning_engine_2>;
+
+    using element_type = typename element_traits::element_type;
+    using engine_type  = typename engine_traits::engine_type;
+    using result_type  = basic_vector<engine_type, OT>;
+
+    static_assert(std::is_same_v<element_type, typename engine_type::element_type>);
+
+    static constexpr result_type
+    add(basic_vector<ET1, OT1> const& v1, basic_vector<ET2, OT2> const& v2)
+    {
+        using index_type_1 = typename vector<ET1, OT1>::index_type;
+        using index_type_2 = typename vector<ET2, OT2>::index_type;
+        using index_type_r = typename result_type::index_type;
+
+        index_type_r    elems = static_cast<index_type_r>(v1.size());
+        result_type     vr;
+
+        if constexpr (is_resizable_engine_v<engine_type>)
+        {
+            vr.resize(elems);
+        }
+
+        index_type_r    ir = 0;
+        index_type_1    i1 = 0;
+        index_type_2    i2 = 0;
+
+        for (;  ir < elems;  ++ir, ++i1, ++i2)
+        {
+            vr(ir) = v1(i1) + v2(i2);
+        }
+
+        return vr;
+    }
+};
+
+//-------------------
+//- (matrix + matrix)
+//
+template<class OT, class ET1, class OT1, class ET2, class OT2>
+struct addition_arithmetic_traits<OT, basic_matrix<ET1, OT1>, basic_matrix<ET2, OT2>>
+{
+    using element_type_1  = typename ET1::element_type;
+    using element_type_2  = typename ET2::element_type;
+    using element_traits  = addition_element_traits_t<OT, element_type_1, element_type_2>;
+
+    using owning_engine_1 = typename basic_matrix<ET1, OT1>::owning_engine_type;
+    using owning_engine_2 = typename basic_matrix<ET2, OT2>::owning_engine_type;
+    using engine_traits   = addition_engine_traits_t<OT, owning_engine_1, owning_engine_2>;
+
+    using engine_type = typename engine_traits::engine_type;
+    using result_type = basic_matrix<engine_type, OT>;
+
+    static constexpr result_type
+    add(basic_matrix<ET1, OT1> const& m1, basic_matrix<ET2, OT2> const& m2)
+    {
+        using index_type_1 = typename basic_matrix<ET1, OT1>::index_type;
+        using index_type_2 = typename basic_matrix<ET2, OT2>::index_type;
+        using index_type_r = typename result_type::index_type;
+
+        index_type_r    rows = static_cast<index_type_r>(m1.rows());
+        index_type_r    cols = static_cast<index_type_r>(m1.columns());
+        result_type		mr;
+
+        if constexpr (is_resizable_engine_v<engine_type>)
+	    {
+		    mr.resize(rows, cols);
+        }
+
+        index_type_r    ir = 0;
+        index_type_1    i1 = 0;
+        index_type_2    i2 = 0;
+
+	    for (;  ir < rows;  ++ir, ++i1, ++i2)
+        {
+            index_type_r    jr = 0;
+            index_type_1    j1 = 0;
+            index_type_2    j2 = 0;
+
+            for (;  jr < cols;  ++jr, ++j1, ++j2)
+            {
+			    mr(ir, jr) = m1(i1, j1) + m2(i2, j2);
+            }
+        }
+
+	    return mr;
+    }
+};
+
+}   //- namespace detail
+
+namespace detail {
 //==================================================================================================
 //                         **** ELEMENT ADDITION TRAITS DETECTORS ****
 //==================================================================================================

@@ -110,6 +110,7 @@ namespace STD_LA
 #include "linear_algebra/basic_matrix.hpp"
 #include "linear_algebra/traits_support.hpp"
 
+
 #include "linear_algebra/fixed_size_vector_engine.hpp"
 #include "linear_algebra/fixed_size_matrix_engine.hpp"
 #include "linear_algebra/dynamic_vector_engine.hpp"
@@ -120,12 +121,14 @@ namespace STD_LA
 #include "linear_algebra/vector.hpp"
 #include "linear_algebra/matrix.hpp"
 
+
 #include "linear_algebra/debug_helpers.hpp"     //- Helpers for debug/test -- not for production.
 
 #include "linear_algebra/addition_traits.hpp"
 #include "linear_algebra/subtraction_traits.hpp"
 #include "linear_algebra/multiplication_traits.hpp"
 #include "linear_algebra/division_traits.hpp"
+
 #include "linear_algebra/operation_traits.hpp"
 #include "linear_algebra/arithmetic_operators.hpp"
 
