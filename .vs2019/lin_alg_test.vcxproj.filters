@@ -15,19 +15,13 @@
     <Filter Include="Library Interface Headers">
       <UniqueIdentifier>{d983a94d-1b7f-4c43-bbaf-feb32ee50fa3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Obsolete Headers">
+      <UniqueIdentifier>{93a5bf1d-3cc0-4327-b7ef-1bfb78160094}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\linear_algebra.hpp">
       <Filter>Library Interface Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\matrix.hpp">
-      <Filter>Library Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\vector.hpp">
-      <Filter>Library Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\forward_declarations.hpp">
-      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\debug_helpers.hpp">
       <Filter>Library Implementation Headers</Filter>
@@ -41,40 +35,13 @@
     <ClInclude Include="..\include\linear_algebra\subtraction_traits.hpp">
       <Filter>Library Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\negation_traits.hpp">
-      <Filter>Library Implementation Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\linear_algebra\multiplication_traits.hpp">
-      <Filter>Library Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\vector_iterators.hpp">
       <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\arithmetic_operators.hpp">
       <Filter>Library Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\public_support.hpp">
-      <Filter>Library Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\private_support.hpp">
-      <Filter>Library Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\dynamic_matrix_engine.hpp">
-      <Filter>Library Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\dynamic_vector_engine.hpp">
-      <Filter>Library Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\fixed_size_matrix_engine.hpp">
-      <Filter>Library Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\fixed_size_vector_engine.hpp">
-      <Filter>Library Implementation Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\linear_algebra\matrix_view_engine.hpp">
-      <Filter>Library Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\vector_view_engine.hpp">
       <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\tests\test_common.hpp">
@@ -98,9 +65,6 @@
     <ClInclude Include="..\include\linear_algebra\engine_support.hpp">
       <Filter>Library Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\matrix_storage_engine_data.hpp">
-      <Filter>Library Implementation Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\linear_algebra\basic_matrix.hpp">
       <Filter>Library Implementation Headers</Filter>
     </ClInclude>
@@ -109,6 +73,45 @@
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\traits_support.hpp">
       <Filter>Library Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\dynamic_matrix_engine.hpp">
+      <Filter>Obsolete Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\dynamic_vector_engine.hpp">
+      <Filter>Obsolete Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\fixed_size_matrix_engine.hpp">
+      <Filter>Obsolete Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\fixed_size_vector_engine.hpp">
+      <Filter>Obsolete Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\forward_declarations.hpp">
+      <Filter>Obsolete Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\matrix.hpp">
+      <Filter>Obsolete Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\matrix_storage_engine_data.hpp">
+      <Filter>Obsolete Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\negation_traits.hpp">
+      <Filter>Obsolete Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\private_support.hpp">
+      <Filter>Obsolete Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\public_support.hpp">
+      <Filter>Obsolete Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\vector.hpp">
+      <Filter>Obsolete Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\vector_iterators.hpp">
+      <Filter>Obsolete Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\vector_view_engine.hpp">
+      <Filter>Obsolete Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -14,7 +14,6 @@ struct unoriented {};
 struct row_major {};
 struct column_major {};
 
-
 namespace detail {
 //==================================================================================================
 //  TRAITS DEFINITIONS
