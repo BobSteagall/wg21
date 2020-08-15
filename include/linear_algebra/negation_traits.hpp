@@ -293,8 +293,8 @@ struct matrix_negation_engine_traits
     using element_type_1 = typename ET1::element_type;
     using element_type   = select_matrix_negation_element_t<OT, element_type_1>;
     using engine_type    = conditional_t<is_matrix_engine_v<ET1>,
-                                         dr_matrix_engine<element_type, allocator<element_type>>,
-                                         dr_vector_engine<element_type, allocator<element_type>>>;
+                                         dr_matrix_engine<element_type, std::allocator<element_type>>,
+                                         dr_vector_engine<element_type, std::allocator<element_type>>>;
 };
 
 //- General transpose cases for matrices.

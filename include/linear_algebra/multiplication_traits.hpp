@@ -296,8 +296,8 @@ struct matrix_multiplication_engine_traits
     using element_type_2 = typename ET2::element_type;
     using element_type   = select_matrix_multiplication_element_t<OT, element_type_1, element_type_2>;
     using engine_type    = conditional_t<use_matrix_engine,
-                                         dr_matrix_engine<element_type, allocator<element_type>>,
-                                         dr_vector_engine<element_type, allocator<element_type>>>;
+                                         dr_matrix_engine<element_type, std::allocator<element_type>>,
+                                         dr_vector_engine<element_type, std::allocator<element_type>>>;
 };
 
 //- General transpose cases for matrices.

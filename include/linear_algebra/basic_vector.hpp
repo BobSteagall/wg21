@@ -35,7 +35,7 @@ class basic_vector
 
   public:
     using engine_type          = ET;
-    using owning_engine_type   = detail::determine_owning_engine_type_t<ET>;
+    using owning_engine_type   = detail::get_owning_engine_type_t<ET>;
     using element_type         = typename engine_type::element_type;
     using value_type           = typename engine_type::value_type;
     using reference            = typename engine_type::reference;
@@ -512,7 +512,7 @@ class basic_vector
 };
 
 template<class T, class OT = matrix_operation_traits>
-using dyn_vec = basic_vector<matrix_storage_engine<T, extents<dynamic_extent>, allocator<T>, unoriented>, OT>;
+using dyn_vec = basic_vector<matrix_storage_engine<T, extents<dynamic_extent>, std::allocator<T>, unoriented>, OT>;
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_BASIC_VECTOR_HPP_DEFINED

@@ -19,8 +19,8 @@ using std::cout;
 using std::endl;
 
 using namespace STD_LA;
-using STD_LA::detail::v_cmp_eq;
-using STD_LA::detail::m_cmp_eq;
+//using STD_LA::detail::v_cmp_eq;
+//using STD_LA::detail::m_cmp_eq;
 
 struct dummy_type {};
 

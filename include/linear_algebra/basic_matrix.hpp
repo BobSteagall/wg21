@@ -25,7 +25,7 @@ class basic_matrix
 
   public:
     using engine_type          = ET;
-    using owning_engine_type   = detail::determine_owning_engine_type_t<ET>;
+    using owning_engine_type   = detail::get_owning_engine_type_t<ET>;
     using element_type         = typename engine_type::element_type;
     using value_type           = typename engine_type::value_type;
     using reference            = typename engine_type::reference;
@@ -705,16 +705,16 @@ class basic_matrix
 
 
 template<class T, ptrdiff_t R, ptrdiff_t C, class OT = matrix_operation_traits>
-using fs_dyn_matrix = basic_matrix<matrix_storage_engine<T, extents<R, C>, allocator<T>, row_major>, OT>;
+using fs_dyn_matrix = basic_matrix<matrix_storage_engine<T, extents<R, C>, std::allocator<T>, row_major>, OT>;
 
 template<class T, class OT = matrix_operation_traits>
-using dr_matrix = basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, allocator<T>, row_major>, OT>;
+using dr_matrix = basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, std::allocator<T>, row_major>, OT>;
 
 template<class T, class OT = matrix_operation_traits>
-using dyn_row_vector = basic_matrix<matrix_storage_engine<T, extents<1, dynamic_extent>, allocator<T>, row_major>, OT>;
+using dyn_row_vector = basic_matrix<matrix_storage_engine<T, extents<1, dynamic_extent>, std::allocator<T>, row_major>, OT>;
 
 template<class T, class OT = matrix_operation_traits>
-using dyn_col_vector = basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, 1>, allocator<T>, column_major>, OT>;
+using dyn_col_vector = basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, 1>, std::allocator<T>, column_major>, OT>;
 
 
 template<class T, ptrdiff_t R, ptrdiff_t C, class OT = matrix_operation_traits>

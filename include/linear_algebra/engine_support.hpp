@@ -9,6 +9,12 @@
 #define LINEAR_ALGEBRA_ENGINE_SUPPORT_HPP_DEFINED
 
 namespace STD_LA {
+
+struct unoriented {};
+struct row_major {};
+struct column_major {};
+
+
 namespace detail {
 //==================================================================================================
 //  TRAITS DEFINITIONS
@@ -165,6 +171,35 @@ struct is_random_access_standard_container<std::vector<T, A>> : public true_type
 
 template<class T> inline constexpr
 bool    is_random_access_standard_container_v = is_random_access_standard_container<T>::value;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Trait:      has_owning_engine_type_alias<ET>
+//  Alias:      get_owning_engine_type_t<ET>
+//
+//  This private type detector and variable template are used to determine whether or not an
+//  engine type is an owning engine.  An owning engine is one that owns (manages the lifetime of)
+//  the elements it contains.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET, typename = void>
+struct has_owning_engine_type_alias
+:   public false_type
+{
+    static constexpr bool   is_owning = true;
+    using owning_engine_type = ET;
+};
+
+template<class ET>
+struct has_owning_engine_type_alias<ET, void_t<typename ET::owning_engine_type>>
+:   public true_type
+{
+    static constexpr bool   is_owning = false;
+    using owning_engine_type = typename ET::owning_engine_type;
+};
+
+template<class ET>
+using get_owning_engine_type_t = typename has_owning_engine_type_alias<ET>::owning_engine_type;
 
 
 //--------------------------------------------------------------------------------------------------

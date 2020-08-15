@@ -218,11 +218,55 @@ PrintOperandTypes(string const& loc, O1 const& o1, O2 const& o2)
 #define PRINT_OP_TYPES(ET, MSG, ...)
 //#define PRINT_OP_TYPES(ET, MSG, ...)    STD_LA::PrintOperandTypes<ET>(MSG, __VA_ARGS__)
 
-template<class T, class A>
+template<class T, ptrdiff_t N, class A, class L>
 void
-Print(dr_matrix_engine<T, A> const& m, char const* pname = nullptr)
+Print(matrix_storage_engine<T, extents<N>, A, L> const& m, char const* pname = nullptr)
 {
-    using index_type = typename dr_matrix_engine<T, A>::index_type;
+    using engine_type = matrix_storage_engine<T, extents<N>, A, L>;
+    using index_type  = typename engine_type::index_type;
+
+    cout << endl << "matrix: " << ((pname) ? pname : "<anon>") << endl;
+    cout << "  size: " << m.rows() << "x" << m.columns() << endl;
+    cout << "  capy: " << m.row_capacity() << "x" << m.column_capacity() << endl;
+    cout << "  -----" << endl;
+
+    for (index_type i = 0;  i < m.rows();  ++i)
+    {
+        cout << right << setw(4) << setprecision(3) << (double) m(i, 0);
+
+        for (index_type j = 1;  j < m.columns();  ++j)
+        {
+             cout << right << setw(6) << setprecision(3) << (double) m(i, j);
+        }
+
+        cout << endl;
+    }
+}
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
+void
+Print(matrix_storage_engine<T, extents<R, C>, A, L> const& v, char const* pname = nullptr)
+{
+    using engine_type = matrix_storage_engine<T, extents<R, C>, A, L>;
+    using index_type  = typename engine_type::index_type;
+
+    cout << endl << "vector: " << ((pname) ? pname : "<anon>") << endl;
+    cout << "  size: " << v.size() << endl;
+    cout << "  capy: " << v.capacity() << endl;
+    cout << "  -----" << endl;
+
+    for (index_type i = 1;  i < v.size();  ++i)
+    {
+        cout << right << setw(6) << setprecision(3) << (double) v(i);
+    }
+    cout << endl;
+}
+
+template<class ET, class OT>
+void
+Print(basic_matrix<ET, OT> const& m, char const* pname = nullptr)
+{
+    using index_type = typename basic_matrix<ET, OT>::index_type;
 
     cout << endl << "matrix: " << ((pname) ? pname : "<anon>") << endl;
     cout << "  size: " << m.rows() << "x" << m.columns() << endl;
@@ -244,33 +288,9 @@ Print(dr_matrix_engine<T, A> const& m, char const* pname = nullptr)
 
 template<class ET, class OT>
 void
-Print(matrix<ET, OT> const& m, char const* pname = nullptr)
+Print(basic_vector<ET, OT> const& v, char const* pname = nullptr)
 {
-    using index_type = typename matrix<ET, OT>::index_type;
-
-    cout << endl << "matrix: " << ((pname) ? pname : "<anon>") << endl;
-    cout << "  size: " << m.rows() << "x" << m.columns() << endl;
-    cout << "  capy: " << m.row_capacity() << "x" << m.column_capacity() << endl;
-    cout << "  -----" << endl;
-
-    for (index_type i = 0;  i < m.rows();  ++i)
-    {
-        cout << right << setw(4) << setprecision(3) << (double) m(i, 0);
-
-        for (index_type j = 1;  j < m.columns();  ++j)
-        {
-             cout << right << setw(6) << setprecision(3) << (double) m(i, j);
-        }
-
-        cout << endl;
-    }
-}
-
-template<class ET, class OT>
-void
-Print(vector<ET, OT> const& v, char const* pname = nullptr)
-{
-    using index_type = typename vector<ET, OT>::index_type;
+    using index_type = typename basic_vector<ET, OT>::index_type;
 
     cout << endl << "vector: " << ((pname) ? pname : "<anon>") << endl;
     cout << "  size: " << v.size() << endl;
@@ -281,7 +301,7 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
 
     for (index_type i = 1;  i < v.size();  ++i)
     {
-            cout << right << setw(6) << setprecision(3) << (double) v(i);
+        cout << right << setw(6) << setprecision(3) << (double) v(i);
     }
     cout << endl;
 
@@ -292,7 +312,7 @@ Print(vector<ET, OT> const& v, char const* pname = nullptr)
 
     for (++iter;  iter != last;  ++iter)
     {
-            cout << right << setw(6) << setprecision(3) << (double) *iter;
+        cout << right << setw(6) << setprecision(3) << (double) *iter;
     }
     cout << endl;
 }
@@ -348,10 +368,10 @@ Print(bool b, char const* pname = nullptr)
 
 template<class ET, class OT>
 void
-Fill(vector<ET, OT>& v)
+Fill(basic_vector<ET, OT>& v)
 {
-    using index_type    = typename vector<ET, OT>::index_type;
-    using element_type = typename vector<ET, OT>::element_type;
+    using index_type   = typename basic_vector<ET, OT>::index_type;
+    using element_type = typename basic_vector<ET, OT>::element_type;
 
     element_type    x = 1;
 
@@ -363,10 +383,10 @@ Fill(vector<ET, OT>& v)
 
 template<class ET, class OT>
 void
-Fill(matrix<ET, OT>& m)
+Fill(basic_matrix<ET, OT>& m)
 {
-    using index_type    = typename STD_LA::matrix<ET, OT>::index_type;
-    using element_type = typename STD_LA::matrix<ET, OT>::element_type;
+    using index_type   = typename STD_LA::basic_matrix<ET, OT>::index_type;
+    using element_type = typename STD_LA::basic_matrix<ET, OT>::element_type;
 
     element_type    x = 1;
 

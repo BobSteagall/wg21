@@ -8,10 +8,10 @@ using namespace MDSPAN_NS;
 //  Unit tests for resizable, dynamically allocated matrix engine, Case 2C (row matrix)
 //==================================================================================================
 //
-using mse_f_fd_cm = matrix_storage_engine<float, extents<1, dynamic_extent>, allocator<float>, column_major>;
-using mse_f_fd_rm = matrix_storage_engine<float, extents<1, dynamic_extent>, allocator<float>, row_major>;
-using mse_i_fd_cm = matrix_storage_engine<int, extents<1, dynamic_extent>, allocator<int>, column_major>;
-using mse_d_fd_rm = matrix_storage_engine<double, extents<1, dynamic_extent>, allocator<double>, column_major>;
+using mse_f_fd_cm = matrix_storage_engine<float, extents<1, dynamic_extent>, std::allocator<float>, column_major>;
+using mse_f_fd_rm = matrix_storage_engine<float, extents<1, dynamic_extent>, std::allocator<float>, row_major>;
+using mse_i_fd_cm = matrix_storage_engine<int, extents<1, dynamic_extent>, std::allocator<int>, column_major>;
+using mse_d_fd_rm = matrix_storage_engine<double, extents<1, dynamic_extent>, std::allocator<double>, column_major>;
 
 using msupport = matrix_engine_support;
 

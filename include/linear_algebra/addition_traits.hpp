@@ -27,6 +27,31 @@ struct addition_element_traits
 };
 
 
+template<class OT>
+struct addition_layout_traits<OT, row_major, row_major>
+{
+    using layout_type = row_major;
+};
+
+template<class OT>
+struct addition_layout_traits<OT, row_major, column_major>
+{
+    using layout_type = row_major;
+};
+
+template<class OT>
+struct addition_layout_traits<OT, column_major, row_major>
+{
+    using layout_type = row_major;
+};
+
+template<class OT>
+struct addition_layout_traits<OT, column_major, column_major>
+{
+    using layout_type = column_major;
+};
+
+
 //- The standard engine addition traits type provides the default mechanism for determining the
 //  correct engine type for a matrix/matrix or vector/vector addition.
 //
@@ -54,9 +79,8 @@ struct addition_engine_traits<OT,
                               matrix_storage_engine<T2, extents<R2, C2>, AT2, LT2>>
 {
   private:
-    static constexpr ptrdiff_t  DYNX     = dynamic_extent;
-    static constexpr bool       dyn_rows = ((R1 == DYNX) || (R2 == DYNX));
-    static constexpr bool       dyn_cols = ((C1 == DYNX) || (C2 == DYNX));
+    static constexpr bool   dyn_rows = ((R1 == dynamic_extent) || (R2 == dynamic_extent));
+    static constexpr bool   dyn_cols = ((C1 == dynamic_extent) || (C2 == dynamic_extent));
 
     //- Validate the size template parameters.
     //
@@ -65,8 +89,8 @@ struct addition_engine_traits<OT,
 
     //- Compute the new extents.
     //
-    static constexpr ptrdiff_t  RR = (dyn_rows) ? DYNX : R1;
-    static constexpr ptrdiff_t  CR = (dyn_cols) ? DYNX : C1;
+    static constexpr ptrdiff_t  RR = (dyn_rows) ? dynamic_extent : R1;
+    static constexpr ptrdiff_t  CR = (dyn_cols) ? dynamic_extent : C1;
 
     //- Extract individual traits from the operation traits.
     //
@@ -172,15 +196,15 @@ struct addition_arithmetic_traits<OT, basic_matrix<ET1, OT1>, basic_matrix<ET2, 
         result_type		mr;
 
         if constexpr (detail::reshapable_matrix_engine<engine_type>)
-	    {
-		    mr.resize(rows, cols);
+        {
+            mr.resize(rows, cols);
         }
 
         index_type_r    ir = 0;
         index_type_1    i1 = 0;
         index_type_2    i2 = 0;
 
-	    for (;  ir < rows;  ++ir, ++i1, ++i2)
+        for (;  ir < rows;  ++ir, ++i1, ++i2)
         {
             index_type_r    jr = 0;
             index_type_1    j1 = 0;
@@ -188,16 +212,16 @@ struct addition_arithmetic_traits<OT, basic_matrix<ET1, OT1>, basic_matrix<ET2, 
 
             for (;  jr < cols;  ++jr, ++j1, ++j2)
             {
-			    mr(ir, jr) = m1(i1, j1) + m2(i2, j2);
+                mr(ir, jr) = m1(i1, j1) + m2(i2, j2);
             }
         }
 
-	    return mr;
+        return mr;
     }
 };
 
 }   //- namespace detail
-
+#if 0
 namespace detail {
 //==================================================================================================
 //                         **** ELEMENT ADDITION TRAITS DETECTORS ****
@@ -472,8 +496,8 @@ struct matrix_addition_engine_traits
     using element_type_2 = typename ET2::element_type;
     using element_type   = select_matrix_addition_element_t<OT, element_type_1, element_type_2>;
     using engine_type    = conditional_t<is_matrix_engine_v<ET1>,
-                                         dr_matrix_engine<element_type, allocator<element_type>>,
-                                         dr_vector_engine<element_type, allocator<element_type>>>;
+                                         dr_matrix_engine<element_type, std::allocator<element_type>>,
+                                         dr_vector_engine<element_type, std::allocator<element_type>>>;
 };
 
 //- General transpose cases for matrices.
@@ -805,15 +829,15 @@ matrix_addition_arithmetic_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
     result_type		mr;
 
     if constexpr (is_resizable_engine_v<engine_type>)
-	{
-		mr.resize(rows, cols);
+    {
+        mr.resize(rows, cols);
     }
 
     index_type_r    ir = 0;
     index_type_1    i1 = 0;
     index_type_2    i2 = 0;
 
-	for (;  ir < rows;  ++ir, ++i1, ++i2)
+    for (;  ir < rows;  ++ir, ++i1, ++i2)
     {
         index_type_r    jr = 0;
         index_type_1    j1 = 0;
@@ -821,12 +845,12 @@ matrix_addition_arithmetic_traits<OT, matrix<ET1, OT1>, matrix<ET2, OT2>>::add
 
         for (;  jr < cols;  ++jr, ++j1, ++j2)
         {
-			mr(ir, jr) = m1(i1, j1) + m2(i2, j2);
+            mr(ir, jr) = m1(i1, j1) + m2(i2, j2);
         }
     }
 
-	return mr;
+    return mr;
 }
-
+#endif
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_ADDITION_TRAITS_HPP_DEFINED

@@ -41,12 +41,10 @@
 //#define USING_STD   using namespace std; using namespace std::experimental;
 
 #define STD_LA      std::math
-#define USING_STD   using namespace std; using namespace std::experimental;
+#define USING_STD   using namespace std::experimental;
 
 //#define STD_LA      std::experimental::math
 //#define USING_STD   using namespace std::experimental;
-
-#define MDSPAN_NS   std::experimental
 
 #include <cstdint>
 
@@ -78,8 +76,12 @@
 
 #include <experimental/mdspan>
 
+#define MDSPAN_NS   std::experimental
+
 namespace STD_LA
 {
+    USING_STD
+
     using MDSPAN_NS::extents;
     using MDSPAN_NS::dynamic_extent;
     using MDSPAN_NS::layout_left;
@@ -99,37 +101,20 @@ namespace STD_LA
 
 //- Implementation headers.
 //
-#include "linear_algebra/forward_declarations.hpp"
-#include "linear_algebra/private_support.hpp"
-#include "linear_algebra/public_support.hpp"
-
 #include "linear_algebra/engine_support.hpp"
-#include "linear_algebra/matrix_storage_engine_data.hpp"
 #include "linear_algebra/matrix_storage_engine.hpp"
+//#include "linear_algebra/matrix_view_engine.hpp"
+#include "linear_algebra/operation_traits.hpp"
 #include "linear_algebra/basic_vector.hpp"
 #include "linear_algebra/basic_matrix.hpp"
 #include "linear_algebra/traits_support.hpp"
 
-
-#include "linear_algebra/fixed_size_vector_engine.hpp"
-#include "linear_algebra/fixed_size_matrix_engine.hpp"
-#include "linear_algebra/dynamic_vector_engine.hpp"
-#include "linear_algebra/dynamic_matrix_engine.hpp"
-#include "linear_algebra/vector_view_engine.hpp"
-#include "linear_algebra/matrix_view_engine.hpp"
-#include "linear_algebra/vector_iterators.hpp"
-#include "linear_algebra/vector.hpp"
-#include "linear_algebra/matrix.hpp"
-
-
 #include "linear_algebra/debug_helpers.hpp"     //- Helpers for debug/test -- not for production.
 
 #include "linear_algebra/addition_traits.hpp"
-#include "linear_algebra/subtraction_traits.hpp"
-#include "linear_algebra/multiplication_traits.hpp"
-#include "linear_algebra/division_traits.hpp"
-
-#include "linear_algebra/operation_traits.hpp"
+//#include "linear_algebra/subtraction_traits.hpp"
+//#include "linear_algebra/multiplication_traits.hpp"
+//#include "linear_algebra/division_traits.hpp"
 #include "linear_algebra/arithmetic_operators.hpp"
 
 #endif  //- LINEAR_ALGEBRA_HPP_DEFINED

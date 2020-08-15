@@ -12,7 +12,6 @@ class fs_matrix_engine_tst
     static_assert(C >= 1);
 
   public:
-    using engine_category  = STD_LA::writable_matrix_engine_tag;
     using element_type     = T;
     using value_type       = T;
     using pointer          = T*;
@@ -41,13 +40,13 @@ class fs_matrix_engine_tst
 
     constexpr const_reference   operator ()(index_type i, index_type j) const;
 
-    constexpr index_type     columns() const noexcept;
-    constexpr index_type     rows() const noexcept;
-    constexpr index_tuple_type    size() const noexcept;
+    constexpr index_type    columns() const noexcept;
+    constexpr index_type    rows() const noexcept;
+    constexpr index_type    size() const noexcept;
 
-    constexpr index_type     column_capacity() const noexcept;
-    constexpr index_type     row_capacity() const noexcept;
-    constexpr index_tuple_type    capacity() const noexcept;
+    constexpr index_type    column_capacity() const noexcept;
+    constexpr index_type    row_capacity() const noexcept;
+    constexpr index_type    capacity() const noexcept;
 
     constexpr reference     operator ()(index_type i, index_type j);
 
@@ -96,10 +95,10 @@ fs_matrix_engine_tst<T,R,C>::rows() const noexcept
 }
 
 template<class T, size_t R, size_t C> inline
-constexpr typename fs_matrix_engine_tst<T,R,C>::index_tuple_type
+constexpr typename fs_matrix_engine_tst<T,R,C>::index_type
 fs_matrix_engine_tst<T,R,C>::size() const noexcept
 {
-    return index_tuple_type(R, C);
+    return R*C;
 }
 
 template<class T, size_t R, size_t C> inline
@@ -117,10 +116,10 @@ fs_matrix_engine_tst<T,R,C>::row_capacity() const noexcept
 }
 
 template<class T, size_t R, size_t C> inline
-constexpr typename fs_matrix_engine_tst<T,R,C>::index_tuple_type
+constexpr typename fs_matrix_engine_tst<T,R,C>::index_type
 fs_matrix_engine_tst<T,R,C>::capacity() const noexcept
 {
-    return index_tuple_type(R, C);
+    return R*C;
 }
 
 template<class T, size_t R, size_t C> inline
@@ -189,7 +188,7 @@ fs_matrix_engine_tst<T,R,C>::swap(fs_matrix_engine_tst& rhs) noexcept
     {
         for (index_type i = 0;  i < R*C;  ++i)
         {
-            STD_LA::detail::la_swap(ma_elems[i], rhs.ma_elems[i]);
+            STD_LA::detail::common_engine_support::swap(ma_elems[i], rhs.ma_elems[i]);
         }
     }
 }
@@ -202,7 +201,7 @@ fs_matrix_engine_tst<T,R,C>::swap_columns(index_type j1, index_type j2)
     {
         for (index_type i = 0;  i < R;  ++i)
         {
-            STD_LA::detail::la_swap(ma_elems[i*C + j1], ma_elems[i*C + j2]);
+            STD_LA::detail::common_engine_support::swap(ma_elems[i*C + j1], ma_elems[i*C + j2]);
         }
     }
 }
@@ -215,7 +214,7 @@ fs_matrix_engine_tst<T,R,C>::swap_rows(index_type i1, index_type i2)
     {
         for (index_type j = 0;  j < C;  ++j)
         {
-            STD_LA::detail::la_swap(ma_elems[i1*C + j], ma_elems[i2*C + j]);
+            STD_LA::detail::common_engine_support::swap(ma_elems[i1*C + j], ma_elems[i2*C + j]);
         }
     }
 }
@@ -231,7 +230,6 @@ class test_fs_matrix_engine
     static_assert(C >= 1);
 
   public:
-    using engine_category  = STD_LA::writable_matrix_engine_tag;
     using element_type     = T;
     using value_type       = T;
     using reference        = T&;
@@ -347,7 +345,7 @@ test_fs_matrix_engine<T,R,C>::swap(test_fs_matrix_engine& rhs) noexcept
     {
         for (index_type i = 0;  i < R*C;  ++i)
         {
-            STD_LA::detail::la_swap(ma_elems[i], rhs.ma_elems[i]);
+            STD_LA::detail::common_engine_support::swap(ma_elems[i], rhs.ma_elems[i]);
         }
     }
 }

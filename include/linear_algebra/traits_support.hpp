@@ -9,7 +9,6 @@
 #define LINEAR_ALGEBRA_TRAITS_SUPPORT_HPP_DEFINED
 
 namespace STD_LA {
-namespace detail {
 //==================================================================================================
 //  TRAITS DEFINITIONS
 //==================================================================================================
@@ -58,116 +57,133 @@ namespace detail {
 //  types, the addition_{element/engine/arithmetic}_traits_extractor traits types, and also
 //  the corresponding get_addition_{element/engine/arithmetic}_traits_t alias templates.
 //
-//  The following set of default operation traits class templates is declared:
+//  The following set of default operation traits class templates is declared in the
+//  std::math::detail namespace:
 //
 //      addition_element_traits<OT, U, V>
+//      addition_allocation_traits<OT, U, V, W>
 //      addition_layout_traits<OT, U, V>
 //      addition_engine_traits<OT, U, V>
 //      addition_arithmetic_traits<OT, U, V>
 //
 //      subtraction_element_traits<OT, U, V>
+//      subtraction_allocation_traits<OT, U, V, W>
 //      subtraction_layout_traits<OT, U, V>
 //      subtraction_engine_traits<OT, U, V>
 //      subtraction_arithmetic_traits<OT, U, V>
 //
 //      multiplication_element_traits<OT, U, V>
+//      multiplication_allocation_traits<OT, U, V, W>
 //      multiplication_layout_traits<OT, U, V>
 //      multiplication_engine_traits<OT, U, V>
 //      multiplication_arithmetic_traits<OT, U, V>
 //
 //      division_element_traits<OT, U, V>
+//      division_allocation_traits<OT, U, V, W>
 //      division_layout_traits<OT, U, V>
 //      division_engine_traits<OT, U, V>
 //      division_arithmetic_traits<OT, U, V>
 //
-//  The following set of extractor class templates is defined:
+//  The following set of extractor class templates is defined in the std::math::detail
+//  namespace:
 //
 //      addition_element_traits_extractor<OT, U, V>
+//      addition_allocation_traits_extractor<OT, U, V, W>
 //      addition_layout_traits_extractor<OT, U, V>
 //      addition_engine_traits_extractor<OT, U, V>
 //      addition_arithmetic_traits_extractor<OT, U, V>
 //
 //      subtraction_element_traits_extractor<OT, U, V>
+//      subtraction_allocation_traits_extractor<OT, U, V, W>
 //      subtraction_layout_traits_extractor<OT, U, V>
 //      subtraction_engine_traits_extractor<OT, U, V>
 //      subtraction_arithmetic_traits_extractor<OT, U, V>
 //
 //      multiplication_element_traits_extractor<OT, U, V>
+//      multiplication_allocation_traits_extractor<OT, U, V, W>
 //      multiplication_layout_traits_extractor<OT, U, V>
 //      multiplication_engine_traits_extractor<OT, U, V>
 //      multiplication_arithmetic_traits_extractor<OT, U, V>
 //
 //      division_element_traits_extractor<OT, U, V>
+//      division_allocation_traits_extractor<OT, U, V, W>
 //      division_layout_traits_extractor<OT, U, V>
 //      division_engine_traits_extractor<OT, U, V>
 //      division_arithmetic_traits_extractor<OT, U, V>
 //
-//  The following set of corresponding extractor alias templates is defined:
+//  The corresponding set of extractor alias templates is defined in the std::math
+//  namespace:
 //
 //      get_addition_element_traits_t<OT, U, V>
+//      get_addition_allocation_traits_t<OT, U, V, W>
 //      get_addition_layout_traits_t<OT, U, V>
 //      get_addition_engine_traits_t<OT, U, V>
 //      get_addition_arithmetic_traits_t<OT, U, V>
 //
 //      get_subtraction_element_traits_t<OT, U, V>
+//      get_subtraction_allocation_traits_t<OT, U, V, W>
 //      get_subtraction_layout_traits_t<OT, U, V>
 //      get_subtraction_engine_traits_t<OT, U, V>
 //      get_subtraction_arithmetic_traits_t<OT, U, V>
 //`
 //      get_multiplication_element_traits_t<OT, U, V>
+//      get_multiplication_allocation_traits_t<OT, U, V, W>
 //      get_multiplication_layout_traits_t<OT, U, V>
 //      get_multiplication_engine_traits_t<OT, U, V>
 //      get_multiplication_arithmetic_traits_t<OT, U, V>
 //
 //      get_division_element_traits_t<OT, U, V>
+//      get_division_allocation_traits_t<OT, U, V, W>
 //      get_division_layout_traits_t<OT, U, V>
 //      get_division_engine_traits_t<OT, U, V>
 //      get_division_arithmetic_traits_t<OT, U, V>
 //--------------------------------------------------------------------------------------------------
 //
-#define STD_LA_DEFINE_OP_TRAITS_EXTRACTOR_2(OP, LVL)                            \
-                                                                                \
-    template<typename OT, typename U, typename V> struct OP##_##LVL##_traits;   \
-                                                                                \
-    template<typename OT, typename U, typename V, typename = void>              \
-    struct OP##_##LVL##_traits_extractor                                        \
-    {                                                                           \
-        using type = OP##_##LVL##_traits<OT,U,V>;                               \
-    };                                                                          \
-                                                                                \
-    template<typename OT, typename U, typename V>                               \
-    struct OP##_##LVL##_traits_extractor                                        \
-    <OT, U, V, std::void_t<typename OT::template OP##_##LVL##_traits<OT,U,V>>>  \
-    {                                                                           \
-        using type = typename OT::template OP##_##LVL##_traits<OT, U, V>;       \
-    };                                                                          \
-                                                                                \
-    template<typename OT, typename U, typename V>                               \
-    using get_##OP##_##LVL##_traits_t =                                         \
-        typename OP##_##LVL##_traits_extractor<OT,U,V>::type
+#define STD_LA_DEFINE_OP_TRAITS_EXTRACTOR_2(OP, LVL)                                \
+    namespace detail {                                                              \
+        template<typename OT, typename U, typename V> struct OP##_##LVL##_traits;   \
+                                                                                    \
+        template<typename OT, typename U, typename V, typename = void>              \
+        struct OP##_##LVL##_traits_extractor                                        \
+        {                                                                           \
+            using type = OP##_##LVL##_traits<OT,U,V>;                               \
+        };                                                                          \
+                                                                                    \
+        template<typename OT, typename U, typename V>                               \
+        struct OP##_##LVL##_traits_extractor                                        \
+        <OT, U, V, std::void_t<typename OT::template OP##_##LVL##_traits<OT,U,V>>>  \
+        {                                                                           \
+            using type = typename OT::template OP##_##LVL##_traits<OT, U, V>;       \
+        };                                                                          \
+    }                                                                               \
+                                                                                    \
+    template<typename OT, typename U, typename V>                                   \
+    using get_##OP##_##LVL##_traits_t =                                             \
+        typename detail::OP##_##LVL##_traits_extractor<OT,U,V>::type
 
 
-#define STD_LA_DEFINE_OP_TRAITS_EXTRACTOR_3(OP, LVL)                            \
-                                                                                \
-    template<typename OT, typename U, typename V, typename W>                   \
-    class OP##_##LVL##_traits;                                                  \
-                                                                                \
-    template<typename OT, typename U, typename V, typename W, typename = void>  \
-    struct OP##_##LVL##_traits_extractor                                        \
-    {                                                                           \
-        using type = OP##_##LVL##_traits<OT,U,V,W>;                             \
-    };                                                                          \
-                                                                                \
-    template<typename OT, typename U, typename V, typename W>                   \
-    struct OP##_##LVL##_traits_extractor                                        \
-    <OT,U,V,W,std::void_t<typename OT::template OP##_##LVL##_traits<OT,U,V,W>>> \
-    {                                                                           \
-        using type = typename OT::template OP##_##LVL##_traits<OT, U, V, W>;    \
-    };                                                                          \
-                                                                                \
-    template<typename OT, typename U, typename V, typename W>                   \
-    using get_##OP##_##LVL##_traits_t =                                         \
-        typename OP##_##LVL##_traits_extractor<OT, U, V, W>::type
+#define STD_LA_DEFINE_OP_TRAITS_EXTRACTOR_3(OP, LVL)                                \
+    namespace detail {                                                              \
+        template<typename OT, typename U, typename V, typename W>                   \
+        class OP##_##LVL##_traits;                                                  \
+                                                                                    \
+        template<typename OT, typename U, typename V, typename W, typename = void>  \
+        struct OP##_##LVL##_traits_extractor                                        \
+        {                                                                           \
+            using type = OP##_##LVL##_traits<OT,U,V,W>;                             \
+        };                                                                          \
+                                                                                    \
+        template<typename OT, typename U, typename V, typename W>                   \
+        struct OP##_##LVL##_traits_extractor                                        \
+        <OT,U,V,W,std::void_t<typename OT::template OP##_##LVL##_traits<OT,U,V,W>>> \
+        {                                                                           \
+            using type = typename OT::template OP##_##LVL##_traits<OT, U, V, W>;    \
+        };                                                                          \
+    }                                                                               \
+                                                                                    \
+    template<typename OT, typename U, typename V, typename W>                       \
+    using get_##OP##_##LVL##_traits_t =                                             \
+        typename detail::OP##_##LVL##_traits_extractor<OT, U, V, W>::type
 
 
 #define STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(OP)              \
@@ -187,6 +203,7 @@ STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(addition);
 #undef STD_LA_DEFINE_OP_TRAITS_EXTRACTOR_2
 
 
+namespace detail {
 //--------------------------------------------------------------------------------------------------
 //  Trait:      is_ttp_helper<T>
 //
@@ -202,7 +219,6 @@ struct is_ttp_helper : public std::true_type
 //==================================================================================================
 //  CONCEPT DEFINITIONS
 //==================================================================================================
-//--------------------------------------------------------------------------------------------------
 //  Concepts:   has_valid_{traits_name}<OT, U, V>
 //              has_nested_{traits_name}<OT>
 //              has_no_nested_{traits_name}<OT>
@@ -339,31 +355,7 @@ STD_LA_DEFINE_VALID_OP_TRAITS_DETECTORS(division);
 #undef STD_LA_DEFINE_VALID_OP_TRAITS_DETECTORS
 #undef STD_LA_DEFINE_OP_TRAITS_CHECKER
 
-template<class OT, class LT1, class LT2>    struct addition_layout_traits;
-
-template<class OT>
-struct addition_layout_traits<OT, row_major, row_major>
-{
-    using layout_type = row_major;
-};
-
-template<class OT>
-struct addition_layout_traits<OT, row_major, column_major>
-{
-    using layout_type = row_major;
-};
-
-template<class OT>
-struct addition_layout_traits<OT, column_major, row_major>
-{
-    using layout_type = row_major;
-};
-
-template<class OT>
-struct addition_layout_traits<OT, column_major, column_major>
-{
-    using layout_type = column_major;
-};
+//template<class OT, class LT1, class LT2>    struct addition_layout_traits;
 
 
 template<class OT, class LT1, class LT2>    struct multiplication_layout_traits;
@@ -392,8 +384,6 @@ struct multiplication_layout_traits<OT, column_major, column_major>
     using layout_type = column_major;
 };
 
-
-template<class OT, class AT1, class AT2, class T>   struct allocation_traits;
 
 template<class OT, class T>
 struct allocation_traits<OT, void, void, T>
