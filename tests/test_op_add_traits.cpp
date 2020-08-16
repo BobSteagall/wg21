@@ -327,6 +327,26 @@ TEST(AddTraits, EnginePromotion)
     ASSERT_A_ADD_B_EQ_C(dyn_new_num,  dyn_new_num,  dyn_new_num);
 }
 
+TEST(AddTraits, Views)
+{
+    using fxd_float   = fixed_size_matrix<float, 2, 3>;
+    using gen_float   = general_matrix<float, 2, 3>;
+    using dyn_float   = dynamic_matrix<float>;
+
+    fxd_float   m1  = {{ 1, 2, 3}, { 4, 5, 6}};
+    auto        m1n = -m1;
+    auto        m1t = m1.t();
+    auto        m1h = m1.h();
+
+    PRINT(m1);
+    PRINT(-m1);
+    PRINT(m1n);
+    PRINT(m1.t());
+    PRINT(m1t);
+    PRINT(m1.h());
+    PRINT(m1h);
+}
+
 #if 0
 //- This operation traits type has its element/engine/arithmetic nested traits type as ordinary
 //  (i.e., non-template) type aliases.

@@ -4,10 +4,326 @@
 //  Summary:    This header defines an engine that acts as a "view" of a subset of a matrix.
 //==================================================================================================
 //
-#ifndef LINEAR_ALGEBRA_SUBMATRIX_ENGINE_HPP_DEFINED
-#define LINEAR_ALGEBRA_SUBMATRIX_ENGINE_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_MATRIX_VIEW_ENGINE_HPP_DEFINED
+#define LINEAR_ALGEBRA_MATRIX_VIEW_ENGINE_HPP_DEFINED
 
 namespace STD_LA {
+
+struct negation_readonly_view {};
+struct hermitian_readonly_view {};
+struct transpose_readonly_view {};
+
+struct readonly_tag  {};
+struct readwrite_tag {};
+
+template<class TAG>
+requires
+    detail::same_as_either<TAG, readonly_tag, readwrite_tag>
+struct submatrix_view {};
+
+template<class ET, class VF>    class matrix_view_engine;
+
+template<class ET>
+requires
+    detail::readable_matrix_engine<ET>
+class matrix_view_engine<ET, hermitian_readonly_view>
+{
+    static constexpr bool   is_cx = detail::is_complex_v<typename ET::element_type>;
+
+    using conj_el_type = conditional_t<is_cx, typename ET::element_type, typename ET::const_reference>;
+    using support_type = detail::matrix_engine_support;
+
+  public:
+
+    using engine_type     = ET;
+    using element_type    = typename engine_type::element_type;
+    using value_type      = typename engine_type::value_type;
+    using reference       = conj_el_type;
+    using const_reference = conj_el_type;
+    using index_type      = typename engine_type::index_type;
+
+    //- Construct/copy/destroy
+    //
+    ~matrix_view_engine() noexcept = default;
+
+    constexpr matrix_view_engine();
+    constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine(matrix_view_engine const&) = default;
+
+    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+
+    explicit constexpr
+    matrix_view_engine(engine_type const& eng)
+    :   mp_engine(&eng)
+    {}
+
+    //- Status
+    //
+    constexpr bool
+    is_valid() const noexcept
+    {
+        return mp_engine != nullptr;
+    }
+
+    //- Size and capacity reporting.
+    //
+    constexpr index_type
+    columns() const noexcept
+    {
+        return mp_engine->rows();
+    }
+
+    constexpr index_type
+    rows() const noexcept
+    {
+        return mp_engine->columns();
+    }
+
+    constexpr index_type
+    size() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    constexpr index_type
+    column_capacity() const noexcept
+    {
+        return mp_engine->rows();
+    }
+
+    constexpr index_type
+    row_capacity() const noexcept
+    {
+        return mp_engine->columns();
+    }
+
+    constexpr index_type
+    capacity() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    //- Element access
+    //
+    constexpr reference
+    operator ()(index_type i, index_type j) const
+    {
+        if constexpr (is_cx)
+            return std::conj((*mp_engine)(j, i));
+        else
+            return (*mp_engine)(j, i);
+    }
+
+    //- Modifiers
+    //
+    constexpr void
+    swap(matrix_view_engine& rhs) noexcept
+    {
+        support_type::swap(mp_engine, rhs.mp_engine);
+    }
+
+  private:
+    engine_type const*  mp_engine;
+};
+
+
+template<class ET>
+requires
+    detail::readable_matrix_engine<ET>
+class matrix_view_engine<ET, negation_readonly_view>
+{
+    using support_type = detail::matrix_engine_support;
+
+  public:
+    using engine_type     = ET;
+    using element_type    = typename engine_type::element_type;
+    using value_type      = typename engine_type::value_type;
+    using reference       = typename engine_type::element_type;
+    using const_reference = typename engine_type::element_type;
+    using index_type      = typename engine_type::index_type;
+
+    //- Construct/copy/destroy
+    //
+    ~matrix_view_engine() noexcept = default;
+
+    constexpr matrix_view_engine();
+    constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine(matrix_view_engine const&) = default;
+
+    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+
+    explicit constexpr
+    matrix_view_engine(engine_type const& eng)
+    :   mp_engine(&eng)
+    {}
+
+    //- Status
+    //
+    constexpr bool
+    is_valid() const noexcept
+    {
+        return mp_engine != nullptr;
+    }
+
+    //- Size and capacity reporting.
+    //
+    constexpr index_type
+    columns() const noexcept
+    {
+        return mp_engine->columns();
+    }
+
+    constexpr index_type
+    rows() const noexcept
+    {
+        return mp_engine->rows();
+    }
+
+    constexpr index_type
+    size() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    constexpr index_type
+    column_capacity() const noexcept
+    {
+        return mp_engine->columns();
+    }
+
+    constexpr index_type
+    row_capacity() const noexcept
+    {
+        return mp_engine->rows();
+    }
+
+    constexpr index_type
+    capacity() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    //- Element access
+    //
+    constexpr reference
+    operator ()(index_type i, index_type j) const
+    {
+        return -((*mp_engine)(i, j));
+    }
+
+    //- Modifiers
+    //
+    constexpr void
+    swap(matrix_view_engine& rhs) noexcept
+    {
+        support_type::swap(mp_engine, rhs.mp_engine);
+    }
+
+  private:
+    engine_type const*  mp_engine;
+};
+
+
+template<class ET>
+requires
+    detail::readable_matrix_engine<ET>
+class matrix_view_engine<ET, transpose_readonly_view>
+{
+    using support_type = detail::matrix_engine_support;
+
+  public:
+    using engine_type     = ET;
+    using element_type    = typename engine_type::element_type;
+    using value_type      = typename engine_type::value_type;
+    using reference       = typename engine_type::const_reference;
+    using const_reference = typename engine_type::const_reference;
+    using index_type      = typename engine_type::index_type;
+
+    //- Construct/copy/destroy
+    //
+    ~matrix_view_engine() noexcept = default;
+
+    constexpr matrix_view_engine();
+    constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine(matrix_view_engine const&) = default;
+
+    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+
+    explicit constexpr
+    matrix_view_engine(engine_type const& eng)
+    :   mp_engine(&eng)
+    {}
+
+    //- Status
+    //
+    constexpr bool
+    is_valid() const noexcept
+    {
+        return mp_engine != nullptr;
+    }
+
+    //- Size and capacity reporting.
+    //
+    constexpr index_type
+    columns() const noexcept
+    {
+        return mp_engine->rows();
+    }
+
+    constexpr index_type
+    rows() const noexcept
+    {
+        return mp_engine->columns();
+    }
+
+    constexpr index_type
+    size() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    constexpr index_type
+    column_capacity() const noexcept
+    {
+        return mp_engine->rows();
+    }
+
+    constexpr index_type
+    row_capacity() const noexcept
+    {
+        return mp_engine->columns();
+    }
+
+    constexpr index_type
+    capacity() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    //- Element access
+    //
+    constexpr reference
+    operator ()(index_type i, index_type j) const
+    {
+        return (*mp_engine)(j, i);
+    }
+
+    //- Modifiers
+    //
+    constexpr void
+    swap(matrix_view_engine& rhs) noexcept
+    {
+        support_type::swap(mp_engine, rhs.mp_engine);
+    }
+
+  private:
+    engine_type const*  mp_engine;
+};
+
+#if 0
 #undef LA_MVET2
 #define LA_MVET2    matrix_view_engine<NVET,MCT,VFT>
 
@@ -1814,5 +2130,6 @@ matrix_view_engine<LA_MVET2, writable_matrix_engine_tag, subset_view_tag>::swap(
 }
 
 #undef LA_MVET2
+#endif
 }       //- STD_LA namespace
-#endif  //- LINEAR_ALGEBRA_SUBMATRIX_ENGINE_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_MATRIX_VIEW_ENGINE_HPP_DEFINED

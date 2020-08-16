@@ -15,9 +15,13 @@ struct row_major {};
 struct column_major {};
 
 namespace detail {
+
+struct special_ctor_tag{};
+
 //==================================================================================================
 //  TRAITS DEFINITIONS
 //==================================================================================================
+//--------------------------------------------------------------------------------------------------
 //  Trait:      is_valid_engine_extents<X>
 //  Alias:      is_valid_engine_extents_v<X>
 //
@@ -225,6 +229,29 @@ template<class A>
 using alloc_size_t = typename get_size_type<A>::type;
 
 
+//--------------------------------------------------------------------------------------------------
+//  Trait:      is_specialization_of<T, PT>
+//  Alias:      is_specialization_of_v<T, PT>
+//
+//  This private traits type determines whether a given type T is a specialization of a primary
+//  template type PT.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T, template<class...> class PT>
+struct is_specialization_of : public std::false_type
+{};
+
+template<template<class...> class PT, class... ARGS>
+struct is_specialization_of<PT<ARGS...>, PT> : public std::true_type
+{};
+
+template<class T, template<class...> class PT> inline constexpr
+bool    is_specialization_of_v = is_specialization_of<T, PT>::value;
+
+template<class T> inline constexpr
+bool    is_complex_v = is_specialization_of_v<T, std::complex>;
+
+
 //==================================================================================================
 //  CONCEPT DEFINITIONS
 //==================================================================================================
@@ -252,7 +279,7 @@ concept class_type = std::is_class_v<T>;
 //  the tested compilers do not yet implement the standard concepts library in <concepts>.
 //
 //  If <concepts> exists, this implementation wraps the concepts it uses; if <concepts> does not
-//  exist, then we fake it.  The first reason for wrapping is consistencey and readability; the
+//  exist, then we fake it.  The first reason for wrapping is consistency and readability; the
 //  second reason is to keep the temporary "fake" concepts out of the std namespace.
 //--------------------------------------------------------------------------------------------------
 //
@@ -352,6 +379,9 @@ concept comparable_types_helper =
 template<class T1, class T2>
 concept comparable_types = comparable_types_helper<T1, T2> and comparable_types_helper<T2, T1>;
 
+
+template<typename T, typename U1, typename U2>
+concept same_as_either = same_as<T, U1> or same_as<T, U2>;
 
 //--------------------------------------------------------------------------------------------------
 //  Concept:    random_access_standard_container<CT>
@@ -482,7 +512,6 @@ concept readable_engine_fundamentals =
         typename ET::index_type;
         typename ET::reference;
         typename ET::const_reference;
-        requires is_lvalue_reference_v<typename ET::reference>;
         { eng.size()     } -> same_as<typename ET::index_type>;
         { eng.capacity() } -> same_as<typename ET::index_type>;
     };
@@ -509,7 +538,7 @@ concept readable_vector_engine =
     and
     requires (ET const& eng, typename ET::index_type i)
     {
-        { eng(i) } -> same_as<typename ET::const_reference>;
+        { eng(i) } -> same_as_either<typename ET::const_reference, typename ET::element_type>;
     };
 
 
@@ -594,13 +623,17 @@ template<class ET>
 concept readable_matrix_engine =
     readable_engine_fundamentals<ET>
     and
+    requires (ET const& eng)
+    {
+        { eng.columns()          } -> same_as<typename ET::index_type>;
+        { eng.rows()             } -> same_as<typename ET::index_type>;
+        { eng.column_capacity()  } -> same_as<typename ET::index_type>;
+        { eng.row_capacity()     } -> same_as<typename ET::index_type>;
+    }
+    and
     requires (ET const& eng, typename ET::index_type i)
     {
-        { eng.columns()         } -> same_as<typename ET::index_type>;
-        { eng.rows()            } -> same_as<typename ET::index_type>;
-        { eng.column_capacity() } -> same_as<typename ET::index_type>;
-        { eng.row_capacity()    } -> same_as<typename ET::index_type>;
-        { eng(i, i)             } -> same_as<typename ET::const_reference>;
+        { eng(i, i) } -> same_as_either<typename ET::const_reference, typename ET::element_type>;
     };
 
 
@@ -619,7 +652,7 @@ concept readable_and_1d_indexable_matrix_engine =
     and
     requires (ET const& eng, typename ET::index_type i)
     {
-        { eng(i) } -> same_as<typename ET::const_reference>;
+        { eng(i) } -> same_as_either<typename ET::const_reference, typename ET::element_type>;
     };
 
 

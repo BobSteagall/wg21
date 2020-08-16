@@ -18,6 +18,9 @@
     <Filter Include="Obsolete Headers">
       <UniqueIdentifier>{93a5bf1d-3cc0-4327-b7ef-1bfb78160094}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Unit Test Source Files\Obsolete Test Files">
+      <UniqueIdentifier>{3ca1faa4-7772-491a-909b-adab87778e1e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\linear_algebra.hpp">
@@ -115,22 +118,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\tests\test_01.cpp">
-      <Filter>Unit Test Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tests\test_02.cpp">
-      <Filter>Unit Test Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tests\test_dynamic_engines.cpp">
-      <Filter>Unit Test Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tests\test_fixed_size_engines.cpp">
-      <Filter>Unit Test Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\tests\test_main.cpp">
-      <Filter>Unit Test Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tests\test_obj_matrix.cpp">
       <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_op_add_traits.cpp">
@@ -142,19 +130,7 @@
     <ClCompile Include="..\tests\test_op_sub_traits.cpp">
       <Filter>Unit Test Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\tests\test_geometry_2.cpp">
-      <Filter>Unit Test Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tests\test_geometry_3.cpp">
-      <Filter>Unit Test Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tests\test_geometry_4.cpp">
-      <Filter>Unit Test Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\tests\test_op_div_traits.cpp">
-      <Filter>Unit Test Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tests\test_matrix_view_engines.cpp">
       <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_mse_01.cpp">
@@ -195,6 +171,33 @@
     </ClCompile>
     <ClCompile Include="..\tests\test_mse_3C.cpp">
       <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_01.cpp">
+      <Filter>Unit Test Source Files\Obsolete Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_02.cpp">
+      <Filter>Unit Test Source Files\Obsolete Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_dynamic_engines.cpp">
+      <Filter>Unit Test Source Files\Obsolete Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_fixed_size_engines.cpp">
+      <Filter>Unit Test Source Files\Obsolete Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_geometry_2.cpp">
+      <Filter>Unit Test Source Files\Obsolete Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_geometry_3.cpp">
+      <Filter>Unit Test Source Files\Obsolete Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_geometry_4.cpp">
+      <Filter>Unit Test Source Files\Obsolete Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_matrix_view_engines.cpp">
+      <Filter>Unit Test Source Files\Obsolete Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_obj_matrix.cpp">
+      <Filter>Unit Test Source Files\Obsolete Test Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

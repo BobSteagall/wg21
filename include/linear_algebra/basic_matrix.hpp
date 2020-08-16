@@ -34,6 +34,10 @@ class basic_matrix
     using span_type            = conditional_t<engine_has_mdspan, detail::engine_mdspan_t<ET>, void>;
     using const_span_type      = conditional_t<engine_has_mdspan, detail::engine_const_mdspan_t<ET>, void>;
 
+    using const_negation_type  = basic_matrix<matrix_view_engine<engine_type, negation_readonly_view>, OT>;
+    using const_hermitian_type = basic_matrix<matrix_view_engine<engine_type, hermitian_readonly_view>, OT>;
+    using const_transpose_type = basic_matrix<matrix_view_engine<engine_type, transpose_readonly_view>, OT>;
+
   public:
     ~basic_matrix() = default;
 
@@ -541,6 +545,26 @@ class basic_matrix
         return m_engine(i);
     }
 
+    constexpr const_negation_type
+    operator -() const noexcept
+    {
+        return const_negation_type(detail::special_ctor_tag(), m_engine);
+    }
+
+    constexpr const_hermitian_type
+    h() const noexcept
+    {
+        return const_hermitian_type(detail::special_ctor_tag(), m_engine);
+    }
+
+    constexpr const_transpose_type
+    t() const noexcept
+    {
+        return const_transpose_type(detail::special_ctor_tag(), m_engine);
+    }
+
+    //constexpr const_hermitian_type  h() const;
+
     //----------------------------------------------------------
     //- Data access.
     //
@@ -701,6 +725,12 @@ class basic_matrix
     friend class basic_matrix;
 
     engine_type     m_engine;
+
+    template<class ET2, class... ARGS>
+    constexpr
+    basic_matrix(detail::special_ctor_tag, ET2&& eng, ARGS&&... args)
+    :   m_engine(std::forward<ET2>(eng), std::forward<ARGS>(args)...)
+    {}
 };
 
 
