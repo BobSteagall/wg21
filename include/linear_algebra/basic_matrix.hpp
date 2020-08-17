@@ -34,9 +34,9 @@ class basic_matrix
     using span_type            = conditional_t<engine_has_mdspan, detail::engine_mdspan_t<ET>, void>;
     using const_span_type      = conditional_t<engine_has_mdspan, detail::engine_const_mdspan_t<ET>, void>;
 
-    using const_negation_type  = basic_matrix<matrix_view_engine<engine_type, negation_readonly_view>, OT>;
-    using const_hermitian_type = basic_matrix<matrix_view_engine<engine_type, hermitian_readonly_view>, OT>;
-    using const_transpose_type = basic_matrix<matrix_view_engine<engine_type, transpose_readonly_view>, OT>;
+    using const_negation_type  = basic_matrix<matrix_view_engine<engine_type, matrix_view::negation>, OT>;
+    using const_hermitian_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::hermitian>, OT>;
+    using const_transpose_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::transpose>, OT>;
 
   public:
     ~basic_matrix() = default;

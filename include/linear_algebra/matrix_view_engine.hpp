@@ -9,24 +9,27 @@
 
 namespace STD_LA {
 
-struct negation_readonly_view {};
-struct hermitian_readonly_view {};
-struct transpose_readonly_view {};
+struct matrix_view
+{
+    struct readonly {};
+    struct writable {};
 
-struct readonly_tag  {};
-struct readwrite_tag {};
+    struct negation {};
+    struct hermitian {};
+    struct transpose {};
 
-template<class TAG>
-requires
-    detail::same_as_either<TAG, readonly_tag, readwrite_tag>
-struct submatrix_view {};
+    template<class T>
+    requires
+        detail::same_as_either<T, readonly, writable>
+    struct submatrix {};
+};
 
 template<class ET, class VF>    class matrix_view_engine;
 
 template<class ET>
 requires
     detail::readable_matrix_engine<ET>
-class matrix_view_engine<ET, hermitian_readonly_view>
+class matrix_view_engine<ET, matrix_view::hermitian>
 {
     static constexpr bool   is_cx = detail::is_complex_v<typename ET::element_type>;
 
@@ -131,7 +134,7 @@ class matrix_view_engine<ET, hermitian_readonly_view>
 template<class ET>
 requires
     detail::readable_matrix_engine<ET>
-class matrix_view_engine<ET, negation_readonly_view>
+class matrix_view_engine<ET, matrix_view::negation>
 {
     using support_type = detail::matrix_engine_support;
 
@@ -229,7 +232,7 @@ class matrix_view_engine<ET, negation_readonly_view>
 template<class ET>
 requires
     detail::readable_matrix_engine<ET>
-class matrix_view_engine<ET, transpose_readonly_view>
+class matrix_view_engine<ET, matrix_view::transpose>
 {
     using support_type = detail::matrix_engine_support;
 
