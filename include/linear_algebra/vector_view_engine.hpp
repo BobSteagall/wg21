@@ -299,7 +299,7 @@ vector_view_engine<ET, VCT, subset_view_tag>::vector_view_engine(referent_type& 
 {}
 
 
-//=================================================================================================
+//==================================================================================================
 //  Matrix column engine, meant to act as a "view" of a portion of a matrix column in expresssions
 //  so as to help avoid unnecessary allocation and/or element copying.
 //==================================================================================================

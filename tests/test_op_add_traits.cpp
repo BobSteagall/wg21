@@ -345,6 +345,42 @@ TEST(AddTraits, Views)
     PRINT(m1t);
     PRINT(m1.h());
     PRINT(m1h);
+
+    m1t(0, 0) = 38.0f;
+    PRINT(m1t);
+    m1.t()(0, 1) = 48.0f;
+    PRINT(m1.t());
+
+    dyn_float   m2 = {{10, 20}, {30, 40}, {50, 60}};
+    m1.t() = m2;
+    PRINT(m1.t());
+
+    matrix_view_engine<fxd_float::engine_type, matrix_view::submatrix>  ve1;
+    matrix_view_engine<fxd_float::engine_type, matrix_view::transpose>  ve2;
+
+    PRINT(m1);
+    PRINT(m1.submatrix(0, 2, 1, 2));
+    PRINT(m1.submatrix(0, 2, 1, 2).t());
+
+    m1.submatrix(0, 2, 1, 2)(0, 1) = 70;
+    PRINT(m1);
+    PRINT(m1.submatrix(0, 2, 1, 2));
+    PRINT(m1.submatrix(0, 2, 1, 2).t());
+
+    m1.submatrix(0, 2, 1, 2).t()(0, 1) = 80;
+    PRINT(m1);
+    PRINT(m1.submatrix(0, 2, 1, 2));
+    PRINT(m1.submatrix(0, 2, 1, 2).t());
+
+    PRINT(m1.row(1));
+    PRINT(m1.column(1));
+    PRINT(m1.row(1).t());
+    PRINT(m1.column(1).t());
+
+    PRINT_TYPE(decltype(m1.column(1).t()));
+    PRINT_TYPE(decltype(m1.column(1).t()(0)));
+    PRINT(m1);
+    PRINT(m1.column(1).t());
 }
 
 #if 0

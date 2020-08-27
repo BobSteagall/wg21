@@ -19,9 +19,14 @@ requires
     detail::readable_matrix_engine<ET>
 class basic_matrix
 {
-    static constexpr bool   engine_has_mdspan = detail::spannable_matrix_engine<ET>;
+    static constexpr bool   engine_is_writable = detail::writable_matrix_engine<ET>;
+    static constexpr bool   engine_has_mdspan  = detail::spannable_matrix_engine<ET>;
 
-    using engine_support = detail::matrix_engine_support;
+    using engine_support              = detail::matrix_engine_support;
+    using possibly_writable_column    = conditional_t<engine_is_writable, matrix_view::column, matrix_view::const_column>;
+    using possibly_writable_row       = conditional_t<engine_is_writable, matrix_view::row, matrix_view::const_row>;
+    using possibly_writable_submatrix = conditional_t<engine_is_writable, matrix_view::submatrix, matrix_view::const_submatrix>;
+    using possibly_writable_transpose = conditional_t<engine_is_writable, matrix_view::transpose, matrix_view::const_transpose>;
 
   public:
     using engine_type          = ET;
@@ -34,9 +39,17 @@ class basic_matrix
     using span_type            = conditional_t<engine_has_mdspan, detail::engine_mdspan_t<ET>, void>;
     using const_span_type      = conditional_t<engine_has_mdspan, detail::engine_const_mdspan_t<ET>, void>;
 
-    using const_negation_type  = basic_matrix<matrix_view_engine<engine_type, matrix_view::negation>, OT>;
-    using const_hermitian_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::hermitian>, OT>;
-    using const_transpose_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::transpose>, OT>;
+    using const_negation_type  = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_negation>, OT>;
+    using const_hermitian_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_hermitian>, OT>;
+
+    using transpose_type       = basic_matrix<matrix_view_engine<engine_type, possibly_writable_transpose>, OT>;
+    using const_transpose_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_transpose>, OT>;
+    using column_type          = basic_matrix<matrix_view_engine<engine_type, possibly_writable_column>, OT>;
+    using const_column_type    = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_column>, OT>;
+    using row_type             = basic_matrix<matrix_view_engine<engine_type, possibly_writable_row>, OT>;
+    using const_row_type       = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_row>, OT>;
+    using submatrix_type       = basic_matrix<matrix_view_engine<engine_type, possibly_writable_submatrix>, OT>;
+    using const_submatrix_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_submatrix>, OT>;
 
   public:
     ~basic_matrix() = default;
@@ -532,7 +545,7 @@ class basic_matrix
     constexpr reference
     operator ()(index_type i)
     requires
-        detail::readable_and_1d_indexable_matrix_engine<engine_type>
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
     {
         return m_engine(i);
     }
@@ -557,13 +570,53 @@ class basic_matrix
         return const_hermitian_type(detail::special_ctor_tag(), m_engine);
     }
 
+    constexpr transpose_type
+    t() noexcept
+    {
+        return transpose_type(detail::special_ctor_tag(), m_engine);
+    }
+
     constexpr const_transpose_type
     t() const noexcept
     {
         return const_transpose_type(detail::special_ctor_tag(), m_engine);
     }
 
-    //constexpr const_hermitian_type  h() const;
+    constexpr column_type
+    column(index_type j) noexcept
+    {
+        return column_type(detail::special_ctor_tag(), m_engine, j);
+    }
+
+    constexpr const_column_type
+    column(index_type j) const noexcept
+    {
+        return const_column_type(detail::special_ctor_tag(), m_engine, j);
+    }
+
+    constexpr row_type
+    row(index_type i) noexcept
+    {
+        return row_type(detail::special_ctor_tag(), m_engine, i);
+    }
+
+    constexpr const_row_type
+    row(index_type i) const noexcept
+    {
+        return const_row_type(detail::special_ctor_tag(), m_engine, i);
+    }
+
+    constexpr submatrix_type
+    submatrix(index_type ri, index_type rn, index_type ci, index_type cn) noexcept
+    {
+        return submatrix_type(detail::special_ctor_tag(), m_engine, ri, rn, ci, cn);
+    }
+
+    constexpr const_submatrix_type
+    submatrix(index_type ri, index_type rn, index_type ci, index_type cn) const noexcept
+    {
+        return const_submatrix_type(detail::special_ctor_tag(), m_engine, ri, rn, ci, cn);
+    }
 
     //----------------------------------------------------------
     //- Data access.
@@ -683,7 +736,7 @@ class basic_matrix
     constexpr void
     swap(basic_matrix& rhs) noexcept
     {
-        m_engine.swap(rhs.engine());
+        m_engine.swap(rhs.m_engine);
     }
 
     constexpr void

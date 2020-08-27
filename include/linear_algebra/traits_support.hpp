@@ -17,13 +17,14 @@ namespace STD_LA {
 //  Aliases:    {traits_name}_t<OT, U, V>
 //
 //  These private traits types are used to extract element/engine/arithmetic traits types from
-//  a containing operation traits type OT.  A straightforward application of the type detection
-//  idiom is used to carry out the work.  A corresponding alias template is defined for each
-//  extractor type.
+//  a containing operation traits type OT.  In each case, a straightforward application of the
+//  type detection idiom is used to carry out the work.  A corresponding alias template is
+//  defined for each extractor type.
 //
 //  Because the library requires a fairly large number of these, and their names vary only
-//  by a small number of tokens, the macros STD_LA_DEFINE_OP_TRAITS_EXTRACTOR_2(OP, LVL) and
-//  STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(OP) are used to generate them.
+//  by a small number of tokens, the macros STD_LA_DEFINE_OP_TRAITS_EXTRACTOR_2(OP, LVL),
+//  STD_LA_DEFINE_OP_TRAITS_EXTRACTOR_3(OP, LVL), and STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(OP)
+//  are used to generate them.
 //
 //  For example, invoking STD_LA_DEFINE_OP_TRAITS_EXTRACTOR_2(addition, engine) will expand
 //  to the following:
@@ -45,7 +46,7 @@ namespace STD_LA {
 //      using addition_engine_traits_t =
 //          typename addition_engine_traits_extractor<OT, U, V>::type
 //
-//  Likewise, invoking STD_LA_DEFINE_OP_TRAITS_EXTRACTOR_2S(addition) will expand to:
+//  Likewise, invoking STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(addition) will expand to:
 //
 //      STD_LA_DEFINE_OP_TRAITS_EXTRACTOR_2(addition, element);
 //      STD_LA_DEFINE_OP_TRAITS_EXTRACTOR_2(addition, layout);
@@ -384,6 +385,8 @@ struct multiplication_layout_traits<OT, column_major, column_major>
     using layout_type = column_major;
 };
 
+
+template<class OT, class AT1, class AT2, class T>  struct allocation_traits;
 
 template<class OT, class T>
 struct allocation_traits<OT, void, void, T>

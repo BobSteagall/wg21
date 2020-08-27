@@ -50,6 +50,7 @@ struct mse_data<T, extents<N>, void, L>
     array_type  m_elems;
 
     ~mse_data() = default;
+
     constexpr mse_data()
     :   m_elems()
     {
@@ -86,7 +87,8 @@ struct mse_data<T, extents<N>, A, L>
     array_type  m_elems;
 
     ~mse_data() = default;
-    inline mse_data()
+
+    mse_data()
     :   m_elems(N)
     {}
     mse_data(mse_data&&) noexcept = default;
@@ -116,7 +118,8 @@ struct mse_data<T, extents<dynamic_extent>, A, L>
     ptrdiff_t   m_cap;
 
     ~mse_data() = default;
-    inline constexpr mse_data()
+
+    constexpr mse_data()
     :   m_elems(), m_size(0), m_cap(0)
     {}
     constexpr mse_data(mse_data&&) noexcept = default;
@@ -205,7 +208,7 @@ struct mse_data<T, extents<R, C>, A, L>
     //
     ~mse_data() = default;
 
-    inline constexpr mse_data()
+    constexpr mse_data()
     :   m_elems(static_cast<typename array_type::size_type>(R*C))
     {}
     constexpr mse_data(mse_data&&) noexcept = default;
@@ -248,7 +251,7 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
     //
     ~mse_data() = default;
 
-    inline constexpr
+    constexpr
     mse_data()
     :   m_elems(), m_cols(0), m_colcap(0)
     {}
@@ -336,7 +339,6 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
     //
     ~mse_data() = default;
 
-    inline
     mse_data()
     :   m_elems(), m_rows(0), m_cols(0), m_rowcap(0), m_colcap(0)
     {}

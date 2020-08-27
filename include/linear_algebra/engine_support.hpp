@@ -517,6 +517,15 @@ concept readable_engine_fundamentals =
     };
 
 
+template<class T, class ET>
+concept readable_engine_acceptable_indexing_result =
+    same_as<T, typename ET::const_reference>
+    or
+    same_as<T, typename ET::element_type>
+    or
+    same_as<T, typename ET::reference>;
+
+
 //--------------------------------------------------------------------------------------------------
 //  Concept:    readable_vector_engine<ET>
 //
@@ -538,7 +547,8 @@ concept readable_vector_engine =
     and
     requires (ET const& eng, typename ET::index_type i)
     {
-        { eng(i) } -> same_as_either<typename ET::const_reference, typename ET::element_type>;
+//        { eng(i) } -> same_as_either<typename ET::const_reference, typename ET::element_type>;
+        { eng(i) } -> readable_engine_acceptable_indexing_result<ET>;
     };
 
 
@@ -601,8 +611,7 @@ concept writable_vector_engine =
     requires (ET& eng, typename ET::index_type i, typename ET::element_type v)
     {
         requires std::is_same_v<typename ET::reference, typename ET::element_type&>;
-        { eng(i)     } -> same_as<typename ET::reference>;
-        { eng(i) = v } -> same_as<typename ET::reference>;
+        { eng(i) } -> same_as<typename ET::reference>;
     };
 
 
@@ -633,7 +642,7 @@ concept readable_matrix_engine =
     and
     requires (ET const& eng, typename ET::index_type i)
     {
-        { eng(i, i) } -> same_as_either<typename ET::const_reference, typename ET::element_type>;
+        { eng(i, i) } -> readable_engine_acceptable_indexing_result<ET>;
     };
 
 
@@ -652,7 +661,7 @@ concept readable_and_1d_indexable_matrix_engine =
     and
     requires (ET const& eng, typename ET::index_type i)
     {
-        { eng(i) } -> same_as_either<typename ET::const_reference, typename ET::element_type>;
+        { eng(i) } -> readable_engine_acceptable_indexing_result<ET>;
     };
 
 
@@ -685,7 +694,7 @@ concept spannable_matrix_engine =
 //  writability interface required to function correctly with basic_matrix<ET, OT>.
 //
 //  Engine types that fulfill this concept fulfill the corresponding readable_matrix_engine<ET>
-//  concept, and also permit the value of their elements to be changed via two-dimentionsl
+//  concept, and also permit the value of their elements to be changed via two-dimensional
 //  indexing.
 //--------------------------------------------------------------------------------------------------
 //
@@ -696,8 +705,7 @@ concept writable_matrix_engine =
     requires (ET& eng, typename ET::index_type i, typename ET::element_type v)
     {
         requires std::is_same_v<typename ET::reference, typename ET::element_type&>;
-        { eng(i, i)     } -> same_as<typename ET::reference>;
-        { eng(i, i) = v } -> same_as<typename ET::reference>;
+        { eng(i, i) } -> same_as<typename ET::reference>;
     };
 
 
@@ -716,9 +724,8 @@ concept writable_and_1d_indexable_matrix_engine =
     and
     requires (ET const& ceng, ET& meng, typename ET::index_type i, typename ET::element_type v)
     {
-        { ceng(i)     } -> same_as<typename ET::const_reference>;
-        { meng(i)     } -> same_as<typename ET::reference>;
-        { meng(i) = v } -> same_as<typename ET::reference>;
+        { ceng(i) } -> readable_engine_acceptable_indexing_result<ET>;
+        { meng(i) } -> same_as<typename ET::reference>;
     };
 
 
