@@ -19,7 +19,284 @@ namespace detail {
 struct special_ctor_tag{};
 
 //==================================================================================================
-//  TRAITS DEFINITIONS
+//  TYPES AND TRAITS DEFINITIONS -- GENERAL
+//==================================================================================================
+//--------------------------------------------------------------------------------------------------
+//  Trait:      has_size_type<T>
+//  Alias:      get_size_type_t<T>
+//
+//  This private traits type finds the nested alias size_type if it is present; otherwise, it
+//  returns size_t.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T, typename = void>
+struct has_size_type_alias
+{
+    using size_type = std::size_t;
+};
+
+template<class T>
+struct has_size_type_alias<T, std::void_t<typename T::size_type>>
+{
+    using size_type = typename T::size_type;
+};
+
+template<class T>
+using get_size_type_t = typename has_size_type_alias<T>::size_type;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Trait:      is_specialization_of<T, PT>
+//  Alias:      is_specialization_of_v<T, PT>
+//
+//  This private traits type determines whether a given type T is a specialization of a primary
+//  template type PT.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T, template<class...> class PT>
+struct is_specialization_of : public std::false_type
+{};
+
+template<template<class...> class PT, class... ARGS>
+struct is_specialization_of<PT<ARGS...>, PT> : public std::true_type
+{};
+
+template<class T, template<class...> class PT> inline constexpr
+bool    is_specialization_of_v = is_specialization_of<T, PT>::value;
+
+template<class T> inline constexpr
+bool    is_complex_v = is_specialization_of_v<T, std::complex>;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Trait:      is_random_access_standard_container<X>
+//  Alias:      is_random_access_standard_container_v<X>
+//
+//  This private traits type determines whether the template parameter is a specialization
+//  of std::array, std::deque, or std::vector.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T>
+struct is_random_access_standard_container : public false_type
+{};
+
+template<class T, std::size_t N>
+struct is_random_access_standard_container<std::array<T, N>> : public true_type
+{};
+
+template<class T, class A>
+struct is_random_access_standard_container<std::deque<T, A>> : public true_type
+{};
+
+template<class T, class A>
+struct is_random_access_standard_container<std::vector<T, A>> : public true_type
+{};
+
+template<class T> inline constexpr
+bool    is_random_access_standard_container_v = is_random_access_standard_container<T>::value;
+
+
+//==================================================================================================
+//  TYPES AND TRAITS DEFINITIONS -- MDSPAN-RELATED
+//==================================================================================================
+//--------------------------------------------------------------------------------------------------
+//  Trait:      is_1d_mdspan<T>
+//  Alias:      is_1d_mdspan_v<T>
+//
+//  This private traits type determines whether its template parameter is a specialization of
+//  basic_mdspan<T, X, L, A> with a one-dimensional extents template parameter.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T>
+struct is_1d_mdspan : public false_type
+{};
+
+template<class T, ptrdiff_t X0, class SL, class SA>
+struct is_1d_mdspan<basic_mdspan<T, extents<X0>, SL, SA>> : public true_type
+{};
+
+template<class T> inline constexpr
+bool    is_1d_mdspan_v = is_1d_mdspan<T>::value;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Trait:      is_2d_mdspan<T>
+//  Alias:      is_2d_mdspan_v<T>
+//
+//  This private traits type determines whether its template parameter is a specialization of
+//  basic_mdspan<T, X, L, A> with a two-dimensional extents template parameter.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T>
+struct is_2d_mdspan : public false_type
+{};
+
+template<class T, ptrdiff_t X0, ptrdiff_t X1, class SL, class SA>
+struct is_2d_mdspan<basic_mdspan<T, extents<X0, X1>, SL, SA>> : public true_type
+{};
+
+template<class T> inline constexpr
+bool    is_2d_mdspan_v = is_2d_mdspan<T>::value;
+
+//- First, these are specialized accessor policies used for negation, transpose, and hermitian views.
+//
+//--------------------------------------------------------------------------------------------------
+//  Types:  passthru_accessor<T, WA>
+//          negation_accessor<T, WA>
+//          conjugation_accessor<T, WW>
+//
+//  These private accessor types wrap another accessor type WA for an element type T.  They differ
+//  in how they provide access to the underlying element.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
+struct passthru_accessor
+{
+    using offset_policy = passthru_accessor;
+    using element_type  = T;
+    using reference     = typename WA::reference;
+    using pointer       = typename WA::pointer;
+
+    constexpr pointer
+    offset(pointer p, ptrdiff_t i) const noexcept
+    {
+        return WA().offset(p, i);
+    }
+
+    constexpr reference
+    access(pointer p, ptrdiff_t i) const noexcept
+    {
+        return WA().access(p, i);
+    }
+
+    constexpr pointer
+    decay(pointer p) const noexcept
+    {
+        return WA().decay(p);
+    }
+};
+
+template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
+struct negation_accessor
+{
+    using offset_policy = negation_accessor;
+    using element_type  = T;
+    using reference     = T;
+    using pointer       = typename WA::pointer;
+
+    constexpr pointer
+    offset(pointer p, ptrdiff_t i) const noexcept
+    {
+        return WA().offset(p, i);
+    }
+
+    constexpr reference
+    access(pointer p, ptrdiff_t i) const noexcept
+    {
+        return -(WA().access(p, i));
+    }
+
+    constexpr pointer
+    decay(pointer p) const noexcept
+    {
+        return WA().decay(p);
+    }
+};
+
+template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
+struct conjugation_accessor
+{
+    using offset_policy = conjugation_accessor;
+    using element_type  = T;
+    using reference     = T;
+    using pointer       = typename WA::pointer;
+
+    constexpr pointer
+    offset(pointer p, ptrdiff_t i) const noexcept
+    {
+        return WA().offset(p, i);
+    }
+
+    constexpr reference
+    access(pointer p, ptrdiff_t i) const noexcept
+    {
+        return std::conj(WA().access(p, i));
+    }
+
+    constexpr pointer
+    decay(pointer p) const noexcept
+    {
+        return WA().decay(p);
+    }
+};
+
+//--------------------------------------------------------------------
+//- Next, these are some type alias helpers to reduce verbosity in the
+//  noe_mdspan_traits type below.
+//
+using dyn_mat_extents = extents<dynamic_extent, dynamic_extent>;
+using dyn_mat_strides = array<typename dyn_mat_extents::index_type, 2>;
+using dyn_mat_layout  = layout_stride<dynamic_extent, dynamic_extent>;
+using dyn_mat_mapping = typename dyn_mat_layout::template mapping<dyn_mat_extents>;
+
+using dyn_vec_extents = extents<dynamic_extent>;
+using dyn_vec_strides = array<typename dyn_vec_extents::index_type, 1>;
+using dyn_vec_layout  = layout_stride<dynamic_extent>;
+using dyn_vec_mapping = typename dyn_mat_layout::template mapping<dyn_vec_extents>;
+
+//------------------------------------------------------------------------
+//- The actual noe_mdspan_traits type, with partial specializations below.
+//
+template<class T>
+struct mdspan_view_traits;
+
+//- This partial specialization is used when no span interface is desired.
+//
+template<>
+struct mdspan_view_traits<void>
+{
+    using source_span_type    = void;
+    using rowcolumn_span_type = void;
+    using subvector_span_type = void;
+    using submatrix_span_type = void;
+    using transpose_span_type = void;
+};
+
+//- This partial specialization is used when an engine is one-dimensional.
+//
+template<class T, ptrdiff_t X0, class L, class A>
+struct mdspan_view_traits<basic_mdspan<T, extents<X0>, L, A>>
+{
+    using dyn_extents = extents<dynamic_extent>;
+    using dyn_strides = array<typename dyn_extents::index_type, 1>;
+    using dyn_layout  = layout_stride<dynamic_extent>;
+    using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
+
+    using source_span_type    = basic_mdspan<T, extents<X0>, L, A>;
+    using negation_span_type  = basic_mdspan<T, dyn_extents, dyn_layout, negation_accessor<T>>;
+    using subvector_span_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
+};
+
+//- These partial specializations are used when an engine is two-dimensional.
+//
+template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+struct mdspan_view_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
+{
+    using dyn_extents = extents<dynamic_extent, dynamic_extent>;
+    using dyn_strides = array<typename dyn_extents::index_type, 2>;
+    using dyn_layout  = layout_stride<dynamic_extent, dynamic_extent>;
+    using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
+
+    using source_span_type    = basic_mdspan<T, extents<X0, X1>, L, A>;
+    using negation_span_type  = basic_mdspan<T, dyn_extents, dyn_layout, negation_accessor<T, A>>;
+    using hermitian_span_type = basic_mdspan<T, dyn_extents, dyn_layout, conjugation_accessor<T, A>>;
+    using transpose_span_type = basic_mdspan<T, dyn_extents, dyn_layout, passthru_accessor<T, A>>;
+    using submatrix_span_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
+};
+
+
+//==================================================================================================
+//  TYPES AND TRAITS DEFINITIONS -- ENGINE-RELATED
 //==================================================================================================
 //--------------------------------------------------------------------------------------------------
 //  Trait:      is_valid_engine_extents<X>
@@ -78,111 +355,17 @@ bool    is_valid_fixed_engine_extents_v = is_valid_fixed_engine_extents<X>::valu
 
 
 //--------------------------------------------------------------------------------------------------
-//  Trait:      is_1d_mdspan<T>
-//  Alias:      is_1d_mdspan_v<T>
-//
-//  This private traits type determines whether its template parameter is a specialization of
-//  basic_mdspan<T, X, L, A> with a one-dimensional extents template parameter.
-//--------------------------------------------------------------------------------------------------
-//
-template<class T>
-struct is_1d_mdspan : public false_type
-{};
-
-template<class T, ptrdiff_t X0, class SL, class SA>
-struct is_1d_mdspan<basic_mdspan<T, extents<X0>, SL, SA>> : public true_type
-{};
-
-template<class T> inline constexpr
-bool    is_1d_mdspan_v = is_1d_mdspan<T>::value;
-
-
-//--------------------------------------------------------------------------------------------------
-//  Trait:      is_2d_mdspan<T>
-//  Alias:      is_2d_mdspan_v<T>
-//
-//  This private traits type determines whether its template parameter is a specialization of
-//  basic_mdspan<T, X, L, A> with a two-dimensional extents template parameter.
-//--------------------------------------------------------------------------------------------------
-//
-template<class T>
-struct is_2d_mdspan : public false_type
-{};
-
-template<class T, ptrdiff_t X0, ptrdiff_t X1, class SL, class SA>
-struct is_2d_mdspan<basic_mdspan<T, extents<X0, X1>, SL, SA>> : public true_type
-{};
-
-template<class T> inline constexpr
-bool    is_2d_mdspan_v = is_2d_mdspan<T>::value;
-
-
-//--------------------------------------------------------------------------------------------------
-//  Trait:      nested_mdspan_types<T>
-//  Aliases:    engine_mdspan_t<T> and const_engine_mdspan_t<T>
-//
-//  This private traits type and the associated alias templates determine whether or not the
-//  template parameter type has nested type aliases "span_type" and "const_span_type".  If both
-//  aliases are present, then the associated aliases templates refer to the corresponding types.
-//  Otherwise, the alias templates refer to the void type.
-//--------------------------------------------------------------------------------------------------
-//
-template<class ET, class = void>
-struct nested_mdspan_types
-{
-    using span_type       = void;
-    using const_span_type = void;
-};
-
-template<class ET>
-struct nested_mdspan_types<ET, void_t<typename ET::span_type, typename ET::const_span_type>>
-{
-    using span_type       = typename ET::span_type;
-    using const_span_type = typename ET::const_span_type;
-};
-
-template<class ET>
-using engine_mdspan_t = typename nested_mdspan_types<ET>::span_type;
-
-template<class ET>
-using engine_const_mdspan_t = typename nested_mdspan_types<ET>::const_span_type;
-
-
-//--------------------------------------------------------------------------------------------------
-//  Trait:      is_random_access_standard_container<X>
-//  Alias:      is_random_access_standard_container_v<X>
-//
-//  This private traits type determines whether the template parameter is a specialization
-//  of std::array, std::deque, or std::vector.
-//--------------------------------------------------------------------------------------------------
-//
-template<class T>
-struct is_random_access_standard_container : public false_type
-{};
-
-template<class T, std::size_t N>
-struct is_random_access_standard_container<std::array<T, N>> : public true_type
-{};
-
-template<class T, class A>
-struct is_random_access_standard_container<std::deque<T, A>> : public true_type
-{};
-
-template<class T, class A>
-struct is_random_access_standard_container<std::vector<T, A>> : public true_type
-{};
-
-template<class T> inline constexpr
-bool    is_random_access_standard_container_v = is_random_access_standard_container<T>::value;
-
-
-//--------------------------------------------------------------------------------------------------
 //  Trait:      has_owning_engine_type_alias<ET>
 //  Alias:      get_owning_engine_type_t<ET>
 //
 //  This private type detector and variable template are used to determine whether or not an
 //  engine type is an owning engine.  An owning engine is one that owns (manages the lifetime of)
-//  the elements it contains.
+//  the elements it contains, and does not have a nested owning_engine_type type alias.
+//
+//  A non-owning engine refers to elements managed by another engine and has the nested type alias
+//  owning_engine_type.  Non-owning engines may refer to other non-owning engines, but ultimately,
+//  at the end of the "chain", the bottom-most non-owning engine must refer to an owning engine.
+//  The owning_engine_type alias indicates the type of the owning engine.
 //--------------------------------------------------------------------------------------------------
 //
 template<class ET, typename = void>
@@ -206,50 +389,34 @@ using get_owning_engine_type_t = typename has_owning_engine_type_alias<ET>::owni
 
 
 //--------------------------------------------------------------------------------------------------
-//  Trait:      get_size_type<T>
-//  Alias:      get_size_t<T>
+//  Trait:      has_nested_mdspan_types<T>
+//  Aliases:    get_mdspan_type_t<T> and get_const_mdspan_type_t<T>
 //
-//  This private traits type finds the nested alias size_type if it is present; otherwise, it
-//  returns size_t.
+//  This private traits type and the associated alias templates determine whether or not the
+//  template parameter type has nested type aliases "span_type" and "const_span_type".  If both
+//  aliases are present, then the associated aliases templates refer to the corresponding types.
+//  Otherwise, the alias templates refer to the void type.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, typename = void>
-struct get_size_type
+template<class ET, class = void>
+struct has_nested_mdspan_types
 {
-    using type = std::size_t;
+    using span_type       = void;
+    using const_span_type = void;
 };
 
-template<class T>
-struct get_size_type<T, std::void_t<typename T::size_type>>
+template<class ET>
+struct has_nested_mdspan_types<ET, void_t<typename ET::span_type, typename ET::const_span_type>>
 {
-    using type = typename T::size_type;
+    using span_type       = typename ET::span_type;
+    using const_span_type = typename ET::const_span_type;
 };
 
-template<class A>
-using alloc_size_t = typename get_size_type<A>::type;
+template<class ET>
+using get_mdspan_type_t = typename has_nested_mdspan_types<ET>::span_type;
 
-
-//--------------------------------------------------------------------------------------------------
-//  Trait:      is_specialization_of<T, PT>
-//  Alias:      is_specialization_of_v<T, PT>
-//
-//  This private traits type determines whether a given type T is a specialization of a primary
-//  template type PT.
-//--------------------------------------------------------------------------------------------------
-//
-template<class T, template<class...> class PT>
-struct is_specialization_of : public std::false_type
-{};
-
-template<template<class...> class PT, class... ARGS>
-struct is_specialization_of<PT<ARGS...>, PT> : public std::true_type
-{};
-
-template<class T, template<class...> class PT> inline constexpr
-bool    is_specialization_of_v = is_specialization_of<T, PT>::value;
-
-template<class T> inline constexpr
-bool    is_complex_v = is_specialization_of_v<T, std::complex>;
+template<class ET>
+using get_const_mdspan_type_t = typename has_nested_mdspan_types<ET>::const_span_type;
 
 
 //==================================================================================================
@@ -380,9 +547,6 @@ template<class T1, class T2>
 concept comparable_types = comparable_types_helper<T1, T2> and comparable_types_helper<T2, T1>;
 
 
-template<typename T, typename U1, typename U2>
-concept same_as_either = same_as<T, U1> or same_as<T, U2>;
-
 //--------------------------------------------------------------------------------------------------
 //  Concept:    random_access_standard_container<CT>
 //
@@ -427,7 +591,7 @@ concept valid_fixed_engine_extents = is_valid_fixed_engine_extents_v<X>;
 //
 template<typename T, typename A>
 concept valid_allocator_interface =
-    requires (A a, alloc_size_t<A> n)
+    requires (A a, get_size_type_t<A> n)
     {
         typename A::value_type;
         requires std::is_same_v<T, typename A::value_type>;
@@ -512,13 +676,26 @@ concept readable_engine_fundamentals =
         typename ET::index_type;
         typename ET::reference;
         typename ET::const_reference;
+        requires std::is_convertible_v<typename ET::reference, typename ET::element_type>;
+        requires std::is_convertible_v<typename ET::const_reference, typename ET::element_type>;
         { eng.size()     } -> same_as<typename ET::index_type>;
         { eng.capacity() } -> same_as<typename ET::index_type>;
     };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Concept:    valid_engine_indexing_result<ET>
+//
+//  This private concept determines whether a given type is equal to one of the three possible
+//  result types of an engine's indexing operator(s).
+//
+//  Note that non-const references are acceptable as an indexing return type.  This is in order
+//  to support view engines, which may have a const indexing operator that returns a non-const
+//  reference to an element.
+//--------------------------------------------------------------------------------------------------
+//
 template<class T, class ET>
-concept readable_engine_acceptable_indexing_result =
+concept valid_engine_indexing_result =
     same_as<T, typename ET::const_reference>
     or
     same_as<T, typename ET::element_type>
@@ -547,8 +724,7 @@ concept readable_vector_engine =
     and
     requires (ET const& eng, typename ET::index_type i)
     {
-//        { eng(i) } -> same_as_either<typename ET::const_reference, typename ET::element_type>;
-        { eng(i) } -> readable_engine_acceptable_indexing_result<ET>;
+        { eng(i) } -> valid_engine_indexing_result<ET>;
     };
 
 
@@ -642,7 +818,7 @@ concept readable_matrix_engine =
     and
     requires (ET const& eng, typename ET::index_type i)
     {
-        { eng(i, i) } -> readable_engine_acceptable_indexing_result<ET>;
+        { eng(i, i) } -> valid_engine_indexing_result<ET>;
     };
 
 
@@ -661,7 +837,7 @@ concept readable_and_1d_indexable_matrix_engine =
     and
     requires (ET const& eng, typename ET::index_type i)
     {
-        { eng(i) } -> readable_engine_acceptable_indexing_result<ET>;
+        { eng(i) } -> valid_engine_indexing_result<ET>;
     };
 
 
@@ -724,7 +900,7 @@ concept writable_and_1d_indexable_matrix_engine =
     and
     requires (ET const& ceng, ET& meng, typename ET::index_type i, typename ET::element_type v)
     {
-        { ceng(i) } -> readable_engine_acceptable_indexing_result<ET>;
+        { ceng(i) } -> valid_engine_indexing_result<ET>;
         { meng(i) } -> same_as<typename ET::reference>;
     };
 

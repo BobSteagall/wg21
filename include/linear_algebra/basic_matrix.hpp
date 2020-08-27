@@ -19,29 +19,33 @@ requires
     detail::readable_matrix_engine<ET>
 class basic_matrix
 {
-    static constexpr bool   engine_is_writable = detail::writable_matrix_engine<ET>;
-    static constexpr bool   engine_has_mdspan  = detail::spannable_matrix_engine<ET>;
+    static constexpr bool   is_writable = detail::writable_matrix_engine<ET>;
 
     using engine_support              = detail::matrix_engine_support;
-    using possibly_writable_column    = conditional_t<engine_is_writable, matrix_view::column, matrix_view::const_column>;
-    using possibly_writable_row       = conditional_t<engine_is_writable, matrix_view::row, matrix_view::const_row>;
-    using possibly_writable_submatrix = conditional_t<engine_is_writable, matrix_view::submatrix, matrix_view::const_submatrix>;
-    using possibly_writable_transpose = conditional_t<engine_is_writable, matrix_view::transpose, matrix_view::const_transpose>;
+    using possibly_writable_column    = conditional_t<is_writable, matrix_view::column, matrix_view::const_column>;
+    using possibly_writable_row       = conditional_t<is_writable, matrix_view::row, matrix_view::const_row>;
+    using possibly_writable_submatrix = conditional_t<is_writable, matrix_view::submatrix, matrix_view::const_submatrix>;
+    using possibly_writable_transpose = conditional_t<is_writable, matrix_view::transpose, matrix_view::const_transpose>;
 
   public:
+    //- Fundamental type aliases.
+    //
     using engine_type          = ET;
     using owning_engine_type   = detail::get_owning_engine_type_t<ET>;
     using element_type         = typename engine_type::element_type;
-    using value_type           = typename engine_type::value_type;
     using reference            = typename engine_type::reference;
     using const_reference      = typename engine_type::const_reference;
     using index_type           = typename engine_type::index_type;
-    using span_type            = conditional_t<engine_has_mdspan, detail::engine_mdspan_t<ET>, void>;
-    using const_span_type      = conditional_t<engine_has_mdspan, detail::engine_const_mdspan_t<ET>, void>;
 
+    //- Type aliases pertaining to mdspan.
+    //
+    using span_type            = detail::get_mdspan_type_t<ET>;
+    using const_span_type      = detail::get_const_mdspan_type_t<ET>;
+
+    //- Type aliases pertaining to views.
+    //
     using const_negation_type  = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_negation>, OT>;
     using const_hermitian_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_hermitian>, OT>;
-
     using transpose_type       = basic_matrix<matrix_view_engine<engine_type, possibly_writable_transpose>, OT>;
     using const_transpose_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_transpose>, OT>;
     using column_type          = basic_matrix<matrix_view_engine<engine_type, possibly_writable_column>, OT>;
@@ -401,8 +405,6 @@ class basic_matrix
         detail::random_access_standard_container<CT>
         and
         detail::assignable_from<engine_type, decltype(rhs)>
-        and
-        detail::convertible_from<element_type, typename CT::value_type>
     {
         m_engine = rhs;
         return *this;

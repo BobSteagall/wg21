@@ -41,8 +41,8 @@ class basic_vector
     using reference            = typename engine_type::reference;
     using const_reference      = typename engine_type::const_reference;
     using index_type           = typename engine_type::index_type;
-    using span_type            = conditional_t<engine_has_mdspan, detail::engine_mdspan_t<ET>, void>;
-    using const_span_type      = conditional_t<engine_has_mdspan, detail::engine_const_mdspan_t<ET>, void>;
+    using span_type            = detail::get_mdspan_type_t<ET>;
+    using const_span_type      = detail::get_const_mdspan_type_t<ET>;
 
   public:
     ~basic_vector() = default;
