@@ -138,15 +138,47 @@ struct is_2d_mdspan<basic_mdspan<T, extents<X0, X1>, SL, SA>> : public true_type
 template<class T> inline constexpr
 bool    is_2d_mdspan_v = is_2d_mdspan<T>::value;
 
-//- First, these are specialized accessor policies used for negation, transpose, and hermitian views.
+
+//--------------------------------------------------------------------------------------------------
+//  Trait:      mdspan_layout_mapper<T>
+//  Alias:      get_mdspan_layout_t<T>
 //
+//  This private traits type maps a linear algebra element layout (row_major, etc.) into a
+//  corresponding mdspan layout policy (layout_right, etc.).
+//--------------------------------------------------------------------------------------------------
+//
+template<class L>   struct mdspan_layout_mapper;
+
+template<>
+struct mdspan_layout_mapper<row_major>
+{
+    using layout_type = MDSPAN_NS::layout_right;
+};
+
+template<>
+struct mdspan_layout_mapper<column_major>
+{
+    using layout_type = MDSPAN_NS::layout_left;
+};
+
+template<>
+struct mdspan_layout_mapper<unoriented>
+{
+    using layout_type = MDSPAN_NS::layout_right;
+};
+
+template<class L>
+using get_mdspan_layout_t = typename mdspan_layout_mapper<L>::layout_type;
+
+
 //--------------------------------------------------------------------------------------------------
 //  Types:  passthru_accessor<T, WA>
 //          negation_accessor<T, WA>
 //          conjugation_accessor<T, WW>
 //
-//  These private accessor types wrap another accessor type WA for an element type T.  They differ
-//  in how they provide access to the underlying element.
+//  These are specialized accessor policy types used for negation, transpose, and hermitian views.
+//  They wrap another accessor type WA for an element type T.  They differ in how they provide
+//  access to the underlying element.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
@@ -230,9 +262,19 @@ struct conjugation_accessor
     }
 };
 
-//--------------------------------------------------------------------
-//- Next, these are some type alias helpers to reduce verbosity in the
-//  noe_mdspan_traits type below.
+//--------------------------------------------------------------------------------------------------
+//  Aliases:    dyn_mat_extents
+//              dyn_mat_strides
+//              dyn_mat_layout
+//              dyn_mat_mapping
+//              dyn_vec_extents
+//              dyn_vec_strides
+//              dyn_vec_layout
+//              dyn_vec_mapping
+//
+//  These private aliases are used to reduce verbosity in subsequent code pertaining to mdspan
+//  types and objects.
+//--------------------------------------------------------------------------------------------------
 //
 using dyn_mat_extents = extents<dynamic_extent, dynamic_extent>;
 using dyn_mat_strides = array<typename dyn_mat_extents::index_type, 2>;
@@ -243,6 +285,7 @@ using dyn_vec_extents = extents<dynamic_extent>;
 using dyn_vec_strides = array<typename dyn_vec_extents::index_type, 1>;
 using dyn_vec_layout  = layout_stride<dynamic_extent>;
 using dyn_vec_mapping = typename dyn_mat_layout::template mapping<dyn_vec_extents>;
+
 
 //------------------------------------------------------------------------
 //- The actual noe_mdspan_traits type, with partial specializations below.

@@ -348,6 +348,158 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
     mse_data&   operator =(mse_data const&) = default;
 };
 
+
+//--------------------------------------------------------------------------------------------------
+//  Traits Type:    mse_mdspan_support
+//
+//  Possibly temporary traits type that computes the values of basic_mdspan objects on behalf of
+//  traits type mse_mdspan_support<MSED>.
+//--------------------------------------------------------------------------------------------------
+//
+struct mse_mdspan_support
+{
+    template<class ST, class MSE>
+    static constexpr ST
+    make_static_mdspan(MSE& mse)
+    {
+        return ST(mse.m_elems.data());
+    }
+
+    template<class ST, class MSE>
+    static constexpr ST
+    make_dynamic_mdspan(MSE& mse)
+    {
+        if constexpr (MSE::is_row_major)
+        {
+            dyn_mat_extents     extents(mse.m_rows, mse.m_cols);
+            dyn_mat_strides     strides{mse.m_colcap, 1};
+            dyn_mat_mapping     mapping(extents, strides);
+
+            return ST(mse.m_elems.data(), mapping);
+        }
+        else
+        {
+            dyn_mat_extents     extents(mse.m_rows, mse.m_cols);
+            dyn_mat_strides     strides{1, mse.m_rowcap};
+            dyn_mat_mapping     mapping(extents, strides);
+
+            return ST(mse.m_elems.data(), mapping);
+        }
+    }
+};
+
+
+//--------------------------------------------------------------------------------------------------
+//  Traits Type:    mse_mdspan_traits<T, X, L>
+//
+//  Traits type that determines the types, and computes the values, of basic_mdspan objects
+//  on behalf of matrix_storage_engine<T,X,A,L>.
+//
+//  Partial specializations of this class template are tailored to specific corresponding partial
+//  specializations of the extents paramter.  They provide static member functions to compute the
+//  corresponding mdspan objects.
+//
+//  Note that only the fixed-size partial specialization is non-dynamic; if either the rows or
+//  columns size parameter is dynamic, then the corresponding mdspan type is dynamic in both
+//  dimensions.  This may change later.
+//--------------------------------------------------------------------------------------------------
+//
+template<class MSED>    struct mse_mdspan_traits;
+
+
+//------ Partial specialization for extents<R, C>.
+//
+template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
+struct mse_mdspan_traits<mse_data<T, extents<R, C>, A, L>> : mse_mdspan_support
+{
+    using mse_data_type   = mse_data<T, extents<R, C>, A, L>;
+    using layout_type     = get_mdspan_layout_t<L>;
+    using span_type       = basic_mdspan<T, extents<R, C>, layout_type>;
+    using const_span_type = basic_mdspan<T const, extents<R, C>, layout_type>;
+
+    static constexpr span_type
+    make_mdspan(mse_data_type& mse)
+    {
+        return make_static_mdspan<span_type, mse_data_type>(mse);
+    }
+
+    static constexpr const_span_type
+    make_const_mdspan(mse_data_type const& mse)
+    {
+        return make_static_mdspan<const_span_type, mse_data_type const>(mse);
+    }
+};
+
+
+//------ Partial specialization for extents<R, dynamic_extent>.
+//
+template<class T, ptrdiff_t R, class A, class L>
+struct mse_mdspan_traits<mse_data<T, extents<R, dynamic_extent>, A, L>> : mse_mdspan_support
+{
+    using mse_data_type   = mse_data<T, extents<R, dynamic_extent>, A, L>;
+    using span_type       = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>;
+    using const_span_type = basic_mdspan<T const, dyn_mat_extents, dyn_mat_layout>;
+
+    static constexpr span_type
+    make_mdspan(mse_data_type& mse)
+    {
+        return make_dynamic_mdspan<span_type, mse_data_type>(mse);
+    }
+
+    static constexpr const_span_type
+    make_const_mdspan(mse_data_type const& mse)
+    {
+        return make_dynamic_mdspan<const_span_type, mse_data_type const>(mse);
+    }
+};
+
+
+//------ Partial specialization for extents<dynamic_extent, C>.
+//
+template<class T, ptrdiff_t C, class A, class L>
+struct mse_mdspan_traits<mse_data<T, extents<dynamic_extent, C>, A, L>> : mse_mdspan_support
+{
+    using mse_data_type   = mse_data<T, extents<dynamic_extent, C>, A, L>;
+    using span_type       = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>;
+    using const_span_type = basic_mdspan<T const, dyn_mat_extents, dyn_mat_layout>;
+
+    static constexpr span_type
+    make_mdspan(mse_data_type& mse)
+    {
+        return make_dynamic_mdspan<span_type, mse_data_type>(mse);
+    }
+
+    static constexpr const_span_type
+    make_const_mdspan(mse_data_type const& mse)
+    {
+        return make_dynamic_mdspan<const_span_type, mse_data_type const>(mse);
+    }
+};
+
+
+//------ Partial specialization for extents<dynamic_extent, dynamic_extent>.
+//
+template<class T, class A, class L>
+struct mse_mdspan_traits<mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>> : mse_mdspan_support
+{
+    using mse_data_type   = mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>;
+    using span_type       = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>;
+    using const_span_type = basic_mdspan<T const, dyn_mat_extents, dyn_mat_layout>;
+
+    static constexpr span_type
+    make_mdspan(mse_data_type& mse)
+    {
+        return make_dynamic_mdspan<span_type, mse_data_type>(mse);
+    }
+
+    static constexpr const_span_type
+    make_const_mdspan(mse_data_type const& mse)
+    {
+        return make_dynamic_mdspan<const_span_type, mse_data_type const>(mse);
+    }
+};
+
+
 }       //- detail namespace
 //==================================================================================================
 //==================================================================================================
@@ -679,20 +831,10 @@ requires
     detail::valid_layout_for_2d_storage_engine<L>
 class matrix_storage_engine<T, extents<R, C>, A, L>
 {
-    using this_type    = matrix_storage_engine;
-    using storage_type = detail::mse_data<T, extents<R, C>, A, L>;
-    using support_type = detail::matrix_engine_support;
-
-    using this_layout = conditional_t<storage_type::is_row_major, layout_right, layout_left>;
-    using fxd_span    = basic_mdspan<T, extents<R, C>, this_layout>;
-    using c_fxd_span  = basic_mdspan<T const, extents<R, C>, this_layout>;
-
-    using dyn_extents = extents<dynamic_extent, dynamic_extent>;
-    using dyn_layout  = layout_stride<dynamic_extent, dynamic_extent>;
-    using dyn_strides = array<typename dyn_extents::index_type, 2>;
-    using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
-    using dyn_span    = basic_mdspan<T, dyn_extents, dyn_layout>;
-    using c_dyn_span  = basic_mdspan<T const, dyn_extents, dyn_layout>;
+    using this_type     = matrix_storage_engine;
+    using support_type  = detail::matrix_engine_support;
+    using storage_type  = detail::mse_data<T, extents<R, C>, A, L>;
+    using mdspan_traits = detail::mse_mdspan_traits<storage_type>;
 
     static constexpr bool   is_fixed_size        = storage_type::is_fixed_size;
     static constexpr bool   is_1d_indexable      = storage_type::is_1d_indexable;
@@ -706,14 +848,13 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     storage_type    m_data;
 
   public:
-    using value_type      = T;
     using allocator_type  = A;
-    using element_type    = value_type;
+    using element_type    = T;
     using reference       = element_type&;
     using const_reference = element_type const&;
     using index_type      = ptrdiff_t;
-    using span_type       = conditional_t<this_type::is_fixed_size, fxd_span, dyn_span>;
-    using const_span_type = conditional_t<this_type::is_fixed_size, c_fxd_span, c_dyn_span>;
+    using span_type       = typename mdspan_traits::span_type;
+    using const_span_type = typename mdspan_traits::const_span_type;
 
   public:
     ~matrix_storage_engine() = default;
@@ -1014,13 +1155,13 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     constexpr span_type
     span() noexcept
     {
-        return make_mdspan<span_type, element_type>(m_data.m_elems.data(), m_data);
+        return mdspan_traits::make_mdspan(m_data);
     }
 
     constexpr const_span_type
     span() const noexcept
     {
-        return make_mdspan<const_span_type, element_type const>(m_data.m_elems.data(), m_data);
+        return mdspan_traits::make_const_mdspan(m_data);
     }
 
     //- Setting overall size and capacity.
@@ -1078,36 +1219,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
   private:
-    template<class ST, class U>
-    static constexpr ST
-    make_mdspan(U* pdata, storage_type const& rep)
-    {
-        if constexpr (this_type::is_fixed_size)
-        {
-            return ST(pdata);
-        }
-        else
-        {
-            if constexpr (this_type::is_row_major)
-            {
-                dyn_extents     extents(rep.m_rows, rep.m_cols);
-                dyn_strides     strides{rep.m_colcap, 1};
-                dyn_mapping     mapping(extents, strides);
-
-                return ST(pdata, mapping);
-            }
-            else
-            {
-                dyn_extents     extents(rep.m_rows, rep.m_cols);
-                dyn_strides     strides{1, rep.m_rowcap};
-                dyn_mapping     mapping(extents, strides);
-
-                return ST(pdata, mapping);
-            }
-        }
-    }
-
-    void
+    constexpr void
     do_reshape(ptrdiff_t rows, ptrdiff_t cols, ptrdiff_t rowcap, ptrdiff_t colcap)
     requires
         this_type::is_two_d_reshapable
@@ -1158,7 +1270,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         }
     }
 
-    void
+    constexpr void
     do_reshape_columns(ptrdiff_t cols, ptrdiff_t colcap)
     requires
         this_type::is_column_reshapable
@@ -1197,7 +1309,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         }
     }
 
-    void
+    constexpr void
     do_reshape_rows(ptrdiff_t rows, ptrdiff_t rowcap)
     requires
         this_type::is_row_reshapable
