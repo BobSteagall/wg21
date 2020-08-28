@@ -381,6 +381,22 @@ TEST(AddTraits, Views)
     PRINT_TYPE(decltype(m1.column(1).t()(0)));
     PRINT(m1);
     PRINT(m1.column(1).t());
+
+    PRINT(m1);
+    PRINT(m1.span());
+    PRINT(-m1);
+    PRINT((-m1).span());
+
+    PRINT(m1.t());
+    PRINT(m1.t().span());
+
+    auto    s1 = m1.t().span();
+    PRINT(s1);
+    s1(0, 0) = 43;
+    PRINT(s1);
+    PRINT(m1);
+    PRINT(m1.t());
+    PRINT(m1.t().span());
 }
 
 #if 0

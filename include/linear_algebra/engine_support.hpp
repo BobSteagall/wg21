@@ -172,97 +172,6 @@ using get_mdspan_layout_t = typename mdspan_layout_mapper<L>::layout_type;
 
 
 //--------------------------------------------------------------------------------------------------
-//  Types:  passthru_accessor<T, WA>
-//          negation_accessor<T, WA>
-//          conjugation_accessor<T, WW>
-//
-//  These are specialized accessor policy types used for negation, transpose, and hermitian views.
-//  They wrap another accessor type WA for an element type T.  They differ in how they provide
-//  access to the underlying element.
-//--------------------------------------------------------------------------------------------------
-//
-template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
-struct passthru_accessor
-{
-    using offset_policy = passthru_accessor;
-    using element_type  = T;
-    using reference     = typename WA::reference;
-    using pointer       = typename WA::pointer;
-
-    constexpr pointer
-    offset(pointer p, ptrdiff_t i) const noexcept
-    {
-        return WA().offset(p, i);
-    }
-
-    constexpr reference
-    access(pointer p, ptrdiff_t i) const noexcept
-    {
-        return WA().access(p, i);
-    }
-
-    constexpr pointer
-    decay(pointer p) const noexcept
-    {
-        return WA().decay(p);
-    }
-};
-
-template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
-struct negation_accessor
-{
-    using offset_policy = negation_accessor;
-    using element_type  = T;
-    using reference     = T;
-    using pointer       = typename WA::pointer;
-
-    constexpr pointer
-    offset(pointer p, ptrdiff_t i) const noexcept
-    {
-        return WA().offset(p, i);
-    }
-
-    constexpr reference
-    access(pointer p, ptrdiff_t i) const noexcept
-    {
-        return -(WA().access(p, i));
-    }
-
-    constexpr pointer
-    decay(pointer p) const noexcept
-    {
-        return WA().decay(p);
-    }
-};
-
-template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
-struct conjugation_accessor
-{
-    using offset_policy = conjugation_accessor;
-    using element_type  = T;
-    using reference     = T;
-    using pointer       = typename WA::pointer;
-
-    constexpr pointer
-    offset(pointer p, ptrdiff_t i) const noexcept
-    {
-        return WA().offset(p, i);
-    }
-
-    constexpr reference
-    access(pointer p, ptrdiff_t i) const noexcept
-    {
-        return std::conj(WA().access(p, i));
-    }
-
-    constexpr pointer
-    decay(pointer p) const noexcept
-    {
-        return WA().decay(p);
-    }
-};
-
-//--------------------------------------------------------------------------------------------------
 //  Aliases:    dyn_mat_extents
 //              dyn_mat_strides
 //              dyn_mat_layout
@@ -285,57 +194,6 @@ using dyn_vec_extents = extents<dynamic_extent>;
 using dyn_vec_strides = array<typename dyn_vec_extents::index_type, 1>;
 using dyn_vec_layout  = layout_stride<dynamic_extent>;
 using dyn_vec_mapping = typename dyn_mat_layout::template mapping<dyn_vec_extents>;
-
-
-//------------------------------------------------------------------------
-//- The actual noe_mdspan_traits type, with partial specializations below.
-//
-template<class T>
-struct mdspan_view_traits;
-
-//- This partial specialization is used when no span interface is desired.
-//
-template<>
-struct mdspan_view_traits<void>
-{
-    using source_span_type    = void;
-    using rowcolumn_span_type = void;
-    using subvector_span_type = void;
-    using submatrix_span_type = void;
-    using transpose_span_type = void;
-};
-
-//- This partial specialization is used when an engine is one-dimensional.
-//
-template<class T, ptrdiff_t X0, class L, class A>
-struct mdspan_view_traits<basic_mdspan<T, extents<X0>, L, A>>
-{
-    using dyn_extents = extents<dynamic_extent>;
-    using dyn_strides = array<typename dyn_extents::index_type, 1>;
-    using dyn_layout  = layout_stride<dynamic_extent>;
-    using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
-
-    using source_span_type    = basic_mdspan<T, extents<X0>, L, A>;
-    using negation_span_type  = basic_mdspan<T, dyn_extents, dyn_layout, negation_accessor<T>>;
-    using subvector_span_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
-};
-
-//- These partial specializations are used when an engine is two-dimensional.
-//
-template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
-struct mdspan_view_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
-{
-    using dyn_extents = extents<dynamic_extent, dynamic_extent>;
-    using dyn_strides = array<typename dyn_extents::index_type, 2>;
-    using dyn_layout  = layout_stride<dynamic_extent, dynamic_extent>;
-    using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
-
-    using source_span_type    = basic_mdspan<T, extents<X0, X1>, L, A>;
-    using negation_span_type  = basic_mdspan<T, dyn_extents, dyn_layout, negation_accessor<T, A>>;
-    using hermitian_span_type = basic_mdspan<T, dyn_extents, dyn_layout, conjugation_accessor<T, A>>;
-    using transpose_span_type = basic_mdspan<T, dyn_extents, dyn_layout, passthru_accessor<T, A>>;
-    using submatrix_span_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
-};
 
 
 //==================================================================================================
@@ -571,6 +429,9 @@ concept class_type = std::is_class_v<T>;
 
 #endif
 
+
+template<class T, class U1, class U2>
+concept same_as_either = same_as<T, U1> or same_as<T, U2>;
 
 //--------------------------------------------------------------------------------------------------
 //  Concept:    comparable_types<T1, T2>
@@ -902,7 +763,7 @@ concept spannable_matrix_engine =
         requires is_2d_mdspan_v<typename ET::span_type>;
         requires is_2d_mdspan_v<typename ET::const_span_type>;
         { meng.span() } -> same_as<typename ET::span_type>;
-        { ceng.span() } -> same_as<typename ET::const_span_type>;
+        { ceng.span() } -> same_as_either<typename ET::const_span_type, typename ET::span_type>;
     };
 
 
