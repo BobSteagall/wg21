@@ -53,7 +53,7 @@ struct mse_data<T, extents<N>, void, L>
     constexpr mse_data()
     :   m_elems()
     {
-        if constexpr (!is_class_v<T>)
+        if constexpr (!std::is_class_v<T>)
         {
             for (auto& elem : m_elems) elem = T{};
         }
@@ -159,7 +159,7 @@ struct mse_data<T, extents<R, C>, void, L>
     constexpr mse_data()
     :   m_elems()
     {
-        if constexpr (!is_class_v<T>)
+        if constexpr (!std::is_class_v<T>)
         {
             for (auto& elem : m_elems) elem = T{};
         }

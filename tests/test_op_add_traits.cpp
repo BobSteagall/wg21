@@ -397,6 +397,38 @@ TEST(AddTraits, Views)
     PRINT(m1);
     PRINT(m1.t());
     PRINT(m1.t().span());
+
+    PRINT_TYPE(decltype(m1.span()));
+    PRINT(m1.span());
+    PRINT_TYPE(decltype(m1.submatrix(0, 2, 1, 2)));
+    PRINT(m1.submatrix(0, 2, 1, 2));
+    PRINT_TYPE(decltype(m1.submatrix(0, 2, 1, 2).span()));
+    PRINT(m1.submatrix(0, 2, 1, 2).span());
+
+    PRINT_TYPE(decltype(m2.span()));
+    PRINT(m2.span());
+    PRINT_TYPE(decltype(m2.submatrix(0, 2, 1, 2)));
+    PRINT(m2.submatrix(0, 2, 1, 2));
+    PRINT_TYPE(decltype(m2.submatrix(0, 2, 1, 2).span()));
+    PRINT(m2.submatrix(0, 2, 1, 2).span());
+
+    PRINT(m1.row(1));
+    PRINT(m1.row(1).span());
+
+    PRINT(m1.row(1).t());
+    PRINT(m1.row(1).t().span());
+
+    PRINT(m1.column(0));
+    PRINT(m1.column(0).span());
+
+    PRINT(m1.column(0).t());
+    PRINT(m1.column(0).t().span());
+
+    m1.column(0).t()(0) = 55;
+    m1.column(0).t().span()(0, 1) = 66;
+    PRINT(m1);
+    PRINT(m1.column(0).t().span());
+    PRINT_TYPE(decltype(m1.column(0).t().span()));
 }
 
 #if 0

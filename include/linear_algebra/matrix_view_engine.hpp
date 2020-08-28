@@ -156,7 +156,7 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
 
     template<class EST>
     static constexpr negation_mdspan_type
-    make_negation_mdspan(EST const& s)
+    make_negation(EST const& s)
     {
         dyn_extents     ext(s.extent(0), s.extent(1));
         dyn_strides     str{s.stride(0), s.stride(1)};
@@ -167,7 +167,7 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
 
     template<class EST>
     static constexpr hermitian_mdspan_type
-    make_hermitian_mdspan(EST const& s)
+    make_hermitian(EST const& s)
     {
         dyn_extents     ext(s.extent(1), s.extent(0));
         dyn_strides     str{s.stride(1), s.stride(0)};
@@ -178,13 +178,36 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
 
     template<class EST>
     static constexpr transpose_mdspan_type
-    make_transpose_mdspan(EST const& s)
+    make_transpose(EST const& s)
     {
         dyn_extents     ext(s.extent(1), s.extent(0));
         dyn_strides     str{s.stride(1), s.stride(0)};
         dyn_mapping     map(ext, str);
 
         return transpose_mdspan_type(s.data(), map, A());
+    }
+
+    template<class EST, class S1, class S2, class S3, class S4>
+    static constexpr submatrix_mdspan_type
+    make_submatrix(EST const& s, S1 row, S2 row_count, S3 col, S4 col_count)
+    {
+        using idx_t  = decltype(dynamic_extent);
+        using pair_t = std::pair<idx_t, idx_t>;
+
+        pair_t  row_set(static_cast<idx_t>(row), static_cast<idx_t>(row + row_count));
+        pair_t  col_set(static_cast<idx_t>(col), static_cast<idx_t>(col + col_count));
+
+        if constexpr (std::is_same_v<EST, submatrix_mdspan_type>)
+        {
+            return subspan(s, row_set, col_set);
+        }
+        else
+        {
+            dyn_extents     ext(s.extent(0), s.extent(1));
+            dyn_strides     str{s.stride(0), s.stride(1)};
+            dyn_mapping     map(ext, str);
+            return subspan(submatrix_mdspan_type(s.data(), map), row_set, col_set);
+        }
     }
 };
 
@@ -235,13 +258,12 @@ requires
     detail::readable_matrix_engine<ET>
 class matrix_view_engine<ET, matrix_view::const_negation>
 {
-    using this_type        = matrix_view_engine;
-    using engine_pointer   = ET const*;
-    using support_traits   = detail::matrix_engine_support;
-    using engine_span_type = detail::get_const_mdspan_type_t<ET>;
-    using mdspan_traits    = detail::mve_mdspan_traits<engine_span_type>;
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET const*;
+    using support_traits      = detail::matrix_engine_support;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
 
-    static constexpr bool   has_mdspan = mdspan_traits::has_mdspan;
+    static constexpr bool   has_mdspan = const_mdspan_traits::has_mdspan;
 
   public:
     using engine_type        = ET;
@@ -250,8 +272,8 @@ class matrix_view_engine<ET, matrix_view::const_negation>
     using reference          = typename engine_type::element_type;
     using const_reference    = typename engine_type::element_type;
     using index_type         = typename engine_type::index_type;
-    using span_type          = typename mdspan_traits::negation_mdspan_type;
-    using const_span_type    = span_type;
+    using span_type          = typename const_mdspan_traits::negation_mdspan_type;
+    using const_span_type    = typename const_mdspan_traits::negation_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -330,7 +352,7 @@ class matrix_view_engine<ET, matrix_view::const_negation>
     requires
         this_type::has_mdspan
     {
-        return mdspan_traits::make_negation_mdspan(mp_engine->span());
+        return const_mdspan_traits::make_negation(mp_engine->span());
     }
 
     //- Modifiers
@@ -353,19 +375,23 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
 {
     static constexpr bool   is_cx = detail::is_complex_v<typename ET::element_type>;
 
-    using conj_el_type   = conditional_t<is_cx, typename ET::element_type, typename ET::const_reference>;
-    using support_traits   = detail::matrix_engine_support;
-    using engine_pointer = ET const*;
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET const*;
+    using conj_elem_type      = conditional_t<is_cx, typename ET::element_type, typename ET::const_reference>;
+    using support_traits      = detail::matrix_engine_support;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
+
+    static constexpr bool   has_mdspan = const_mdspan_traits::has_mdspan;
 
   public:
     using engine_type        = ET;
     using owning_engine_type = detail::get_owning_engine_type_t<ET>;
     using element_type       = typename engine_type::element_type;
-    using reference          = conj_el_type;
-    using const_reference    = conj_el_type;
+    using reference          = conj_elem_type;
+    using const_reference    = conj_elem_type;
     using index_type         = typename engine_type::index_type;
-    using span_type          = detail::get_mdspan_type_t<ET>;
-    using const_span_type    = detail::get_const_mdspan_type_t<ET>;
+    using span_type          = typename const_mdspan_traits::hermitian_mdspan_type;
+    using const_span_type    = typename const_mdspan_traits::hermitian_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -440,6 +466,14 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
             return std::conj((*mp_engine)(j, i));
         else
             return (*mp_engine)(j, i);
+    }
+
+    constexpr span_type
+    span() const noexcept
+    requires
+        this_type::has_mdspan
+    {
+        return const_mdspan_traits::make_hermitian(mp_engine->span());
     }
 
     //- Modifiers
@@ -563,7 +597,7 @@ class matrix_view_engine<ET, matrix_view::transpose>
     requires
         this_type::has_mdspan
     {
-        return mdspan_traits::make_transpose_mdspan(mp_engine->span());
+        return mdspan_traits::make_transpose(mp_engine->span());
     }
 
     //- Modifiers
@@ -584,12 +618,12 @@ requires
     detail::readable_matrix_engine<ET>
 class matrix_view_engine<ET, matrix_view::const_transpose>
 {
-    using this_type      = matrix_view_engine;
-    using engine_pointer = ET const*;
-    using support_traits = detail::matrix_engine_support;
-    using mdspan_traits  = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET const*;
+    using support_traits      = detail::matrix_engine_support;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
 
-    static constexpr bool   has_mdspan = mdspan_traits::has_mdspan;
+    static constexpr bool   has_mdspan = const_mdspan_traits::has_mdspan;
 
   public:
     using engine_type        = ET;
@@ -598,8 +632,8 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
     using index_type         = typename engine_type::index_type;
-    using span_type          = typename mdspan_traits::transpose_mdspan_type;
-    using const_span_type    = span_type;
+    using span_type          = typename const_mdspan_traits::transpose_mdspan_type;
+    using const_span_type    = typename const_mdspan_traits::transpose_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -686,7 +720,7 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
     requires
         this_type::has_mdspan
     {
-        return mdspan_traits::make_transpose_mdspan(mp_engine->span());
+        return const_mdspan_traits::make_transpose(mp_engine->span());
     }
 
     //- Modifiers
@@ -707,8 +741,13 @@ requires
     detail::writable_matrix_engine<ET>
 class matrix_view_engine<ET, matrix_view::column>
 {
-    using support_traits   = detail::matrix_engine_support;
-    using engine_pointer = ET*;
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET*;
+    using support_traits      = detail::matrix_engine_support;
+    using mdspan_traits       = detail::mve_mdspan_traits<detail::get_mdspan_type_t<ET>>;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
+
+    static constexpr bool   has_mdspan = mdspan_traits::has_mdspan;
 
   public:
     using engine_type        = ET;
@@ -717,8 +756,8 @@ class matrix_view_engine<ET, matrix_view::column>
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
     using index_type         = typename engine_type::index_type;
-    using span_type          = detail::get_mdspan_type_t<ET>;
-    using const_span_type    = detail::get_const_mdspan_type_t<ET>;
+    using span_type          = typename mdspan_traits::submatrix_mdspan_type;
+    using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -800,6 +839,16 @@ class matrix_view_engine<ET, matrix_view::column>
         return (*mp_engine)(i, m_column);
     }
 
+    constexpr span_type
+    span() const noexcept
+    requires
+        this_type::has_mdspan
+    {
+        return mdspan_traits::make_submatrix(mp_engine->span(),
+                                                    0, mp_engine->rows(),
+                                                    m_column, 1);
+    }
+
     //- Modifiers
     //
     constexpr void
@@ -819,8 +868,12 @@ requires
     detail::readable_matrix_engine<ET>
 class matrix_view_engine<ET, matrix_view::const_column>
 {
-    using support_traits   = detail::matrix_engine_support;
-    using engine_pointer = ET const*;
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET const*;
+    using support_traits      = detail::matrix_engine_support;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
+
+    static constexpr bool   has_mdspan = const_mdspan_traits::has_mdspan;
 
   public:
     using engine_type        = ET;
@@ -829,8 +882,8 @@ class matrix_view_engine<ET, matrix_view::const_column>
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
     using index_type         = typename engine_type::index_type;
-    using span_type          = detail::get_mdspan_type_t<ET>;
-    using const_span_type    = detail::get_const_mdspan_type_t<ET>;
+    using span_type          = typename const_mdspan_traits::submatrix_mdspan_type;
+    using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -912,6 +965,16 @@ class matrix_view_engine<ET, matrix_view::const_column>
         return (*mp_engine)(i, m_column);
     }
 
+    constexpr span_type
+    span() const noexcept
+    requires
+        this_type::has_mdspan
+    {
+        return const_mdspan_traits::make_submatrix(mp_engine->span(),
+                                                          0, mp_engine->rows(),
+                                                          m_column, 1);
+    }
+
     //- Modifiers
     //
     constexpr void
@@ -931,8 +994,13 @@ requires
     detail::writable_matrix_engine<ET>
 class matrix_view_engine<ET, matrix_view::row>
 {
-    using support_traits   = detail::matrix_engine_support;
-    using engine_pointer = ET*;
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET*;
+    using support_traits      = detail::matrix_engine_support;
+    using mdspan_traits       = detail::mve_mdspan_traits<detail::get_mdspan_type_t<ET>>;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
+
+    static constexpr bool   has_mdspan = mdspan_traits::has_mdspan;
 
   public:
     using engine_type        = ET;
@@ -941,8 +1009,8 @@ class matrix_view_engine<ET, matrix_view::row>
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
     using index_type         = typename engine_type::index_type;
-    using span_type          = detail::get_mdspan_type_t<ET>;
-    using const_span_type    = detail::get_const_mdspan_type_t<ET>;
+    using span_type          = typename mdspan_traits::submatrix_mdspan_type;
+    using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -1024,6 +1092,16 @@ class matrix_view_engine<ET, matrix_view::row>
         return (*mp_engine)(m_row, j);
     }
 
+    constexpr span_type
+    span() const noexcept
+    requires
+        this_type::has_mdspan
+    {
+        return mdspan_traits::make_submatrix(mp_engine->span(),
+                                                    m_row, 1,
+                                                    0, mp_engine->columns());
+    }
+
     //- Modifiers
     //
     constexpr void
@@ -1043,8 +1121,12 @@ requires
     detail::readable_matrix_engine<ET>
 class matrix_view_engine<ET, matrix_view::const_row>
 {
-    using support_traits   = detail::matrix_engine_support;
-    using engine_pointer = ET const*;
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET const*;
+    using support_traits      = detail::matrix_engine_support;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
+
+    static constexpr bool   has_mdspan = const_mdspan_traits::has_mdspan;
 
   public:
     using engine_type        = ET;
@@ -1053,8 +1135,8 @@ class matrix_view_engine<ET, matrix_view::const_row>
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
     using index_type         = typename engine_type::index_type;
-    using span_type          = detail::get_mdspan_type_t<ET>;
-    using const_span_type    = detail::get_const_mdspan_type_t<ET>;
+    using span_type          = typename const_mdspan_traits::submatrix_mdspan_type;
+    using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -1136,6 +1218,16 @@ class matrix_view_engine<ET, matrix_view::const_row>
         return (*mp_engine)(m_row, j);
     }
 
+    constexpr span_type
+    span() const noexcept
+    requires
+        this_type::has_mdspan
+    {
+        return const_mdspan_traits::make_submatrix(mp_engine->span(),
+                                                          m_row, 1,
+                                                          0, mp_engine->columns());
+    }
+
     //- Modifiers
     //
     constexpr void
@@ -1155,8 +1247,13 @@ requires
     detail::writable_matrix_engine<ET>
 class matrix_view_engine<ET, matrix_view::submatrix>
 {
-    using support_traits   = detail::matrix_engine_support;
-    using engine_pointer = ET*;
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET*;
+    using support_traits      = detail::matrix_engine_support;
+    using mdspan_traits       = detail::mve_mdspan_traits<detail::get_mdspan_type_t<ET>>;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
+
+    static constexpr bool   has_mdspan = mdspan_traits::has_mdspan;
 
   public:
     using engine_type        = ET;
@@ -1165,8 +1262,8 @@ class matrix_view_engine<ET, matrix_view::submatrix>
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
     using index_type         = typename engine_type::index_type;
-    using span_type          = detail::get_mdspan_type_t<ET>;
-    using const_span_type    = detail::get_const_mdspan_type_t<ET>;
+    using span_type          = typename mdspan_traits::submatrix_mdspan_type;
+    using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -1256,6 +1353,16 @@ class matrix_view_engine<ET, matrix_view::submatrix>
         return (*mp_engine)(i);
     }
 
+    constexpr span_type
+    span() const noexcept
+    requires
+        this_type::has_mdspan
+    {
+        return mdspan_traits::make_submatrix(mp_engine->span(),
+                                                    m_row_start, m_row_count,
+                                                    m_col_start, m_col_count);
+    }
+
     //- Modifiers
     //
     constexpr void
@@ -1278,8 +1385,12 @@ requires
     detail::readable_matrix_engine<ET>
 class matrix_view_engine<ET, matrix_view::const_submatrix>
 {
-    using support_traits   = detail::matrix_engine_support;
-    using engine_pointer = ET const*;
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET const*;
+    using support_traits      = detail::matrix_engine_support;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
+
+    static constexpr bool   has_mdspan = const_mdspan_traits::has_mdspan;
 
   public:
     using engine_type        = ET;
@@ -1288,8 +1399,8 @@ class matrix_view_engine<ET, matrix_view::const_submatrix>
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
     using index_type         = typename engine_type::index_type;
-    using span_type          = detail::get_mdspan_type_t<ET>;
-    using const_span_type    = detail::get_const_mdspan_type_t<ET>;
+    using span_type          = typename const_mdspan_traits::submatrix_mdspan_type;
+    using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -1377,6 +1488,16 @@ class matrix_view_engine<ET, matrix_view::const_submatrix>
         detail::readable_and_1d_indexable_matrix_engine<engine_type>
     {
         return (*mp_engine)(i);
+    }
+
+    constexpr span_type
+    span() const noexcept
+    requires
+        this_type::has_mdspan
+    {
+        return const_mdspan_traits::make_submatrix(mp_engine->span(),
+                                                          m_row_start, m_row_count,
+                                                          m_col_start, m_col_count);
     }
 
     //- Modifiers
