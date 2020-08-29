@@ -37,9 +37,6 @@ target_sources(la_test
         test_new_arithmetic.hpp
         test_new_engine.hpp
         test_new_number.hpp
-#        test_dynamic_engines.cpp
-#        test_fixed_size_engines.cpp
-#        test_matrix_view_engines.cpp
         test_mse_00.cpp
         test_mse_01.cpp
         test_mse_2A.cpp
@@ -53,14 +50,11 @@ target_sources(la_test
         test_mse_4C.cpp
         test_mse_4D.cpp
         test_mse_4E.cpp
-#        test_vector_view_engines.cpp
-#        test_obj_matrix.cpp
+        test_mve_00.cpp
         test_op_add_traits.cpp
 #        test_op_div_traits.cpp
 #        test_op_mul_traits.cpp
 #        test_op_sub_traits.cpp
- #       test_01.cpp
- #       test_02.cpp
         test_main.cpp
 )
 
