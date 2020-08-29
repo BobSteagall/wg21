@@ -28,6 +28,9 @@
     #endif
 
 #elif defined _MSC_VER
+    #if (_MSC_VER < 1925)
+        #error unsupported version of VC++
+    #endif
     #define LA_COMPILER_MS
     #if (_MSC_VER >= 1925)
         #define LA_STD_CONCEPTS_HEADER_SUPPORTED
@@ -47,7 +50,6 @@
 //#define USING_STD   using namespace std::experimental;
 
 #include <cstdint>
-
 #include <array>
 #include <complex>
 #include <deque>
