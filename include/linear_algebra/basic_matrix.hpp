@@ -201,8 +201,6 @@ class basic_matrix
         and
         detail::random_access_standard_container<CT>
         and
-        detail::convertible_from<typename ET::element_type, typename CT::value_type>
-        and
         detail::constructible_from<engine_type, CT>
     :   m_engine(rhs)
     {}
@@ -215,9 +213,9 @@ class basic_matrix
         and
         detail::random_access_standard_container<CT>
         and
-        detail::convertible_from<typename ET::element_type, typename CT::value_type>
-        and
         detail::not_constructible_from<engine_type, CT>
+        and
+        detail::convertible_from<typename ET::element_type, typename CT::value_type>
     :   m_engine()
     {
         engine_support::assign_from(m_engine, rhs);

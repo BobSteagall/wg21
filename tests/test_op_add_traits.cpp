@@ -327,7 +327,7 @@ TEST(AddTraits, EnginePromotion)
     ASSERT_A_ADD_B_EQ_C(dyn_new_num,  dyn_new_num,  dyn_new_num);
 }
 
-TEST(AddTraits, Views)
+TEST(AddTraits, MatViews)
 {
     using fxd_float   = fixed_size_matrix<float, 2, 3>;
     using gen_float   = general_matrix<float, 2, 3>;
@@ -429,6 +429,42 @@ TEST(AddTraits, Views)
     PRINT(m1);
     PRINT(m1.column(0).t().span());
     PRINT_TYPE(decltype(m1.column(0).t().span()));
+}
+
+TEST(AddTraits, VecViews)
+{
+    using fxd_float   = fixed_size_vector<float, 3>;
+    using gen_float   = general_vector<float, 3>;
+    using dyn_float   = dynamic_vector<float>;
+
+    fxd_float   v1  = { 1, 2, 3};
+
+    PRINT_TYPE(decltype(v1));
+    PRINT(v1);
+    PRINT_TYPE(decltype(-v1));
+    PRINT(-v1);
+
+    PRINT_TYPE(decltype(v1.span()));
+    PRINT(v1.span());
+    PRINT_TYPE(decltype((-v1).span()));
+    PRINT((-v1).span());
+
+    dyn_float   v2 = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    PRINT_TYPE(decltype(v2));
+    PRINT(v2);
+    PRINT_TYPE(decltype(v2.subvector(2, 5)));
+    PRINT(v2.subvector(2, 5));
+    PRINT_TYPE(decltype(v2.subvector(2, 5).span()));
+    PRINT(v2.subvector(2, 5).span());
+    PRINT_TYPE(decltype((-v2).subvector(2, 5)));
+    PRINT((-v2).subvector(2, 5));
+    PRINT_TYPE(decltype((-v2).subvector(2, 5).span()));
+    PRINT((-v2).subvector(2, 5).span());
+    PRINT_TYPE(decltype((-v2.subvector(2, 5))));
+    PRINT((-v2.subvector(2, 5)));
+    PRINT_TYPE(decltype((-v2.subvector(2, 5)).span()));
+    PRINT((-v2.subvector(2, 5)).span());
+
 }
 
 #if 0

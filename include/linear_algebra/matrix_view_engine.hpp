@@ -135,6 +135,40 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0>, L, A>>
 
     using negation_mdspan_type  = basic_mdspan<T, dyn_extents, dyn_layout, negation_accessor<T>>;
     using subvector_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
+
+    template<class EST>
+    static constexpr negation_mdspan_type
+    make_negation(EST const& s)
+    {
+        dyn_extents     ext(s.extent(0));
+        dyn_strides     str{s.stride(0)};
+        dyn_mapping     map(ext, str);
+
+        return negation_mdspan_type(s.data(), map, negation_accessor<T, A>());
+    }
+
+    template<class EST, class S1, class S2>
+    static constexpr subvector_mdspan_type
+    make_subvector(EST const& s, S1 start, S2 count)
+    {
+        using idx_t  = decltype(dynamic_extent);
+        using pair_t = std::pair<idx_t, idx_t>;
+
+        pair_t  elem_set(static_cast<idx_t>(start), static_cast<idx_t>(start + count));
+
+        if constexpr (std::is_same_v<EST, subvector_mdspan_type>)
+        {
+            return subspan(s, elem_set);
+        }
+        else
+        {
+            dyn_extents     ext(s.extent(0));
+            dyn_strides     str{s.stride(0)};
+            dyn_mapping     map(ext, str);
+
+            return subspan(subvector_mdspan_type(s.data(), map), elem_set);
+        }
+    }
 };
 
 //- These partial specializations are used when an engine is two-dimensional.
@@ -206,6 +240,7 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
             dyn_extents     ext(s.extent(0), s.extent(1));
             dyn_strides     str{s.stride(0), s.stride(1)};
             dyn_mapping     map(ext, str);
+
             return subspan(submatrix_mdspan_type(s.data(), map), row_set, col_set);
         }
     }
@@ -251,6 +286,291 @@ struct matrix_view
 //--------------------------------------------------------------------------------------------------
 //
 template<class ET, class MVT>    class matrix_view_engine;
+
+template<class ET>
+requires
+    detail::readable_1d_vector_engine<ET>
+class matrix_view_engine<ET, matrix_view::const_negation>
+{
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET const*;
+    using support_traits      = detail::vector_engine_support;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
+
+    static constexpr bool   has_mdspan = const_mdspan_traits::has_mdspan;
+
+  public:
+    using engine_type        = ET;
+    using owning_engine_type = detail::get_owning_engine_type_t<ET>;
+    using element_type       = typename engine_type::element_type;
+    using reference          = typename engine_type::element_type;
+    using const_reference    = typename engine_type::element_type;
+    using index_type         = typename engine_type::index_type;
+    using span_type          = typename const_mdspan_traits::negation_mdspan_type;
+    using const_span_type    = typename const_mdspan_traits::negation_mdspan_type;
+
+    //- Construct/copy/destroy
+    //
+    ~matrix_view_engine() noexcept = default;
+
+    constexpr matrix_view_engine() noexcept
+    :   mp_engine(nullptr)
+    {}
+    constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine(matrix_view_engine const&) = default;
+
+    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+
+    explicit constexpr
+    matrix_view_engine(engine_type const& eng)
+    :   mp_engine(&eng)
+    {}
+
+    //- Status
+    //
+    constexpr bool
+    is_valid() const noexcept
+    {
+        return mp_engine != nullptr;
+    }
+
+    //- Size and capacity reporting.
+    //
+    constexpr index_type
+    size() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    constexpr index_type
+    capacity() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    //- Element access
+    //
+    constexpr reference
+    operator ()(index_type i) const
+    {
+        return -((*mp_engine)(i));
+    }
+
+    constexpr span_type
+    span() const noexcept
+    requires
+        this_type::has_mdspan
+    {
+        return const_mdspan_traits::make_negation(mp_engine->span());
+    }
+
+    //- Modifiers
+    //
+    constexpr void
+    swap(matrix_view_engine& rhs) noexcept
+    {
+        support_traits::swap(mp_engine, rhs.mp_engine);
+    }
+
+  private:
+    engine_type const*  mp_engine;
+};
+
+
+template<class ET>
+requires
+    detail::writable_1d_vector_engine<ET>
+class matrix_view_engine<ET, matrix_view::subvector>
+{
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET*;
+    using support_traits      = detail::matrix_engine_support;
+    using mdspan_traits       = detail::mve_mdspan_traits<detail::get_mdspan_type_t<ET>>;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
+
+    static constexpr bool   has_mdspan = mdspan_traits::has_mdspan;
+
+  public:
+    using engine_type        = ET;
+    using owning_engine_type = detail::get_owning_engine_type_t<ET>;
+    using element_type       = typename engine_type::element_type;
+    using reference          = typename engine_type::reference;
+    using const_reference    = typename engine_type::const_reference;
+    using index_type         = typename engine_type::index_type;
+    using span_type          = typename mdspan_traits::subvector_mdspan_type;
+    using const_span_type    = typename const_mdspan_traits::subvector_mdspan_type;
+
+    //- Construct/copy/destroy
+    //
+    ~matrix_view_engine() noexcept = default;
+
+    constexpr matrix_view_engine() noexcept
+    :   mp_engine(nullptr)
+    ,   m_start(0)
+    ,   m_count(0)
+    {}
+    constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine(matrix_view_engine const&) = default;
+
+    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+
+    explicit constexpr
+    matrix_view_engine(engine_type& eng, index_type start, index_type count) noexcept
+    :   mp_engine(&eng)
+    ,   m_start(start)
+    ,   m_count(count)
+    {}
+
+    //- Status
+    //
+    constexpr bool
+    is_valid() const noexcept
+    {
+        return mp_engine != nullptr;
+    }
+
+    //- Size and capacity reporting.
+    //
+    constexpr index_type
+    size() const noexcept
+    {
+        return m_count;
+    }
+
+    constexpr index_type
+    capacity() const noexcept
+    {
+        return m_count;
+    }
+
+    //- Element access
+    //
+    constexpr reference
+    operator ()(index_type i) const
+    {
+        return (*mp_engine)(i + m_start);
+    }
+
+    constexpr span_type
+    span() const noexcept
+    requires
+        this_type::has_mdspan
+    {
+        return mdspan_traits::make_subvector(mp_engine->span(), m_start, m_count);
+    }
+
+    //- Modifiers
+    //
+    constexpr void
+    swap(matrix_view_engine& rhs) noexcept
+    {
+        support_traits::swap(*this, rhs);
+    }
+
+  private:
+    engine_pointer  mp_engine;
+    index_type      m_start;
+    index_type      m_count;
+};
+
+
+template<class ET>
+requires
+    detail::readable_1d_vector_engine<ET>
+class matrix_view_engine<ET, matrix_view::const_subvector>
+{
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET const*;
+    using support_traits      = detail::matrix_engine_support;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
+
+    static constexpr bool   has_mdspan = const_mdspan_traits::has_mdspan;
+
+  public:
+    using engine_type        = ET;
+    using owning_engine_type = detail::get_owning_engine_type_t<ET>;
+    using element_type       = typename engine_type::element_type;
+    using reference          = typename engine_type::const_reference;
+    using const_reference    = typename engine_type::const_reference;
+    using index_type         = typename engine_type::index_type;
+    using span_type          = typename const_mdspan_traits::subvector_mdspan_type;
+    using const_span_type    = typename const_mdspan_traits::subvector_mdspan_type;
+
+    //- Construct/copy/destroy
+    //
+    ~matrix_view_engine() noexcept = default;
+
+    constexpr matrix_view_engine() noexcept
+    :   mp_engine(nullptr)
+    ,   m_start(0)
+    ,   m_count(0)
+    {}
+    constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine(matrix_view_engine const&) = default;
+
+    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+
+    explicit constexpr
+    matrix_view_engine(engine_type const& eng, index_type start, index_type count) noexcept
+    :   mp_engine(&eng)
+    ,   m_start(start)
+    ,   m_count(count)
+    {}
+
+    //- Status
+    //
+    constexpr bool
+    is_valid() const noexcept
+    {
+        return mp_engine != nullptr;
+    }
+
+    //- Size and capacity reporting.
+    //
+    constexpr index_type
+    size() const noexcept
+    {
+        return m_count;
+    }
+
+    constexpr index_type
+    capacity() const noexcept
+    {
+        return m_count;
+    }
+
+    //- Element access
+    //
+    constexpr const_reference
+    operator ()(index_type i) const
+    {
+        return (*mp_engine)(i + m_start);
+    }
+
+    constexpr span_type
+    span() const noexcept
+    requires
+        this_type::has_mdspan
+    {
+        return const_mdspan_traits::make_subvector(mp_engine->span(), m_start, m_count);
+    }
+
+    //- Modifiers
+    //
+    constexpr void
+    swap(matrix_view_engine& rhs) noexcept
+    {
+        support_traits::swap(*this, rhs);
+    }
+
+  private:
+    engine_pointer  mp_engine;
+    index_type      m_start;
+    index_type      m_count;
+};
 
 
 template<class ET>

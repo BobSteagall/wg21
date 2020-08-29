@@ -669,7 +669,7 @@ concept spannable_vector_engine =
         requires is_1d_mdspan_v<typename ET::span_type>;
         requires is_1d_mdspan_v<typename ET::const_span_type>;
         { meng.span() } -> same_as<typename ET::span_type>;
-        { ceng.span() } -> same_as<typename ET::const_span_type>;
+        { ceng.span() } -> same_as_either<typename ET::const_span_type, typename ET::span_type>;
     };
 
 
@@ -692,6 +692,16 @@ concept writable_vector_engine =
     {
         requires std::is_same_v<typename ET::reference, typename ET::element_type&>;
         { eng(i) } -> same_as<typename ET::reference>;
+    };
+
+template<class ET>
+concept writable_1d_vector_engine =
+    writable_vector_engine<ET>
+    and
+    not requires (ET const& ceng, ET& meng, typename ET::index_type i)
+    {
+        { ceng(i, i) };
+        { meng(i, i) };
     };
 
 

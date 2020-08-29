@@ -304,7 +304,7 @@ Print(basic_vector<ET, OT> const& v, char const* pname = nullptr)
         cout << right << setw(6) << setprecision(3) << (double) v(i);
     }
     cout << endl;
-
+/*
     auto    iter = cbegin(v);
     auto    last = cend(v);
 
@@ -315,6 +315,7 @@ Print(basic_vector<ET, OT> const& v, char const* pname = nullptr)
         cout << right << setw(6) << setprecision(3) << (double) *iter;
     }
     cout << endl;
+    */
 }
 
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>

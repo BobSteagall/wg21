@@ -30,19 +30,24 @@ requires
 class basic_vector
 {
     static constexpr bool   engine_has_mdspan = detail::spannable_vector_engine<ET>;
+    static constexpr bool   is_writable = detail::writable_vector_engine<ET>;
 
-    using engine_support = detail::vector_engine_support;
+    using engine_support              = detail::vector_engine_support;
+    using possibly_writable_subvector = conditional_t<is_writable, matrix_view::subvector, matrix_view::const_subvector>;
 
   public:
     using engine_type          = ET;
     using owning_engine_type   = detail::get_owning_engine_type_t<ET>;
     using element_type         = typename engine_type::element_type;
-    using value_type           = typename engine_type::value_type;
     using reference            = typename engine_type::reference;
     using const_reference      = typename engine_type::const_reference;
     using index_type           = typename engine_type::index_type;
     using span_type            = detail::get_mdspan_type_t<ET>;
     using const_span_type      = detail::get_const_mdspan_type_t<ET>;
+
+    using const_negation_type  = basic_vector<matrix_view_engine<engine_type, matrix_view::const_negation>, OT>;
+    using subvector_type       = basic_vector<matrix_view_engine<engine_type, possibly_writable_subvector>, OT>;
+    using const_subvector_type = basic_vector<matrix_view_engine<engine_type, matrix_view::const_subvector>, OT>;
 
   public:
     ~basic_vector() = default;
@@ -141,8 +146,6 @@ class basic_vector
         detail::random_access_standard_container<CT>
         and
         detail::constructible_from<engine_type, CT>
-        and
-        detail::convertible_from<typename ET::element_type, typename CT::value_type>
     :   m_engine(rhs)
     {}
 
@@ -290,8 +293,6 @@ class basic_vector
         detail::random_access_standard_container<CT>
         and
         detail::assignable_from<engine_type, decltype(rhs)>
-        and
-        detail::convertible_from<element_type, typename CT::value_type>
     {
         m_engine = rhs;
         return *this;
@@ -431,6 +432,24 @@ class basic_vector
         return m_engine(i);
     }
 
+    constexpr const_negation_type
+    operator -() const noexcept
+    {
+        return const_negation_type(detail::special_ctor_tag(), m_engine);
+    }
+
+    constexpr subvector_type
+    subvector(index_type start, index_type count) noexcept
+    {
+        return subvector_type(detail::special_ctor_tag(), m_engine, start, count);
+    }
+
+    constexpr const_subvector_type
+    subvector(index_type start, index_type count) const noexcept
+    {
+        return const_subvector_type(detail::special_ctor_tag(), m_engine, start, count);
+    }
+
     //----------------------------------------------------------
     //- Data access.
     //
@@ -509,10 +528,31 @@ class basic_vector
     friend class basic_vector;
 
     engine_type     m_engine;
+
+    template<class ET2, class... ARGS>
+    constexpr
+    basic_vector(detail::special_ctor_tag, ET2&& eng, ARGS&&... args)
+    :   m_engine(std::forward<ET2>(eng), std::forward<ARGS>(args)...)
+    {}
 };
 
 template<class T, class OT = matrix_operation_traits>
 using dyn_vec = basic_vector<matrix_storage_engine<T, extents<dynamic_extent>, std::allocator<T>, unoriented>, OT>;
+
+template<class T, ptrdiff_t N, class OT = matrix_operation_traits>
+using fixed_size_vector =
+        basic_vector<matrix_storage_engine<T, extents<N>, void, unoriented>, OT>;
+
+
+template<class T, ptrdiff_t N, class A = std::allocator<T>, class OT = matrix_operation_traits>
+using general_vector =
+        basic_vector<matrix_storage_engine<T, extents<N>, A, unoriented>, OT>;
+
+
+template<class T, class OT = matrix_operation_traits>
+using dynamic_vector =
+        basic_vector<matrix_storage_engine<T, extents<dynamic_extent>, std::allocator<T>, unoriented>, OT>;
+
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_BASIC_VECTOR_HPP_DEFINED
