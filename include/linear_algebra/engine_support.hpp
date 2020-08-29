@@ -602,9 +602,9 @@ template<class T, class ET>
 concept valid_engine_indexing_result =
     same_as<T, typename ET::const_reference>
     or
-    same_as<T, typename ET::element_type>
+    same_as<T, typename ET::reference>
     or
-    same_as<T, typename ET::reference>;
+    same_as<T, typename ET::element_type>;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -1084,7 +1084,7 @@ struct vector_engine_support : public common_engine_support
     static constexpr void
     assign_from(ET& dst, basic_mdspan<U, extents<X0>, SL, SA> const& src)
     requires
-        readable_vector_engine<ET>
+        writable_vector_engine<ET>
         and
         convertible_from<typename ET::element_type, U>
     {
