@@ -31,7 +31,6 @@
     <ClInclude Include="..\include\linear_algebra\multiplication_traits.hpp" />
     <ClInclude Include="..\include\linear_algebra\operation_traits.hpp" />
     <ClInclude Include="..\include\linear_algebra\subtraction_traits.hpp" />
-    <ClInclude Include="..\include\linear_algebra\traits_support.hpp" />
     <ClInclude Include="..\tests\test_common.hpp" />
     <ClInclude Include="..\tests\test_new_arithmetic.hpp" />
     <ClInclude Include="..\tests\test_new_engine.hpp" />
