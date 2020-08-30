@@ -129,55 +129,75 @@ struct matrix_operation_traits
 //  that operation's result type.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T1, class T2>    struct matrix_operation_traits_selector;
-
-template<class T1>
-struct matrix_operation_traits_selector<T1, T1>
-{
-    using traits_type = T1;
-};
-
-template<class T1>
-struct matrix_operation_traits_selector<T1, matrix_operation_traits>
-{
-    using traits_type = T1;
-};
-
-template<class T1>
-struct matrix_operation_traits_selector<matrix_operation_traits, T1>
-{
-    using traits_type = T1;
-};
-
-template<>
-struct matrix_operation_traits_selector<matrix_operation_traits, matrix_operation_traits>
-{
-    using traits_type = matrix_operation_traits;
-};
+template<class COT1, class COT2>    struct matrix_operation_traits_selector;
 
 template<>
 struct matrix_operation_traits_selector<void, void>
 {
-    using traits_type = matrix_operation_traits;
+    using traits_type = void;
 };
 
 template<>
 struct matrix_operation_traits_selector<void, matrix_operation_traits>
 {
-    using traits_type = matrix_operation_traits;
+    using traits_type = void;
 };
 
+template<class COT2>
+struct matrix_operation_traits_selector<void, COT2>
+{
+    using traits_type = COT2;
+};
+
+//------
+//
 template<>
 struct matrix_operation_traits_selector<matrix_operation_traits, void>
 {
-    using traits_type = matrix_operation_traits;
+    using traits_type = void;
 };
+
+template<>
+struct matrix_operation_traits_selector<matrix_operation_traits, matrix_operation_traits>
+{
+    using traits_type = void;
+};
+
+template<class COT2>
+struct matrix_operation_traits_selector<matrix_operation_traits, COT2>
+{
+    using traits_type = COT2;
+};
+
+//------
+//
+template<class COT1>
+struct matrix_operation_traits_selector<COT1, void>
+{
+    using traits_type = COT1;
+};
+
+
+template<class COT1>
+struct matrix_operation_traits_selector<COT1, matrix_operation_traits>
+{
+    using traits_type = COT1;
+};
+
+//------
+//
+template<class COT1>
+struct matrix_operation_traits_selector<COT1, COT1>
+{
+    using traits_type = COT1;
+};
+
 
 //- Alias template interface to trait.
 //
-template<class T1, class T2>
+template<class COT1, class COT2>
 using select_matrix_operation_traits_t =
-        typename matrix_operation_traits_selector<T1,T2>::traits_type;
+        typename matrix_operation_traits_selector<COT1,COT2>::traits_type;
 
 
 //==================================================================================================

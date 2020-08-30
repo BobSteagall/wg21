@@ -20,33 +20,33 @@
 namespace STD_LA {
 namespace detail {
 
-template<class OT, class T1, class T2>
+template<class OTR, class T1, class T2>
 struct addition_element_traits
 {
     using element_type = decltype(declval<T1>() + declval<T2>());
 };
 
 
-template<class OT>
-struct addition_layout_traits<OT, matrix_layout::row_major, matrix_layout::row_major>
+template<class OTR>
+struct addition_layout_traits<OTR, matrix_layout::row_major, matrix_layout::row_major>
 {
     using layout_type = matrix_layout::row_major;
 };
 
-template<class OT>
-struct addition_layout_traits<OT, matrix_layout::row_major, matrix_layout::column_major>
+template<class OTR>
+struct addition_layout_traits<OTR, matrix_layout::row_major, matrix_layout::column_major>
 {
     using layout_type = matrix_layout::row_major;
 };
 
-template<class OT>
-struct addition_layout_traits<OT, matrix_layout::column_major, matrix_layout::row_major>
+template<class OTR>
+struct addition_layout_traits<OTR, matrix_layout::column_major, matrix_layout::row_major>
 {
     using layout_type = matrix_layout::row_major;
 };
 
-template<class OT>
-struct addition_layout_traits<OT, matrix_layout::column_major, matrix_layout::column_major>
+template<class OTR>
+struct addition_layout_traits<OTR, matrix_layout::column_major, matrix_layout::column_major>
 {
     using layout_type = matrix_layout::column_major;
 };
@@ -55,13 +55,13 @@ struct addition_layout_traits<OT, matrix_layout::column_major, matrix_layout::co
 //- The standard engine addition traits type provides the default mechanism for determining the
 //  correct engine type for a matrix/matrix or vector/vector addition.
 //
-template<class OT, class ET1, class ET2>
+template<class OTR, class ET1, class ET2>
 struct addition_engine_traits
 {
   private:
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
-    using element_traits = get_addition_element_traits_t<OT, element_type_1, element_type_2>;
+    using element_traits = get_addition_element_traits_t<OTR, element_type_1, element_type_2>;
 
   public:
     using element_type = typename element_traits::element_type;
@@ -71,10 +71,10 @@ struct addition_engine_traits
 };
 
 
-template<class OT,
+template<class OTR,
          class T1, ptrdiff_t R1, ptrdiff_t C1, class AT1, class LT1,
          class T2, ptrdiff_t R2, ptrdiff_t C2, class AT2, class LT2>
-struct addition_engine_traits<OT,
+struct addition_engine_traits<OTR,
                               matrix_storage_engine<T1, extents<R1, C1>, AT1, LT1>,
                               matrix_storage_engine<T2, extents<R2, C2>, AT2, LT2>>
 {
@@ -94,9 +94,9 @@ struct addition_engine_traits<OT,
 
     //- Extract individual traits from the operation traits.
     //
-    using element_traits    = get_addition_element_traits_t<OT, T1, T2>;
-    using allocation_traits = get_addition_allocation_traits_t<OT, AT1, AT2, typename element_traits::element_type>;
-    using layout_traits     = get_addition_layout_traits_t<OT, LT1, LT2>;
+    using element_traits    = get_addition_element_traits_t<OTR, T1, T2>;
+    using allocation_traits = get_addition_allocation_traits_t<OTR, AT1, AT2, typename element_traits::element_type>;
+    using layout_traits     = get_addition_layout_traits_t<OTR, LT1, LT2>;
 
     //- Determine required engine template parameters from the traits types.
     //
@@ -115,30 +115,30 @@ public:
 //
 //- (vector + vector)
 //
-template<class OT, class ET1, class OT1, class ET2, class OT2>
-struct addition_arithmetic_traits<OT, basic_vector<ET1, OT1>, basic_vector<ET2, OT2>>
+template<class OTR, class ET1, class COT1, class ET2, class COT2>
+struct addition_arithmetic_traits<OTR, basic_vector<ET1, COT1>, basic_vector<ET2, COT2>>
 {
   private:
     using element_type_1  = typename ET1::element_type;
     using element_type_2  = typename ET2::element_type;
-    using element_traits  = get_addition_element_traits_t<OT, element_type_1, element_type_2>;
+    using element_traits  = get_addition_element_traits_t<OTR, element_type_1, element_type_2>;
 
-    using owning_engine_1 = typename basic_vector<ET1, OT1>::owning_engine_type;
-    using owning_engine_2 = typename basic_vector<ET2, OT2>::owning_engine_type;
-    using engine_traits   = get_addition_engine_traits_t<OT, owning_engine_1, owning_engine_2>;
+    using owning_engine_1 = typename basic_vector<ET1, COT1>::owning_engine_type;
+    using owning_engine_2 = typename basic_vector<ET2, COT2>::owning_engine_type;
+    using engine_traits   = get_addition_engine_traits_t<OTR, owning_engine_1, owning_engine_2>;
 
   public:
     using element_type = typename element_traits::element_type;
     using engine_type  = typename engine_traits::engine_type;
-    using result_type  = basic_vector<engine_type, OT>;
+    using result_type  = basic_vector<engine_type, OTR>;
 
     static_assert(std::is_same_v<element_type, typename engine_type::element_type>);
 
     static constexpr result_type
-    add(basic_vector<ET1, OT1> const& v1, basic_vector<ET2, OT2> const& v2)
+    add(basic_vector<ET1, COT1> const& v1, basic_vector<ET2, COT2> const& v2)
     {
-        using index_type_1 = typename vector<ET1, OT1>::index_type;
-        using index_type_2 = typename vector<ET2, OT2>::index_type;
+        using index_type_1 = typename vector<ET1, COT1>::index_type;
+        using index_type_2 = typename vector<ET2, COT2>::index_type;
         using index_type_r = typename result_type::index_type;
 
         index_type_r    elems = static_cast<index_type_r>(v1.size());
@@ -165,30 +165,30 @@ struct addition_arithmetic_traits<OT, basic_vector<ET1, OT1>, basic_vector<ET2, 
 //-------------------
 //- (matrix + matrix)
 //
-template<class OT, class ET1, class OT1, class ET2, class OT2>
-struct addition_arithmetic_traits<OT, basic_matrix<ET1, OT1>, basic_matrix<ET2, OT2>>
+template<class OTR, class ET1, class COT1, class ET2, class COT2>
+struct addition_arithmetic_traits<OTR, basic_matrix<ET1, COT1>, basic_matrix<ET2, COT2>>
 {
   private:
     using element_type_1  = typename ET1::element_type;
     using element_type_2  = typename ET2::element_type;
-    using element_traits  = get_addition_element_traits_t<OT, element_type_1, element_type_2>;
+    using element_traits  = get_addition_element_traits_t<OTR, element_type_1, element_type_2>;
 
-    using owning_engine_1 = typename basic_matrix<ET1, OT1>::owning_engine_type;
-    using owning_engine_2 = typename basic_matrix<ET2, OT2>::owning_engine_type;
-    using engine_traits   = get_addition_engine_traits_t<OT, owning_engine_1, owning_engine_2>;
+    using owning_engine_1 = typename basic_matrix<ET1, COT1>::owning_engine_type;
+    using owning_engine_2 = typename basic_matrix<ET2, COT2>::owning_engine_type;
+    using engine_traits   = get_addition_engine_traits_t<OTR, owning_engine_1, owning_engine_2>;
 
   public:
     using element_type = typename element_traits::element_type;
     using engine_type  = typename engine_traits::engine_type;
-    using result_type  = basic_matrix<engine_type, OT>;
+    using result_type  = basic_matrix<engine_type, OTR>;
 
     static_assert(std::is_same_v<element_type, typename engine_type::element_type>);
 
     static constexpr result_type
-    add(basic_matrix<ET1, OT1> const& m1, basic_matrix<ET2, OT2> const& m2)
+    add(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
     {
-        using index_type_1 = typename basic_matrix<ET1, OT1>::index_type;
-        using index_type_2 = typename basic_matrix<ET2, OT2>::index_type;
+        using index_type_1 = typename basic_matrix<ET1, COT1>::index_type;
+        using index_type_2 = typename basic_matrix<ET2, COT2>::index_type;
         using index_type_r = typename result_type::index_type;
 
         index_type_r    rows = static_cast<index_type_r>(m1.rows());

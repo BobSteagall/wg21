@@ -10,7 +10,7 @@
 
 namespace STD_LA {
 
-template<class ET, class OT>
+template<class ET, class COT>
 requires
     detail::copyable<ET>
     and
@@ -20,7 +20,7 @@ requires
 class basic_matrix;
 
 
-template<class ET, class OT>
+template<class ET, class COT>
 requires
     detail::copyable<ET>
     and
@@ -45,9 +45,9 @@ class basic_vector
     using span_type            = detail::get_mdspan_type_t<ET>;
     using const_span_type      = detail::get_const_mdspan_type_t<ET>;
 
-    using const_negation_type  = basic_vector<matrix_view_engine<engine_type, matrix_view::const_negation>, OT>;
-    using subvector_type       = basic_vector<matrix_view_engine<engine_type, possibly_writable_subvector>, OT>;
-    using const_subvector_type = basic_vector<matrix_view_engine<engine_type, matrix_view::const_subvector>, OT>;
+    using const_negation_type  = basic_vector<matrix_view_engine<engine_type, matrix_view::const_negation>, COT>;
+    using subvector_type       = basic_vector<matrix_view_engine<engine_type, possibly_writable_subvector>, COT>;
+    using const_subvector_type = basic_vector<matrix_view_engine<engine_type, matrix_view::const_subvector>, COT>;
 
   public:
     ~basic_vector() = default;
@@ -79,9 +79,9 @@ class basic_vector
     //----------------------------------------------------------
     //- Construction from a vector of different engine type.
     //
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr explicit
-    basic_vector(basic_vector<ET2, OT2> const& rhs)
+    basic_vector(basic_vector<ET2, COT2> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
@@ -89,9 +89,9 @@ class basic_vector
     :   m_engine(rhs)
     {}
 
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr explicit
-    basic_vector(basic_vector<ET2, OT2> const& rhs)
+    basic_vector(basic_vector<ET2, COT2> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
@@ -106,9 +106,9 @@ class basic_vector
     //----------------------------------------------------------
     //- Construction from a row/column basic_matrix.
     //
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr explicit
-    basic_vector(basic_matrix<ET2, OT2> const& rhs)
+    basic_vector(basic_matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
@@ -118,9 +118,9 @@ class basic_vector
     :   m_engine(rhs.engine())
     {}
 
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr explicit
-    basic_vector(basic_matrix<ET2, OT2> const& rhs)
+    basic_vector(basic_matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
@@ -222,9 +222,9 @@ class basic_vector
     //----------------------------------------------------------
     //- Assignment from a vector of different engine type.
     //
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr basic_vector&
-    operator =(basic_vector<ET2, OT2> const& rhs)
+    operator =(basic_vector<ET2, COT2> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
@@ -234,9 +234,9 @@ class basic_vector
         return *this;
     }
 
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr basic_vector&
-    operator =(basic_vector<ET2, OT2> const& rhs)
+    operator =(basic_vector<ET2, COT2> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
@@ -251,9 +251,9 @@ class basic_vector
     //----------------------------------------------------------
     //- Assignment from a row/column basic_matrix.
     //
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr basic_vector&
-    operator =(basic_matrix<ET2, OT2> const& rhs)
+    operator =(basic_matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
@@ -265,9 +265,9 @@ class basic_vector
         return *this;
     }
 
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr basic_vector&
-    operator =(basic_matrix<ET2, OT2> const& rhs)
+    operator =(basic_matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
@@ -518,7 +518,7 @@ class basic_vector
     }
 
   private:
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     requires
         detail::copyable<ET2>
         and
@@ -536,22 +536,22 @@ class basic_vector
     {}
 };
 
-template<class T, class OT = matrix_operation_traits>
-using dyn_vec = basic_vector<matrix_storage_engine<T, extents<dynamic_extent>, std::allocator<T>, void>, OT>;
+template<class T, class COT = void>
+using dyn_vec = basic_vector<matrix_storage_engine<T, extents<dynamic_extent>, std::allocator<T>, void>, COT>;
 
-template<class T, ptrdiff_t N, class OT = matrix_operation_traits>
+template<class T, ptrdiff_t N, class COT = void>
 using fixed_size_vector =
-        basic_vector<matrix_storage_engine<T, extents<N>, void, void>, OT>;
+        basic_vector<matrix_storage_engine<T, extents<N>, void, void>, COT>;
 
 
-template<class T, ptrdiff_t N, class A = std::allocator<T>, class OT = matrix_operation_traits>
+template<class T, ptrdiff_t N, class A = std::allocator<T>, class COT = void>
 using general_vector =
-        basic_vector<matrix_storage_engine<T, extents<N>, A, void>, OT>;
+        basic_vector<matrix_storage_engine<T, extents<N>, A, void>, COT>;
 
 
-template<class T, class OT = matrix_operation_traits>
+template<class T, class COT = void>
 using dynamic_vector =
-        basic_vector<matrix_storage_engine<T, extents<dynamic_extent>, std::allocator<T>, void>, OT>;
+        basic_vector<matrix_storage_engine<T, extents<dynamic_extent>, std::allocator<T>, void>, COT>;
 
 
 }       //- STD_LA namespace

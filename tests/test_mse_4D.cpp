@@ -719,6 +719,7 @@ TEST(MSE_Matrix_4D, Span)
 }
 
 
+/*
 template<class T, ptrdiff_t R, ptrdiff_t C>
 using test_fs_matrix = STD_LA::basic_matrix<test_fs_matrix_engine<T, R, C>, STD_LA::matrix_operation_traits>;
 
@@ -814,3 +815,4 @@ TEST(BasicMatrix, Sanity)
     dyn_vec<float>  dv1(4);
 
 }
+*/

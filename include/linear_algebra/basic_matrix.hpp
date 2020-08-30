@@ -10,7 +10,7 @@
 
 namespace STD_LA {
 
-template<class ET, class OT>
+template<class ET, class COT>
 requires
     detail::copyable<ET>
     and
@@ -44,16 +44,16 @@ class basic_matrix
 
     //- Type aliases pertaining to views.
     //
-    using const_negation_type  = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_negation>, OT>;
-    using const_hermitian_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_hermitian>, OT>;
-    using transpose_type       = basic_matrix<matrix_view_engine<engine_type, possibly_writable_transpose>, OT>;
-    using const_transpose_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_transpose>, OT>;
-    using column_type          = basic_matrix<matrix_view_engine<engine_type, possibly_writable_column>, OT>;
-    using const_column_type    = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_column>, OT>;
-    using row_type             = basic_matrix<matrix_view_engine<engine_type, possibly_writable_row>, OT>;
-    using const_row_type       = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_row>, OT>;
-    using submatrix_type       = basic_matrix<matrix_view_engine<engine_type, possibly_writable_submatrix>, OT>;
-    using const_submatrix_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_submatrix>, OT>;
+    using const_negation_type  = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_negation>, COT>;
+    using const_hermitian_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_hermitian>, COT>;
+    using transpose_type       = basic_matrix<matrix_view_engine<engine_type, possibly_writable_transpose>, COT>;
+    using const_transpose_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_transpose>, COT>;
+    using column_type          = basic_matrix<matrix_view_engine<engine_type, possibly_writable_column>, COT>;
+    using const_column_type    = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_column>, COT>;
+    using row_type             = basic_matrix<matrix_view_engine<engine_type, possibly_writable_row>, COT>;
+    using const_row_type       = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_row>, COT>;
+    using submatrix_type       = basic_matrix<matrix_view_engine<engine_type, possibly_writable_submatrix>, COT>;
+    using const_submatrix_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_submatrix>, COT>;
 
   public:
     ~basic_matrix() = default;
@@ -85,9 +85,9 @@ class basic_matrix
     //----------------------------------------------------------
     //- Construction from a matrix of different engine type.
     //
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr explicit
-    basic_matrix(basic_matrix<ET2, OT2> const& rhs)
+    basic_matrix(basic_matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -95,9 +95,9 @@ class basic_matrix
     :   m_engine(rhs.engine())
     {}
 
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr explicit
-    basic_matrix(basic_matrix<ET2, OT2> const& rhs)
+    basic_matrix(basic_matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -166,9 +166,9 @@ class basic_matrix
     //----------------------------------------------------------
     //- Construction from a basic_vector.
     //
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr explicit
-    basic_matrix(basic_vector<ET2, OT2> const& rhs)
+    basic_matrix(basic_vector<ET2, COT2> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -176,9 +176,9 @@ class basic_matrix
     :   m_engine(rhs.engine())
     {}
 
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr explicit
-    basic_matrix(basic_vector<ET2, OT2> const& rhs)
+    basic_matrix(basic_vector<ET2, COT2> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -278,9 +278,9 @@ class basic_matrix
     //----------------------------------------------------------
     //- Assignment from a different matrix engine type.
     //
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr basic_matrix&
-    operator =(basic_matrix<ET2, OT2> const& rhs)
+    operator =(basic_matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -290,9 +290,9 @@ class basic_matrix
         return *this;
     }
 
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr basic_matrix&
-    operator =(basic_matrix<ET2, OT2> const& rhs)
+    operator =(basic_matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -365,9 +365,9 @@ class basic_matrix
     //----------------------------------------------------------
     //- Assignment from a basic_vector.
     //
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr basic_matrix&
-    operator =(basic_vector<ET2, OT2> const& rhs)
+    operator =(basic_vector<ET2, COT2> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -377,9 +377,9 @@ class basic_matrix
         return *this;
     }
 
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     constexpr basic_matrix&
-    operator =(basic_vector<ET2, OT2> const& rhs)
+    operator =(basic_vector<ET2, COT2> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<ET>
         and
@@ -768,7 +768,7 @@ class basic_matrix
     }
 
   private:
-    template<class ET2, class OT2>
+    template<class ET2, class COT2>
     requires
         detail::copyable<ET2>
         and
@@ -787,56 +787,43 @@ class basic_matrix
 };
 
 
-template<class T, ptrdiff_t R, ptrdiff_t C, class OT = matrix_operation_traits>
-using fs_dyn_matrix = basic_matrix<matrix_storage_engine<T, extents<R, C>, std::allocator<T>, matrix_layout::row_major>, OT>;
-
-template<class T, class OT = matrix_operation_traits>
-using dr_matrix = basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, OT>;
-
-template<class T, class OT = matrix_operation_traits>
-using dyn_row_vector = basic_matrix<matrix_storage_engine<T, extents<1, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, OT>;
-
-template<class T, class OT = matrix_operation_traits>
-using dyn_col_vector = basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, 1>, std::allocator<T>, matrix_layout::column_major>, OT>;
-
-
-template<class T, ptrdiff_t R, ptrdiff_t C, class OT = matrix_operation_traits>
+template<class T, ptrdiff_t R, ptrdiff_t C, class COT = void>
 using fixed_size_matrix =
-        basic_matrix<matrix_storage_engine<T, extents<R, C>, void, matrix_layout::row_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<R, C>, void, matrix_layout::row_major>, COT>;
 
-template<class T, ptrdiff_t R, class OT = matrix_operation_traits>
+template<class T, ptrdiff_t R, class COT = void>
 using fixed_size_column_vector =
-        basic_matrix<matrix_storage_engine<T, extents<R, 1>, void, matrix_layout::column_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<R, 1>, void, matrix_layout::column_major>, COT>;
 
-template<class T, ptrdiff_t C, class OT = matrix_operation_traits>
+template<class T, ptrdiff_t C, class COT = void>
 using fixed_size_row_vector =
-        basic_matrix<matrix_storage_engine<T, extents<1, C>, void, matrix_layout::row_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<1, C>, void, matrix_layout::row_major>, COT>;
 
 
-template<class T, ptrdiff_t R, ptrdiff_t C, class A = std::allocator<T>, class OT = matrix_operation_traits>
+template<class T, ptrdiff_t R, ptrdiff_t C, class A = std::allocator<T>, class COT = void>
 using general_matrix =
-        basic_matrix<matrix_storage_engine<T, extents<R, C>, A, matrix_layout::row_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<R, C>, A, matrix_layout::row_major>, COT>;
 
-template<class T, ptrdiff_t R, class A = std::allocator<T>, class OT = matrix_operation_traits>
+template<class T, ptrdiff_t R, class A = std::allocator<T>, class COT = void>
 using general_column_vector =
-        basic_matrix<matrix_storage_engine<T, extents<R, 1>, A, matrix_layout::column_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<R, 1>, A, matrix_layout::column_major>, COT>;
 
-template<class T, ptrdiff_t C, class A = std::allocator<T>, class OT = matrix_operation_traits>
+template<class T, ptrdiff_t C, class A = std::allocator<T>, class COT = void>
 using general_row_vector =
-        basic_matrix<matrix_storage_engine<T, extents<1, C>, A, matrix_layout::row_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<1, C>, A, matrix_layout::row_major>, COT>;
 
 
-template<class T, class OT = matrix_operation_traits>
+template<class T, class COT = void>
 using dynamic_matrix =
-        basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, COT>;
 
-template<class T, class OT = matrix_operation_traits>
+template<class T, class COT = void>
 using dynamic_column_vector =
-        basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, 1>, std::allocator<T>, matrix_layout::column_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, 1>, std::allocator<T>, matrix_layout::column_major>, COT>;
 
-template<class T, class OT = matrix_operation_traits>
+template<class T, class COT = void>
 using dynamic_row_vector =
-        basic_matrix<matrix_storage_engine<T, extents<1, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<1, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, COT>;
 
 
 }       //- STD_LA namespace
