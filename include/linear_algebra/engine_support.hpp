@@ -10,11 +10,14 @@
 #define LINEAR_ALGEBRA_ENGINE_SUPPORT_HPP_DEFINED
 
 namespace STD_LA {
+//==================================================================================================
+//  PUBLIC TAG TYPES
+//==================================================================================================
 //--------------------------------------------------------------------------------------------------
 //  Class:      matrix_layout
 //
-//  This public type is a container of tag sub-types whose purpose is to specify the functionality
-//  of a matrix or vector view when used as a template argument to matrix_view_engine<ET, MVT>
+//  This public type is a container of tag sub-types whose purpose is to specify the layout
+//  of matrix elements when used as a template argument to matrix_storage_engine<T, X, A, L>.
 //--------------------------------------------------------------------------------------------------
 //
 struct matrix_layout
@@ -54,6 +57,9 @@ struct matrix_view
 };
 
 
+//==================================================================================================
+//  PUBLIC TYPE FORWARD DECLARATIONS
+//==================================================================================================
 //--------------------------------------------------------------------------------------------------
 //  Class Template:     matrix_storage_engine<T, X, A, L>
 //
