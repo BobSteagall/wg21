@@ -10,21 +10,18 @@
 #define LINEAR_ALGEBRA_ENGINE_SUPPORT_HPP_DEFINED
 
 namespace STD_LA {
-
-struct unoriented {};
-struct row_major {};
-struct column_major {};
-
 //--------------------------------------------------------------------------------------------------
-//  Class Template:     matrix_storage_engine<T, X, A, L>
+//  Class:      matrix_layout
 //
-//  This class template implements an owning engine for use by the math object class templates
-//  basic_matrix<ET, OT> and basic_vector<ET, OT>.  Specifically, it provides storage suitable
-//  for modeling a mathematical matrix or vector, having dimensions specified by X, employing
-//  allocator A, and having element layout L.
+//  This public type is a container of tag sub-types whose purpose is to specify the functionality
+//  of a matrix or vector view when used as a template argument to matrix_view_engine<ET, MVT>
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, class X, class A, class L>    class matrix_storage_engine;
+struct matrix_layout
+{
+    struct row_major {};
+    struct column_major {};
+};
 
 
 //--------------------------------------------------------------------------------------------------
@@ -55,6 +52,18 @@ struct matrix_view
     struct row {};
     struct const_row {};
 };
+
+
+//--------------------------------------------------------------------------------------------------
+//  Class Template:     matrix_storage_engine<T, X, A, L>
+//
+//  This class template implements an owning engine for use by the math object class templates
+//  basic_matrix<ET, OT> and basic_vector<ET, OT>.  Specifically, it provides storage suitable
+//  for modeling a mathematical matrix or vector, having dimensions specified by X, employing
+//  allocator A, and having element layout L.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T, class X, class A, class L>    class matrix_storage_engine;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -95,6 +104,8 @@ struct has_size_type_alias<T, std::void_t<typename T::size_type>>
     using size_type = typename T::size_type;
 };
 
+//------
+//
 template<class T>
 using get_size_type_t = typename has_size_type_alias<T>::size_type;
 
@@ -115,6 +126,8 @@ template<template<class...> class PT, class... ARGS>
 struct is_specialization_of<PT<ARGS...>, PT> : public std::true_type
 {};
 
+//------
+//
 template<class T, template<class...> class PT> inline constexpr
 bool    is_specialization_of_v = is_specialization_of<T, PT>::value;
 
@@ -146,6 +159,8 @@ template<class T, class A>
 struct is_random_access_standard_container<std::vector<T, A>> : public true_type
 {};
 
+//------
+//
 template<class T> inline constexpr
 bool    is_random_access_standard_container_v = is_random_access_standard_container<T>::value;
 
@@ -169,6 +184,8 @@ template<class T, ptrdiff_t X0, class SL, class SA>
 struct is_1d_mdspan<basic_mdspan<T, extents<X0>, SL, SA>> : public true_type
 {};
 
+//------
+//
 template<class T> inline constexpr
 bool    is_1d_mdspan_v = is_1d_mdspan<T>::value;
 
@@ -189,6 +206,8 @@ template<class T, ptrdiff_t X0, ptrdiff_t X1, class SL, class SA>
 struct is_2d_mdspan<basic_mdspan<T, extents<X0, X1>, SL, SA>> : public true_type
 {};
 
+//------
+//
 template<class T> inline constexpr
 bool    is_2d_mdspan_v = is_2d_mdspan<T>::value;
 
@@ -204,23 +223,25 @@ bool    is_2d_mdspan_v = is_2d_mdspan<T>::value;
 template<class L>   struct mdspan_layout_mapper;
 
 template<>
-struct mdspan_layout_mapper<row_major>
+struct mdspan_layout_mapper<matrix_layout::row_major>
 {
     using layout_type = MDSPAN_NS::layout_right;
 };
 
 template<>
-struct mdspan_layout_mapper<column_major>
+struct mdspan_layout_mapper<matrix_layout::column_major>
 {
     using layout_type = MDSPAN_NS::layout_left;
 };
 
 template<>
-struct mdspan_layout_mapper<unoriented>
+struct mdspan_layout_mapper<void>
 {
     using layout_type = MDSPAN_NS::layout_right;
 };
 
+//------
+//
 template<class L>
 using get_mdspan_layout_t = typename mdspan_layout_mapper<L>::layout_type;
 
@@ -259,7 +280,7 @@ using dyn_vec_mapping = typename dyn_mat_layout::template mapping<dyn_vec_extent
 //
 //  This private traits type is used to validate an engine's extents template argument.  The
 //  extents parameter must be one- or two-dimensional, and each dimension's template argument
-//  must be greater than zero or equal to dynamic_extent.
+//  must have a value greater than zero or equal to dynamic_extent.
 //--------------------------------------------------------------------------------------------------
 //
 template<class X>
@@ -277,6 +298,8 @@ struct is_valid_engine_extents<extents<R, C>>
     static constexpr bool   value = (R == dynamic_extent || R > 0) && (C == dynamic_extent || C > 0);
 };
 
+//------
+//
 template<class T> inline constexpr
 bool    is_valid_engine_extents_v = is_valid_engine_extents<T>::value;
 
@@ -287,7 +310,7 @@ bool    is_valid_engine_extents_v = is_valid_engine_extents<T>::value;
 //
 //  This private traits type is used to validate an engine's extents template argument.  The
 //  extents parameter must be one- or two-dimensional, and each dimension's template argument
-//  must be greater than zero.
+//  must have a value greater than zero.
 //--------------------------------------------------------------------------------------------------
 //
 template<class X>
@@ -305,6 +328,8 @@ struct is_valid_fixed_engine_extents<extents<R, C>>
     static constexpr bool   value = (R > 0) && (C > 0);
 };
 
+//------
+//
 template<class X> inline constexpr
 bool    is_valid_fixed_engine_extents_v = is_valid_fixed_engine_extents<X>::value;
 
@@ -341,6 +366,8 @@ struct has_owning_engine_type_alias<ET, void_t<typename ET::owning_engine_type>>
     using owning_engine_type = typename ET::owning_engine_type;
 };
 
+//------
+//
 template<class ET>
 using get_owning_engine_type_t = typename has_owning_engine_type_alias<ET>::owning_engine_type;
 
@@ -372,6 +399,8 @@ struct has_nested_mdspan_types<ET, void_t<typename ET::span_type, typename ET::c
     using const_span_type = typename ET::const_span_type;
 };
 
+//------
+//
 template<class ET>
 using get_mdspan_type_t = typename has_nested_mdspan_types<ET>::span_type;
 
@@ -379,14 +408,9 @@ template<class ET>
 using get_const_mdspan_type_t = typename has_nested_mdspan_types<ET>::const_span_type;
 
 
-template<class ET, class = void>
-struct has_row_major_value : std::false_type
-{};
-
-
 //--------------------------------------------------------------------------------------------------
 //  Traits:     get_row_major_value_helper<bool, ET>
-//              get_indexing_order<ET>
+//              determine_indexing_order<ET>
 //  Variable:   use_row_wise_indexing_v<ET>
 //
 //  These private traits types and the associated variable template are used to help determine
@@ -411,26 +435,26 @@ struct get_row_major_value_helper<true, ET>
 //------
 //
 template<class ET, class = void>
-struct get_indexing_order
+struct determine_indexing_order
 {
     static constexpr bool   use_row_wise = true;
 };
 
 template<class ET>
-struct get_indexing_order<ET, std::void_t<decltype(ET::is_row_major)>>
+struct determine_indexing_order<ET, std::void_t<decltype(ET::is_row_major)>>
 {
     static constexpr bool   is_suitable  = std::is_convertible_v<decltype(ET::is_row_major), bool>;
     static constexpr bool   use_row_wise = get_row_major_value_helper<is_suitable, ET>::is_row_major;
 };
 
 template<class T, ptrdiff_t R, ptrdiff_t C, class A>
-struct get_indexing_order<matrix_storage_engine<T, extents<R, C>, A, column_major>, void>
+struct determine_indexing_order<matrix_storage_engine<T, extents<R, C>, A, matrix_layout::column_major>, void>
 {
     static constexpr bool   use_row_wise = false;
 };
 
 template<class T, ptrdiff_t R, ptrdiff_t C, class A>
-struct get_indexing_order<matrix_storage_engine<T, extents<R, C>, A, row_major>, void>
+struct determine_indexing_order<matrix_storage_engine<T, extents<R, C>, A, matrix_layout::row_major>, void>
 {
     static constexpr bool   use_row_wise = true;
 };
@@ -438,7 +462,7 @@ struct get_indexing_order<matrix_storage_engine<T, extents<R, C>, A, row_major>,
 //------
 //
 template<class ET> inline constexpr
-bool    use_row_wise_indexing_v = get_indexing_order<ET>::use_row_wise;
+bool    use_row_wise_indexing_v = determine_indexing_order<ET>::use_row_wise;
 
 
 //==================================================================================================
@@ -680,10 +704,10 @@ concept valid_engine_extents_and_allocator =
 //
 template<typename L>
 concept valid_layout_for_2d_storage_engine =
-    (std::is_same_v<L, row_major> || std::is_same_v<L, column_major>);
+    (std::is_same_v<L, matrix_layout::row_major> || std::is_same_v<L, matrix_layout::column_major>);
 
 template<typename L>
-concept valid_layout_for_1d_storage_engine = std::is_same_v<L, unoriented>;
+concept valid_layout_for_1d_storage_engine = std::is_same_v<L, void>;
 
 
 //--------------------------------------------------------------------------------------------------

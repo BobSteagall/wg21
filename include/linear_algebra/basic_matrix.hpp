@@ -788,55 +788,55 @@ class basic_matrix
 
 
 template<class T, ptrdiff_t R, ptrdiff_t C, class OT = matrix_operation_traits>
-using fs_dyn_matrix = basic_matrix<matrix_storage_engine<T, extents<R, C>, std::allocator<T>, row_major>, OT>;
+using fs_dyn_matrix = basic_matrix<matrix_storage_engine<T, extents<R, C>, std::allocator<T>, matrix_layout::row_major>, OT>;
 
 template<class T, class OT = matrix_operation_traits>
-using dr_matrix = basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, std::allocator<T>, row_major>, OT>;
+using dr_matrix = basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, OT>;
 
 template<class T, class OT = matrix_operation_traits>
-using dyn_row_vector = basic_matrix<matrix_storage_engine<T, extents<1, dynamic_extent>, std::allocator<T>, row_major>, OT>;
+using dyn_row_vector = basic_matrix<matrix_storage_engine<T, extents<1, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, OT>;
 
 template<class T, class OT = matrix_operation_traits>
-using dyn_col_vector = basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, 1>, std::allocator<T>, column_major>, OT>;
+using dyn_col_vector = basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, 1>, std::allocator<T>, matrix_layout::column_major>, OT>;
 
 
 template<class T, ptrdiff_t R, ptrdiff_t C, class OT = matrix_operation_traits>
 using fixed_size_matrix =
-        basic_matrix<matrix_storage_engine<T, extents<R, C>, void, row_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<R, C>, void, matrix_layout::row_major>, OT>;
 
 template<class T, ptrdiff_t R, class OT = matrix_operation_traits>
 using fixed_size_column_vector =
-        basic_matrix<matrix_storage_engine<T, extents<R, 1>, void, column_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<R, 1>, void, matrix_layout::column_major>, OT>;
 
 template<class T, ptrdiff_t C, class OT = matrix_operation_traits>
 using fixed_size_row_vector =
-        basic_matrix<matrix_storage_engine<T, extents<1, C>, void, row_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<1, C>, void, matrix_layout::row_major>, OT>;
 
 
 template<class T, ptrdiff_t R, ptrdiff_t C, class A = std::allocator<T>, class OT = matrix_operation_traits>
 using general_matrix =
-        basic_matrix<matrix_storage_engine<T, extents<R, C>, A, row_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<R, C>, A, matrix_layout::row_major>, OT>;
 
 template<class T, ptrdiff_t R, class A = std::allocator<T>, class OT = matrix_operation_traits>
 using general_column_vector =
-        basic_matrix<matrix_storage_engine<T, extents<R, 1>, A, column_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<R, 1>, A, matrix_layout::column_major>, OT>;
 
 template<class T, ptrdiff_t C, class A = std::allocator<T>, class OT = matrix_operation_traits>
 using general_row_vector =
-        basic_matrix<matrix_storage_engine<T, extents<1, C>, A, row_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<1, C>, A, matrix_layout::row_major>, OT>;
 
 
 template<class T, class OT = matrix_operation_traits>
 using dynamic_matrix =
-        basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, std::allocator<T>, row_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, OT>;
 
 template<class T, class OT = matrix_operation_traits>
 using dynamic_column_vector =
-        basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, 1>, std::allocator<T>, column_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, 1>, std::allocator<T>, matrix_layout::column_major>, OT>;
 
 template<class T, class OT = matrix_operation_traits>
 using dynamic_row_vector =
-        basic_matrix<matrix_storage_engine<T, extents<1, dynamic_extent>, std::allocator<T>, row_major>, OT>;
+        basic_matrix<matrix_storage_engine<T, extents<1, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, OT>;
 
 
 }       //- STD_LA namespace

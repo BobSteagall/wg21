@@ -104,8 +104,8 @@ struct matrix_operation_traits
 
     //- Division
     //
-    template<class OT, class T1, class T2>
-    using division_element_traits    = detail::division_element_traits<OT, T1, T2>;
+    template<class OTR, class T1, class T2>
+    using division_element_traits    = detail::division_element_traits<OTR, T1, T2>;
 
     template<class OTR, class AT1, class AT2, class T>
     using division_allocation_traits = detail::allocation_traits<OTR, AT1, AT2, T>;
@@ -533,27 +533,27 @@ STD_LA_DEFINE_VALID_OP_TRAITS_DETECTORS(division);
 template<class OT, class LT1, class LT2>    struct multiplication_layout_traits;
 
 template<class OT>
-struct multiplication_layout_traits<OT, row_major, row_major>
+struct multiplication_layout_traits<OT, matrix_layout::row_major, matrix_layout::row_major>
 {
-    using layout_type = row_major;
+    using layout_type = matrix_layout::row_major;
 };
 
 template<class OT>
-struct multiplication_layout_traits<OT, row_major, column_major>
+struct multiplication_layout_traits<OT, matrix_layout::row_major, matrix_layout::column_major>
 {
-    using layout_type = column_major;
+    using layout_type = matrix_layout::column_major;
 };
 
 template<class OT>
-struct multiplication_layout_traits<OT, column_major, row_major>
+struct multiplication_layout_traits<OT, matrix_layout::column_major, matrix_layout::row_major>
 {
-    using layout_type = row_major;
+    using layout_type = matrix_layout::row_major;
 };
 
 template<class OT>
-struct multiplication_layout_traits<OT, column_major, column_major>
+struct multiplication_layout_traits<OT, matrix_layout::column_major, matrix_layout::column_major>
 {
-    using layout_type = column_major;
+    using layout_type = matrix_layout::column_major;
 };
 
 
@@ -591,23 +591,23 @@ struct allocation_traits<OT, std::allocator<U>, std::allocator<V>, T>
 //- Some useful alias templates used to support the various traits types.
 //
 template<class T, ptrdiff_t N>
-using fixed_vector_engine = matrix_storage_engine<T, extents<N>, void, unoriented>;
+using fixed_vector_engine = matrix_storage_engine<T, extents<N>, void, void>;
 
 template<class T, ptrdiff_t N>
-using sized_vector_engine = matrix_storage_engine<T, extents<N>, std::allocator<T>, unoriented>;
+using sized_vector_engine = matrix_storage_engine<T, extents<N>, std::allocator<T>, void>;
 
 template<class T>
 using dynamic_vector_engine =
-        matrix_storage_engine<T, extents<dynamic_extent>, std::allocator<T>, unoriented>;
+        matrix_storage_engine<T, extents<dynamic_extent>, std::allocator<T>, void>;
 
 
-template<class T, ptrdiff_t R, ptrdiff_t C, class LT = row_major>
+template<class T, ptrdiff_t R, ptrdiff_t C, class LT = matrix_layout::row_major>
 using fixed_matrix_engine = matrix_storage_engine<T, extents<R, C>, void, LT>;
 
-template<class T, ptrdiff_t R, ptrdiff_t C, class LT = row_major>
+template<class T, ptrdiff_t R, ptrdiff_t C, class LT = matrix_layout::row_major>
 using sized_matrix_engine = matrix_storage_engine<T, extents<R, C>, std::allocator<T>, LT>;
 
-template<class T, class LT = row_major>
+template<class T, class LT = matrix_layout::row_major>
 using dynamic_matrix_engine =
         matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, std::allocator<T>, LT>;
 

@@ -28,27 +28,27 @@ struct addition_element_traits
 
 
 template<class OT>
-struct addition_layout_traits<OT, row_major, row_major>
+struct addition_layout_traits<OT, matrix_layout::row_major, matrix_layout::row_major>
 {
-    using layout_type = row_major;
+    using layout_type = matrix_layout::row_major;
 };
 
 template<class OT>
-struct addition_layout_traits<OT, row_major, column_major>
+struct addition_layout_traits<OT, matrix_layout::row_major, matrix_layout::column_major>
 {
-    using layout_type = row_major;
+    using layout_type = matrix_layout::row_major;
 };
 
 template<class OT>
-struct addition_layout_traits<OT, column_major, row_major>
+struct addition_layout_traits<OT, matrix_layout::column_major, matrix_layout::row_major>
 {
-    using layout_type = row_major;
+    using layout_type = matrix_layout::row_major;
 };
 
 template<class OT>
-struct addition_layout_traits<OT, column_major, column_major>
+struct addition_layout_traits<OT, matrix_layout::column_major, matrix_layout::column_major>
 {
-    using layout_type = column_major;
+    using layout_type = matrix_layout::column_major;
 };
 
 

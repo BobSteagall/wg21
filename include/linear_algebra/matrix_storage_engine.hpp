@@ -13,7 +13,7 @@ namespace detail {
 //--------------------------------------------------------------------------------------------------
 //  Class Template:     mse_data<T, X, A, L>
 //
-//  Type that contains and manages elements on behalf of matrix_storage_engine<T,X,A,L>.
+//  Thie type contains and manages elements on behalf of matrix_storage_engine<T,X,A,L>.
 //
 //  Partial specializations of this class template are tailored to specific corresponding partial
 //  specializations of matrix_storage_engine.  They provide the special member functions that make
@@ -30,14 +30,14 @@ template<class T, class X, class A, class L>    struct mse_data;
 
 
 //--------------------------------------------------------------------------------------------------
-//  Specialization:     mse_data<T, extents<N>, void, L>
+//  Specialization:     mse_data<T, extents<N>, void, void>
 //
 //  Manages elements representing a fixed-size unoriented vector of N elements.  Its elements are
 //  implemented as member data in a std::array.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, ptrdiff_t N, class L>
-struct mse_data<T, extents<N>, void, L>
+template<class T, ptrdiff_t N>
+struct mse_data<T, extents<N>, void, void>
 {
     using array_type = std::array<T, N>;
 
@@ -66,14 +66,14 @@ struct mse_data<T, extents<N>, void, L>
 
 
 //--------------------------------------------------------------------------------------------------
-//  Specialization:     mse_data<T, extents<N>, A, L>
+//  Specialization:     mse_data<T, extents<N>, A, void>
 //
 //  Manages elements representing a fixed-size unoriented vector of N elements.  Its elements are
 //  implemented as member data in a std::vector.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, ptrdiff_t N, class A, class L>
-struct mse_data<T, extents<N>, A, L>
+template<class T, ptrdiff_t N, class A>
+struct mse_data<T, extents<N>, A, void>
 {
     using array_type = std::vector<T, A>;
 
@@ -97,14 +97,14 @@ struct mse_data<T, extents<N>, A, L>
 
 
 //--------------------------------------------------------------------------------------------------
-//  Partial Specialization:     mse_data<T, extents<dynamic_extent>, A, L>
+//  Partial Specialization:     mse_data<T, extents<dynamic_extent>, A, void>
 //
 //  Manages elements representing a dynamically-resizable unoriented vector.  Its elements are
 //  implemented as member data in a std::vector.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, class A, class L>
-struct mse_data<T, extents<dynamic_extent>, A, L>
+template<class T, class A>
+struct mse_data<T, extents<dynamic_extent>, A, void>
 {
     using array_type = std::vector<T, A>;
 
@@ -144,8 +144,8 @@ struct mse_data<T, extents<R, C>, void, L>
     static constexpr bool   is_column_reshapable = false;
     static constexpr bool   is_row_reshapable    = false;
     static constexpr bool   is_2d_reshapable     = false;
-    static constexpr bool   is_column_major      = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major         = is_same_v<L, row_major>;
+    static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
+    static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
 
     static constexpr ptrdiff_t  m_rows   = R;
     static constexpr ptrdiff_t  m_cols   = C;
@@ -189,8 +189,8 @@ struct mse_data<T, extents<R, C>, A, L>
     static constexpr bool   is_column_reshapable = false;
     static constexpr bool   is_row_reshapable    = false;
     static constexpr bool   is_2d_reshapable     = false;
-    static constexpr bool   is_column_major      = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major         = is_same_v<L, row_major>;
+    static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
+    static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
 
     static constexpr ptrdiff_t  m_rows   = R;
     static constexpr ptrdiff_t  m_cols   = C;
@@ -231,8 +231,8 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
     static constexpr bool   is_column_reshapable = true;
     static constexpr bool   is_row_reshapable    = false;
     static constexpr bool   is_2d_reshapable     = false;
-    static constexpr bool   is_column_major      = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major         = is_same_v<L, row_major>;
+    static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
+    static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
 
     static constexpr ptrdiff_t  m_rows   = R;
     static constexpr ptrdiff_t  m_rowcap = R;
@@ -274,8 +274,8 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
     static constexpr bool   is_column_reshapable = false;
     static constexpr bool   is_row_reshapable    = true;
     static constexpr bool   is_2d_reshapable     = false;
-    static constexpr bool   is_column_major      = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major         = is_same_v<L, row_major>;
+    static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
+    static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
 
     static constexpr ptrdiff_t  m_cols   = C;
     static constexpr ptrdiff_t  m_colcap = C;
@@ -318,8 +318,8 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
     static constexpr bool   is_column_reshapable = false;
     static constexpr bool   is_row_reshapable    = false;
     static constexpr bool   is_2d_reshapable     = true;
-    static constexpr bool   is_column_major      = is_same_v<L, column_major>;
-    static constexpr bool   is_row_major         = is_same_v<L, row_major>;
+    static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
+    static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
 
     array_type  m_elems;
     ptrdiff_t   m_rows;

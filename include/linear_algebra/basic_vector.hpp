@@ -537,21 +537,21 @@ class basic_vector
 };
 
 template<class T, class OT = matrix_operation_traits>
-using dyn_vec = basic_vector<matrix_storage_engine<T, extents<dynamic_extent>, std::allocator<T>, unoriented>, OT>;
+using dyn_vec = basic_vector<matrix_storage_engine<T, extents<dynamic_extent>, std::allocator<T>, void>, OT>;
 
 template<class T, ptrdiff_t N, class OT = matrix_operation_traits>
 using fixed_size_vector =
-        basic_vector<matrix_storage_engine<T, extents<N>, void, unoriented>, OT>;
+        basic_vector<matrix_storage_engine<T, extents<N>, void, void>, OT>;
 
 
 template<class T, ptrdiff_t N, class A = std::allocator<T>, class OT = matrix_operation_traits>
 using general_vector =
-        basic_vector<matrix_storage_engine<T, extents<N>, A, unoriented>, OT>;
+        basic_vector<matrix_storage_engine<T, extents<N>, A, void>, OT>;
 
 
 template<class T, class OT = matrix_operation_traits>
 using dynamic_vector =
-        basic_vector<matrix_storage_engine<T, extents<dynamic_extent>, std::allocator<T>, unoriented>, OT>;
+        basic_vector<matrix_storage_engine<T, extents<dynamic_extent>, std::allocator<T>, void>, OT>;
 
 
 }       //- STD_LA namespace

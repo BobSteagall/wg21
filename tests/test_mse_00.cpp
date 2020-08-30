@@ -8,9 +8,9 @@ using namespace MDSPAN_NS;
 //  Unit tests for fixed-size and resizable vector engines.
 //==================================================================================================
 //
-using fve_type_v = matrix_storage_engine<float, extents<4>, void, unoriented>;
-using fve_type_a = matrix_storage_engine<float, extents<4>, std::allocator<float>, unoriented>;
-using dve_type   = matrix_storage_engine<float, extents<dynamic_extent>, std::allocator<float>, unoriented>;
+using fve_type_v = matrix_storage_engine<float, extents<4>, void, void>;
+using fve_type_a = matrix_storage_engine<float, extents<4>, std::allocator<float>, void>;
+using dve_type   = matrix_storage_engine<float, extents<dynamic_extent>, std::allocator<float>, void>;
 
 using vsupport = vector_engine_support;
 
