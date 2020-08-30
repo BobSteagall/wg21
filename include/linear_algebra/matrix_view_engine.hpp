@@ -248,36 +248,7 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
 
 }       //- detail namespace
 //==================================================================================================
-//--------------------------------------------------------------------------------------------------
-//  Class:      matrix_view
-//
-//  This public type is a container of tag sub-types whose purpose is to specify the functionality
-//  of a matrix or vector view when used as a template argument to matrix_view_engine<ET, MVT>
-//--------------------------------------------------------------------------------------------------
-//
-struct matrix_view
-{
-    struct subvector {};
-    struct const_subvector {};
-
-    struct const_negation {};
-    struct const_hermitian {};
-
-    struct transpose {};
-    struct const_transpose {};
-
-    struct submatrix {};
-    struct const_submatrix {};
-
-    struct column {};
-    struct const_column {};
-
-    struct row {};
-    struct const_row {};
-};
-
-
-//--------------------------------------------------------------------------------------------------
+//==================================================================================================
 //  Class Template:     matrix_view_engine<ET, MVT>
 //
 //  This partial specialization of matrix_storage_engine<T,X,A,L> implements an owning engine
@@ -285,11 +256,9 @@ struct matrix_view
 //  vector having N elements, employing allocator A, and having element layout L.
 //--------------------------------------------------------------------------------------------------
 //
-template<class ET, class MVT>    class matrix_view_engine;
-
 template<class ET>
 requires
-    detail::readable_1d_vector_engine<ET>
+    detail::readable_vector_engine<ET>
 class matrix_view_engine<ET, matrix_view::const_negation>
 {
     using this_type           = matrix_view_engine;
@@ -380,7 +349,7 @@ class matrix_view_engine<ET, matrix_view::const_negation>
 
 template<class ET>
 requires
-    detail::writable_1d_vector_engine<ET>
+    detail::writable_vector_engine<ET>
 class matrix_view_engine<ET, matrix_view::subvector>
 {
     using this_type           = matrix_view_engine;
@@ -478,7 +447,7 @@ class matrix_view_engine<ET, matrix_view::subvector>
 
 template<class ET>
 requires
-    detail::readable_1d_vector_engine<ET>
+    detail::readable_vector_engine<ET>
 class matrix_view_engine<ET, matrix_view::const_subvector>
 {
     using this_type           = matrix_view_engine;

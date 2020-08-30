@@ -570,12 +570,13 @@ struct mse_mdspan_traits<mse_data<T, extents<dynamic_extent, dynamic_extent>, A,
 
 }       //- detail namespace
 //==================================================================================================
-//--------------------------------------------------------------------------------------------------
-//  Class Template:     matrix_storage_engine<T, extents<N>, A, L>
+//==================================================================================================
+//  Class Template:     matrix_storage_engine<T, X, A, L>
 //
-//  This partial specialization of matrix_storage_engine<T,X,A,L> implements an owning engine
-//  for use by class template basic_vector<ET, OT>.  Specifically, it models a mathematical
-//  vector having N elements, employing allocator A, and having element layout L.
+//  This class template implements an owning engine for use by the math object class templates
+//  basic_matrix<ET, OT> and basic_vector<ET, OT>.  Specifically, it provides storage suitable
+//  for modeling a mathematical matrix or vector, having dimensions specified by X, employing
+//  allocator A, and having element layout L.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, class X, class A, class L>
@@ -829,7 +830,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
         {
             //- Normalize requested new capacity.
             //
-            newcap = max(newsize, newcap);
+            newcap = std::max(newsize, newcap);
 
             //- Prepare a temporary engine to receive elements from this one.
             //
@@ -840,7 +841,7 @@ class matrix_storage_engine<T, extents<N>, A, L>
 
             //- Move the appropriate subset of elements into the temporary engine, then swap.
             //
-            ptrdiff_t   dst_size = min(newsize, m_data.m_size);
+            ptrdiff_t   dst_size = std::min(newsize, m_data.m_size);
             support_traits::move_elements(tmp, *this, dst_size);
             support_traits::swap(m_data, tmp.m_data);
         }
@@ -885,12 +886,12 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     using mdspan_traits  = detail::mse_mdspan_traits<storage_type>;
     using support_traits = detail::matrix_engine_support;
 
-    static constexpr bool   is_1d_indexable      = storage_type::is_1d_indexable;
-    static constexpr bool   is_column_major      = storage_type::is_column_major;
-    static constexpr bool   is_row_major         = storage_type::is_row_major;
-    static constexpr bool   is_2d_reshapable     = storage_type::is_2d_reshapable   ;
-    static constexpr bool   is_column_reshapable = storage_type::is_column_reshapable;
-    static constexpr bool   is_row_reshapable    = storage_type::is_row_reshapable;
+    static constexpr bool   has_column_major_layout = storage_type::is_column_major;
+    static constexpr bool   has_row_major_layout    = storage_type::is_row_major;
+    static constexpr bool   is_1d_indexable         = storage_type::is_1d_indexable;
+    static constexpr bool   is_2d_reshapable        = storage_type::is_2d_reshapable;
+    static constexpr bool   is_column_reshapable    = storage_type::is_column_reshapable;
+    static constexpr bool   is_row_reshapable       = storage_type::is_row_reshapable;
 
   private:
     storage_type    m_data;
@@ -978,7 +979,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     requires
         this_type::is_1d_indexable
         and
-        detail::readable_1d_vector_engine<ET2>
+        detail::readable_vector_engine<ET2>
         and
         detail::convertible_from<element_type, typename ET2::element_type>
     :   m_data()
@@ -1066,7 +1067,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     requires
         this_type::is_1d_indexable
         and
-        detail::readable_1d_vector_engine<ET2>
+        detail::readable_vector_engine<ET2>
         and
         detail::convertible_from<element_type, typename ET2::element_type>
     {
@@ -1171,7 +1172,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     constexpr reference
     operator ()(index_type i, index_type j)
     requires
-        this_type::is_row_major
+        this_type::has_row_major_layout
     {
         return m_data.m_elems[(i * m_data.m_colcap) + j];
     }
@@ -1179,7 +1180,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     constexpr reference
     operator ()(index_type i, index_type j)
     requires
-        this_type::is_column_major
+        this_type::has_column_major_layout
     {
          return m_data.m_elems[i + (j * m_data.m_rowcap)];
     }
@@ -1187,7 +1188,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     constexpr const_reference
     operator ()(index_type i, index_type j) const
     requires
-        this_type::is_row_major
+        this_type::has_row_major_layout
     {
         return m_data.m_elems[(i * m_data.m_colcap) + j];
     }
@@ -1195,7 +1196,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     constexpr const_reference
     operator ()(index_type i, index_type j) const
     requires
-        this_type::is_column_major
+        this_type::has_column_major_layout
     {
          return m_data.m_elems[i + (j * m_data.m_rowcap)];
     }
@@ -1284,8 +1285,8 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         {
             //- Normalize requested new capacities.
             //
-            rowcap = max(rows, rowcap);
-            colcap = max(cols, colcap);
+            rowcap = std::max(rows, rowcap);
+            colcap = std::max(cols, colcap);
 
             //- Prepare a temporary object to receive elements from this one.
             //
@@ -1298,8 +1299,8 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
             //- Move the appropriate subset of elements into the temporary engine and swap.
             //
-            ptrdiff_t   dst_rows = min(rows, m_data.m_rows);
-            ptrdiff_t   dst_cols = min(cols, m_data.m_cols);
+            ptrdiff_t   dst_rows = std::min(rows, m_data.m_rows);
+            ptrdiff_t   dst_cols = std::min(cols, m_data.m_cols);
             support_traits::move_elements(tmp, *this, dst_rows, dst_cols);
             support_traits::swap(m_data, tmp.m_data);
         }
@@ -1332,7 +1333,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         {
             //- Normalize requested new capacity.
             //
-            colcap = max(cols, colcap);
+            colcap = std::max(cols, colcap);
 
             //- Prepare a temporary object to receive elements from this one.
             //
@@ -1343,7 +1344,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
             //- Move the appropriate subset of elements into the temporary engine and swap.
             //
-            ptrdiff_t   dst_cols = min(cols, m_data.m_cols);
+            ptrdiff_t   dst_cols = std::min(cols, m_data.m_cols);
             support_traits::move_elements(tmp, *this, m_data.m_rows, dst_cols);
             support_traits::swap(*this, tmp);
         }
@@ -1371,7 +1372,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         {
             //- Normalize requested new capacity.
             //
-            rowcap = max(rows, rowcap);
+            rowcap = std::max(rows, rowcap);
 
             //- Prepare a temporary object to receive elements from this one.
             //
@@ -1382,7 +1383,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
             //- Move the appropriate subset of elements into the temporary engine and swap.
             //
-            ptrdiff_t   dst_rows = min(rows, m_data.m_rows);
+            ptrdiff_t   dst_rows = std::min(rows, m_data.m_rows);
             support_traits::move_elements(tmp, *this, dst_rows, m_data.m_cols);
             support_traits::swap(*this, tmp);
         }

@@ -30,6 +30,8 @@ class fs_matrix_engine_tst
     using direct_engine_type = fs_matrix_engine_tst;
     using owning_engine_type = fs_matrix_engine_tst;
 
+    static constexpr bool   is_row_major = true;
+
   public:
     constexpr fs_matrix_engine_tst();
     constexpr fs_matrix_engine_tst(fs_matrix_engine_tst&&) = default;

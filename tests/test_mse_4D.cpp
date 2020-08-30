@@ -23,6 +23,16 @@ TEST(MSE_Matrix_4D, DefaultCtor)
     EXPECT_EQ(e1.columns(), 0);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 0);
+
+    static_assert(!use_row_wise_indexing_v<mse_f_fd_cm>);
+    static_assert(use_row_wise_indexing_v<mse_f_fd_rm>);
+
+    static_assert(use_row_wise_indexing_v<fs_matrix_engine_tst<float, 3, 2>>);
+
+    EXPECT_FALSE(do_row_wise_indexing<mse_f_fd_cm>);
+    EXPECT_TRUE(do_row_wise_indexing<mse_f_fd_rm>);
+    EXPECT_FALSE(do_row_wise_indexing<mse_i_fd_cm>);
+    EXPECT_TRUE(do_row_wise_indexing<mse_d_fd_rm>);
 }
 
 
@@ -750,7 +760,8 @@ TEST(BasicMatrix, Sanity)
     test_fs_matrix<float, 4, 4>     m7;
     test_fs_matrix<float, 4, 4>     m8 = il_44_1;
 
-    static_assert(!STD_LA::detail::spannable_engine<test_fs_matrix_engine<float,4,4>>);
+    static_assert(!STD_LA::detail::spannable_vector_engine<test_fs_matrix_engine<float,4,4>>);
+    static_assert(!STD_LA::detail::spannable_matrix_engine<test_fs_matrix_engine<float,4,4>>);
 
     auto    s3 = m3.span();
     auto&&  e3 = m3.engine();

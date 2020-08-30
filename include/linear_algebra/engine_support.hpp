@@ -1,8 +1,9 @@
 //==================================================================================================
 //  File:       engine_support.hpp
 //
-//  Summary:    This header defines various traits, concepts, types, and functions used across
-//              the entire library to support the provided engines.
+//  Summary:    This header defines a number of private aliases, traits, concepts, types, and
+//              functions used across the entire library to support engines and the required
+//              operations upon them.
 //==================================================================================================
 //
 #ifndef LINEAR_ALGEBRA_ENGINE_SUPPORT_HPP_DEFINED
@@ -14,13 +15,66 @@ struct unoriented {};
 struct row_major {};
 struct column_major {};
 
+//--------------------------------------------------------------------------------------------------
+//  Class Template:     matrix_storage_engine<T, X, A, L>
+//
+//  This class template implements an owning engine for use by the math object class templates
+//  basic_matrix<ET, OT> and basic_vector<ET, OT>.  Specifically, it provides storage suitable
+//  for modeling a mathematical matrix or vector, having dimensions specified by X, employing
+//  allocator A, and having element layout L.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T, class X, class A, class L>    class matrix_storage_engine;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Class:      matrix_view
+//
+//  This public type is a container of tag sub-types whose purpose is to specify the functionality
+//  of a matrix or vector view when used as a template argument to matrix_view_engine<ET, MVT>
+//--------------------------------------------------------------------------------------------------
+//
+struct matrix_view
+{
+    struct subvector {};
+    struct const_subvector {};
+
+    struct const_negation {};
+    struct const_conjugate {};
+    struct const_hermitian {};
+
+    struct transpose {};
+    struct const_transpose {};
+
+    struct submatrix {};
+    struct const_submatrix {};
+
+    struct column {};
+    struct const_column {};
+
+    struct row {};
+    struct const_row {};
+};
+
+
+//--------------------------------------------------------------------------------------------------
+//  Class Template:     matrix_view_engine<ET, MVT>
+//
+//  This class template implements represents a non-owning engine type, which references another
+//  engine object, and which presents a specific "view" of that object.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET, class MVT>    class matrix_view_engine;
+
+
 namespace detail {
-
-struct special_ctor_tag{};
-
 //==================================================================================================
 //  TYPES AND TRAITS DEFINITIONS -- GENERAL
 //==================================================================================================
+//
+struct special_ctor_tag{};
+
+
 //--------------------------------------------------------------------------------------------------
 //  Trait:      has_size_type<T>
 //  Alias:      get_size_type_t<T>
@@ -47,7 +101,7 @@ using get_size_type_t = typename has_size_type_alias<T>::size_type;
 
 //--------------------------------------------------------------------------------------------------
 //  Trait:      is_specialization_of<T, PT>
-//  Alias:      is_specialization_of_v<T, PT>
+//  Variable:   is_specialization_of_v<T, PT>
 //
 //  This private traits type determines whether a given type T is a specialization of a primary
 //  template type PT.
@@ -70,7 +124,7 @@ bool    is_complex_v = is_specialization_of_v<T, std::complex>;
 
 //--------------------------------------------------------------------------------------------------
 //  Trait:      is_random_access_standard_container<X>
-//  Alias:      is_random_access_standard_container_v<X>
+//  Variable:   is_random_access_standard_container_v<X>
 //
 //  This private traits type determines whether the template parameter is a specialization
 //  of std::array, std::deque, or std::vector.
@@ -101,7 +155,7 @@ bool    is_random_access_standard_container_v = is_random_access_standard_contai
 //==================================================================================================
 //--------------------------------------------------------------------------------------------------
 //  Trait:      is_1d_mdspan<T>
-//  Alias:      is_1d_mdspan_v<T>
+//  Variable:   is_1d_mdspan_v<T>
 //
 //  This private traits type determines whether its template parameter is a specialization of
 //  basic_mdspan<T, X, L, A> with a one-dimensional extents template parameter.
@@ -121,7 +175,7 @@ bool    is_1d_mdspan_v = is_1d_mdspan<T>::value;
 
 //--------------------------------------------------------------------------------------------------
 //  Trait:      is_2d_mdspan<T>
-//  Alias:      is_2d_mdspan_v<T>
+//  Variable:   is_2d_mdspan_v<T>
 //
 //  This private traits type determines whether its template parameter is a specialization of
 //  basic_mdspan<T, X, L, A> with a two-dimensional extents template parameter.
@@ -201,11 +255,11 @@ using dyn_vec_mapping = typename dyn_mat_layout::template mapping<dyn_vec_extent
 //==================================================================================================
 //--------------------------------------------------------------------------------------------------
 //  Trait:      is_valid_engine_extents<X>
-//  Alias:      is_valid_engine_extents_v<X>
+//  Variable:   is_valid_engine_extents_v<X>
 //
 //  This private traits type is used to validate an engine's extents template argument.  The
 //  extents parameter must be one- or two-dimensional, and each dimension's template argument
-//  may have only a specific set of values.
+//  must be greater than zero or equal to dynamic_extent.
 //--------------------------------------------------------------------------------------------------
 //
 template<class X>
@@ -229,7 +283,7 @@ bool    is_valid_engine_extents_v = is_valid_engine_extents<T>::value;
 
 //--------------------------------------------------------------------------------------------------
 //  Trait:      is_valid_fixed_engine_extents<X>
-//  Alias:      is_valid_fixed_engine_extents_v<X>
+//  Variable:   is_valid_fixed_engine_extents_v<X>
 //
 //  This private traits type is used to validate an engine's extents template argument.  The
 //  extents parameter must be one- or two-dimensional, and each dimension's template argument
@@ -258,20 +312,22 @@ bool    is_valid_fixed_engine_extents_v = is_valid_fixed_engine_extents<X>::valu
 //--------------------------------------------------------------------------------------------------
 //  Trait:      has_owning_engine_type_alias<ET>
 //  Alias:      get_owning_engine_type_t<ET>
+//  Variable:   is_owning_engine_type_v<ET>
 //
 //  This private type detector and variable template are used to determine whether or not an
 //  engine type is an owning engine.  An owning engine is one that owns (manages the lifetime of)
-//  the elements it contains, and does not have a nested owning_engine_type type alias.
+//  the elements it contains.  An owning engine is indicated by the fact that it and does not
+//  have a public nested type alias owning_engine_type.
 //
-//  A non-owning engine refers to elements managed by another engine and has the nested type alias
-//  owning_engine_type.  Non-owning engines may refer to other non-owning engines, but ultimately,
-//  at the end of the "chain", the bottom-most non-owning engine must refer to an owning engine.
-//  The owning_engine_type alias indicates the type of the owning engine.
+//  A non-owning engine refers to elements managed by another engine and has a public nested type
+//  alias owning_engine_type.  Non-owning engines (views) may refer to other non-owning engines,
+//  but ultimately, at the end of the "view chain", the bottom-most non-owning engine must refer
+//  to an owning engine.  The owning_engine_type alias indicates the type of the owning engine.
 //--------------------------------------------------------------------------------------------------
 //
 template<class ET, typename = void>
 struct has_owning_engine_type_alias
-:   public false_type
+:   public std::false_type
 {
     static constexpr bool   is_owning = true;
     using owning_engine_type = ET;
@@ -279,7 +335,7 @@ struct has_owning_engine_type_alias
 
 template<class ET>
 struct has_owning_engine_type_alias<ET, void_t<typename ET::owning_engine_type>>
-:   public true_type
+:   public std::true_type
 {
     static constexpr bool   is_owning = false;
     using owning_engine_type = typename ET::owning_engine_type;
@@ -287,6 +343,9 @@ struct has_owning_engine_type_alias<ET, void_t<typename ET::owning_engine_type>>
 
 template<class ET>
 using get_owning_engine_type_t = typename has_owning_engine_type_alias<ET>::owning_engine_type;
+
+template<class ET> inline constexpr
+bool    is_owning_engine_type_v = has_owning_engine_type_alias<ET>::is_owning;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -318,6 +377,68 @@ using get_mdspan_type_t = typename has_nested_mdspan_types<ET>::span_type;
 
 template<class ET>
 using get_const_mdspan_type_t = typename has_nested_mdspan_types<ET>::const_span_type;
+
+
+template<class ET, class = void>
+struct has_row_major_value : std::false_type
+{};
+
+
+//--------------------------------------------------------------------------------------------------
+//  Traits:     get_row_major_value_helper<bool, ET>
+//              get_indexing_order<ET>
+//  Variable:   use_row_wise_indexing_v<ET>
+//
+//  These private traits types and the associated variable template are used to help determine
+//  the order in which matrix elements should be accessed when iterating over them in two
+//  dimensions.
+//--------------------------------------------------------------------------------------------------
+//
+template<bool P, class ET> struct get_row_major_value_helper;
+
+template<class ET>
+struct get_row_major_value_helper<false, ET>
+{
+    static constexpr bool   is_row_major = true;
+};
+
+template<class ET>
+struct get_row_major_value_helper<true, ET>
+{
+    static constexpr bool   is_row_major = static_cast<bool>(ET::is_row_major);
+};
+
+//------
+//
+template<class ET, class = void>
+struct get_indexing_order
+{
+    static constexpr bool   use_row_wise = true;
+};
+
+template<class ET>
+struct get_indexing_order<ET, std::void_t<decltype(ET::is_row_major)>>
+{
+    static constexpr bool   is_suitable  = std::is_convertible_v<decltype(ET::is_row_major), bool>;
+    static constexpr bool   use_row_wise = get_row_major_value_helper<is_suitable, ET>::is_row_major;
+};
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class A>
+struct get_indexing_order<matrix_storage_engine<T, extents<R, C>, A, column_major>, void>
+{
+    static constexpr bool   use_row_wise = false;
+};
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class A>
+struct get_indexing_order<matrix_storage_engine<T, extents<R, C>, A, row_major>, void>
+{
+    static constexpr bool   use_row_wise = true;
+};
+
+//------
+//
+template<class ET> inline constexpr
+bool    use_row_wise_indexing_v = get_indexing_order<ET>::use_row_wise;
 
 
 //==================================================================================================
@@ -588,10 +709,10 @@ concept readable_engine_fundamentals =
 
 
 //--------------------------------------------------------------------------------------------------
-//  Concept:    valid_engine_indexing_result<ET>
+//  Concept:    valid_const_indexing_result<ET>
 //
 //  This private concept determines whether a given type is equal to one of the three possible
-//  result types of an engine's indexing operator(s).
+//  result types of an engine's const indexing operator(s).
 //
 //  Note that non-const references are acceptable as an indexing return type.  This is in order
 //  to support view engines, which may have a const indexing operator that returns a non-const
@@ -599,12 +720,117 @@ concept readable_engine_fundamentals =
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, class ET>
-concept valid_engine_indexing_result =
+concept valid_const_indexing_result =
     same_as<T, typename ET::const_reference>
     or
     same_as<T, typename ET::reference>
     or
     same_as<T, typename ET::element_type>;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    valid_mutable_indexing_result<ET>
+//
+//  This private concept determines whether a given type is an acceptable result types of an
+//  engine's mutable indexing operator(s).
+//--------------------------------------------------------------------------------------------------
+//
+template<class T, class ET>
+concept valid_mutable_indexing_result =
+    same_as<typename ET::reference, typename ET::element_type&>
+    and
+    same_as<T, typename ET::reference>;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    engine_has_valid_1d_const_indexing<ET>
+//
+//  This private concept determines whether a given engine type has one-dimensional indexing
+//  for const objects of that type, and that the return type fulfills the requirements of the
+//  valid_const_indexing_result<ET> concept.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET>
+concept engine_has_valid_1d_const_indexing =
+    requires (ET const& eng, typename ET::index_type i)
+    {
+        { eng(i) } -> valid_const_indexing_result<ET>;
+    };
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    engine_has_valid_1d_mutable_indexing<ET>
+//
+//  This private concept determines whether a given engine type has one-dimensional indexing
+//  for non-const objects of that type, and that the return type is a reference.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET>
+concept engine_has_valid_1d_mutable_indexing =
+    requires (ET& eng, typename ET::index_type i)
+    {
+        { eng(i) } -> valid_mutable_indexing_result<ET>;
+    };
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    concept engine_is_not_1d_indexable<ET>
+//
+//  This private concept determines whether a given engine type does not have one-dimensional
+//  indexing for const objects of that type.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET>
+concept engine_is_not_1d_indexable =
+    not requires(ET eng, typename ET::index_type i)
+    {
+        { eng(i) };
+    };
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    engine_has_valid_2d_const_indexing<ET>
+//
+//  This private concept determines whether a given engine type has two-dimensional indexing
+//  for const objects of that type, and that the return type fulfills the requirements of the
+//  valid_const_indexing_result<ET> concept.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET>
+concept engine_has_valid_2d_const_indexing =
+    requires (ET const& eng, typename ET::index_type i)
+    {
+        { eng(i, i) } -> valid_const_indexing_result<ET>;
+    };
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    engine_has_valid_2d_mutable_indexing<ET>
+//
+//  This private concept determines whether a given engine type has two-dimensional indexing
+//  for non-const objects of that type, and that the return type is a reference.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET>
+concept engine_has_valid_2d_mutable_indexing =
+    requires (ET& eng, typename ET::index_type i)
+    {
+        { eng(i, i) } -> valid_mutable_indexing_result<ET>;
+    };
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    concept engine_is_not_2d_indexable<ET>
+//
+//  This private concept determines whether a given engine type does not have two-dimensional
+//  indexing for const objects of that type.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET>
+concept engine_is_not_2d_indexable =
+    not requires(ET eng, typename ET::index_type i)
+    {
+        { eng(i, i) };
+    };
 
 
 //--------------------------------------------------------------------------------------------------
@@ -615,40 +841,16 @@ concept valid_engine_indexing_result =
 //
 //  Engine types that fulfill this concept may have the value of their elements read via one-
 //  dimensional indexing, their element sizes and capacities read, and publicly declare several
-//  important nested type aliases.
-//
-//  Note that certain matrix engine types might also fulfill the requirements of
-//  readable_vector_engine<ET>.  For example, this could occur with matrix engines having
-//  one row/column fixed at compile-time that offer one-dimensional indexing.
+//  important nested type aliases.  They do not have two-dimensional indexing.
 //--------------------------------------------------------------------------------------------------
 //
 template<class ET>
 concept readable_vector_engine =
     readable_engine_fundamentals<ET>
     and
-    requires (ET const& eng, typename ET::index_type i)
-    {
-        { eng(i) } -> valid_engine_indexing_result<ET>;
-    };
-
-
-//--------------------------------------------------------------------------------------------------
-//  Concept:    readable_1d_vector_engine<ET>
-//
-//  This private concept determines whether a prospective vector engine type provides only the
-//  readability interface required to function correctly with basic_vector<ET, OT>.  Most
-//  importantly, engine types that fulfill this concept perform one-dimensional indexing only,
-//  and therefore cannot also be matrix engines.
-//--------------------------------------------------------------------------------------------------
-//
-template<class ET>
-concept readable_1d_vector_engine =
-    readable_vector_engine<ET>
+    engine_has_valid_1d_const_indexing<ET>
     and
-    not requires (ET const& eng, typename ET::index_type i)
-    {
-        { eng(i, i) };
-    };
+    engine_is_not_2d_indexable<ET>;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -660,7 +862,7 @@ concept readable_1d_vector_engine =
 //
 template<class ET>
 concept spannable_vector_engine =
-    readable_1d_vector_engine<ET>
+    readable_vector_engine<ET>
     and
     requires (ET const& ceng, ET& meng)
     {
@@ -688,21 +890,7 @@ template<class ET>
 concept writable_vector_engine =
     readable_vector_engine<ET>
     and
-    requires (ET& eng, typename ET::index_type i, typename ET::element_type v)
-    {
-        requires std::is_same_v<typename ET::reference, typename ET::element_type&>;
-        { eng(i) } -> same_as<typename ET::reference>;
-    };
-
-template<class ET>
-concept writable_1d_vector_engine =
-    writable_vector_engine<ET>
-    and
-    not requires (ET const& ceng, ET& meng, typename ET::index_type i)
-    {
-        { ceng(i, i) };
-        { meng(i, i) };
-    };
+    engine_has_valid_1d_mutable_indexing<ET>;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -722,17 +910,14 @@ template<class ET>
 concept readable_matrix_engine =
     readable_engine_fundamentals<ET>
     and
+    engine_has_valid_2d_const_indexing<ET>
+    and
     requires (ET const& eng)
     {
         { eng.columns()          } -> same_as<typename ET::index_type>;
         { eng.rows()             } -> same_as<typename ET::index_type>;
         { eng.column_capacity()  } -> same_as<typename ET::index_type>;
         { eng.row_capacity()     } -> same_as<typename ET::index_type>;
-    }
-    and
-    requires (ET const& eng, typename ET::index_type i)
-    {
-        { eng(i, i) } -> valid_engine_indexing_result<ET>;
     };
 
 
@@ -749,10 +934,7 @@ template<class ET>
 concept readable_and_1d_indexable_matrix_engine =
     readable_matrix_engine<ET>
     and
-    requires (ET const& eng, typename ET::index_type i)
-    {
-        { eng(i) } -> valid_engine_indexing_result<ET>;
-    };
+    engine_has_valid_1d_const_indexing<ET>;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -792,11 +974,7 @@ template<class ET>
 concept writable_matrix_engine =
     readable_matrix_engine<ET>
     and
-    requires (ET& eng, typename ET::index_type i, typename ET::element_type v)
-    {
-        requires std::is_same_v<typename ET::reference, typename ET::element_type&>;
-        { eng(i, i) } -> same_as<typename ET::reference>;
-    };
+    engine_has_valid_2d_mutable_indexing<ET>;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -812,15 +990,10 @@ template<class ET>
 concept writable_and_1d_indexable_matrix_engine =
     writable_matrix_engine<ET>
     and
-    requires (ET const& ceng, ET& meng, typename ET::index_type i, typename ET::element_type v)
-    {
-        { ceng(i) } -> valid_engine_indexing_result<ET>;
-        { meng(i) } -> same_as<typename ET::reference>;
-    };
+    engine_has_valid_1d_const_indexing<ET>
+    and
+    engine_has_valid_1d_mutable_indexing<ET>;
 
-
-template<class ET>
-concept row_major_engine = true;
 
 //--------------------------------------------------------------------------------------------------
 //  Concepts:   reshapable_vector_engine<ET>
@@ -876,6 +1049,18 @@ concept row_reshapable_matrix_engine =
 
 
 //--------------------------------------------------------------------------------------------------
+//  Concept:    do_row_wise_indexing<ET>
+//
+//  This private concept determines whether to use row-wise indexing for the inner loop when
+//  performing two-dimensional iteration over the elements of a matrix engine.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET>
+concept do_row_wise_indexing = readable_matrix_engine<ET>  and  use_row_wise_indexing_v<ET>;
+
+
+
+//--------------------------------------------------------------------------------------------------
 //  Concept:    similar_engines<ET1, ET2>
 //
 //  This private concept determines whether both prospective engine types represent matrix engines
@@ -890,17 +1075,6 @@ concept similar_engines =
     (readable_vector_engine<ET1> and readable_vector_engine<ET2>);
 
 
-//--------------------------------------------------------------------------------------------------
-//  Concept:    spannable_engine<ET>
-//
-//  This private concept determines whether a prospective matrix engine type implements either
-//  the spannable_vector_engine<ET> or spannable_matrix_engine<ET> concepts.
-//--------------------------------------------------------------------------------------------------
-//
-template<class ET>
-concept spannable_engine = spannable_matrix_engine<ET> or spannable_vector_engine<ET>;
-
-
 //==================================================================================================
 //  SUPPORT TYPE DEFINITIONS
 //==================================================================================================
@@ -912,37 +1086,37 @@ concept spannable_engine = spannable_matrix_engine<ET> or spannable_vector_engin
 //
 struct common_engine_support
 {
-    template<class IT1, class IT2>
+    template<class N1, class N2>
     static constexpr bool
-    sizes_differ(IT1 n1, IT2 n2) noexcept
+    sizes_differ(N1 n1, N2 n2) noexcept
     {
-        using cmp_type = common_type_t<IT1, IT2, ptrdiff_t>;
+        using cmp_type = common_type_t<N1, N2, ptrdiff_t>;
 
         return (static_cast<cmp_type>(n1) != static_cast<cmp_type>(n2));
     }
 
-    template<class ITR1, class ITC1, class ITR2, class ITC2>
+    template<class R1, class C1, class R2, class C2>
     static constexpr bool
-    sizes_differ(ITR1 r1, ITC1 c1, ITR2 r2, ITC2 c2) noexcept
+    sizes_differ(R1 r1, C1 c1, R2 r2, C2 c2) noexcept
     {
-        using cmp_type = common_type_t<ITR1, ITC1, ITR2, ITC2, ptrdiff_t>;
+        using cmp_type = common_type_t<R1, C1, R2, C2, ptrdiff_t>;
 
         return ((static_cast<cmp_type>(r1) != static_cast<cmp_type>(r2)) ||
                 (static_cast<cmp_type>(c1) != static_cast<cmp_type>(c2)));
     }
 
-    template<class IT>
+    template<class N>
     static constexpr void
-    verify_capacity(IT c)
+    verify_capacity(N c)
     {
-        if (c < static_cast<IT>(0))
+        if (c < static_cast<N>(0))
         {
             throw runtime_error("invalid capacity parameter");
         }
     }
 
     template<class U>
-    static constexpr tuple<ptrdiff_t, ptrdiff_t>
+    static constexpr std::tuple<ptrdiff_t, ptrdiff_t>
     verify_list(initializer_list<initializer_list<U>> list)
     {
         size_t  rows = list.size();
@@ -958,19 +1132,19 @@ struct common_engine_support
         return {static_cast<ptrdiff_t>(rows), static_cast<ptrdiff_t>(cols)};
     }
 
-    template<class IT>
+    template<class N>
     static constexpr void
-    verify_size(IT s)
+    verify_size(N s)
     {
-        if (s < static_cast<IT>(1))
+        if (s < static_cast<N>(1))
         {
             throw runtime_error("invalid size parameter");
         }
     }
 
-    template<class IT1, class IT2>
+    template<class N1, class N2>
     static constexpr void
-    verify_size(IT1 s1, IT2 s2)
+    verify_size(N1 s1, N2 s2)
     {
         if (sizes_differ(s1, s2))
         {
@@ -995,9 +1169,9 @@ struct common_engine_support
 
 
 //--------------------------------------------------------------------------------------------------
-//  Class Template:     vector_engine_support
+//  Class:      vector_engine_support
 //
-//  Policy/traits base type that provides various types and functions for verification.
+//  Provides various utility functions for vector engines.
 //--------------------------------------------------------------------------------------------------
 //
 struct vector_engine_support : public common_engine_support
@@ -1281,9 +1455,9 @@ struct vector_engine_support : public common_engine_support
 
 
 //--------------------------------------------------------------------------------------------------
-//  Class Template:     matrix_engine_support
+//  Class:      matrix_engine_support
 //
-//  Policy/traits base type that provides various types and functions for verification.
+//  Provides various utility functions for matrix engines.
 //--------------------------------------------------------------------------------------------------
 //
 struct matrix_engine_support : public common_engine_support
@@ -1468,7 +1642,7 @@ struct matrix_engine_support : public common_engine_support
     requires
         writable_and_1d_indexable_matrix_engine<ET1>
         and
-        readable_1d_vector_engine<ET2>
+        readable_vector_engine<ET2>
         and
         convertible_from<typename ET1::element_type, typename ET2::element_type>
     {
@@ -1577,7 +1751,7 @@ struct matrix_engine_support : public common_engine_support
         auto    i1 = dst.rows();
         auto    j1 = static_cast<index_type>(c1);
 
-        if constexpr (row_major_engine<ET>)
+        if constexpr (do_row_wise_indexing<ET>)
         {
             for (auto i = i0;  i < i1;  ++i)
             {
@@ -1616,7 +1790,7 @@ struct matrix_engine_support : public common_engine_support
         auto    i1 = static_cast<index_type>(r1);
         auto    j1 = dst.columns();
 
-        if constexpr (row_major_engine<ET>)
+        if constexpr (do_row_wise_indexing<ET>)
         {
             for (auto i = i0;  i < i1;  ++i)
             {
@@ -1651,7 +1825,7 @@ struct matrix_engine_support : public common_engine_support
         auto    i1 = static_cast<index_type>(rows);
         auto    j1 = static_cast<index_type>(cols);
 
-        if constexpr (row_major_engine<ET>)
+        if constexpr (do_row_wise_indexing<ET>)
         {
             for (auto i = i0;  i < i1;  ++i)
             {
@@ -1792,7 +1966,7 @@ struct matrix_engine_support : public common_engine_support
     requires
         readable_and_1d_indexable_matrix_engine<ET1>
         and
-        readable_1d_vector_engine<ET2>
+        readable_vector_engine<ET2>
         and
         comparable_types<typename ET1::element_type, typename ET2::element_type>
     {

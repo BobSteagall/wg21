@@ -40,7 +40,7 @@ template<class OT, class LT1, class LT2>    struct multiplication_layout_traits;
 
 }       //- detail namespace
 //==================================================================================================
-//==================================================================================================
+//--------------------------------------------------------------------------------------------------
 //  Class:  matrix_operation_traits
 //
 //  This class provides a set of nested type aliases which, in turn, provide for element
