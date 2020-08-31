@@ -45,6 +45,7 @@ class basic_matrix
     //- Type aliases pertaining to views.
     //
     using const_negation_type  = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_negation>, COT>;
+    using const_conjugate_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_conjugate>, COT>;
     using const_hermitian_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_hermitian>, COT>;
     using transpose_type       = basic_matrix<matrix_view_engine<engine_type, possibly_writable_transpose>, COT>;
     using const_transpose_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_transpose>, COT>;
@@ -562,6 +563,12 @@ class basic_matrix
     operator -() const noexcept
     {
         return const_negation_type(detail::special_ctor_tag(), m_engine);
+    }
+
+    constexpr const_conjugate_type
+    conj() const noexcept
+    {
+        return const_conjugate_type(detail::special_ctor_tag(), m_engine);
     }
 
     constexpr const_hermitian_type

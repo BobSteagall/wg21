@@ -46,6 +46,7 @@ class basic_vector
     using const_span_type      = detail::get_const_mdspan_type_t<ET>;
 
     using const_negation_type  = basic_vector<matrix_view_engine<engine_type, matrix_view::const_negation>, COT>;
+    using const_conjugate_type = basic_vector<matrix_view_engine<engine_type, matrix_view::const_conjugate>, COT>;
     using subvector_type       = basic_vector<matrix_view_engine<engine_type, possibly_writable_subvector>, COT>;
     using const_subvector_type = basic_vector<matrix_view_engine<engine_type, matrix_view::const_subvector>, COT>;
 
@@ -436,6 +437,12 @@ class basic_vector
     operator -() const noexcept
     {
         return const_negation_type(detail::special_ctor_tag(), m_engine);
+    }
+
+    constexpr const_conjugate_type
+    conj() const noexcept
+    {
+        return const_conjugate_type(detail::special_ctor_tag(), m_engine);
     }
 
     constexpr subvector_type

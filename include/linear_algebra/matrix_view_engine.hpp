@@ -134,6 +134,7 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0>, L, A>>
     using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
 
     using negation_mdspan_type  = basic_mdspan<T, dyn_extents, dyn_layout, negation_accessor<T>>;
+    using conjugate_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, conjugation_accessor<T, A>>;
     using subvector_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
 
     template<class EST>
@@ -145,6 +146,17 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0>, L, A>>
         dyn_mapping     map(ext, str);
 
         return negation_mdspan_type(s.data(), map, negation_accessor<T, A>());
+    }
+
+    template<class EST>
+    static constexpr conjugate_mdspan_type
+    make_conjugate(EST const& s)
+    {
+        dyn_extents     ext(s.extent(0));
+        dyn_strides     str{s.stride(0)};
+        dyn_mapping     map(ext, str);
+
+        return conjugate_mdspan_type(s.data(), map, conjugation_accessor<T, A>());
     }
 
     template<class EST, class S1, class S2>
@@ -184,6 +196,7 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
     using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
 
     using negation_mdspan_type  = basic_mdspan<T, dyn_extents, dyn_layout, negation_accessor<T, A>>;
+    using conjugate_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, conjugation_accessor<T, A>>;
     using hermitian_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, conjugation_accessor<T, A>>;
     using transpose_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
     using submatrix_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
@@ -197,6 +210,17 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
         dyn_mapping     map(ext, str);
 
         return negation_mdspan_type(s.data(), map, negation_accessor<T, A>());
+    }
+
+    template<class EST>
+    static constexpr conjugate_mdspan_type
+    make_conjugate(EST const& s)
+    {
+        dyn_extents     ext(s.extent(0), s.extent(1));
+        dyn_strides     str{s.stride(0), s.stride(1)};
+        dyn_mapping     map(ext, str);
+
+        return conjugate_mdspan_type(s.data(), map, conjugation_accessor<T, A>());
     }
 
     template<class EST>
@@ -344,6 +368,103 @@ class matrix_view_engine<ET, matrix_view::const_negation>
 
   private:
     engine_type const*  mp_engine;
+};
+
+
+template<class ET>
+requires
+    detail::readable_vector_engine<ET>
+class matrix_view_engine<ET, matrix_view::const_conjugate>
+{
+    static constexpr bool   is_cx = detail::is_complex_v<typename ET::element_type>;
+
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET const*;
+    using conj_elem_type      = conditional_t<is_cx, typename ET::element_type, typename ET::const_reference>;
+    using support_traits      = detail::matrix_engine_support;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
+
+    static constexpr bool   has_mdspan = const_mdspan_traits::has_mdspan;
+
+  public:
+    using engine_type        = ET;
+    using owning_engine_type = detail::get_owning_engine_type_t<ET>;
+    using element_type       = typename engine_type::element_type;
+    using reference          = conj_elem_type;
+    using const_reference    = conj_elem_type;
+    using index_type         = typename engine_type::index_type;
+    using span_type          = typename const_mdspan_traits::conjugate_mdspan_type;
+    using const_span_type    = typename const_mdspan_traits::conjugate_mdspan_type;
+
+    //- Construct/copy/destroy
+    //
+    ~matrix_view_engine() noexcept = default;
+
+    constexpr matrix_view_engine() noexcept
+    :   mp_engine(nullptr)
+    {}
+    constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine(matrix_view_engine const&) = default;
+
+    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+
+    explicit constexpr
+    matrix_view_engine(engine_type const& eng)
+    :   mp_engine(&eng)
+    {}
+
+    //- Status
+    //
+    constexpr bool
+    is_valid() const noexcept
+    {
+        return mp_engine != nullptr;
+    }
+
+    //- Size and capacity reporting.
+    //
+    constexpr index_type
+    size() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    constexpr index_type
+    capacity() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    //- Element access
+    //
+    constexpr reference
+    operator ()(index_type i) const
+    {
+        if constexpr (is_cx)
+            return std::conj((*mp_engine)(i));
+        else
+            return (*mp_engine)(i);
+    }
+
+    constexpr span_type
+    span() const noexcept
+    requires
+        this_type::has_mdspan
+    {
+        return const_mdspan_traits::make_conjugate(mp_engine->span());
+    }
+
+    //- Modifiers
+    //
+    constexpr void
+    swap(matrix_view_engine& rhs) noexcept
+    {
+        support_traits::swap(mp_engine, rhs.mp_engine);
+    }
+
+  private:
+    engine_pointer  mp_engine;
 };
 
 
@@ -654,6 +775,127 @@ class matrix_view_engine<ET, matrix_view::const_negation>
 
   private:
     engine_type const*  mp_engine;
+};
+
+
+template<class ET>
+requires
+    detail::readable_matrix_engine<ET>
+class matrix_view_engine<ET, matrix_view::const_conjugate>
+{
+    static constexpr bool   is_cx = detail::is_complex_v<typename ET::element_type>;
+
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET const*;
+    using conj_elem_type      = conditional_t<is_cx, typename ET::element_type, typename ET::const_reference>;
+    using support_traits      = detail::matrix_engine_support;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
+
+    static constexpr bool   has_mdspan = const_mdspan_traits::has_mdspan;
+
+  public:
+    using engine_type        = ET;
+    using owning_engine_type = detail::get_owning_engine_type_t<ET>;
+    using element_type       = typename engine_type::element_type;
+    using reference          = conj_elem_type;
+    using const_reference    = conj_elem_type;
+    using index_type         = typename engine_type::index_type;
+    using span_type          = typename const_mdspan_traits::conjugate_mdspan_type;
+    using const_span_type    = typename const_mdspan_traits::conjugate_mdspan_type;
+
+    //- Construct/copy/destroy
+    //
+    ~matrix_view_engine() noexcept = default;
+
+    constexpr matrix_view_engine() noexcept
+    :   mp_engine(nullptr)
+    {}
+    constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine(matrix_view_engine const&) = default;
+
+    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+
+    explicit constexpr
+    matrix_view_engine(engine_type const& eng)
+    :   mp_engine(&eng)
+    {}
+
+    //- Status
+    //
+    constexpr bool
+    is_valid() const noexcept
+    {
+        return mp_engine != nullptr;
+    }
+
+    //- Size and capacity reporting.
+    //
+    constexpr index_type
+    columns() const noexcept
+    {
+        return mp_engine->columns();
+    }
+
+    constexpr index_type
+    rows() const noexcept
+    {
+        return mp_engine->rows();
+    }
+
+    constexpr index_type
+    size() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    constexpr index_type
+    column_capacity() const noexcept
+    {
+        return mp_engine->columns();
+    }
+
+    constexpr index_type
+    row_capacity() const noexcept
+    {
+        return mp_engine->rows();
+    }
+
+    constexpr index_type
+    capacity() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    //- Element access
+    //
+    constexpr reference
+    operator ()(index_type i, index_type j) const
+    {
+        if constexpr (is_cx)
+            return std::conj((*mp_engine)(i, j));
+        else
+            return (*mp_engine)(i, j);
+    }
+
+    constexpr span_type
+    span() const noexcept
+    requires
+        this_type::has_mdspan
+    {
+        return const_mdspan_traits::make_conjugate(mp_engine->span());
+    }
+
+    //- Modifiers
+    //
+    constexpr void
+    swap(matrix_view_engine& rhs) noexcept
+    {
+        support_traits::swap(mp_engine, rhs.mp_engine);
+    }
+
+  private:
+    engine_pointer  mp_engine;
 };
 
 
@@ -1133,9 +1375,7 @@ class matrix_view_engine<ET, matrix_view::column>
     requires
         this_type::has_mdspan
     {
-        return mdspan_traits::make_submatrix(mp_engine->span(),
-                                                    0, mp_engine->rows(),
-                                                    m_column, 1);
+        return mdspan_traits::make_submatrix(mp_engine->span(), 0, mp_engine->rows(), m_column, 1);
     }
 
     //- Modifiers
@@ -1259,9 +1499,7 @@ class matrix_view_engine<ET, matrix_view::const_column>
     requires
         this_type::has_mdspan
     {
-        return const_mdspan_traits::make_submatrix(mp_engine->span(),
-                                                          0, mp_engine->rows(),
-                                                          m_column, 1);
+        return const_mdspan_traits::make_submatrix(mp_engine->span(), 0, mp_engine->rows(), m_column, 1);
     }
 
     //- Modifiers
@@ -1386,9 +1624,7 @@ class matrix_view_engine<ET, matrix_view::row>
     requires
         this_type::has_mdspan
     {
-        return mdspan_traits::make_submatrix(mp_engine->span(),
-                                                    m_row, 1,
-                                                    0, mp_engine->columns());
+        return mdspan_traits::make_submatrix(mp_engine->span(), m_row, 1, 0, mp_engine->columns());
     }
 
     //- Modifiers
@@ -1512,9 +1748,7 @@ class matrix_view_engine<ET, matrix_view::const_row>
     requires
         this_type::has_mdspan
     {
-        return const_mdspan_traits::make_submatrix(mp_engine->span(),
-                                                          m_row, 1,
-                                                          0, mp_engine->columns());
+        return const_mdspan_traits::make_submatrix(mp_engine->span(), m_row, 1, 0, mp_engine->columns());
     }
 
     //- Modifiers
@@ -1648,8 +1882,8 @@ class matrix_view_engine<ET, matrix_view::submatrix>
         this_type::has_mdspan
     {
         return mdspan_traits::make_submatrix(mp_engine->span(),
-                                                    m_row_start, m_row_count,
-                                                    m_col_start, m_col_count);
+                                             m_row_start, m_row_count,
+                                             m_col_start, m_col_count);
     }
 
     //- Modifiers
@@ -1785,8 +2019,8 @@ class matrix_view_engine<ET, matrix_view::const_submatrix>
         this_type::has_mdspan
     {
         return const_mdspan_traits::make_submatrix(mp_engine->span(),
-                                                          m_row_start, m_row_count,
-                                                          m_col_start, m_col_count);
+                                                   m_row_start, m_row_count,
+                                                   m_col_start, m_col_count);
     }
 
     //- Modifiers

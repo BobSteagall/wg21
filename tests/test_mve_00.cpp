@@ -10,6 +10,10 @@ TEST(Matrix, NegationView)
 {
 }
 
+TEST(Matrix, ConjugateView)
+{
+}
+
 TEST(Matrix, HermitianView)
 {
 }
@@ -116,6 +120,10 @@ TEST(AddTraits, MatViews)
     PRINT(m1);
     PRINT(m1.column(0).t().span());
     PRINT_TYPE(decltype(m1.column(0).t().span()));
+
+    PRINT(m1);
+    PRINT(m1.conj());
+    PRINT_TYPE(decltype(m1.conj()));
 }
 
 TEST(AddTraits, VecViews)
@@ -152,5 +160,7 @@ TEST(AddTraits, VecViews)
     PRINT_TYPE(decltype((-v2.subvector(2, 5)).span()));
     PRINT((-v2.subvector(2, 5)).span());
 
+    PRINT_TYPE(decltype(v2.conj()));
+    PRINT(v2.conj());
 }
 
