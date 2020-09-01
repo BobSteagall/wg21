@@ -52,9 +52,6 @@ struct matrix_view
     struct row {};
     struct const_row {};
 
-    struct subset {}
-    struct const_subset{};
-
     struct transpose {};
     struct const_transpose {};
 
