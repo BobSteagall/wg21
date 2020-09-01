@@ -12,7 +12,7 @@ namespace detail {
 //--------------------------------------------------------------------------------------------------
 //  Types:  passthru_accessor<T, WA>
 //          negation_accessor<T, WA>
-//          conjugation_accessor<T, WW>
+//          conjugate_accessor<T, WW>
 //
 //  These are specialized accessor policy types used for negation, transpose, and hermitian views.
 //  They wrap another accessor type WA for an element type T.  They differ in how they provide
@@ -74,9 +74,9 @@ struct negation_accessor
 };
 
 template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
-struct conjugation_accessor
+struct conjugate_accessor
 {
-    using offset_policy = conjugation_accessor;
+    using offset_policy = conjugate_accessor;
     using element_type  = T;
     using reference     = T;
     using pointer       = typename WA::pointer;
@@ -134,7 +134,7 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0>, L, A>>
     using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
 
     using negation_mdspan_type  = basic_mdspan<T, dyn_extents, dyn_layout, negation_accessor<T>>;
-    using conjugate_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, conjugation_accessor<T, A>>;
+    using conjugate_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, conjugate_accessor<T, A>>;
     using subvector_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
 
     template<class EST>
@@ -156,7 +156,7 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0>, L, A>>
         dyn_strides     str{s.stride(0)};
         dyn_mapping     map(ext, str);
 
-        return conjugate_mdspan_type(s.data(), map, conjugation_accessor<T, A>());
+        return conjugate_mdspan_type(s.data(), map, conjugate_accessor<T, A>());
     }
 
     template<class EST, class S1, class S2>
@@ -196,8 +196,8 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
     using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
 
     using negation_mdspan_type  = basic_mdspan<T, dyn_extents, dyn_layout, negation_accessor<T, A>>;
-    using conjugate_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, conjugation_accessor<T, A>>;
-    using hermitian_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, conjugation_accessor<T, A>>;
+    using conjugate_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, conjugate_accessor<T, A>>;
+    using hermitian_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, conjugate_accessor<T, A>>;
     using transpose_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
     using submatrix_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
 
@@ -220,7 +220,7 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
         dyn_strides     str{s.stride(0), s.stride(1)};
         dyn_mapping     map(ext, str);
 
-        return conjugate_mdspan_type(s.data(), map, conjugation_accessor<T, A>());
+        return conjugate_mdspan_type(s.data(), map, conjugate_accessor<T, A>());
     }
 
     template<class EST>
@@ -231,7 +231,7 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
         dyn_strides     str{s.stride(1), s.stride(0)};
         dyn_mapping     map(ext, str);
 
-        return hermitian_mdspan_type(s.data(), map, conjugation_accessor<T, A>());
+        return hermitian_mdspan_type(s.data(), map, conjugate_accessor<T, A>());
     }
 
     template<class EST>

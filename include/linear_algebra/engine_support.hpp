@@ -43,17 +43,23 @@ struct matrix_view
     struct const_conjugate {};
     struct const_hermitian {};
 
-    struct transpose {};
-    struct const_transpose {};
-
-    struct submatrix {};
-    struct const_submatrix {};
+    struct identity {};
+    struct const_identity {};
 
     struct column {};
     struct const_column {};
 
     struct row {};
     struct const_row {};
+
+    struct subset {}
+    struct const_subset{};
+
+    struct transpose {};
+    struct const_transpose {};
+
+    struct submatrix {};
+    struct const_submatrix {};
 };
 
 
