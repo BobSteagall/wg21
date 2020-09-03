@@ -8,7 +8,6 @@
 #ifndef LINEAR_ALGEBRA_HPP_DEFINED
 #define LINEAR_ALGEBRA_HPP_DEFINED
 
-
 //- Detect the compiler.
 //
 #if defined __clang__
@@ -106,8 +105,8 @@ namespace STD_LA
 #include "linear_algebra/engine_support.hpp"
 #include "linear_algebra/matrix_storage_engine.hpp"
 #include "linear_algebra/matrix_view_engine.hpp"
-#include "linear_algebra/basic_vector.hpp"
 #include "linear_algebra/basic_matrix.hpp"
+#include "linear_algebra/basic_vector.hpp"
 
 #include "linear_algebra/debug_helpers.hpp"     //- Helpers for debug/test -- not for production.
 

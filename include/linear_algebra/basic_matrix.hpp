@@ -16,6 +16,16 @@ requires
     and
     detail::default_initializable<ET>
     and
+    detail::readable_vector_engine<ET>
+class basic_vector;
+
+
+template<class ET, class COT>
+requires
+    detail::copyable<ET>
+    and
+    detail::default_initializable<ET>
+    and
     detail::readable_matrix_engine<ET>
 class basic_matrix
 {
@@ -623,6 +633,23 @@ class basic_matrix
     submatrix(index_type ri, index_type rn, index_type ci, index_type cn) const noexcept
     {
         return const_submatrix_type(detail::special_ctor_tag(), m_engine, ri, rn, ci, cn);
+    }
+
+    //----------------------------------------------------------
+    //- Custom operation injection.
+    //
+    template<class COT2>
+    constexpr basic_matrix<matrix_view_engine<engine_type, matrix_view::identity>, COT2>
+    adopt() noexcept
+    {
+        return {detail::special_ctor_tag(), m_engine};
+    }
+
+    template<class COT2>
+    constexpr basic_matrix<matrix_view_engine<engine_type, matrix_view::const_identity>, COT2>
+    adopt() const noexcept
+    {
+        return {detail::special_ctor_tag(), m_engine};
     }
 
     //----------------------------------------------------------

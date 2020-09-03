@@ -31,14 +31,11 @@ struct matrix_layout
 //  Class:      matrix_view
 //
 //  This public type is a container of tag sub-types whose purpose is to specify the functionality
-//  of a matrix or vector view when used as a template argument to matrix_view_engine<ET, MVT>
+//  of a view engine when used as the second template argument to matrix_view_engine<ET, MVT>.
 //--------------------------------------------------------------------------------------------------
 //
 struct matrix_view
 {
-    struct subvector {};
-    struct const_subvector {};
-
     struct const_negation {};
     struct const_conjugate {};
     struct const_hermitian {};
@@ -46,17 +43,20 @@ struct matrix_view
     struct identity {};
     struct const_identity {};
 
+    struct transpose {};
+    struct const_transpose {};
+
     struct column {};
     struct const_column {};
 
     struct row {};
     struct const_row {};
 
-    struct transpose {};
-    struct const_transpose {};
-
     struct submatrix {};
     struct const_submatrix {};
+
+    struct subvector {};
+    struct const_subvector {};
 };
 
 
@@ -692,7 +692,7 @@ concept valid_allocator_arg = no_allocator<A> or valid_allocator_interface<T, A>
 //  This private concept determines whether a given combination of element type T, allocator A,
 //  and extents X is acceptable for matrix_storage_engine.  There are valid two possibilities:
 //  1. There is no allocator and the extents are greater than zero in all dimensions;
-//  2. There is a valid allocator, the extent arguments are valid.
+//  2. There is a valid allocator, the extent arguments are valid for fixed-size or dynamic-sized.
 //--------------------------------------------------------------------------------------------------
 //
 template<typename T, typename X, typename A>

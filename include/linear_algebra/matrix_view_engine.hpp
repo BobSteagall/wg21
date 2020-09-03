@@ -14,9 +14,9 @@ namespace detail {
 //          negation_accessor<T, WA>
 //          conjugate_accessor<T, WW>
 //
-//  These are specialized accessor policy types used for negation, transpose, and hermitian views.
-//  They wrap another accessor type WA for an element type T.  They differ in how they provide
-//  access to the underlying element.
+//  These are specialized mdspan accessor policy types used for negation, transpose, and hermitian
+//  views.  They wrap another accessor type WA for an element type T.  They differ in how they
+//  provide access to the underlying element.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
@@ -101,8 +101,12 @@ struct conjugate_accessor
 };
 
 
-//------------------------------------------------------------------------
-//- The actual noe_mdspan_traits type, with partial specializations below.
+//--------------------------------------------------------------------------------------------------
+//  Class Template:     mve_mdspan_traits<T>
+//
+//  This traits class template provides services for determining the types, and computing the
+//  values, of mdspan object that can index the set of elements represented by a view object.
+//--------------------------------------------------------------------------------------------------
 //
 template<class T>
 struct mve_mdspan_traits;
@@ -121,7 +125,8 @@ struct mve_mdspan_traits<void>
     using transpose_mdspan_type = void;
 };
 
-//- This partial specialization is used when an engine is one-dimensional.
+
+//- This partial specialization is used when a host engine is one-dimensional.
 //
 template<class T, ptrdiff_t X0, class L, class A>
 struct mve_mdspan_traits<basic_mdspan<T, extents<X0>, L, A>>
@@ -183,7 +188,8 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0>, L, A>>
     }
 };
 
-//- These partial specializations are used when an engine is two-dimensional.
+
+//- This partial specialization is used when a host engine is two-dimensional.
 //
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
 struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
@@ -272,12 +278,14 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
 
 }       //- detail namespace
 //==================================================================================================
+//  VECTOR VIEW ENGINES
 //==================================================================================================
-//  Class Template:     matrix_view_engine<ET, MVT>
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_negation>
 //
-//  This partial specialization of matrix_storage_engine<T,X,A,L> implements an owning engine
-//  for use by class template basic_vector<ET, OT>.  Specifically, it models a mathematical
-//  vector having N elements, employing allocator A, and having element layout L.
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_vector<ET, OT>.  It provides a view of a host vector engine
+//  that expresses the negation of that engine.
 //--------------------------------------------------------------------------------------------------
 //
 template<class ET>
@@ -312,8 +320,8 @@ class matrix_view_engine<ET, matrix_view::const_negation>
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
 
-    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
     matrix_view_engine(engine_type const& eng)
@@ -344,7 +352,7 @@ class matrix_view_engine<ET, matrix_view::const_negation>
 
     //- Element access
     //
-    constexpr reference
+    constexpr const_reference
     operator ()(index_type i) const
     {
         return -((*mp_engine)(i));
@@ -371,6 +379,14 @@ class matrix_view_engine<ET, matrix_view::const_negation>
 };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_conjugate>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_vector<ET, OT>.  It provides a read-only view of a host
+//  vector engine that expresses the element-wise complex conjugate of that engine.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 requires
     detail::readable_vector_engine<ET>
@@ -406,8 +422,8 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
 
-    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
     matrix_view_engine(engine_type const& eng)
@@ -438,7 +454,7 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
 
     //- Element access
     //
-    constexpr reference
+    constexpr const_reference
     operator ()(index_type i) const
     {
         if constexpr (is_cx)
@@ -468,6 +484,14 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
 };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::subvector>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_vector<ET, OT>.  It provides a read-write view of a host
+//  vector engine that expresses a sub-region of that engine.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 requires
     detail::writable_vector_engine<ET>
@@ -503,8 +527,8 @@ class matrix_view_engine<ET, matrix_view::subvector>
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
 
-    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
     matrix_view_engine(engine_type& eng, index_type start, index_type count) noexcept
@@ -566,6 +590,14 @@ class matrix_view_engine<ET, matrix_view::subvector>
 };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_subvector>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_vector<ET, OT>.  It provides a read-only view of a host
+//  vector engine that expresses a sub-region of that engine.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 requires
     detail::readable_vector_engine<ET>
@@ -600,8 +632,8 @@ class matrix_view_engine<ET, matrix_view::const_subvector>
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
 
-    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
     matrix_view_engine(engine_type const& eng, index_type start, index_type count) noexcept
@@ -663,6 +695,17 @@ class matrix_view_engine<ET, matrix_view::const_subvector>
 };
 
 
+//==================================================================================================
+//  MATRIX VIEW ENGINES
+//==================================================================================================
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_negation>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_matrix<ET, OT>.  It provides a read-only view of a host
+//  matrix engine that expresses the element-wise negation of that engine.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 requires
     detail::readable_matrix_engine<ET>
@@ -695,8 +738,8 @@ class matrix_view_engine<ET, matrix_view::const_negation>
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
 
-    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
     matrix_view_engine(engine_type const& eng)
@@ -751,7 +794,7 @@ class matrix_view_engine<ET, matrix_view::const_negation>
 
     //- Element access
     //
-    constexpr reference
+    constexpr const_reference
     operator ()(index_type i, index_type j) const
     {
         return -((*mp_engine)(i, j));
@@ -778,6 +821,14 @@ class matrix_view_engine<ET, matrix_view::const_negation>
 };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_conjugate>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_matrix<ET, OT>.  It provides a read-only view of a host
+//  matrix engine that expresses the element-wise complex conjugate of that engine.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 requires
     detail::readable_matrix_engine<ET>
@@ -813,8 +864,8 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
 
-    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
     matrix_view_engine(engine_type const& eng)
@@ -869,7 +920,7 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
 
     //- Element access
     //
-    constexpr reference
+    constexpr const_reference
     operator ()(index_type i, index_type j) const
     {
         if constexpr (is_cx)
@@ -899,6 +950,14 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
 };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_hermitian>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_matrix<ET, OT>.  It provides a read-only view of a host
+//  matrix engine that expresses the complex conjugate transpose of that engine.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 requires
     detail::readable_matrix_engine<ET>
@@ -934,8 +993,8 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
 
-    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
     matrix_view_engine(engine_type const& eng)
@@ -990,7 +1049,7 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
 
     //- Element access
     //
-    constexpr reference
+    constexpr const_reference
     operator ()(index_type i, index_type j) const
     {
         if constexpr (is_cx)
@@ -1020,6 +1079,277 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
 };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::identity>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_matrix<ET, OT>.  It provides a read-write view of a host
+//  matrix engine that is the same as that engine.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET>
+requires
+    detail::writable_matrix_engine<ET>
+class matrix_view_engine<ET, matrix_view::identity>
+{
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET*;
+    using support_traits      = detail::matrix_engine_support;
+    using mdspan_traits       = detail::mve_mdspan_traits<detail::get_mdspan_type_t<ET>>;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
+
+    static constexpr bool   has_mdspan = mdspan_traits::has_mdspan;
+
+  public:
+    using engine_type        = ET;
+    using owning_engine_type = detail::get_owning_engine_type_t<ET>;
+    using element_type       = typename engine_type::element_type;
+    using reference          = typename engine_type::reference;
+    using const_reference    = typename engine_type::const_reference;
+    using index_type         = typename engine_type::index_type;
+    using span_type          = typename engine_type::span_type;
+    using const_span_type    = typename engine_type::const_span_type;
+
+    //- Construct/copy/destroy
+    //
+    ~matrix_view_engine() noexcept = default;
+
+    constexpr matrix_view_engine() noexcept
+    :   mp_engine(nullptr)
+    {}
+    constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine(matrix_view_engine const&) = default;
+
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
+
+    explicit constexpr
+    matrix_view_engine(engine_type& eng)
+    :   mp_engine(&eng)
+    {}
+
+    //- Status
+    //
+    constexpr bool
+    is_valid() const noexcept
+    {
+        return mp_engine != nullptr;
+    }
+
+    //- Size and capacity reporting.
+    //
+    constexpr index_type
+    columns() const noexcept
+    {
+        return mp_engine->columns();
+    }
+
+    constexpr index_type
+    rows() const noexcept
+    {
+        return mp_engine->rows();
+    }
+
+    constexpr index_type
+    size() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    constexpr index_type
+    column_capacity() const noexcept
+    {
+        return mp_engine->columns();
+    }
+
+    constexpr index_type
+    row_capacity() const noexcept
+    {
+        return mp_engine->rows();
+    }
+
+    constexpr index_type
+    capacity() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    //- Element access
+    //
+    constexpr reference
+    operator ()(index_type i, index_type j) const
+    {
+        return (*mp_engine)(i, j);
+    }
+
+    constexpr reference
+    operator ()(index_type i) const
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        return (*mp_engine)(i);
+    }
+
+    constexpr span_type
+    span() const noexcept
+    requires
+        this_type::has_mdspan
+    {
+        return mp_engine->span();
+    }
+
+    //- Modifiers
+    //
+    constexpr void
+    swap(matrix_view_engine& rhs) noexcept
+    {
+        support_traits::swap(mp_engine, rhs.mp_engine);
+    }
+
+  private:
+    engine_pointer  mp_engine;
+};
+
+
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_identity>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_matrix<ET, OT>.  It provides a read-only view of a host
+//  matrix engine that is the same as that engine.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET>
+requires
+    detail::readable_matrix_engine<ET>
+class matrix_view_engine<ET, matrix_view::const_identity>
+{
+    using this_type           = matrix_view_engine;
+    using engine_pointer      = ET const*;
+    using support_traits      = detail::matrix_engine_support;
+    using const_mdspan_traits = detail::mve_mdspan_traits<detail::get_const_mdspan_type_t<ET>>;
+
+    static constexpr bool   has_mdspan = const_mdspan_traits::has_mdspan;
+
+  public:
+    using engine_type        = ET;
+    using owning_engine_type = detail::get_owning_engine_type_t<ET>;
+    using element_type       = typename engine_type::element_type;
+    using reference          = typename engine_type::const_reference;
+    using const_reference    = typename engine_type::const_reference;
+    using index_type         = typename engine_type::index_type;
+    using span_type          = typename engine_type::const_span_type;
+    using const_span_type    = typename engine_type::const_span_type;
+
+    //- Construct/copy/destroy
+    //
+    ~matrix_view_engine() noexcept = default;
+
+    constexpr matrix_view_engine() noexcept
+    :   mp_engine(nullptr)
+    {}
+    constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine(matrix_view_engine const&) = default;
+
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
+
+    explicit constexpr
+    matrix_view_engine(engine_type const& eng)
+    :   mp_engine(&eng)
+    {}
+
+    //- Status
+    //
+    constexpr bool
+    is_valid() const noexcept
+    {
+        return mp_engine != nullptr;
+    }
+
+    //- Size and capacity reporting.
+    //
+    constexpr index_type
+    columns() const noexcept
+    {
+        return mp_engine->columns();
+    }
+
+    constexpr index_type
+    rows() const noexcept
+    {
+        return mp_engine->rows();
+    }
+
+    constexpr index_type
+    size() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    constexpr index_type
+    column_capacity() const noexcept
+    {
+        return mp_engine->columns();
+    }
+
+    constexpr index_type
+    row_capacity() const noexcept
+    {
+        return mp_engine->rows();
+    }
+
+    constexpr index_type
+    capacity() const noexcept
+    {
+        return mp_engine->size();
+    }
+
+    //- Element access
+    //
+    constexpr const_reference
+    operator ()(index_type i, index_type j) const
+    {
+        return (*mp_engine)(i, j);
+    }
+
+    constexpr const_reference
+    operator ()(index_type i) const
+    requires
+        detail::readable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        return (*mp_engine)(i);
+    }
+
+    constexpr span_type
+    span() const noexcept
+    requires
+        this_type::has_mdspan
+    {
+        return mp_engine->span();
+    }
+
+    //- Modifiers
+    //
+    constexpr void
+    swap(matrix_view_engine& rhs) noexcept
+    {
+        support_traits::swap(mp_engine, rhs.mp_engine);
+    }
+
+  private:
+    engine_pointer  mp_engine;
+};
+
+
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::transpose>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_matrix<ET, OT>.  It provides a read-write view of a host
+//  matrix engine that expresses the transpose of that engine.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 requires
     detail::writable_matrix_engine<ET>
@@ -1053,8 +1383,8 @@ class matrix_view_engine<ET, matrix_view::transpose>
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
 
-    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
     matrix_view_engine(engine_type& eng)
@@ -1144,6 +1474,14 @@ class matrix_view_engine<ET, matrix_view::transpose>
 };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_transpose>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_matrix<ET, OT>.  It provides a read-only view of a host
+//  matrix engine that expresses the transpose of that engine.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 requires
     detail::readable_matrix_engine<ET>
@@ -1176,8 +1514,8 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
 
-    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
     matrix_view_engine(engine_type const& eng)
@@ -1267,6 +1605,14 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
 };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::column>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_matrix<ET, OT>.  It provides a read-write view of a column
+//  of a host matrix engine, and expresses an engine of size R x 1.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 requires
     detail::writable_matrix_engine<ET>
@@ -1301,8 +1647,8 @@ class matrix_view_engine<ET, matrix_view::column>
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
 
-    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
     matrix_view_engine(engine_type& eng, index_type ci) noexcept
@@ -1392,6 +1738,14 @@ class matrix_view_engine<ET, matrix_view::column>
 };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_column>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_matrix<ET, OT>.  It provides a read-only view of a column
+//  of a host matrix engine, and expresses an engine of size R x 1.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 requires
     detail::readable_matrix_engine<ET>
@@ -1425,8 +1779,8 @@ class matrix_view_engine<ET, matrix_view::const_column>
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
 
-    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
     matrix_view_engine(engine_type const& eng, index_type ci) noexcept
@@ -1516,6 +1870,14 @@ class matrix_view_engine<ET, matrix_view::const_column>
 };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::row>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_matrix<ET, OT>.  It provides a read-write view of a row
+//  of a host matrix engine, and expresses an engine of size 1 x C.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 requires
     detail::writable_matrix_engine<ET>
@@ -1550,8 +1912,8 @@ class matrix_view_engine<ET, matrix_view::row>
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
 
-    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
     matrix_view_engine(engine_type& eng, index_type ri) noexcept
@@ -1641,6 +2003,14 @@ class matrix_view_engine<ET, matrix_view::row>
 };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_row>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_matrix<ET, OT>.  It provides a read-only view of a row
+//  of a host matrix engine, and expresses an engine of size 1 x C.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 requires
     detail::readable_matrix_engine<ET>
@@ -1674,8 +2044,8 @@ class matrix_view_engine<ET, matrix_view::const_row>
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
 
-    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
     matrix_view_engine(engine_type const& eng, index_type ri) noexcept
@@ -1765,6 +2135,14 @@ class matrix_view_engine<ET, matrix_view::const_row>
 };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::submatrix>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_matrix<ET, OT>.  It provides a read-write view of a host
+//  matrix engine that expresses a sub-region of that engine.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 requires
     detail::writable_matrix_engine<ET>
@@ -1802,11 +2180,13 @@ class matrix_view_engine<ET, matrix_view::submatrix>
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
 
-    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
-    matrix_view_engine(engine_type& eng, index_type ri, index_type rn, index_type ci, index_type cn) noexcept
+    matrix_view_engine(engine_type& eng,
+                       index_type ri, index_type rn,
+                       index_type ci, index_type cn) noexcept
     :   mp_engine(&eng)
     ,   m_row_start(ri)
     ,   m_row_count(rn)
@@ -1903,6 +2283,14 @@ class matrix_view_engine<ET, matrix_view::submatrix>
 };
 
 
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_submatrix>
+//
+//  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
+//  for use by class template basic_matrix<ET, OT>.  It provides a read-write view of a host
+//  matrix engine that expresses a sub-region of that engine.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET>
 requires
     detail::readable_matrix_engine<ET>
@@ -1939,11 +2327,13 @@ class matrix_view_engine<ET, matrix_view::const_submatrix>
     constexpr matrix_view_engine(matrix_view_engine&&) noexcept = default;
     constexpr matrix_view_engine(matrix_view_engine const&) = default;
 
-    constexpr matrix_view_engine&     operator =(matrix_view_engine&&) noexcept = default;
-    constexpr matrix_view_engine&     operator =(matrix_view_engine const&) = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine&&) noexcept = default;
+    constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
-    matrix_view_engine(engine_type const& eng, index_type ri, index_type rn, index_type ci, index_type cn) noexcept
+    matrix_view_engine(engine_type const& eng,
+                       index_type ri, index_type rn,
+                       index_type ci, index_type cn) noexcept
     :   mp_engine(&eng)
     ,   m_row_start(ri)
     ,   m_row_count(rn)
