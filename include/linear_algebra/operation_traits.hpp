@@ -32,10 +32,9 @@ template<class OT, class T1, class T2>      struct division_element_traits;
 template<class OT, class ET1, class ET2>    struct division_engine_traits;
 template<class OT, class OP1, class OP2>    struct division_arithmetic_traits;
 
-template<class OT, class AT1, class AT2, class T>  struct allocation_traits;
-
-template<class OT, class LT1, class LT2>    struct addition_layout_traits;
-template<class OT, class LT1, class LT2>    struct multiplication_layout_traits;
+template<class OT, class AT1, class AT2, class T>   struct allocation_traits;
+template<class OT, class LT1, class LT2>            struct addition_layout_traits;
+template<class OT, class LT1, class LT2>            struct multiplication_layout_traits;
 
 
 }       //- detail namespace
@@ -218,7 +217,7 @@ using select_matrix_operation_traits_t =
 //  are used to generate them.
 //
 //  For example, invoking STD_LA_DEFINE_OP_TRAITS_EXTRACTOR_2(addition, engine) will expand
-//  to the following:
+//  to the following set of traits types:
 //
 //      template<typename OT, typename U, typename V, typename = void>
 //      struct addition_engine_traits_extractor

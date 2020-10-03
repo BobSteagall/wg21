@@ -265,8 +265,8 @@ using get_mdspan_layout_t = typename mdspan_layout_mapper<L>::layout_type;
 //              dyn_vec_layout
 //              dyn_vec_mapping
 //
-//  These private aliases are used to reduce verbosity in subsequent code pertaining to mdspan
-//  types and objects.
+//  These private type aliases are used to reduce verbosity in subsequent code pertaining to
+//  mdspan types and objects.
 //--------------------------------------------------------------------------------------------------
 //
 using dyn_mat_extents = extents<dynamic_extent, dynamic_extent>;
