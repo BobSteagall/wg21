@@ -860,5 +860,19 @@ using dynamic_row_vector =
         basic_matrix<matrix_storage_engine<T, extents<1, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, COT>;
 
 
+template<class ET1, class COT1, class ET2, class COT2> inline constexpr
+bool
+operator ==(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
+{
+    return detail::matrix_engine_support::compare(m1, m2);
+}
+
+template<class ET1, class COT1, class ET2, class COT2> inline constexpr
+bool
+operator !=(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
+{
+    return !detail::matrix_engine_support::compare(m1, m2);
+}
+
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_BASIC_MATRIX_HPP_DEFINED

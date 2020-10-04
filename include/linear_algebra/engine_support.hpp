@@ -97,8 +97,8 @@ struct special_ctor_tag{};
 //  Trait:      has_size_type<T>
 //  Alias:      get_size_type_t<T>
 //
-//  This private traits type finds the nested alias size_type if it is present; otherwise, it
-//  returns size_t.
+//  This private traits type finds the nested type alias size_type if it is present; otherwise,
+//  it returns size_t.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, typename = void>
@@ -472,6 +472,41 @@ struct determine_indexing_order<matrix_storage_engine<T, extents<R, C>, A, matri
 //
 template<class ET> inline constexpr
 bool    use_row_wise_indexing_v = determine_indexing_order<ET>::use_row_wise;
+
+
+//--------------------------------------------------------------------------------------------------
+//  The following are used to determine whether or not an engine type actually has constexpr
+//  size member functions.  This technique relies on the facts that: (1) a lambda can be
+//  constexpr in C++17; (2) a capture-less lambda can be default-constructed (C++20); and
+//  (3), engine types must have a default constructor.
+//
+//  The detection code comes directly from a very cool technique described on StackOverflow at:
+//  https://stackoverflow.com/questions/55288555/c-check-if-statement-can-be-evaluated-constexpr.
+//--------------------------------------------------------------------------------------------------
+//
+template<class Lambda, int = (Lambda{}(), 0)> inline constexpr
+bool
+is_constexpr(Lambda)
+{
+    return true;
+}
+
+inline constexpr
+bool
+is_constexpr(...)
+{
+    return false;
+}
+
+template<class ET> inline constexpr
+bool
+has_constexpr_size()
+{
+    return is_constexpr([]{ ET().rows(); })  &&  is_constexpr([]{ ET().columns(); });
+}
+
+template<class ET> inline constexpr
+bool    has_constexpr_size_v = has_constexpr_size<ET>();
 
 
 //==================================================================================================
@@ -1283,7 +1318,7 @@ struct vector_engine_support : public common_engine_support
 
         for (;  si < sn;  ++di, ++si)
         {
-            dst(di) = static_cast<typename CT::value_type>(src[si]);
+            dst(di) = static_cast<typename ET::element_type>(src[si]);
         }
     }
 

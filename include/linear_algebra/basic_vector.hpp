@@ -10,7 +10,7 @@
 
 namespace STD_LA {
 
-template<class ET, class COT>
+template<class ET, class COT = void>
 requires
     detail::copyable<ET>
     and
@@ -20,7 +20,7 @@ requires
 class basic_matrix;
 
 
-template<class ET, class COT>
+template<class ET, class COT = void>
 requires
     detail::copyable<ET>
     and

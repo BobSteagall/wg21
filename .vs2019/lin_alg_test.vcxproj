@@ -53,6 +53,7 @@
     <ClCompile Include="..\tests\test_mse_4C.cpp" />
     <ClCompile Include="..\tests\test_mse_4D.cpp" />
     <ClCompile Include="..\tests\test_mse_4E.cpp" />
+    <ClCompile Include="..\tests\test_op_add.cpp" />
     <ClCompile Include="..\tests\test_op_add_traits.cpp" />
     <ClCompile Include="..\tests\test_op_div_traits.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
