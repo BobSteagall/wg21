@@ -606,6 +606,76 @@ struct allocation_traits<OT, std::allocator<U>, std::allocator<V>, T>
 };
 
 
+template<class ET>
+struct extent_helper
+{
+  private:
+    template<class Lambda, int = (Lambda{}(), 0)>
+    static constexpr ptrdiff_t
+    get_value_helper(Lambda)
+    {
+        return Lambda{}();
+    }
+
+    static constexpr ptrdiff_t
+    get_value_helper(...)
+    {
+        return dynamic_extent;
+    }
+
+  public:
+    static constexpr ptrdiff_t
+    columns()
+    requires
+        readable_matrix_engine<ET>
+    {
+        return get_value_helper([]{ return static_cast<ptrdiff_t>(ET().columns()); });
+    }
+
+    static constexpr ptrdiff_t
+    rows()
+    requires
+        readable_matrix_engine<ET>
+    {
+        return get_value_helper([]{ return static_cast<ptrdiff_t>(ET().rows()); });
+    }
+
+    static constexpr ptrdiff_t
+    size()
+    requires
+        readable_vector_engine<ET>
+    {
+        return get_value_helper([]{ return static_cast<ptrdiff_t>(ET().size()); });
+    }
+};
+
+template<class T, ptrdiff_t N, class A, class L>
+struct extent_helper<matrix_storage_engine<T, extents<N>, A, L>>
+{
+    static constexpr ptrdiff_t
+    size()
+    {
+        return N;
+    }
+};
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
+struct extent_helper<matrix_storage_engine<T, extents<R, C>, A, L>>
+{
+    static constexpr ptrdiff_t
+    columns()
+    {
+        return C;
+    }
+
+    static constexpr ptrdiff_t
+    rows()
+    {
+        return R;
+    }
+};
+
+
 //--------------------------------------------------------------------------------------------------
 //- Some useful alias templates used to support the various traits types.
 //

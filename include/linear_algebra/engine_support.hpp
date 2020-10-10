@@ -500,10 +500,30 @@ is_constexpr(...)
 
 template<class ET> inline constexpr
 bool
+has_constexpr_columns()
+{
+    return is_constexpr([]{ ET().columns(); });
+}
+
+template<class ET> inline constexpr
+bool
+has_constexpr_rows()
+{
+    return is_constexpr([]{ ET().rows(); });
+}
+
+template<class ET> inline constexpr
+bool
 has_constexpr_size()
 {
-    return is_constexpr([]{ ET().rows(); })  &&  is_constexpr([]{ ET().columns(); });
+    return is_constexpr([]{ ET().size(); });
 }
+
+template<class ET> inline constexpr
+bool    has_constexpr_columns_v = has_constexpr_columns<ET>();
+
+template<class ET> inline constexpr
+bool    has_constexpr_rows_v = has_constexpr_rows<ET>();
 
 template<class ET> inline constexpr
 bool    has_constexpr_size_v = has_constexpr_size<ET>();
