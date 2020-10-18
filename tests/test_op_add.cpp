@@ -14,17 +14,17 @@ struct addition_engine_traits2
     using element_type_2 = typename ET2::element_type;
     using element_traits = get_addition_element_traits_t<OTR, element_type_1, element_type_2>;
 
-    template<bool is_matrix> struct mat_t;
+    template<bool is_matrix> struct size_helper;
 
     template<>
-    struct mat_t<true>
+    struct size_helper<true>
     {
         //- Get the extents for each engine
         //
-        static constexpr ptrdiff_t  R1 = STD_LA::detail::extent_helper<ET1>::rows();
-        static constexpr ptrdiff_t  C1 = STD_LA::detail::extent_helper<ET1>::columns();
-        static constexpr ptrdiff_t  R2 = STD_LA::detail::extent_helper<ET2>::rows();
-        static constexpr ptrdiff_t  C3 = STD_LA::detail::extent_helper<ET2>::columns();
+        static constexpr ptrdiff_t  R1 = STD_LA::detail::engine_extents_helper<ET1>::rows();
+        static constexpr ptrdiff_t  C1 = STD_LA::detail::engine_extents_helper<ET1>::columns();
+        static constexpr ptrdiff_t  R2 = STD_LA::detail::engine_extents_helper<ET2>::rows();
+        static constexpr ptrdiff_t  C2 = STD_LA::detail::engine_extents_helper<ET2>::columns();
 
         //- Determine there are any dynamic row or column extents.
         //
@@ -40,11 +40,35 @@ struct addition_engine_traits2
         //
         static constexpr ptrdiff_t  RR = (dyn_rows) ? dynamic_extent : R1;
         static constexpr ptrdiff_t  CR = (dyn_cols) ? dynamic_extent : C1;
+
+        //- Specify the new extents type.
+        //
+        using extents_type = extents<RR, CR>;
     };
 
     template<>
-    struct mat_t<false>
+    struct size_helper<false>
     {
+        //- Get the extent for each engine.
+        //
+        static constexpr ptrdiff_t  S1 = STD_LA::detail::engine_extents_helper<ET1>::size();
+        static constexpr ptrdiff_t  S2 = STD_LA::detail::engine_extents_helper<ET2>::size();
+
+        //- Determine if there are any dynamic size extents.
+        //
+        static constexpr bool   dyn_size = ((S1 == dynamic_extent) || (S2 == dynamic_extent));
+
+        //- Validate the extents.
+        //
+        static_assert((S1 == S2 || dyn_size), "mis-matched/invalid size for addition");
+
+        //- Decide on the new size.
+        //
+        static constexpr ptrdiff_t  SR = (dyn_size) ? dynamic_extent : S1;
+
+        //- Specify the new extents type.
+        //
+        using extents_type = extents<SR>;
     };
 
   public:
@@ -67,14 +91,14 @@ using dmf    = dynamic_matrix<float>;
 
 template<class Lambda, int = (Lambda{}(), 0)> inline constexpr
 ptrdiff_t
-get_extent_helper(Lambda)
+get_engine_extents_helper(Lambda)
 {
     return Lambda{}();
 }
 
 inline constexpr
 ptrdiff_t
-get_extent_helper(...)
+get_engine_extents_helper(...)
 {
     return dynamic_extent;
 }
@@ -83,14 +107,14 @@ template<class ET> inline constexpr
 ptrdiff_t
 get_column_extent()
 {
-    return get_extent_helper([]{ return static_cast<ptrdiff_t>(ET().columns()); });
+    return get_engine_extents_helper([]{ return static_cast<ptrdiff_t>(ET().columns()); });
 }
 
 template<class ET> inline constexpr
 ptrdiff_t
 get_row_extent()
 {
-    return get_extent_helper([]{ return static_cast<ptrdiff_t>(ET().rows()); });
+    return get_engine_extents_helper([]{ return static_cast<ptrdiff_t>(ET().rows()); });
 }
 
 TEST(Add, Constexpr)
@@ -112,10 +136,10 @@ TEST(Add, Constexpr)
     constexpr auto  xc3 = get_column_extent<decltype(mr.t())::engine_type>();
     constexpr auto  xc4 = get_column_extent<dmf::engine_type>();
 
-    constexpr auto  xc5 = extent_helper<fmf_33::engine_type>::columns();
-    constexpr auto  xc6 = extent_helper<gmf_44::engine_type>::columns();
-    constexpr auto  xc7 = extent_helper<decltype(mr.t())::engine_type>::columns();
-    constexpr auto  xc8 = extent_helper<dmf::engine_type>::columns();
+    constexpr auto  xc5 = engine_extents_helper<fmf_33::engine_type>::columns();
+    constexpr auto  xc6 = engine_extents_helper<gmf_44::engine_type>::columns();
+    constexpr auto  xc7 = engine_extents_helper<decltype(mr.t())::engine_type>::columns();
+    constexpr auto  xc8 = engine_extents_helper<dmf::engine_type>::columns();
 
     //constexpr gmf_33    m10 = LST_33_1;
 }

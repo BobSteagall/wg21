@@ -607,7 +607,7 @@ struct allocation_traits<OT, std::allocator<U>, std::allocator<V>, T>
 
 
 template<class ET>
-struct extent_helper
+struct engine_extents_helper
 {
   private:
     template<class Lambda, int = (Lambda{}(), 0)>
@@ -650,7 +650,7 @@ struct extent_helper
 };
 
 template<class T, ptrdiff_t N, class A, class L>
-struct extent_helper<matrix_storage_engine<T, extents<N>, A, L>>
+struct engine_extents_helper<matrix_storage_engine<T, extents<N>, A, L>>
 {
     static constexpr ptrdiff_t
     size()
@@ -660,7 +660,7 @@ struct extent_helper<matrix_storage_engine<T, extents<N>, A, L>>
 };
 
 template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
-struct extent_helper<matrix_storage_engine<T, extents<R, C>, A, L>>
+struct engine_extents_helper<matrix_storage_engine<T, extents<R, C>, A, L>>
 {
     static constexpr ptrdiff_t
     columns()
@@ -675,6 +675,23 @@ struct extent_helper<matrix_storage_engine<T, extents<R, C>, A, L>>
     }
 };
 
+template<class ET>
+struct engine_layout_helper
+{
+    using layout_type = matrix_layout::row_major;
+};
+
+template<class T, ptrdiff_t N, class A, class L>
+struct engine_layout_helper<matrix_storage_engine<T, extents<N>, A, L>>
+{
+    using layout_type = void;
+};
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
+struct engine_layout_helper<matrix_storage_engine<T, extents<R, C>, A, L>>
+{
+    using layout_type = L;
+};
 
 //--------------------------------------------------------------------------------------------------
 //- Some useful alias templates used to support the various traits types.
