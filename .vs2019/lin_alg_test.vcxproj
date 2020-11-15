@@ -75,6 +75,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\docs\papers\P1385D7.md" />
     <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

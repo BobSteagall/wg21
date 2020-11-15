@@ -54,7 +54,7 @@ struct addition_engine_traits2
         static constexpr ptrdiff_t  S1 = STD_LA::detail::engine_extents_helper<ET1>::size();
         static constexpr ptrdiff_t  S2 = STD_LA::detail::engine_extents_helper<ET2>::size();
 
-        //- Determine if there are any dynamic size extents.
+        //- Determine if the size extent is dynamic.
         //
         static constexpr bool   dyn_size = ((S1 == dynamic_extent) || (S2 == dynamic_extent));
 
@@ -62,7 +62,7 @@ struct addition_engine_traits2
         //
         static_assert((S1 == S2 || dyn_size), "mis-matched/invalid size for addition");
 
-        //- Decide on the new size.
+        //- Decide on the new extent.
         //
         static constexpr ptrdiff_t  SR = (dyn_size) ? dynamic_extent : S1;
 
@@ -70,6 +70,9 @@ struct addition_engine_traits2
         //
         using extents_type = extents<SR>;
     };
+
+    using extents_type = typename size_helper<STD_LA::detail::readable_matrix_engine<ET1>>::extents_type;
+
 
   public:
     using element_type = typename element_traits::element_type;

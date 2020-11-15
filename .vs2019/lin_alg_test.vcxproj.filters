@@ -15,6 +15,9 @@
     <Filter Include="Library Interface Headers">
       <UniqueIdentifier>{d983a94d-1b7f-4c43-bbaf-feb32ee50fa3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Docs">
+      <UniqueIdentifier>{f6bb5b86-d96d-48ef-8309-aa1972924033}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\linear_algebra.hpp">
@@ -133,5 +136,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="..\docs\papers\P1385D7.md">
+      <Filter>Docs</Filter>
+    </None>
   </ItemGroup>
 </Project>
