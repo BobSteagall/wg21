@@ -121,11 +121,11 @@ struct matrix_operation_traits
 
 
 //--------------------------------------------------------------------------------------------------
-//  Class Template:     matrix_operation_traits
+//  Class Template:     matrix_operation_traits_selector
 //
 //  This class template is a customization point, which can be specialized by users, that is
 //  used by the arithmetic operators to select the operation traits type to be used in computing
-//  that operation's result type.
+//  that operator's result type.
 //--------------------------------------------------------------------------------------------------
 //
 template<class COT1, class COT2>    struct matrix_operation_traits_selector;
@@ -593,6 +593,20 @@ struct allocation_traits<OT, void, std::allocator<V>, T>
 
 template<class OT, class U, class T>
 struct allocation_traits<OT, std::allocator<U>, void, T>
+{
+    using traits_type    = std::allocator_traits<std::allocator<U>>;
+    using allocator_type = typename traits_type::template rebind_alloc<T>;
+};
+
+template<class OT, class A1, class V, class T>
+struct allocation_traits<OT, A1, std::allocator<V>, T>
+{
+    using traits_type    = std::allocator_traits<std::allocator<V>>;
+    using allocator_type = typename traits_type::template rebind_alloc<T>;
+};
+
+template<class OT, class U, class A2, class T>
+struct allocation_traits<OT, std::allocator<U>, A2, T>
 {
     using traits_type    = std::allocator_traits<std::allocator<U>>;
     using allocator_type = typename traits_type::template rebind_alloc<T>;

@@ -4,6 +4,64 @@
 using namespace STD_LA;
 //using namespace MDSPAN_NS;
 
+template<class ET1, class ET2, bool IsMatrix> struct engine_addition_extents_helper;
+
+template<class ET1, class ET2>
+struct engine_addition_extents_helper<ET1, ET2, true>
+{
+    //- Get the extents for each engine
+    //
+    static constexpr ptrdiff_t  R1 = STD_LA::detail::engine_extents_helper<ET1>::rows();
+    static constexpr ptrdiff_t  C1 = STD_LA::detail::engine_extents_helper<ET1>::columns();
+    static constexpr ptrdiff_t  R2 = STD_LA::detail::engine_extents_helper<ET2>::rows();
+    static constexpr ptrdiff_t  C2 = STD_LA::detail::engine_extents_helper<ET2>::columns();
+
+    //- Determine there are any dynamic row or column extents.
+    //
+    static constexpr bool   dyn_rows = ((R1 == dynamic_extent) || (R2 == dynamic_extent));
+    static constexpr bool   dyn_cols = ((C1 == dynamic_extent) || (C2 == dynamic_extent));
+
+    //- Validate the extents.
+    //
+    static_assert((R1 == R2 || dyn_rows), "mis-matched/invalid number of rows for addition");
+    static_assert((C1 == C2 || dyn_cols), "mis-matched/invalid number of columns for addition");
+
+    //- Decide on the new extents.
+    //
+    static constexpr ptrdiff_t  RR = (dyn_rows) ? dynamic_extent : R1;
+    static constexpr ptrdiff_t  CR = (dyn_cols) ? dynamic_extent : C1;
+
+    //- Specify the new extents type.
+    //
+    using extents_type = extents<RR, CR>;
+};
+
+template<class ET1, class ET2>
+struct engine_addition_extents_helper<ET1, ET2, false>
+{
+    //- Get the extent for each engine.
+    //
+    static constexpr ptrdiff_t  S1 = STD_LA::detail::engine_extents_helper<ET1>::size();
+    static constexpr ptrdiff_t  S2 = STD_LA::detail::engine_extents_helper<ET2>::size();
+
+    //- Determine if the size extent is dynamic.
+    //
+    static constexpr bool   dyn_size = ((S1 == dynamic_extent) || (S2 == dynamic_extent));
+
+    //- Validate the extents.
+    //
+    static_assert((S1 == S2 || dyn_size), "mis-matched/invalid size for addition");
+
+    //- Decide on the new extent.
+    //
+    static constexpr ptrdiff_t  SR = (dyn_size) ? dynamic_extent : S1;
+
+    //- Specify the new extents type.
+    //
+    using extents_type = extents<SR>;
+};
+
+
 template<class OTR, class ET1, class ET2>
 struct addition_engine_traits2
 {
@@ -14,64 +72,7 @@ struct addition_engine_traits2
     using element_type_2 = typename ET2::element_type;
     using element_traits = get_addition_element_traits_t<OTR, element_type_1, element_type_2>;
 
-    template<bool is_matrix> struct size_helper;
-
-    template<>
-    struct size_helper<true>
-    {
-        //- Get the extents for each engine
-        //
-        static constexpr ptrdiff_t  R1 = STD_LA::detail::engine_extents_helper<ET1>::rows();
-        static constexpr ptrdiff_t  C1 = STD_LA::detail::engine_extents_helper<ET1>::columns();
-        static constexpr ptrdiff_t  R2 = STD_LA::detail::engine_extents_helper<ET2>::rows();
-        static constexpr ptrdiff_t  C2 = STD_LA::detail::engine_extents_helper<ET2>::columns();
-
-        //- Determine there are any dynamic row or column extents.
-        //
-        static constexpr bool   dyn_rows = ((R1 == dynamic_extent) || (R2 == dynamic_extent));
-        static constexpr bool   dyn_cols = ((C1 == dynamic_extent) || (C2 == dynamic_extent));
-
-        //- Validate the extents.
-        //
-        static_assert((R1 == R2 || dyn_rows), "mis-matched/invalid number of rows for addition");
-        static_assert((C1 == C2 || dyn_cols), "mis-matched/invalid number of columns for addition");
-
-        //- Decide on the new extents.
-        //
-        static constexpr ptrdiff_t  RR = (dyn_rows) ? dynamic_extent : R1;
-        static constexpr ptrdiff_t  CR = (dyn_cols) ? dynamic_extent : C1;
-
-        //- Specify the new extents type.
-        //
-        using extents_type = extents<RR, CR>;
-    };
-
-    template<>
-    struct size_helper<false>
-    {
-        //- Get the extent for each engine.
-        //
-        static constexpr ptrdiff_t  S1 = STD_LA::detail::engine_extents_helper<ET1>::size();
-        static constexpr ptrdiff_t  S2 = STD_LA::detail::engine_extents_helper<ET2>::size();
-
-        //- Determine if the size extent is dynamic.
-        //
-        static constexpr bool   dyn_size = ((S1 == dynamic_extent) || (S2 == dynamic_extent));
-
-        //- Validate the extents.
-        //
-        static_assert((S1 == S2 || dyn_size), "mis-matched/invalid size for addition");
-
-        //- Decide on the new extent.
-        //
-        static constexpr ptrdiff_t  SR = (dyn_size) ? dynamic_extent : S1;
-
-        //- Specify the new extents type.
-        //
-        using extents_type = extents<SR>;
-    };
-
-    using extents_type = typename size_helper<STD_LA::detail::readable_matrix_engine<ET1>>::extents_type;
+//    using extents_type = typename size_helper<STD_LA::detail::readable_matrix_engine<ET1>>::extents_type;
 
 
   public:
