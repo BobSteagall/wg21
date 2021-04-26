@@ -10,7 +10,7 @@ def username():
     return os.getenv("CONAN_USERNAME", "conan-oss")
 
 def login_username():
-    return os.getenv("CONAN_LOGIN_USERNAME", "ant.peacock@gmail.com")
+    return os.getenv("CONAN_LOGIN_USERNAME", "twonington")
 
 def upload():
     return os.getenv("CONAN_UPLOAD", "https://twonington.jfrog.io/artifactory/conan-oss/")
