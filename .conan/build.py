@@ -13,7 +13,7 @@ def login_username():
     return os.getenv("CONAN_LOGIN_USERNAME", "twonington")
 
 def upload():
-    return os.getenv("CONAN_UPLOAD", "https://twonington.jfrog.io/artifactory/conan-oss/")
+    return os.getenv("CONAN_UPLOAD", "https://twonington.jfrog.io/artifactory/api/conan/conan-oss")
 
 def upload_only_when_stable():
     return os.getenv("CONAN_UPLOAD_ONLY_WHEN_STABLE", "True").lower() in ["true", "1", "yes"]
