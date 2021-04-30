@@ -25,7 +25,7 @@ target_compile_options(gtest_main
 if(LA_BUILD_USING_PCH)
     target_precompile_headers(la_test
         PRIVATE
-            <linear_algebra.hpp>
+            <matrix.hpp>
             <gtest/gtest.h>
             <cassert>
     )
@@ -37,7 +37,6 @@ target_sources(la_test
         test_new_arithmetic.hpp
         test_new_engine.hpp
         test_new_number.hpp
-        test_mse_00.cpp
         test_mse_01.cpp
         test_mse_2A.cpp
         test_mse_2B.cpp
