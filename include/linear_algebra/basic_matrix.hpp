@@ -16,16 +16,6 @@ requires
     and
     detail::default_initializable<ET>
     and
-    detail::readable_vector_engine<ET>
-class basic_vector;
-
-
-template<class ET, class COT>
-requires
-    detail::copyable<ET>
-    and
-    detail::default_initializable<ET>
-    and
     detail::readable_matrix_engine<ET>
 class basic_matrix
 {
@@ -172,33 +162,6 @@ class basic_matrix
     :   m_engine()
     {
         engine_support::assign_from(m_engine, rhs);
-    }
-
-    //----------------------------------------------------------
-    //- Construction from a basic_vector.
-    //
-    template<class ET2, class COT2>
-    constexpr explicit
-    basic_matrix(basic_vector<ET2, COT2> const& rhs)
-    requires
-        detail::writable_and_1d_indexable_matrix_engine<engine_type>
-        and
-        detail::constructible_from<engine_type, ET2>
-    :   m_engine(rhs.engine())
-    {}
-
-    template<class ET2, class COT2>
-    constexpr explicit
-    basic_matrix(basic_vector<ET2, COT2> const& rhs)
-    requires
-        detail::writable_and_1d_indexable_matrix_engine<engine_type>
-        and
-        detail::not_constructible_from<engine_type, ET2>
-        and
-        detail::convertible_from<element_type, typename ET2::element_type>
-    :   m_engine()
-    {
-        engine_support::assign_from(m_engine, rhs.engine());
     }
 
     //----------------------------------------------------------
@@ -370,35 +333,6 @@ class basic_matrix
         detail::convertible_from<element_type, U>
     {
         engine_support::assign_from(m_engine, rhs);
-        return *this;
-    }
-
-    //----------------------------------------------------------
-    //- Assignment from a basic_vector.
-    //
-    template<class ET2, class COT2>
-    constexpr basic_matrix&
-    operator =(basic_vector<ET2, COT2> const& rhs)
-    requires
-        detail::writable_and_1d_indexable_matrix_engine<engine_type>
-        and
-        detail::assignable_from<engine_type, ET2>
-    {
-        m_engine = rhs.engine();
-        return *this;
-    }
-
-    template<class ET2, class COT2>
-    constexpr basic_matrix&
-    operator =(basic_vector<ET2, COT2> const& rhs)
-    requires
-        detail::writable_and_1d_indexable_matrix_engine<ET>
-        and
-        detail::not_assignable_from<engine_type, ET2>
-        and
-        detail::convertible_from<element_type, typename ET2::element_type>
-    {
-        engine_support::assign_from(m_engine, rhs.engine());
         return *this;
     }
 

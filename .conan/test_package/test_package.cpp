@@ -1,4 +1,4 @@
-#include <linear_algebra.hpp>
+#include <matrix.hpp>
 
 using namespace STD_LA;
 

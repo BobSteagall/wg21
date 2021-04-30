@@ -67,9 +67,7 @@ struct addition_engine_traits
 
   public:
     using element_type = typename element_traits::element_type;
-    using engine_type  = conditional_t<readable_matrix_engine<ET1>,
-                                       dynamic_matrix_engine<element_type>,
-                                       dynamic_vector_engine<element_type>>;
+    using engine_type  = dynamic_matrix_engine<element_type>;
 };
 
 
@@ -106,63 +104,11 @@ struct addition_engine_traits<OTR,
     using allocator_type = typename allocation_traits::allocator_type;
     using layout_type    = typename layout_traits::layout_type;
 
-public:
+  public:
     using element_type = typename element_traits::element_type;
     using engine_type  = matrix_storage_engine<element_type, extents_type, allocator_type, layout_type>;
 };
 
-
-//- The standard addition traits type provides the default mechanism for computing the result
-//  of a matrix/matrix or vector/vector addition.
-//
-//- (vector + vector)
-//
-template<class OTR, class ET1, class COT1, class ET2, class COT2>
-struct addition_arithmetic_traits<OTR, basic_vector<ET1, COT1>, basic_vector<ET2, COT2>>
-{
-  private:
-    using element_type_1  = typename ET1::element_type;
-    using element_type_2  = typename ET2::element_type;
-    using element_traits  = get_addition_element_traits_t<OTR, element_type_1, element_type_2>;
-
-    using owning_engine_1 = typename basic_vector<ET1, COT1>::owning_engine_type;
-    using owning_engine_2 = typename basic_vector<ET2, COT2>::owning_engine_type;
-    using engine_traits   = get_addition_engine_traits_t<OTR, owning_engine_1, owning_engine_2>;
-
-  public:
-    using element_type = typename element_traits::element_type;
-    using engine_type  = typename engine_traits::engine_type;
-    using result_type  = basic_vector<engine_type, OTR>;
-
-    static_assert(std::is_same_v<element_type, typename engine_type::element_type>);
-
-    static constexpr result_type
-    add(basic_vector<ET1, COT1> const& v1, basic_vector<ET2, COT2> const& v2)
-    {
-        using index_type_1 = typename vector<ET1, COT1>::index_type;
-        using index_type_2 = typename vector<ET2, COT2>::index_type;
-        using index_type_r = typename result_type::index_type;
-
-        index_type_r    elems = static_cast<index_type_r>(v1.size());
-        result_type     vr;
-
-        if constexpr (detail::reshapable_vector_engine<engine_type>)
-        {
-            vr.resize(elems);
-        }
-
-        index_type_r    ir = 0;
-        index_type_1    i1 = 0;
-        index_type_2    i2 = 0;
-
-        for (;  ir < elems;  ++ir, ++i1, ++i2)
-        {
-            vr(ir) = v1(i1) + v2(i2);
-        }
-
-        return vr;
-    }
-};
 
 //-------------------
 //- (matrix + matrix)

@@ -123,9 +123,9 @@ struct matrix_operation_traits
 //--------------------------------------------------------------------------------------------------
 //  Class Template:     matrix_operation_traits_selector
 //
-//  This class template is a customization point, which can be specialized by users, that is
-//  used by the arithmetic operators to select the operation traits type to be used in computing
-//  that operator's result type.
+//  This class template is a customization point, which may be specialized by users, that is used
+//  by the arithmetic operators to select the operation traits type to be used in computing that
+//  operator's result type.
 //--------------------------------------------------------------------------------------------------
 //
 template<class COT1, class COT2>    struct matrix_operation_traits_selector;
@@ -710,17 +710,6 @@ struct engine_layout_helper<matrix_storage_engine<T, extents<R, C>, A, L>>
 //--------------------------------------------------------------------------------------------------
 //- Some useful alias templates used to support the various traits types.
 //
-template<class T, ptrdiff_t N>
-using fixed_vector_engine = matrix_storage_engine<T, extents<N>, void, void>;
-
-template<class T, ptrdiff_t N>
-using sized_vector_engine = matrix_storage_engine<T, extents<N>, std::allocator<T>, void>;
-
-template<class T>
-using dynamic_vector_engine =
-        matrix_storage_engine<T, extents<dynamic_extent>, std::allocator<T>, void>;
-
-
 template<class T, ptrdiff_t R, ptrdiff_t C, class LT = matrix_layout::row_major>
 using fixed_matrix_engine = matrix_storage_engine<T, extents<R, C>, void, LT>;
 

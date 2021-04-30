@@ -286,38 +286,6 @@ Print(basic_matrix<ET, OT> const& m, char const* pname = nullptr)
     }
 }
 
-template<class ET, class OT>
-void
-Print(basic_vector<ET, OT> const& v, char const* pname = nullptr)
-{
-    using index_type = typename basic_vector<ET, OT>::index_type;
-
-    cout << endl << "vector: " << ((pname) ? pname : "<anon>") << endl;
-    cout << "  size: " << v.size() << endl;
-    cout << "  capy: " << v.capacity() << endl;
-    cout << "  -----" << endl;
-
-    cout << "(idx) " << right << setw(4) << setprecision(3) << (double) v(0);
-
-    for (index_type i = 1;  i < v.size();  ++i)
-    {
-        cout << right << setw(6) << setprecision(3) << (double) v(i);
-    }
-    cout << endl;
-/*
-    auto    iter = cbegin(v);
-    auto    last = cend(v);
-
-    cout << "(itr) " << right << setw(4) << setprecision(3) << (double) *iter;
-
-    for (++iter;  iter != last;  ++iter)
-    {
-        cout << right << setw(6) << setprecision(3) << (double) *iter;
-    }
-    cout << endl;
-    */
-}
-
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
 void
 Print(basic_mdspan<T, extents<X0, X1>, L, A> const& s, char const* pname = nullptr)
@@ -366,21 +334,6 @@ Print(bool b, char const* pname = nullptr)
 }
 
 #define PRINT(X)    Print(X, #X)
-
-template<class ET, class OT>
-void
-Fill(basic_vector<ET, OT>& v)
-{
-    using index_type   = typename basic_vector<ET, OT>::index_type;
-    using element_type = typename basic_vector<ET, OT>::element_type;
-
-    element_type    x = 1;
-
-    for (index_type i = 0;  i < v.size();  ++i)
-    {
-         v(i) = x;  x = x + 1;
-    }
-}
 
 template<class ET, class OT>
 void

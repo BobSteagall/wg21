@@ -2,7 +2,7 @@
 //  File:       engine_support.hpp
 //
 //  Summary:    This header defines a number of private aliases, traits, concepts, types, and
-//              functions used across the entire library to support engines and the required
+//              functions used across the entire library to support matrix engines and the
 //              operations upon them.
 //==================================================================================================
 //
@@ -54,9 +54,6 @@ struct matrix_view
 
     struct submatrix {};
     struct const_submatrix {};
-
-    struct subvector {};
-    struct const_subvector {};
 };
 
 
