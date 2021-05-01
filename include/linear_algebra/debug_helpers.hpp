@@ -218,31 +218,6 @@ PrintOperandTypes(string const& loc, O1 const& o1, O2 const& o2)
 #define PRINT_OP_TYPES(ET, MSG, ...)
 //#define PRINT_OP_TYPES(ET, MSG, ...)    STD_LA::PrintOperandTypes<ET>(MSG, __VA_ARGS__)
 
-template<class T, ptrdiff_t N, class A, class L>
-void
-Print(matrix_storage_engine<T, extents<N>, A, L> const& m, char const* pname = nullptr)
-{
-    using engine_type = matrix_storage_engine<T, extents<N>, A, L>;
-    using index_type  = typename engine_type::index_type;
-
-    cout << endl << "matrix: " << ((pname) ? pname : "<anon>") << endl;
-    cout << "  size: " << m.rows() << "x" << m.columns() << endl;
-    cout << "  capy: " << m.row_capacity() << "x" << m.column_capacity() << endl;
-    cout << "  -----" << endl;
-
-    for (index_type i = 0;  i < m.rows();  ++i)
-    {
-        cout << right << setw(4) << setprecision(3) << (double) m(i, 0);
-
-        for (index_type j = 1;  j < m.columns();  ++j)
-        {
-             cout << right << setw(6) << setprecision(3) << (double) m(i, j);
-        }
-
-        cout << endl;
-    }
-}
-
 template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
 void
 Print(matrix_storage_engine<T, extents<R, C>, A, L> const& v, char const* pname = nullptr)
@@ -250,7 +225,7 @@ Print(matrix_storage_engine<T, extents<R, C>, A, L> const& v, char const* pname 
     using engine_type = matrix_storage_engine<T, extents<R, C>, A, L>;
     using index_type  = typename engine_type::index_type;
 
-    cout << endl << "vector: " << ((pname) ? pname : "<anon>") << endl;
+    cout << endl << "engine: " << ((pname) ? pname : "<anon>") << endl;
     cout << "  size: " << v.size() << endl;
     cout << "  capy: " << v.capacity() << endl;
     cout << "  -----" << endl;
@@ -306,25 +281,6 @@ Print(basic_mdspan<T, extents<X0, X1>, L, A> const& s, char const* pname = nullp
         }
         cout << endl;
     }
-}
-
-template<class T, ptrdiff_t X0, class L, class A>
-void
-Print(basic_mdspan<T, extents<X0>, L, A> const& s, char const* pname = nullptr)
-{
-    using index_type = ptrdiff_t;
-
-    cout << endl << "mdspan: " << ((pname) ? pname : "<anon>") << endl;
-    cout << "  size: " << s.extent(0) << endl;
-    cout << "  -----" << endl;
-
-    cout << "(idx) " << right << setw(4) << setprecision(3) << (double) s(0);
-
-    for (index_type i = 1;  i < s.extent(0);  ++i)
-    {
-         std::cout << std::right << std::setw(6) << std::setprecision(3) << (double) s(i);
-    }
-    cout << endl;
 }
 
 inline void
