@@ -18,6 +18,9 @@
     <Filter Include="Docs">
       <UniqueIdentifier>{f6bb5b86-d96d-48ef-8309-aa1972924033}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CMake Files">
+      <UniqueIdentifier>{9c8428a1-5814-463b-ace4-cd6ef3874400}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\linear_algebra\debug_helpers.hpp">
@@ -63,9 +66,6 @@
       <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\linear_algebra\basic_matrix.hpp">
-      <Filter>Library Implementation Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\linear_algebra\basic_vector.hpp">
       <Filter>Library Implementation Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\matrix.hpp">
@@ -133,5 +133,13 @@
     <None Include="..\docs\papers\P1385D7.md">
       <Filter>Docs</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\CMakeLists.txt">
+      <Filter>CMake Files</Filter>
+    </Text>
+    <Text Include="..\tests\CMakeLists.txt">
+      <Filter>CMake Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
