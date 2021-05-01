@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\linear_algebra.hpp" />
     <ClInclude Include="..\include\linear_algebra\addition_traits.hpp" />
     <ClInclude Include="..\include\linear_algebra\basic_matrix.hpp" />
     <ClInclude Include="..\include\linear_algebra\basic_vector.hpp" />
@@ -31,6 +30,7 @@
     <ClInclude Include="..\include\linear_algebra\multiplication_traits.hpp" />
     <ClInclude Include="..\include\linear_algebra\operation_traits.hpp" />
     <ClInclude Include="..\include\linear_algebra\subtraction_traits.hpp" />
+    <ClInclude Include="..\include\matrix.hpp" />
     <ClInclude Include="..\tests\test_common.hpp" />
     <ClInclude Include="..\tests\test_new_arithmetic.hpp" />
     <ClInclude Include="..\tests\test_new_engine.hpp" />
@@ -39,9 +39,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\linear_algebra\matrix_storage_engine.hpp" />
     <ClCompile Include="..\tests\test_main.cpp" />
-    <ClCompile Include="..\tests\test_mse_00.cpp" />
     <ClCompile Include="..\tests\test_mve_00.cpp" />
-    <ClCompile Include="..\tests\test_mse_01.cpp" />
     <ClCompile Include="..\tests\test_mse_2A.cpp" />
     <ClCompile Include="..\tests\test_mse_2B.cpp" />
     <ClCompile Include="..\tests\test_mse_2C.cpp" />

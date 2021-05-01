@@ -20,9 +20,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\linear_algebra.hpp">
-      <Filter>Library Interface Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\linear_algebra\debug_helpers.hpp">
       <Filter>Library Implementation Headers</Filter>
     </ClInclude>
@@ -71,6 +68,9 @@
     <ClInclude Include="..\include\linear_algebra\basic_vector.hpp">
       <Filter>Library Implementation Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\matrix.hpp">
+      <Filter>Library Interface Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tests\test_main.cpp">
@@ -86,12 +86,6 @@
       <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_op_div_traits.cpp">
-      <Filter>Unit Test Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tests\test_mse_01.cpp">
-      <Filter>Unit Test Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tests\test_mse_00.cpp">
       <Filter>Unit Test Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tests\test_mse_4A.cpp">
