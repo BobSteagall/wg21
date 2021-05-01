@@ -19,6 +19,34 @@
 
 namespace STD_LA {
 namespace detail {
+
+template<class OT, class LT1, class LT2>    struct multiplication_layout_traits;
+
+template<class OT>
+struct multiplication_layout_traits<OT, matrix_layout::row_major, matrix_layout::row_major>
+{
+    using layout_type = matrix_layout::row_major;
+};
+
+template<class OT>
+struct multiplication_layout_traits<OT, matrix_layout::row_major, matrix_layout::column_major>
+{
+    using layout_type = matrix_layout::column_major;
+};
+
+template<class OT>
+struct multiplication_layout_traits<OT, matrix_layout::column_major, matrix_layout::row_major>
+{
+    using layout_type = matrix_layout::row_major;
+};
+
+template<class OT>
+struct multiplication_layout_traits<OT, matrix_layout::column_major, matrix_layout::column_major>
+{
+    using layout_type = matrix_layout::column_major;
+};
+
+
 //==================================================================================================
 //                         **** ELEMENT MULTIPLICATION TRAITS DETECTORS ****
 //==================================================================================================

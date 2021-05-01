@@ -66,8 +66,6 @@ template<class OTR, class ET1, class ET2>
 struct addition_engine_traits2
 {
   private:
-    static_assert(STD_LA::detail::similar_engines<ET1, ET2>);
-
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
     using element_traits = get_addition_element_traits_t<OTR, element_type_1, element_type_2>;

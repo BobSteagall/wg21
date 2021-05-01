@@ -15,8 +15,8 @@ namespace detail {
 //          conjugate_accessor<T, WW>
 //
 //  These are specialized mdspan accessor policy types used for negation, transpose, and hermitian
-//  views.  They wrap another accessor type WA for an element type T.  They differ in how they
-//  provide access to the underlying element.
+//  views.  They wrap another accessor type WA for an element type T.  They differ mainly in how
+//  they provide access to the underlying element.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
@@ -125,71 +125,7 @@ struct mve_mdspan_traits<void>
     using transpose_mdspan_type = void;
 };
 
-
-//- This partial specialization is used when a host engine is one-dimensional.
-//
-template<class T, ptrdiff_t X0, class L, class A>
-struct mve_mdspan_traits<basic_mdspan<T, extents<X0>, L, A>>
-{
-    static constexpr bool   has_mdspan = true;
-
-    using dyn_extents = extents<dynamic_extent>;
-    using dyn_strides = array<typename dyn_extents::index_type, 1>;
-    using dyn_layout  = layout_stride<dynamic_extent>;
-    using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
-
-    using negation_mdspan_type  = basic_mdspan<T, dyn_extents, dyn_layout, negation_accessor<T>>;
-    using conjugate_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, conjugate_accessor<T, A>>;
-    using subvector_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
-
-    template<class EST>
-    static constexpr negation_mdspan_type
-    make_negation(EST const& s)
-    {
-        dyn_extents     ext(s.extent(0));
-        dyn_strides     str{s.stride(0)};
-        dyn_mapping     map(ext, str);
-
-        return negation_mdspan_type(s.data(), map, negation_accessor<T, A>());
-    }
-
-    template<class EST>
-    static constexpr conjugate_mdspan_type
-    make_conjugate(EST const& s)
-    {
-        dyn_extents     ext(s.extent(0));
-        dyn_strides     str{s.stride(0)};
-        dyn_mapping     map(ext, str);
-
-        return conjugate_mdspan_type(s.data(), map, conjugate_accessor<T, A>());
-    }
-
-    template<class EST, class S1, class S2>
-    static constexpr subvector_mdspan_type
-    make_subvector(EST const& s, S1 start, S2 count)
-    {
-        using idx_t  = decltype(dynamic_extent);
-        using pair_t = std::pair<idx_t, idx_t>;
-
-        pair_t  elem_set(static_cast<idx_t>(start), static_cast<idx_t>(start + count));
-
-        if constexpr (std::is_same_v<EST, subvector_mdspan_type>)
-        {
-            return subspan(s, elem_set);
-        }
-        else
-        {
-            dyn_extents     ext(s.extent(0));
-            dyn_strides     str{s.stride(0)};
-            dyn_mapping     map(ext, str);
-
-            return subspan(subvector_mdspan_type(s.data(), map), elem_set);
-        }
-    }
-};
-
-
-//- This partial specialization is used when a host engine is two-dimensional.
+//- This partial specialization is used when the host engine is (correctly) two-dimensional.
 //
 template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
 struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>

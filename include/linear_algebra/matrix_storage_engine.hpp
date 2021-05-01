@@ -246,34 +246,19 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
 
 
 //--------------------------------------------------------------------------------------------------
-//  Traits Type:    mse_1d_mdspan_support
-//                  mse_2d_mdspan_support
+//  Traits Type:    mse_mdspan_support
 //
 //  Traits types (possibly temporary) that creates basic_mdspan objects on behalf of traits type
-//  mse_2d_mdspan_support<MSED> (defined below).
+//  mse_mdspan_support<MSED> (defined below).
 //--------------------------------------------------------------------------------------------------
 //
-struct mse_1d_mdspan_support
+struct mse_mdspan_support
 {
-    template<class ST, class MSE>
-    static constexpr ST
-    make_static_mdspan(MSE& mse)
-    {
-        return ST(mse.m_elems.data());
-    }
+    using dyn_mat_extents = extents<dynamic_extent, dynamic_extent>;
+    using dyn_mat_strides = array<typename dyn_mat_extents::index_type, 2>;
+    using dyn_mat_layout  = layout_stride<dynamic_extent, dynamic_extent>;
+    using dyn_mat_mapping = typename dyn_mat_layout::template mapping<dyn_mat_extents>;
 
-    template<class ST, class MSE>
-    static constexpr ST
-    make_dynamic_mdspan(MSE& mse)
-    {
-        return ST(mse.m_elems.data(), mse.m_size);
-    }
-};
-
-//------
-//
-struct mse_2d_mdspan_support
-{
     template<class ST, class MSE>
     static constexpr ST
     make_static_mdspan(MSE& mse)
@@ -325,60 +310,11 @@ struct mse_2d_mdspan_support
 //
 template<class MSED>    struct mse_mdspan_traits;
 
-
-//------ Partial specialization for extents<N>.
-//
-template<class T, ptrdiff_t N, class A, class L>
-struct mse_mdspan_traits<mse_data<T, extents<N>, A, L>>
-:   mse_1d_mdspan_support
-{
-    using mse_data_type   = mse_data<T, extents<N>, A, L>;
-    using span_type       = mdspan<T, N>;
-    using const_span_type = mdspan<T const, N>;
-
-    static constexpr span_type
-    make_mdspan(mse_data_type& mse)
-    {
-        return make_static_mdspan<span_type, mse_data_type>(mse);
-    }
-
-    static constexpr const_span_type
-    make_const_mdspan(mse_data_type const& mse)
-    {
-        return make_static_mdspan<const_span_type, mse_data_type const>(mse);
-    }
-};
-
-
-//------ Partial specialization for extents<dynamic_extent>.
-//
-template<class T, class A, class L>
-struct mse_mdspan_traits<mse_data<T, extents<dynamic_extent>, A, L>>
-:   mse_1d_mdspan_support
-{
-    using mse_data_type   = mse_data<T, extents<dynamic_extent>, A, L>;
-    using span_type       = mdspan<T, dynamic_extent>;
-    using const_span_type = mdspan<T const, dynamic_extent>;
-
-    static constexpr span_type
-    make_mdspan(mse_data_type& mse)
-    {
-        return make_dynamic_mdspan<span_type, mse_data_type>(mse);
-    }
-
-    static constexpr const_span_type
-    make_const_mdspan(mse_data_type const& mse)
-    {
-        return make_dynamic_mdspan<const_span_type, mse_data_type const>(mse);
-    }
-};
-
-
 //------ Partial specialization for extents<R, C>.
 //
 template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
 struct mse_mdspan_traits<mse_data<T, extents<R, C>, A, L>>
-:   mse_2d_mdspan_support
+:   public mse_mdspan_support
 {
     using mse_data_type   = mse_data<T, extents<R, C>, A, L>;
     using layout_type     = get_mdspan_layout_t<L>;
@@ -403,7 +339,7 @@ struct mse_mdspan_traits<mse_data<T, extents<R, C>, A, L>>
 //
 template<class T, ptrdiff_t R, class A, class L>
 struct mse_mdspan_traits<mse_data<T, extents<R, dynamic_extent>, A, L>>
-:   mse_2d_mdspan_support
+:   public mse_mdspan_support
 {
     using mse_data_type   = mse_data<T, extents<R, dynamic_extent>, A, L>;
     using span_type       = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>;
@@ -427,7 +363,7 @@ struct mse_mdspan_traits<mse_data<T, extents<R, dynamic_extent>, A, L>>
 //
 template<class T, ptrdiff_t C, class A, class L>
 struct mse_mdspan_traits<mse_data<T, extents<dynamic_extent, C>, A, L>>
-:   mse_2d_mdspan_support
+:   public mse_mdspan_support
 {
     using mse_data_type   = mse_data<T, extents<dynamic_extent, C>, A, L>;
     using span_type       = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>;
@@ -451,7 +387,7 @@ struct mse_mdspan_traits<mse_data<T, extents<dynamic_extent, C>, A, L>>
 //
 template<class T, class A, class L>
 struct mse_mdspan_traits<mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>>
-:   mse_2d_mdspan_support
+:   public mse_mdspan_support
 {
     using mse_data_type   = mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>;
     using span_type       = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>;
@@ -517,9 +453,9 @@ requires
 class matrix_storage_engine<T, extents<R, C>, A, L>
 {
     using this_type      = matrix_storage_engine;
+    using support_traits = detail::matrix_engine_support;
     using storage_type   = detail::mse_data<T, extents<R, C>, A, L>;
     using mdspan_traits  = detail::mse_mdspan_traits<storage_type>;
-    using support_traits = detail::matrix_engine_support;
 
     static constexpr bool   has_column_major_layout = storage_type::is_column_major;
     static constexpr bool   has_row_major_layout    = storage_type::is_row_major;
@@ -608,20 +544,6 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     //- Heterogeneous construction from one-dimensional sources.
     //
-    template<class ET2>
-    constexpr
-    matrix_storage_engine(ET2 const& rhs)
-    requires
-        this_type::is_1d_indexable
-        and
-        detail::readable_vector_engine<ET2>
-        and
-        detail::convertible_from<element_type, typename ET2::element_type>
-    :   m_data()
-    {
-        support_traits::assign_from(*this, rhs);
-    }
-
     template<class CT>
     constexpr
     matrix_storage_engine(CT const& rhs)
@@ -696,20 +618,6 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     //- Heterogeneous assignment from one-dimensional sources.
     //
-    template<class ET2>
-    constexpr matrix_storage_engine&
-    operator =(ET2 const& rhs)
-    requires
-        this_type::is_1d_indexable
-        and
-        detail::readable_vector_engine<ET2>
-        and
-        detail::convertible_from<element_type, typename ET2::element_type>
-    {
-        support_traits::assign_from(*this, rhs);
-        return *this;
-    }
-
     template<class CT>
     constexpr matrix_storage_engine&
     operator =(CT const& rhs)

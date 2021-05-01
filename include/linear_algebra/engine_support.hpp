@@ -252,31 +252,6 @@ template<class L>
 using get_mdspan_layout_t = typename mdspan_layout_mapper<L>::layout_type;
 
 
-//--------------------------------------------------------------------------------------------------
-//  Aliases:    dyn_mat_extents
-//              dyn_mat_strides
-//              dyn_mat_layout
-//              dyn_mat_mapping
-//              dyn_vec_extents
-//              dyn_vec_strides
-//              dyn_vec_layout
-//              dyn_vec_mapping
-//
-//  These private type aliases are used to reduce verbosity in subsequent code pertaining to
-//  mdspan types and objects.
-//--------------------------------------------------------------------------------------------------
-//
-using dyn_mat_extents = extents<dynamic_extent, dynamic_extent>;
-using dyn_mat_strides = array<typename dyn_mat_extents::index_type, 2>;
-using dyn_mat_layout  = layout_stride<dynamic_extent, dynamic_extent>;
-using dyn_mat_mapping = typename dyn_mat_layout::template mapping<dyn_mat_extents>;
-
-using dyn_vec_extents = extents<dynamic_extent>;
-using dyn_vec_strides = array<typename dyn_vec_extents::index_type, 1>;
-using dyn_vec_layout  = layout_stride<dynamic_extent>;
-using dyn_vec_mapping = typename dyn_mat_layout::template mapping<dyn_vec_extents>;
-
-
 //==================================================================================================
 //  TYPES AND TRAITS DEFINITIONS -- ENGINE-RELATED
 //==================================================================================================
@@ -919,66 +894,6 @@ concept engine_is_not_2d_indexable =
 
 
 //--------------------------------------------------------------------------------------------------
-//  Concept:    readable_vector_engine<ET>
-//
-//  This private concept determines whether a prospective vector engine type provides the
-//  readability interface required to function correctly with basic_vector<ET, OT>.
-//
-//  Engine types that fulfill this concept may have the value of their elements read via one-
-//  dimensional indexing, their element sizes and capacities read, and publicly declare several
-//  important nested type aliases.  They do not have two-dimensional indexing.
-//--------------------------------------------------------------------------------------------------
-//
-template<class ET>
-concept readable_vector_engine =
-    readable_engine_fundamentals<ET>
-    and
-    engine_has_valid_1d_const_indexing<ET>
-    and
-    engine_is_not_2d_indexable<ET>;
-
-
-//--------------------------------------------------------------------------------------------------
-//  Concept:    spannable_vector_engine<ET>
-//
-//  This private concept determines whether a prospective vector engine type provides the
-//  correct nested mdspan types optionally required by basic_vector<ET, OT>.
-//--------------------------------------------------------------------------------------------------
-//
-template<class ET>
-concept spannable_vector_engine =
-    readable_vector_engine<ET>
-    and
-    requires (ET const& ceng, ET& meng)
-    {
-        typename ET::span_type;
-        typename ET::const_span_type;
-        requires is_1d_mdspan_v<typename ET::span_type>;
-        requires is_1d_mdspan_v<typename ET::const_span_type>;
-        { meng.span() } -> same_as<typename ET::span_type>;
-        { ceng.span() } -> same_as_either<typename ET::const_span_type, typename ET::span_type>;
-    };
-
-
-//--------------------------------------------------------------------------------------------------
-//  Concept:    writable_vector_engine<ET>
-//
-//  This private concept determines whether a prospective vector engine type provides the
-//  writability interface required to function correctly with basic_vector<ET, OT>.
-//
-//  Engine types that fulfill this concept fulfill the corresponding readable_vector_engine<ET>
-//  concept, and also permit the value of their elements to be changed via one-dimensional
-//  indexing.
-//--------------------------------------------------------------------------------------------------
-//
-template<class ET>
-concept writable_vector_engine =
-    readable_vector_engine<ET>
-    and
-    engine_has_valid_1d_mutable_indexing<ET>;
-
-
-//--------------------------------------------------------------------------------------------------
 //  Concept:    readable_matrix_engine<ET>
 //
 //  This private concept determines whether a prospective matrix engine type provides the
@@ -1081,22 +996,6 @@ concept writable_and_1d_indexable_matrix_engine =
 
 
 //--------------------------------------------------------------------------------------------------
-//  Concepts:   reshapable_vector_engine<ET>
-//
-//  This private concept determines whether a prospective vector engine type provides an interface
-//  for overall reshaping.
-//--------------------------------------------------------------------------------------------------
-//
-template<class ET>
-concept reshapable_vector_engine =
-    writable_vector_engine<ET>
-    and
-    requires (ET& eng, typename ET::index_type i)
-    {
-        { eng.reshape(i, i) };
-    };
-
-//--------------------------------------------------------------------------------------------------
 //  Concepts:   reshapable_matrix_engine<ET>
 //              column_reshapable_matrix_engine<ET>
 //              row_reshapable_matrix_engine<ET>
@@ -1144,32 +1043,96 @@ template<class ET>
 concept do_row_wise_indexing = readable_matrix_engine<ET>  and  use_row_wise_indexing_v<ET>;
 
 
+template<class ET>
+struct engine_extents_helper
+{
+  private:
+    template<class Lambda, int = (Lambda{}(), 0)>
+    static constexpr ptrdiff_t
+    get_value_helper(Lambda)
+    {
+        return Lambda{}();
+    }
 
-//--------------------------------------------------------------------------------------------------
-//  Concept:    similar_engines<ET1, ET2>
-//
-//  This private concept determines whether both prospective engine types represent matrix engines
-//  or vector engines.  The motivation for this concept is matrix/vector addition/subtraction where
-//  engine arities must match.
-//--------------------------------------------------------------------------------------------------
-//
-template<class ET1, class ET2>
-concept similar_engines =
-    (readable_matrix_engine<ET1> and readable_matrix_engine<ET2>)
-    or
-    (readable_vector_engine<ET1> and readable_vector_engine<ET2>);
+    static constexpr ptrdiff_t
+    get_value_helper(...)
+    {
+        return dynamic_extent;
+    }
+
+  public:
+    static constexpr ptrdiff_t
+    columns()
+    requires
+        readable_matrix_engine<ET>
+    {
+        return get_value_helper([]{ return static_cast<ptrdiff_t>(ET().columns()); });
+    }
+
+    static constexpr ptrdiff_t
+    rows()
+    requires
+        readable_matrix_engine<ET>
+    {
+        return get_value_helper([]{ return static_cast<ptrdiff_t>(ET().rows()); });
+    }
+};
+
+template<class T, ptrdiff_t N, class A, class L>
+struct engine_extents_helper<matrix_storage_engine<T, extents<N>, A, L>>
+{
+    static constexpr ptrdiff_t
+    size()
+    {
+        return N;
+    }
+};
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
+struct engine_extents_helper<matrix_storage_engine<T, extents<R, C>, A, L>>
+{
+    static constexpr ptrdiff_t
+    columns()
+    {
+        return C;
+    }
+
+    static constexpr ptrdiff_t
+    rows()
+    {
+        return R;
+    }
+};
+
+template<class ET>
+struct engine_layout_helper
+{
+    using layout_type = matrix_layout::row_major;
+};
+
+template<class T, ptrdiff_t N, class A, class L>
+struct engine_layout_helper<matrix_storage_engine<T, extents<N>, A, L>>
+{
+    using layout_type = void;
+};
+
+template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
+struct engine_layout_helper<matrix_storage_engine<T, extents<R, C>, A, L>>
+{
+    using layout_type = L;
+};
 
 
 //==================================================================================================
-//  SUPPORT TYPE DEFINITIONS
+//  MATRIX ENGINE SUPPORT TYPE DEFINITION
 //==================================================================================================
 //--------------------------------------------------------------------------------------------------
-//  Class Template:     common_engine_support
+//  Class:      matrix_engine_support
 //
-//  Policy/traits base type that provides swapping and several functions for verification.
+//  Provides various utility functions for matrix engines.
 //--------------------------------------------------------------------------------------------------
 //
-struct common_engine_support
+struct matrix_engine_support
 {
     template<class N1, class N2>
     static constexpr bool
@@ -1250,303 +1213,6 @@ struct common_engine_support
         }
     }
 
-};
-
-
-//--------------------------------------------------------------------------------------------------
-//  Class:      vector_engine_support
-//
-//  Provides various utility functions for vector engines.
-//--------------------------------------------------------------------------------------------------
-//
-struct vector_engine_support : public common_engine_support
-{
-    //----------------------------------------------------------------------------------------------
-    //  This member function performs reshaping where requested and possible; otherwise, it
-    //  peforms size verification.
-    //----------------------------------------------------------------------------------------------
-    //
-    template<class ET, class IT>
-    static constexpr void
-    verify_and_reshape(ET& dst, IT src_elems)
-    requires
-        writable_vector_engine<ET>
-    {
-        auto    elems = static_cast<typename ET::index_type>(src_elems);
-
-        if constexpr (reshapable_vector_engine<ET>)
-        {
-            dst.reshape(elems, dst.capacity());
-        }
-        else
-        {
-            verify_size(dst.size(), elems);
-        }
-    }
-
-    //----------------------------------------------------------------------------------------------
-    //  These member functions assign to the contents of vector engines from those of other vector
-    //  engines, random-access standard containers, 1-D mdspans, and 1-D initializer lists.
-    //----------------------------------------------------------------------------------------------
-    //
-    template<class ET1, class ET2>
-    static constexpr void
-    assign_from(ET1& dst, ET2 const& src)
-    requires
-        writable_vector_engine<ET1>
-        and
-        readable_vector_engine<ET2>
-        and
-        convertible_from<typename ET1::element_type, typename ET2::element_type>
-    {
-        using index_type_dst = typename ET1::index_type;
-        using index_type_src = typename ET2::index_type;
-
-        index_type_dst  di = 0;
-        index_type_src  si = 0;
-        index_type_src  sn = src.size();
-
-        verify_and_reshape(dst, sn);
-
-        for (;  si < sn;  ++di, ++si)
-        {
-            dst(di) = static_cast<typename ET1::element_type>(src(si));
-        }
-    }
-
-    template<class ET, class CT>
-    static constexpr void
-    assign_from(ET& dst, CT const& src)
-    requires
-        writable_vector_engine<ET>
-        and
-        random_access_standard_container<CT>
-        and
-        convertible_from<typename ET::element_type, typename CT::value_type>
-    {
-        using index_type_dst = typename ET::index_type;
-        using index_type_src = typename CT::size_type;
-
-        index_type_dst  di = 0;
-        index_type_src  si = 0;
-        index_type_src  sn = src.size();
-
-        verify_and_reshape(dst, sn);
-
-        for (;  si < sn;  ++di, ++si)
-        {
-            dst(di) = static_cast<typename ET::element_type>(src[si]);
-        }
-    }
-
-    template<class ET, class U, ptrdiff_t X0, class SL, class SA>
-    static constexpr void
-    assign_from(ET& dst, basic_mdspan<U, extents<X0>, SL, SA> const& src)
-    requires
-        writable_vector_engine<ET>
-        and
-        convertible_from<typename ET::element_type, U>
-    {
-        using index_type_dst = typename ET::index_type;
-        using index_type_src = typename basic_mdspan<U, extents<X0>, SL, SA>::index_type;
-
-        index_type_dst  di = 0;
-        index_type_src  si = 0;
-        index_type_src  sn = src.extent(0);
-
-        verify_and_reshape(dst, sn);
-
-        for (;  si < sn;  ++di, ++si)
-        {
-            dst(di) = static_cast<typename ET::element_type>(src(si));
-        }
-    }
-
-
-    template<class ET, class U>
-    static constexpr void
-    assign_from(ET& dst, initializer_list<U> src)
-    requires
-        writable_vector_engine<ET>
-        and
-        convertible_from<typename ET::element_type, U>
-    {
-        using index_type_dst = typename ET::index_type;
-
-        verify_and_reshape(dst, src.size());
-
-        index_type_dst  di = 0;
-        index_type_dst  dn = dst.size();
-        auto            si = src.begin();
-
-        for (;  di < dn;  ++di, ++si)
-        {
-            dst(di) = static_cast<typename ET::element_type>(*si);
-        }
-    }
-
-    //----------------------------------------------------------------------------------------------
-    //  These member functions fill and move ranges of elements, usually when reshaping.
-    //----------------------------------------------------------------------------------------------
-    //
-    template<class ET, class JT0, class JT1, class T>
-    static constexpr void
-    fill(ET& dst, JT0 e0, JT1 e1, T const& t)
-    requires
-        writable_vector_engine<ET>
-        and
-        convertible_from<typename ET::element_type, T>
-    {
-        using index_type = typename ET::index_type;
-
-        auto    i0 = static_cast<index_type>(e0);
-        auto    i1 = static_cast<index_type>(e1);
-
-        for (auto i = i0;  i < i1;  ++i)
-        {
-            dst(i) = static_cast<typename ET::element_type>(t);
-        }
-    }
-
-    template<class ET, class IT>
-    static constexpr void
-    move_elements(ET& dst, ET& src, IT size)
-    requires
-        writable_vector_engine<ET>
-    {
-        using index_type = typename ET::index_type;
-
-        auto    i0 = static_cast<index_type>(0);
-        auto    i1 = static_cast<index_type>(size);
-
-        for (auto i = i0;  i < i1;  ++i)
-        {
-            dst(i) = std::move(src(i));
-        }
-    }
-
-    //----------------------------------------------------------------------------------------------
-    //  These member functions compare the contents of vector engines with those of other vector
-    //  engines, random-access standard containers, 1-D mdspans, and 1-D initializer lists.
-    //----------------------------------------------------------------------------------------------
-    //
-    template<class ET1, class ET2>
-    static constexpr bool
-    compare(ET1 const& lhs, ET2 const& rhs)
-    requires
-        readable_vector_engine<ET1>
-        and
-        readable_vector_engine<ET2>
-        and
-        comparable_types<typename ET1::element_type, typename ET2::element_type>
-    {
-        using index_type_lhs = typename ET1::index_type;
-        using index_type_rhs = typename ET2::index_type;
-
-        index_type_lhs  n1 = lhs.size();
-        index_type_rhs  n2 = rhs.size();
-
-        if (sizes_differ(n1, n2)) return false;
-
-        index_type_lhs  i1 = 0;
-        index_type_rhs  i2 = 0;
-
-        for (;  i1 < n1;  ++i1, ++i2)
-        {
-            if (not (lhs(i1) == rhs(i2))) return false;
-        }
-        return true;
-    }
-
-    template<class ET, class CT>
-    static constexpr bool
-    compare(ET const& lhs, CT const& rhs)
-    requires
-        readable_vector_engine<ET>
-        and
-        random_access_standard_container<CT>
-        and
-        comparable_types<typename ET::element_type, typename CT::value_type>
-    {
-        using index_type_lhs = typename ET::index_type;
-        using index_type_rhs = typename CT::size_type;
-
-        index_type_lhs  n1 = lhs.size();
-        index_type_rhs  n2 = rhs.size();
-
-        if (sizes_differ(n1, n2)) return false;
-
-        index_type_lhs  i1 = 0;
-        index_type_rhs  i2 = 0;
-
-        for (;  i1 < n1;  ++i1, ++i2)
-        {
-            if (not (lhs(i1) == rhs[i2])) return false;
-        }
-        return true;
-    }
-
-    template<class ET, class U, ptrdiff_t X0, class SL, class SA>
-    static constexpr bool
-    compare(ET const& lhs, basic_mdspan<U, extents<X0>, SL, SA> const& rhs)
-    requires
-        readable_vector_engine<ET>
-        and
-        comparable_types<typename ET::element_type, U>
-    {
-        using index_type_lhs = typename ET::index_type;
-        using index_type_rhs = typename basic_mdspan<U, extents<X0>, SL, SA>::index_type;
-
-        index_type_lhs  n1 = lhs.size();
-        index_type_rhs  n2 = rhs.extent(0);
-
-        if (sizes_differ(n1, n2)) return false;
-
-        index_type_lhs  i1 = 0;
-        index_type_rhs  i2 = 0;
-
-        for (;  i1 < n1;  ++i1, ++i2)
-        {
-            if (not (lhs(i1) == rhs(i2))) return false;
-        }
-        return true;
-    }
-
-    template<class ET, class U>
-    static constexpr bool
-    compare(ET const& lhs, initializer_list<U> rhs)
-    requires
-        readable_vector_engine<ET>
-        and
-        comparable_types<typename ET::element_type, U>
-    {
-        using index_type_lhs = typename ET::index_type;
-
-        index_type_lhs  n1 = lhs.size();
-        auto            n2 = rhs.size();
-
-        if (sizes_differ(n1, n2)) return false;
-
-        index_type_lhs  i1 = 0;
-        auto            i2 = rhs.begin();
-
-        for (;  i1 < n1;  ++i1, ++i2)
-        {
-            if (not (lhs(i1) == *i2)) return false;
-        }
-        return true;
-    }
-};
-
-
-//--------------------------------------------------------------------------------------------------
-//  Class:      matrix_engine_support
-//
-//  Provides various utility functions for matrix engines.
-//--------------------------------------------------------------------------------------------------
-//
-struct matrix_engine_support : public common_engine_support
-{
     //----------------------------------------------------------------------------------------------
     //  These member functions perform reshaping where requested and possible; otherwise, they
     //  peform size verifications.
@@ -1717,35 +1383,9 @@ struct matrix_engine_support : public common_engine_support
 
     //----------------------------------------------------------------------------------------------
     //  These member functions assign to the contents of 1-D indexable matrix engines from those
-    //  of 1-D vector engines, random-access standard containers, 1-D mdspans, and 1-D initializer
-    //  lists.
+    //  of random-access standard containers, 1-D mdspans, and 1-D initializer lists.
     //----------------------------------------------------------------------------------------------
     //
-    template<class ET1, class ET2>
-    static constexpr void
-    assign_from(ET1& dst, ET2 const& src)
-    requires
-        writable_and_1d_indexable_matrix_engine<ET1>
-        and
-        readable_vector_engine<ET2>
-        and
-        convertible_from<typename ET1::element_type, typename ET2::element_type>
-    {
-        using index_type_dst = typename ET1::index_type;
-        using index_type_src = typename ET2::index_type;
-
-        index_type_dst  di = 0;
-        index_type_src  si = 0;
-        index_type_src  sn = src.size();
-
-        verify_and_reshape(dst, sn);
-
-        for (;  si < sn;  ++di, ++si)
-        {
-            dst(di) = static_cast<typename ET1::element_type>(src(si));
-        }
-    }
-
     template<class ET, class CT>
     static constexpr void
     assign_from(ET& dst, CT const& src)
@@ -2045,34 +1685,6 @@ struct matrix_engine_support : public common_engine_support
     //  vector engines, random-access standard containers, 1-D mdspans, and 1-D initializer lists.
     //----------------------------------------------------------------------------------------------
     //
-    template<class ET1, class ET2>
-    static constexpr bool
-    compare(ET1 const& lhs, ET2 const& rhs)
-    requires
-        readable_and_1d_indexable_matrix_engine<ET1>
-        and
-        readable_vector_engine<ET2>
-        and
-        comparable_types<typename ET1::element_type, typename ET2::element_type>
-    {
-        using index_type_lhs = typename ET1::index_type;
-        using index_type_rhs = typename ET2::index_type;
-
-        index_type_lhs  n1 = lhs.size();
-        index_type_rhs  n2 = rhs.size();
-
-        if (sizes_differ(n1, n2)) return false;
-
-        index_type_lhs  i1 = 0;
-        index_type_rhs  i2 = 0;
-
-        for (;  i1 < n1;  ++i1, ++i2)
-        {
-            if (not (lhs(i1) == rhs(i2))) return false;
-        }
-        return true;
-    }
-
     template<class ET, class CT>
     static constexpr bool
     compare(ET const& lhs, CT const& rhs)

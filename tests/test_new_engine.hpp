@@ -190,7 +190,7 @@ fs_matrix_engine_tst<T,R,C>::swap(fs_matrix_engine_tst& rhs) noexcept
     {
         for (index_type i = 0;  i < R*C;  ++i)
         {
-            STD_LA::detail::common_engine_support::swap(ma_elems[i], rhs.ma_elems[i]);
+            STD_LA::detail::matrix_engine_support::swap(ma_elems[i], rhs.ma_elems[i]);
         }
     }
 }
@@ -203,7 +203,7 @@ fs_matrix_engine_tst<T,R,C>::swap_columns(index_type j1, index_type j2)
     {
         for (index_type i = 0;  i < R;  ++i)
         {
-            STD_LA::detail::common_engine_support::swap(ma_elems[i*C + j1], ma_elems[i*C + j2]);
+            STD_LA::detail::matrix_engine_support::swap(ma_elems[i*C + j1], ma_elems[i*C + j2]);
         }
     }
 }
@@ -216,7 +216,7 @@ fs_matrix_engine_tst<T,R,C>::swap_rows(index_type i1, index_type i2)
     {
         for (index_type j = 0;  j < C;  ++j)
         {
-            STD_LA::detail::common_engine_support::swap(ma_elems[i1*C + j], ma_elems[i2*C + j]);
+            STD_LA::detail::matrix_engine_support::swap(ma_elems[i1*C + j], ma_elems[i2*C + j]);
         }
     }
 }
@@ -347,7 +347,7 @@ test_fs_matrix_engine<T,R,C>::swap(test_fs_matrix_engine& rhs) noexcept
     {
         for (index_type i = 0;  i < R*C;  ++i)
         {
-            STD_LA::detail::common_engine_support::swap(ma_elems[i], rhs.ma_elems[i]);
+            STD_LA::detail::matrix_engine_support::swap(ma_elems[i], rhs.ma_elems[i]);
         }
     }
 }
