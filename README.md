@@ -138,13 +138,13 @@ To add the *linear_algebra* library to your project as a dependency, you need to
 
 ```bash
 pip install conan
-conan remote add linear_algebra https://api.bintray.com/conan/twonington/public-conan
+conan remote add linear_algebra https://twonington.jfrog.io/artifactory/api/conan/conan-oss
 ```
 
 Once this is set, you can add the linear_algebra dependency to you project via the following signature:
 
 ```bash
-linear_algebra/0.7.0@public-conan/testing
+linear_algebra/0.7.0@conan-oss/testing
 ```
 
 Available versions of the Linear Algebra package can be search via Conan:
