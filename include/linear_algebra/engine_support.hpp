@@ -260,18 +260,12 @@ using get_mdspan_layout_t = typename mdspan_layout_mapper<L>::layout_type;
 //  Variable:   is_valid_engine_extents_v<X>
 //
 //  This private traits type is used to validate an engine's extents template argument.  The
-//  extents parameter must be one- or two-dimensional, and each dimension's template argument
-//  must have a value greater than zero or equal to dynamic_extent.
+//  extents parameter must be two-dimensional, and each dimension's template argument must
+//  have a value greater than zero or equal to dynamic_extent.
 //--------------------------------------------------------------------------------------------------
 //
 template<class X>
 struct is_valid_engine_extents : public false_type {};
-
-template<ptrdiff_t N>
-struct is_valid_engine_extents<extents<N>>
-{
-    static constexpr bool   value = (N == dynamic_extent || N > 0);
-};
 
 template<ptrdiff_t R, ptrdiff_t C>
 struct is_valid_engine_extents<extents<R, C>>
@@ -290,18 +284,12 @@ bool    is_valid_engine_extents_v = is_valid_engine_extents<T>::value;
 //  Variable:   is_valid_fixed_engine_extents_v<X>
 //
 //  This private traits type is used to validate an engine's extents template argument.  The
-//  extents parameter must be one- or two-dimensional, and each dimension's template argument
-//  must have a value greater than zero.
+//  extents parameter must be two-dimensional, and each dimension's template argument must
+//  have a value greater than zero.
 //--------------------------------------------------------------------------------------------------
 //
 template<class X>
 struct is_valid_fixed_engine_extents : public std::false_type {};
-
-template<ptrdiff_t N>
-struct is_valid_fixed_engine_extents<extents<N>>
-{
-    static constexpr bool   value = (N > 0);
-};
 
 template<ptrdiff_t R, ptrdiff_t C>
 struct is_valid_fixed_engine_extents<extents<R, C>>

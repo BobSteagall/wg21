@@ -19,38 +19,6 @@
 
 namespace STD_LA {
 namespace detail {
-
-//==================================================================================================
-//                              **** LAYOUT ADDITION TRAITS ****
-//==================================================================================================
-//- The standard layout addition traits type provides the default mechanism for determining the
-//  resulting data layout when adding two matrices having different layouts..
-//
-template<class OTR>
-struct addition_layout_traits<OTR, matrix_layout::row_major, matrix_layout::row_major>
-{
-    using layout_type = matrix_layout::row_major;
-};
-
-template<class OTR>
-struct addition_layout_traits<OTR, matrix_layout::row_major, matrix_layout::column_major>
-{
-    using layout_type = matrix_layout::row_major;
-};
-
-template<class OTR>
-struct addition_layout_traits<OTR, matrix_layout::column_major, matrix_layout::row_major>
-{
-    using layout_type = matrix_layout::row_major;
-};
-
-template<class OTR>
-struct addition_layout_traits<OTR, matrix_layout::column_major, matrix_layout::column_major>
-{
-    using layout_type = matrix_layout::column_major;
-};
-
-
 //==================================================================================================
 //                              **** ELEMENT ADDITION TRAITS ****
 //==================================================================================================
@@ -73,43 +41,43 @@ struct addition_element_traits
 template<class OTR, class ET1, class ET2>
 struct addition_engine_traits
 {
-  private:
-    using element_type_1 = typename ET1::element_type;
-    using element_type_2 = typename ET2::element_type;
-    using element_traits = get_addition_element_traits_t<OTR, element_type_1, element_type_2>;
+    //- Get the extents for each engine
+    //
+    static constexpr ptrdiff_t  R1 = engine_extents_helper<ET1>::rows();
+    static constexpr ptrdiff_t  C1 = engine_extents_helper<ET1>::columns();
+    static constexpr ptrdiff_t  R2 = engine_extents_helper<ET2>::rows();
+    static constexpr ptrdiff_t  C2 = engine_extents_helper<ET2>::columns();
 
-  public:
-    using element_type = typename element_traits::element_type;
-    using engine_type  = dynamic_matrix_engine<element_type>;
-};
-
-
-template<class OTR,
-         class T1, ptrdiff_t R1, ptrdiff_t C1, class AT1, class LT1,
-         class T2, ptrdiff_t R2, ptrdiff_t C2, class AT2, class LT2>
-struct addition_engine_traits<OTR,
-                              matrix_storage_engine<T1, extents<R1, C1>, AT1, LT1>,
-                              matrix_storage_engine<T2, extents<R2, C2>, AT2, LT2>>
-{
-  private:
+    //- Determine if there are dynamic row or column extents.
+    //
     static constexpr bool   dyn_rows = ((R1 == dynamic_extent) || (R2 == dynamic_extent));
     static constexpr bool   dyn_cols = ((C1 == dynamic_extent) || (C2 == dynamic_extent));
+    static constexpr bool   dyn_size = (dyn_rows || dyn_cols);
 
-    //- Validate the size template parameters.
+    //- Validate the extents.
     //
     static_assert((dyn_rows || R1 == R2), "mis-matched/invalid number of rows for addition");
     static_assert((dyn_cols || C1 == C2), "mis-matched/invalid number of columns for addition");
 
-    //- Compute the new extents.
+    //- Decide on the new extents.
     //
     static constexpr ptrdiff_t  RR = (dyn_rows) ? dynamic_extent : R1;
     static constexpr ptrdiff_t  CR = (dyn_cols) ? dynamic_extent : C1;
 
-    //- Extract element traits from the operation traits, and determine allocation and layout traits.
+    //- Extract the element traits from the operation traits, and determine the resulting
+    //  element type.
     //
-    using element_traits    = get_addition_element_traits_t<OTR, T1, T2>;
-    using allocation_traits = detail::allocation_traits<OTR, AT1, AT2, typename element_traits::element_type>;
-    using layout_traits     = detail::addition_layout_traits<OTR, LT1, LT2>;
+    using element_type_1 = typename ET1::element_type;
+    using element_type_2 = typename ET2::element_type;
+    using element_traits = get_addition_element_traits_t<OTR, element_type_1, element_type_2>;
+    using elem_type      = typename element_traits::element_type;
+
+    //- Determine the appropriate allocation and layout traits for the resulting engine type.
+    //
+    using owning_type_1     = get_owning_engine_type_t<ET1>;
+    using owning_type_2     = get_owning_engine_type_t<ET2>;
+    using allocation_traits = engine_allocation_traits<owning_type_1, owning_type_2, dyn_size, RR, CR, elem_type>;
+    using layout_traits     = engine_layout_traits<ET1, ET2, false>;
 
     //- Determine required engine template parameters from the traits types.
     //
@@ -137,8 +105,8 @@ struct addition_arithmetic_traits<OTR, basic_matrix<ET1, COT1>, basic_matrix<ET2
     using element_type_2 = typename ET2::element_type;
     using element_traits = get_addition_element_traits_t<OTR, element_type_1, element_type_2>;
 
-    using engine_type_1 = typename basic_matrix<ET1, COT1>::owning_engine_type;
-    using engine_type_2 = typename basic_matrix<ET2, COT2>::owning_engine_type;
+    using engine_type_1 = typename basic_matrix<ET1, COT1>::engine_type;
+    using engine_type_2 = typename basic_matrix<ET2, COT2>::engine_type;
     using engine_traits = get_addition_engine_traits_t<OTR, engine_type_1, engine_type_2>;
 
     static_assert(std::is_same_v<typename element_traits::element_type,

@@ -11,57 +11,6 @@
 namespace STD_LA {
 namespace detail {
 //--------------------------------------------------------------------------------------------------
-//  Class:  allocation_traits
-//
-//  This class provides a traits type to perform allocator promotion; it is used by the standard
-//  engine promotion traits.
-//--------------------------------------------------------------------------------------------------
-//
-template<class OT, class AT1, class AT2, class T>  struct allocation_traits;
-
-template<class OT, class T>
-struct allocation_traits<OT, void, void, T>
-{
-    using allocator_type = void;
-};
-
-template<class OT, class V, class T>
-struct allocation_traits<OT, void, std::allocator<V>, T>
-{
-    using traits_type    = std::allocator_traits<std::allocator<V>>;
-    using allocator_type = typename traits_type::template rebind_alloc<T>;
-};
-
-template<class OT, class U, class T>
-struct allocation_traits<OT, std::allocator<U>, void, T>
-{
-    using traits_type    = std::allocator_traits<std::allocator<U>>;
-    using allocator_type = typename traits_type::template rebind_alloc<T>;
-};
-
-template<class OT, class A1, class V, class T>
-struct allocation_traits<OT, A1, std::allocator<V>, T>
-{
-    using traits_type    = std::allocator_traits<std::allocator<V>>;
-    using allocator_type = typename traits_type::template rebind_alloc<T>;
-};
-
-template<class OT, class U, class A2, class T>
-struct allocation_traits<OT, std::allocator<U>, A2, T>
-{
-    using traits_type    = std::allocator_traits<std::allocator<U>>;
-    using allocator_type = typename traits_type::template rebind_alloc<T>;
-};
-
-template<class OT, class U, class V, class T>
-struct allocation_traits<OT, std::allocator<U>, std::allocator<V>, T>
-{
-    using traits_type    = std::allocator_traits<std::allocator<U>>;
-    using allocator_type = typename traits_type::template rebind_alloc<T>;
-};
-
-
-//--------------------------------------------------------------------------------------------------
 //- Forward declarations of the default individual element/allocator/layout/engine/arithmetic
 //  traits types referred to by matrix_operation_traits.  These are forward declared in order
 //  to be referenced in matrix_operation_traits below.
@@ -83,10 +32,8 @@ template<class OT, class T1, class T2>      struct division_element_traits;
 template<class OT, class ET1, class ET2>    struct division_engine_traits;
 template<class OT, class OP1, class OP2>    struct division_arithmetic_traits;
 
-template<class OT, class AT1, class AT2, class T>   struct allocation_traits;
-template<class OT, class LT1, class LT2>            struct addition_layout_traits;
-template<class OT, class LT1, class LT2>            struct subtraction_layout_traits;
-template<class OT, class LT1, class LT2>            struct multiplication_layout_traits;
+template<class AT1, class AT2, class T>    struct mse_allocation_traits;
+template<class LT1, class LT2>             struct addsubdiv_layout_traits;
 
 
 }       //- detail namespace
@@ -312,7 +259,7 @@ using select_matrix_operation_traits_t =
 //      get_division_arithmetic_traits_t<OT, U, V>
 //--------------------------------------------------------------------------------------------------
 //
-#define STD_LA_DEFINE_OP_TRAITS_EXTRACTOR(OP, LVL)                                \
+#define STD_LA_DEFINE_OP_TRAITS_EXTRACTOR(OP, LVL)                                  \
     namespace detail {                                                              \
         template<typename OT, typename U, typename V, typename = void>              \
         struct OP##_##LVL##_traits_extractor                                        \
@@ -513,6 +460,176 @@ using sized_matrix_engine = matrix_storage_engine<t, extents<r, c>, std::allocat
 template<class t, class lt = matrix_layout::row_major>
 using dynamic_matrix_engine =
         matrix_storage_engine<t, extents<dynamic_extent, dynamic_extent>, std::allocator<t>, lt>;
+
+//==================================================================================================
+//                              **** ALLOCATION TRAITS ****
+//==================================================================================================
+//--------------------------------------------------------------------------------------------------
+//  Class:  mse_allocation_traits
+//
+//  This type performs allocator promotion when both engine types are matrix_storage_engine.  The
+//  idea is straightforward:
+//    a. If both allocator types are void, then the resulting allocator type is void;
+//    b. If one allocator is std::allocator, and the other is custom, rebind from the custom
+//       allocator type;
+//    c. If both allocator types are std::allocator, the result is allocator<T>.
+//--------------------------------------------------------------------------------------------------
+//
+template<class AT1, class AT2, class T>
+struct mse_allocation_traits
+{
+    using allocator_type = std::allocator<T>;
+};
+
+template<class T>
+struct mse_allocation_traits<void, void, T>
+{
+    using allocator_type = void;
+};
+
+
+template<class V, class T>
+struct mse_allocation_traits<void, std::allocator<V>, T>
+{
+    using allocator_type = std::allocator<T>;
+};
+
+template<class U, class T>
+struct mse_allocation_traits<std::allocator<U>, void, T>
+{
+    using allocator_type = std::allocator<T>;
+};
+
+
+template<class AT2, class T>
+struct mse_allocation_traits<void, AT2, T>
+{
+    using traits_type    = std::allocator_traits<AT2>;
+    using allocator_type = typename traits_type::template rebind_alloc<T>;
+};
+
+template<class AT1, class T>
+struct mse_allocation_traits<AT1, void, T>
+{
+    using traits_type    = std::allocator_traits<AT1>;
+    using allocator_type = typename traits_type::template rebind_alloc<T>;
+};
+
+
+template<class AT1, class V, class T>
+struct mse_allocation_traits<AT1, std::allocator<V>, T>
+{
+    using traits_type    = std::allocator_traits<AT1>;
+    using allocator_type = typename traits_type::template rebind_alloc<T>;
+};
+
+template<class U, class AT2, class T>
+struct mse_allocation_traits<std::allocator<U>, AT2, T>
+{
+    using traits_type    = std::allocator_traits<AT2>;
+    using allocator_type = typename traits_type::template rebind_alloc<T>;
+};
+
+
+template<class U, class V, class T>
+struct mse_allocation_traits<std::allocator<U>, std::allocator<V>, T>
+{
+    using allocator_type = std::allocator<T>;
+};
+
+template<class AT1, class T>
+requires
+    not detail::is_specialization_of_v<AT1, std::allocator>
+struct mse_allocation_traits<AT1, AT1, T>
+{
+    using traits_type    = std::allocator_traits<AT1>;
+    using allocator_type = typename traits_type::template rebind_alloc<T>;
+};
+
+//------
+//
+template<class ET1, class ET2, bool DX, ptrdiff_t RR, ptrdiff_t CR, class T>
+struct engine_allocation_traits
+{
+    static constexpr bool   dyn_size = (DX  ||  (RR*CR) > 64);
+    using allocator_type = std::conditional_t<dyn_size, std::allocator<T>, void>;
+};
+
+template<class T1, ptrdiff_t R1, ptrdiff_t C1, class AT1, class LT1,
+         class T2, ptrdiff_t R2, ptrdiff_t C2, class AT2, class LT2,
+         bool DX, ptrdiff_t RR, ptrdiff_t CR, class T>
+struct engine_allocation_traits<matrix_storage_engine<T1, extents<R1, C1>, AT1, LT1>,
+                                matrix_storage_engine<T2, extents<R2, C2>, AT2, LT2>,
+                                DX, RR, CR, T>
+{
+    using allocator_type = typename mse_allocation_traits<AT1, AT2, T>::allocator_type;
+};
+
+
+//==================================================================================================
+//                              **** LAYOUT TRAITS ****
+//==================================================================================================
+//- The standard layout addition traits type provides the default mechanism for determining the
+//  resulting data layout when adding two matrices having different layouts..
+//
+template<class LT1, class LT2>
+struct addsubdiv_layout_traits
+{
+    using layout_type = matrix_layout::row_major;
+};
+
+template<>
+struct addsubdiv_layout_traits<matrix_layout::column_major, matrix_layout::column_major>
+{
+    using layout_type = matrix_layout::column_major;
+};
+
+//------
+//
+template<class LT1, class LT2>
+struct multiplication_layout_traits
+{
+    using layout_type = matrix_layout::row_major;
+};
+
+template<>
+struct multiplication_layout_traits<matrix_layout::row_major, matrix_layout::column_major>
+{
+    using layout_type = matrix_layout::column_major;
+};
+
+template<>
+struct multiplication_layout_traits<matrix_layout::column_major, matrix_layout::column_major>
+{
+    using layout_type = matrix_layout::column_major;
+};
+
+//-------
+//
+template<class ET1, class ET2, bool DX>
+struct engine_layout_traits
+{
+    using layout_type = matrix_layout::row_major;
+};
+
+template<class T1, ptrdiff_t R1, ptrdiff_t C1, class AT1, class LT1,
+         class T2, ptrdiff_t R2, ptrdiff_t C2, class AT2, class LT2>
+struct engine_layout_traits<matrix_storage_engine<T1, extents<R1, C1>, AT1, LT1>,
+                            matrix_storage_engine<T2, extents<R2, C2>, AT2, LT2>,
+                            true>
+{
+    using layout_type = typename multiplication_layout_traits<LT1, LT2>::layout_type;
+};
+
+
+template<class T1, ptrdiff_t R1, ptrdiff_t C1, class AT1, class LT1,
+         class T2, ptrdiff_t R2, ptrdiff_t C2, class AT2, class LT2>
+struct engine_layout_traits<matrix_storage_engine<T1, extents<R1, C1>, AT1, LT1>,
+                            matrix_storage_engine<T2, extents<R2, C2>, AT2, LT2>,
+                            false>
+{
+    using layout_type = typename addsubdiv_layout_traits<LT1, LT2>::layout_type;
+};
 
 }       //- detail namespace
 }       //- STD_LA namespace
