@@ -539,7 +539,7 @@ struct mse_allocation_traits<std::allocator<U>, std::allocator<V>, T>
 
 template<class AT1, class T>
 requires
-    not detail::is_specialization_of_v<AT1, std::allocator>
+    (not detail::is_specialization_of_v<AT1, std::allocator>)
 struct mse_allocation_traits<AT1, AT1, T>
 {
     using traits_type    = std::allocator_traits<AT1>;

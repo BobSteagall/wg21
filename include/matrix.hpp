@@ -17,7 +17,7 @@
     #define LA_COMPILER_CLANG
 
 #elif defined __GNUG__
-    #if (__GNUG__ < 9)
+    #if (__GNUG__ < 10)
         #error unsupported version of GCC
     #endif
     #define LA_COMPILER_GCC
