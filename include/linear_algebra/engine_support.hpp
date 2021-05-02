@@ -1064,6 +1064,14 @@ struct engine_extents_helper
     {
         return get_value_helper([]{ return static_cast<ptrdiff_t>(ET().rows()); });
     }
+
+    static constexpr ptrdiff_t
+    size()
+    requires
+        readable_matrix_engine<ET>
+    {
+        return get_value_helper([]{ return static_cast<ptrdiff_t>(ET().size()); });
+    }
 };
 
 template<class T, ptrdiff_t N, class A, class L>
@@ -1089,6 +1097,12 @@ struct engine_extents_helper<matrix_storage_engine<T, extents<R, C>, A, L>>
     rows()
     {
         return R;
+    }
+
+    static constexpr ptrdiff_t
+    size()
+    {
+        return R*C;
     }
 };
 

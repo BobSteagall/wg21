@@ -86,15 +86,15 @@ class basic_matrix
     //----------------------------------------------------------
     //- Construction from a matrix of different engine type.
     //
-//    template<class ET2, class COT2>
-//    constexpr
-//    basic_matrix(basic_matrix<ET2, COT2> const& rhs)
-//    requires
-//        detail::writable_matrix_engine<engine_type>
-//        and
-//        detail::constructible_from<engine_type, ET2>
-//    :   m_engine(rhs.engine())
-//    {}
+    template<class ET2, class COT2>
+    constexpr
+    basic_matrix(basic_matrix<ET2, COT2> const& rhs)
+    requires
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::constructible_from<engine_type, ET2>
+    :   m_engine(rhs.engine())
+    {}
 
     template<class ET2, class COT2>
     constexpr
@@ -102,8 +102,8 @@ class basic_matrix
     requires
         detail::writable_matrix_engine<engine_type>
         and
-//        detail::not_constructible_from<engine_type, ET2>
-//        and
+        detail::not_constructible_from<engine_type, ET2>
+        and
         detail::convertible_from<element_type, typename ET2::element_type>
     :   m_engine()
     {

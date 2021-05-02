@@ -278,37 +278,58 @@ class matrix_view_engine<ET, matrix_view::const_negation>
     constexpr index_type
     columns() const noexcept
     {
-        return mp_engine->columns();
+        if constexpr(detail::has_constexpr_columns<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::columns();
+        }
+        else
+        {
+            return mp_engine->columns();
+        }
     }
 
     constexpr index_type
     rows() const noexcept
     {
-        return mp_engine->rows();
+        if constexpr(detail::has_constexpr_rows<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::rows();
+        }
+        else
+        {
+            return mp_engine->rows();
+        }
     }
 
     constexpr index_type
     size() const noexcept
     {
-        return mp_engine->size();
+        if constexpr(detail::has_constexpr_size<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::size();
+        }
+        else
+        {
+            return mp_engine->size();
+        }
     }
 
     constexpr index_type
     column_capacity() const noexcept
     {
-        return mp_engine->columns();
+        return columns();
     }
 
     constexpr index_type
     row_capacity() const noexcept
     {
-        return mp_engine->rows();
+        return rows();
     }
 
     constexpr index_type
     capacity() const noexcept
     {
-        return mp_engine->size();
+        return size();
     }
 
     //- Element access
@@ -404,37 +425,58 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
     constexpr index_type
     columns() const noexcept
     {
-        return mp_engine->columns();
+        if constexpr(detail::has_constexpr_columns<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::columns();
+        }
+        else
+        {
+            return mp_engine->columns();
+        }
     }
 
     constexpr index_type
     rows() const noexcept
     {
-        return mp_engine->rows();
+        if constexpr(detail::has_constexpr_rows<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::rows();
+        }
+        else
+        {
+            return mp_engine->rows();
+        }
     }
 
     constexpr index_type
     size() const noexcept
     {
-        return mp_engine->size();
+        if constexpr(detail::has_constexpr_size<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::size();
+        }
+        else
+        {
+            return mp_engine->size();
+        }
     }
 
     constexpr index_type
     column_capacity() const noexcept
     {
-        return mp_engine->columns();
+        return columns();
     }
 
     constexpr index_type
     row_capacity() const noexcept
     {
-        return mp_engine->rows();
+        return rows();
     }
 
     constexpr index_type
     capacity() const noexcept
     {
-        return mp_engine->size();
+        return size();
     }
 
     //- Element access
@@ -533,37 +575,58 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
     constexpr index_type
     columns() const noexcept
     {
-        return mp_engine->rows();
+        if constexpr(detail::has_constexpr_rows<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::rows();
+        }
+        else
+        {
+            return mp_engine->rows();
+        }
     }
 
     constexpr index_type
     rows() const noexcept
     {
-        return mp_engine->columns();
+        if constexpr(detail::has_constexpr_columns<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::columns();
+        }
+        else
+        {
+            return mp_engine->columns();
+        }
     }
 
     constexpr index_type
     size() const noexcept
     {
-        return mp_engine->size();
+        if constexpr(detail::has_constexpr_size<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::size();
+        }
+        else
+        {
+            return mp_engine->size();
+        }
     }
 
     constexpr index_type
     column_capacity() const noexcept
     {
-        return mp_engine->rows();
+        return rows();
     }
 
     constexpr index_type
     row_capacity() const noexcept
     {
-        return mp_engine->columns();
+        return columns();
     }
 
     constexpr index_type
     capacity() const noexcept
     {
-        return mp_engine->size();
+        return size();
     }
 
     //- Element access
@@ -660,37 +723,58 @@ class matrix_view_engine<ET, matrix_view::identity>
     constexpr index_type
     columns() const noexcept
     {
-        return mp_engine->columns();
+        if constexpr(detail::has_constexpr_columns<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::columns();
+        }
+        else
+        {
+            return mp_engine->columns();
+        }
     }
 
     constexpr index_type
     rows() const noexcept
     {
-        return mp_engine->rows();
+        if constexpr(detail::has_constexpr_rows<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::rows();
+        }
+        else
+        {
+            return mp_engine->rows();
+        }
     }
 
     constexpr index_type
     size() const noexcept
     {
-        return mp_engine->size();
+        if constexpr(detail::has_constexpr_size<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::size();
+        }
+        else
+        {
+            return mp_engine->size();
+        }
     }
 
     constexpr index_type
     column_capacity() const noexcept
     {
-        return mp_engine->columns();
+        return columns();
     }
 
     constexpr index_type
     row_capacity() const noexcept
     {
-        return mp_engine->rows();
+        return rows();
     }
 
     constexpr index_type
     capacity() const noexcept
     {
-        return mp_engine->size();
+        return size();
     }
 
     //- Element access
@@ -791,37 +875,58 @@ class matrix_view_engine<ET, matrix_view::const_identity>
     constexpr index_type
     columns() const noexcept
     {
-        return mp_engine->columns();
+        if constexpr(detail::has_constexpr_columns<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::columns();
+        }
+        else
+        {
+            return mp_engine->columns();
+        }
     }
 
     constexpr index_type
     rows() const noexcept
     {
-        return mp_engine->rows();
+        if constexpr(detail::has_constexpr_rows<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::rows();
+        }
+        else
+        {
+            return mp_engine->rows();
+        }
     }
 
     constexpr index_type
     size() const noexcept
     {
-        return mp_engine->size();
+        if constexpr(detail::has_constexpr_size<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::size();
+        }
+        else
+        {
+            return mp_engine->size();
+        }
     }
 
     constexpr index_type
     column_capacity() const noexcept
     {
-        return mp_engine->columns();
+        return columns();
     }
 
     constexpr index_type
     row_capacity() const noexcept
     {
-        return mp_engine->rows();
+        return rows();
     }
 
     constexpr index_type
     capacity() const noexcept
     {
-        return mp_engine->size();
+        return size();
     }
 
     //- Element access
@@ -923,37 +1028,58 @@ class matrix_view_engine<ET, matrix_view::transpose>
     constexpr index_type
     columns() const noexcept
     {
-        return mp_engine->rows();
+        if constexpr(detail::has_constexpr_rows<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::rows();
+        }
+        else
+        {
+            return mp_engine->rows();
+        }
     }
 
     constexpr index_type
     rows() const noexcept
     {
-        return mp_engine->columns();
+        if constexpr(detail::has_constexpr_columns<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::columns();
+        }
+        else
+        {
+            return mp_engine->columns();
+        }
     }
 
     constexpr index_type
     size() const noexcept
     {
-        return mp_engine->size();
+        if constexpr(detail::has_constexpr_size<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::size();
+        }
+        else
+        {
+            return mp_engine->size();
+        }
     }
 
     constexpr index_type
     column_capacity() const noexcept
     {
-        return mp_engine->rows();
+        return rows();
     }
 
     constexpr index_type
     row_capacity() const noexcept
     {
-        return mp_engine->columns();
+        return columns();
     }
 
     constexpr index_type
     capacity() const noexcept
     {
-        return mp_engine->size();
+        return size();
     }
 
     //- Element access
@@ -1054,37 +1180,58 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
     constexpr index_type
     columns() const noexcept
     {
-        return mp_engine->rows();
+        if constexpr(detail::has_constexpr_rows<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::rows();
+        }
+        else
+        {
+            return mp_engine->rows();
+        }
     }
 
     constexpr index_type
     rows() const noexcept
     {
-        return mp_engine->columns();
+        if constexpr(detail::has_constexpr_columns<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::columns();
+        }
+        else
+        {
+            return mp_engine->columns();
+        }
     }
 
     constexpr index_type
     size() const noexcept
     {
-        return mp_engine->size();
+        if constexpr(detail::has_constexpr_size<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::size();
+        }
+        else
+        {
+            return mp_engine->size();
+        }
     }
 
     constexpr index_type
     column_capacity() const noexcept
     {
-        return mp_engine->rows();
+        return rows();
     }
 
     constexpr index_type
     row_capacity() const noexcept
     {
-        return mp_engine->columns();
+        return columns();
     }
 
     constexpr index_type
     capacity() const noexcept
     {
-        return mp_engine->size();
+        return size();
     }
 
     //- Element access
@@ -1194,13 +1341,20 @@ class matrix_view_engine<ET, matrix_view::column>
     constexpr index_type
     rows() const noexcept
     {
-        return mp_engine->rows();
+        if constexpr(detail::has_constexpr_rows<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::rows();
+        }
+        else
+        {
+            return mp_engine->rows();
+        }
     }
 
     constexpr index_type
     size() const noexcept
     {
-        return mp_engine->rows();
+        return rows();
     }
 
     constexpr index_type
@@ -1212,13 +1366,13 @@ class matrix_view_engine<ET, matrix_view::column>
     constexpr index_type
     row_capacity() const noexcept
     {
-        return mp_engine->rows();
+        return rows();
     }
 
     constexpr index_type
     capacity() const noexcept
     {
-        return mp_engine->rows();
+        return rows();
     }
 
     //- Element access
@@ -1326,13 +1480,20 @@ class matrix_view_engine<ET, matrix_view::const_column>
     constexpr index_type
     rows() const noexcept
     {
-        return mp_engine->rows();
+        if constexpr(detail::has_constexpr_rows<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::rows();
+        }
+        else
+        {
+            return mp_engine->rows();
+        }
     }
 
     constexpr index_type
     size() const noexcept
     {
-        return mp_engine->rows();
+        return rows();
     }
 
     constexpr index_type
@@ -1344,13 +1505,13 @@ class matrix_view_engine<ET, matrix_view::const_column>
     constexpr index_type
     row_capacity() const noexcept
     {
-        return mp_engine->rows();
+        return rows();
     }
 
     constexpr index_type
     capacity() const noexcept
     {
-        return mp_engine->rows();
+        return rows();
     }
 
     //- Element access
@@ -1453,7 +1614,14 @@ class matrix_view_engine<ET, matrix_view::row>
     constexpr index_type
     columns() const noexcept
     {
-        return mp_engine->columns();
+        if constexpr(detail::has_constexpr_columns<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::columns();
+        }
+        else
+        {
+            return mp_engine->columns();
+        }
     }
 
     constexpr index_type
@@ -1471,7 +1639,7 @@ class matrix_view_engine<ET, matrix_view::row>
     constexpr index_type
     column_capacity() const noexcept
     {
-        return mp_engine->columns();
+        return columns();
     }
 
     constexpr index_type
@@ -1483,7 +1651,7 @@ class matrix_view_engine<ET, matrix_view::row>
     constexpr index_type
     capacity() const noexcept
     {
-        return mp_engine->columns();
+        return columns();
     }
 
     //- Element access
@@ -1585,7 +1753,14 @@ class matrix_view_engine<ET, matrix_view::const_row>
     constexpr index_type
     columns() const noexcept
     {
-        return mp_engine->columns();
+        if constexpr(detail::has_constexpr_columns<engine_type>())
+        {
+            return detail::engine_extents_helper<engine_type>::columns();
+        }
+        else
+        {
+            return mp_engine->columns();
+        }
     }
 
     constexpr index_type
@@ -1597,13 +1772,13 @@ class matrix_view_engine<ET, matrix_view::const_row>
     constexpr index_type
     size() const noexcept
     {
-        return mp_engine->columns();
+        return columns();
     }
 
     constexpr index_type
     column_capacity() const noexcept
     {
-        return mp_engine->columns();
+        return columns();
     }
 
     constexpr index_type
@@ -1615,7 +1790,7 @@ class matrix_view_engine<ET, matrix_view::const_row>
     constexpr index_type
     capacity() const noexcept
     {
-        return mp_engine->columns();
+        return columns();
     }
 
     //- Element access
@@ -1825,6 +2000,7 @@ class matrix_view_engine<ET, matrix_view::const_submatrix>
   public:
     using engine_type        = ET;
     using owning_engine_type = detail::get_owning_engine_type_t<ET>;
+
     using element_type       = typename engine_type::element_type;
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;

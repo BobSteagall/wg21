@@ -44,11 +44,37 @@ TEST(Add, Constexpr)
     PRINT(has_constexpr_columns<ET1>());
     PRINT(has_constexpr_columns<ET2>());
 
+    constexpr ET1   et1;
+    constexpr auto  r1 = et1.rows();
+    PRINT(r1);
+
+    constexpr ET2   et2;
+    constexpr auto  r2 = et2.rows();
+    constexpr auto  s2 = et2.size();
+    PRINT(r2);
+    PRINT(s2);
+
     constexpr fmd_33    d2 = m2;
 
+    auto  sm = d2.submatrix(0, 2, 0, 2);
+
+    constexpr auto  m4 = mr + mr.h();
+    constexpr auto  m5 = mr + mr.conj();
+    constexpr auto  m6 = mr + mr.t();
+    constexpr auto  m7 = mr + mr.h().conj().t();
+    constexpr auto  m8 = mr + mr.adopt<void>();
+    constexpr auto  m9 = mr.t() + mr.h() + mr.conj() + mr.adopt<void>();
+
+    PRINT_TYPE(decltype(m4));
+    PRINT_TYPE(decltype(m5));
+    PRINT_TYPE(decltype(m6));
+    PRINT_TYPE(decltype(m7));
+    PRINT_TYPE(decltype(m8));
+    PRINT_TYPE(decltype(m9));
     PRINT_TYPE(decltype(d2));
 
-//    constexpr fmf_33    mt = mr + mr.t();
+    constexpr fmf_33    mt = mr + mr.t().h().t();
+
 //
 //    constexpr fmd_33    d1 = LST_33_1;
 //    constexpr fmd_33    d2 = m1;
