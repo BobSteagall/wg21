@@ -286,7 +286,13 @@ Print(basic_mdspan<T, extents<X0, X1>, L, A> const& s, char const* pname = nullp
 inline void
 Print(bool b, char const* pname = nullptr)
 {
-    cout << endl << "bool: " << ((pname) ? pname : "<anon>") << b << endl;
+    cout << endl << "bool: " << ((pname) ? pname : "<anon>") << " " << b << endl;
+}
+
+inline void
+Print(ptrdiff_t v, char const* pname = nullptr)
+{
+    cout << endl << "ptrdiff_t: " << ((pname) ? pname : "<anon>") << " " << v << endl;
 }
 
 #define PRINT(X)    Print(X, #X)
