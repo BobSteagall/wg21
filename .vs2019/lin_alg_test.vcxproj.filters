@@ -127,6 +127,15 @@
     <ClCompile Include="..\tests\test_op_add.cpp">
       <Filter>Unit Test Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\tests\test_op_div.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_op_mul.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\test_op_sub.cpp">
+      <Filter>Unit Test Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
