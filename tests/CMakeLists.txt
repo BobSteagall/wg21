@@ -51,8 +51,8 @@ target_sources(la_test
         test_mse_4E.cpp
         test_mve_00.cpp
         test_op_add_traits.cpp
-#        test_op_div_traits.cpp
-#        test_op_mul_traits.cpp
+        test_op_div_traits.cpp
+        test_op_mul_traits.cpp
         test_op_sub_traits.cpp
         test_op_add.cpp
         test_op_div.cpp

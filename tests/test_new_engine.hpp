@@ -16,7 +16,7 @@ class fs_matrix_engine_tst
     using value_type       = T;
     using reference        = T&;
     using const_reference  = T const&;
-    using index_type       = std::uint32_t;
+    using index_type       = ptrdiff_t;
     using index_tuple_type = std::tuple<index_type, index_type>;
 
 #ifdef LA_USE_MDSPAN

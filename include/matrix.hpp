@@ -109,8 +109,8 @@ namespace STD_LA
 #include "linear_algebra/operation_traits.hpp"
 #include "linear_algebra/addition_traits.hpp"
 #include "linear_algebra/subtraction_traits.hpp"
-//#include "linear_algebra/multiplication_traits.hpp"
-//#include "linear_algebra/division_traits.hpp"
+#include "linear_algebra/multiplication_traits.hpp"
+#include "linear_algebra/division_traits.hpp"
 #include "linear_algebra/arithmetic_operators.hpp"
 
 #include "linear_algebra/debug_helpers.hpp"     //- Helpers for edit/debug/test -- not for production.

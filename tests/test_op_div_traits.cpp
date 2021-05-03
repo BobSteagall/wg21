@@ -1,6 +1,7 @@
-//#define ENABLE_TEST_PRINTING
+#define ENABLE_TEST_PRINTING
 #include "test_common.hpp"
 
+#if 0
 //- A helper macro to assist in readability of test functions below.
 //
 #define ASSERT_A_DIV_B_EQ_C(A, B, C)    \
@@ -435,3 +436,5 @@ TestGroup50()
     t503();
     t504();
 }
+
+#endif

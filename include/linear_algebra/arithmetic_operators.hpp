@@ -48,6 +48,18 @@ operator -(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
 //  Multiplication operators, which employ the multiplication arithmetic traits to do the work.
 //==================================================================================================
 //
+template<class ET1, class COT1, class ET2, class COT2> inline constexpr
+auto
+operator *(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
+{
+    using op_traits  = select_matrix_operation_traits_t<COT1, COT2>;
+    using op1_type   = basic_matrix<ET1, COT1>;
+    using op2_type   = basic_matrix<ET2, COT2>;
+    using mul_traits = get_multiplication_arithmetic_traits_t<op_traits, op1_type, op2_type>;
+
+    return mul_traits::multiply(m1, m2);
+}
+
 template<class ET1, class COT1, class S2> inline constexpr
 auto
 operator *(basic_matrix<ET1, COT1> const& m1, S2 const& s2)
@@ -70,18 +82,6 @@ operator *(S1 const& s1, basic_matrix<ET2, COT2> const& m2)
     using mul_traits = get_multiplication_arithmetic_traits_t<op_traits, op1_type, op2_type>;
 
     return mul_traits::multiply(s1, m2);
-}
-
-template<class ET1, class COT1, class ET2, class COT2> inline constexpr
-auto
-operator *(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
-{
-    using op_traits  = select_matrix_operation_traits_t<COT1, COT2>;
-    using op1_type   = basic_matrix<ET1, COT1>;
-    using op2_type   = basic_matrix<ET2, COT2>;
-    using mul_traits = get_multiplication_arithmetic_traits_t<op_traits, op1_type, op2_type>;
-
-    return mul_traits::multiply(m1, m2);
 }
 
 
