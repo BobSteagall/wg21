@@ -327,3 +327,164 @@ TEST(AddTraits, EnginePromotion)
     ASSERT_A_ADD_B_EQ_C(dyn_new_num,  dyn_new_num,  dyn_new_num);
 }
 
+
+//--------------------------------------------------------------------------------------------------
+//  Suffix "_tst" means "test"
+//
+template<class OT, class T1, class T2>
+struct element_add_traits_tst;
+
+//- Promote any float/float addition to double.
+//
+template<class OT>
+struct element_add_traits_tst<OT, float, float>
+{
+    using element_type = double;
+};
+
+//------
+//
+template<class OTR, class ET1, class ET2>
+struct engine_add_traits_tst;
+
+template<class OTR, class T1, size_t R1, size_t C1, class T2, size_t R2, size_t C2>
+struct engine_add_traits_tst<OTR,
+                             fs_matrix_engine_tst<T1, R1, C1>,
+                             fs_matrix_engine_tst<T2, R2, C2>>
+{
+    static_assert(R1 == R2  &&  R1 > 0);
+    static_assert(C1 == C2  &&  C1 > 0);
+    using element_traits = get_addition_element_traits_t<OTR, T1, T2>;
+
+    using element_type = typename element_traits::element_type;
+    using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
+};
+
+template<class OTR,
+         class T1, size_t R1, size_t C1,
+         class T2, ptrdiff_t R2, ptrdiff_t C2, class AT, class LT>
+requires
+    (R2 > 0  && C2 > 0)
+struct engine_add_traits_tst<OTR,
+                             fs_matrix_engine_tst<T1, R1, C1>,
+                             matrix_storage_engine<T2, extents<R2, C2>, AT, LT>>
+{
+    static_assert(R1 == R2);
+    static_assert(C1 == C2);
+    using element_traits = get_addition_element_traits_t<OTR, T1, T2>;
+
+    using element_type = typename element_traits::element_type;
+    using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
+};
+
+template<class OTR,
+         class T1, ptrdiff_t R1, ptrdiff_t C1, class AT, class LT,
+         class T2, size_t R2, size_t C2>
+requires
+    (R1 > 0  && C1 > 0)
+struct engine_add_traits_tst<OTR,
+                             matrix_storage_engine<T1, extents<R1, C1>, AT, LT>,
+                             fs_matrix_engine_tst<T2, R2, C2>>
+{
+    static_assert(R1 == R2);
+    static_assert(C1 == C2);
+    using element_traits = get_addition_element_traits_t<OTR, T1, T2>;
+
+    using element_type = typename element_traits::element_type;
+    using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
+};
+
+//------
+//
+template<class OTR, class OP1, class OP2>
+struct addition_traits_tst;
+
+template<class OTR, class COT1, class COT2>
+struct addition_traits_tst<OTR,
+                              basic_matrix<fs_matrix_engine_tst<double, 3, 4>, COT1>,
+                              basic_matrix<fs_matrix_engine_tst<double, 3, 4>, COT2>>
+{
+    using op_type_1     = basic_matrix<fs_matrix_engine_tst<double, 3, 4>, COT1>;
+    using op_type_2     = basic_matrix<fs_matrix_engine_tst<double, 3, 4>, COT2>;
+    using op_traits     = OTR;
+    using engine_type_1 = typename op_type_1::engine_type;
+    using engine_type_2 = typename op_type_2::engine_type;
+
+    using engine_traits = get_addition_engine_traits_t<op_traits, engine_type_1, engine_type_2>;
+    using engine_type   = typename engine_traits::engine_type;
+    using result_type   = basic_matrix<engine_type, op_traits>;
+
+    static result_type  add(op_type_1 const& m1, op_type_2 const& m2)
+                        {
+                            STD_LA::PrintOperandTypes<result_type>("addition_traits_TST", m1, m2);
+                            return result_type();
+                        }
+};
+
+//------
+//
+struct test_add_op_traits_tst
+{
+     template<class OT, class T1, class T2>
+     using addition_element_traits = element_add_traits_tst<OT, T1, T2>;
+
+     template<class OT, class ET1, class ET2>
+     using addition_engine_traits = engine_add_traits_tst<OT, ET1, ET2>;
+
+     template<class OT, class OP1, class OP2>
+     using addition_arithmetic_traits = addition_traits_tst<OT, OP1, OP2>;
+};
+
+
+TEST(AddTraits, CustomTraits)
+{
+    PRINT_FNAME();
+
+    using fsm_float       = fixed_size_matrix<float, 2, 3>;
+    using fsm_float_tst   = basic_matrix<fs_matrix_engine_tst<float, 2, 3>, test_add_op_traits_tst>;
+    using fsm_double_tst  = basic_matrix<fs_matrix_engine_tst<double, 2, 3>, test_add_op_traits_tst>;
+    using fsm_new_num_tst = basic_matrix<fs_matrix_engine_tst<new_num, 2, 3>, test_add_op_traits_tst>;
+
+    using fsm_float_tst_tr   = decltype(std::declval<basic_matrix<fs_matrix_engine_tst<float, 3, 2>, test_add_op_traits_tst>>().t());
+    using fsm_double_tst_tr  = decltype(std::declval<basic_matrix<fs_matrix_engine_tst<double, 3, 2>, test_add_op_traits_tst>>().t());
+    using fsm_new_num_tst_tr = decltype(std::declval<basic_matrix<fs_matrix_engine_tst<new_num, 3, 2>, test_add_op_traits_tst>>().t());
+
+    using fsm_double_tst2  = fixed_size_matrix<double, 2, 3, test_add_op_traits_tst>;
+    using fsm_new_num_tst2 = fixed_size_matrix<new_num, 3, 2, test_add_op_traits_tst>;
+
+    using drm_double_tst  = dynamic_matrix<double, test_add_op_traits_tst>;
+    using drm_new_num_tst = dynamic_matrix<new_num, test_add_op_traits_tst>;
+
+    ASSERT_A_ADD_B_EQ_C(fsm_float,      fsm_float,      fsm_float);
+    ASSERT_A_ADD_B_EQ_C(fsm_float_tst,  fsm_float_tst,  fsm_double_tst);
+    ASSERT_A_ADD_B_EQ_C(fsm_float_tst,  fsm_float,      fsm_double_tst);
+    ASSERT_A_ADD_B_EQ_C(fsm_float_tst,  fsm_float_tst,  fsm_double_tst);
+
+    ASSERT_A_ADD_B_EQ_C(fsm_float_tst_tr,  fsm_float_tst_tr,  fsm_double_tst2);
+    ASSERT_A_ADD_B_EQ_C(fsm_float_tst_tr,  fsm_float_tst,     fsm_double_tst2);
+    ASSERT_A_ADD_B_EQ_C(fsm_float_tst,     fsm_float_tst_tr,  fsm_double_tst2);
+
+    ASSERT_A_ADD_B_EQ_C(fsm_double_tst,   fsm_double_tst,   fsm_double_tst);
+    ASSERT_A_ADD_B_EQ_C(fsm_double_tst,   fsm_new_num_tst,  fsm_new_num_tst);
+    ASSERT_A_ADD_B_EQ_C(fsm_new_num_tst,  fsm_double_tst,   fsm_new_num_tst);
+    ASSERT_A_ADD_B_EQ_C(fsm_new_num_tst,  fsm_new_num_tst,  fsm_new_num_tst);
+
+    ASSERT_A_ADD_B_EQ_C(fsm_double_tst_tr,   fsm_double_tst_tr,   fsm_double_tst2);
+
+    PRINT_TYPE(decltype(std::declval<fsm_double_tst_tr>() + std::declval<fsm_double_tst_tr>()));
+    PRINT_TYPE(decltype(std::declval<fsm_double_tst_tr>() + std::declval<fsm_new_num_tst_tr>()));
+
+//    ASSERT_A_ADD_B_EQ_C(fsm_double_tst_tr,   fsm_new_num_tst_tr,  drm_new_num_tst);
+//    ASSERT_A_ADD_B_EQ_C(fsm_new_num_tst_tr,  fsm_double_tst_tr,   drm_new_num_tst);
+//    ASSERT_A_ADD_B_EQ_C(fsm_new_num_tst_tr,  fsm_new_num_tst_tr,  drm_new_num_tst);
+
+    ASSERT_A_ADD_B_EQ_C(fsm_double_tst,   drm_double_tst,   drm_double_tst);
+    ASSERT_A_ADD_B_EQ_C(drm_double_tst,   fsm_new_num_tst,  drm_new_num_tst);
+    ASSERT_A_ADD_B_EQ_C(drm_new_num_tst,  fsm_double_tst,   drm_new_num_tst);
+    ASSERT_A_ADD_B_EQ_C(fsm_new_num_tst,  drm_new_num_tst,  drm_new_num_tst);
+
+    using fsm_double_tst_34 = basic_matrix<fs_matrix_engine_tst<double, 3, 4>, test_add_op_traits_tst>;
+
+    ASSERT_A_ADD_B_EQ_C(fsm_double_tst,     fsm_double_tst,     fsm_double_tst);
+    ASSERT_A_ADD_B_EQ_C(fsm_double_tst_34,  fsm_double_tst_34,  fsm_double_tst_34);
+}

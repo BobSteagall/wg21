@@ -14,11 +14,8 @@ class fs_matrix_engine_tst
   public:
     using element_type     = T;
     using value_type       = T;
-    using pointer          = T*;
-    using const_pointer    = T const*;
     using reference        = T&;
     using const_reference  = T const&;
-    using difference_type  = std::int32_t;
     using index_type       = std::uint32_t;
     using index_tuple_type = std::tuple<index_type, index_type>;
 
@@ -26,11 +23,6 @@ class fs_matrix_engine_tst
 //    using span_type       = typename STD_LA::fs_matrix_engine<T, R, C>::span_type;
 //    using const_span_type = typename STD_LA::fs_matrix_engine<T, R, C>::const_span_type;
 #endif
-
-    using direct_engine_type = fs_matrix_engine_tst;
-    using owning_engine_type = fs_matrix_engine_tst;
-
-    static constexpr bool   is_row_major = true;
 
   public:
     constexpr fs_matrix_engine_tst();

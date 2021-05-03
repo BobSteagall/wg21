@@ -119,6 +119,7 @@ struct mve_mdspan_traits<void>
     static constexpr bool   has_mdspan = false;
 
     using subvector_mdspan_type = void;
+    using conjugate_mdspan_type = void;
     using negation_mdspan_type  = void;
     using hermitian_mdspan_type = void;
     using submatrix_mdspan_type = void;

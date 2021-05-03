@@ -22,8 +22,8 @@ namespace detail {
 //==================================================================================================
 //                              **** ELEMENT ADDITION TRAITS ****
 //==================================================================================================
-//- The standard element subtraction traits type provides the default mechanism for determining the
-//  result of subtracting two elements of (possibly) different types.
+//- The standard element addition traits type provides the default mechanism for determining the
+//  result of adding two elements of (possibly) different types.
 //
 template<class OTR, class T1, class T2>
 struct addition_element_traits

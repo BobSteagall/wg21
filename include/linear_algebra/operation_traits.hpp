@@ -259,36 +259,95 @@ using select_matrix_operation_traits_t =
 //      get_division_arithmetic_traits_t<OT, U, V>
 //--------------------------------------------------------------------------------------------------
 //
-#define STD_LA_DEFINE_OP_TRAITS_EXTRACTOR(OP, LVL)                                  \
-    namespace detail {                                                              \
-        template<typename OT, typename U, typename V, typename = void>              \
-        struct OP##_##LVL##_traits_extractor                                        \
-        {                                                                           \
-            using type = matrix_operation_traits::OP##_##LVL##_traits<OT,U,V>;      \
-        };                                                                          \
-                                                                                    \
-        template<typename OT, typename U, typename V>                               \
-        struct OP##_##LVL##_traits_extractor                                        \
-        <OT, U, V, std::void_t<typename OT::template OP##_##LVL##_traits<OT,U,V>>>  \
-        {                                                                           \
-            using type = typename OT::template OP##_##LVL##_traits<OT, U, V>;       \
-        };                                                                          \
-    }                                                                               \
-                                                                                    \
-    template<typename OT, typename U, typename V>                                   \
-    using get_##OP##_##LVL##_traits_t =                                             \
-        typename detail::OP##_##LVL##_traits_extractor<OT,U,V>::type
+#if 1
+#define STD_LA_DEFINE_OP_TRAITS_EXTRACTOR(OP, LVL, RT)                                  \
+    namespace detail {                                                                  \
+        template<typename OT, typename U, typename V, typename = void>                  \
+        struct OP##_##LVL##_traits_extractor                                            \
+        {                                                                               \
+            using type = matrix_operation_traits::OP##_##LVL##_traits<OT,U,V>;          \
+        };                                                                              \
+                                                                                        \
+        template<typename OT, typename U, typename V>                                   \
+        struct OP##_##LVL##_traits_extractor                                            \
+        <OT, U, V, std::void_t<typename OT::template OP##_##LVL##_traits<OT,U,V>::RT>>  \
+        {                                                                               \
+            using type = typename OT::template OP##_##LVL##_traits<OT, U, V>;           \
+        };                                                                              \
+    }                                                                                   \
+                                                                                        \
+    template<typename OT, typename U, typename V>                                       \
+    using get_##OP##_##LVL##_traits_t =                                                 \
+        typename detail::OP##_##LVL##_traits_extractor<OT,U,V>::type;
 
 
-#define STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(OP)          \
-    STD_LA_DEFINE_OP_TRAITS_EXTRACTOR(OP, element);     \
-    STD_LA_DEFINE_OP_TRAITS_EXTRACTOR(OP, engine);      \
-    STD_LA_DEFINE_OP_TRAITS_EXTRACTOR(OP, arithmetic)
+#define STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(OP)                      \
+    STD_LA_DEFINE_OP_TRAITS_EXTRACTOR(OP, element, element_type)    \
+    STD_LA_DEFINE_OP_TRAITS_EXTRACTOR(OP, engine, engine_type)      \
+    STD_LA_DEFINE_OP_TRAITS_EXTRACTOR(OP, arithmetic, result_type)
 
-STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(addition);
-STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(subtraction);
-STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(multiplication);
-STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(division);
+#else
+
+#define STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(OP)                                                      \
+    namespace detail {                                                                              \
+        template<typename OT, typename U, typename V, typename = void>                              \
+        struct OP##_element_traits_extractor                                                        \
+        {                                                                                           \
+            using type = matrix_operation_traits::OP##_element_traits<OT,U,V>;                      \
+        };                                                                                          \
+                                                                                                    \
+        template<typename OT, typename U, typename V>                                               \
+        struct OP##_element_traits_extractor                                                        \
+        <OT, U, V, std::void_t<typename OT::template OP##_element_traits<OT,U,V>::element_type>>    \
+        {                                                                                           \
+            using type = typename OT::template OP##_element_traits<OT, U, V>;                       \
+        };                                                                                          \
+                                                                                                    \
+        template<typename OT, typename U, typename V, typename = void>                              \
+        struct OP##_engine_traits_extractor                                                         \
+        {                                                                                           \
+            using type = matrix_operation_traits::OP##_engine_traits<OT,U,V>;                       \
+        };                                                                                          \
+                                                                                                    \
+        template<typename OT, typename U, typename V>                                               \
+        struct OP##_engine_traits_extractor                                                         \
+        <OT, U, V, std::void_t<typename OT::template OP##_engine_traits<OT,U,V>::engine_type>>      \
+        {                                                                                           \
+            using type = typename OT::template OP##_engine_traits<OT, U, V>;                        \
+        };                                                                                          \
+                                                                                                    \
+        template<typename OT, typename U, typename V, typename = void>                              \
+        struct OP##_arithmetic_traits_extractor                                                     \
+        {                                                                                           \
+            using type = matrix_operation_traits::OP##_arithmetic_traits<OT,U,V>;                   \
+        };                                                                                          \
+                                                                                                    \
+        template<typename OT, typename U, typename V>                                               \
+        struct OP##_arithmetic_traits_extractor                                                     \
+        <OT, U, V, std::void_t<typename OT::template OP##_arithmetic_traits<OT,U,V>::result_type>>  \
+        {                                                                                           \
+            using type = typename OT::template OP##_arithmetic_traits<OT, U, V>;                    \
+        };                                                                                          \
+    }                                                                                               \
+                                                                                                    \
+    template<typename OT, typename U, typename V>                                                   \
+    using get_##OP##_element_traits_t =                                                             \
+        typename detail::OP##_element_traits_extractor<OT,U,V>::type;                               \
+                                                                                                    \
+    template<typename OT, typename U, typename V>                                                   \
+    using get_##OP##_engine_traits_t =                                                              \
+        typename detail::OP##_engine_traits_extractor<OT,U,V>::type;                                \
+                                                                                                    \
+    template<typename OT, typename U, typename V>                                                   \
+    using get_##OP##_arithmetic_traits_t =                                                          \
+        typename detail::OP##_arithmetic_traits_extractor<OT,U,V>::type;
+
+#endif
+
+STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(addition)
+STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(subtraction)
+STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(multiplication)
+STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(division)
 
 #undef STD_LA_DEFINE_OP_TRAITS_EXTRACTORS
 #undef STD_LA_DEFINE_OP_TRAITS_EXTRACTOR
