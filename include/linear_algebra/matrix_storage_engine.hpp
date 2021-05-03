@@ -508,6 +508,42 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         do_reshape(rows, cols, rowcap, colcap);
     }
 
+    constexpr
+    matrix_storage_engine(index_type cols)
+    requires
+        this_type::is_column_reshapable
+    :   m_data()
+    {
+        do_reshape_columns(cols, cols);
+    }
+
+    constexpr
+    matrix_storage_engine(index_type cols, index_type colcap)
+    requires
+        this_type::is_column_reshapable
+    :   m_data()
+    {
+        do_reshape_columns(cols, colcap);
+    }
+
+    constexpr
+    matrix_storage_engine(index_type rows)
+    requires
+        this_type::is_row_reshapable
+    :   m_data()
+    {
+        do_reshape_rows(rows, rows);
+    }
+
+    constexpr
+    matrix_storage_engine(index_type rows, index_type rowcap)
+    requires
+        this_type::is_row_reshapable
+    :   m_data()
+    {
+        do_reshape_rows(rows, rowcap);
+    }
+
     //- Heterogeneous construction from two-dimensional sources.
     //
     template<class ET2>

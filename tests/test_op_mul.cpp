@@ -61,3 +61,17 @@ TEST(Mul, Constexpr)
     PRINT(m16);
     PRINT_TYPE(decltype(m16));
 }
+
+TEST(Mul, Various)
+{
+    gmf_33  g1;
+
+    general_matrix<float, 3, dynamic_extent>    g2;
+
+    g2.resize_columns(100);
+
+    dynamic_column_vector<float>    v1(15);
+    PRINT(v1);
+    dynamic_row_vector<float>       v2(10);
+    PRINT(v2);
+}

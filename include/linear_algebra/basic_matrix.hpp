@@ -83,6 +83,24 @@ class basic_matrix
     :   m_engine(rows, cols, rowcap, colcap)
     {}
 
+    constexpr
+    basic_matrix(index_type cols)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::column_reshapable_matrix_engine<engine_type>
+    :   m_engine(cols, cols)
+    {}
+
+    constexpr
+    basic_matrix(index_type rows)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::row_reshapable_matrix_engine<engine_type>
+    :   m_engine(rows, rows)
+    {}
+
     //----------------------------------------------------------
     //- Construction from a matrix of different engine type.
     //
