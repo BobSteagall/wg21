@@ -15,6 +15,7 @@ class LinearAlgebraConan(ConanFile):
     exports_sources = "*.txt", "*.hpp", "*.cpp", "*.cmake", "*.cmake.in", "LICENSE.txt"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
+    requires = ("mdspan/0.1.0")
 
     def set_version(self):
         content = load(os.path.join(os.path.dirname(__file__), "CMakeLists.txt"))
