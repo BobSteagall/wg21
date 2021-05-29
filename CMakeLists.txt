@@ -6,20 +6,22 @@ endif()
 
 project(wg21_linear_algebra VERSION 0.7.0)
 
+include(CTest)
+include(FetchContent)
+include(GNUInstallDirs)
+include(CMakeDependentOption)
+include(CMakePackageConfigHelpers)
+
 if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
     include(${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
     conan_basic_setup()
 elseif(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     conan_basic_setup()
+else()
+    FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git GIT_TAG stable)
+    FetchContent_MakeAvailable(mdspan)
 endif()
-
-
-include(CTest)
-include(FetchContent)
-include(GNUInstallDirs)
-include(CMakeDependentOption)
-include(CMakePackageConfigHelpers)
 
 option(LA_BUILD_USING_PCH "Build using precompiled headers" OFF)
 option(LA_VERBOSE_TEST_OUTPUT "Write verbose test results" OFF)
@@ -31,9 +33,6 @@ cmake_dependent_option(LA_BUILD_DEB "Create a DEB" ON "LA_BUILD_PACKAGE" OFF)
 cmake_dependent_option(LA_BUILD_RPM "Create a RPM" ON "LA_BUILD_PACKAGE" OFF)
 
 option(MDSPAN_ENABLE_CONCEPTS "" OFF)
-FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git GIT_TAG stable)
-FetchContent_MakeAvailable(mdspan)
-
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
