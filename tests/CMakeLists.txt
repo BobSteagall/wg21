@@ -1,7 +1,10 @@
 add_executable(la_test "")
 
-FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git)
-FetchContent_GetProperties(gtest)
+if(NOT EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake AND NOT EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git)
+    FetchContent_MakeAvailable(gtest)
+endif()
+
 option(BUILD_GMOCK "" OFF)
 option(INSTALL_GTEST "" OFF)
 option(gtest_force_shared_crt "" ON)
