@@ -1,19 +1,12 @@
 add_executable(la_test "")
 
-if(NOT EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake AND NOT EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git)
-    FetchContent_MakeAvailable(gtest)
-endif()
-
 option(BUILD_GMOCK "" OFF)
 option(INSTALL_GTEST "" OFF)
 option(gtest_force_shared_crt "" ON)
 add_compile_options(-U__cpp_char8_t)
 
-if(NOT gtest_POPULATED)
-    FetchContent_Populate(gtest)
-    add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
-endif()
+FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git)
+FetchContent_MakeAvailable(gtest)
 
 if(LA_BUILD_USING_PCH)
     target_precompile_headers(la_test
@@ -49,7 +42,6 @@ target_link_libraries(la_test
         gtest_main
         gtest
 )
-
 
 target_compile_options(la_test
     PRIVATE

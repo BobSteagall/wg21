@@ -18,10 +18,6 @@ class LinearAlgebraConan(ConanFile):
     generators = "cmake", "cmake_find_package_multi"
     requires = ("mdspan/0.1.0")
 
-    @property
-    def _source_subfolder(self):
-        return "source_subfolder"
-
     def set_version(self):
         content = load(os.path.join(os.path.dirname(__file__), "CMakeLists.txt"))
         version = re.search(r'project\(wg21_linear_algebra VERSION (\d+\.\d+\.\d+)\)', content).group(1)
