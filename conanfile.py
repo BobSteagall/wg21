@@ -10,11 +10,12 @@ class LinearAlgebraConan(ConanFile):
     name = "linear_algebra"
     license = "MIT"
     url = "https://github.com/BobSteagall/wg21"
+    homepage = "https://github.com/BobSteagall/wg21"
     description = "A linear algebra proposal for the C++ standard library"
     topics = ("conan", "linear algebra", "header-only", "std", "math", "wg21")
-    exports_sources = "*.txt", "*.hpp", "*.cpp", "*.cmake", "*.cmake.in", "LICENSE.txt"
+    exports_sources = "*.txt", "*.hpp", "*.cpp", "*.cmake", "*.cmake.in"
     settings = "os", "compiler", "build_type", "arch"
-    generators = "cmake_paths"
+    generators = "cmake", "cmake_find_package_multi"
     requires = ("mdspan/0.1.0")
 
     def set_version(self):
@@ -53,4 +54,15 @@ class LinearAlgebraConan(ConanFile):
             self.cmake.test()
 
     def package(self):
-        self.cmake.install()
+        self.copy(pattern="*", dst="include", src="include")
+        self.copy("LICENSE.txt", dst="licenses", src=".")
+
+    def package_id(self):
+        self.info.header_only()
+
+    def package_info(self):
+        self.cpp_info.names["cmake_find_package"] = "wg21_linear_algebra"
+        self.cpp_info.names["cmake_find_package_multi"] = "wg21_linear_algebra"
+        self.cpp_info.components["_wg21_linear_algebra"].names["cmake_find_package"] = "wg21_linear_algebra"
+        self.cpp_info.components["_wg21_linear_algebra"].names["cmake_find_package_multi"] = "wg21_linear_algebra"
+        self.cpp_info.components["_wg21_linear_algebra"].requires = ["mdspan::mdspan"]
