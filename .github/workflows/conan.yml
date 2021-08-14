@@ -1,0 +1,64 @@
+# Copyright (c) 2018-2020  Robert N. Steagall and KEWB Computing
+# All rights reserved.
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+# associated documentation files (the "Software"), to deal with the Software without restriction,
+# including without limitation the rights to use, copy, modify, merge, publish, distribute, 
+# sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is 
+# furnished to do so, subject to the following conditions:
+
+# 1. Redistributions of source code must retain the above copyright notice, this list of conditions
+#    and the following disclaimers.
+# 2. Redistributions in binary form must reproduce the above copyright notice, this list of 
+#    conditions and the following disclaimers in the documentation and/or other materials provided
+#    with the distribution.
+# 3. Neither the names of the copyright holder, nor the names of its contributors may be used 
+#    to endorse or promote products derived from this Software without specific prior written
+#    permission. 
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT 
+# NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE. 
+
+name: Conan
+
+on: [push]
+
+jobs:
+  build:
+    name: ${{ matrix.settings.name }} ${{ matrix.configuration }}
+    runs-on: ${{ matrix.settings.os }}
+    strategy:
+      matrix:
+        configuration: [ "Release", "Debug" ]
+        settings:
+       # - {
+       #     name: "Gcc 11.0.0",
+       #     os: ubuntu-20.04
+       #   }
+       # - {
+       #     name: "Clang 12.0.0",
+       #     os: ubuntu-20.04
+       #   }
+        - {
+            name: "Visual Studio 2019",
+            os: ubuntu-20.04
+          }
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Install Conan Package Tools
+        run: |
+          pip install -U conan_package_tools
+      - name: Configure Conan
+        shell: bash
+        run: |
+          conan config init
+          conan profile show default
+        run: |
+          python build.py
