@@ -60,5 +60,6 @@ jobs:
         run: |
           conan config init
           conan profile show default
+      - name: Build Conan
         run: |
           python build.py
