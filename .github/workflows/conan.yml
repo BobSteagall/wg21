@@ -66,13 +66,12 @@ jobs:
         run: |
           conan config init
           conan profile show default
-      - name: Run Conan Package Tools
+      - name: Build Conan
         shell: bash
         env:
           CONAN_BUILD_TYPES: ${{ matrix.configuration }}
           CC: ${{ matrix.configuration.compiler.cc }}
           CXX: ${{ matrix.configuration.compiler.cxx }}
           CONAN_${{ matrix.configuration.compiler.type }}_VERSIONS: ${{ matrix.configuration.compiler.version }}
-      - name: Build Conan
         run: |
           python .conan/build.py
