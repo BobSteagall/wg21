@@ -44,7 +44,7 @@ jobs:
        #   }
         - {
             name: "Visual Studio 2019",
-            os: ubuntu-20.04
+            os: windows-latest,
           }
     steps:
       - uses: actions/checkout@v2
