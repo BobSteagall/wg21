@@ -62,4 +62,4 @@ jobs:
           conan profile show default
       - name: Build Conan
         run: |
-          python build.py
+          python .conan/build.py
