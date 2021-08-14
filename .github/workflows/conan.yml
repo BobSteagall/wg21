@@ -45,6 +45,7 @@ jobs:
         - {
             name: "Visual Studio 2019",
             os: windows-latest,
+            compiler: { type: VISUAL, version: 16, cc: "cl", cxx: "cl" }
           }
     steps:
       - uses: actions/checkout@v2
@@ -65,6 +66,13 @@ jobs:
         run: |
           conan config init
           conan profile show default
+      - name: Run Conan Package Tools
+        shell: bash
+        env:
+          CONAN_BUILD_TYPES: ${{ matrix.configuration }}
+          CC: ${{ matrix.configuration.compiler.cc }}
+          CXX: ${{ matrix.configuration.compiler.cxx }}
+          CONAN_${{ matrix.configuration.compiler.type }}_VERSIONS: ${{ matrix.configuration.compiler.version }}
       - name: Build Conan
         run: |
           python .conan/build.py
