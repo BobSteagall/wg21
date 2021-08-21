@@ -40,9 +40,9 @@ jobs:
             compiler: { type: GCC, version: 11, cc: "gcc-11", cxx: "g++-11" }
           }
         - {
-            name: "Clang 13.0.0",
+            name: "Clang 12.0.0",
             os: ubuntu-20.04,
-            compiler: { type: CLANG, version: 13, cc: "clang-13", cxx: "clang++-13" }
+            compiler: { type: CLANG, version: 12, cc: "clang-12", cxx: "clang++-12" }
           }
         - {
             name: "Visual Studio 2019",
@@ -56,7 +56,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.2
         with:
           vs-version: "16.5"
-      - name: Install GCC 11
+      - name: Install Latest GCC 
         if: matrix.settings.compiler.type == 'GCC'
         shell: bash
         run: |
