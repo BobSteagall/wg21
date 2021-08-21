@@ -92,7 +92,7 @@ jobs:
         shell: bash
         env:
           CONAN_USERNAME: twonington
-          CONAN_UPLOAD: https://twonington.jfrog.io/artifactory/api/conan/conan-oss"
+          CONAN_UPLOAD: https://twonington.jfrog.io/artifactory/api/conan/conan-oss
           CONAN_LOGIN_USERNAME: ${{ secrets.CONAN_LOGIN_USERNAME }}
           CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD }}
           CONAN_ARCHS: x86_64
