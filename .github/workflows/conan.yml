@@ -37,7 +37,7 @@ jobs:
         - {
             name: "Gcc 11.0.0",
             os: ubuntu-20.04,
-            compiler: { type: GCC, version: 11, cc: "gcc-11", cxx: "g++-10" }
+            compiler: { type: GCC, version: 11, cc: "gcc-11", cxx: "g++-11" }
           }
        # - {
        #     name: "Clang 12.0.0",
