@@ -84,8 +84,8 @@ jobs:
         shell: bash
         run: |
           conan config init
-          if [[ "${{ matrix.settings.compiler.type }}" == "GCC" || "${{ matrix.config.compiler.type }}" == "CLANG" ]]; then
-            conan profile update settings.compiler.libcxx=${{ matrix.config.lib }} default
+          if [[ "${{ matrix.settings.compiler.type }}" == "GCC" || "${{ matrix.settings.compiler.type }}" == "CLANG" ]]; then
+            conan profile update settings.compiler.libcxx=${{ matrix.settings.lib }} default
           fi
           conan profile show default
       - name: Build Conan
