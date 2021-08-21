@@ -37,12 +37,14 @@ jobs:
         - {
             name: "Gcc 11.0.0",
             os: ubuntu-20.04,
-            compiler: { type: GCC, version: 11, cc: "gcc-11", cxx: "g++-11" }
+            compiler: { type: GCC, version: 11, cc: "gcc-11", cxx: "g++-11" },
+            lib: "libstdc++11"
           }
         - {
             name: "Clang 12.0.0",
             os: ubuntu-20.04,
-            compiler: { type: CLANG, version: 12, cc: "clang-12", cxx: "clang++-12" }
+            compiler: { type: CLANG, version: 12, cc: "clang-12", cxx: "clang++-12" },
+            lib: "libc++"
           }
         - {
             name: "Visual Studio 2019",
@@ -82,6 +84,9 @@ jobs:
         shell: bash
         run: |
           conan config init
+          if [[ "${{ matrix.settings.compiler.type }}" == "GCC" || "${{ matrix.config.compiler.type }}" == "CLANG" ]]; then
+            conan profile update settings.compiler.libcxx=${{ matrix.config.lib }} default
+          fi
           conan profile show default
       - name: Build Conan
         shell: bash
