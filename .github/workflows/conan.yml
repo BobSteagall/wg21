@@ -56,7 +56,7 @@ jobs:
         with:
           vs-version: "16.5"
       - name: Install GCC 11
-        if: matrix.settings.compiler.type == GCC
+        if: matrix.settings.compiler.type == 'GCC'
         shell: bash
         run: |
           sudo apt update
