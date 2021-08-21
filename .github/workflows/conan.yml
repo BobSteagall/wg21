@@ -63,7 +63,7 @@ jobs:
           sudo apt update
           sudo apt install gcc-11-multilib g++-11-multilib
       - name: Install Clang
-        if: matrix.config.compiler.type == 'CLANG'
+        if: matrix.settings.compiler.type == 'CLANG'
         shell: bash
         working-directory: ${{ env.HOME }}
         run: |
