@@ -70,6 +70,7 @@ jobs:
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh ${{ matrix.settings.compiler.version }}
+          sudo apt install -y libc++-${{ matrix.settings.compiler.version }}-dev libc++abi-${{ matrix.settings.compiler.version }}-dev libunwind-${{ matrix.settings.compiler.version }}-dev
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
