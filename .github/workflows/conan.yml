@@ -55,6 +55,12 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.2
         with:
           vs-version: "16.5"
+      - name: Install GCC 11
+        if: matrix.settings.compiler.type == GCC
+        shell: bash
+        run: |
+          sudo apt update
+          sudo apt install gcc-11 g++-11
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
