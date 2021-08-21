@@ -91,6 +91,7 @@ jobs:
       - name: Build Conan
         shell: bash
         env:
+          CONAN_ARCHS: x86_64
           CONAN_BUILD_TYPES: ${{ matrix.configuration }}
           CC: ${{ matrix.settings.compiler.cc }}
           CXX: ${{ matrix.settings.compiler.cxx }}
