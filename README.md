@@ -1,7 +1,6 @@
 ## wg21
- [![Travis Build Status](https://travis-ci.org/BobSteagall/wg21.svg?branch=master)](https://travis-ci.org/BobSteagall/wg21)
- [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/BobSteagall/wg21?svg=true&branch=master)](https://ci.appveyor.com/project/BobSteagall/wg21)
- 
+[![Conan Build](https://img.shields.io/github/workflow/status/Twon/wg21/Conan/master?label=Conan)](https://github.com/Twon/wg21/actions?query=workflow%3A%22Conan%22+branch%3Amaster)
+
 Work on revision R7  of linear algebra proposal P1385 is currently underway in the `r7` branch.
 
 ## Support
@@ -139,13 +138,13 @@ To add the *linear_algebra* library to your project as a dependency, you need to
 
 ```bash
 pip install conan
-conan remote add linear_algebra https://api.bintray.com/conan/twonington/public-conan
+conan remote add linear_algebra https://twonington.jfrog.io/artifactory/api/conan/conan-oss
 ```
 
 Once this is set, you can add the linear_algebra dependency to you project via the following signature:
 
 ```bash
-linear_algebra/0.7.0@public-conan/testing
+linear_algebra/0.7.0@conan-oss/testing
 ```
 
 Available versions of the Linear Algebra package can be search via Conan:
