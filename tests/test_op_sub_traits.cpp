@@ -471,12 +471,15 @@ TEST(SubTraits, CustomTraits)
 
     ASSERT_A_SUB_B_EQ_C(fsm_double_tst_tr,   fsm_double_tst_tr,   fsm_double_tst2);
 
+    PRINT(has_constexpr_columns_v<fsm_double_tst_tr>);
+    PRINT(has_constexpr_columns_v<fsm_new_num_tst_tr>);
+
     PRINT_TYPE(decltype(std::declval<fsm_double_tst_tr>() - std::declval<fsm_double_tst_tr>()));
     PRINT_TYPE(decltype(std::declval<fsm_double_tst_tr>() - std::declval<fsm_new_num_tst_tr>()));
 
-//    ASSERT_A_SUB_B_EQ_C(fsm_double_tst_tr,   fsm_new_num_tst_tr,  drm_new_num_tst);
-//    ASSERT_A_SUB_B_EQ_C(fsm_new_num_tst_tr,  fsm_double_tst_tr,   drm_new_num_tst);
-//    ASSERT_A_SUB_B_EQ_C(fsm_new_num_tst_tr,  fsm_new_num_tst_tr,  drm_new_num_tst);
+//    ASSERT_A_SUB_B_EQ_C(fsm_double_tst_tr,   fsm_new_num_tst_tr,  fsm_new_num_tst);
+//    ASSERT_A_SUB_B_EQ_C(fsm_new_num_tst_tr,  fsm_double_tst_tr,   fsm_new_num_tst);
+//    ASSERT_A_SUB_B_EQ_C(fsm_new_num_tst_tr,  fsm_new_num_tst_tr,  fsm_new_num_tst);
 
     ASSERT_A_SUB_B_EQ_C(fsm_double_tst,   drm_double_tst,   drm_double_tst);
     ASSERT_A_SUB_B_EQ_C(drm_double_tst,   fsm_new_num_tst,  drm_new_num_tst);
