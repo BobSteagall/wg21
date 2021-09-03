@@ -1,8 +1,7 @@
 ## wg21
- [![Travis Build Status](https://travis-ci.org/BobSteagall/wg21.svg?branch=master)](https://travis-ci.org/BobSteagall/wg21)
- [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/BobSteagall/wg21?svg=true&branch=master)](https://ci.appveyor.com/project/BobSteagall/wg21)
- 
-Work on revision R7 of linear algebra proposal P1385 is currently underway in the `r7` branch.  P1385 is targeted for C++23.
+[![Conan Build](https://img.shields.io/github/workflow/status/Twon/wg21/Conan/master?label=Conan)](https://github.com/Twon/wg21/actions?query=workflow%3A%22Conan%22+branch%3Amaster)
+
+Work on revision R7  of linear algebra proposal P1385 is currently underway in the `r7y` branch.  We are targeting C++23, but may be delayed until C++26.
 
 ## Support
 

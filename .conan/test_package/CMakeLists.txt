@@ -31,6 +31,13 @@ target_compile_options(test_linear_algebra
 
 target_link_libraries(test_linear_algebra PRIVATE wg21_linear_algebra::wg21_linear_algebra)
 
+set_target_properties(test_linear_algebra
+    PROPERTIES
+        CXX_STANDARD 20
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+)
+
 enable_testing()
 add_test(
         NAME test_linear_algebra
