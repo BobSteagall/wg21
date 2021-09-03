@@ -20,7 +20,7 @@
 namespace STD_LA {
 namespace detail {
 //==================================================================================================
-//                              **** ELEMENT SUBTRACTION TRAITS ****
+//                              **** SUBTRACTION ELEMENT TRAITS ****
 //==================================================================================================
 //- The standard element subtraction traits type provides the default mechanism for determining the
 //  result of subtracting two elements of (possibly) different types.
@@ -33,7 +33,7 @@ struct subtraction_element_traits
 
 
 //==================================================================================================
-//                              **** ENGINE SUBTRACTION TRAITS ****
+//                              **** SUBTRACTION ENGINE TRAITS ****
 //==================================================================================================
 //- The standard engine subtraction traits type provides the default mechanism for determining the
 //  correct engine type for a matrix/matrix or vector/vector subtraction.
@@ -92,7 +92,7 @@ struct subtraction_engine_traits
 
 
 //==================================================================================================
-//                              **** ENGINE SUBTRACTION TRAITS ****
+//                              **** SUBTRACTION ARITHMETIC TRAITS ****
 //==================================================================================================
 //- The standard subtraction arithmetic traits type provides the default mechanism for computing the
 //  result of a matrix/matrix subtraction.
