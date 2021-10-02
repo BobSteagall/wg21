@@ -43,10 +43,10 @@ struct subtraction_engine_traits
 {
     //- Get the extents for each engine
     //
-    static constexpr ptrdiff_t  R1 = engine_extents_helper<ET1>::rows();
-    static constexpr ptrdiff_t  C1 = engine_extents_helper<ET1>::columns();
-    static constexpr ptrdiff_t  R2 = engine_extents_helper<ET2>::rows();
-    static constexpr ptrdiff_t  C2 = engine_extents_helper<ET2>::columns();
+    static constexpr size_t     R1 = engine_extents_helper<ET1>::rows();
+    static constexpr size_t     C1 = engine_extents_helper<ET1>::columns();
+    static constexpr size_t     R2 = engine_extents_helper<ET2>::rows();
+    static constexpr size_t     C2 = engine_extents_helper<ET2>::columns();
 
     //- Determine if there are dynamic row or column extents.
     //
@@ -61,8 +61,8 @@ struct subtraction_engine_traits
 
     //- Decide on the new extents.
     //
-    static constexpr ptrdiff_t  RR = (dyn_rows) ? dynamic_extent : R1;
-    static constexpr ptrdiff_t  CR = (dyn_cols) ? dynamic_extent : C1;
+    static constexpr size_t     RR = (dyn_rows) ? dynamic_extent : R1;
+    static constexpr size_t     CR = (dyn_cols) ? dynamic_extent : C1;
 
     //- Extract the element traits from the operation traits, and determine the resulting
     //  element type.
@@ -120,12 +120,12 @@ struct subtraction_arithmetic_traits<OTR, basic_matrix<ET1, COT1>, basic_matrix<
     static constexpr result_type
     subtract(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
     {
-        using index_type_1 = typename basic_matrix<ET1, COT1>::index_type;
-        using index_type_2 = typename basic_matrix<ET2, COT2>::index_type;
-        using index_type_r = typename result_type::index_type;
+        using size_type_1 = typename basic_matrix<ET1, COT1>::size_type;
+        using size_type_2 = typename basic_matrix<ET2, COT2>::size_type;
+        using size_type_r = typename result_type::size_type;
 
-        index_type_r    rows = static_cast<index_type_r>(m1.rows());
-        index_type_r    cols = static_cast<index_type_r>(m1.columns());
+        size_type_r     rows = static_cast<size_type_r>(m1.rows());
+        size_type_r     cols = static_cast<size_type_r>(m1.columns());
         result_type		mr;
 
         if constexpr (detail::reshapable_matrix_engine<engine_type>)
@@ -133,15 +133,15 @@ struct subtraction_arithmetic_traits<OTR, basic_matrix<ET1, COT1>, basic_matrix<
             mr.resize(rows, cols);
         }
 
-        index_type_r    ir = 0;
-        index_type_1    i1 = 0;
-        index_type_2    i2 = 0;
+        size_type_r    ir = 0;
+        size_type_1    i1 = 0;
+        size_type_2    i2 = 0;
 
         for (;  ir < rows;  ++ir, ++i1, ++i2)
         {
-            index_type_r    jr = 0;
-            index_type_1    j1 = 0;
-            index_type_2    j2 = 0;
+            size_type_r    jr = 0;
+            size_type_1    j1 = 0;
+            size_type_2    j2 = 0;
 
             for (;  jr < cols;  ++jr, ++j1, ++j2)
             {

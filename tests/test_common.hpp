@@ -32,31 +32,31 @@ struct dummy_type {};
 #endif
 
 #if 0
-using index_tuple_type = std::experimental::extents<std::experimental::dynamic_extent,
-                                               std::experimental::dynamic_extent>;
+using size_tuple_type = std::experimental::extents<std::experimental::dynamic_extent,
+                                                   std::experimental::dynamic_extent>;
 
 namespace std::experimental
 {
     inline bool
-    operator >=(index_tuple_type lhs, index_tuple_type rhs)
+    operator >=(size_tuple_type lhs, size_tuple_type rhs)
     {
         return lhs.extent(0) >= rhs.extent(0)  &&  lhs.extent(1) >= rhs.extent(1);
     }
 }
 #else
-using index_tuple_type = std::tuple<ptrdiff_t, ptrdiff_t>;
+using size_tuple_type = std::tuple<size_t, size_t>;
 
 namespace STD_LA
 {
     inline bool
-    operator >=(index_tuple_type lhs, index_tuple_type rhs)
+    operator >=(size_tuple_type lhs, size_tuple_type rhs)
     {
         return !(lhs < rhs);
     }
 }
 #endif
-using itup_t = index_tuple_type;
 
+using itup_t = size_tuple_type;
 
 using vi_init_list = std::initializer_list<int>;
 using vf_init_list = std::initializer_list<float>;
@@ -81,11 +81,11 @@ static const vi_init_list   il_4_3 = LST_4_3;
 static const vf_init_list   fl_4_3 = LST_4_3;
 
 
-inline constexpr index_tuple_type     st_33(3, 3);
-inline constexpr index_tuple_type     st_34(3, 4);
-inline constexpr index_tuple_type     st_43(4, 3);
-inline constexpr index_tuple_type     st_44(4, 4);
-inline constexpr index_tuple_type     st_55(5, 5);
+inline constexpr size_tuple_type     st_33(3, 3);
+inline constexpr size_tuple_type     st_34(3, 4);
+inline constexpr size_tuple_type     st_43(4, 3);
+inline constexpr size_tuple_type     st_44(4, 4);
+inline constexpr size_tuple_type     st_55(5, 5);
 
 #define LST_14_0       {{0, 0, 0, 0}}
 #define LST_14_1       {{1, 2, 3, 4}}

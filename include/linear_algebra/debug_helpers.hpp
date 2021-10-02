@@ -218,19 +218,19 @@ PrintOperandTypes(string const& loc, O1 const& o1, O2 const& o2)
 #define PRINT_OP_TYPES(ET, MSG, ...)
 //#define PRINT_OP_TYPES(ET, MSG, ...)    STD_LA::PrintOperandTypes<ET>(MSG, __VA_ARGS__)
 
-template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
+template<class T, size_t R, size_t C, class A, class L>
 void
 Print(matrix_storage_engine<T, extents<R, C>, A, L> const& v, char const* pname = nullptr)
 {
     using engine_type = matrix_storage_engine<T, extents<R, C>, A, L>;
-    using index_type  = typename engine_type::index_type;
+    using size_type  = typename engine_type::size_type;
 
     cout << endl << "engine: " << ((pname) ? pname : "<anon>") << endl;
     cout << "  size: " << v.size() << endl;
     cout << "  capy: " << v.capacity() << endl;
     cout << "  -----" << endl;
 
-    for (index_type i = 1;  i < v.size();  ++i)
+    for (size_type i = 1;  i < v.size();  ++i)
     {
         cout << right << setw(6) << setprecision(3) << (double) v(i);
     }
@@ -241,18 +241,18 @@ template<class ET, class OT>
 void
 Print(basic_matrix<ET, OT> const& m, char const* pname = nullptr)
 {
-    using index_type = typename basic_matrix<ET, OT>::index_type;
+    using size_type = typename basic_matrix<ET, OT>::size_type;
 
     cout << endl << "matrix: " << ((pname) ? pname : "<anon>") << endl;
     cout << "  size: " << m.rows() << "x" << m.columns() << endl;
     cout << "  capy: " << m.row_capacity() << "x" << m.column_capacity() << endl;
     cout << "  -----" << endl;
 
-    for (index_type i = 0;  i < m.rows();  ++i)
+    for (size_type i = 0;  i < m.rows();  ++i)
     {
         cout << right << setw(4) << setprecision(3) << (double) m(i, 0);
 
-        for (index_type j = 1;  j < m.columns();  ++j)
+        for (size_type j = 1;  j < m.columns();  ++j)
         {
              cout << right << setw(6) << setprecision(3) << (double) m(i, j);
         }
@@ -261,21 +261,21 @@ Print(basic_matrix<ET, OT> const& m, char const* pname = nullptr)
     }
 }
 
-template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
+template<class T, size_t X0, size_t X1, class L, class A>
 void
-Print(basic_mdspan<T, extents<X0, X1>, L, A> const& s, char const* pname = nullptr)
+Print(mdspan<T, extents<X0, X1>, L, A> const& s, char const* pname = nullptr)
 {
-    using index_type = ptrdiff_t;
+    using size_type = size_t;
 
     cout << endl << "mdspan: " << ((pname) ? pname : "<anon>") << endl;
     cout << "  size: " << s.extent(0) << "x" << s.extent(1) << endl;
     cout << "  -----" << endl;
 
-    for (index_type i = 0;  i < s.extent(0);  ++i)
+    for (size_type i = 0;  i < s.extent(0);  ++i)
     {
         std::cout << std::right << std::setw(4) << std::setprecision(3) << (double) s(i, 0);
 
-        for (index_type j = 1;  j < s.extent(1);  ++j)
+        for (size_type j = 1;  j < s.extent(1);  ++j)
         {
              std::cout << std::right << std::setw(6) << std::setprecision(3) << (double) s(i, j);
         }
@@ -290,9 +290,9 @@ Print(bool b, char const* pname = nullptr)
 }
 
 inline void
-Print(ptrdiff_t v, char const* pname = nullptr)
+Print(size_t v, char const* pname = nullptr)
 {
-    cout << endl << "ptrdiff_t: " << ((pname) ? pname : "<anon>") << " " << v << endl;
+    cout << endl << "size_t: " << ((pname) ? pname : "<anon>") << " " << v << endl;
 }
 
 #define PRINT(X)    Print(X, #X)
@@ -301,14 +301,14 @@ template<class ET, class OT>
 void
 Fill(basic_matrix<ET, OT>& m)
 {
-    using index_type   = typename STD_LA::basic_matrix<ET, OT>::index_type;
+    using size_type   = typename STD_LA::basic_matrix<ET, OT>::size_type;
     using element_type = typename STD_LA::basic_matrix<ET, OT>::element_type;
 
     element_type    x = 1;
 
-    for (index_type i = 0;  i < m.rows();  ++i)
+    for (size_type i = 0;  i < m.rows();  ++i)
     {
-        for (index_type j = 0;  j < m.columns();  ++j)
+        for (size_type j = 0;  j < m.columns();  ++j)
         {
             m(i, j) = x;  x = x + 1;
         }

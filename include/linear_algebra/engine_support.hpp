@@ -183,15 +183,15 @@ bool    is_random_access_standard_container_v = is_random_access_standard_contai
 //  Variable:   is_1d_mdspan_v<T>
 //
 //  This private traits type determines whether its template parameter is a specialization of
-//  basic_mdspan<T, X, L, A> with a one-dimensional extents template parameter.
+//  mdspan<T, X, L, A> with a one-dimensional extents template parameter.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T>
 struct is_1d_mdspan : public false_type
 {};
 
-template<class T, ptrdiff_t X0, class SL, class SA>
-struct is_1d_mdspan<basic_mdspan<T, extents<X0>, SL, SA>> : public true_type
+template<class T, size_t X0, class SL, class SA>
+struct is_1d_mdspan<mdspan<T, extents<X0>, SL, SA>> : public true_type
 {};
 
 //------
@@ -205,15 +205,15 @@ bool    is_1d_mdspan_v = is_1d_mdspan<T>::value;
 //  Variable:   is_2d_mdspan_v<T>
 //
 //  This private traits type determines whether its template parameter is a specialization of
-//  basic_mdspan<T, X, L, A> with a two-dimensional extents template parameter.
+//  mdspan<T, X, L, A> with a two-dimensional extents template parameter.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T>
 struct is_2d_mdspan : public false_type
 {};
 
-template<class T, ptrdiff_t X0, ptrdiff_t X1, class SL, class SA>
-struct is_2d_mdspan<basic_mdspan<T, extents<X0, X1>, SL, SA>> : public true_type
+template<class T, size_t X0, size_t X1, class SL, class SA>
+struct is_2d_mdspan<mdspan<T, extents<X0, X1>, SL, SA>> : public true_type
 {};
 
 //------
@@ -271,10 +271,10 @@ using get_mdspan_layout_t = typename mdspan_layout_mapper<L>::layout_type;
 template<class X>
 struct is_valid_engine_extents : public false_type {};
 
-template<ptrdiff_t R, ptrdiff_t C>
+template<size_t R, size_t C>
 struct is_valid_engine_extents<extents<R, C>>
 {
-    static constexpr bool   value = (R == dynamic_extent || R > 0) && (C == dynamic_extent || C > 0);
+    static constexpr bool   value = (R > 0) && (C > 0);
 };
 
 //------
@@ -282,10 +282,14 @@ struct is_valid_engine_extents<extents<R, C>>
 template<class T> inline constexpr
 bool    is_valid_engine_extents_v = is_valid_engine_extents<T>::value;
 
+template<size_t R, size_t C> inline constexpr
+bool    is_valid_engine_size_v = (R > 0) && (C > 0);
+
 
 //--------------------------------------------------------------------------------------------------
 //  Trait:      is_valid_fixed_engine_extents<X>
-//  Variable:   is_valid_fixed_engine_extents_v<X>
+//  Variables:  is_valid_fixed_engine_extents_v<X>
+//              is_valid_fixed_engine_size_v<R, C>
 //
 //  This private traits type is used to validate an engine's extents template argument.  The
 //  extents parameter must be two-dimensional, and each dimension's template argument must
@@ -295,16 +299,19 @@ bool    is_valid_engine_extents_v = is_valid_engine_extents<T>::value;
 template<class X>
 struct is_valid_fixed_engine_extents : public std::false_type {};
 
-template<ptrdiff_t R, ptrdiff_t C>
+template<size_t R, size_t C>
 struct is_valid_fixed_engine_extents<extents<R, C>>
 {
-    static constexpr bool   value = (R > 0) && (C > 0);
+    static constexpr bool   value = (R > 0 && R != dynamic_extent) && (C > 0 && C != dynamic_extent);
 };
 
 //------
 //
 template<class X> inline constexpr
 bool    is_valid_fixed_engine_extents_v = is_valid_fixed_engine_extents<X>::value;
+
+template<size_t R, size_t C> inline constexpr
+bool    is_valid_fixed_engine_size_v = (R > 0 && R != dynamic_extent) && (C > 0 && C != dynamic_extent);
 
 
 //--------------------------------------------------------------------------------------------------
@@ -420,13 +427,13 @@ struct determine_indexing_order<ET, std::void_t<decltype(ET::is_row_major)>>
     static constexpr bool   use_row_wise = get_row_major_value_helper<is_suitable, ET>::is_row_major;
 };
 
-template<class T, ptrdiff_t R, ptrdiff_t C, class A>
+template<class T, size_t R, size_t C, class A>
 struct determine_indexing_order<matrix_storage_engine<T, extents<R, C>, A, matrix_layout::column_major>, void>
 {
     static constexpr bool   use_row_wise = false;
 };
 
-template<class T, ptrdiff_t R, ptrdiff_t C, class A>
+template<class T, size_t R, size_t C, class A>
 struct determine_indexing_order<matrix_storage_engine<T, extents<R, C>, A, matrix_layout::row_major>, void>
 {
     static constexpr bool   use_row_wise = true;
@@ -441,8 +448,8 @@ bool    use_row_wise_indexing_v = determine_indexing_order<ET>::use_row_wise;
 //--------------------------------------------------------------------------------------------------
 //  The following are used to determine whether or not an engine type actually has constexpr
 //  size member functions.  This technique relies on the facts that: (1) a lambda can be
-//  constexpr in C++17; (2) a capture-less lambda can be default-constructed (C++20); and
-//  (3), engine types must have a default constructor.
+//  constexpr in C++17; (2) a capture-less lambda can be default-constructed in C++20; and
+//  (3) engine types must have a default constructor.
 //
 //  The detection code comes directly from a very cool technique described on StackOverflow at:
 //  https://stackoverflow.com/questions/55288555/c-check-if-statement-can-be-evaluated-constexpr.
@@ -750,13 +757,13 @@ concept readable_engine_fundamentals =
     requires (ET const& eng)
     {
         typename ET::element_type;
-        typename ET::index_type;
+        typename ET::size_type;
         typename ET::reference;
         typename ET::const_reference;
         requires std::is_convertible_v<typename ET::reference, typename ET::element_type>;
         requires std::is_convertible_v<typename ET::const_reference, typename ET::element_type>;
-        { eng.size()     } -> same_as<typename ET::index_type>;
-        { eng.capacity() } -> same_as<typename ET::index_type>;
+        { eng.size()     } -> same_as<typename ET::size_type>;
+        { eng.capacity() } -> same_as<typename ET::size_type>;
     };
 
 
@@ -804,7 +811,7 @@ concept valid_mutable_indexing_result =
 //
 template<class ET>
 concept engine_has_valid_1d_const_indexing =
-    requires (ET const& eng, typename ET::index_type i)
+    requires (ET const& eng, typename ET::size_type i)
     {
         { eng(i) } -> valid_const_indexing_result<ET>;
     };
@@ -819,7 +826,7 @@ concept engine_has_valid_1d_const_indexing =
 //
 template<class ET>
 concept engine_has_valid_1d_mutable_indexing =
-    requires (ET& eng, typename ET::index_type i)
+    requires (ET& eng, typename ET::size_type i)
     {
         { eng(i) } -> valid_mutable_indexing_result<ET>;
     };
@@ -834,7 +841,7 @@ concept engine_has_valid_1d_mutable_indexing =
 //
 template<class ET>
 concept engine_is_not_1d_indexable =
-    not requires(ET eng, typename ET::index_type i)
+    not requires(ET eng, typename ET::size_type i)
     {
         { eng(i) };
     };
@@ -850,7 +857,7 @@ concept engine_is_not_1d_indexable =
 //
 template<class ET>
 concept engine_has_valid_2d_const_indexing =
-    requires (ET const& eng, typename ET::index_type i)
+    requires (ET const& eng, typename ET::size_type i)
     {
         { eng(i, i) } -> valid_const_indexing_result<ET>;
     };
@@ -865,7 +872,7 @@ concept engine_has_valid_2d_const_indexing =
 //
 template<class ET>
 concept engine_has_valid_2d_mutable_indexing =
-    requires (ET& eng, typename ET::index_type i)
+    requires (ET& eng, typename ET::size_type i)
     {
         { eng(i, i) } -> valid_mutable_indexing_result<ET>;
     };
@@ -879,7 +886,7 @@ concept engine_has_valid_2d_mutable_indexing =
 //
 template<class ET>
 concept engine_is_not_2d_indexable =
-    not requires(ET eng, typename ET::index_type i)
+    not requires(ET eng, typename ET::size_type i)
     {
         { eng(i, i) };
     };
@@ -906,10 +913,10 @@ concept readable_matrix_engine =
     and
     requires (ET const& eng)
     {
-        { eng.columns()          } -> same_as<typename ET::index_type>;
-        { eng.rows()             } -> same_as<typename ET::index_type>;
-        { eng.column_capacity()  } -> same_as<typename ET::index_type>;
-        { eng.row_capacity()     } -> same_as<typename ET::index_type>;
+        { eng.columns()          } -> same_as<typename ET::size_type>;
+        { eng.rows()             } -> same_as<typename ET::size_type>;
+        { eng.column_capacity()  } -> same_as<typename ET::size_type>;
+        { eng.row_capacity()     } -> same_as<typename ET::size_type>;
     };
 
 
@@ -1000,7 +1007,7 @@ template<class ET>
 concept reshapable_matrix_engine =
     writable_matrix_engine<ET>
     and
-    requires (ET& eng, typename ET::index_type i)
+    requires (ET& eng, typename ET::size_type i)
     {
         { eng.reshape(i, i, i, i) };
     };
@@ -1009,7 +1016,7 @@ template<class ET>
 concept column_reshapable_matrix_engine =
     writable_matrix_engine<ET>
     and
-    requires (ET& eng, typename ET::index_type i)
+    requires (ET& eng, typename ET::size_type i)
     {
         { eng.reshape_columns(i, i) };
     };
@@ -1018,7 +1025,7 @@ template<class ET>
 concept row_reshapable_matrix_engine =
     writable_matrix_engine<ET>
     and
-    requires (ET& eng, typename ET::index_type i)
+    requires (ET& eng, typename ET::size_type i)
     {
         { eng.reshape_rows(i, i) };
     };
@@ -1040,70 +1047,70 @@ struct engine_extents_helper
 {
   private:
     template<class Lambda, int = (Lambda{}(), 0)>
-    static constexpr ptrdiff_t
+    static constexpr size_t
     get_value_helper(Lambda)
     {
         return Lambda{}();
     }
 
-    static constexpr ptrdiff_t
+    static constexpr size_t
     get_value_helper(...)
     {
         return dynamic_extent;
     }
 
   public:
-    static constexpr ptrdiff_t
+    static constexpr size_t
     columns()
     requires
         readable_matrix_engine<ET>
     {
-        return get_value_helper([]{ return static_cast<ptrdiff_t>(ET().columns()); });
+        return get_value_helper([]{ return static_cast<size_t>(ET().columns()); });
     }
 
-    static constexpr ptrdiff_t
+    static constexpr size_t
     rows()
     requires
         readable_matrix_engine<ET>
     {
-        return get_value_helper([]{ return static_cast<ptrdiff_t>(ET().rows()); });
+        return get_value_helper([]{ return static_cast<size_t>(ET().rows()); });
     }
 
-    static constexpr ptrdiff_t
+    static constexpr size_t
     size()
     requires
         readable_matrix_engine<ET>
     {
-        return get_value_helper([]{ return static_cast<ptrdiff_t>(ET().size()); });
+        return get_value_helper([]{ return static_cast<size_t>(ET().size()); });
     }
 };
 
-template<class T, ptrdiff_t N, class A, class L>
+template<class T, size_t N, class A, class L>
 struct engine_extents_helper<matrix_storage_engine<T, extents<N>, A, L>>
 {
-    static constexpr ptrdiff_t
+    static constexpr size_t
     size()
     {
         return N;
     }
 };
 
-template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
+template<class T, size_t R, size_t C, class A, class L>
 struct engine_extents_helper<matrix_storage_engine<T, extents<R, C>, A, L>>
 {
-    static constexpr ptrdiff_t
+    static constexpr size_t
     columns()
     {
         return C;
     }
 
-    static constexpr ptrdiff_t
+    static constexpr size_t
     rows()
     {
         return R;
     }
 
-    static constexpr ptrdiff_t
+    static constexpr size_t
     size()
     {
         return R*C;
@@ -1116,13 +1123,13 @@ struct engine_layout_helper
     using layout_type = matrix_layout::row_major;
 };
 
-template<class T, ptrdiff_t N, class A, class L>
+template<class T, size_t N, class A, class L>
 struct engine_layout_helper<matrix_storage_engine<T, extents<N>, A, L>>
 {
     using layout_type = void;
 };
 
-template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
+template<class T, size_t R, size_t C, class A, class L>
 struct engine_layout_helper<matrix_storage_engine<T, extents<R, C>, A, L>>
 {
     using layout_type = L;
@@ -1144,7 +1151,7 @@ struct matrix_engine_support
     static constexpr bool
     sizes_differ(N1 n1, N2 n2) noexcept
     {
-        using cmp_type = common_type_t<N1, N2, ptrdiff_t>;
+        using cmp_type = common_type_t<N1, N2, size_t>;
 
         return (static_cast<cmp_type>(n1) != static_cast<cmp_type>(n2));
     }
@@ -1153,7 +1160,7 @@ struct matrix_engine_support
     static constexpr bool
     sizes_differ(R1 r1, C1 c1, R2 r2, C2 c2) noexcept
     {
-        using cmp_type = common_type_t<R1, C1, R2, C2, ptrdiff_t>;
+        using cmp_type = common_type_t<R1, C1, R2, C2, size_t>;
 
         return ((static_cast<cmp_type>(r1) != static_cast<cmp_type>(r2)) ||
                 (static_cast<cmp_type>(c1) != static_cast<cmp_type>(c2)));
@@ -1170,7 +1177,7 @@ struct matrix_engine_support
     }
 
     template<class U>
-    static constexpr std::tuple<ptrdiff_t, ptrdiff_t>
+    static constexpr std::tuple<size_t, size_t>
     verify_list(initializer_list<initializer_list<U>> list)
     {
         size_t  rows = list.size();
@@ -1183,7 +1190,7 @@ struct matrix_engine_support
                 throw runtime_error("matrix initializer_list has invalid shape");
             }
         }
-        return {static_cast<ptrdiff_t>(rows), static_cast<ptrdiff_t>(cols)};
+        return {static_cast<size_t>(rows), static_cast<size_t>(cols)};
     }
 
     template<class N>
@@ -1230,8 +1237,8 @@ struct matrix_engine_support
     requires
         writable_matrix_engine<ET>
     {
-        auto    rows = static_cast<typename ET::index_type>(src_rows);
-        auto    cols = static_cast<typename ET::index_type>(src_cols);
+        auto    rows = static_cast<typename ET::size_type>(src_rows);
+        auto    cols = static_cast<typename ET::size_type>(src_cols);
 
         if constexpr (reshapable_matrix_engine<ET>)
         {
@@ -1267,7 +1274,7 @@ struct matrix_engine_support
     requires
         writable_and_1d_indexable_matrix_engine<ET>
     {
-        auto    size = static_cast<typename ET::index_type>(src_size);
+        auto    size = static_cast<typename ET::size_type>(src_size);
 
         if constexpr (column_reshapable_matrix_engine<ET>)
         {
@@ -1304,21 +1311,21 @@ struct matrix_engine_support
         and
         convertible_from<typename ET1::element_type, typename ET2::element_type>
     {
-        using index_type_dst = typename ET1::index_type;
-        using index_type_src = typename ET2::index_type;
+        using size_type_dst = typename ET1::size_type;
+        using size_type_src = typename ET2::size_type;
 
-        index_type_src  rows = src.rows();
-        index_type_src  cols = src.columns();
+        size_type_src  rows = src.rows();
+        size_type_src  cols = src.columns();
 
         verify_and_reshape(dst, rows, cols);
 
-        index_type_dst  di = 0;
-        index_type_src  si = 0;
+        size_type_dst   di = 0;
+        size_type_src   si = 0;
 
         for (; si < rows;  ++di, ++si)
         {
-            index_type_dst  dj = 0;
-            index_type_src  sj = 0;
+            size_type_dst   dj = 0;
+            size_type_src   sj = 0;
 
             for (; sj < cols;  ++dj, ++sj)
             {
@@ -1327,29 +1334,29 @@ struct matrix_engine_support
         }
     }
 
-    template<class ET, class U, ptrdiff_t X0, ptrdiff_t X1, class SL, class SA>
+    template<class ET, class U, size_t X0, size_t X1, class SL, class SA>
     static constexpr void
-    assign_from(ET& dst, basic_mdspan<U, extents<X0, X1>, SL, SA> const& src)
+    assign_from(ET& dst, mdspan<U, extents<X0, X1>, SL, SA> const& src)
     requires
         writable_matrix_engine<ET>
         and
         convertible_from<typename ET::element_type, U>
     {
-        using index_type_dst = typename ET::index_type;
-        using index_type_src = typename basic_mdspan<U, extents<X0, X1>, SL, SA>::index_type;
+        using size_type_dst = typename ET::size_type;
+        using size_type_src = typename mdspan<U, extents<X0, X1>, SL, SA>::size_type;
 
-        index_type_src  rows = src.extent(0);
-        index_type_src  cols = src.extent(1);
+        size_type_src   rows = src.extent(0);
+        size_type_src   cols = src.extent(1);
 
         verify_and_reshape(dst, rows, cols);
 
-        index_type_dst  di = 0;
-        index_type_src  si = 0;
+        size_type_dst   di = 0;
+        size_type_src   si = 0;
 
         for (; si < rows;  ++di, ++si)
         {
-            index_type_dst  dj = 0;
-            index_type_src  sj = 0;
+            size_type_dst   dj = 0;
+            size_type_src   sj = 0;
 
             for (; sj < cols;  ++dj, ++sj)
             {
@@ -1366,18 +1373,18 @@ struct matrix_engine_support
         and
         convertible_from<typename ET::element_type, U>
     {
-        using index_type_dst = typename ET::index_type;
+        using size_type_dst = typename ET::size_type;
 
         auto    [rows, cols] = verify_list(src);
 
         verify_and_reshape(dst, rows, cols);
 
-        index_type_dst  di = 0;
+        size_type_dst   di = 0;
         auto            si = src.begin();
 
         for (;  di < dst.rows();  ++di, ++si)
         {
-            index_type_dst  dj = 0;
+            size_type_dst   dj = 0;
             auto            sj = si->begin();
 
             for (;  dj < dst.columns();  ++dj, ++sj)
@@ -1402,12 +1409,12 @@ struct matrix_engine_support
         and
         convertible_from<typename ET::element_type, typename CT::value_type>
     {
-        using index_type_dst = typename ET::index_type;
-        using index_type_src = typename CT::size_type;
+        using size_type_dst = typename ET::size_type;
+        using size_type_src = typename CT::size_type;
 
-        index_type_dst  di = 0;
-        index_type_src  si = 0;
-        index_type_src  sn = src.size();
+        size_type_dst   di = 0;
+        size_type_src   si = 0;
+        size_type_src   sn = src.size();
 
         verify_and_reshape(dst, sn);
 
@@ -1417,20 +1424,20 @@ struct matrix_engine_support
         }
     }
 
-    template<class ET, class T, ptrdiff_t X0, class SL, class SA>
+    template<class ET, class T, size_t X0, class SL, class SA>
     static constexpr void
-    assign_from(ET& dst, basic_mdspan<T, extents<X0>, SL, SA> const& src)
+    assign_from(ET& dst, mdspan<T, extents<X0>, SL, SA> const& src)
     requires
         writable_and_1d_indexable_matrix_engine<ET>
         and
         convertible_from<typename ET::element_type, T>
     {
-        using index_type_dst = typename ET::index_type;
-        using index_type_src = typename basic_mdspan<T, extents<X0>, SL, SA>::index_type;
+        using size_type_dst = typename ET::size_type;
+        using size_type_src = typename mdspan<T, extents<X0>, SL, SA>::size_type;
 
-        index_type_dst  di = 0;
-        index_type_src  si = 0;
-        index_type_src  sn = src.extent(0);
+        size_type_dst   di = 0;
+        size_type_src   si = 0;
+        size_type_src   sn = src.extent(0);
 
         verify_and_reshape(dst, sn);
 
@@ -1448,12 +1455,12 @@ struct matrix_engine_support
         and
         convertible_from<typename ET::element_type, T>
     {
-        using index_type_dst = typename ET::index_type;
+        using size_type_dst = typename ET::size_type;
 
         verify_and_reshape(dst, src.size());
 
-        index_type_dst  di = 0;
-        index_type_dst  dn = dst.size();
+        size_type_dst   di = 0;
+        size_type_dst   dn = dst.size();
         auto            si = src.begin();
 
         for (;  di < dn;  ++di, ++si)
@@ -1475,12 +1482,12 @@ struct matrix_engine_support
         and
         convertible_from<typename ET::element_type, T>
     {
-        using index_type = typename ET::index_type;
+        using size_type = typename ET::size_type;
 
-        auto    i0 = static_cast<index_type>(0);
-        auto    j0 = static_cast<index_type>(c0);
+        auto    i0 = static_cast<size_type>(0);
+        auto    j0 = static_cast<size_type>(c0);
         auto    i1 = dst.rows();
-        auto    j1 = static_cast<index_type>(c1);
+        auto    j1 = static_cast<size_type>(c1);
 
         if constexpr (do_row_wise_indexing<ET>)
         {
@@ -1514,11 +1521,11 @@ struct matrix_engine_support
         and
         convertible_from<typename ET::element_type, T>
     {
-        using index_type = typename ET::index_type;
+        using size_type = typename ET::size_type;
 
-        auto    i0 = static_cast<index_type>(r0);
-        auto    j0 = static_cast<index_type>(0);
-        auto    i1 = static_cast<index_type>(r1);
+        auto    i0 = static_cast<size_type>(r0);
+        auto    j0 = static_cast<size_type>(0);
+        auto    i1 = static_cast<size_type>(r1);
         auto    j1 = dst.columns();
 
         if constexpr (do_row_wise_indexing<ET>)
@@ -1549,12 +1556,12 @@ struct matrix_engine_support
     requires
         writable_matrix_engine<ET>
     {
-        using index_type = typename ET::index_type;
+        using size_type = typename ET::size_type;
 
-        auto    i0 = static_cast<index_type>(0);
-        auto    j0 = static_cast<index_type>(0);
-        auto    i1 = static_cast<index_type>(rows);
-        auto    j1 = static_cast<index_type>(cols);
+        auto    i0 = static_cast<size_type>(0);
+        auto    j0 = static_cast<size_type>(0);
+        auto    i1 = static_cast<size_type>(rows);
+        auto    j1 = static_cast<size_type>(cols);
 
         if constexpr (do_row_wise_indexing<ET>)
         {
@@ -1593,23 +1600,23 @@ struct matrix_engine_support
         and
         comparable_types<typename ET1::element_type, typename ET2::element_type>
     {
-        using index_type_lhs = typename ET1::index_type;
-        using index_type_rhs = typename ET2::index_type;
+        using size_type_lhs = typename ET1::size_type;
+        using size_type_rhs = typename ET2::size_type;
 
-        index_type_lhs  r1 = lhs.rows();
-        index_type_lhs  c1 = lhs.columns();
-        index_type_rhs  r2 = rhs.rows();
-        index_type_rhs  c2 = rhs.columns();
+        size_type_lhs   r1 = lhs.rows();
+        size_type_lhs   c1 = lhs.columns();
+        size_type_rhs   r2 = rhs.rows();
+        size_type_rhs   c2 = rhs.columns();
 
         if (sizes_differ(r1, c1, r2, c2)) return false;
 
-        index_type_lhs  i1 = 0;
-        index_type_rhs  i2 = 0;
+        size_type_lhs   i1 = 0;
+        size_type_rhs   i2 = 0;
 
         for (;  i1 < r1;  ++i1, ++i2)
         {
-            index_type_lhs  j1 = 0;
-            index_type_rhs  j2 = 0;
+            size_type_lhs   j1 = 0;
+            size_type_rhs   j2 = 0;
 
             for (;  j1 < c1;  ++j1, ++j2)
             {
@@ -1619,31 +1626,31 @@ struct matrix_engine_support
         return true;
     }
 
-    template<class ET, class T, ptrdiff_t X0, ptrdiff_t X1, class SL, class SA>
+    template<class ET, class T, size_t X0, size_t X1, class SL, class SA>
     static constexpr bool
-    compare(ET const& lhs, basic_mdspan<T, extents<X0, X1>, SL, SA> const& rhs)
+    compare(ET const& lhs, mdspan<T, extents<X0, X1>, SL, SA> const& rhs)
     requires
         readable_matrix_engine<ET>
         and
         comparable_types<typename ET::element_type, T>
     {
-        using index_type_lhs = typename ET::index_type;
-        using index_type_rhs = typename basic_mdspan<T, extents<X0, X1>, SL, SA>::index_type;
+        using size_type_lhs = typename ET::size_type;
+        using size_type_rhs = typename mdspan<T, extents<X0, X1>, SL, SA>::size_type;
 
-        index_type_lhs  r1 = lhs.rows();
-        index_type_lhs  c1 = lhs.columns();
-        index_type_rhs  r2 = rhs.extent(0);
-        index_type_rhs  c2 = rhs.extent(1);
+        size_type_lhs   r1 = lhs.rows();
+        size_type_lhs   c1 = lhs.columns();
+        size_type_rhs   r2 = rhs.extent(0);
+        size_type_rhs   c2 = rhs.extent(1);
 
         if (sizes_differ(r1, c1, r2, c2)) return false;
 
-        index_type_lhs  i1 = 0;
-        index_type_rhs  i2 = 0;
+        size_type_lhs   i1 = 0;
+        size_type_rhs   i2 = 0;
 
         for (;  i1 < r1;  ++i1, ++i2)
         {
-            index_type_lhs  j1 = 0;
-            index_type_rhs  j2 = 0;
+            size_type_lhs   j1 = 0;
+            size_type_rhs   j2 = 0;
 
             for (;  j1 < c1;  ++j1, ++j2)
             {
@@ -1661,21 +1668,21 @@ struct matrix_engine_support
         and
         comparable_types<typename ET::element_type, U>
     {
-        using index_type_lhs = typename ET::index_type;
-        using index_type_rhs = typename initializer_list<initializer_list<U>>::size_type;
+        using size_type_lhs = typename ET::size_type;
+        using size_type_rhs = typename initializer_list<initializer_list<U>>::size_type;
 
-        index_type_lhs  r1 = lhs.rows();
-        index_type_lhs  c1 = lhs.columns();
+        size_type_lhs   r1 = lhs.rows();
+        size_type_lhs   c1 = lhs.columns();
         auto            [r2, c2] = verify_list(rhs);
 
         if (sizes_differ(r1, c1, r2, c2)) return false;
 
-        index_type_lhs  i1 = 0;
+        size_type_lhs  i1 = 0;
         auto            i2 = rhs.begin();
 
         for (;  i1 < r1;  ++i1, ++i2)
         {
-            index_type_lhs  j1 = 0;
+            size_type_lhs  j1 = 0;
             auto            j2 = i2->begin();
 
             for (;  j1 < c1;  ++j1, ++j2)
@@ -1701,16 +1708,16 @@ struct matrix_engine_support
         and
         comparable_types<typename ET::element_type, typename CT::value_type>
     {
-        using index_type_lhs = typename ET::index_type;
-        using index_type_rhs = typename CT::size_type;
+        using size_type_lhs = typename ET::size_type;
+        using size_type_rhs = typename CT::size_type;
 
-        index_type_lhs  n1 = lhs.size();
-        index_type_rhs  n2 = rhs.size();
+        size_type_lhs   n1 = lhs.size();
+        size_type_rhs   n2 = rhs.size();
 
         if (sizes_differ(n1, n2)) return false;
 
-        index_type_lhs  i1 = 0;
-        index_type_rhs  i2 = 0;
+        size_type_lhs   i1 = 0;
+        size_type_rhs   i2 = 0;
 
         for (;  i1 < n1;  ++i1, ++i2)
         {
@@ -1719,24 +1726,24 @@ struct matrix_engine_support
         return true;
     }
 
-    template<class ET, class T, ptrdiff_t X0, class L, class A>
+    template<class ET, class T, size_t X0, class L, class A>
     static constexpr bool
-    compare(ET const& lhs, basic_mdspan<T, extents<X0>, L, A> const& rhs)
+    compare(ET const& lhs, mdspan<T, extents<X0>, L, A> const& rhs)
     requires
         readable_and_1d_indexable_matrix_engine<ET>
         and
         comparable_types<typename ET::element_type, T>
     {
-        using index_type_lhs = typename ET::index_type;
-        using index_type_rhs = typename basic_mdspan<T, extents<X0>, L, A>::index_type;
+        using size_type_lhs = typename ET::size_type;
+        using size_type_rhs = typename mdspan<T, extents<X0>, L, A>::size_type;
 
-        index_type_lhs  n1 = lhs.size();
-        index_type_rhs  n2 = rhs.extent(0);
+        size_type_lhs   n1 = lhs.size();
+        size_type_rhs   n2 = rhs.extent(0);
 
         if (sizes_differ(n1, n2)) return false;
 
-        index_type_lhs  i1 = 0;
-        index_type_rhs  i2 = 0;
+        size_type_lhs   i1 = 0;
+        size_type_rhs   i2 = 0;
 
         for (;  i1 < n1;  ++i1, ++i2)
         {
@@ -1753,15 +1760,15 @@ struct matrix_engine_support
         and
         comparable_types<typename ET::element_type, U>
     {
-        using index_type_lhs = typename ET::index_type;
-        using index_type_rhs = typename initializer_list<U>::size_type;
+        using size_type_lhs = typename ET::size_type;
+        using size_type_rhs = typename initializer_list<U>::size_type;
 
-        index_type_lhs  n1 = lhs.size();
-        index_type_rhs  n2 = rhs.size();
+        size_type_lhs   n1 = lhs.size();
+        size_type_rhs   n2 = rhs.size();
 
         if (sizes_differ(n1, n2)) return false;
 
-        index_type_lhs  i1 = 0;
+        size_type_lhs   i1 = 0;
         auto            i2 = rhs.begin();
 
         for (;  i1 < n1;  ++i1, ++i2)

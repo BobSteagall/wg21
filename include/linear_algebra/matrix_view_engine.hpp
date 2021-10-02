@@ -19,7 +19,7 @@ namespace detail {
 //  they provide access to the underlying element.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
+template<class T, class WA = MDSPAN_NS::default_accessor<T>>
 struct passthru_accessor
 {
     using offset_policy = passthru_accessor;
@@ -28,13 +28,13 @@ struct passthru_accessor
     using pointer       = typename WA::pointer;
 
     constexpr pointer
-    offset(pointer p, ptrdiff_t i) const noexcept
+    offset(pointer p, size_t i) const noexcept
     {
         return WA().offset(p, i);
     }
 
     constexpr reference
-    access(pointer p, ptrdiff_t i) const noexcept
+    access(pointer p, size_t i) const noexcept
     {
         return WA().access(p, i);
     }
@@ -46,7 +46,7 @@ struct passthru_accessor
     }
 };
 
-template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
+template<class T, class WA = MDSPAN_NS::default_accessor<T>>
 struct negation_accessor
 {
     using offset_policy = negation_accessor;
@@ -55,13 +55,13 @@ struct negation_accessor
     using pointer       = typename WA::pointer;
 
     constexpr pointer
-    offset(pointer p, ptrdiff_t i) const noexcept
+    offset(pointer p, size_t i) const noexcept
     {
         return WA().offset(p, i);
     }
 
     constexpr reference
-    access(pointer p, ptrdiff_t i) const noexcept
+    access(pointer p, size_t i) const noexcept
     {
         return -(WA().access(p, i));
     }
@@ -73,7 +73,7 @@ struct negation_accessor
     }
 };
 
-template<class T, class WA = MDSPAN_NS::accessor_basic<T>>
+template<class T, class WA = MDSPAN_NS::default_accessor<T>>
 struct conjugate_accessor
 {
     using offset_policy = conjugate_accessor;
@@ -82,13 +82,13 @@ struct conjugate_accessor
     using pointer       = typename WA::pointer;
 
     constexpr pointer
-    offset(pointer p, ptrdiff_t i) const noexcept
+    offset(pointer p, size_t i) const noexcept
     {
         return WA().offset(p, i);
     }
 
     constexpr reference
-    access(pointer p, ptrdiff_t i) const noexcept
+    access(pointer p, size_t i) const noexcept
     {
         return std::conj(WA().access(p, i));
     }
@@ -128,21 +128,21 @@ struct mve_mdspan_traits<void>
 
 //- This partial specialization is used when the host engine is (correctly) two-dimensional.
 //
-template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A>
-struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
+template<class T, size_t X0, size_t X1, class L, class A>
+struct mve_mdspan_traits<mdspan<T, extents<X0, X1>, L, A>>
 {
     static constexpr bool   has_mdspan = true;
 
     using dyn_extents = extents<dynamic_extent, dynamic_extent>;
-    using dyn_strides = array<typename dyn_extents::index_type, 2>;
-    using dyn_layout  = layout_stride<dynamic_extent, dynamic_extent>;
-    using dyn_mapping = typename dyn_layout::template mapping<dyn_extents>;
+    using dyn_strides = array<typename dyn_extents::size_type, 2>;
+    using dyn_layout  = layout_stride;
+    using dyn_mapping = typename dyn_layout::mapping<dyn_extents>;
 
-    using negation_mdspan_type  = basic_mdspan<T, dyn_extents, dyn_layout, negation_accessor<T, A>>;
-    using conjugate_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, conjugate_accessor<T, A>>;
-    using hermitian_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, conjugate_accessor<T, A>>;
-    using transpose_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
-    using submatrix_mdspan_type = basic_mdspan<T, dyn_extents, dyn_layout, A>;
+    using negation_mdspan_type  = mdspan<T, dyn_extents, dyn_layout, negation_accessor<T, A>>;
+    using conjugate_mdspan_type = mdspan<T, dyn_extents, dyn_layout, conjugate_accessor<T, A>>;
+    using hermitian_mdspan_type = mdspan<T, dyn_extents, dyn_layout, conjugate_accessor<T, A>>;
+    using transpose_mdspan_type = mdspan<T, dyn_extents, dyn_layout, A>;
+    using submatrix_mdspan_type = mdspan<T, dyn_extents, dyn_layout, A>;
 
     template<class EST>
     static constexpr negation_mdspan_type
@@ -200,7 +200,7 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
 
         if constexpr (std::is_same_v<EST, submatrix_mdspan_type>)
         {
-            return subspan(s, row_set, col_set);
+            return submdspan(s, row_set, col_set);
         }
         else
         {
@@ -208,7 +208,7 @@ struct mve_mdspan_traits<basic_mdspan<T, extents<X0, X1>, L, A>>
             dyn_strides     str{s.stride(0), s.stride(1)};
             dyn_mapping     map(ext, str);
 
-            return subspan(submatrix_mdspan_type(s.data(), map), row_set, col_set);
+            return submdspan(submatrix_mdspan_type(s.data(), map), row_set, col_set);
         }
     }
 };
@@ -244,7 +244,7 @@ class matrix_view_engine<ET, matrix_view::const_negation>
     using element_type       = typename engine_type::element_type;
     using reference          = typename engine_type::element_type;
     using const_reference    = typename engine_type::element_type;
-    using index_type         = typename engine_type::index_type;
+    using size_type          = typename engine_type::size_type;
     using span_type          = typename const_mdspan_traits::negation_mdspan_type;
     using const_span_type    = typename const_mdspan_traits::negation_mdspan_type;
 
@@ -276,7 +276,7 @@ class matrix_view_engine<ET, matrix_view::const_negation>
 
     //- Size and capacity reporting.
     //
-    constexpr index_type
+    constexpr size_type
     columns() const noexcept
     {
         if constexpr(detail::has_constexpr_columns<engine_type>())
@@ -289,7 +289,7 @@ class matrix_view_engine<ET, matrix_view::const_negation>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     rows() const noexcept
     {
         if constexpr(detail::has_constexpr_rows<engine_type>())
@@ -302,7 +302,7 @@ class matrix_view_engine<ET, matrix_view::const_negation>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     size() const noexcept
     {
         if constexpr(detail::has_constexpr_size<engine_type>())
@@ -315,19 +315,19 @@ class matrix_view_engine<ET, matrix_view::const_negation>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     column_capacity() const noexcept
     {
         return columns();
     }
 
-    constexpr index_type
+    constexpr size_type
     row_capacity() const noexcept
     {
         return rows();
     }
 
-    constexpr index_type
+    constexpr size_type
     capacity() const noexcept
     {
         return size();
@@ -336,7 +336,7 @@ class matrix_view_engine<ET, matrix_view::const_negation>
     //- Element access
     //
     constexpr const_reference
-    operator ()(index_type i, index_type j) const
+    operator ()(size_type i, size_type j) const
     {
         return -((*mp_engine)(i, j));
     }
@@ -391,7 +391,7 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
     using element_type       = typename engine_type::element_type;
     using reference          = conj_elem_type;
     using const_reference    = conj_elem_type;
-    using index_type         = typename engine_type::index_type;
+    using size_type          = typename engine_type::size_type;
     using span_type          = typename const_mdspan_traits::conjugate_mdspan_type;
     using const_span_type    = typename const_mdspan_traits::conjugate_mdspan_type;
 
@@ -423,7 +423,7 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
 
     //- Size and capacity reporting.
     //
-    constexpr index_type
+    constexpr size_type
     columns() const noexcept
     {
         if constexpr(detail::has_constexpr_columns<engine_type>())
@@ -436,7 +436,7 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     rows() const noexcept
     {
         if constexpr(detail::has_constexpr_rows<engine_type>())
@@ -449,7 +449,7 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     size() const noexcept
     {
         if constexpr(detail::has_constexpr_size<engine_type>())
@@ -462,19 +462,19 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     column_capacity() const noexcept
     {
         return columns();
     }
 
-    constexpr index_type
+    constexpr size_type
     row_capacity() const noexcept
     {
         return rows();
     }
 
-    constexpr index_type
+    constexpr size_type
     capacity() const noexcept
     {
         return size();
@@ -483,7 +483,7 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
     //- Element access
     //
     constexpr const_reference
-    operator ()(index_type i, index_type j) const
+    operator ()(size_type i, size_type j) const
     {
         if constexpr (is_cx)
             return std::conj((*mp_engine)(i, j));
@@ -541,7 +541,7 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
     using element_type       = typename engine_type::element_type;
     using reference          = conj_elem_type;
     using const_reference    = conj_elem_type;
-    using index_type         = typename engine_type::index_type;
+    using size_type          = typename engine_type::size_type;
     using span_type          = typename const_mdspan_traits::hermitian_mdspan_type;
     using const_span_type    = typename const_mdspan_traits::hermitian_mdspan_type;
 
@@ -573,7 +573,7 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
 
     //- Size and capacity reporting.
     //
-    constexpr index_type
+    constexpr size_type
     columns() const noexcept
     {
         if constexpr(detail::has_constexpr_rows<engine_type>())
@@ -586,7 +586,7 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     rows() const noexcept
     {
         if constexpr(detail::has_constexpr_columns<engine_type>())
@@ -599,7 +599,7 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     size() const noexcept
     {
         if constexpr(detail::has_constexpr_size<engine_type>())
@@ -612,19 +612,19 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     column_capacity() const noexcept
     {
         return rows();
     }
 
-    constexpr index_type
+    constexpr size_type
     row_capacity() const noexcept
     {
         return columns();
     }
 
-    constexpr index_type
+    constexpr size_type
     capacity() const noexcept
     {
         return size();
@@ -633,7 +633,7 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
     //- Element access
     //
     constexpr const_reference
-    operator ()(index_type i, index_type j) const
+    operator ()(size_type i, size_type j) const
     {
         if constexpr (is_cx)
             return std::conj((*mp_engine)(j, i));
@@ -689,7 +689,7 @@ class matrix_view_engine<ET, matrix_view::identity>
     using element_type       = typename engine_type::element_type;
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
-    using index_type         = typename engine_type::index_type;
+    using size_type          = typename engine_type::size_type;
     using span_type          = typename engine_type::span_type;
     using const_span_type    = typename engine_type::const_span_type;
 
@@ -721,7 +721,7 @@ class matrix_view_engine<ET, matrix_view::identity>
 
     //- Size and capacity reporting.
     //
-    constexpr index_type
+    constexpr size_type
     columns() const noexcept
     {
         if constexpr(detail::has_constexpr_columns<engine_type>())
@@ -734,7 +734,7 @@ class matrix_view_engine<ET, matrix_view::identity>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     rows() const noexcept
     {
         if constexpr(detail::has_constexpr_rows<engine_type>())
@@ -747,7 +747,7 @@ class matrix_view_engine<ET, matrix_view::identity>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     size() const noexcept
     {
         if constexpr(detail::has_constexpr_size<engine_type>())
@@ -760,19 +760,19 @@ class matrix_view_engine<ET, matrix_view::identity>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     column_capacity() const noexcept
     {
         return columns();
     }
 
-    constexpr index_type
+    constexpr size_type
     row_capacity() const noexcept
     {
         return rows();
     }
 
-    constexpr index_type
+    constexpr size_type
     capacity() const noexcept
     {
         return size();
@@ -781,13 +781,13 @@ class matrix_view_engine<ET, matrix_view::identity>
     //- Element access
     //
     constexpr reference
-    operator ()(index_type i, index_type j) const
+    operator ()(size_type i, size_type j) const
     {
         return (*mp_engine)(i, j);
     }
 
     constexpr reference
-    operator ()(index_type i) const
+    operator ()(size_type i) const
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
     {
@@ -841,7 +841,7 @@ class matrix_view_engine<ET, matrix_view::const_identity>
     using element_type       = typename engine_type::element_type;
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
-    using index_type         = typename engine_type::index_type;
+    using size_type          = typename engine_type::size_type;
     using span_type          = typename engine_type::const_span_type;
     using const_span_type    = typename engine_type::const_span_type;
 
@@ -873,7 +873,7 @@ class matrix_view_engine<ET, matrix_view::const_identity>
 
     //- Size and capacity reporting.
     //
-    constexpr index_type
+    constexpr size_type
     columns() const noexcept
     {
         if constexpr(detail::has_constexpr_columns<engine_type>())
@@ -886,7 +886,7 @@ class matrix_view_engine<ET, matrix_view::const_identity>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     rows() const noexcept
     {
         if constexpr(detail::has_constexpr_rows<engine_type>())
@@ -899,7 +899,7 @@ class matrix_view_engine<ET, matrix_view::const_identity>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     size() const noexcept
     {
         if constexpr(detail::has_constexpr_size<engine_type>())
@@ -912,19 +912,19 @@ class matrix_view_engine<ET, matrix_view::const_identity>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     column_capacity() const noexcept
     {
         return columns();
     }
 
-    constexpr index_type
+    constexpr size_type
     row_capacity() const noexcept
     {
         return rows();
     }
 
-    constexpr index_type
+    constexpr size_type
     capacity() const noexcept
     {
         return size();
@@ -933,13 +933,13 @@ class matrix_view_engine<ET, matrix_view::const_identity>
     //- Element access
     //
     constexpr const_reference
-    operator ()(index_type i, index_type j) const
+    operator ()(size_type i, size_type j) const
     {
         return (*mp_engine)(i, j);
     }
 
     constexpr const_reference
-    operator ()(index_type i) const
+    operator ()(size_type i) const
     requires
         detail::readable_and_1d_indexable_matrix_engine<engine_type>
     {
@@ -994,7 +994,7 @@ class matrix_view_engine<ET, matrix_view::transpose>
     using element_type       = typename engine_type::element_type;
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
-    using index_type         = typename engine_type::index_type;
+    using size_type          = typename engine_type::size_type;
     using span_type          = typename mdspan_traits::transpose_mdspan_type;
     using const_span_type    = typename const_mdspan_traits::transpose_mdspan_type;
 
@@ -1026,7 +1026,7 @@ class matrix_view_engine<ET, matrix_view::transpose>
 
     //- Size and capacity reporting.
     //
-    constexpr index_type
+    constexpr size_type
     columns() const noexcept
     {
         if constexpr(detail::has_constexpr_rows<engine_type>())
@@ -1039,7 +1039,7 @@ class matrix_view_engine<ET, matrix_view::transpose>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     rows() const noexcept
     {
         if constexpr(detail::has_constexpr_columns<engine_type>())
@@ -1052,7 +1052,7 @@ class matrix_view_engine<ET, matrix_view::transpose>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     size() const noexcept
     {
         if constexpr(detail::has_constexpr_size<engine_type>())
@@ -1065,19 +1065,19 @@ class matrix_view_engine<ET, matrix_view::transpose>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     column_capacity() const noexcept
     {
         return rows();
     }
 
-    constexpr index_type
+    constexpr size_type
     row_capacity() const noexcept
     {
         return columns();
     }
 
-    constexpr index_type
+    constexpr size_type
     capacity() const noexcept
     {
         return size();
@@ -1086,13 +1086,13 @@ class matrix_view_engine<ET, matrix_view::transpose>
     //- Element access
     //
     constexpr reference
-    operator ()(index_type i, index_type j) const
+    operator ()(size_type i, size_type j) const
     {
         return (*mp_engine)(j, i);
     }
 
     constexpr reference
-    operator ()(index_type i) const
+    operator ()(size_type i) const
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
     {
@@ -1146,7 +1146,7 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
     using element_type       = typename engine_type::element_type;
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
-    using index_type         = typename engine_type::index_type;
+    using size_type          = typename engine_type::size_type;
     using span_type          = typename const_mdspan_traits::transpose_mdspan_type;
     using const_span_type    = typename const_mdspan_traits::transpose_mdspan_type;
 
@@ -1178,7 +1178,7 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
 
     //- Size and capacity reporting.
     //
-    constexpr index_type
+    constexpr size_type
     columns() const noexcept
     {
         if constexpr(detail::has_constexpr_rows<engine_type>())
@@ -1191,7 +1191,7 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     rows() const noexcept
     {
         if constexpr(detail::has_constexpr_columns<engine_type>())
@@ -1204,7 +1204,7 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     size() const noexcept
     {
         if constexpr(detail::has_constexpr_size<engine_type>())
@@ -1217,19 +1217,19 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     column_capacity() const noexcept
     {
         return rows();
     }
 
-    constexpr index_type
+    constexpr size_type
     row_capacity() const noexcept
     {
         return columns();
     }
 
-    constexpr index_type
+    constexpr size_type
     capacity() const noexcept
     {
         return size();
@@ -1238,13 +1238,13 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
     //- Element access
     //
     constexpr const_reference
-    operator ()(index_type i, index_type j) const
+    operator ()(size_type i, size_type j) const
     {
         return (*mp_engine)(j, i);
     }
 
     constexpr const_reference
-    operator ()(index_type i) const
+    operator ()(size_type i) const
     requires
         detail::readable_and_1d_indexable_matrix_engine<engine_type>
     {
@@ -1299,7 +1299,7 @@ class matrix_view_engine<ET, matrix_view::column>
     using element_type       = typename engine_type::element_type;
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
-    using index_type         = typename engine_type::index_type;
+    using size_type          = typename engine_type::size_type;
     using span_type          = typename mdspan_traits::submatrix_mdspan_type;
     using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
 
@@ -1318,7 +1318,7 @@ class matrix_view_engine<ET, matrix_view::column>
     constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
-    matrix_view_engine(engine_type& eng, index_type ci) noexcept
+    matrix_view_engine(engine_type& eng, size_type ci) noexcept
     :   mp_engine(&eng)
     ,   m_column(ci)
     {}
@@ -1333,13 +1333,13 @@ class matrix_view_engine<ET, matrix_view::column>
 
     //- Size and capacity reporting.
     //
-    constexpr index_type
+    constexpr size_type
     columns() const noexcept
     {
         return 1;
     }
 
-    constexpr index_type
+    constexpr size_type
     rows() const noexcept
     {
         if constexpr(detail::has_constexpr_rows<engine_type>())
@@ -1352,25 +1352,25 @@ class matrix_view_engine<ET, matrix_view::column>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     size() const noexcept
     {
         return rows();
     }
 
-    constexpr index_type
+    constexpr size_type
     column_capacity() const noexcept
     {
         return 1;
     }
 
-    constexpr index_type
+    constexpr size_type
     row_capacity() const noexcept
     {
         return rows();
     }
 
-    constexpr index_type
+    constexpr size_type
     capacity() const noexcept
     {
         return rows();
@@ -1379,13 +1379,13 @@ class matrix_view_engine<ET, matrix_view::column>
     //- Element access
     //
     constexpr reference
-    operator ()(index_type i, index_type) const
+    operator ()(size_type i, size_type) const
     {
         return (*mp_engine)(i, m_column);
     }
 
     constexpr reference
-    operator ()(index_type i) const
+    operator ()(size_type i) const
     {
         return (*mp_engine)(i, m_column);
     }
@@ -1408,7 +1408,7 @@ class matrix_view_engine<ET, matrix_view::column>
 
   private:
     engine_pointer  mp_engine;
-    index_type      m_column;
+    size_type       m_column;
 };
 
 
@@ -1438,7 +1438,7 @@ class matrix_view_engine<ET, matrix_view::const_column>
     using element_type       = typename engine_type::element_type;
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
-    using index_type         = typename engine_type::index_type;
+    using size_type          = typename engine_type::size_type;
     using span_type          = typename const_mdspan_traits::submatrix_mdspan_type;
     using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
 
@@ -1457,7 +1457,7 @@ class matrix_view_engine<ET, matrix_view::const_column>
     constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
-    matrix_view_engine(engine_type const& eng, index_type ci) noexcept
+    matrix_view_engine(engine_type const& eng, size_type ci) noexcept
     :   mp_engine(&eng)
     ,   m_column(ci)
     {}
@@ -1472,13 +1472,13 @@ class matrix_view_engine<ET, matrix_view::const_column>
 
     //- Size and capacity reporting.
     //
-    constexpr index_type
+    constexpr size_type
     columns() const noexcept
     {
         return 1;
     }
 
-    constexpr index_type
+    constexpr size_type
     rows() const noexcept
     {
         if constexpr(detail::has_constexpr_rows<engine_type>())
@@ -1491,25 +1491,25 @@ class matrix_view_engine<ET, matrix_view::const_column>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     size() const noexcept
     {
         return rows();
     }
 
-    constexpr index_type
+    constexpr size_type
     column_capacity() const noexcept
     {
         return 1;
     }
 
-    constexpr index_type
+    constexpr size_type
     row_capacity() const noexcept
     {
         return rows();
     }
 
-    constexpr index_type
+    constexpr size_type
     capacity() const noexcept
     {
         return rows();
@@ -1518,13 +1518,13 @@ class matrix_view_engine<ET, matrix_view::const_column>
     //- Element access
     //
     constexpr const_reference
-    operator ()(index_type i, index_type) const
+    operator ()(size_type i, size_type) const
     {
         return (*mp_engine)(i, m_column);
     }
 
     constexpr const_reference
-    operator ()(index_type i) const
+    operator ()(size_type i) const
     {
         return (*mp_engine)(i, m_column);
     }
@@ -1547,7 +1547,7 @@ class matrix_view_engine<ET, matrix_view::const_column>
 
   private:
     engine_pointer  mp_engine;
-    index_type      m_column;
+    size_type       m_column;
 };
 
 
@@ -1578,7 +1578,7 @@ class matrix_view_engine<ET, matrix_view::row>
     using element_type       = typename engine_type::element_type;
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
-    using index_type         = typename engine_type::index_type;
+    using size_type          = typename engine_type::size_type;
     using span_type          = typename mdspan_traits::submatrix_mdspan_type;
     using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
 
@@ -1597,7 +1597,7 @@ class matrix_view_engine<ET, matrix_view::row>
     constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
-    matrix_view_engine(engine_type& eng, index_type ri) noexcept
+    matrix_view_engine(engine_type& eng, size_type ri) noexcept
     :   mp_engine(&eng)
     ,   m_row(ri)
     {}
@@ -1612,7 +1612,7 @@ class matrix_view_engine<ET, matrix_view::row>
 
     //- Size and capacity reporting.
     //
-    constexpr index_type
+    constexpr size_type
     columns() const noexcept
     {
         if constexpr(detail::has_constexpr_columns<engine_type>())
@@ -1625,31 +1625,31 @@ class matrix_view_engine<ET, matrix_view::row>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     rows() const noexcept
     {
         return 1;
     }
 
-    constexpr index_type
+    constexpr size_type
     size() const noexcept
     {
         return mp_engine->columns();
     }
 
-    constexpr index_type
+    constexpr size_type
     column_capacity() const noexcept
     {
         return columns();
     }
 
-    constexpr index_type
+    constexpr size_type
     row_capacity() const noexcept
     {
         return 1;
     }
 
-    constexpr index_type
+    constexpr size_type
     capacity() const noexcept
     {
         return columns();
@@ -1658,13 +1658,13 @@ class matrix_view_engine<ET, matrix_view::row>
     //- Element access
     //
     constexpr reference
-    operator ()(index_type, index_type j) const
+    operator ()(size_type, size_type j) const
     {
         return (*mp_engine)(m_row, j);
     }
 
     constexpr reference
-    operator ()(index_type j) const
+    operator ()(size_type j) const
     {
         return (*mp_engine)(m_row, j);
     }
@@ -1687,7 +1687,7 @@ class matrix_view_engine<ET, matrix_view::row>
 
   private:
     engine_pointer  mp_engine;
-    index_type      m_row;
+    size_type       m_row;
 };
 
 
@@ -1717,7 +1717,7 @@ class matrix_view_engine<ET, matrix_view::const_row>
     using element_type       = typename engine_type::element_type;
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
-    using index_type         = typename engine_type::index_type;
+    using size_type          = typename engine_type::size_type;
     using span_type          = typename const_mdspan_traits::submatrix_mdspan_type;
     using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
 
@@ -1736,7 +1736,7 @@ class matrix_view_engine<ET, matrix_view::const_row>
     constexpr matrix_view_engine&   operator =(matrix_view_engine const&) = default;
 
     explicit constexpr
-    matrix_view_engine(engine_type const& eng, index_type ri) noexcept
+    matrix_view_engine(engine_type const& eng, size_type ri) noexcept
     :   mp_engine(&eng)
     ,   m_row(ri)
     {}
@@ -1751,7 +1751,7 @@ class matrix_view_engine<ET, matrix_view::const_row>
 
     //- Size and capacity reporting.
     //
-    constexpr index_type
+    constexpr size_type
     columns() const noexcept
     {
         if constexpr(detail::has_constexpr_columns<engine_type>())
@@ -1764,31 +1764,31 @@ class matrix_view_engine<ET, matrix_view::const_row>
         }
     }
 
-    constexpr index_type
+    constexpr size_type
     rows() const noexcept
     {
         return 1;
     }
 
-    constexpr index_type
+    constexpr size_type
     size() const noexcept
     {
         return columns();
     }
 
-    constexpr index_type
+    constexpr size_type
     column_capacity() const noexcept
     {
         return columns();
     }
 
-    constexpr index_type
+    constexpr size_type
     row_capacity() const noexcept
     {
         return 1;
     }
 
-    constexpr index_type
+    constexpr size_type
     capacity() const noexcept
     {
         return columns();
@@ -1797,13 +1797,13 @@ class matrix_view_engine<ET, matrix_view::const_row>
     //- Element access
     //
     constexpr const_reference
-    operator ()(index_type, index_type j) const
+    operator ()(size_type, size_type j) const
     {
         return (*mp_engine)(m_row, j);
     }
 
     constexpr const_reference
-    operator ()(index_type j) const
+    operator ()(size_type j) const
     {
         return (*mp_engine)(m_row, j);
     }
@@ -1826,7 +1826,7 @@ class matrix_view_engine<ET, matrix_view::const_row>
 
   private:
     engine_pointer  mp_engine;
-    index_type      m_row;
+    size_type       m_row;
 };
 
 
@@ -1857,7 +1857,7 @@ class matrix_view_engine<ET, matrix_view::submatrix>
     using element_type       = typename engine_type::element_type;
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
-    using index_type         = typename engine_type::index_type;
+    using size_type          = typename engine_type::size_type;
     using span_type          = typename mdspan_traits::submatrix_mdspan_type;
     using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
 
@@ -1880,8 +1880,8 @@ class matrix_view_engine<ET, matrix_view::submatrix>
 
     explicit constexpr
     matrix_view_engine(engine_type& eng,
-                       index_type ri, index_type rn,
-                       index_type ci, index_type cn) noexcept
+                       size_type ri, size_type rn,
+                       size_type ci, size_type cn) noexcept
     :   mp_engine(&eng)
     ,   m_row_start(ri)
     ,   m_row_count(rn)
@@ -1899,37 +1899,37 @@ class matrix_view_engine<ET, matrix_view::submatrix>
 
     //- Size and capacity reporting.
     //
-    constexpr index_type
+    constexpr size_type
     columns() const noexcept
     {
         return m_col_count;
     }
 
-    constexpr index_type
+    constexpr size_type
     rows() const noexcept
     {
         return m_row_count;
     }
 
-    constexpr index_type
+    constexpr size_type
     size() const noexcept
     {
         return m_row_count * m_col_count;
     }
 
-    constexpr index_type
+    constexpr size_type
     column_capacity() const noexcept
     {
         return m_col_count;
     }
 
-    constexpr index_type
+    constexpr size_type
     row_capacity() const noexcept
     {
         return m_row_count;
     }
 
-    constexpr index_type
+    constexpr size_type
     capacity() const noexcept
     {
         return m_row_count * m_col_count;
@@ -1938,13 +1938,13 @@ class matrix_view_engine<ET, matrix_view::submatrix>
     //- Element access
     //
     constexpr reference
-    operator ()(index_type i, index_type j) const
+    operator ()(size_type i, size_type j) const
     {
         return (*mp_engine)(i + m_row_start, j + m_col_start);
     }
 
     constexpr reference
-    operator ()(index_type i) const
+    operator ()(size_type i) const
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
     {
@@ -1971,10 +1971,10 @@ class matrix_view_engine<ET, matrix_view::submatrix>
 
   private:
     engine_pointer  mp_engine;
-    index_type      m_row_start;
-    index_type      m_row_count;
-    index_type      m_col_start;
-    index_type      m_col_count;
+    size_type       m_row_start;
+    size_type       m_row_count;
+    size_type       m_col_start;
+    size_type       m_col_count;
 };
 
 
@@ -2005,7 +2005,7 @@ class matrix_view_engine<ET, matrix_view::const_submatrix>
     using element_type       = typename engine_type::element_type;
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
-    using index_type         = typename engine_type::index_type;
+    using size_type          = typename engine_type::size_type;
     using span_type          = typename const_mdspan_traits::submatrix_mdspan_type;
     using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
 
@@ -2028,8 +2028,8 @@ class matrix_view_engine<ET, matrix_view::const_submatrix>
 
     explicit constexpr
     matrix_view_engine(engine_type const& eng,
-                       index_type ri, index_type rn,
-                       index_type ci, index_type cn) noexcept
+                       size_type ri, size_type rn,
+                       size_type ci, size_type cn) noexcept
     :   mp_engine(&eng)
     ,   m_row_start(ri)
     ,   m_row_count(rn)
@@ -2047,37 +2047,37 @@ class matrix_view_engine<ET, matrix_view::const_submatrix>
 
     //- Size and capacity reporting.
     //
-    constexpr index_type
+    constexpr size_type
     columns() const noexcept
     {
         return m_col_count;
     }
 
-    constexpr index_type
+    constexpr size_type
     rows() const noexcept
     {
         return m_row_count;
     }
 
-    constexpr index_type
+    constexpr size_type
     size() const noexcept
     {
         return m_row_count * m_col_count;
     }
 
-    constexpr index_type
+    constexpr size_type
     column_capacity() const noexcept
     {
         return m_col_count;
     }
 
-    constexpr index_type
+    constexpr size_type
     row_capacity() const noexcept
     {
         return m_row_count;
     }
 
-    constexpr index_type
+    constexpr size_type
     capacity() const noexcept
     {
         return m_row_count * m_col_count;
@@ -2086,13 +2086,13 @@ class matrix_view_engine<ET, matrix_view::const_submatrix>
     //- Element access
     //
     constexpr const_reference
-    operator ()(index_type i, index_type j) const
+    operator ()(size_type i, size_type j) const
     {
         return (*mp_engine)(i + m_row_start, j + m_col_start);
     }
 
     constexpr const_reference
-    operator ()(index_type i) const
+    operator ()(size_type i) const
     requires
         detail::readable_and_1d_indexable_matrix_engine<engine_type>
     {
@@ -2119,10 +2119,10 @@ class matrix_view_engine<ET, matrix_view::const_submatrix>
 
   private:
     engine_pointer  mp_engine;
-    index_type      m_row_start;
-    index_type      m_row_count;
-    index_type      m_col_start;
-    index_type      m_col_count;
+    size_type       m_row_start;
+    size_type       m_row_count;
+    size_type       m_col_start;
+    size_type       m_col_count;
 };
 
 }       //- STD_LA namespace

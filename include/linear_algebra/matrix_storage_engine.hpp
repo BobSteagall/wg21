@@ -36,7 +36,7 @@ template<class T, class X, class A, class L>    struct mse_data;
 //  implemented as member data in a std::array.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, ptrdiff_t R, ptrdiff_t C, class L>
+template<class T, size_t R, size_t C, class L>
 struct mse_data<T, extents<R, C>, void, L>
 {
     using array_type = std::array<T, R*C>;
@@ -50,10 +50,10 @@ struct mse_data<T, extents<R, C>, void, L>
     static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
     static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
 
-    static constexpr ptrdiff_t  m_rows   = R;
-    static constexpr ptrdiff_t  m_cols   = C;
-    static constexpr ptrdiff_t  m_rowcap = R;
-    static constexpr ptrdiff_t  m_colcap = C;
+    static constexpr size_t     m_rows   = R;
+    static constexpr size_t     m_cols   = C;
+    static constexpr size_t     m_rowcap = R;
+    static constexpr size_t     m_colcap = C;
 
     array_type  m_elems;
 
@@ -81,7 +81,7 @@ struct mse_data<T, extents<R, C>, void, L>
 //  implemented as member data in a std::vector.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
+template<class T, size_t R, size_t C, class A, class L>
 struct mse_data<T, extents<R, C>, A, L>
 {
     using array_type = std::vector<T, A>;
@@ -95,10 +95,10 @@ struct mse_data<T, extents<R, C>, A, L>
     static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
     static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
 
-    static constexpr ptrdiff_t  m_rows   = R;
-    static constexpr ptrdiff_t  m_cols   = C;
-    static constexpr ptrdiff_t  m_rowcap = R;
-    static constexpr ptrdiff_t  m_colcap = C;
+    static constexpr size_t     m_rows   = R;
+    static constexpr size_t     m_cols   = C;
+    static constexpr size_t     m_rowcap = R;
+    static constexpr size_t     m_colcap = C;
 
     array_type  m_elems;
 
@@ -123,7 +123,7 @@ struct mse_data<T, extents<R, C>, A, L>
 //  resizable number of columns.  Its elements are implemented as member data in a std::vector.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, ptrdiff_t R, class A, class L>
+template<class T, size_t R, class A, class L>
 struct mse_data<T, extents<R, dynamic_extent>, A, L>
 {
     using array_type = std::vector<T, A>;
@@ -137,12 +137,12 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
     static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
     static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
 
-    static constexpr ptrdiff_t  m_rows   = R;
-    static constexpr ptrdiff_t  m_rowcap = R;
+    static constexpr size_t     m_rows   = R;
+    static constexpr size_t     m_rowcap = R;
 
     array_type  m_elems;
-    ptrdiff_t   m_cols;
-    ptrdiff_t   m_colcap;
+    size_t      m_cols;
+    size_t      m_colcap;
 
     //- Construct/copy/destroy.
     //
@@ -166,7 +166,7 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
 //  fixed number of C columns.  Its elements are implemented as member data in a std::vector.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, ptrdiff_t C, class A, class L>
+template<class T, size_t C, class A, class L>
 struct mse_data<T, extents<dynamic_extent, C>, A, L>
 {
     using array_type = std::vector<T, A>;
@@ -180,12 +180,12 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
     static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
     static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
 
-    static constexpr ptrdiff_t  m_cols   = C;
-    static constexpr ptrdiff_t  m_colcap = C;
+    static constexpr size_t     m_cols   = C;
+    static constexpr size_t     m_colcap = C;
 
     array_type  m_elems;
-    ptrdiff_t   m_rows;
-    ptrdiff_t   m_rowcap;
+    size_t      m_rows;
+    size_t      m_rowcap;
 
     //- Construct/copy/destroy.
     //
@@ -225,10 +225,10 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
     static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
 
     array_type  m_elems;
-    ptrdiff_t   m_rows;
-    ptrdiff_t   m_cols;
-    ptrdiff_t   m_rowcap;
-    ptrdiff_t   m_colcap;
+    size_t      m_rows;
+    size_t      m_cols;
+    size_t      m_rowcap;
+    size_t      m_colcap;
 
     //- Construct/copy/destroy.
     //
@@ -248,16 +248,16 @@ struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
 //--------------------------------------------------------------------------------------------------
 //  Traits Type:    mse_mdspan_support
 //
-//  Traits types (possibly temporary) that creates basic_mdspan objects on behalf of traits type
+//  Traits types (possibly temporary) that creates mdspan objects on behalf of traits type
 //  mse_mdspan_support<MSED> (defined below).
 //--------------------------------------------------------------------------------------------------
 //
 struct mse_mdspan_support
 {
     using dyn_mat_extents = extents<dynamic_extent, dynamic_extent>;
-    using dyn_mat_strides = array<typename dyn_mat_extents::index_type, 2>;
-    using dyn_mat_layout  = layout_stride<dynamic_extent, dynamic_extent>;
-    using dyn_mat_mapping = typename dyn_mat_layout::template mapping<dyn_mat_extents>;
+    using dyn_mat_strides = array<typename dyn_mat_extents::size_type, 2>;
+    using dyn_mat_layout  = layout_stride;
+    using dyn_mat_mapping = typename dyn_mat_layout::mapping<dyn_mat_extents>;
 
     template<class ST, class MSE>
     static constexpr ST
@@ -293,7 +293,7 @@ struct mse_mdspan_support
 //--------------------------------------------------------------------------------------------------
 //  Traits Type:    mse_mdspan_traits<T, X, L>
 //
-//  Traits type that determines the types, and computes the values, of basic_mdspan objects
+//  Traits type that determines the types, and computes the values, of mdspan objects
 //  on behalf of matrix_storage_engine<T,X,A,L>.
 //
 //  Partial specializations of this class template are tailored to specific sets of partial
@@ -312,14 +312,14 @@ template<class MSED>    struct mse_mdspan_traits;
 
 //------ Partial specialization for extents<R, C>.
 //
-template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
+template<class T, size_t R, size_t C, class A, class L>
 struct mse_mdspan_traits<mse_data<T, extents<R, C>, A, L>>
 :   public mse_mdspan_support
 {
     using mse_data_type   = mse_data<T, extents<R, C>, A, L>;
     using layout_type     = get_mdspan_layout_t<L>;
-    using span_type       = basic_mdspan<T, extents<R, C>, layout_type>;
-    using const_span_type = basic_mdspan<T const, extents<R, C>, layout_type>;
+    using span_type       = mdspan<T, extents<R, C>, layout_type>;
+    using const_span_type = mdspan<T const, extents<R, C>, layout_type>;
 
     static constexpr span_type
     make_mdspan(mse_data_type& mse)
@@ -337,13 +337,13 @@ struct mse_mdspan_traits<mse_data<T, extents<R, C>, A, L>>
 
 //------ Partial specialization for extents<R, dynamic_extent>.
 //
-template<class T, ptrdiff_t R, class A, class L>
+template<class T, size_t R, class A, class L>
 struct mse_mdspan_traits<mse_data<T, extents<R, dynamic_extent>, A, L>>
 :   public mse_mdspan_support
 {
     using mse_data_type   = mse_data<T, extents<R, dynamic_extent>, A, L>;
-    using span_type       = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>;
-    using const_span_type = basic_mdspan<T const, dyn_mat_extents, dyn_mat_layout>;
+    using span_type       = mdspan<T, dyn_mat_extents, dyn_mat_layout>;
+    using const_span_type = mdspan<T const, dyn_mat_extents, dyn_mat_layout>;
 
     static constexpr span_type
     make_mdspan(mse_data_type& mse)
@@ -361,13 +361,13 @@ struct mse_mdspan_traits<mse_data<T, extents<R, dynamic_extent>, A, L>>
 
 //------ Partial specialization for extents<dynamic_extent, C>.
 //
-template<class T, ptrdiff_t C, class A, class L>
+template<class T, size_t C, class A, class L>
 struct mse_mdspan_traits<mse_data<T, extents<dynamic_extent, C>, A, L>>
 :   public mse_mdspan_support
 {
     using mse_data_type   = mse_data<T, extents<dynamic_extent, C>, A, L>;
-    using span_type       = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>;
-    using const_span_type = basic_mdspan<T const, dyn_mat_extents, dyn_mat_layout>;
+    using span_type       = mdspan<T, dyn_mat_extents, dyn_mat_layout>;
+    using const_span_type = mdspan<T const, dyn_mat_extents, dyn_mat_layout>;
 
     static constexpr span_type
     make_mdspan(mse_data_type& mse)
@@ -390,8 +390,8 @@ struct mse_mdspan_traits<mse_data<T, extents<dynamic_extent, dynamic_extent>, A,
 :   public mse_mdspan_support
 {
     using mse_data_type   = mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>;
-    using span_type       = basic_mdspan<T, dyn_mat_extents, dyn_mat_layout>;
-    using const_span_type = basic_mdspan<T const, dyn_mat_extents, dyn_mat_layout>;
+    using span_type       = mdspan<T, dyn_mat_extents, dyn_mat_layout>;
+    using const_span_type = mdspan<T const, dyn_mat_extents, dyn_mat_layout>;
 
     static constexpr span_type
     make_mdspan(mse_data_type& mse)
@@ -445,7 +445,7 @@ class matrix_storage_engine
 //  assumption makes implementation easy, but may be absent in the final version.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, ptrdiff_t R, ptrdiff_t C, class A, class L>
+template<class T, size_t R, size_t C, class A, class L>
 requires
     detail::valid_engine_extents_and_allocator<T, extents<R, C>, A>
     and
@@ -472,7 +472,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     using element_type    = T;
     using reference       = element_type&;
     using const_reference = element_type const&;
-    using index_type      = ptrdiff_t;
+    using size_type       = size_t;
     using span_type       = typename mdspan_traits::span_type;
     using const_span_type = typename mdspan_traits::const_span_type;
 
@@ -491,7 +491,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //- Rehsaping constructors.
     //
     constexpr
-    matrix_storage_engine(index_type rows, index_type cols)
+    matrix_storage_engine(size_type rows, size_type cols)
     requires
         this_type::is_2d_reshapable
     :   m_data()
@@ -500,7 +500,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
     constexpr
-    matrix_storage_engine(index_type rows, index_type cols, index_type rowcap, index_type colcap)
+    matrix_storage_engine(size_type rows, size_type cols, size_type rowcap, size_type colcap)
     requires
         this_type::is_2d_reshapable
     :   m_data()
@@ -509,7 +509,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
     constexpr
-    matrix_storage_engine(index_type cols)
+    matrix_storage_engine(size_type cols)
     requires
         this_type::is_column_reshapable
     :   m_data()
@@ -518,7 +518,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
     constexpr
-    matrix_storage_engine(index_type cols, index_type colcap)
+    matrix_storage_engine(size_type cols, size_type colcap)
     requires
         this_type::is_column_reshapable
     :   m_data()
@@ -527,7 +527,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
     constexpr
-    matrix_storage_engine(index_type rows)
+    matrix_storage_engine(size_type rows)
     requires
         this_type::is_row_reshapable
     :   m_data()
@@ -536,7 +536,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
     constexpr
-    matrix_storage_engine(index_type rows, index_type rowcap)
+    matrix_storage_engine(size_type rows, size_type rowcap)
     requires
         this_type::is_row_reshapable
     :   m_data()
@@ -558,9 +558,9 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         support_traits::assign_from(*this, rhs);
     }
 
-    template<class U, ptrdiff_t X0, ptrdiff_t X1, class SL, class SA>
+    template<class U, size_t X0, size_t X1, class SL, class SA>
     constexpr
-    matrix_storage_engine(basic_mdspan<U, extents<X0, X1>, SL, SA> const& rhs)
+    matrix_storage_engine(mdspan<U, extents<X0, X1>, SL, SA> const& rhs)
     requires
         detail::convertible_from<element_type, U>
     :   m_data()
@@ -594,9 +594,9 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         support_traits::assign_from(*this, rhs);
     }
 
-    template<class U, ptrdiff_t X0, class SL, class SA>
+    template<class U, size_t X0, class SL, class SA>
     constexpr
-    matrix_storage_engine(basic_mdspan<U, extents<X0>, SL, SA> const& rhs)
+    matrix_storage_engine(mdspan<U, extents<X0>, SL, SA> const& rhs)
     requires
         this_type::is_1d_indexable
         and
@@ -632,9 +632,9 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         return *this;
     }
 
-    template<class U, ptrdiff_t X0, ptrdiff_t X1, class SL, class SA>
+    template<class U, size_t X0, size_t X1, class SL, class SA>
     constexpr matrix_storage_engine&
-    operator =(basic_mdspan<U, extents<X0, X1>, SL, SA> const& rhs)
+    operator =(mdspan<U, extents<X0, X1>, SL, SA> const& rhs)
     requires
         detail::convertible_from<element_type, U>
     {
@@ -668,9 +668,9 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
         return *this;
     }
 
-    template<class U, ptrdiff_t X0, class SL, class SA>
+    template<class U, size_t X0, class SL, class SA>
     constexpr matrix_storage_engine&
-    operator =(basic_mdspan<U, extents<X0>, SL, SA> const& rhs)
+    operator =(mdspan<U, extents<X0>, SL, SA> const& rhs)
     requires
         this_type::is_1d_indexable
         and
@@ -694,37 +694,37 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
     //- Size and capacity reporting.
     //
-    constexpr index_type
+    constexpr size_type
     columns() const noexcept
     {
         return m_data.m_cols;
     }
 
-    constexpr index_type
+    constexpr size_type
     rows() const noexcept
     {
         return m_data.m_rows;
     }
 
-    constexpr index_type
+    constexpr size_type
     size() const noexcept
     {
         return m_data.m_rows * m_data.m_cols;
     }
 
-    constexpr index_type
+    constexpr size_type
     column_capacity() const noexcept
     {
         return m_data.m_colcap;
     }
 
-    constexpr index_type
+    constexpr size_type
     row_capacity() const noexcept
     {
         return m_data.m_rowcap;
     }
 
-    constexpr index_type
+    constexpr size_type
     capacity() const noexcept
     {
         return m_data.m_rowcap * m_data.m_colcap;
@@ -733,7 +733,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //- Element access
     //
     constexpr reference
-    operator ()(index_type i)
+    operator ()(size_type i)
     requires
         this_type::is_1d_indexable
     {
@@ -741,7 +741,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
     constexpr const_reference
-    operator ()(index_type i) const
+    operator ()(size_type i) const
     requires
         this_type::is_1d_indexable
     {
@@ -749,7 +749,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
     constexpr reference
-    operator ()(index_type i, index_type j)
+    operator ()(size_type i, size_type j)
     requires
         this_type::has_row_major_layout
     {
@@ -757,7 +757,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
     constexpr reference
-    operator ()(index_type i, index_type j)
+    operator ()(size_type i, size_type j)
     requires
         this_type::has_column_major_layout
     {
@@ -765,7 +765,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
     constexpr const_reference
-    operator ()(index_type i, index_type j) const
+    operator ()(size_type i, size_type j) const
     requires
         this_type::has_row_major_layout
     {
@@ -773,7 +773,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
     constexpr const_reference
-    operator ()(index_type i, index_type j) const
+    operator ()(size_type i, size_type j) const
     requires
         this_type::has_column_major_layout
     {
@@ -795,7 +795,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //- Setting overall size and capacity.
     //
     constexpr void
-    reshape(index_type rows, index_type cols, index_type rowcap, index_type colcap)
+    reshape(size_type rows, size_type cols, size_type rowcap, size_type colcap)
     requires
         this_type::is_2d_reshapable
     {
@@ -805,7 +805,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //- Setting column size and capacity.
     //
     constexpr void
-    reshape_columns(index_type cols, index_type colcap)
+    reshape_columns(size_type cols, size_type colcap)
     requires
         this_type::is_column_reshapable
     {
@@ -813,7 +813,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
     constexpr void
-    reshape_columns(index_type cols, index_type colcap)
+    reshape_columns(size_type cols, size_type colcap)
     requires
         this_type::is_2d_reshapable
     {
@@ -823,7 +823,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     //- Setting row size and capacity.
     //
     constexpr void
-    reshape_rows(index_type rows, index_type rowcap)
+    reshape_rows(size_type rows, size_type rowcap)
     requires
         this_type::is_row_reshapable
     {
@@ -831,7 +831,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
     constexpr void
-    reshape_rows(index_type rows, index_type rowcap)
+    reshape_rows(size_type rows, size_type rowcap)
     requires
         this_type::is_2d_reshapable
     {
@@ -848,7 +848,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
   private:
     constexpr void
-    do_reshape(ptrdiff_t rows, ptrdiff_t cols, ptrdiff_t rowcap, ptrdiff_t colcap)
+    do_reshape(size_type rows, size_type cols, size_type rowcap, size_type colcap)
     requires
         this_type::is_2d_reshapable
     {
@@ -878,8 +878,8 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
             //- Move the appropriate subset of elements into the temporary engine and swap.
             //
-            ptrdiff_t   dst_rows = std::min(rows, m_data.m_rows);
-            ptrdiff_t   dst_cols = std::min(cols, m_data.m_cols);
+            size_type   dst_rows = std::min(rows, m_data.m_rows);
+            size_type   dst_cols = std::min(cols, m_data.m_cols);
             support_traits::move_elements(tmp, *this, dst_rows, dst_cols);
             support_traits::swap(m_data, tmp.m_data);
         }
@@ -899,7 +899,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
     constexpr void
-    do_reshape_columns(ptrdiff_t cols, ptrdiff_t colcap)
+    do_reshape_columns(size_type cols, size_type colcap)
     requires
         this_type::is_column_reshapable
     {
@@ -923,7 +923,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
             //- Move the appropriate subset of elements into the temporary engine and swap.
             //
-            ptrdiff_t   dst_cols = std::min(cols, m_data.m_cols);
+            size_type   dst_cols = std::min(cols, m_data.m_cols);
             support_traits::move_elements(tmp, *this, m_data.m_rows, dst_cols);
             support_traits::swap(*this, tmp);
         }
@@ -938,7 +938,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
     }
 
     constexpr void
-    do_reshape_rows(ptrdiff_t rows, ptrdiff_t rowcap)
+    do_reshape_rows(size_type rows, size_type rowcap)
     requires
         this_type::is_row_reshapable
     {
@@ -962,7 +962,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
 
             //- Move the appropriate subset of elements into the temporary engine and swap.
             //
-            ptrdiff_t   dst_rows = std::min(rows, m_data.m_rows);
+            size_type   dst_rows = std::min(rows, m_data.m_rows);
             support_traits::move_elements(tmp, *this, dst_rows, m_data.m_cols);
             support_traits::swap(*this, tmp);
         }

@@ -720,7 +720,7 @@ TEST(MSE_Matrix_4D, Span)
 
 
 /*
-template<class T, ptrdiff_t R, ptrdiff_t C>
+template<class T, size_t R, size_t C>
 using test_fs_matrix = STD_LA::basic_matrix<test_fs_matrix_engine<T, R, C>, STD_LA::matrix_operation_traits>;
 
 TEST(BasicMatrix, Sanity)
@@ -777,10 +777,10 @@ TEST(BasicMatrix, Sanity)
 
     dr_matrix<float>    m9(s3);
 
-    std::array<float, 4>    o1 = LST_4_1;
-    std::vector<float>      o2 = fl_4_2;
-    std::deque<float>       o3 = fl_4_3;
-    mdspan<float, 4>        o4(o1.data());
+    std::array<float, 4>        o1 = LST_4_1;
+    std::vector<float>          o2 = fl_4_2;
+    std::deque<float>           o3 = fl_4_3;
+    mdspan<float, extents<4>>   o4(o1.data());
 
     rv1 = o1;
     EXPECT_TRUE(msupport::compare(rv1.engine(), o1));

@@ -1,7 +1,10 @@
 #define ENABLE_TEST_PRINTING
 #include "test_common.hpp"
 
-#if 0
+using namespace STD_LA;
+using namespace STD_LA::detail;
+using namespace MDSPAN_NS;
+
 //- A helper macro to assist in readability of test functions below.
 //
 #define ASSERT_A_DIV_B_EQ_C(A, B, C)    \
@@ -10,46 +13,16 @@
 
 //--------------------------------------------------------------------------------------------------
 //  The following are several traits types used to exercise the element, engine, and operation
-//  type detection meta-functions in the private implementation.  See test function t500() below.
+//  type detection meta-functions in the private implementation.
 //--------------------------------------------------------------------------------------------------
-//
 //- This traits type is used to verify that default operations are selected when they are not
 //  declared in the operations traits type.
 //
 struct test_div_op_traits_empty {};
 
 
-//- This operation traits type has its element/engine/arithmetic nested traits type as ordinary
-//  (i.e., non-template) type aliases.
-//
-//  Suffix "_ord" means "ordinary"
-//
-struct test_element_div_traits_ord
-{
-    using element_type = dummy_type;
-};
-
-struct test_engine_div_traits_ord
-{
-    using engine_type = dummy_type;
-};
-
-struct test_div_traits_ord
-{
-    using result_type = dummy_type;
-};
-
-struct test_div_op_traits_ord
-{
-    using division_element_traits = test_element_div_traits_ord;
-    using division_engine_traits  = test_engine_div_traits_ord;
-    using division_arithmetic_traits         = test_div_traits_ord;
-};
-
-
 //- This operation traits type is analogous to STD_LA::matrix_operation_traits, where its nested
 //  traits types for element/engine/arithmetic are alias templates.
-//
 //  Suffix "_nta" means "nested type alias"
 //
 template<class OT, class T1, class T2>
@@ -82,9 +55,7 @@ struct test_div_op_traits_nta
     using division_arithmetic_traits = test_div_traits_nta<OT, OP1, OP2>;
 };
 
-
 //- This operation traits type has its element/engine/arithmetic traits as nested class templates.
-//
 //  Suffix "_nct" means "nested class type"
 //
 struct test_div_op_traits_nct
@@ -108,54 +79,84 @@ struct test_div_op_traits_nct
     };
 };
 
+//- The following are some invalid operation traits.
+//
+struct test_div_op_traits_bad_00
+{
+    using division_element_traits = int;
+    using division_engine_traits = int;
+    using division_arithmetic_traits = int;
+};
+
+struct test_div_op_traits_bad_01
+{
+    template<class OT>
+    using division_element_traits = STD_LA::detail::division_element_traits<OT, int, int>;
+
+    template<class OT>
+    using division_engine_traits = STD_LA::detail::division_engine_traits<OT, int, int>;
+
+    template<class OT>
+    using division_arithmetic_traits = STD_LA::detail::division_arithmetic_traits<OT, int, int>;
+};
+
+struct test_div_op_traits_bad_02
+{
+    template<class OT, class T1>
+    using division_element_traits = STD_LA::detail::division_element_traits<OT, T1, T1>;
+
+    template<class OT, class T1>
+    using division_engine_traits = STD_LA::detail::division_engine_traits<OT, T1, T1>;
+
+    template<class OT, class T1>
+    using division_arithmetic_traits = STD_LA::detail::division_arithmetic_traits<OT, T1, T1>;
+};
 
 //--------------------------------------------------------------------------------------------------
-//  This test ensures that the type detection meta-functions are working properly.  It exercises
-//  only the detection meta-functions.
+//  This test ensures that the nested traits associated with division are properly validated.
+//  It exercises only the validation meta-functions.
+//
+//  Note that the types for the second and third template parameters are unimportant for these
+//  tests - it is the form of the nested template that is being validated (specifically, being
+//  instantiable with three template arguments).
 //--------------------------------------------------------------------------------------------------
 //
-void t500()
+TEST(DivTraits, Validation)
 {
-    PRINT_FNAME();
+    static_assert(valid_division_element_traits<test_div_op_traits_empty, int, int>);
+    static_assert(valid_division_element_traits<test_div_op_traits_nta, int, int>);
+    static_assert(valid_division_element_traits<test_div_op_traits_nct, int, int>);
 
-    //- Detect element traits.
-    //
-    using elem_t = double;
+    static_assert(!valid_division_element_traits<test_div_op_traits_bad_00, int, int>);
+    static_assert(!valid_division_element_traits<test_div_op_traits_bad_01, int, int>);
+    static_assert(!valid_division_element_traits<test_div_op_traits_bad_02, int, int>);
 
-    static_assert(!STD_LA::detail::has_element_div_traits_v<test_div_op_traits_empty, elem_t, elem_t>);
-    static_assert(!STD_LA::detail::has_element_div_traits_v<void, elem_t, elem_t>);
+    static_assert(valid_division_engine_traits<test_div_op_traits_empty, int, int>);
+    static_assert(valid_division_engine_traits<test_div_op_traits_nta, int, int>);
+    static_assert(valid_division_engine_traits<test_div_op_traits_nct, int, int>);
 
-    static_assert(STD_LA::detail::has_element_div_traits_v<STD_LA::matrix_operation_traits, elem_t, elem_t>);
-    static_assert(STD_LA::detail::has_element_div_traits_v<test_div_op_traits_ord, elem_t, elem_t>);
-    static_assert(STD_LA::detail::has_element_div_traits_v<test_div_op_traits_nta, elem_t, elem_t>);
-    static_assert(STD_LA::detail::has_element_div_traits_v<test_div_op_traits_nct, elem_t, elem_t>);
+    static_assert(!valid_division_engine_traits<test_div_op_traits_bad_00, int, int>);
+    static_assert(!valid_division_engine_traits<test_div_op_traits_bad_01, int, int>);
+    static_assert(!valid_division_engine_traits<test_div_op_traits_bad_02, int, int>);
 
-    //- Detect engine traits.
-    //
-    using m_eng_t = STD_LA::dr_matrix_engine<elem_t, std::allocator<elem_t>>;
-    using s_eng_t = STD_LA::scalar_engine<elem_t>;
+    static_assert(valid_division_arithmetic_traits<test_div_op_traits_empty, int, int>);
+    static_assert(valid_division_arithmetic_traits<test_div_op_traits_nta, int, int>);
+    static_assert(valid_division_arithmetic_traits<test_div_op_traits_nct, int, int>);
 
-    static_assert(!STD_LA::detail::has_engine_div_traits_v<test_div_op_traits_empty, m_eng_t, s_eng_t>);
-    static_assert(!STD_LA::detail::has_engine_div_traits_v<void, m_eng_t, s_eng_t>);
+    static_assert(!valid_division_arithmetic_traits<test_div_op_traits_bad_00, int, int>);
+    static_assert(!valid_division_arithmetic_traits<test_div_op_traits_bad_01, int, int>);
+    static_assert(!valid_division_arithmetic_traits<test_div_op_traits_bad_02, int, int>);
 
-    static_assert(STD_LA::detail::has_engine_div_traits_v<STD_LA::matrix_operation_traits, m_eng_t, s_eng_t>);
-    static_assert(STD_LA::detail::has_engine_div_traits_v<test_div_op_traits_ord, m_eng_t, s_eng_t>);
-    static_assert(STD_LA::detail::has_engine_div_traits_v<test_div_op_traits_nta, m_eng_t, s_eng_t>);
-    static_assert(STD_LA::detail::has_engine_div_traits_v<test_div_op_traits_nct, m_eng_t, s_eng_t>);
+    static_assert(valid_division_traits<test_div_op_traits_empty, int, int>);
+    static_assert(valid_division_traits<test_div_op_traits_nta, int, int>);
+    static_assert(valid_division_traits<test_div_op_traits_nct, int, int>);
 
-    //- Detect operation traits.
-    //
-    using opnd_t = STD_LA::dyn_matrix<elem_t>;
-
-    static_assert(!STD_LA::detail::has_div_traits_v<test_div_op_traits_empty, opnd_t, elem_t>);
-    static_assert(!STD_LA::detail::has_div_traits_v<void, opnd_t, elem_t>);
-
-    static_assert(STD_LA::detail::has_div_traits_v<STD_LA::matrix_operation_traits, opnd_t, elem_t>);
-    static_assert(STD_LA::detail::has_div_traits_v<test_div_op_traits_ord, opnd_t, elem_t>);
-    static_assert(STD_LA::detail::has_div_traits_v<test_div_op_traits_nta, opnd_t, elem_t>);
-    static_assert(STD_LA::detail::has_div_traits_v<test_div_op_traits_nct, opnd_t, elem_t>);
+    static_assert(!valid_division_traits<test_div_op_traits_bad_00, int, int>);
+    static_assert(!valid_division_traits<test_div_op_traits_bad_01, int, int>);
+    static_assert(!valid_division_traits<test_div_op_traits_bad_02, int, int>);
 }
 
+#if 0
 //--------------------------------------------------------------------------------------------------
 //  This test verifies that VECTOR/SCALAR divisions return the correct result type.
 //--------------------------------------------------------------------------------------------------
@@ -270,7 +271,7 @@ struct engine_div_traits_tst<OT,
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
 };
 
-template<class OT, class T1, ptrdiff_t R1, ptrdiff_t C1, class T2>
+template<class OT, class T1, size_t R1, size_t C1, class T2>
 struct engine_div_traits_tst<OT,
                              STD_LA::fs_matrix_engine<T1, R1, C1>,
                              STD_LA::scalar_engine<T2>>

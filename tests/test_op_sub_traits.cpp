@@ -15,12 +15,10 @@ using namespace MDSPAN_NS;
 //  The following are several traits types used to exercise the element, engine, and operation
 //  type detection meta-functions in the private implementation.  See test function t200() below.
 //--------------------------------------------------------------------------------------------------
-//
 //- This traits type is used to verify that default operations are selected when they are not
 //  declared in the operations traits type.
 //
 struct test_sub_op_traits_empty {};
-
 
 //- This operation traits type is analogous to STD_LA::matrix_operation_traits, where its nested
 //  traits types for element/engine/arithmetic are alias templates.
@@ -362,9 +360,9 @@ struct engine_sub_traits_tst<OTR,
 
 template<class OTR,
          class T1, size_t R1, size_t C1,
-         class T2, ptrdiff_t R2, ptrdiff_t C2, class AT, class LT>
+         class T2, size_t R2, size_t C2, class AT, class LT>
 requires
-    (R2 > 0  && C2 > 0)
+    is_valid_fixed_engine_size_v<R2, C2>
 struct engine_sub_traits_tst<OTR,
                              fs_matrix_engine_tst<T1, R1, C1>,
                              matrix_storage_engine<T2, extents<R2, C2>, AT, LT>>
@@ -378,10 +376,10 @@ struct engine_sub_traits_tst<OTR,
 };
 
 template<class OTR,
-         class T1, ptrdiff_t R1, ptrdiff_t C1, class AT, class LT,
+         class T1, size_t R1, size_t C1, class AT, class LT,
          class T2, size_t R2, size_t C2>
 requires
-    (R1 > 0  && C1 > 0)
+    is_valid_fixed_engine_size_v<R1, C1>
 struct engine_sub_traits_tst<OTR,
                              matrix_storage_engine<T1, extents<R1, C1>, AT, LT>,
                              fs_matrix_engine_tst<T2, R2, C2>>
@@ -450,7 +448,7 @@ TEST(SubTraits, CustomTraits)
     using fsm_new_num_tst_tr = decltype(std::declval<basic_matrix<fs_matrix_engine_tst<new_num, 3, 2>, test_sub_op_traits_tst>>().t());
 
     using fsm_double_tst2  = fixed_size_matrix<double, 2, 3, test_sub_op_traits_tst>;
-    using fsm_new_num_tst2 = fixed_size_matrix<new_num, 3, 2, test_sub_op_traits_tst>;
+    using fsm_new_num_tst2 = fixed_size_matrix<new_num, 2, 3, test_sub_op_traits_tst>;
 
     using drm_double_tst  = dynamic_matrix<double, test_sub_op_traits_tst>;
     using drm_new_num_tst = dynamic_matrix<new_num, test_sub_op_traits_tst>;
@@ -477,9 +475,9 @@ TEST(SubTraits, CustomTraits)
     PRINT_TYPE(decltype(std::declval<fsm_double_tst_tr>() - std::declval<fsm_double_tst_tr>()));
     PRINT_TYPE(decltype(std::declval<fsm_double_tst_tr>() - std::declval<fsm_new_num_tst_tr>()));
 
-//    ASSERT_A_SUB_B_EQ_C(fsm_double_tst_tr,   fsm_new_num_tst_tr,  fsm_new_num_tst);
-//    ASSERT_A_SUB_B_EQ_C(fsm_new_num_tst_tr,  fsm_double_tst_tr,   fsm_new_num_tst);
-//    ASSERT_A_SUB_B_EQ_C(fsm_new_num_tst_tr,  fsm_new_num_tst_tr,  fsm_new_num_tst);
+    ASSERT_A_SUB_B_EQ_C(fsm_double_tst_tr,   fsm_new_num_tst_tr,  fsm_new_num_tst2);
+    ASSERT_A_SUB_B_EQ_C(fsm_new_num_tst_tr,  fsm_double_tst_tr,   fsm_new_num_tst2);
+    ASSERT_A_SUB_B_EQ_C(fsm_new_num_tst_tr,  fsm_new_num_tst_tr,  fsm_new_num_tst2);
 
     ASSERT_A_SUB_B_EQ_C(fsm_double_tst,   drm_double_tst,   drm_double_tst);
     ASSERT_A_SUB_B_EQ_C(drm_double_tst,   fsm_new_num_tst,  drm_new_num_tst);

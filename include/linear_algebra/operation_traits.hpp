@@ -510,10 +510,10 @@ STD_LA_DEFINE_VALID_OP_TRAITS_DETECTORS(division);
 //--------------------------------------------------------------------------------------------------
 //- Some useful alias templates used to support the various traits types.
 //
-template<class t, ptrdiff_t r, ptrdiff_t c, class lt = matrix_layout::row_major>
+template<class t, size_t r, size_t c, class lt = matrix_layout::row_major>
 using fixed_matrix_engine = matrix_storage_engine<t, extents<r, c>, void, lt>;
 
-template<class t, ptrdiff_t r, ptrdiff_t c, class lt = matrix_layout::row_major>
+template<class t, size_t r, size_t c, class lt = matrix_layout::row_major>
 using sized_matrix_engine = matrix_storage_engine<t, extents<r, c>, std::allocator<t>, lt>;
 
 template<class t, class lt = matrix_layout::row_major>
@@ -607,16 +607,16 @@ struct mse_allocation_traits<AT1, AT1, T>
 
 //------
 //
-template<class ET1, class ET2, bool DX, ptrdiff_t RR, ptrdiff_t CR, class T>
+template<class ET1, class ET2, bool DX, size_t RR, size_t CR, class T>
 struct engine_allocation_traits
 {
     static constexpr bool   dyn_size = (DX  ||  (RR*CR) > 64);
     using allocator_type = std::conditional_t<dyn_size, std::allocator<T>, void>;
 };
 
-template<class T1, ptrdiff_t R1, ptrdiff_t C1, class AT1, class LT1,
-         class T2, ptrdiff_t R2, ptrdiff_t C2, class AT2, class LT2,
-         bool DX, ptrdiff_t RR, ptrdiff_t CR, class T>
+template<class T1, size_t R1, size_t C1, class AT1, class LT1,
+         class T2, size_t R2, size_t C2, class AT2, class LT2,
+         bool DX, size_t RR, size_t CR, class T>
 struct engine_allocation_traits<matrix_storage_engine<T1, extents<R1, C1>, AT1, LT1>,
                                 matrix_storage_engine<T2, extents<R2, C2>, AT2, LT2>,
                                 DX, RR, CR, T>
@@ -671,8 +671,8 @@ struct engine_layout_traits
     using layout_type = matrix_layout::row_major;
 };
 
-template<class T1, ptrdiff_t R1, ptrdiff_t C1, class AT1, class LT1,
-         class T2, ptrdiff_t R2, ptrdiff_t C2, class AT2, class LT2>
+template<class T1, size_t R1, size_t C1, class AT1, class LT1,
+         class T2, size_t R2, size_t C2, class AT2, class LT2>
 struct engine_layout_traits<matrix_storage_engine<T1, extents<R1, C1>, AT1, LT1>,
                             matrix_storage_engine<T2, extents<R2, C2>, AT2, LT2>,
                             true>
@@ -681,8 +681,8 @@ struct engine_layout_traits<matrix_storage_engine<T1, extents<R1, C1>, AT1, LT1>
 };
 
 
-template<class T1, ptrdiff_t R1, ptrdiff_t C1, class AT1, class LT1,
-         class T2, ptrdiff_t R2, ptrdiff_t C2, class AT2, class LT2>
+template<class T1, size_t R1, size_t C1, class AT1, class LT1,
+         class T2, size_t R2, size_t C2, class AT2, class LT2>
 struct engine_layout_traits<matrix_storage_engine<T1, extents<R1, C1>, AT1, LT1>,
                             matrix_storage_engine<T2, extents<R2, C2>, AT2, LT2>,
                             false>

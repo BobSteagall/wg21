@@ -41,7 +41,7 @@ class basic_vector
     using element_type         = typename engine_type::element_type;
     using reference            = typename engine_type::reference;
     using const_reference      = typename engine_type::const_reference;
-    using index_type           = typename engine_type::index_type;
+    using size_type           = typename engine_type::size_type;
     using span_type            = detail::get_mdspan_type_t<ET>;
     using const_span_type      = detail::get_const_mdspan_type_t<ET>;
 
@@ -64,14 +64,14 @@ class basic_vector
     //- Other constructors.
     //
     constexpr explicit
-    basic_vector(index_type size)
+    basic_vector(size_type size)
     requires
         detail::reshapable_vector_engine<engine_type>
     :   m_engine(size, size)
     {}
 
     constexpr explicit
-    basic_vector(index_type size, index_type cap)
+    basic_vector(size_type size, size_type cap)
     requires
         detail::reshapable_vector_engine<engine_type>
     :   m_engine(size, cap)
@@ -169,9 +169,9 @@ class basic_vector
     //----------------------------------------------------------
     //- Construction from a 1D mdspan.
     //
-    template<class U, ptrdiff_t X0, class L, class A>
+    template<class U, size_t X0, class L, class A>
     constexpr explicit
-    basic_vector(basic_mdspan<U, extents<X0>, L, A> const& rhs)
+    basic_vector(mdspan<U, extents<X0>, L, A> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
@@ -179,9 +179,9 @@ class basic_vector
     :   m_engine(rhs)
     {}
 
-    template<class U, ptrdiff_t X0, class L, class A>
+    template<class U, size_t X0, class L, class A>
     constexpr explicit
-    basic_vector(basic_mdspan<U, extents<X0>, L, A> const& rhs)
+    basic_vector(mdspan<U, extents<X0>, L, A> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
@@ -318,9 +318,9 @@ class basic_vector
     //----------------------------------------------------------
     //- Assignment from a 1D mdspan.
     //
-    template<class U, ptrdiff_t X0, class L, class A>
+    template<class U, size_t X0, class L, class A>
     constexpr basic_vector&
-    operator =(basic_mdspan<U, extents<X0>, L, A> const& rhs)
+    operator =(mdspan<U, extents<X0>, L, A> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
@@ -330,9 +330,9 @@ class basic_vector
         return *this;
     }
 
-    template<class U, ptrdiff_t X0, class L, class A>
+    template<class U, size_t X0, class L, class A>
     constexpr basic_vector&
-    operator =(basic_mdspan<U, extents<X0>, L, A> const& rhs)
+    operator =(mdspan<U, extents<X0>, L, A> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
@@ -376,43 +376,43 @@ class basic_vector
     //----------------------------------------------------------
     //- Size and capacity reporting.
     //
-    constexpr index_type
+    constexpr size_type
     elements() const noexcept
     {
         return m_engine.elements();
     }
 
-    constexpr index_type
+    constexpr size_type
     columns() const noexcept
     {
         return m_engine.columns();
     }
 
-    constexpr index_type
+    constexpr size_type
     rows() const noexcept
     {
         return m_engine.rows();
     }
 
-    constexpr index_type
+    constexpr size_type
     size() const noexcept
     {
         return m_engine.size();
     }
 
-    constexpr index_type
+    constexpr size_type
     column_capacity() const noexcept
     {
         return m_engine.column_capacity();
     }
 
-    constexpr index_type
+    constexpr size_type
     row_capacity() const noexcept
     {
         return m_engine.row_capacity();
     }
 
-    constexpr index_type
+    constexpr size_type
     capacity() const noexcept
     {
         return m_engine.capacity();
@@ -422,13 +422,13 @@ class basic_vector
     //- Element access.
     //
     constexpr reference
-    operator ()(index_type i)
+    operator ()(size_type i)
     {
         return m_engine(i);
     }
 
     constexpr const_reference
-    operator ()(index_type i) const
+    operator ()(size_type i) const
     {
         return m_engine(i);
     }
@@ -446,13 +446,13 @@ class basic_vector
     }
 
     constexpr subvector_type
-    subvector(index_type start, index_type count) noexcept
+    subvector(size_type start, size_type count) noexcept
     {
         return subvector_type(detail::special_ctor_tag(), m_engine, start, count);
     }
 
     constexpr const_subvector_type
-    subvector(index_type start, index_type count) const noexcept
+    subvector(size_type start, size_type count) const noexcept
     {
         return const_subvector_type(detail::special_ctor_tag(), m_engine, start, count);
     }
@@ -492,7 +492,7 @@ class basic_vector
     //- Setting overall size and capacity.
     //
     constexpr void
-    resize(index_type size)
+    resize(size_type size)
     requires
         detail::reshapable_vector_engine<engine_type>
     {
@@ -500,7 +500,7 @@ class basic_vector
     }
 
     constexpr void
-    reserve(index_type cap)
+    reserve(size_type cap)
     requires
         detail::reshapable_vector_engine<engine_type>
     {
@@ -508,7 +508,7 @@ class basic_vector
     }
 
     constexpr void
-    reshape(index_type size, index_type cap)
+    reshape(size_type size, size_type cap)
     requires
         detail::reshapable_vector_engine<engine_type>
     {
@@ -546,12 +546,12 @@ class basic_vector
 template<class T, class COT = void>
 using dyn_vec = basic_vector<matrix_storage_engine<T, extents<dynamic_extent>, std::allocator<T>, void>, COT>;
 
-template<class T, ptrdiff_t N, class COT = void>
+template<class T, size_t N, class COT = void>
 using fixed_size_vector =
         basic_vector<matrix_storage_engine<T, extents<N>, void, void>, COT>;
 
 
-template<class T, ptrdiff_t N, class A = std::allocator<T>, class COT = void>
+template<class T, size_t N, class A = std::allocator<T>, class COT = void>
 using general_vector =
         basic_vector<matrix_storage_engine<T, extents<N>, A, void>, COT>;
 

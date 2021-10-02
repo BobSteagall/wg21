@@ -89,8 +89,8 @@ TEST(MSE_Vector, CmpEq)
     std::initializer_list<float>    l2 = {13, 17, 19, 23};
     std::array<float, 4>            a1 = {0, 0, 0, 0};
     std::array<float, 4>            a2 = {13, 17, 19, 23};
-    mdspan<float, 4>                s1(a1.data());
-    mdspan<float, 4>                s2(a2.data());
+    mdspan<float, extents<4>>       s1(a1.data());
+    mdspan<float, extents<4>>       s2(a2.data());
 
     fve_type_v  e1;
     fve_type_a  e2;
@@ -295,10 +295,10 @@ TEST(MSE_Vector, OtherCtor)
 
     //- Construct new engines via other ctors and verify their initial state.
     //
-    std::array<float, 4>    o1 = LST_4_1;
-    std::vector<float>      o2 = fl_4_2;
-    std::deque<float>       o3 = fl_4_3;
-    mdspan<float, 4>        o4(o1.data());
+    std::array<float, 4>        o1 = LST_4_1;
+    std::vector<float>          o2 = fl_4_2;
+    std::deque<float>           o3 = fl_4_3;
+    mdspan<float, extents<4>>   o4(o1.data());
 
     fve_type_v      e1b(o2);
     fve_type_a      e2b(o3);
@@ -517,10 +517,10 @@ TEST(MSE_Vector, OtherAssign)
 
     //- Assign to engines via other assignment operators and verify.
     //
-    std::array<float, 4>    o1 = LST_4_1;
-    std::vector<float>      o2 = fl_4_2;
-    std::deque<float>       o3 = fl_4_3;
-    mdspan<float, 4>        o4(o1.data());
+    std::array<float, 4>        o1 = LST_4_1;
+    std::vector<float>          o2 = fl_4_2;
+    std::deque<float>           o3 = fl_4_3;
+    mdspan<float, extents<4>>   o4(o1.data());
 
     e1a = o1;
     e2a = o1;
