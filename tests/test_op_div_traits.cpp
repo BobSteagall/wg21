@@ -156,7 +156,66 @@ TEST(DivTraits, Validation)
     static_assert(!valid_division_traits<test_div_op_traits_bad_02, int, int>);
 }
 
+
 #if 0
+//--------------------------------------------------------------------------------------------------
+//  This test ensures that the element/engine/arithmetic nested traits contained by *validated*
+//  operation traits types are properly extracted.  It exercises only the extraction meta-functions.
+//--------------------------------------------------------------------------------------------------
+//
+TEST(DivTraits, Extraction)
+{
+    using mat_t = fixed_size_matrix<float, 2, 3>;
+    using eng_t = typename mat_t::engine_type;
+
+    //- Extracting from the library's default operation traits should yield library results.
+    //
+    static_assert(std::is_same_v<get_division_element_traits_t<matrix_operation_traits, int, int>,
+                                 matrix_operation_traits::division_element_traits<matrix_operation_traits, int, int>>);
+
+    static_assert(std::is_same_v<get_division_engine_traits_t<matrix_operation_traits, eng_t, eng_t>,
+                                 matrix_operation_traits::division_engine_traits<matrix_operation_traits, eng_t, eng_t>>);
+
+    static_assert(std::is_same_v<get_division_arithmetic_traits_t<matrix_operation_traits, mat_t, mat_t>,
+                                 matrix_operation_traits::division_arithmetic_traits<matrix_operation_traits, mat_t, mat_t>>);
+
+    //- Extracting from an empty operation traits type should yield library results.
+    //
+    static_assert(std::is_same_v<get_division_element_traits_t<test_div_op_traits_empty, int, int>,
+                                 matrix_operation_traits::division_element_traits<test_div_op_traits_empty, int, int>>);
+
+    static_assert(std::is_same_v<get_division_engine_traits_t<test_div_op_traits_empty, eng_t, eng_t>,
+                                 matrix_operation_traits::division_engine_traits<test_div_op_traits_empty, eng_t, eng_t>>);
+
+    static_assert(std::is_same_v<get_division_arithmetic_traits_t<test_div_op_traits_empty, int, int>,
+                                 matrix_operation_traits::division_arithmetic_traits<test_div_op_traits_empty, int, int>>);
+
+    //- Extracting a nested alias template specialization from a custom operation traits type should
+    //  yield the specializations to which those aliases refer.
+    //
+    static_assert(std::is_same_v<get_division_element_traits_t<test_div_op_traits_nta, int, int>,
+                                 test_element_div_traits_nta<test_div_op_traits_nta, int, int>>);
+
+    static_assert(std::is_same_v<get_division_engine_traits_t<test_div_op_traits_nta, eng_t, eng_t>,
+                                 test_engine_div_traits_nta<test_div_op_traits_nta, eng_t, eng_t>>);
+
+    static_assert(std::is_same_v<get_division_arithmetic_traits_t<test_div_op_traits_nta, mat_t, mat_t>,
+                                 test_arithmetic_div_traits_nta<test_div_op_traits_nta, mat_t, mat_t>>);
+
+    //- Extracting a nested class template specialization from a custom operation traits type should
+    //  yield those same nested specializations.
+    //
+    static_assert(std::is_same_v<get_division_element_traits_t<test_div_op_traits_nct, int, int>,
+                                 test_div_op_traits_nct::division_element_traits<test_div_op_traits_nct, int, int>>);
+
+    static_assert(std::is_same_v<get_division_engine_traits_t<test_div_op_traits_nct, eng_t, eng_t>,
+                                 test_div_op_traits_nct::division_engine_traits<test_div_op_traits_nct, eng_t, eng_t>>);
+
+    static_assert(std::is_same_v<get_division_arithmetic_traits_t<test_div_op_traits_nct, mat_t, mat_t>,
+                                 test_div_op_traits_nct::division_arithmetic_traits<test_div_op_traits_nct, mat_t, mat_t>>);
+}
+
+
 //--------------------------------------------------------------------------------------------------
 //  This test verifies that VECTOR/SCALAR divisions return the correct result type.
 //--------------------------------------------------------------------------------------------------

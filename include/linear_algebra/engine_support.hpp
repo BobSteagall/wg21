@@ -1085,16 +1085,6 @@ struct engine_extents_helper
     }
 };
 
-template<class T, size_t N, class A, class L>
-struct engine_extents_helper<matrix_storage_engine<T, extents<N>, A, L>>
-{
-    static constexpr size_t
-    size()
-    {
-        return N;
-    }
-};
-
 template<class T, size_t R, size_t C, class A, class L>
 struct engine_extents_helper<matrix_storage_engine<T, extents<R, C>, A, L>>
 {
