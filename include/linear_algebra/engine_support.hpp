@@ -68,7 +68,7 @@ struct matrix_scalar_engine
 //  Class Template:     matrix_storage_engine<T, X, A, L>
 //
 //  This class template implements an owning engine for use by the math object class templates
-//  basic_matrix<ET, OT> and basic_vector<ET, OT>.  Specifically, it provides storage suitable
+//  matrix<ET, OT> and basic_vector<ET, OT>.  Specifically, it provides storage suitable
 //  for modeling a mathematical matrix or vector, having dimensions specified by X, employing
 //  allocator A, and having element layout L.
 //--------------------------------------------------------------------------------------------------
@@ -896,7 +896,7 @@ concept engine_is_not_2d_indexable =
 //  Concept:    readable_matrix_engine<ET>
 //
 //  This private concept determines whether a prospective matrix engine type provides the
-//  readability interface required to function correctly with basic_matrix<ET, OT>.
+//  readability interface required to function correctly with matrix<ET, OT>.
 //
 //  Engine types that fulfill this concept may have the value of their elements read via two-
 //  dimensional indexing, their row and column sizes and capacities read, their overall sizes
@@ -940,7 +940,7 @@ concept readable_and_1d_indexable_matrix_engine =
 //  Concept:    spannable_matrix_engine<ET>
 //
 //  This private concept determines whether a prospective matrix engine type provides the
-//  correct nested mdspan types optionally required by basic_matrix<ET, OT>.
+//  correct nested mdspan types optionally required by matrix<ET, OT>.
 //--------------------------------------------------------------------------------------------------
 //
 template<class ET>
@@ -962,7 +962,7 @@ concept spannable_matrix_engine =
 //  Concept:    writable_matrix_engine<ET>
 //
 //  This private concept determines whether a prospective matrix engine type provides the
-//  writability interface required to function correctly with basic_matrix<ET, OT>.
+//  writability interface required to function correctly with matrix<ET, OT>.
 //
 //  Engine types that fulfill this concept fulfill the corresponding readable_matrix_engine<ET>
 //  concept, and also permit the value of their elements to be changed via two-dimensional

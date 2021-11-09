@@ -92,14 +92,14 @@ struct division_engine_traits
 //  result of a matrix/matrix addition.
 //
 template<class OTR, class ET1, class COT1, class S2>
-struct division_arithmetic_traits<OTR, basic_matrix<ET1, COT1>, S2>
+struct division_arithmetic_traits<OTR, matrix<ET1, COT1>, S2>
 {
   private:
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = S2;
     using element_traits = get_division_element_traits_t<OTR, element_type_1, element_type_2>;
 
-    using engine_type_1 = typename basic_matrix<ET1, COT1>::engine_type;
+    using engine_type_1 = typename matrix<ET1, COT1>::engine_type;
     using engine_type_2 = S2;
     using engine_traits = get_division_engine_traits_t<OTR, engine_type_1, engine_type_2>;
 
@@ -109,12 +109,12 @@ struct division_arithmetic_traits<OTR, basic_matrix<ET1, COT1>, S2>
   public:
     using element_type = typename element_traits::element_type;
     using engine_type  = typename engine_traits::engine_type;
-    using result_type  = basic_matrix<engine_type, OTR>;
+    using result_type  = matrix<engine_type, OTR>;
 
     static constexpr result_type
-    divide(basic_matrix<ET1, COT1> const& m1, S2 const& s2)
+    divide(matrix<ET1, COT1> const& m1, S2 const& s2)
     {
-        using size_type_1 = typename basic_matrix<ET1, COT1>::size_type;
+        using size_type_1 = typename matrix<ET1, COT1>::size_type;
         using size_type_r = typename result_type::size_type;
 
         size_type_r    rows = static_cast<size_type_r>(m1.rows());

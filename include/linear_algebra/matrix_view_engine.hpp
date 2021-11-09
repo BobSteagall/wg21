@@ -222,7 +222,7 @@ struct mve_mdspan_traits<mdspan<T, extents<X0, X1>, L, A>>
 //  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_negation>
 //
 //  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
-//  for use by class template basic_matrix<ET, OT>.  It provides a read-only view of a host
+//  for use by class template matrix<ET, OT>.  It provides a read-only view of a host
 //  matrix engine that expresses the element-wise negation of that engine.
 //--------------------------------------------------------------------------------------------------
 //
@@ -366,7 +366,7 @@ class matrix_view_engine<ET, matrix_view::const_negation>
 //  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_conjugate>
 //
 //  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
-//  for use by class template basic_matrix<ET, OT>.  It provides a read-only view of a host
+//  for use by class template matrix<ET, OT>.  It provides a read-only view of a host
 //  matrix engine that expresses the element-wise complex conjugate of that engine.
 //--------------------------------------------------------------------------------------------------
 //
@@ -516,7 +516,7 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
 //  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_hermitian>
 //
 //  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
-//  for use by class template basic_matrix<ET, OT>.  It provides a read-only view of a host
+//  for use by class template matrix<ET, OT>.  It provides a read-only view of a host
 //  matrix engine that expresses the complex conjugate transpose of that engine.
 //--------------------------------------------------------------------------------------------------
 //
@@ -666,7 +666,7 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
 //  Partial Specialization:     matrix_view_engine<ET, matrix_view::identity>
 //
 //  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
-//  for use by class template basic_matrix<ET, OT>.  It provides a read-write view of a host
+//  for use by class template matrix<ET, OT>.  It provides a read-write view of a host
 //  matrix engine that is the same as that engine.
 //--------------------------------------------------------------------------------------------------
 //
@@ -819,7 +819,7 @@ class matrix_view_engine<ET, matrix_view::identity>
 //  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_identity>
 //
 //  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
-//  for use by class template basic_matrix<ET, OT>.  It provides a read-only view of a host
+//  for use by class template matrix<ET, OT>.  It provides a read-only view of a host
 //  matrix engine that is the same as that engine.
 //--------------------------------------------------------------------------------------------------
 //
@@ -971,7 +971,7 @@ class matrix_view_engine<ET, matrix_view::const_identity>
 //  Partial Specialization:     matrix_view_engine<ET, matrix_view::transpose>
 //
 //  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
-//  for use by class template basic_matrix<ET, OT>.  It provides a read-write view of a host
+//  for use by class template matrix<ET, OT>.  It provides a read-write view of a host
 //  matrix engine that expresses the transpose of that engine.
 //--------------------------------------------------------------------------------------------------
 //
@@ -1124,7 +1124,7 @@ class matrix_view_engine<ET, matrix_view::transpose>
 //  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_transpose>
 //
 //  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
-//  for use by class template basic_matrix<ET, OT>.  It provides a read-only view of a host
+//  for use by class template matrix<ET, OT>.  It provides a read-only view of a host
 //  matrix engine that expresses the transpose of that engine.
 //--------------------------------------------------------------------------------------------------
 //
@@ -1276,7 +1276,7 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
 //  Partial Specialization:     matrix_view_engine<ET, matrix_view::column>
 //
 //  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
-//  for use by class template basic_matrix<ET, OT>.  It provides a read-write view of a column
+//  for use by class template matrix<ET, OT>.  It provides a read-write view of a column
 //  of a host matrix engine, and expresses an engine of size R x 1.
 //--------------------------------------------------------------------------------------------------
 //
@@ -1416,7 +1416,7 @@ class matrix_view_engine<ET, matrix_view::column>
 //  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_column>
 //
 //  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
-//  for use by class template basic_matrix<ET, OT>.  It provides a read-only view of a column
+//  for use by class template matrix<ET, OT>.  It provides a read-only view of a column
 //  of a host matrix engine, and expresses an engine of size R x 1.
 //--------------------------------------------------------------------------------------------------
 //
@@ -1555,7 +1555,7 @@ class matrix_view_engine<ET, matrix_view::const_column>
 //  Partial Specialization:     matrix_view_engine<ET, matrix_view::row>
 //
 //  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
-//  for use by class template basic_matrix<ET, OT>.  It provides a read-write view of a row
+//  for use by class template matrix<ET, OT>.  It provides a read-write view of a row
 //  of a host matrix engine, and expresses an engine of size 1 x C.
 //--------------------------------------------------------------------------------------------------
 //
@@ -1695,7 +1695,7 @@ class matrix_view_engine<ET, matrix_view::row>
 //  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_row>
 //
 //  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
-//  for use by class template basic_matrix<ET, OT>.  It provides a read-only view of a row
+//  for use by class template matrix<ET, OT>.  It provides a read-only view of a row
 //  of a host matrix engine, and expresses an engine of size 1 x C.
 //--------------------------------------------------------------------------------------------------
 //
@@ -1834,7 +1834,7 @@ class matrix_view_engine<ET, matrix_view::const_row>
 //  Partial Specialization:     matrix_view_engine<ET, matrix_view::submatrix>
 //
 //  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
-//  for use by class template basic_matrix<ET, OT>.  It provides a read-write view of a host
+//  for use by class template matrix<ET, OT>.  It provides a read-write view of a host
 //  matrix engine that expresses a sub-region of that engine.
 //--------------------------------------------------------------------------------------------------
 //
@@ -1982,7 +1982,7 @@ class matrix_view_engine<ET, matrix_view::submatrix>
 //  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_submatrix>
 //
 //  This partial specialization of matrix_view_engine<ET, MVT> implements a non-owning engine
-//  for use by class template basic_matrix<ET, OT>.  It provides a read-write view of a host
+//  for use by class template matrix<ET, OT>.  It provides a read-write view of a host
 //  matrix engine that expresses a sub-region of that engine.
 //--------------------------------------------------------------------------------------------------
 //

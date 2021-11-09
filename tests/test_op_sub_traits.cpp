@@ -399,18 +399,18 @@ struct subtraction_traits_tst;
 
 template<class OTR, class COT1, class COT2>
 struct subtraction_traits_tst<OTR,
-                              basic_matrix<fs_matrix_engine_tst<double, 3, 4>, COT1>,
-                              basic_matrix<fs_matrix_engine_tst<double, 3, 4>, COT2>>
+                              matrix<fs_matrix_engine_tst<double, 3, 4>, COT1>,
+                              matrix<fs_matrix_engine_tst<double, 3, 4>, COT2>>
 {
-    using op_type_1     = basic_matrix<fs_matrix_engine_tst<double, 3, 4>, COT1>;
-    using op_type_2     = basic_matrix<fs_matrix_engine_tst<double, 3, 4>, COT2>;
+    using op_type_1     = matrix<fs_matrix_engine_tst<double, 3, 4>, COT1>;
+    using op_type_2     = matrix<fs_matrix_engine_tst<double, 3, 4>, COT2>;
     using op_traits     = OTR;
     using engine_type_1 = typename op_type_1::engine_type;
     using engine_type_2 = typename op_type_2::engine_type;
 
     using engine_traits = get_subtraction_engine_traits_t<op_traits, engine_type_1, engine_type_2>;
     using engine_type   = typename engine_traits::engine_type;
-    using result_type   = basic_matrix<engine_type, op_traits>;
+    using result_type   = matrix<engine_type, op_traits>;
 
     static result_type  subtract(op_type_1 const& m1, op_type_2 const& m2)
                         {
@@ -439,13 +439,13 @@ TEST(SubTraits, CustomTraits)
     PRINT_FNAME();
 
     using fsm_float       = fixed_size_matrix<float, 2, 3>;
-    using fsm_float_tst   = basic_matrix<fs_matrix_engine_tst<float, 2, 3>, test_sub_op_traits_tst>;
-    using fsm_double_tst  = basic_matrix<fs_matrix_engine_tst<double, 2, 3>, test_sub_op_traits_tst>;
-    using fsm_new_num_tst = basic_matrix<fs_matrix_engine_tst<new_num, 2, 3>, test_sub_op_traits_tst>;
+    using fsm_float_tst   = matrix<fs_matrix_engine_tst<float, 2, 3>, test_sub_op_traits_tst>;
+    using fsm_double_tst  = matrix<fs_matrix_engine_tst<double, 2, 3>, test_sub_op_traits_tst>;
+    using fsm_new_num_tst = matrix<fs_matrix_engine_tst<new_num, 2, 3>, test_sub_op_traits_tst>;
 
-    using fsm_float_tst_tr   = decltype(std::declval<basic_matrix<fs_matrix_engine_tst<float, 3, 2>, test_sub_op_traits_tst>>().t());
-    using fsm_double_tst_tr  = decltype(std::declval<basic_matrix<fs_matrix_engine_tst<double, 3, 2>, test_sub_op_traits_tst>>().t());
-    using fsm_new_num_tst_tr = decltype(std::declval<basic_matrix<fs_matrix_engine_tst<new_num, 3, 2>, test_sub_op_traits_tst>>().t());
+    using fsm_float_tst_tr   = decltype(std::declval<matrix<fs_matrix_engine_tst<float, 3, 2>, test_sub_op_traits_tst>>().t());
+    using fsm_double_tst_tr  = decltype(std::declval<matrix<fs_matrix_engine_tst<double, 3, 2>, test_sub_op_traits_tst>>().t());
+    using fsm_new_num_tst_tr = decltype(std::declval<matrix<fs_matrix_engine_tst<new_num, 3, 2>, test_sub_op_traits_tst>>().t());
 
     using fsm_double_tst2  = fixed_size_matrix<double, 2, 3, test_sub_op_traits_tst>;
     using fsm_new_num_tst2 = fixed_size_matrix<new_num, 2, 3, test_sub_op_traits_tst>;
@@ -484,7 +484,7 @@ TEST(SubTraits, CustomTraits)
     ASSERT_A_SUB_B_EQ_C(drm_new_num_tst,  fsm_double_tst,   drm_new_num_tst);
     ASSERT_A_SUB_B_EQ_C(fsm_new_num_tst,  drm_new_num_tst,  drm_new_num_tst);
 
-    using fsm_double_tst_34 = basic_matrix<fs_matrix_engine_tst<double, 3, 4>, test_sub_op_traits_tst>;
+    using fsm_double_tst_34 = matrix<fs_matrix_engine_tst<double, 3, 4>, test_sub_op_traits_tst>;
 
     ASSERT_A_SUB_B_EQ_C(fsm_double_tst,     fsm_double_tst,     fsm_double_tst);
     ASSERT_A_SUB_B_EQ_C(fsm_double_tst_34,  fsm_double_tst_34,  fsm_double_tst_34);

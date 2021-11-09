@@ -239,9 +239,9 @@ Print(matrix_storage_engine<T, extents<R, C>, A, L> const& v, char const* pname 
 
 template<class ET, class OT>
 void
-Print(basic_matrix<ET, OT> const& m, char const* pname = nullptr)
+Print(matrix<ET, OT> const& m, char const* pname = nullptr)
 {
-    using size_type = typename basic_matrix<ET, OT>::size_type;
+    using size_type = typename matrix<ET, OT>::size_type;
 
     cout << endl << "matrix: " << ((pname) ? pname : "<anon>") << endl;
     cout << "  size: " << m.rows() << "x" << m.columns() << endl;
@@ -299,10 +299,10 @@ Print(size_t v, char const* pname = nullptr)
 
 template<class ET, class OT>
 void
-Fill(basic_matrix<ET, OT>& m)
+Fill(matrix<ET, OT>& m)
 {
-    using size_type   = typename STD_LA::basic_matrix<ET, OT>::size_type;
-    using element_type = typename STD_LA::basic_matrix<ET, OT>::element_type;
+    using size_type   = typename STD_LA::matrix<ET, OT>::size_type;
+    using element_type = typename STD_LA::matrix<ET, OT>::element_type;
 
     element_type    x = 1;
 

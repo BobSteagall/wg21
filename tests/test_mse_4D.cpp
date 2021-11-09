@@ -721,7 +721,7 @@ TEST(MSE_Matrix_4D, Span)
 
 /*
 template<class T, size_t R, size_t C>
-using test_fs_matrix = STD_LA::basic_matrix<test_fs_matrix_engine<T, R, C>, STD_LA::matrix_operation_traits>;
+using test_fs_matrix = STD_LA::matrix<test_fs_matrix_engine<T, R, C>, STD_LA::matrix_operation_traits>;
 
 TEST(BasicMatrix, Sanity)
 {

@@ -413,7 +413,7 @@ struct mse_mdspan_traits<mse_data<T, extents<dynamic_extent, dynamic_extent>, A,
 //  Class Template:     matrix_storage_engine<T, X, A, L>
 //
 //  This class template implements an owning engine for use by the math object class templates
-//  basic_matrix<ET, OT> and basic_vector<ET, OT>.  Specifically, it provides storage suitable
+//  matrix<ET, OT> and basic_vector<ET, OT>.  Specifically, it provides storage suitable
 //  for modeling a mathematical matrix or vector, having dimensions specified by X, employing
 //  allocator A, and having element layout L.
 //--------------------------------------------------------------------------------------------------
@@ -432,7 +432,7 @@ class matrix_storage_engine
 //  Partial Specialization:     matrix_storage_engine<T, extents<R, C>, A, L>
 //
 //  This partial specialization of matrix_storage_engine<T,X,A,L> implements an owning engine
-//  for use by class template basic_matrix<ET, OT>.  Specifically, it models a mathematical
+//  for use by class template matrix<ET, OT>.  Specifically, it models a mathematical
 //  matrix with R rows and C columns, employing allocator A, and having element layout L.
 //
 //  Sizes R and C may be positive integers, or have the value "dynamic_extent" (defined in the

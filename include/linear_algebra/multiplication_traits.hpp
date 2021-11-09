@@ -43,6 +43,7 @@ struct multiplication_element_traits
 template<class OTR, class ET1, class ET2>
 struct multiplication_engine_traits
 {
+  private:
     //- Get the extents for each engine
     //
     static constexpr size_t     R1 = engine_extents_helper<ET1>::rows();
@@ -191,14 +192,14 @@ struct multiplication_engine_traits<OTR, ET1, matrix_scalar_engine<S2>>
 //  result of a matrix/matrix addition.
 //
 template<class OTR, class ET1, class COT1, class ET2, class COT2>
-struct multiplication_arithmetic_traits<OTR, basic_matrix<ET1, COT1>, basic_matrix<ET2, COT2>>
+struct multiplication_arithmetic_traits<OTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
 {
     using element_type_1 = typename ET2::element_type;
     using element_type_2 = typename ET2::element_type;
     using element_traits = get_multiplication_element_traits_t<OTR, element_type_1, element_type_2>;
 
-    using engine_type_1 = typename basic_matrix<ET1, COT1>::engine_type;
-    using engine_type_2 = typename basic_matrix<ET2, COT2>::engine_type;
+    using engine_type_1 = typename matrix<ET1, COT1>::engine_type;
+    using engine_type_2 = typename matrix<ET2, COT2>::engine_type;
     using engine_traits = get_multiplication_engine_traits_t<OTR, engine_type_1, engine_type_2>;
 
     static_assert(std::is_same_v<typename element_traits::element_type,
@@ -207,13 +208,13 @@ struct multiplication_arithmetic_traits<OTR, basic_matrix<ET1, COT1>, basic_matr
   public:
     using element_type = typename element_traits::element_type;
     using engine_type  = typename engine_traits::engine_type;
-    using result_type  = basic_matrix<engine_type, OTR>;
+    using result_type  = matrix<engine_type, OTR>;
 
     static constexpr result_type
-    multiply(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
+    multiply(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
     {
-        using size_type_1 = typename basic_matrix<ET1, COT1>::size_type;
-        using size_type_2 = typename basic_matrix<ET2, COT2>::size_type;
+        using size_type_1 = typename matrix<ET1, COT1>::size_type;
+        using size_type_2 = typename matrix<ET2, COT2>::size_type;
         using size_type_r = typename result_type::size_type;
 
         size_type_r     rows  = static_cast<size_type_r>(m1.rows());
@@ -255,14 +256,14 @@ struct multiplication_arithmetic_traits<OTR, basic_matrix<ET1, COT1>, basic_matr
 
 
 template<class OTR, class S1, class ET2, class COT2>
-struct multiplication_arithmetic_traits<OTR, S1, basic_matrix<ET2, COT2>>
+struct multiplication_arithmetic_traits<OTR, S1, matrix<ET2, COT2>>
 {
     using element_type_1 = S1;
     using element_type_2 = typename ET2::element_type;
     using element_traits = get_multiplication_element_traits_t<OTR, element_type_1, element_type_2>;
 
     using engine_type_1 = matrix_scalar_engine<S1>;
-    using engine_type_2 = typename basic_matrix<ET2, COT2>::engine_type;
+    using engine_type_2 = typename matrix<ET2, COT2>::engine_type;
     using engine_traits = get_multiplication_engine_traits_t<OTR, engine_type_1, engine_type_2>;
 
     static_assert(std::is_same_v<typename element_traits::element_type,
@@ -271,12 +272,12 @@ struct multiplication_arithmetic_traits<OTR, S1, basic_matrix<ET2, COT2>>
   public:
     using element_type = typename element_traits::element_type;
     using engine_type  = typename engine_traits::engine_type;
-    using result_type  = basic_matrix<engine_type, OTR>;
+    using result_type  = matrix<engine_type, OTR>;
 
     static constexpr result_type
-    multiply(S1 const& s1, basic_matrix<ET2, COT2> const& m2)
+    multiply(S1 const& s1, matrix<ET2, COT2> const& m2)
     {
-        using size_type_2 = typename basic_matrix<ET2, COT2>::size_type;
+        using size_type_2 = typename matrix<ET2, COT2>::size_type;
         using size_type_r = typename result_type::size_type;
 
         size_type_r     rows = static_cast<size_type_r>(m2.rows());
@@ -308,13 +309,13 @@ struct multiplication_arithmetic_traits<OTR, S1, basic_matrix<ET2, COT2>>
 
 
 template<class OTR, class ET1, class COT1, class S2>
-struct multiplication_arithmetic_traits<OTR, basic_matrix<ET1, COT1>, S2>
+struct multiplication_arithmetic_traits<OTR, matrix<ET1, COT1>, S2>
 {
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = S2;
     using element_traits = get_multiplication_element_traits_t<OTR, element_type_1, element_type_2>;
 
-    using engine_type_1 = typename basic_matrix<ET1, COT1>::engine_type;
+    using engine_type_1 = typename matrix<ET1, COT1>::engine_type;
     using engine_type_2 = matrix_scalar_engine<S2>;
     using engine_traits = get_multiplication_engine_traits_t<OTR, engine_type_1, engine_type_2>;
 
@@ -324,12 +325,12 @@ struct multiplication_arithmetic_traits<OTR, basic_matrix<ET1, COT1>, S2>
   public:
     using element_type = typename element_traits::element_type;
     using engine_type  = typename engine_traits::engine_type;
-    using result_type  = basic_matrix<engine_type, OTR>;
+    using result_type  = matrix<engine_type, OTR>;
 
     static constexpr result_type
-    multiply(basic_matrix<ET1, COT1> const& m1, S2 const& s2)
+    multiply(matrix<ET1, COT1> const& m1, S2 const& s2)
     {
-        using size_type_1 = typename basic_matrix<ET1, COT1>::size_type;
+        using size_type_1 = typename matrix<ET1, COT1>::size_type;
         using size_type_r = typename result_type::size_type;
 
         size_type_r     rows = static_cast<size_type_r>(m1.rows());

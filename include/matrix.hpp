@@ -105,7 +105,7 @@ namespace STD_LA
 #include "linear_algebra/engine_support.hpp"
 #include "linear_algebra/matrix_storage_engine.hpp"
 #include "linear_algebra/matrix_view_engine.hpp"
-#include "linear_algebra/basic_matrix.hpp"
+#include "linear_algebra/matrix.hpp"
 #include "linear_algebra/operation_traits.hpp"
 #include "linear_algebra/addition_traits.hpp"
 #include "linear_algebra/subtraction_traits.hpp"

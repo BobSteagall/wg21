@@ -1,7 +1,7 @@
 //==================================================================================================
-//  File:       basic_matrix.hpp
+//  File:       matrix.hpp
 //
-//  Summary:    This header defines the basic_matrix class template, one of the two primary
+//  Summary:    This header defines the matrix class template, one of the two primary
 //              math objects provided by the library.
 //==================================================================================================
 //
@@ -17,7 +17,7 @@ requires
     detail::default_initializable<ET>
     and
     detail::readable_matrix_engine<ET>
-class basic_matrix
+class matrix
 {
     static constexpr bool   is_writable = detail::writable_matrix_engine<ET>;
 
@@ -44,47 +44,47 @@ class basic_matrix
 
     //- Type aliases pertaining to views.
     //
-    using const_negation_type  = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_negation>, COT>;
-    using const_conjugate_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_conjugate>, COT>;
-    using const_hermitian_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_hermitian>, COT>;
-    using transpose_type       = basic_matrix<matrix_view_engine<engine_type, possibly_writable_transpose>, COT>;
-    using const_transpose_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_transpose>, COT>;
-    using column_type          = basic_matrix<matrix_view_engine<engine_type, possibly_writable_column>, COT>;
-    using const_column_type    = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_column>, COT>;
-    using row_type             = basic_matrix<matrix_view_engine<engine_type, possibly_writable_row>, COT>;
-    using const_row_type       = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_row>, COT>;
-    using submatrix_type       = basic_matrix<matrix_view_engine<engine_type, possibly_writable_submatrix>, COT>;
-    using const_submatrix_type = basic_matrix<matrix_view_engine<engine_type, matrix_view::const_submatrix>, COT>;
+    using const_negation_type  = matrix<matrix_view_engine<engine_type, matrix_view::const_negation>, COT>;
+    using const_conjugate_type = matrix<matrix_view_engine<engine_type, matrix_view::const_conjugate>, COT>;
+    using const_hermitian_type = matrix<matrix_view_engine<engine_type, matrix_view::const_hermitian>, COT>;
+    using transpose_type       = matrix<matrix_view_engine<engine_type, possibly_writable_transpose>, COT>;
+    using const_transpose_type = matrix<matrix_view_engine<engine_type, matrix_view::const_transpose>, COT>;
+    using column_type          = matrix<matrix_view_engine<engine_type, possibly_writable_column>, COT>;
+    using const_column_type    = matrix<matrix_view_engine<engine_type, matrix_view::const_column>, COT>;
+    using row_type             = matrix<matrix_view_engine<engine_type, possibly_writable_row>, COT>;
+    using const_row_type       = matrix<matrix_view_engine<engine_type, matrix_view::const_row>, COT>;
+    using submatrix_type       = matrix<matrix_view_engine<engine_type, possibly_writable_submatrix>, COT>;
+    using const_submatrix_type = matrix<matrix_view_engine<engine_type, matrix_view::const_submatrix>, COT>;
 
   public:
-    ~basic_matrix() = default;
+    ~matrix() = default;
 
-    constexpr basic_matrix() = default;
-    constexpr basic_matrix(basic_matrix&&) noexcept = default;
-    constexpr basic_matrix(basic_matrix const&) = default;
+    constexpr matrix() = default;
+    constexpr matrix(matrix&&) noexcept = default;
+    constexpr matrix(matrix const&) = default;
 
-    basic_matrix&   operator =(basic_matrix&&) noexcept = default;
-    basic_matrix&   operator =(basic_matrix const&) = default;
+    matrix&   operator =(matrix&&) noexcept = default;
+    matrix&   operator =(matrix const&) = default;
 
     //----------------------------------------------------------
     //- Other constructors.
     //
     constexpr
-    basic_matrix(size_type rows, size_type cols)
+    matrix(size_type rows, size_type cols)
     requires
         detail::reshapable_matrix_engine<engine_type>
     :   m_engine(rows, cols, rows, cols)
     {}
 
     constexpr
-    basic_matrix(size_type rows, size_type cols, size_type rowcap, size_type colcap)
+    matrix(size_type rows, size_type cols, size_type rowcap, size_type colcap)
     requires
         detail::reshapable_matrix_engine<engine_type>
     :   m_engine(rows, cols, rowcap, colcap)
     {}
 
     constexpr
-    basic_matrix(size_type cols)
+    matrix(size_type cols)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -93,7 +93,7 @@ class basic_matrix
     {}
 
     constexpr
-    basic_matrix(size_type rows)
+    matrix(size_type rows)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -106,7 +106,7 @@ class basic_matrix
     //
     template<class ET2, class COT2>
     constexpr
-    basic_matrix(basic_matrix<ET2, COT2> const& rhs)
+    matrix(matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -116,7 +116,7 @@ class basic_matrix
 
     template<class ET2, class COT2>
     constexpr
-    basic_matrix(basic_matrix<ET2, COT2> const& rhs)
+    matrix(matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -133,7 +133,7 @@ class basic_matrix
     //
     template<class U, size_t X0, size_t X1, class L, class A>
     constexpr explicit
-    basic_matrix(mdspan<U, extents<X0, X1>, L, A> const& rhs)
+    matrix(mdspan<U, extents<X0, X1>, L, A> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -143,7 +143,7 @@ class basic_matrix
 
     template<class U, size_t X0, size_t X1, class L, class A>
     constexpr explicit
-    basic_matrix(mdspan<U, extents<X0, X1>, L, A> const& rhs)
+    matrix(mdspan<U, extents<X0, X1>, L, A> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -160,7 +160,7 @@ class basic_matrix
     //
     template<class U>
     constexpr
-    basic_matrix(initializer_list<initializer_list<U>> rhs)
+    matrix(initializer_list<initializer_list<U>> rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -170,7 +170,7 @@ class basic_matrix
 
     template<class U>
     constexpr
-    basic_matrix(initializer_list<initializer_list<U>> rhs)
+    matrix(initializer_list<initializer_list<U>> rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -187,7 +187,7 @@ class basic_matrix
     //
     template<class CT>
     constexpr explicit
-    basic_matrix(CT const& rhs)
+    matrix(CT const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<ET>
         and
@@ -199,7 +199,7 @@ class basic_matrix
 
     template<class CT>
     constexpr explicit
-    basic_matrix(CT const& rhs)
+    matrix(CT const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<ET>
         and
@@ -218,7 +218,7 @@ class basic_matrix
     //
     template<class U, size_t X0, class L, class A>
     constexpr explicit
-    basic_matrix(mdspan<U, extents<X0>, L, A> const& rhs)
+    matrix(mdspan<U, extents<X0>, L, A> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -228,7 +228,7 @@ class basic_matrix
 
     template<class U, size_t X0, class L, class A>
     constexpr explicit
-    basic_matrix(mdspan<U, extents<X0>, L, A> const& rhs)
+    matrix(mdspan<U, extents<X0>, L, A> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -245,7 +245,7 @@ class basic_matrix
     //
     template<class U>
     constexpr
-    basic_matrix(initializer_list<U> rhs)
+    matrix(initializer_list<U> rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -255,7 +255,7 @@ class basic_matrix
 
     template<class U>
     constexpr
-    basic_matrix(initializer_list<U> rhs)
+    matrix(initializer_list<U> rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -271,8 +271,8 @@ class basic_matrix
     //- Assignment from a different matrix engine type.
     //
     template<class ET2, class COT2>
-    constexpr basic_matrix&
-    operator =(basic_matrix<ET2, COT2> const& rhs)
+    constexpr matrix&
+    operator =(matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -283,8 +283,8 @@ class basic_matrix
     }
 
     template<class ET2, class COT2>
-    constexpr basic_matrix&
-    operator =(basic_matrix<ET2, COT2> const& rhs)
+    constexpr matrix&
+    operator =(matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -300,7 +300,7 @@ class basic_matrix
     //- Assignment from a 2D mdspan.
     //
     template<class U, size_t X0, size_t X1, class L, class A>
-    constexpr basic_matrix&
+    constexpr matrix&
     operator =(mdspan<U, extents<X0, X1>, L, A> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
@@ -312,7 +312,7 @@ class basic_matrix
     }
 
     template<class U, size_t X0, size_t X1, class L, class A>
-    constexpr basic_matrix&
+    constexpr matrix&
     operator =(mdspan<U, extents<X0, X1>, L, A> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
@@ -329,7 +329,7 @@ class basic_matrix
     //- Assignment from a 2D initializtion list.
     //
     template<class U>
-    constexpr basic_matrix&
+    constexpr matrix&
     operator =(initializer_list<initializer_list<U>> rhs)
     requires
         detail::writable_matrix_engine<engine_type>
@@ -341,7 +341,7 @@ class basic_matrix
     }
 
     template<class U>
-    constexpr basic_matrix&
+    constexpr matrix&
     operator =(initializer_list<initializer_list<U>> rhs)
     requires
         detail::writable_matrix_engine<engine_type>
@@ -358,7 +358,7 @@ class basic_matrix
     //- Assignment from a standard random-access container.
     //
     template<class CT>
-    constexpr basic_matrix&
+    constexpr matrix&
     operator =(CT const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
@@ -372,7 +372,7 @@ class basic_matrix
     }
 
     template<class CT>
-    constexpr basic_matrix&
+    constexpr matrix&
     operator =(CT const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<ET>
@@ -391,7 +391,7 @@ class basic_matrix
     //- Assignment from a 1D mdspan.
     //
     template<class U, size_t X0, class L, class A>
-    constexpr basic_matrix&
+    constexpr matrix&
     operator =(mdspan<U, extents<X0>, L, A> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
@@ -403,7 +403,7 @@ class basic_matrix
     }
 
     template<class U, size_t X0, class L, class A>
-    constexpr basic_matrix&
+    constexpr matrix&
     operator =(mdspan<U, extents<X0>, L, A> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
@@ -417,10 +417,10 @@ class basic_matrix
     }
 
     //----------------------------------------------------------
-    //- Assignment from a 1D initializtion list.
+    //- Assignment from a 1D initialization list.
     //
     template<class U>
-    constexpr basic_matrix&
+    constexpr matrix&
     operator =(initializer_list<U> rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
@@ -432,7 +432,7 @@ class basic_matrix
     }
 
     template<class U>
-    constexpr basic_matrix&
+    constexpr matrix&
     operator =(initializer_list<U> rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
@@ -591,14 +591,14 @@ class basic_matrix
     //- Custom operation injection.
     //
     template<class COT2>
-    constexpr basic_matrix<matrix_view_engine<engine_type, matrix_view::identity>, COT2>
+    constexpr matrix<matrix_view_engine<engine_type, matrix_view::identity>, COT2>
     adopt() noexcept
     {
         return {detail::special_ctor_tag(), m_engine};
     }
 
     template<class COT2>
-    constexpr basic_matrix<matrix_view_engine<engine_type, matrix_view::const_identity>, COT2>
+    constexpr matrix<matrix_view_engine<engine_type, matrix_view::const_identity>, COT2>
     adopt() const noexcept
     {
         return {detail::special_ctor_tag(), m_engine};
@@ -720,7 +720,7 @@ class basic_matrix
     //- Other modifiers.
     //
     constexpr void
-    swap(basic_matrix& rhs) noexcept
+    swap(matrix& rhs) noexcept
     {
         m_engine.swap(rhs.m_engine);
     }
@@ -761,13 +761,13 @@ class basic_matrix
         detail::default_initializable<ET2>
         and
         detail::readable_matrix_engine<ET2>
-    friend class basic_matrix;
+    friend class matrix;
 
     engine_type     m_engine;
 
     template<class ET2, class... ARGS>
     constexpr
-    basic_matrix(detail::special_ctor_tag, ET2&& eng, ARGS&&... args)
+    matrix(detail::special_ctor_tag, ET2&& eng, ARGS&&... args)
     :   m_engine(std::forward<ET2>(eng), std::forward<ARGS>(args)...)
     {}
 };
@@ -775,53 +775,53 @@ class basic_matrix
 
 template<class T, size_t R, size_t C, class COT = void>
 using fixed_size_matrix =
-        basic_matrix<matrix_storage_engine<T, extents<R, C>, void, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, extents<R, C>, void, matrix_layout::row_major>, COT>;
 
 template<class T, size_t R, class COT = void>
 using fixed_size_column_vector =
-        basic_matrix<matrix_storage_engine<T, extents<R, 1>, void, matrix_layout::column_major>, COT>;
+        matrix<matrix_storage_engine<T, extents<R, 1>, void, matrix_layout::column_major>, COT>;
 
 template<class T, size_t C, class COT = void>
 using fixed_size_row_vector =
-        basic_matrix<matrix_storage_engine<T, extents<1, C>, void, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, extents<1, C>, void, matrix_layout::row_major>, COT>;
 
 
 template<class T, size_t R, size_t C, class A = std::allocator<T>, class COT = void>
 using general_matrix =
-        basic_matrix<matrix_storage_engine<T, extents<R, C>, A, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, extents<R, C>, A, matrix_layout::row_major>, COT>;
 
 template<class T, size_t R, class A = std::allocator<T>, class COT = void>
 using general_column_vector =
-        basic_matrix<matrix_storage_engine<T, extents<R, 1>, A, matrix_layout::column_major>, COT>;
+        matrix<matrix_storage_engine<T, extents<R, 1>, A, matrix_layout::column_major>, COT>;
 
 template<class T, size_t C, class A = std::allocator<T>, class COT = void>
 using general_row_vector =
-        basic_matrix<matrix_storage_engine<T, extents<1, C>, A, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, extents<1, C>, A, matrix_layout::row_major>, COT>;
 
 
 template<class T, class COT = void>
 using dynamic_matrix =
-        basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, COT>;
 
 template<class T, class COT = void>
 using dynamic_column_vector =
-        basic_matrix<matrix_storage_engine<T, extents<dynamic_extent, 1>, std::allocator<T>, matrix_layout::column_major>, COT>;
+        matrix<matrix_storage_engine<T, extents<dynamic_extent, 1>, std::allocator<T>, matrix_layout::column_major>, COT>;
 
 template<class T, class COT = void>
 using dynamic_row_vector =
-        basic_matrix<matrix_storage_engine<T, extents<1, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, extents<1, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, COT>;
 
 
 template<class ET1, class COT1, class ET2, class COT2> inline constexpr
 bool
-operator ==(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
+operator ==(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
 {
     return detail::matrix_engine_support::compare(m1, m2);
 }
 
 template<class ET1, class COT1, class ET2, class COT2> inline constexpr
 bool
-operator !=(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
+operator !=(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
 {
     return !detail::matrix_engine_support::compare(m1, m2);
 }

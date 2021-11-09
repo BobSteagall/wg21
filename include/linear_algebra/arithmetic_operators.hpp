@@ -16,11 +16,11 @@ namespace STD_LA {
 //
 template<class ET1, class COT1, class ET2, class COT2> inline constexpr
 auto
-operator +(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
+operator +(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
 {
     using op_traits  = select_matrix_operation_traits_t<COT1, COT2>;
-    using op1_type   = basic_matrix<ET1, COT1>;
-    using op2_type   = basic_matrix<ET2, COT2>;
+    using op1_type   = matrix<ET1, COT1>;
+    using op2_type   = matrix<ET2, COT2>;
     using add_traits = get_addition_arithmetic_traits_t<op_traits, op1_type, op2_type>;
 
     return add_traits::add(m1, m2);
@@ -33,11 +33,11 @@ operator +(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
 //
 template<class ET1, class COT1, class ET2, class COT2> inline constexpr
 auto
-operator -(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
+operator -(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
 {
     using op_traits  = select_matrix_operation_traits_t<COT1, COT2>;
-    using op1_type   = basic_matrix<ET1, COT1>;
-    using op2_type   = basic_matrix<ET2, COT2>;
+    using op1_type   = matrix<ET1, COT1>;
+    using op2_type   = matrix<ET2, COT2>;
     using sub_traits = get_subtraction_arithmetic_traits_t<op_traits, op1_type, op2_type>;
 
     return sub_traits::subtract(m1, m2);
@@ -50,11 +50,11 @@ operator -(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
 //
 template<class ET1, class COT1, class ET2, class COT2> inline constexpr
 auto
-operator *(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
+operator *(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
 {
     using op_traits  = select_matrix_operation_traits_t<COT1, COT2>;
-    using op1_type   = basic_matrix<ET1, COT1>;
-    using op2_type   = basic_matrix<ET2, COT2>;
+    using op1_type   = matrix<ET1, COT1>;
+    using op2_type   = matrix<ET2, COT2>;
     using mul_traits = get_multiplication_arithmetic_traits_t<op_traits, op1_type, op2_type>;
 
     return mul_traits::multiply(m1, m2);
@@ -62,10 +62,10 @@ operator *(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
 
 template<class ET1, class COT1, class S2> inline constexpr
 auto
-operator *(basic_matrix<ET1, COT1> const& m1, S2 const& s2)
+operator *(matrix<ET1, COT1> const& m1, S2 const& s2)
 {
     using op_traits  = COT1;
-    using op1_type   = basic_matrix<ET1, COT1>;
+    using op1_type   = matrix<ET1, COT1>;
     using op2_type   = S2;
     using mul_traits = get_multiplication_arithmetic_traits_t<op_traits, op1_type, op2_type>;
 
@@ -74,11 +74,11 @@ operator *(basic_matrix<ET1, COT1> const& m1, S2 const& s2)
 
 template<class S1, class ET2, class COT2> inline constexpr
 auto
-operator *(S1 const& s1, basic_matrix<ET2, COT2> const& m2)
+operator *(S1 const& s1, matrix<ET2, COT2> const& m2)
 {
     using op_traits  = COT2;
     using op1_type   = S1;
-    using op2_type   = basic_matrix<ET2, COT2>;
+    using op2_type   = matrix<ET2, COT2>;
     using mul_traits = get_multiplication_arithmetic_traits_t<op_traits, op1_type, op2_type>;
 
     return mul_traits::multiply(s1, m2);
@@ -91,10 +91,10 @@ operator *(S1 const& s1, basic_matrix<ET2, COT2> const& m2)
 //
 template<class ET1, class COT1, class S2> inline constexpr
 auto
-operator /(basic_matrix<ET1, COT1> const& m1, S2 const& s2)
+operator /(matrix<ET1, COT1> const& m1, S2 const& s2)
 {
     using op_traits  = COT1;
-    using op1_type   = basic_matrix<ET1, COT1>;
+    using op1_type   = matrix<ET1, COT1>;
     using op2_type   = S2;
     using div_traits = get_division_arithmetic_traits_t<op_traits, op1_type, op2_type>;
 

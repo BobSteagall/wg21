@@ -98,15 +98,15 @@ struct subtraction_engine_traits
 //  result of a matrix/matrix subtraction.
 //
 template<class OTR, class ET1, class COT1, class ET2, class COT2>
-struct subtraction_arithmetic_traits<OTR, basic_matrix<ET1, COT1>, basic_matrix<ET2, COT2>>
+struct subtraction_arithmetic_traits<OTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
 {
   private:
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
     using element_traits = get_subtraction_element_traits_t<OTR, element_type_1, element_type_2>;
 
-    using engine_type_1 = typename basic_matrix<ET1, COT1>::engine_type;
-    using engine_type_2 = typename basic_matrix<ET2, COT2>::engine_type;
+    using engine_type_1 = typename matrix<ET1, COT1>::engine_type;
+    using engine_type_2 = typename matrix<ET2, COT2>::engine_type;
     using engine_traits = get_subtraction_engine_traits_t<OTR, engine_type_1, engine_type_2>;
 
     static_assert(std::is_same_v<typename element_traits::element_type,
@@ -115,13 +115,13 @@ struct subtraction_arithmetic_traits<OTR, basic_matrix<ET1, COT1>, basic_matrix<
   public:
     using element_type = typename element_traits::element_type;
     using engine_type  = typename engine_traits::engine_type;
-    using result_type  = basic_matrix<engine_type, OTR>;
+    using result_type  = matrix<engine_type, OTR>;
 
     static constexpr result_type
-    subtract(basic_matrix<ET1, COT1> const& m1, basic_matrix<ET2, COT2> const& m2)
+    subtract(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
     {
-        using size_type_1 = typename basic_matrix<ET1, COT1>::size_type;
-        using size_type_2 = typename basic_matrix<ET2, COT2>::size_type;
+        using size_type_1 = typename matrix<ET1, COT1>::size_type;
+        using size_type_2 = typename matrix<ET2, COT2>::size_type;
         using size_type_r = typename result_type::size_type;
 
         size_type_r     rows = static_cast<size_type_r>(m1.rows());

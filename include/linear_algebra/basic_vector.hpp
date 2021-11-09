@@ -17,7 +17,7 @@ requires
     detail::default_initializable<ET>
     and
     detail::readable_matrix_engine<ET>
-class basic_matrix;
+class matrix;
 
 
 template<class ET, class COT = void>
@@ -105,11 +105,11 @@ class basic_vector
     }
 
     //----------------------------------------------------------
-    //- Construction from a row/column basic_matrix.
+    //- Construction from a row/column matrix.
     //
     template<class ET2, class COT2>
     constexpr explicit
-    basic_vector(basic_matrix<ET2, COT2> const& rhs)
+    basic_vector(matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
@@ -121,7 +121,7 @@ class basic_vector
 
     template<class ET2, class COT2>
     constexpr explicit
-    basic_vector(basic_matrix<ET2, COT2> const& rhs)
+    basic_vector(matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
@@ -250,11 +250,11 @@ class basic_vector
     }
 
     //----------------------------------------------------------
-    //- Assignment from a row/column basic_matrix.
+    //- Assignment from a row/column matrix.
     //
     template<class ET2, class COT2>
     constexpr basic_vector&
-    operator =(basic_matrix<ET2, COT2> const& rhs)
+    operator =(matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
@@ -268,7 +268,7 @@ class basic_vector
 
     template<class ET2, class COT2>
     constexpr basic_vector&
-    operator =(basic_matrix<ET2, COT2> const& rhs)
+    operator =(matrix<ET2, COT2> const& rhs)
     requires
         detail::writable_vector_engine<engine_type>
         and
