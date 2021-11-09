@@ -1,4 +1,4 @@
-#include <matrix.hpp>
+#include <matrix>
 
 using namespace STD_LA;
 
