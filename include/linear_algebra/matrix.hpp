@@ -775,41 +775,41 @@ class matrix
 
 template<class T, size_t R, size_t C, class COT = void>
 using fixed_size_matrix =
-        matrix<matrix_storage_engine<T, extents<R, C>, void, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, R, C, void, matrix_layout::row_major>, COT>;
 
 template<class T, size_t R, class COT = void>
 using fixed_size_column_vector =
-        matrix<matrix_storage_engine<T, extents<R, 1>, void, matrix_layout::column_major>, COT>;
+        matrix<matrix_storage_engine<T, R, 1, void, matrix_layout::column_major>, COT>;
 
 template<class T, size_t C, class COT = void>
 using fixed_size_row_vector =
-        matrix<matrix_storage_engine<T, extents<1, C>, void, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, 1, C, void, matrix_layout::row_major>, COT>;
 
 
 template<class T, size_t R, size_t C, class A = std::allocator<T>, class COT = void>
 using general_matrix =
-        matrix<matrix_storage_engine<T, extents<R, C>, A, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, R, C, A, matrix_layout::row_major>, COT>;
 
 template<class T, size_t R, class A = std::allocator<T>, class COT = void>
 using general_column_vector =
-        matrix<matrix_storage_engine<T, extents<R, 1>, A, matrix_layout::column_major>, COT>;
+        matrix<matrix_storage_engine<T, R, 1, A, matrix_layout::column_major>, COT>;
 
 template<class T, size_t C, class A = std::allocator<T>, class COT = void>
 using general_row_vector =
-        matrix<matrix_storage_engine<T, extents<1, C>, A, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, 1, C, A, matrix_layout::row_major>, COT>;
 
 
 template<class T, class COT = void>
 using dynamic_matrix =
-        matrix<matrix_storage_engine<T, extents<dynamic_extent, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, dynamic_extent, dynamic_extent, std::allocator<T>, matrix_layout::row_major>, COT>;
 
 template<class T, class COT = void>
 using dynamic_column_vector =
-        matrix<matrix_storage_engine<T, extents<dynamic_extent, 1>, std::allocator<T>, matrix_layout::column_major>, COT>;
+        matrix<matrix_storage_engine<T, dynamic_extent, 1, std::allocator<T>, matrix_layout::column_major>, COT>;
 
 template<class T, class COT = void>
 using dynamic_row_vector =
-        matrix<matrix_storage_engine<T, extents<1, dynamic_extent>, std::allocator<T>, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, 1, dynamic_extent, std::allocator<T>, matrix_layout::row_major>, COT>;
 
 
 template<class ET1, class COT1, class ET2, class COT2> inline constexpr

@@ -21,7 +21,7 @@ target_compile_options(gtest_main
 if(LA_BUILD_USING_PCH)
     target_precompile_headers(la_test
         PRIVATE
-            <matrix.hpp>
+            <matrix>
             <gtest/gtest.h>
             <cassert>
     )

@@ -486,9 +486,13 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
     operator ()(size_type i, size_type j) const
     {
         if constexpr (is_cx)
+        {
             return std::conj((*mp_engine)(i, j));
+        }
         else
+        {
             return (*mp_engine)(i, j);
+        }
     }
 
     constexpr span_type
@@ -636,9 +640,13 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
     operator ()(size_type i, size_type j) const
     {
         if constexpr (is_cx)
+        {
             return std::conj((*mp_engine)(j, i));
+        }
         else
+        {
             return (*mp_engine)(j, i);
+        }
     }
 
     constexpr span_type

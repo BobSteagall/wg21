@@ -17,7 +17,7 @@ namespace STD_LA {
 //  Class:      matrix_layout
 //
 //  This public type is a container of tag sub-types whose purpose is to specify the layout
-//  of matrix elements when used as a template argument to matrix_storage_engine<T, X, A, L>.
+//  of matrix elements when used as a template argument to matrix_storage_engine<T, R, C, A, L>.
 //--------------------------------------------------------------------------------------------------
 //
 struct matrix_layout
@@ -59,21 +59,21 @@ struct matrix_view
 
 template<class T>
 struct matrix_scalar_engine
-{};
+;//{};
 
 //==================================================================================================
 //  PUBLIC TYPE FORWARD DECLARATIONS
 //==================================================================================================
 //--------------------------------------------------------------------------------------------------
-//  Class Template:     matrix_storage_engine<T, X, A, L>
+//  Class Template:     matrix_storage_engine<T, R, C, A, L>
 //
 //  This class template implements an owning engine for use by the math object class templates
 //  matrix<ET, OT> and basic_vector<ET, OT>.  Specifically, it provides storage suitable
-//  for modeling a mathematical matrix or vector, having dimensions specified by X, employing
-//  allocator A, and having element layout L.
+//  for modeling a mathematical matrix or vector, having dimensions specified by R and C,
+//  employing allocator A, and having element layout L.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, class X, class A, class L>    class matrix_storage_engine;
+//template<class T, size_t R, size_t C, class A, class L>     class matrix_storage_engine;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -386,63 +386,6 @@ using get_mdspan_type_t = typename has_nested_mdspan_types<ET>::span_type;
 
 template<class ET>
 using get_const_mdspan_type_t = typename has_nested_mdspan_types<ET>::const_span_type;
-
-
-//--------------------------------------------------------------------------------------------------
-//  Traits:     get_row_major_value_helper<bool, ET>
-//              determine_indexing_order<ET>
-//  Variable:   use_row_wise_indexing_v<ET>
-//
-//  These private traits types and the associated variable template are used to help determine
-//  the order in which matrix elements should be accessed when iterating over them in two
-//  dimensions.
-//--------------------------------------------------------------------------------------------------
-//
-template<bool P, class ET> struct get_row_major_value_helper;
-
-template<class ET>
-struct get_row_major_value_helper<false, ET>
-{
-    static constexpr bool   is_row_major = true;
-};
-
-template<class ET>
-struct get_row_major_value_helper<true, ET>
-{
-    static constexpr bool   is_row_major = static_cast<bool>(ET::is_row_major);
-};
-
-//------
-//
-template<class ET, class = void>
-struct determine_indexing_order
-{
-    static constexpr bool   use_row_wise = true;
-};
-
-template<class ET>
-struct determine_indexing_order<ET, std::void_t<decltype(ET::is_row_major)>>
-{
-    static constexpr bool   is_suitable  = std::is_convertible_v<decltype(ET::is_row_major), bool>;
-    static constexpr bool   use_row_wise = get_row_major_value_helper<is_suitable, ET>::is_row_major;
-};
-
-template<class T, size_t R, size_t C, class A>
-struct determine_indexing_order<matrix_storage_engine<T, extents<R, C>, A, matrix_layout::column_major>, void>
-{
-    static constexpr bool   use_row_wise = false;
-};
-
-template<class T, size_t R, size_t C, class A>
-struct determine_indexing_order<matrix_storage_engine<T, extents<R, C>, A, matrix_layout::row_major>, void>
-{
-    static constexpr bool   use_row_wise = true;
-};
-
-//------
-//
-template<class ET> inline constexpr
-bool    use_row_wise_indexing_v = determine_indexing_order<ET>::use_row_wise;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -1032,16 +975,12 @@ concept row_reshapable_matrix_engine =
 
 
 //--------------------------------------------------------------------------------------------------
-//  Concept:    do_row_wise_indexing<ET>
+//  Class:      engine_extents_helper<ET>
 //
 //  This private concept determines whether to use row-wise indexing for the inner loop when
 //  performing two-dimensional iteration over the elements of a matrix engine.
 //--------------------------------------------------------------------------------------------------
 //
-template<class ET>
-concept do_row_wise_indexing = readable_matrix_engine<ET>  and  use_row_wise_indexing_v<ET>;
-
-
 template<class ET>
 struct engine_extents_helper
 {
@@ -1084,9 +1023,9 @@ struct engine_extents_helper
         return get_value_helper([]{ return static_cast<size_t>(ET().size()); });
     }
 };
-
+/*
 template<class T, size_t R, size_t C, class A, class L>
-struct engine_extents_helper<matrix_storage_engine<T, extents<R, C>, A, L>>
+struct engine_extents_helper<matrix_storage_engine<T, R, C, A, L>>
 {
     static constexpr size_t
     columns()
@@ -1113,18 +1052,12 @@ struct engine_layout_helper
     using layout_type = matrix_layout::row_major;
 };
 
-template<class T, size_t N, class A, class L>
-struct engine_layout_helper<matrix_storage_engine<T, extents<N>, A, L>>
-{
-    using layout_type = void;
-};
-
 template<class T, size_t R, size_t C, class A, class L>
-struct engine_layout_helper<matrix_storage_engine<T, extents<R, C>, A, L>>
+struct engine_layout_helper<matrix_storage_engine<T, R, C, A, L>>
 {
     using layout_type = L;
 };
-
+*/
 
 //==================================================================================================
 //  MATRIX ENGINE SUPPORT TYPE DEFINITION
@@ -1479,24 +1412,11 @@ struct matrix_engine_support
         auto    i1 = dst.rows();
         auto    j1 = static_cast<size_type>(c1);
 
-        if constexpr (do_row_wise_indexing<ET>)
-        {
-            for (auto i = i0;  i < i1;  ++i)
-            {
-                for (auto j = j0;  j < j1;  ++j)
-                {
-                    dst(i, j) = static_cast<typename ET::element_type>(t);
-                }
-            }
-        }
-        else
+        for (auto i = i0;  i < i1;  ++i)
         {
             for (auto j = j0;  j < j1;  ++j)
             {
-                for (auto i = i0;  i < i1;  ++i)
-                {
-                    dst(i, j) = static_cast<typename ET::element_type>(t);
-                }
+                dst(i, j) = static_cast<typename ET::element_type>(t);
             }
         }
     }
@@ -1518,24 +1438,11 @@ struct matrix_engine_support
         auto    i1 = static_cast<size_type>(r1);
         auto    j1 = dst.columns();
 
-        if constexpr (do_row_wise_indexing<ET>)
-        {
-            for (auto i = i0;  i < i1;  ++i)
-            {
-                for (auto j = j0;  j < j1;  ++j)
-                {
-                    dst(i, j) = static_cast<typename ET::element_type>(t);
-                }
-            }
-        }
-        else
+        for (auto i = i0;  i < i1;  ++i)
         {
             for (auto j = j0;  j < j1;  ++j)
             {
-                for (auto i = i0;  i < i1;  ++i)
-                {
-                    dst(i, j) = static_cast<typename ET::element_type>(t);
-                }
+                dst(i, j) = static_cast<typename ET::element_type>(t);
             }
         }
     }
@@ -1553,24 +1460,11 @@ struct matrix_engine_support
         auto    i1 = static_cast<size_type>(rows);
         auto    j1 = static_cast<size_type>(cols);
 
-        if constexpr (do_row_wise_indexing<ET>)
-        {
-            for (auto i = i0;  i < i1;  ++i)
-            {
-                for (auto j = j0;  j < j1;  ++j)
-                {
-                    dst(i, j) = std::move(src(i, j));
-                }
-            }
-        }
-        else
+        for (auto i = i0;  i < i1;  ++i)
         {
             for (auto j = j0;  j < j1;  ++j)
             {
-                for (auto i = i0;  i < i1;  ++i)
-                {
-                    dst(i, j) = std::move(src(i, j));
-                }
+                dst(i, j) = std::move(src(i, j));
             }
         }
     }

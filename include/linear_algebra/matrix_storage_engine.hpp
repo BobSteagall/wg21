@@ -11,9 +11,9 @@
 namespace STD_LA {
 namespace detail {
 //--------------------------------------------------------------------------------------------------
-//  Class Template:     mse_data<T, X, A, L>
+//  Class Template:     mse_data<T, R, C, A, L>
 //
-//  Thie type contains and manages elements on behalf of matrix_storage_engine<T,X,A,L>.
+//  Thie type contains and manages elements on behalf of matrix_storage_engine<T,R,C,A,L>.
 //
 //  Partial specializations of this class template are tailored to specific corresponding partial
 //  specializations of matrix_storage_engine.  They provide the special member functions that make
@@ -26,18 +26,50 @@ namespace detail {
 //  This assumption makes implementation easy for now, but may be absent in the final version.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, class X, class A, class L>    struct mse_data;
+template<class T, size_t R, size_t C, class A, class L>
+struct mse_data
+{
+    using array_type = std::vector<T, A>;
+
+    static constexpr bool   is_column_matrix     = (C == 1);
+    static constexpr bool   is_row_matrix        = (R == 1);
+    static constexpr bool   is_1d_indexable      = (is_column_matrix || is_row_matrix);
+    static constexpr bool   is_column_reshapable = false;
+    static constexpr bool   is_row_reshapable    = false;
+    static constexpr bool   is_2d_reshapable     = false;
+    static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
+    static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
+
+    static constexpr size_t     m_rows   = R;
+    static constexpr size_t     m_cols   = C;
+    static constexpr size_t     m_rowcap = R;
+    static constexpr size_t     m_colcap = C;
+
+    array_type  m_elems;
+
+    //- Construct/copy/destroy.
+    //
+    ~mse_data() = default;
+
+    constexpr mse_data()
+    :   m_elems(static_cast<typename array_type::size_type>(R*C))
+    {}
+    constexpr mse_data(mse_data&&) noexcept = default;
+    constexpr mse_data(mse_data const&) = default;
+    constexpr mse_data&     operator =(mse_data&&) noexcept = default;
+    constexpr mse_data&     operator =(mse_data const&) = default;
+};
 
 
 //--------------------------------------------------------------------------------------------------
-//  Partial Specialization:     mse_data<T, extents<R, C>, void, L>
+//  Partial Specialization:     mse_data<T, R, C, void, L>
 //
 //  Manages elements representing a fixed-size matrix of R rows and C columns.  Its elements are
 //  implemented as member data in a std::array.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, size_t R, size_t C, class L>
-struct mse_data<T, extents<R, C>, void, L>
+struct mse_data<T, R, C, void, L>
 {
     using array_type = std::array<T, R*C>;
 
@@ -75,56 +107,14 @@ struct mse_data<T, extents<R, C>, void, L>
 
 
 //--------------------------------------------------------------------------------------------------
-//  Partial Specialization:     mse_data<T, extents<R, C>, A, L>
-//
-//  Manages elements representing a fixed-size matrix of R rows and C columns.  Its elements are
-//  implemented as member data in a std::vector.
-//--------------------------------------------------------------------------------------------------
-//
-template<class T, size_t R, size_t C, class A, class L>
-struct mse_data<T, extents<R, C>, A, L>
-{
-    using array_type = std::vector<T, A>;
-
-    static constexpr bool   is_column_matrix     = (C == 1);
-    static constexpr bool   is_row_matrix        = (R == 1);
-    static constexpr bool   is_1d_indexable      = (is_column_matrix || is_row_matrix);
-    static constexpr bool   is_column_reshapable = false;
-    static constexpr bool   is_row_reshapable    = false;
-    static constexpr bool   is_2d_reshapable     = false;
-    static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
-    static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
-
-    static constexpr size_t     m_rows   = R;
-    static constexpr size_t     m_cols   = C;
-    static constexpr size_t     m_rowcap = R;
-    static constexpr size_t     m_colcap = C;
-
-    array_type  m_elems;
-
-    //- Construct/copy/destroy.
-    //
-    ~mse_data() = default;
-
-    constexpr mse_data()
-    :   m_elems(static_cast<typename array_type::size_type>(R*C))
-    {}
-    constexpr mse_data(mse_data&&) noexcept = default;
-    constexpr mse_data(mse_data const&) = default;
-    constexpr mse_data&     operator =(mse_data&&) noexcept = default;
-    constexpr mse_data&     operator =(mse_data const&) = default;
-};
-
-
-//--------------------------------------------------------------------------------------------------
-//  Partial Specialization:     mse_data<T, extents<R, dynamic_extent>, A, L>
+//  Partial Specialization:     mse_data<T, R, dynamic_extent, A, L>
 //
 //  Manages elements representing a matrix having a fixed number of R rows and a dynamically-
 //  resizable number of columns.  Its elements are implemented as member data in a std::vector.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, size_t R, class A, class L>
-struct mse_data<T, extents<R, dynamic_extent>, A, L>
+struct mse_data<T, R, dynamic_extent, A, L>
 {
     using array_type = std::vector<T, A>;
 
@@ -160,14 +150,14 @@ struct mse_data<T, extents<R, dynamic_extent>, A, L>
 
 
 //--------------------------------------------------------------------------------------------------
-//  Partial Specialization:     mse_data<T, extents<dynamic_extent, C>, A, L>
+//  Partial Specialization:     mse_data<T, dynamic_extent, C, A, L>
 //
 //  Manages elements representing a matrix having a dynamically-resizable number of rows and a
 //  fixed number of C columns.  Its elements are implemented as member data in a std::vector.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, size_t C, class A, class L>
-struct mse_data<T, extents<dynamic_extent, C>, A, L>
+struct mse_data<T, dynamic_extent, C, A, L>
 {
     using array_type = std::vector<T, A>;
 
@@ -203,7 +193,7 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
 
 
 //--------------------------------------------------------------------------------------------------
-//  Partial Specialization:     mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
+//  Partial Specialization:     mse_data<T, dynamic_extent, dynamic_extent, A, L>
 //
 //  Manages elements representing a matrix having a dynamically-resizable number of rows and a
 //  dynamically-resizable number of columns.  Its elements are implemented as member data in a
@@ -211,7 +201,7 @@ struct mse_data<T, extents<dynamic_extent, C>, A, L>
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, class A, class L>
-struct mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>
+struct mse_data<T, dynamic_extent, dynamic_extent, A, L>
 {
     using array_type = std::vector<T, A>;
 
@@ -301,22 +291,18 @@ struct mse_mdspan_support
 //  create mdspan objects.
 //
 //  Note that only the fixed-size partial specialization creates a non-dynamic mdspan object;
-//  if either the rows orcolumns size parameter is dynamic, then the corresponding mdspan type
+//  if either the rows or columns size parameter is dynamic, then the corresponding mdspan type
 //  is dynamic in both dimensions.
 //
 //  TODO: This may change later -- it should be possible to create two-dimensional mdspan objects
 //  with one fixed and one dynamic dimension.
 //--------------------------------------------------------------------------------------------------
 //
-template<class MSED>    struct mse_mdspan_traits;
-
-//------ Partial specialization for extents<R, C>.
-//
 template<class T, size_t R, size_t C, class A, class L>
-struct mse_mdspan_traits<mse_data<T, extents<R, C>, A, L>>
+struct mse_mdspan_traits<mse_data<T, R, C, A, L>>
 :   public mse_mdspan_support
 {
-    using mse_data_type   = mse_data<T, extents<R, C>, A, L>;
+    using mse_data_type   = mse_data<T, R, C, A, L>;
     using layout_type     = get_mdspan_layout_t<L>;
     using span_type       = mdspan<T, extents<R, C>, layout_type>;
     using const_span_type = mdspan<T const, extents<R, C>, layout_type>;
@@ -338,10 +324,10 @@ struct mse_mdspan_traits<mse_data<T, extents<R, C>, A, L>>
 //------ Partial specialization for extents<R, dynamic_extent>.
 //
 template<class T, size_t R, class A, class L>
-struct mse_mdspan_traits<mse_data<T, extents<R, dynamic_extent>, A, L>>
+struct mse_mdspan_traits<mse_data<T, R, dynamic_extent, A, L>>
 :   public mse_mdspan_support
 {
-    using mse_data_type   = mse_data<T, extents<R, dynamic_extent>, A, L>;
+    using mse_data_type   = mse_data<T, R, dynamic_extent, A, L>;
     using span_type       = mdspan<T, dyn_mat_extents, dyn_mat_layout>;
     using const_span_type = mdspan<T const, dyn_mat_extents, dyn_mat_layout>;
 
@@ -362,10 +348,10 @@ struct mse_mdspan_traits<mse_data<T, extents<R, dynamic_extent>, A, L>>
 //------ Partial specialization for extents<dynamic_extent, C>.
 //
 template<class T, size_t C, class A, class L>
-struct mse_mdspan_traits<mse_data<T, extents<dynamic_extent, C>, A, L>>
+struct mse_mdspan_traits<mse_data<T, dynamic_extent, C, A, L>>
 :   public mse_mdspan_support
 {
-    using mse_data_type   = mse_data<T, extents<dynamic_extent, C>, A, L>;
+    using mse_data_type   = mse_data<T, dynamic_extent, C, A, L>;
     using span_type       = mdspan<T, dyn_mat_extents, dyn_mat_layout>;
     using const_span_type = mdspan<T const, dyn_mat_extents, dyn_mat_layout>;
 
@@ -386,10 +372,10 @@ struct mse_mdspan_traits<mse_data<T, extents<dynamic_extent, C>, A, L>>
 //------ Partial specialization for extents<dynamic_extent, dynamic_extent>.
 //
 template<class T, class A, class L>
-struct mse_mdspan_traits<mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>>
+struct mse_mdspan_traits<mse_data<T, dynamic_extent, dynamic_extent, A, L>>
 :   public mse_mdspan_support
 {
-    using mse_data_type   = mse_data<T, extents<dynamic_extent, dynamic_extent>, A, L>;
+    using mse_data_type   = mse_data<T, dynamic_extent, dynamic_extent, A, L>;
     using span_type       = mdspan<T, dyn_mat_extents, dyn_mat_layout>;
     using const_span_type = mdspan<T const, dyn_mat_extents, dyn_mat_layout>;
 
@@ -410,35 +396,16 @@ struct mse_mdspan_traits<mse_data<T, extents<dynamic_extent, dynamic_extent>, A,
 }       //- detail namespace
 //==================================================================================================
 //==================================================================================================
-//  Class Template:     matrix_storage_engine<T, X, A, L>
+//  Class Template:     matrix_storage_engine<T, R, C, A, L>
 //
-//  This class template implements an owning engine for use by the math object class templates
-//  matrix<ET, OT> and basic_vector<ET, OT>.  Specifically, it provides storage suitable
-//  for modeling a mathematical matrix or vector, having dimensions specified by X, employing
-//  allocator A, and having element layout L.
-//--------------------------------------------------------------------------------------------------
+//  This class template implements an owning engine for use by class template matrix<ET, OT>.
+//  Specifically, it models a mathematical matrix with R rows and C columns, employing allocator
+//  A, and having element layout L.
 //
-template<class T, class X, class A, class L>
-class matrix_storage_engine
-{
-    static_assert(detail::valid_engine_extents<X>, "invalid extents parameter");
-    static_assert(detail::valid_allocator_arg<T, A>, "invalid allocator parameter");
-    static_assert(detail::valid_engine_extents_and_allocator<T, X, A>,
-                  "invalid combination of element type, extents, and allocator");
-};
-
-
-//--------------------------------------------------------------------------------------------------
-//  Partial Specialization:     matrix_storage_engine<T, extents<R, C>, A, L>
-//
-//  This partial specialization of matrix_storage_engine<T,X,A,L> implements an owning engine
-//  for use by class template matrix<ET, OT>.  Specifically, it models a mathematical
-//  matrix with R rows and C columns, employing allocator A, and having element layout L.
-//
-//  Sizes R and C may be positive integers, or have the value "dynamic_extent" (defined in the
-//  <mdspan> header).  Allocator type A may be void, which indicates internal non-heap element
-//  storage, or it may be an allocator type that fulfills all the requirements imposed by
-//  std::allocator_traits.  Layout type L must be "row_major" or "column_major".
+//  Sizes R and C must be non-zero, positive integers, possibly having the value "dynamic_extent"
+//  (defined in the <mdspan> header).  Allocator type A may be void, which indicates internal
+//  non-heap element storage, or it may be an allocator type that fulfills all the requirements
+//  imposed by std::allocator_traits.  Layout type L must be "row_major" or "column_major".
 //
 //  This specialization assumes that all dynamically-allocated memory is default-constructed,
 //  with the consequence that elements lying in unused capacity are also constructed.  This
@@ -447,14 +414,14 @@ class matrix_storage_engine
 //
 template<class T, size_t R, size_t C, class A, class L>
 requires
-    detail::valid_engine_extents_and_allocator<T, extents<R, C>, A>
+    detail::valid_engine_extents_and_allocator<T, R, C, A>
     and
     detail::valid_layout_for_2d_storage_engine<L>
-class matrix_storage_engine<T, extents<R, C>, A, L>
+class matrix_storage_engine
 {
     using this_type      = matrix_storage_engine;
     using support_traits = detail::matrix_engine_support;
-    using storage_type   = detail::mse_data<T, extents<R, C>, A, L>;
+    using storage_type   = detail::mse_data<T, R, C, A, L>;
     using mdspan_traits  = detail::mse_mdspan_traits<storage_type>;
 
     static constexpr bool   has_column_major_layout = storage_type::is_column_major;
@@ -925,7 +892,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
             //
             size_type   dst_cols = std::min(cols, m_data.m_cols);
             support_traits::move_elements(tmp, *this, m_data.m_rows, dst_cols);
-            support_traits::swap(*this, tmp);
+            support_traits::swap(m_data, tmp.m_data);
         }
         else
         {
@@ -964,7 +931,7 @@ class matrix_storage_engine<T, extents<R, C>, A, L>
             //
             size_type   dst_rows = std::min(rows, m_data.m_rows);
             support_traits::move_elements(tmp, *this, dst_rows, m_data.m_cols);
-            support_traits::swap(*this, tmp);
+            support_traits::swap(m_data, tmp.m_data);
         }
         else
         {

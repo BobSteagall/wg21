@@ -87,7 +87,7 @@ struct addition_engine_traits
 
   public:
     using element_type = typename element_traits::element_type;
-    using engine_type  = matrix_storage_engine<element_type, extents_type, allocator_type, layout_type>;
+    using engine_type  = matrix_storage_engine<element_type, RR, CR, allocator_type, layout_type>;
 };
 
 
