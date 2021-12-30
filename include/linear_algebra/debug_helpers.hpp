@@ -220,9 +220,9 @@ PrintOperandTypes(string const& loc, O1 const& o1, O2 const& o2)
 
 template<class T, size_t R, size_t C, class A, class L>
 void
-Print(matrix_storage_engine<T, extents<R, C>, A, L> const& v, char const* pname = nullptr)
+Print(matrix_storage_engine<T, R, C, A, L> const& v, char const* pname = nullptr)
 {
-    using engine_type = matrix_storage_engine<T, extents<R, C>, A, L>;
+    using engine_type = matrix_storage_engine<T, R, C, A, L>;
     using size_type  = typename engine_type::size_type;
 
     cout << endl << "engine: " << ((pname) ? pname : "<anon>") << endl;

@@ -366,7 +366,7 @@ requires
     is_valid_fixed_engine_size_v<R2, C2>
 struct engine_add_traits_tst<OTR,
                              fs_matrix_engine_tst<T1, R1, C1>,
-                             matrix_storage_engine<T2, extents<R2, C2>, AT, LT>>
+                             matrix_storage_engine<T2, R2, C2, AT, LT>>
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
@@ -382,7 +382,7 @@ template<class OTR,
 requires
     is_valid_fixed_engine_size_v<R1, C1>
 struct engine_add_traits_tst<OTR,
-                             matrix_storage_engine<T1, extents<R1, C1>, AT, LT>,
+                             matrix_storage_engine<T1, R1, C1, AT, LT>,
                              fs_matrix_engine_tst<T2, R2, C2>>
 {
     static_assert(R1 == R2);

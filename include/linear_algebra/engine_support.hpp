@@ -10,80 +10,13 @@
 #define LINEAR_ALGEBRA_ENGINE_SUPPORT_HPP_DEFINED
 
 namespace STD_LA {
-//==================================================================================================
-//  PUBLIC TAG TYPES
-//==================================================================================================
-//--------------------------------------------------------------------------------------------------
-//  Class:      matrix_layout
-//
-//  This public type is a container of tag sub-types whose purpose is to specify the layout
-//  of matrix elements when used as a template argument to matrix_storage_engine<T, R, C, A, L>.
-//--------------------------------------------------------------------------------------------------
-//
-struct matrix_layout
-{
-    struct row_major {};
-    struct column_major {};
-};
-
-
-//--------------------------------------------------------------------------------------------------
-//  Class:      matrix_view
-//
-//  This public type is a container of tag sub-types whose purpose is to specify the functionality
-//  of a view engine when used as the second template argument to matrix_view_engine<ET, MVT>.
-//--------------------------------------------------------------------------------------------------
-//
-struct matrix_view
-{
-    struct const_negation {};
-    struct const_conjugate {};
-    struct const_hermitian {};
-
-    struct identity {};
-    struct const_identity {};
-
-    struct transpose {};
-    struct const_transpose {};
-
-    struct column {};
-    struct const_column {};
-
-    struct row {};
-    struct const_row {};
-
-    struct submatrix {};
-    struct const_submatrix {};
-};
-
-
-template<class T>
-struct matrix_scalar_engine
-;//{};
 
 //==================================================================================================
 //  PUBLIC TYPE FORWARD DECLARATIONS
 //==================================================================================================
-//--------------------------------------------------------------------------------------------------
-//  Class Template:     matrix_storage_engine<T, R, C, A, L>
-//
-//  This class template implements an owning engine for use by the math object class templates
-//  matrix<ET, OT> and basic_vector<ET, OT>.  Specifically, it provides storage suitable
-//  for modeling a mathematical matrix or vector, having dimensions specified by R and C,
-//  employing allocator A, and having element layout L.
-//--------------------------------------------------------------------------------------------------
-//
-//template<class T, size_t R, size_t C, class A, class L>     class matrix_storage_engine;
-
-
-//--------------------------------------------------------------------------------------------------
-//  Class Template:     matrix_view_engine<ET, MVT>
-//
-//  This class template implements represents a non-owning engine type, which references another
-//  engine object, and which presents a specific "view" of that object.
-//--------------------------------------------------------------------------------------------------
-//
-template<class ET, class MVT>    class matrix_view_engine;
+template<class T>
+struct matrix_scalar_engine
+;//{};
 
 
 namespace detail {
@@ -173,87 +106,6 @@ struct is_random_access_standard_container<std::vector<T, A>> : public true_type
 //
 template<class T> inline constexpr
 bool    is_random_access_standard_container_v = is_random_access_standard_container<T>::value;
-
-
-//==================================================================================================
-//  TYPES AND TRAITS DEFINITIONS -- MDSPAN-RELATED
-//==================================================================================================
-//--------------------------------------------------------------------------------------------------
-//  Trait:      is_1d_mdspan<T>
-//  Variable:   is_1d_mdspan_v<T>
-//
-//  This private traits type determines whether its template parameter is a specialization of
-//  mdspan<T, X, L, A> with a one-dimensional extents template parameter.
-//--------------------------------------------------------------------------------------------------
-//
-template<class T>
-struct is_1d_mdspan : public false_type
-{};
-
-template<class T, size_t X0, class SL, class SA>
-struct is_1d_mdspan<mdspan<T, extents<X0>, SL, SA>> : public true_type
-{};
-
-//------
-//
-template<class T> inline constexpr
-bool    is_1d_mdspan_v = is_1d_mdspan<T>::value;
-
-
-//--------------------------------------------------------------------------------------------------
-//  Trait:      is_2d_mdspan<T>
-//  Variable:   is_2d_mdspan_v<T>
-//
-//  This private traits type determines whether its template parameter is a specialization of
-//  mdspan<T, X, L, A> with a two-dimensional extents template parameter.
-//--------------------------------------------------------------------------------------------------
-//
-template<class T>
-struct is_2d_mdspan : public false_type
-{};
-
-template<class T, size_t X0, size_t X1, class SL, class SA>
-struct is_2d_mdspan<mdspan<T, extents<X0, X1>, SL, SA>> : public true_type
-{};
-
-//------
-//
-template<class T> inline constexpr
-bool    is_2d_mdspan_v = is_2d_mdspan<T>::value;
-
-
-//--------------------------------------------------------------------------------------------------
-//  Trait:      mdspan_layout_mapper<T>
-//  Alias:      get_mdspan_layout_t<T>
-//
-//  This private traits type maps a linear algebra element layout (row_major, etc.) into a
-//  corresponding mdspan layout policy (layout_right, etc.).
-//--------------------------------------------------------------------------------------------------
-//
-template<class L>   struct mdspan_layout_mapper;
-
-template<>
-struct mdspan_layout_mapper<matrix_layout::row_major>
-{
-    using layout_type = MDSPAN_NS::layout_right;
-};
-
-template<>
-struct mdspan_layout_mapper<matrix_layout::column_major>
-{
-    using layout_type = MDSPAN_NS::layout_left;
-};
-
-template<>
-struct mdspan_layout_mapper<void>
-{
-    using layout_type = MDSPAN_NS::layout_right;
-};
-
-//------
-//
-template<class L>
-using get_mdspan_layout_t = typename mdspan_layout_mapper<L>::layout_type;
 
 
 //==================================================================================================
@@ -595,6 +447,8 @@ concept random_access_standard_container = is_random_access_standard_container_v
 template<typename X>
 concept valid_engine_extents = is_valid_engine_extents_v<X>;
 
+template<size_t R, size_t C>
+concept valid_engine_size = (R > 0) && (C > 0);
 
 //--------------------------------------------------------------------------------------------------
 //  Concepts:   valid_fixed_engine_extents<X>
@@ -606,6 +460,8 @@ concept valid_engine_extents = is_valid_engine_extents_v<X>;
 template<typename X>
 concept valid_fixed_engine_extents = is_valid_fixed_engine_extents_v<X>;
 
+template<size_t R, size_t C>
+concept valid_fixed_engine_size = (R > 0 && R != dynamic_extent) && (C > 0 && C != dynamic_extent);
 
 //--------------------------------------------------------------------------------------------------
 //  Concept:    valid_allocator<T, A>
@@ -664,11 +520,12 @@ concept valid_allocator_arg = no_allocator<A> or valid_allocator_interface<T, A>
 //  2. There is a valid allocator, the extent arguments are valid for fixed-size or dynamic-sized.
 //--------------------------------------------------------------------------------------------------
 //
-template<typename T, typename X, typename A>
+//template<typename T, typename X, typename A>
+template<typename T, size_t R, size_t C, typename A>
 concept valid_engine_extents_and_allocator =
-    (no_allocator<A> and valid_fixed_engine_extents<X>)
+    (no_allocator<A> and valid_fixed_engine_size<R, C>)
     or
-    (valid_allocator_interface<T, A> and valid_engine_extents<X>);
+    (valid_allocator_interface<T, A> and valid_engine_size<R, C>);
 
 
 //--------------------------------------------------------------------------------------------------
@@ -1023,41 +880,7 @@ struct engine_extents_helper
         return get_value_helper([]{ return static_cast<size_t>(ET().size()); });
     }
 };
-/*
-template<class T, size_t R, size_t C, class A, class L>
-struct engine_extents_helper<matrix_storage_engine<T, R, C, A, L>>
-{
-    static constexpr size_t
-    columns()
-    {
-        return C;
-    }
 
-    static constexpr size_t
-    rows()
-    {
-        return R;
-    }
-
-    static constexpr size_t
-    size()
-    {
-        return R*C;
-    }
-};
-
-template<class ET>
-struct engine_layout_helper
-{
-    using layout_type = matrix_layout::row_major;
-};
-
-template<class T, size_t R, size_t C, class A, class L>
-struct engine_layout_helper<matrix_storage_engine<T, R, C, A, L>>
-{
-    using layout_type = L;
-};
-*/
 
 //==================================================================================================
 //  MATRIX ENGINE SUPPORT TYPE DEFINITION

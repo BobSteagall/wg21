@@ -1,12 +1,12 @@
 //==================================================================================================
-//  File:       operation_traits.hpp
+//  File:       traits_support.hpp
 //
 //  Summary:    This header defines library's default operation traits type and a customization
 //              point that is specializable by users.
 //==================================================================================================
 //
-#ifndef LINEAR_ALGEBRA_OPERATION_TRAITS_HPP_DEFINED
-#define LINEAR_ALGEBRA_OPERATION_TRAITS_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_TRAITS_SUPPORT_HPP_DEFINED
+#define LINEAR_ALGEBRA_TRAITS_SUPPORT_HPP_DEFINED
 
 namespace STD_LA {
 namespace detail {
@@ -717,4 +717,4 @@ struct engine_layout_traits<matrix_storage_engine<T1, R1, C1, AT1, LT1>,
 
 }       //- detail namespace
 }       //- STD_LA namespace
-#endif  //- LINEAR_ALGEBRA_OPERATION_TRAITS_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_TRAITS_SUPPORT_HPP_DEFINED

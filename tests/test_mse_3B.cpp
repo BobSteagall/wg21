@@ -8,10 +8,10 @@ using namespace MDSPAN_NS;
 //  Unit tests for fixed-size, dynamically allocated matrix engine, Case 3B (column matrix)
 //==================================================================================================
 //
-using mse_f_ffa_cm = matrix_storage_engine<float, extents<4, 1>, std::allocator<float>, matrix_layout::column_major>;
-using mse_f_ffa_rm = matrix_storage_engine<float, extents<4, 1>, std::allocator<float>, matrix_layout::row_major>;
-using mse_i_ffa_cm = matrix_storage_engine<int, extents<4, 1>, std::allocator<int>, matrix_layout::column_major>;
-using mse_d_ffa_rm = matrix_storage_engine<double, extents<4, 1>, std::allocator<double>, matrix_layout::row_major>;
+using mse_f_ffa_cm = matrix_storage_engine<float, 4, 1, std::allocator<float>, matrix_layout::column_major>;
+using mse_f_ffa_rm = matrix_storage_engine<float, 4, 1, std::allocator<float>, matrix_layout::row_major>;
+using mse_i_ffa_cm = matrix_storage_engine<int, 4, 1, std::allocator<int>, matrix_layout::column_major>;
+using mse_d_ffa_rm = matrix_storage_engine<double, 4, 1, std::allocator<double>, matrix_layout::row_major>;
 
 using msupport = matrix_engine_support;
 

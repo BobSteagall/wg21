@@ -84,13 +84,12 @@ struct multiplication_engine_traits
 
     //- Determine required engine template parameters from the traits types.
     //
-    using extents_type   = extents<RR, CR>;
     using allocator_type = typename allocation_traits::allocator_type;
     using layout_type    = typename layout_traits::layout_type;
 
   public:
     using element_type = typename element_traits::element_type;
-    using engine_type  = matrix_storage_engine<element_type, extents_type, allocator_type, layout_type>;
+    using engine_type  = matrix_storage_engine<element_type, RR, CR, allocator_type, layout_type>;
 };
 
 
@@ -129,13 +128,12 @@ struct multiplication_engine_traits<OTR, matrix_scalar_engine<S1>, ET2>
 
     //- Determine required engine template parameters from the traits types.
     //
-    using extents_type   = extents<RR, CR>;
     using allocator_type = typename allocation_traits::allocator_type;
     using layout_type    = typename layout_traits::layout_type;
 
   public:
     using element_type = typename element_traits::element_type;
-    using engine_type  = matrix_storage_engine<element_type, extents_type, allocator_type, layout_type>;
+    using engine_type  = matrix_storage_engine<element_type, RR, CR, allocator_type, layout_type>;
 };
 
 
@@ -174,13 +172,12 @@ struct multiplication_engine_traits<OTR, ET1, matrix_scalar_engine<S2>>
 
     //- Determine required engine template parameters from the traits types.
     //
-    using extents_type   = extents<RR, CR>;
     using allocator_type = typename allocation_traits::allocator_type;
     using layout_type    = typename layout_traits::layout_type;
 
   public:
     using element_type = typename element_traits::element_type;
-    using engine_type  = matrix_storage_engine<element_type, extents_type, allocator_type, layout_type>;
+    using engine_type  = matrix_storage_engine<element_type, RR, CR, allocator_type, layout_type>;
 };
 
 

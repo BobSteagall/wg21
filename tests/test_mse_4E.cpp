@@ -9,10 +9,10 @@ using namespace MDSPAN_NS;
 //  Unit tests for dynamically-resizeable matrix engine, Case 4E
 //==================================================================================================
 //
-using mse_f_dd_cm = matrix_storage_engine<float, extents<dynamic_extent, dynamic_extent>, std::allocator<float>, matrix_layout::column_major>;
-using mse_f_dd_rm = matrix_storage_engine<float, extents<dynamic_extent, dynamic_extent>, std::allocator<float>, matrix_layout::row_major>;
-using mse_i_dd_cm = matrix_storage_engine<int, extents<dynamic_extent, dynamic_extent>, std::allocator<int>, matrix_layout::column_major>;
-using mse_d_dd_rm = matrix_storage_engine<double, extents<dynamic_extent, dynamic_extent>, std::allocator<double>, matrix_layout::row_major>;
+using mse_f_dd_cm = matrix_storage_engine<float, dynamic_extent, dynamic_extent, std::allocator<float>, matrix_layout::column_major>;
+using mse_f_dd_rm = matrix_storage_engine<float, dynamic_extent, dynamic_extent, std::allocator<float>, matrix_layout::row_major>;
+using mse_i_dd_cm = matrix_storage_engine<int, dynamic_extent, dynamic_extent, std::allocator<int>, matrix_layout::column_major>;
+using mse_d_dd_rm = matrix_storage_engine<double, dynamic_extent, dynamic_extent, std::allocator<double>, matrix_layout::row_major>;
 
 using msupport = matrix_engine_support;
 

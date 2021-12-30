@@ -29,14 +29,17 @@ namespace detail {
 template<class T, size_t R, size_t C, class A, class L>
 struct mse_data
 {
-    using array_type = std::vector<T, A>;
+    using array_type      = std::vector<T, A>;
+    using span_type       = mdspan<T, extents<R, C>, get_mdspan_layout_t<L>>;
+    using const_span_type = mdspan<T const, extents<R, C>, get_mdspan_layout_t<L>>;
 
+    static constexpr bool   has_dynamic_mdspan   = false;
     static constexpr bool   is_column_matrix     = (C == 1);
     static constexpr bool   is_row_matrix        = (R == 1);
     static constexpr bool   is_1d_indexable      = (is_column_matrix || is_row_matrix);
     static constexpr bool   is_column_reshapable = false;
     static constexpr bool   is_row_reshapable    = false;
-    static constexpr bool   is_2d_reshapable     = false;
+    static constexpr bool   is_reshapable        = false;
     static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
     static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
 
@@ -52,7 +55,7 @@ struct mse_data
     ~mse_data() = default;
 
     constexpr mse_data()
-    :   m_elems(static_cast<typename array_type::size_type>(R*C))
+    :   m_elems(R*C)
     {}
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
@@ -71,14 +74,17 @@ struct mse_data
 template<class T, size_t R, size_t C, class L>
 struct mse_data<T, R, C, void, L>
 {
-    using array_type = std::array<T, R*C>;
+    using array_type      = std::array<T, R*C>;
+    using span_type       = mdspan<T, extents<R, C>, get_mdspan_layout_t<L>>;
+    using const_span_type = mdspan<T const, extents<R, C>, get_mdspan_layout_t<L>>;
 
+    static constexpr bool   has_dynamic_mdspan   = false;
     static constexpr bool   is_column_matrix     = (C == 1);
     static constexpr bool   is_row_matrix        = (R == 1);
     static constexpr bool   is_1d_indexable      = (is_column_matrix || is_row_matrix);
     static constexpr bool   is_column_reshapable = false;
     static constexpr bool   is_row_reshapable    = false;
-    static constexpr bool   is_2d_reshapable     = false;
+    static constexpr bool   is_reshapable        = false;
     static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
     static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
 
@@ -103,6 +109,18 @@ struct mse_data<T, R, C, void, L>
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
+
+    constexpr span_type
+    span()
+    {
+        return span_type(m_elems.data());
+    }
+
+    constexpr const_span_type
+    span() const
+    {
+        return const_span_type(m_elems.data());
+    }
 };
 
 
@@ -116,14 +134,17 @@ struct mse_data<T, R, C, void, L>
 template<class T, size_t R, class A, class L>
 struct mse_data<T, R, dynamic_extent, A, L>
 {
-    using array_type = std::vector<T, A>;
+    using array_type      = std::vector<T, A>;
+    using span_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
+    using const_span_type = mdspan<T const, dyn_mdspan_extents, dyn_mdspan_layout>;
 
+    static constexpr bool   has_dynamic_mdspan   = true;
     static constexpr bool   is_column_matrix     = false;
     static constexpr bool   is_row_matrix        = (R == 1);
     static constexpr bool   is_1d_indexable      = is_row_matrix;
     static constexpr bool   is_column_reshapable = true;
     static constexpr bool   is_row_reshapable    = false;
-    static constexpr bool   is_2d_reshapable     = false;
+    static constexpr bool   is_reshapable        = false;
     static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
     static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
 
@@ -159,14 +180,17 @@ struct mse_data<T, R, dynamic_extent, A, L>
 template<class T, size_t C, class A, class L>
 struct mse_data<T, dynamic_extent, C, A, L>
 {
-    using array_type = std::vector<T, A>;
+    using array_type      = std::vector<T, A>;
+    using span_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
+    using const_span_type = mdspan<T const, dyn_mdspan_extents, dyn_mdspan_layout>;
 
+    static constexpr bool   has_dynamic_mdspan   = true;
     static constexpr bool   is_column_matrix     = (C == 1);
     static constexpr bool   is_row_matrix        = false;
     static constexpr bool   is_1d_indexable      = is_column_matrix;
     static constexpr bool   is_column_reshapable = false;
     static constexpr bool   is_row_reshapable    = true;
-    static constexpr bool   is_2d_reshapable     = false;
+    static constexpr bool   is_reshapable        = false;
     static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
     static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
 
@@ -203,14 +227,17 @@ struct mse_data<T, dynamic_extent, C, A, L>
 template<class T, class A, class L>
 struct mse_data<T, dynamic_extent, dynamic_extent, A, L>
 {
-    using array_type = std::vector<T, A>;
+    using array_type      = std::vector<T, A>;
+    using span_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
+    using const_span_type = mdspan<T const, dyn_mdspan_extents, dyn_mdspan_layout>;
 
+    static constexpr bool   has_dynamic_mdspan   = true;
     static constexpr bool   is_column_matrix     = false;
     static constexpr bool   is_row_matrix        = false;
     static constexpr bool   is_1d_indexable      = false;
     static constexpr bool   is_column_reshapable = false;
     static constexpr bool   is_row_reshapable    = false;
-    static constexpr bool   is_2d_reshapable     = true;
+    static constexpr bool   is_reshapable        = true;
     static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
     static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
 
@@ -232,164 +259,6 @@ struct mse_data<T, dynamic_extent, dynamic_extent, A, L>
     constexpr mse_data(mse_data const&) = default;
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
-};
-
-
-//--------------------------------------------------------------------------------------------------
-//  Traits Type:    mse_mdspan_support
-//
-//  Traits types (possibly temporary) that creates mdspan objects on behalf of traits type
-//  mse_mdspan_support<MSED> (defined below).
-//--------------------------------------------------------------------------------------------------
-//
-struct mse_mdspan_support
-{
-    using dyn_mat_extents = extents<dynamic_extent, dynamic_extent>;
-    using dyn_mat_strides = array<typename dyn_mat_extents::size_type, 2>;
-    using dyn_mat_layout  = layout_stride;
-    using dyn_mat_mapping = typename dyn_mat_layout::mapping<dyn_mat_extents>;
-
-    template<class ST, class MSE>
-    static constexpr ST
-    make_static_mdspan(MSE& mse)
-    {
-        return ST(mse.m_elems.data());
-    }
-
-    template<class ST, class MSE>
-    static constexpr ST
-    make_dynamic_mdspan(MSE& mse)
-    {
-        if constexpr (MSE::is_row_major)
-        {
-            dyn_mat_extents     extents(mse.m_rows, mse.m_cols);
-            dyn_mat_strides     strides{mse.m_colcap, 1};
-            dyn_mat_mapping     mapping(extents, strides);
-
-            return ST(mse.m_elems.data(), mapping);
-        }
-        else
-        {
-            dyn_mat_extents     extents(mse.m_rows, mse.m_cols);
-            dyn_mat_strides     strides{1, mse.m_rowcap};
-            dyn_mat_mapping     mapping(extents, strides);
-
-            return ST(mse.m_elems.data(), mapping);
-        }
-    }
-};
-
-
-//--------------------------------------------------------------------------------------------------
-//  Traits Type:    mse_mdspan_traits<T, X, L>
-//
-//  Traits type that determines the types, and computes the values, of mdspan objects
-//  on behalf of matrix_storage_engine<T,X,A,L>.
-//
-//  Partial specializations of this class template are tailored to specific sets of partial
-//  specializations of its template parameter.  They provide static member functions to
-//  create mdspan objects.
-//
-//  Note that only the fixed-size partial specialization creates a non-dynamic mdspan object;
-//  if either the rows or columns size parameter is dynamic, then the corresponding mdspan type
-//  is dynamic in both dimensions.
-//
-//  TODO: This may change later -- it should be possible to create two-dimensional mdspan objects
-//  with one fixed and one dynamic dimension.
-//--------------------------------------------------------------------------------------------------
-//
-template<class T, size_t R, size_t C, class A, class L>
-struct mse_mdspan_traits<mse_data<T, R, C, A, L>>
-:   public mse_mdspan_support
-{
-    using mse_data_type   = mse_data<T, R, C, A, L>;
-    using layout_type     = get_mdspan_layout_t<L>;
-    using span_type       = mdspan<T, extents<R, C>, layout_type>;
-    using const_span_type = mdspan<T const, extents<R, C>, layout_type>;
-
-    static constexpr span_type
-    make_mdspan(mse_data_type& mse)
-    {
-        return make_static_mdspan<span_type, mse_data_type>(mse);
-    }
-
-    static constexpr const_span_type
-    make_const_mdspan(mse_data_type const& mse)
-    {
-        return make_static_mdspan<const_span_type, mse_data_type const>(mse);
-    }
-};
-
-
-//------ Partial specialization for extents<R, dynamic_extent>.
-//
-template<class T, size_t R, class A, class L>
-struct mse_mdspan_traits<mse_data<T, R, dynamic_extent, A, L>>
-:   public mse_mdspan_support
-{
-    using mse_data_type   = mse_data<T, R, dynamic_extent, A, L>;
-    using span_type       = mdspan<T, dyn_mat_extents, dyn_mat_layout>;
-    using const_span_type = mdspan<T const, dyn_mat_extents, dyn_mat_layout>;
-
-    static constexpr span_type
-    make_mdspan(mse_data_type& mse)
-    {
-        return make_dynamic_mdspan<span_type, mse_data_type>(mse);
-    }
-
-    static constexpr const_span_type
-    make_const_mdspan(mse_data_type const& mse)
-    {
-        return make_dynamic_mdspan<const_span_type, mse_data_type const>(mse);
-    }
-};
-
-
-//------ Partial specialization for extents<dynamic_extent, C>.
-//
-template<class T, size_t C, class A, class L>
-struct mse_mdspan_traits<mse_data<T, dynamic_extent, C, A, L>>
-:   public mse_mdspan_support
-{
-    using mse_data_type   = mse_data<T, dynamic_extent, C, A, L>;
-    using span_type       = mdspan<T, dyn_mat_extents, dyn_mat_layout>;
-    using const_span_type = mdspan<T const, dyn_mat_extents, dyn_mat_layout>;
-
-    static constexpr span_type
-    make_mdspan(mse_data_type& mse)
-    {
-        return make_dynamic_mdspan<span_type, mse_data_type>(mse);
-    }
-
-    static constexpr const_span_type
-    make_const_mdspan(mse_data_type const& mse)
-    {
-        return make_dynamic_mdspan<const_span_type, mse_data_type const>(mse);
-    }
-};
-
-
-//------ Partial specialization for extents<dynamic_extent, dynamic_extent>.
-//
-template<class T, class A, class L>
-struct mse_mdspan_traits<mse_data<T, dynamic_extent, dynamic_extent, A, L>>
-:   public mse_mdspan_support
-{
-    using mse_data_type   = mse_data<T, dynamic_extent, dynamic_extent, A, L>;
-    using span_type       = mdspan<T, dyn_mat_extents, dyn_mat_layout>;
-    using const_span_type = mdspan<T const, dyn_mat_extents, dyn_mat_layout>;
-
-    static constexpr span_type
-    make_mdspan(mse_data_type& mse)
-    {
-        return make_dynamic_mdspan<span_type, mse_data_type>(mse);
-    }
-
-    static constexpr const_span_type
-    make_const_mdspan(mse_data_type const& mse)
-    {
-        return make_dynamic_mdspan<const_span_type, mse_data_type const>(mse);
-    }
 };
 
 
@@ -419,19 +288,20 @@ requires
     detail::valid_layout_for_2d_storage_engine<L>
 class matrix_storage_engine
 {
-    using this_type      = matrix_storage_engine;
-    using support_traits = detail::matrix_engine_support;
+  public:
     using storage_type   = detail::mse_data<T, R, C, A, L>;
-    using mdspan_traits  = detail::mse_mdspan_traits<storage_type>;
+    using support_traits = detail::matrix_engine_support;
+    using this_type      = matrix_storage_engine;
 
+    static constexpr bool   has_dynamic_mdspan      = storage_type::has_dynamic_mdspan;
     static constexpr bool   has_column_major_layout = storage_type::is_column_major;
     static constexpr bool   has_row_major_layout    = storage_type::is_row_major;
     static constexpr bool   is_1d_indexable         = storage_type::is_1d_indexable;
-    static constexpr bool   is_2d_reshapable        = storage_type::is_2d_reshapable;
+    static constexpr bool   is_reshapable           = storage_type::is_reshapable;
     static constexpr bool   is_column_reshapable    = storage_type::is_column_reshapable;
     static constexpr bool   is_row_reshapable       = storage_type::is_row_reshapable;
 
-  private:
+//  private:
     storage_type    m_data;
 
   public:
@@ -440,8 +310,8 @@ class matrix_storage_engine
     using reference       = element_type&;
     using const_reference = element_type const&;
     using size_type       = size_t;
-    using span_type       = typename mdspan_traits::span_type;
-    using const_span_type = typename mdspan_traits::const_span_type;
+    using span_type       = storage_type::span_type;
+    using const_span_type = storage_type::const_span_type;
 
   public:
     ~matrix_storage_engine() = default;
@@ -460,7 +330,7 @@ class matrix_storage_engine
     constexpr
     matrix_storage_engine(size_type rows, size_type cols)
     requires
-        this_type::is_2d_reshapable
+        this_type::is_reshapable
     :   m_data()
     {
         do_reshape(rows, cols, rows, cols);
@@ -469,7 +339,7 @@ class matrix_storage_engine
     constexpr
     matrix_storage_engine(size_type rows, size_type cols, size_type rowcap, size_type colcap)
     requires
-        this_type::is_2d_reshapable
+        this_type::is_reshapable
     :   m_data()
     {
         do_reshape(rows, cols, rowcap, colcap);
@@ -750,13 +620,13 @@ class matrix_storage_engine
     constexpr span_type
     span() noexcept
     {
-        return mdspan_traits::make_mdspan(m_data);
+        return make_mdspan<span_type, storage_type>(m_data);
     }
 
     constexpr const_span_type
     span() const noexcept
     {
-        return mdspan_traits::make_const_mdspan(m_data);
+        return make_mdspan<const_span_type, storage_type const>(m_data);
     }
 
     //- Setting overall size and capacity.
@@ -764,7 +634,7 @@ class matrix_storage_engine
     constexpr void
     reshape(size_type rows, size_type cols, size_type rowcap, size_type colcap)
     requires
-        this_type::is_2d_reshapable
+        this_type::is_reshapable
     {
         do_reshape(rows, cols, rowcap, colcap);
     }
@@ -782,7 +652,7 @@ class matrix_storage_engine
     constexpr void
     reshape_columns(size_type cols, size_type colcap)
     requires
-        this_type::is_2d_reshapable
+        this_type::is_reshapable
     {
         do_reshape(m_data.m_rows, cols, m_data.m_rowcap, colcap);
     }
@@ -800,7 +670,7 @@ class matrix_storage_engine
     constexpr void
     reshape_rows(size_type rows, size_type rowcap)
     requires
-        this_type::is_2d_reshapable
+        this_type::is_reshapable
     {
         do_reshape(rows, m_data.m_cols, rowcap, m_data.m_colcap);
     }
@@ -817,7 +687,7 @@ class matrix_storage_engine
     constexpr void
     do_reshape(size_type rows, size_type cols, size_type rowcap, size_type colcap)
     requires
-        this_type::is_2d_reshapable
+        this_type::is_reshapable
     {
         support_traits::verify_size(rows);
         support_traits::verify_size(cols);
@@ -942,7 +812,42 @@ class matrix_storage_engine
             }
         }
     }
+
+    template<typename ST, typename MSE>
+    static constexpr ST
+    make_mdspan(MSE& mse) noexcept
+    {
+        if constexpr (this_type::has_dynamic_mdspan)
+        {
+            using accessor_type = typename ST::accessor_type;
+
+            if constexpr (this_type::has_row_major_layout)
+            {
+                detail::dyn_mdspan_extents  extents(mse.m_rows, mse.m_cols);
+                detail::dyn_mdspan_strides  strides{mse.m_colcap, 1};
+                detail::dyn_mdspan_mapping  mapping(extents, strides);
+
+                return ST(mse.m_elems.data(), mapping, accessor_type());
+            }
+            else
+            {
+                detail::dyn_mdspan_extents  extents(mse.m_rows, mse.m_cols);
+                detail::dyn_mdspan_strides  strides{1, mse.m_rowcap};
+                detail::dyn_mdspan_mapping  mapping(extents, strides);
+
+                return ST(mse.m_elems.data(), mapping, accessor_type());
+            }
+        }
+        else
+        {
+            return ST(mse.m_elems.data());
+        }
+    }
 };
 
+namespace detail {
+
+
+}       //- detail namespace
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_MATRIX_STORAGE_ENGINE_HPP_DEFINED

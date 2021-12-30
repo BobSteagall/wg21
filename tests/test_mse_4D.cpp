@@ -8,10 +8,10 @@ using namespace MDSPAN_NS;
 //  Unit tests for dynamically column-resizeable matrix engine, Case 4D
 //==================================================================================================
 //
-using mse_f_fd_cm = matrix_storage_engine<float, extents<4, dynamic_extent>, std::allocator<float>, matrix_layout::column_major>;
-using mse_f_fd_rm = matrix_storage_engine<float, extents<4, dynamic_extent>, std::allocator<float>, matrix_layout::row_major>;
-using mse_i_fd_cm = matrix_storage_engine<int, extents<4, dynamic_extent>, std::allocator<int>, matrix_layout::column_major>;
-using mse_d_fd_rm = matrix_storage_engine<double, extents<4, dynamic_extent>, std::allocator<double>, matrix_layout::row_major>;
+using mse_f_fd_cm = matrix_storage_engine<float, 4, dynamic_extent, std::allocator<float>, matrix_layout::column_major>;
+using mse_f_fd_rm = matrix_storage_engine<float, 4, dynamic_extent, std::allocator<float>, matrix_layout::row_major>;
+using mse_i_fd_cm = matrix_storage_engine<int, 4, dynamic_extent, std::allocator<int>, matrix_layout::column_major>;
+using mse_d_fd_rm = matrix_storage_engine<double, 4, dynamic_extent, std::allocator<double>, matrix_layout::row_major>;
 
 using msupport = matrix_engine_support;
 
@@ -23,16 +23,6 @@ TEST(MSE_Matrix_4D, DefaultCtor)
     EXPECT_EQ(e1.columns(), 0);
     EXPECT_EQ(e1.row_capacity(), 4);
     EXPECT_EQ(e1.column_capacity(), 0);
-
-    static_assert(!use_row_wise_indexing_v<mse_f_fd_cm>);
-    static_assert(use_row_wise_indexing_v<mse_f_fd_rm>);
-
-    static_assert(use_row_wise_indexing_v<fs_matrix_engine_tst<float, 3, 2>>);
-
-    EXPECT_FALSE(do_row_wise_indexing<mse_f_fd_cm>);
-    EXPECT_TRUE(do_row_wise_indexing<mse_f_fd_rm>);
-    EXPECT_FALSE(do_row_wise_indexing<mse_i_fd_cm>);
-    EXPECT_TRUE(do_row_wise_indexing<mse_d_fd_rm>);
 }
 
 

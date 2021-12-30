@@ -10,98 +10,6 @@
 namespace STD_LA {
 namespace detail {
 //--------------------------------------------------------------------------------------------------
-//  Types:  passthru_accessor<T, WA>
-//          negation_accessor<T, WA>
-//          conjugate_accessor<T, WW>
-//
-//  These are specialized mdspan accessor policy types used for negation, transpose, and hermitian
-//  views.  They wrap another accessor type WA for an element type T.  They differ mainly in how
-//  they provide access to the underlying element.
-//--------------------------------------------------------------------------------------------------
-//
-template<class T, class WA = MDSPAN_NS::default_accessor<T>>
-struct passthru_accessor
-{
-    using offset_policy = passthru_accessor;
-    using element_type  = T;
-    using reference     = typename WA::reference;
-    using pointer       = typename WA::pointer;
-
-    constexpr pointer
-    offset(pointer p, size_t i) const noexcept
-    {
-        return WA().offset(p, i);
-    }
-
-    constexpr reference
-    access(pointer p, size_t i) const noexcept
-    {
-        return WA().access(p, i);
-    }
-
-    constexpr pointer
-    decay(pointer p) const noexcept
-    {
-        return WA().decay(p);
-    }
-};
-
-template<class T, class WA = MDSPAN_NS::default_accessor<T>>
-struct negation_accessor
-{
-    using offset_policy = negation_accessor;
-    using element_type  = T;
-    using reference     = T;
-    using pointer       = typename WA::pointer;
-
-    constexpr pointer
-    offset(pointer p, size_t i) const noexcept
-    {
-        return WA().offset(p, i);
-    }
-
-    constexpr reference
-    access(pointer p, size_t i) const noexcept
-    {
-        return -(WA().access(p, i));
-    }
-
-    constexpr pointer
-    decay(pointer p) const noexcept
-    {
-        return WA().decay(p);
-    }
-};
-
-template<class T, class WA = MDSPAN_NS::default_accessor<T>>
-struct conjugate_accessor
-{
-    using offset_policy = conjugate_accessor;
-    using element_type  = T;
-    using reference     = T;
-    using pointer       = typename WA::pointer;
-
-    constexpr pointer
-    offset(pointer p, size_t i) const noexcept
-    {
-        return WA().offset(p, i);
-    }
-
-    constexpr reference
-    access(pointer p, size_t i) const noexcept
-    {
-        return std::conj(WA().access(p, i));
-    }
-
-    constexpr pointer
-    decay(pointer p) const noexcept
-    {
-        return WA().decay(p);
-    }
-};
-
-
-//--------------------------------------------------------------------------------------------------
 //  Class Template:     mve_mdspan_traits<T>
 //
 //  This traits class template provides services for determining the types, and computing the
@@ -218,6 +126,16 @@ struct mve_mdspan_traits<mdspan<T, extents<X0, X1>, L, A>>
 //==================================================================================================
 //  MATRIX VIEW ENGINES
 //==================================================================================================
+//--------------------------------------------------------------------------------------------------
+//  Class Template:     matrix_view_engine<ET, MVT>
+//
+//  This class template implements represents a non-owning engine type, which references another
+//  engine object, and which presents a specific "view" of that object.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET, class MVT>    class matrix_view_engine;
+
+
 //--------------------------------------------------------------------------------------------------
 //  Partial Specialization:     matrix_view_engine<ET, matrix_view::const_negation>
 //
