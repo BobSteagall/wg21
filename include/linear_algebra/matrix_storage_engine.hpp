@@ -289,9 +289,9 @@ requires
 class matrix_storage_engine
 {
   public:
-    using storage_type   = detail::mse_data<T, R, C, A, L>;
-    using support_traits = detail::matrix_engine_support;
     using this_type      = matrix_storage_engine;
+    using support_traits = detail::matrix_engine_support;
+    using storage_type   = detail::mse_data<T, R, C, A, L>;
 
     static constexpr bool   has_dynamic_mdspan      = storage_type::has_dynamic_mdspan;
     static constexpr bool   has_column_major_layout = storage_type::is_column_major;
@@ -301,7 +301,6 @@ class matrix_storage_engine
     static constexpr bool   is_column_reshapable    = storage_type::is_column_reshapable;
     static constexpr bool   is_row_reshapable       = storage_type::is_row_reshapable;
 
-//  private:
     storage_type    m_data;
 
   public:

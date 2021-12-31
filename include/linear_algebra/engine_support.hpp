@@ -208,39 +208,6 @@ bool    is_owning_engine_type_v = has_owning_engine_type_alias<ET>::is_owning;
 
 
 //--------------------------------------------------------------------------------------------------
-//  Trait:      has_nested_mdspan_types<T>
-//  Aliases:    get_mdspan_type_t<T> and get_const_mdspan_type_t<T>
-//
-//  This private traits type and the associated alias templates determine whether or not the
-//  template parameter type has nested type aliases "span_type" and "const_span_type".  If both
-//  aliases are present, then the associated aliases templates refer to the corresponding types.
-//  Otherwise, the alias templates refer to the void type.
-//--------------------------------------------------------------------------------------------------
-//
-template<class ET, class = void>
-struct has_nested_mdspan_types
-{
-    using span_type       = void;
-    using const_span_type = void;
-};
-
-template<class ET>
-struct has_nested_mdspan_types<ET, void_t<typename ET::span_type, typename ET::const_span_type>>
-{
-    using span_type       = typename ET::span_type;
-    using const_span_type = typename ET::const_span_type;
-};
-
-//------
-//
-template<class ET>
-using get_mdspan_type_t = typename has_nested_mdspan_types<ET>::span_type;
-
-template<class ET>
-using get_const_mdspan_type_t = typename has_nested_mdspan_types<ET>::const_span_type;
-
-
-//--------------------------------------------------------------------------------------------------
 //  The following are used to determine whether or not an engine type actually has constexpr
 //  size member functions.  This technique relies on the facts that: (1) a lambda can be
 //  constexpr in C++17; (2) a capture-less lambda can be default-constructed in C++20; and

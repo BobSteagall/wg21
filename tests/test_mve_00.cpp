@@ -46,8 +46,9 @@ TEST(AddTraits, MatViews)
     m1.t() = m2;
     PRINT(m1.t());
 
-    matrix_view_engine<fxd_float::engine_type, matrix_view::submatrix>  ve1;
-    matrix_view_engine<fxd_float::engine_type, matrix_view::transpose>  ve2;
+    matrix_view_engine<fxd_float::engine_type, matrix_view::const_negation> ve0;
+    matrix_view_engine<fxd_float::engine_type, matrix_view::submatrix>      ve1;
+    matrix_view_engine<fxd_float::engine_type, matrix_view::transpose>      ve2;
 
     PRINT(m1);
     PRINT(m1.submatrix(0, 2, 1, 2));
