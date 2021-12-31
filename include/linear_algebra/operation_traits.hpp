@@ -10,30 +10,6 @@
 
 namespace STD_LA {
 namespace detail {
-
-template<class T, size_t R, size_t C, class A, class L>
-struct engine_extents_helper<matrix_storage_engine<T, R, C, A, L>>
-{
-    static constexpr size_t
-    columns()
-    {
-        return C;
-    }
-
-    static constexpr size_t
-    rows()
-    {
-        return R;
-    }
-
-    static constexpr size_t
-    size()
-    {
-        return R*C;
-    }
-};
-
-
 //--------------------------------------------------------------------------------------------------
 //- Forward declarations of the default individual element/allocator/layout/engine/arithmetic
 //  traits types referred to by matrix_operation_traits.  These are forward declared in order
@@ -56,8 +32,8 @@ template<class OT, class T1, class T2>      struct division_element_traits;
 template<class OT, class ET1, class ET2>    struct division_engine_traits;
 template<class OT, class OP1, class OP2>    struct division_arithmetic_traits;
 
-template<class AT1, class AT2, class T>    struct mse_allocation_traits;
-template<class LT1, class LT2>             struct addsubdiv_layout_traits;
+//template<class AT1, class AT2, class T>    struct mse_allocation_traits;
+//template<class LT1, class LT2>             struct addsubdiv_layout_traits;
 
 
 }       //- detail namespace
@@ -376,6 +352,7 @@ STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(division)
 #undef STD_LA_DEFINE_OP_TRAITS_EXTRACTORS
 #undef STD_LA_DEFINE_OP_TRAITS_EXTRACTOR
 
+/*
 
 namespace detail {
 //--------------------------------------------------------------------------------------------------
@@ -716,5 +693,6 @@ struct engine_layout_traits<matrix_storage_engine<T1, R1, C1, AT1, LT1>,
 };
 
 }       //- detail namespace
+*/
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_OPERATION_TRAITS_HPP_DEFINED

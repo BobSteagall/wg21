@@ -252,6 +252,8 @@ has_constexpr_size()
     return is_constexpr([]{ ET().size(); });
 }
 
+//------
+//
 template<class ET> inline constexpr
 bool    has_constexpr_columns_v = has_constexpr_columns<ET>();
 

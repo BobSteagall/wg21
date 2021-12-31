@@ -46,48 +46,10 @@ bool    is_2d_mdspan_v = is_2d_mdspan<T>::value;
 
 
 //--------------------------------------------------------------------------------------------------
-//  Trait:      has_nested_mdspan_types<T>
-//  Aliases:    get_mdspan_type_t<T> and get_const_mdspan_type_t<T>
-//
-//  This private traits type and the associated alias templates determine whether or not the
-//  template parameter type has nested type aliases "span_type" and "const_span_type".  If both
-//  aliases are present, then the associated aliases templates refer to the corresponding types.
-//  Otherwise, the alias templates refer to the void type.
-//--------------------------------------------------------------------------------------------------
-//
-template<class ET, class = void>
-struct has_nested_mdspan_types
-:   public false_type
-{
-    using span_type       = void;
-    using const_span_type = void;
-};
-
-template<class ET>
-struct has_nested_mdspan_types<ET, void_t<typename ET::span_type, typename ET::const_span_type>>
-:   public true_type
-{
-    using span_type       = typename ET::span_type;
-    using const_span_type = typename ET::const_span_type;
-};
-
-//------
-//
-template<class ET>
-using get_mdspan_type_t = typename has_nested_mdspan_types<ET>::span_type;
-
-template<class ET>
-using get_const_mdspan_type_t = typename has_nested_mdspan_types<ET>::const_span_type;
-
-template<class ET> inline constexpr
-bool    has_nested_mdspan_types_v = has_nested_mdspan_types<ET>::value;
-
-
-//--------------------------------------------------------------------------------------------------
 //  Trait:      mdspan_layout_mapper<T>
 //  Alias:      get_mdspan_layout_t<T>
 //
-//  This private traits type maps a linear algebra element layout (row_major, etc.) into a
+//  This private traits type maps a linear algebra element layout tag (row_major, etc.) into a
 //  corresponding mdspan layout policy (layout_right, etc.).
 //--------------------------------------------------------------------------------------------------
 //
@@ -118,8 +80,42 @@ using get_mdspan_layout_t = typename mdspan_layout_mapper<L>::layout_type;
 
 
 //--------------------------------------------------------------------------------------------------
-//  Types:  passthru_accessor<T, WA>
-//          negation_accessor<T, WA>
+//  Trait:      detect_nested_mdspan_types<T>
+//  Aliases:    get_mdspan_type_t<T> and get_const_mdspan_type_t<T>
+//
+//  This private traits type and the associated alias templates determine whether or not the
+//  template parameter type has nested type aliases "span_type" and "const_span_type".  If both
+//  aliases are present, then the associated aliases templates refer to the corresponding mdspan
+//  types.  Otherwise, the alias templates refer to the void type.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET, class = void>
+struct detect_nested_mdspan_types
+:   public false_type
+{
+    using span_type       = void;
+    using const_span_type = void;
+};
+
+template<class ET>
+struct detect_nested_mdspan_types<ET, void_t<typename ET::span_type, typename ET::const_span_type>>
+:   public true_type
+{
+    using span_type       = typename ET::span_type;
+    using const_span_type = typename ET::const_span_type;
+};
+
+//------
+//
+template<class ET>
+using get_mdspan_type_t = typename detect_nested_mdspan_types<ET>::span_type;
+
+template<class ET>
+using get_const_mdspan_type_t = typename detect_nested_mdspan_types<ET>::const_span_type;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Types:  negation_accessor<T, WA>
 //          conjugate_accessor<T, WW>
 //
 //  These are specialized mdspan accessor policy types used for negation, transpose, and hermitian
@@ -127,33 +123,6 @@ using get_mdspan_layout_t = typename mdspan_layout_mapper<L>::layout_type;
 //  they provide access to the underlying element.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, class WA = MDSPAN_NS::default_accessor<T>>
-struct passthru_accessor
-{
-    using offset_policy = passthru_accessor;
-    using element_type  = T;
-    using reference     = typename WA::reference;
-    using pointer       = typename WA::pointer;
-
-    constexpr pointer
-    offset(pointer p, size_t i) const noexcept
-    {
-        return WA().offset(p, i);
-    }
-
-    constexpr reference
-    access(pointer p, size_t i) const noexcept
-    {
-        return WA().access(p, i);
-    }
-
-    constexpr pointer
-    decay(pointer p) const noexcept
-    {
-        return WA().decay(p);
-    }
-};
-
 template<class T, class WA = MDSPAN_NS::default_accessor<T>>
 struct negation_accessor
 {
@@ -208,24 +177,24 @@ struct conjugate_accessor
     }
 };
 
+
 //--------------------------------------------------------------------------------------------------
 //  Class Template:     mdspan_view_traits<T>
 //
-//  This traits class template provides services for determining the types, and computing the
-//  values, of mdspan object that can index the set of elements represented by a view object.
+//  This traits class template provides services for determining the types of, and constructing,
+//  mdspan objects that can index the set of elements represented by a matrix view engine.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T>
 struct mdspan_view_traits;
 
-//- This partial specialization is used when no span interface is desired.
+//- This partial specialization is used when a view engine has a void mdspan interface.
 //
 template<>
 struct mdspan_view_traits<void>
 {
     static constexpr bool   has_mdspan = false;
 
-    using identity_mdspan_type  = void;
     using negation_mdspan_type  = void;
     using conjugate_mdspan_type = void;
     using hermitian_mdspan_type = void;
@@ -233,18 +202,13 @@ struct mdspan_view_traits<void>
     using transpose_mdspan_type = void;
 };
 
-//- This partial specialization is used when the host engine is two-dimensional.
+//- This partial specialization is used when the view engine has a true mdspan interface.
 //
 template<class T, size_t X0, size_t X1, class L, class A>
 struct mdspan_view_traits<mdspan<T, extents<X0, X1>, L, A>>
 {
     static constexpr bool   has_mdspan = true;
 
-    using passthru_accessor_type  = A;
-    using negation_accessor_type  = negation_accessor<T, A>;
-    using conjugate_accessor_type = conjugate_accessor<T, A>;
-
-    using identity_mdspan_type  = mdspan<T, extents<X0, X1>, L, A>;
     using negation_mdspan_type  = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, negation_accessor<T, A>>;
     using conjugate_mdspan_type = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, conjugate_accessor<T, A>>;
     using hermitian_mdspan_type = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, conjugate_accessor<T, A>>;
@@ -297,13 +261,13 @@ struct mdspan_view_traits<mdspan<T, extents<X0, X1>, L, A>>
 
     template<class EST, class S1, class S2, class S3, class S4>
     static constexpr submatrix_mdspan_type
-    make_submatrix(EST const& s, S1 row, S2 row_count, S3 col, S4 col_count)
+    make_submatrix(EST const& s, S1 row_index, S2 row_count, S3 col_index, S4 col_count)
     {
         using idx_t  = decltype(dynamic_extent);
         using pair_t = std::pair<idx_t, idx_t>;
 
-        pair_t  row_set(static_cast<idx_t>(row), static_cast<idx_t>(row + row_count));
-        pair_t  col_set(static_cast<idx_t>(col), static_cast<idx_t>(col + col_count));
+        pair_t  row_set(static_cast<idx_t>(row_index), static_cast<idx_t>(row_index + row_count));
+        pair_t  col_set(static_cast<idx_t>(col_index), static_cast<idx_t>(col_index + col_count));
 
         if constexpr (std::is_same_v<EST, submatrix_mdspan_type>)
         {
