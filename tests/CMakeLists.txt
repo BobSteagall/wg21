@@ -5,7 +5,7 @@ option(INSTALL_GTEST "" OFF)
 option(gtest_force_shared_crt "" ON)
 add_compile_options(-U__cpp_char8_t)
 
-FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git)
+FetchContent_Declare(gtest GIT_REPOSITORY https://github.com/google/googletest.git GIT_TAG release-1.11.0)
 FetchContent_MakeAvailable(gtest)
 
 target_compile_options(gtest
