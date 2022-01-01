@@ -32,10 +32,6 @@ template<class OT, class T1, class T2>      struct division_element_traits;
 template<class OT, class ET1, class ET2>    struct division_engine_traits;
 template<class OT, class OP1, class OP2>    struct division_arithmetic_traits;
 
-//template<class AT1, class AT2, class T>    struct mse_allocation_traits;
-//template<class LT1, class LT2>             struct addsubdiv_layout_traits;
-
-
 }       //- detail namespace
 //==================================================================================================
 //--------------------------------------------------------------------------------------------------
@@ -344,7 +340,7 @@ using select_matrix_operation_traits_t =
 
 #endif
 
-STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(addition)
+//STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(addition)
 STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(subtraction)
 STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(multiplication)
 STD_LA_DEFINE_OP_TRAITS_EXTRACTORS(division)

@@ -19,6 +19,68 @@
 
 namespace STD_LA {
 namespace detail {
+
+template<class OT, class T1, class T2>      struct addition_element_traits;
+template<class OT, class L1, class L2>      struct addition_layout_traits;
+template<class OT, class ET1, class ET2>    struct addition_engine_traits;
+template<class OT, class OP1, class OP2>    struct addition_arithmetic_traits;
+
+template<typename OT, typename U, typename V, typename = void>
+struct addition_element_traits_extractor
+{
+    using type = matrix_operation_traits::addition_element_traits<OT,U,V>;
+};
+
+template<typename OT, typename U, typename V>
+struct addition_element_traits_extractor<OT, U, V, void_t<typename OT::template addition_element_traits<OT,U,V>::element_type>>
+{
+    using type = typename OT::template addition_element_traits<OT, U, V>;
+};
+
+//------
+//
+/*
+template<typename OT, typename U, typename V, typename = void>
+struct addition_layout_traits_extractor
+{
+    using type = matrix_operation_traits::addition_layout_traits<OT,U,V>;
+};
+
+template<typename OT, typename U, typename V>
+struct addition_layout_traits_extractor<OT, U, V, void_t<typename OT::template addition_layout_traits<OT,U,V>::layout_type>>
+{
+    using type = typename OT::template addition_layout_traits<OT, U, V>;
+};
+*/
+//-----
+//
+template<typename OT, typename U, typename V, typename = void>
+struct addition_engine_traits_extractor
+{
+    using type = matrix_operation_traits::addition_engine_traits<OT,U,V>;
+};
+
+template<typename OT, typename U, typename V>
+struct addition_engine_traits_extractor<OT, U, V, void_t<typename OT::template addition_engine_traits<OT,U,V>::engine_type>>
+{
+    using type = typename OT::template addition_engine_traits<OT, U, V>;
+};
+
+//-----
+//
+template<typename OT, typename U, typename V, typename = void>
+struct addition_arithmetic_traits_extractor
+{
+    using type = matrix_operation_traits::addition_arithmetic_traits<OT,U,V>;
+};
+
+template<typename OT, typename U, typename V>
+struct addition_arithmetic_traits_extractor<OT, U, V, void_t<typename OT::template addition_arithmetic_traits<OT,U,V>::result_type>>
+{
+    using type = typename OT::template addition_arithmetic_traits<OT, U, V>;
+};
+
+
 //==================================================================================================
 //                              **** ELEMENT ADDITION TRAITS ****
 //==================================================================================================
@@ -69,7 +131,7 @@ struct addition_engine_traits
     //
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
-    using element_traits = get_addition_element_traits_t<OTR, element_type_1, element_type_2>;
+    using element_traits = typename addition_element_traits_extractor<OTR, element_type_1, element_type_2>::type;
     using elem_type      = typename element_traits::element_type;
 
     //- Determine the appropriate allocation and layout traits for the resulting engine type.
@@ -102,11 +164,12 @@ struct addition_arithmetic_traits<OTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
   private:
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
-    using element_traits = get_addition_element_traits_t<OTR, element_type_1, element_type_2>;
+    using element_xtract = addition_element_traits_extractor<OTR, element_type_1, element_type_2>;
+    using element_traits = typename element_xtract::type;
 
     using engine_type_1 = typename matrix<ET1, COT1>::engine_type;
     using engine_type_2 = typename matrix<ET2, COT2>::engine_type;
-    using engine_traits = get_addition_engine_traits_t<OTR, engine_type_1, engine_type_2>;
+    using engine_traits = typename addition_engine_traits_extractor<OTR, engine_type_1, engine_type_2>::type;
 
     static_assert(std::is_same_v<typename element_traits::element_type,
                                  typename engine_traits::engine_type::element_type>);
