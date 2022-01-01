@@ -46,7 +46,7 @@
 //#define USING_STD   using namespace std::experimental;
 
 #define STD_LA      std::experimental::math
-#define USING_STD
+#define USING_STD   using namespace std::experimental;
 
 #include <cstdint>
 #include <array>

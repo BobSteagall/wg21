@@ -309,8 +309,8 @@ class matrix_storage_engine
     using reference       = element_type&;
     using const_reference = element_type const&;
     using size_type       = size_t;
-    using span_type       = storage_type::span_type;
-    using const_span_type = storage_type::const_span_type;
+    using span_type       = typename storage_type::span_type;
+    using const_span_type = typename storage_type::const_span_type;
 
   public:
     ~matrix_storage_engine() = default;

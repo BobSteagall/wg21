@@ -68,8 +68,11 @@
     <ClInclude Include="..\include\linear_algebra\matrix.hpp">
       <Filter>Library Implementation Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\matrix.hpp">
-      <Filter>Library Interface Headers</Filter>
+    <ClInclude Include="..\include\linear_algebra\traits_support.hpp">
+      <Filter>Library Implementation Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\linear_algebra\mdspan_support.hpp">
+      <Filter>Library Implementation Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -141,6 +144,9 @@
     <None Include="packages.config" />
     <None Include="..\docs\papers\P1385D7.md">
       <Filter>Docs</Filter>
+    </None>
+    <None Include="..\include\matrix">
+      <Filter>Library Interface Headers</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
