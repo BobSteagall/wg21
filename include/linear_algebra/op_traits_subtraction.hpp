@@ -19,16 +19,112 @@
 
 namespace STD_LA {
 namespace detail {
+template<class OT, class T1, class T2>      struct subtraction_element_traits;
+template<class OT, class L1, class L2>      struct subtraction_layout_traits;
+template<class OT, class ET1, class ET2>    struct subtraction_engine_traits;
+template<class OT, class OP1, class OP2>    struct subtraction_arithmetic_traits;
+
+//------
+//
+template<typename OT, typename U, typename V, typename = void>
+struct subtraction_element_traits_extractor
+{
+    using type = subtraction_element_traits<OT,U,V>;
+};
+
+template<typename OT, typename U, typename V>
+struct subtraction_element_traits_extractor<OT, U, V, void_t<typename OT::template subtraction_element_traits<OT,U,V>::element_type>>
+{
+    using type = typename OT::template subtraction_element_traits<OT, U, V>;
+};
+
+template<typename OT, typename U, typename V>
+using subtraction_element_traits_t = typename subtraction_element_traits_extractor<OT, U, V>::type;
+
+
+//------
+//
+template<typename OT, typename U, typename V, typename = void>
+struct subtraction_layout_traits_extractor
+{
+    using type = subtraction_layout_traits<OT,U,V>;
+};
+
+template<typename OT, typename U, typename V>
+struct subtraction_layout_traits_extractor<OT, U, V, void_t<typename OT::template subtraction_layout_traits<OT,U,V>::layout_type>>
+{
+    using type = typename OT::template subtraction_layout_traits<OT, U, V>;
+};
+
+template<typename OT, typename U, typename V>
+using subtraction_layout_traits_t = typename subtraction_layout_traits_extractor<OT, U, V>::type;
+
+
+//-----
+//
+template<typename OT, typename U, typename V, typename = void>
+struct subtraction_engine_traits_extractor
+{
+    using type = subtraction_engine_traits<OT,U,V>;
+};
+
+template<typename OT, typename U, typename V>
+struct subtraction_engine_traits_extractor<OT, U, V, void_t<typename OT::template subtraction_engine_traits<OT,U,V>::engine_type>>
+{
+    using type = typename OT::template subtraction_engine_traits<OT, U, V>;
+};
+
+template<typename OT, typename U, typename V>
+using subtraction_engine_traits_t = typename subtraction_engine_traits_extractor<OT, U, V>::type;
+
+
+//-----
+//
+template<typename OT, typename U, typename V, typename = void>
+struct subtraction_arithmetic_traits_extractor
+{
+    using type = subtraction_arithmetic_traits<OT,U,V>;
+};
+
+template<typename OT, typename U, typename V>
+struct subtraction_arithmetic_traits_extractor<OT, U, V, void_t<typename OT::template subtraction_arithmetic_traits<OT,U,V>::result_type>>
+{
+    using type = typename OT::template subtraction_arithmetic_traits<OT, U, V>;
+};
+
+template<typename OT, typename U, typename V>
+using subtraction_arithmetic_traits_t = typename subtraction_arithmetic_traits_extractor<OT, U, V>::type;
+
+
 //==================================================================================================
 //                              **** SUBTRACTION ELEMENT TRAITS ****
 //==================================================================================================
 //- The standard element subtraction traits type provides the default mechanism for determining the
 //  result of subtracting two elements of (possibly) different types.
 //
-template<class OTR, class T1, class T2>
+template<class COTR, class T1, class T2>
 struct subtraction_element_traits
 {
     using element_type = decltype(declval<T1>() - declval<T2>());
+};
+
+
+//==================================================================================================
+//                              **** SUBTRACTION LAYOUT TRAITS ****
+//==================================================================================================
+//- The standard layout addition traits type provides the default mechanism for determining the
+//  resulting data layout when adding two matrices having different layouts..
+//
+template<class COTR, class L1, class L2>
+struct subtraction_layout_traits
+{
+    using layout_type = matrix_layout::row_major;
+};
+
+template<class COTR>
+struct subtraction_layout_traits<COTR, matrix_layout::column_major, matrix_layout::column_major>
+{
+    using layout_type = matrix_layout::column_major;
 };
 
 
@@ -38,7 +134,7 @@ struct subtraction_element_traits
 //- The standard engine subtraction traits type provides the default mechanism for determining the
 //  correct engine type for a matrix/matrix or vector/vector subtraction.
 //
-template<class OTR, class ET1, class ET2>
+template<class COTR, class ET1, class ET2>
 struct subtraction_engine_traits
 {
     //- Get the extents for each engine
@@ -69,7 +165,7 @@ struct subtraction_engine_traits
     //
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
-    using element_traits = get_subtraction_element_traits_t<OTR, element_type_1, element_type_2>;
+    using element_traits = subtraction_element_traits_t<COTR, element_type_1, element_type_2>;
     using elem_type      = typename element_traits::element_type;
 
     //- Determine the appropriate allocation and layout traits for the resulting engine type.
@@ -77,7 +173,7 @@ struct subtraction_engine_traits
     using owning_type_1     = get_owning_engine_type_t<ET1>;
     using owning_type_2     = get_owning_engine_type_t<ET2>;
     using allocation_traits = engine_allocation_traits<owning_type_1, owning_type_2, dyn_size, RR, CR, elem_type>;
-    using layout_traits     = engine_layout_traits<ET1, ET2, false>;
+    using layout_traits     = engine_layout_traits<COTR, owning_type_1, owning_type_2, subtraction_layout_traits>;
 
     //- Determine required engine template parameters from the traits types.
     //
@@ -96,17 +192,17 @@ struct subtraction_engine_traits
 //- The standard subtraction arithmetic traits type provides the default mechanism for computing the
 //  result of a matrix/matrix subtraction.
 //
-template<class OTR, class ET1, class COT1, class ET2, class COT2>
-struct subtraction_arithmetic_traits<OTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
+template<class COTR, class ET1, class COT1, class ET2, class COT2>
+struct subtraction_arithmetic_traits<COTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
 {
   private:
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
-    using element_traits = get_subtraction_element_traits_t<OTR, element_type_1, element_type_2>;
+    using element_traits = subtraction_element_traits_t<COTR, element_type_1, element_type_2>;
 
-    using engine_type_1 = typename matrix<ET1, COT1>::engine_type;
-    using engine_type_2 = typename matrix<ET2, COT2>::engine_type;
-    using engine_traits = get_subtraction_engine_traits_t<OTR, engine_type_1, engine_type_2>;
+    using engine_type_1  = typename matrix<ET1, COT1>::engine_type;
+    using engine_type_2  = typename matrix<ET2, COT2>::engine_type;
+    using engine_traits  = subtraction_engine_traits_t<COTR, engine_type_1, engine_type_2>;
 
     static_assert(std::is_same_v<typename element_traits::element_type,
                                  typename engine_traits::engine_type::element_type>);
@@ -114,7 +210,7 @@ struct subtraction_arithmetic_traits<OTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
   public:
     using element_type = typename element_traits::element_type;
     using engine_type  = typename engine_traits::engine_type;
-    using result_type  = matrix<engine_type, OTR>;
+    using result_type  = matrix<engine_type, COTR>;
 
     static constexpr result_type
     subtract(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)

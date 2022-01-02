@@ -110,7 +110,7 @@ struct matrix_layout
 //  Class:      matrix_view
 //
 //  This public type is a container of tag sub-types whose purpose is to specify the functionality
-//  of a view engine when used as the second template argument to matrix_view_engine<ET, MVT>.
+//  of a view engine when used as the second template argument to matrix_view_engine<ET, MVTT>.
 //--------------------------------------------------------------------------------------------------
 //
 struct matrix_view
@@ -147,11 +147,11 @@ struct matrix_view
 #include "linear_algebra/matrix.hpp"
 
 #include "linear_algebra/op_traits_support.hpp"
-#include "linear_algebra/operation_traits.hpp"
 #include "linear_algebra/op_traits_addition.hpp"
 #include "linear_algebra/op_traits_subtraction.hpp"
 #include "linear_algebra/op_traits_multiplication.hpp"
 #include "linear_algebra/op_traits_division.hpp"
+#include "linear_algebra/operation_traits.hpp"
 
 #include "linear_algebra/arithmetic_operators.hpp"
 

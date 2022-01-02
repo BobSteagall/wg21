@@ -19,9 +19,85 @@
 
 namespace STD_LA {
 namespace detail {
+template<class OT, class T1, class T2>      struct multiplication_element_traits;
+template<class OT, class L1, class L2>      struct multiplication_layout_traits;
+template<class OT, class ET1, class ET2>    struct multiplication_engine_traits;
+template<class OT, class OP1, class OP2>    struct multiplication_arithmetic_traits;
+
+//------
+//
+template<typename OT, typename U, typename V, typename = void>
+struct multiplication_element_traits_extractor
+{
+    using type = multiplication_element_traits<OT,U,V>;
+};
+
+template<typename OT, typename U, typename V>
+struct multiplication_element_traits_extractor<OT, U, V, void_t<typename OT::template multiplication_element_traits<OT,U,V>::element_type>>
+{
+    using type = typename OT::template multiplication_element_traits<OT, U, V>;
+};
+
+template<typename OT, typename U, typename V>
+using multiplication_element_traits_t = typename multiplication_element_traits_extractor<OT, U, V>::type;
+
+
+//------
+//
+template<typename OT, typename U, typename V, typename = void>
+struct multiplication_layout_traits_extractor
+{
+    using type = multiplication_layout_traits<OT,U,V>;
+};
+
+template<typename OT, typename U, typename V>
+struct multiplication_layout_traits_extractor<OT, U, V, void_t<typename OT::template multiplication_layout_traits<OT,U,V>::layout_type>>
+{
+    using type = typename OT::template multiplication_layout_traits<OT, U, V>;
+};
+
+template<typename OT, typename U, typename V>
+using multiplication_layout_traits_t = typename multiplication_layout_traits_extractor<OT, U, V>::type;
+
+
+//-----
+//
+template<typename OT, typename U, typename V, typename = void>
+struct multiplication_engine_traits_extractor
+{
+    using type = multiplication_engine_traits<OT,U,V>;
+};
+
+template<typename OT, typename U, typename V>
+struct multiplication_engine_traits_extractor<OT, U, V, void_t<typename OT::template multiplication_engine_traits<OT,U,V>::engine_type>>
+{
+    using type = typename OT::template multiplication_engine_traits<OT, U, V>;
+};
+
+template<typename OT, typename U, typename V>
+using multiplication_engine_traits_t = typename multiplication_engine_traits_extractor<OT, U, V>::type;
+
+
+//-----
+//
+template<typename OT, typename U, typename V, typename = void>
+struct multiplication_arithmetic_traits_extractor
+{
+    using type = multiplication_arithmetic_traits<OT,U,V>;
+};
+
+template<typename OT, typename U, typename V>
+struct multiplication_arithmetic_traits_extractor<OT, U, V, void_t<typename OT::template multiplication_arithmetic_traits<OT,U,V>::result_type>>
+{
+    using type = typename OT::template multiplication_arithmetic_traits<OT, U, V>;
+};
+
+template<typename OT, typename U, typename V>
+using multiplication_arithmetic_traits_t = typename multiplication_arithmetic_traits_extractor<OT, U, V>::type;
+
 
 //==================================================================================================
-//                           **** ELEMENT MULTIPLICATION TRAITS ****
+//                           **** MULTIPLICATION ELEMENT TRAITS ****
 //==================================================================================================
 //- The standard element division traits type provides the default mechanism for determining
 //  the result of multiplying two elements of (possibly) different types.
@@ -34,7 +110,32 @@ struct multiplication_element_traits
 
 
 //==================================================================================================
-//                            **** ENGINE MULTIPLICATION TRAITS ****
+//                           **** MULTIPLICATION LAYOUT TRAITS ****
+//==================================================================================================
+//- The standard element division traits type provides the default mechanism for determining
+//  the result of multiplying two elements of (possibly) different types.
+//
+template<class OTR, class L1, class L2>
+struct multiplication_layout_traits
+{
+    using layout_type = matrix_layout::row_major;
+};
+
+template<class OTR>
+struct multiplication_layout_traits<OTR, matrix_layout::row_major, matrix_layout::column_major>
+{
+    using layout_type = matrix_layout::column_major;
+};
+
+template<class OTR>
+struct multiplication_layout_traits<OTR, matrix_layout::column_major, matrix_layout::column_major>
+{
+    using layout_type = matrix_layout::column_major;
+};
+
+
+//==================================================================================================
+//                            **** MULTIPLICATION ENGINE TRAITS ****
 //==================================================================================================
 //
 //- The standard engine addition traits type provides the default mechanism for determining the
@@ -72,7 +173,7 @@ struct multiplication_engine_traits
     //
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
-    using element_traits = get_multiplication_element_traits_t<OTR, element_type_1, element_type_2>;
+    using element_traits = multiplication_element_traits_t<OTR, element_type_1, element_type_2>;
     using elem_type      = typename element_traits::element_type;
 
     //- Determine the appropriate allocation and layout traits for the resulting engine type.
@@ -80,7 +181,7 @@ struct multiplication_engine_traits
     using owning_type_1     = get_owning_engine_type_t<ET1>;
     using owning_type_2     = get_owning_engine_type_t<ET2>;
     using allocation_traits = engine_allocation_traits<owning_type_1, owning_type_2, dyn_size, RR, CR, elem_type>;
-    using layout_traits     = engine_layout_traits<ET1, ET2, false>;
+    using layout_traits     = engine_layout_traits<OTR, owning_type_1, owning_type_2, multiplication_layout_traits>;
 
     //- Determine required engine template parameters from the traits types.
     //
@@ -117,14 +218,14 @@ struct multiplication_engine_traits<OTR, matrix_scalar_engine<S1>, ET2>
     //
     using element_type_1 = S1;
     using element_type_2 = typename ET2::element_type;
-    using element_traits = get_multiplication_element_traits_t<OTR, element_type_1, element_type_2>;
+    using element_traits = multiplication_element_traits_t<OTR, element_type_1, element_type_2>;
     using elem_type      = typename element_traits::element_type;
 
     //- Determine the appropriate allocation and layout traits for the resulting engine type.
     //
     using owning_type_2     = get_owning_engine_type_t<ET2>;
     using allocation_traits = engine_allocation_traits<owning_type_2, owning_type_2, dyn_size, RR, CR, elem_type>;
-    using layout_traits     = engine_layout_traits<ET2, ET2, false>;
+    using layout_traits     = engine_layout_traits<OTR, owning_type_2, owning_type_2, multiplication_layout_traits>;
 
     //- Determine required engine template parameters from the traits types.
     //
@@ -161,14 +262,14 @@ struct multiplication_engine_traits<OTR, ET1, matrix_scalar_engine<S2>>
     //
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = S2;
-    using element_traits = get_multiplication_element_traits_t<OTR, element_type_1, element_type_2>;
+    using element_traits = multiplication_element_traits_t<OTR, element_type_1, element_type_2>;
     using elem_type      = typename element_traits::element_type;
 
     //- Determine the appropriate allocation and layout traits for the resulting engine type.
     //
     using owning_type_1     = get_owning_engine_type_t<ET1>;
     using allocation_traits = engine_allocation_traits<owning_type_1, owning_type_1, dyn_size, RR, CR, elem_type>;
-    using layout_traits     = engine_layout_traits<ET1, ET1, false>;
+    using layout_traits     = engine_layout_traits<OTR, owning_type_1, owning_type_1, multiplication_layout_traits>;
 
     //- Determine required engine template parameters from the traits types.
     //
@@ -193,11 +294,11 @@ struct multiplication_arithmetic_traits<OTR, matrix<ET1, COT1>, matrix<ET2, COT2
 {
     using element_type_1 = typename ET2::element_type;
     using element_type_2 = typename ET2::element_type;
-    using element_traits = get_multiplication_element_traits_t<OTR, element_type_1, element_type_2>;
+    using element_traits = multiplication_element_traits_t<OTR, element_type_1, element_type_2>;
 
     using engine_type_1 = typename matrix<ET1, COT1>::engine_type;
     using engine_type_2 = typename matrix<ET2, COT2>::engine_type;
-    using engine_traits = get_multiplication_engine_traits_t<OTR, engine_type_1, engine_type_2>;
+    using engine_traits = multiplication_engine_traits_t<OTR, engine_type_1, engine_type_2>;
 
     static_assert(std::is_same_v<typename element_traits::element_type,
                                  typename engine_traits::engine_type::element_type>);
@@ -257,11 +358,11 @@ struct multiplication_arithmetic_traits<OTR, S1, matrix<ET2, COT2>>
 {
     using element_type_1 = S1;
     using element_type_2 = typename ET2::element_type;
-    using element_traits = get_multiplication_element_traits_t<OTR, element_type_1, element_type_2>;
+    using element_traits = multiplication_element_traits_t<OTR, element_type_1, element_type_2>;
 
     using engine_type_1 = matrix_scalar_engine<S1>;
     using engine_type_2 = typename matrix<ET2, COT2>::engine_type;
-    using engine_traits = get_multiplication_engine_traits_t<OTR, engine_type_1, engine_type_2>;
+    using engine_traits = multiplication_engine_traits_t<OTR, engine_type_1, engine_type_2>;
 
     static_assert(std::is_same_v<typename element_traits::element_type,
                                  typename engine_traits::engine_type::element_type>);
@@ -310,11 +411,11 @@ struct multiplication_arithmetic_traits<OTR, matrix<ET1, COT1>, S2>
 {
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = S2;
-    using element_traits = get_multiplication_element_traits_t<OTR, element_type_1, element_type_2>;
+    using element_traits = multiplication_element_traits_t<OTR, element_type_1, element_type_2>;
 
     using engine_type_1 = typename matrix<ET1, COT1>::engine_type;
     using engine_type_2 = matrix_scalar_engine<S2>;
-    using engine_traits = get_multiplication_engine_traits_t<OTR, engine_type_1, engine_type_2>;
+    using engine_traits = multiplication_engine_traits_t<OTR, engine_type_1, engine_type_2>;
 
     static_assert(std::is_same_v<typename element_traits::element_type,
                                  typename engine_traits::engine_type::element_type>);

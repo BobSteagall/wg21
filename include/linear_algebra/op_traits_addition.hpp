@@ -25,10 +25,12 @@ template<class OT, class L1, class L2>      struct addition_layout_traits;
 template<class OT, class ET1, class ET2>    struct addition_engine_traits;
 template<class OT, class OP1, class OP2>    struct addition_arithmetic_traits;
 
+//------
+//
 template<typename OT, typename U, typename V, typename = void>
 struct addition_element_traits_extractor
 {
-    using type = matrix_operation_traits::addition_element_traits<OT,U,V>;
+    using type = addition_element_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -37,13 +39,16 @@ struct addition_element_traits_extractor<OT, U, V, void_t<typename OT::template 
     using type = typename OT::template addition_element_traits<OT, U, V>;
 };
 
+template<typename OT, typename U, typename V>
+using addition_element_traits_t = typename addition_element_traits_extractor<OT, U, V>::type;
+
+
 //------
 //
-/*
 template<typename OT, typename U, typename V, typename = void>
 struct addition_layout_traits_extractor
 {
-    using type = matrix_operation_traits::addition_layout_traits<OT,U,V>;
+    using type = addition_layout_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -51,13 +56,17 @@ struct addition_layout_traits_extractor<OT, U, V, void_t<typename OT::template a
 {
     using type = typename OT::template addition_layout_traits<OT, U, V>;
 };
-*/
+
+template<typename OT, typename U, typename V>
+using addition_layout_traits_t = typename addition_layout_traits_extractor<OT, U, V>::type;
+
+
 //-----
 //
 template<typename OT, typename U, typename V, typename = void>
 struct addition_engine_traits_extractor
 {
-    using type = matrix_operation_traits::addition_engine_traits<OT,U,V>;
+    using type = addition_engine_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -66,12 +75,16 @@ struct addition_engine_traits_extractor<OT, U, V, void_t<typename OT::template a
     using type = typename OT::template addition_engine_traits<OT, U, V>;
 };
 
+template<typename OT, typename U, typename V>
+using addition_engine_traits_t = typename addition_engine_traits_extractor<OT, U, V>::type;
+
+
 //-----
 //
 template<typename OT, typename U, typename V, typename = void>
 struct addition_arithmetic_traits_extractor
 {
-    using type = matrix_operation_traits::addition_arithmetic_traits<OT,U,V>;
+    using type = addition_arithmetic_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -80,14 +93,17 @@ struct addition_arithmetic_traits_extractor<OT, U, V, void_t<typename OT::templa
     using type = typename OT::template addition_arithmetic_traits<OT, U, V>;
 };
 
+template<typename OT, typename U, typename V>
+using addition_arithmetic_traits_t = typename addition_arithmetic_traits_extractor<OT, U, V>::type;
+
 
 //==================================================================================================
-//                              **** ELEMENT ADDITION TRAITS ****
+//                              **** ADDITION ELEMENT TRAITS ****
 //==================================================================================================
 //- The standard element addition traits type provides the default mechanism for determining the
 //  result of adding two elements of (possibly) different types.
 //
-template<class OTR, class T1, class T2>
+template<class COTR, class T1, class T2>
 struct addition_element_traits
 {
     using element_type = decltype(declval<T1>() + declval<T2>());
@@ -95,12 +111,31 @@ struct addition_element_traits
 
 
 //==================================================================================================
-//                              **** ENGINE ADDITION TRAITS ****
+//                              **** ADDITION LAYOUT TRAITS ****
+//==================================================================================================
+//- The standard layout addition traits type provides the default mechanism for determining the
+//  resulting data layout using by matrix_storage_engine when adding two matrices.
+//
+template<class COTR, class L1, class L2>
+struct addition_layout_traits
+{
+    using layout_type = matrix_layout::row_major;
+};
+
+template<class COTR>
+struct addition_layout_traits<COTR, matrix_layout::column_major, matrix_layout::column_major>
+{
+    using layout_type = matrix_layout::column_major;
+};
+
+
+//==================================================================================================
+//                              **** ADDITION ENGINE TRAITS ****
 //==================================================================================================
 //- The standard engine addition traits type provides the default mechanism for determining the
 //  correct engine type for a matrix/matrix or vector/vector addition.
 //
-template<class OTR, class ET1, class ET2>
+template<class COTR, class ET1, class ET2>
 struct addition_engine_traits
 {
     //- Get the extents for each engine
@@ -131,7 +166,7 @@ struct addition_engine_traits
     //
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
-    using element_traits = typename addition_element_traits_extractor<OTR, element_type_1, element_type_2>::type;
+    using element_traits = addition_element_traits_t<COTR, element_type_1, element_type_2>;
     using elem_type      = typename element_traits::element_type;
 
     //- Determine the appropriate allocation and layout traits for the resulting engine type.
@@ -139,7 +174,7 @@ struct addition_engine_traits
     using owning_type_1     = get_owning_engine_type_t<ET1>;
     using owning_type_2     = get_owning_engine_type_t<ET2>;
     using allocation_traits = engine_allocation_traits<owning_type_1, owning_type_2, dyn_size, RR, CR, elem_type>;
-    using layout_traits     = engine_layout_traits<ET1, ET2, false>;
+    using layout_traits     = engine_layout_traits<COTR, owning_type_1, owning_type_2, addition_layout_traits>;
 
     //- Determine required engine template parameters from the traits types.
     //
@@ -153,23 +188,22 @@ struct addition_engine_traits
 
 
 //==================================================================================================
-//                              **** ENGINE ADDITION TRAITS ****
+//                              **** ADDITION ARITHMETIC TRAITS ****
 //==================================================================================================
 //- The standard addition arithmetic traits type provides the default mechanism for computing the
 //  result of a matrix/matrix addition.
 //
-template<class OTR, class ET1, class COT1, class ET2, class COT2>
-struct addition_arithmetic_traits<OTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
+template<class COTR, class ET1, class COT1, class ET2, class COT2>
+struct addition_arithmetic_traits<COTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
 {
   private:
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = typename ET2::element_type;
-    using element_xtract = addition_element_traits_extractor<OTR, element_type_1, element_type_2>;
-    using element_traits = typename element_xtract::type;
+    using element_traits = addition_element_traits_t<COTR, element_type_1, element_type_2>;
 
     using engine_type_1 = typename matrix<ET1, COT1>::engine_type;
     using engine_type_2 = typename matrix<ET2, COT2>::engine_type;
-    using engine_traits = typename addition_engine_traits_extractor<OTR, engine_type_1, engine_type_2>::type;
+    using engine_traits = addition_engine_traits_t<COTR, engine_type_1, engine_type_2>;
 
     static_assert(std::is_same_v<typename element_traits::element_type,
                                  typename engine_traits::engine_type::element_type>);
@@ -177,7 +211,7 @@ struct addition_arithmetic_traits<OTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
   public:
     using element_type = typename element_traits::element_type;
     using engine_type  = typename engine_traits::engine_type;
-    using result_type  = matrix<engine_type, OTR>;
+    using result_type  = matrix<engine_type, COTR>;
 
     static constexpr result_type
     add(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
@@ -188,7 +222,7 @@ struct addition_arithmetic_traits<OTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
 
         size_type_r     rows = static_cast<size_type_r>(m1.rows());
         size_type_r     cols = static_cast<size_type_r>(m1.columns());
-        result_type		mr;
+        result_type	    mr;
 
         if constexpr (detail::reshapable_matrix_engine<engine_type>)
         {
