@@ -103,6 +103,7 @@ struct matrix_layout
 {
     struct row_major {};
     struct column_major {};
+    struct unknown{};
 };
 
 

@@ -97,7 +97,7 @@ using division_arithmetic_traits_t = typename division_arithmetic_traits_extract
 
 
 //==================================================================================================
-//                           **** ELEMENT DIVISION TRAITS ****
+//                              **** DIVISION ELEMENT TRAITS ****
 //==================================================================================================
 //- The standard element division traits type provides the default mechanism for determining
 //  the result of multiplying two elements of (possibly) different types.
@@ -110,7 +110,7 @@ struct division_element_traits
 
 
 //==================================================================================================
-//                              **** SUBTRACTION LAYOUT TRAITS ****
+//                               **** DIVISION LAYOUT TRAITS ****
 //==================================================================================================
 //- The standard layout addition traits type provides the default mechanism for determining the
 //  resulting data layout when adding two matrices having different layouts..
@@ -129,15 +129,23 @@ struct division_layout_traits<COTR, matrix_layout::column_major, matrix_layout::
 
 
 //==================================================================================================
-//                            **** ENGINE DIVISION TRAITS ****
+//                              **** DIVISION ENGINE TRAITS ****
 //==================================================================================================
 //
 //- The standard engine addition traits type provides the default mechanism for determining the
 //  correct engine type for a matrix/matrix or vector/vector addition.
 //
-template<class OTR, class ET1, class S2>
+template<class COTR, class ET1, class S2>
 struct division_engine_traits
 {
+    //- Extract the element traits from the operation traits, and determine the resulting
+    //  element type.
+    //
+    using element_type_1 = typename ET1::element_type;
+    using element_type_2 = S2;
+    using element_traits = division_element_traits_t<COTR, element_type_1, element_type_2>;
+    using elem_type      = typename element_traits::element_type;
+
     //- Get the extents for the engine
     //
     static constexpr size_t     R1 = engine_extents_helper<ET1>::rows();
@@ -149,54 +157,47 @@ struct division_engine_traits
     static constexpr bool   dyn_cols = (C1 == dynamic_extent);
     static constexpr bool   dyn_size = (dyn_rows || dyn_cols);
 
-    //- Decide on the new extents.
+    //- Determine the new extents.
     //
     static constexpr size_t     RR = R1;
     static constexpr size_t     CR = C1;
 
-    //- Extract the element traits from the operation traits, and determine the resulting
-    //  element type.
-    //
-    using element_type_1 = typename ET1::element_type;
-    using element_type_2 = S2;
-    using element_traits = division_element_traits_t<OTR, element_type_1, element_type_2>;
-    using elem_type      = typename element_traits::element_type;
-
-    //- Determine the appropriate allocation and layout traits for the resulting engine type.
+    //- Determine the resulting allocator type.
     //
     using owning_type_1     = get_owning_engine_type_t<ET1>;
     using allocation_traits = engine_allocation_traits<owning_type_1, owning_type_1, dyn_size, RR, CR, elem_type>;
-    using layout_traits     = engine_layout_traits<OTR, owning_type_1, owning_type_1, division_layout_traits>;
+    using allocator_type    = typename allocation_traits::allocator_type;
 
-    //- Determine required engine template parameters from the traits types.
+    //- Determine the resulting layout type.
     //
-    using allocator_type = typename allocation_traits::allocator_type;
-    using layout_type    = typename layout_traits::layout_type;
+    using layout_type_1 = get_element_layout_t<ET1>;
+    using layout_traits = division_layout_traits<COTR, layout_type_1, layout_type_1>;
+    using layout_type   = typename layout_traits::layout_type;
 
   public:
-    using element_type = typename element_traits::element_type;
+    using element_type = elem_type;
     using engine_type  = matrix_storage_engine<element_type, RR, CR, allocator_type, layout_type>;
 };
 
 
 //==================================================================================================
-//                                  **** DIVISION TRAITS ****
+//                            **** DIVISION ARITHMETIC TRAITS ****
 //==================================================================================================
 //
 //- The standard addition arithmetic traits type provides the default mechanism for computing the
 //  result of a matrix/matrix addition.
 //
-template<class OTR, class ET1, class COT1, class S2>
-struct division_arithmetic_traits<OTR, matrix<ET1, COT1>, S2>
+template<class COTR, class ET1, class COT1, class S2>
+struct division_arithmetic_traits<COTR, matrix<ET1, COT1>, S2>
 {
   private:
     using element_type_1 = typename ET1::element_type;
     using element_type_2 = S2;
-    using element_traits = division_element_traits_t<OTR, element_type_1, element_type_2>;
+    using element_traits = division_element_traits_t<COTR, element_type_1, element_type_2>;
 
     using engine_type_1 = typename matrix<ET1, COT1>::engine_type;
     using engine_type_2 = S2;
-    using engine_traits = division_engine_traits_t<OTR, engine_type_1, engine_type_2>;
+    using engine_traits = division_engine_traits_t<COTR, engine_type_1, engine_type_2>;
 
     static_assert(std::is_same_v<typename element_traits::element_type,
                                  typename engine_traits::engine_type::element_type>);
@@ -204,7 +205,7 @@ struct division_arithmetic_traits<OTR, matrix<ET1, COT1>, S2>
   public:
     using element_type = typename element_traits::element_type;
     using engine_type  = typename engine_traits::engine_type;
-    using result_type  = matrix<engine_type, OTR>;
+    using result_type  = matrix<engine_type, COTR>;
 
     static constexpr result_type
     divide(matrix<ET1, COT1> const& m1, S2 const& s2)

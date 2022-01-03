@@ -59,6 +59,7 @@ struct mse_data
     {}
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
+
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
 };
@@ -107,6 +108,7 @@ struct mse_data<T, R, C, void, L>
     }
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
+
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
 
@@ -165,6 +167,7 @@ struct mse_data<T, R, dynamic_extent, A, L>
     {}
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
+
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
 };
@@ -211,6 +214,7 @@ struct mse_data<T, dynamic_extent, C, A, L>
     {}
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
+
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
 };
@@ -257,6 +261,7 @@ struct mse_data<T, dynamic_extent, dynamic_extent, A, L>
     {}
     constexpr mse_data(mse_data&&) noexcept = default;
     constexpr mse_data(mse_data const&) = default;
+
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
 };
@@ -304,8 +309,9 @@ class matrix_storage_engine
     storage_type    m_data;
 
   public:
-    using allocator_type  = A;
     using element_type    = T;
+    using allocator_type  = A;
+    using layout_type     = L;
     using reference       = element_type&;
     using const_reference = element_type const&;
     using size_type       = size_t;

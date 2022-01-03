@@ -499,19 +499,14 @@ concept valid_engine_extents_and_allocator =
 
 //--------------------------------------------------------------------------------------------------
 //  Concepts:   valid_layout_for_2d_storage_engine<L>
-//              valid_layout_for_1d_storage_engine<L>
 //
-//  These private concepts are used to validate the fourth template parameter of a specialization
-//  of matrix_storage_engine, the engine's layout type.  It must be row_major or column_major for
-//  matrix storage engines, and unoriented for vector storage engines.
+//  This private concept is used to validate the fifth template parameter of matrix_storage_engine,
+//  the engine's layout type.  It must be row_major or column_major for matrix storage engines.
 //--------------------------------------------------------------------------------------------------
 //
 template<typename L>
 concept valid_layout_for_2d_storage_engine =
     (std::is_same_v<L, matrix_layout::row_major> || std::is_same_v<L, matrix_layout::column_major>);
-
-template<typename L>
-concept valid_layout_for_1d_storage_engine = std::is_same_v<L, void>;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -849,6 +844,55 @@ struct engine_extents_helper
         return get_value_helper([]{ return static_cast<size_t>(ET().size()); });
     }
 };
+
+
+template<class ET>
+struct element_layout_helper
+{
+    using layout_type = matrix_layout::unknown;
+};
+
+template<class ET>
+using get_element_layout_t = typename element_layout_helper<ET>::layout_type;
+
+
+template<class ET, class = void>
+struct extract_nested_layout_type_alias
+{
+    using layout_type = void;
+};
+
+template<class ET>
+struct extract_nested_layout_type_alias<ET, void_t<typename ET::layout_type>>
+{
+    using layout_type = typename ET::layout_type;
+};
+
+template<class ET>
+using get_layout_type_t = typename extract_nested_layout_type_alias<ET>::layout_type;
+
+
+
+template<class LT>
+struct transpose_layout_helper
+{
+    using layout_type = matrix_layout::unknown;
+};
+
+template<>
+struct transpose_layout_helper<matrix_layout::row_major>
+{
+    using layout_type = matrix_layout::column_major;
+};
+
+template<>
+struct transpose_layout_helper<matrix_layout::column_major>
+{
+    using layout_type = matrix_layout::row_major;
+};
+
+template<class LT>
+using get_transpose_layout_t = typename transpose_layout_helper<LT>::layout_type;
 
 
 //==================================================================================================

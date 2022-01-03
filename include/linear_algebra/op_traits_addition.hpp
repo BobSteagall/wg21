@@ -114,7 +114,7 @@ struct addition_element_traits
 //                              **** ADDITION LAYOUT TRAITS ****
 //==================================================================================================
 //- The standard layout addition traits type provides the default mechanism for determining the
-//  resulting data layout using by matrix_storage_engine when adding two matrices.
+//  data layout used by the matrix_storage_engine result when adding two matrices.
 //
 template<class COTR, class L1, class L2>
 struct addition_layout_traits
@@ -138,6 +138,14 @@ struct addition_layout_traits<COTR, matrix_layout::column_major, matrix_layout::
 template<class COTR, class ET1, class ET2>
 struct addition_engine_traits
 {
+    //- Extract the element traits from the operation traits, and determine the resulting
+    //  element type.
+    //
+    using element_type_1 = typename ET1::element_type;
+    using element_type_2 = typename ET2::element_type;
+    using element_traits = addition_element_traits_t<COTR, element_type_1, element_type_2>;
+    using elem_type      = typename element_traits::element_type;
+
     //- Get the extents for each engine
     //
     static constexpr size_t     R1 = engine_extents_helper<ET1>::rows();
@@ -156,33 +164,27 @@ struct addition_engine_traits
     static_assert((dyn_rows || R1 == R2), "mis-matched/invalid number of rows for addition");
     static_assert((dyn_cols || C1 == C2), "mis-matched/invalid number of columns for addition");
 
-    //- Decide on the new extents.
+    //- Determine the new extents.
     //
     static constexpr size_t     RR = (dyn_rows) ? dynamic_extent : R1;
     static constexpr size_t     CR = (dyn_cols) ? dynamic_extent : C1;
 
-    //- Extract the element traits from the operation traits, and determine the resulting
-    //  element type.
-    //
-    using element_type_1 = typename ET1::element_type;
-    using element_type_2 = typename ET2::element_type;
-    using element_traits = addition_element_traits_t<COTR, element_type_1, element_type_2>;
-    using elem_type      = typename element_traits::element_type;
-
-    //- Determine the appropriate allocation and layout traits for the resulting engine type.
+    //- Determine the resulting allocator type.
     //
     using owning_type_1     = get_owning_engine_type_t<ET1>;
     using owning_type_2     = get_owning_engine_type_t<ET2>;
     using allocation_traits = engine_allocation_traits<owning_type_1, owning_type_2, dyn_size, RR, CR, elem_type>;
-    using layout_traits     = engine_layout_traits<COTR, owning_type_1, owning_type_2, addition_layout_traits>;
+    using allocator_type    = typename allocation_traits::allocator_type;
 
-    //- Determine required engine template parameters from the traits types.
+    //- Determine the resulting layout type.
     //
-    using allocator_type = typename allocation_traits::allocator_type;
-    using layout_type    = typename layout_traits::layout_type;
+    using layout_type_1 = get_element_layout_t<ET1>;
+    using layout_type_2 = get_element_layout_t<ET2>;
+    using layout_traits = addition_layout_traits<COTR, layout_type_1, layout_type_2>;
+    using layout_type   = typename layout_traits::layout_type;
 
   public:
-    using element_type = typename element_traits::element_type;
+    using element_type = elem_type;
     using engine_type  = matrix_storage_engine<element_type, RR, CR, allocator_type, layout_type>;
 };
 
