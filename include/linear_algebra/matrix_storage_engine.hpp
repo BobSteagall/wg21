@@ -290,7 +290,7 @@ template<class T, size_t R, size_t C, class A, class L>
 requires
     detail::valid_engine_extents_and_allocator<T, R, C, A>
     and
-    detail::valid_layout_for_2d_storage_engine<L>
+    detail::valid_layout_for_storage_engine<L>
 class matrix_storage_engine
 {
   public:

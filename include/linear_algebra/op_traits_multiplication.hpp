@@ -233,7 +233,7 @@ struct multiplication_engine_traits<COTR, matrix_scalar_engine<S1>, ET2>
     //- Determine the resulting layout type.
     //
     using layout_type_2 = get_element_layout_t<ET2>;
-    using layout_traits = addition_layout_traits<COTR, layout_type_2, layout_type_2>;
+    using layout_traits = multiplication_layout_traits<COTR, layout_type_2, layout_type_2>;
     using layout_type   = typename layout_traits::layout_type;
 
   public:
@@ -279,7 +279,7 @@ struct multiplication_engine_traits<COTR, ET1, matrix_scalar_engine<S2>>
     //- Determine the resulting layout type.
     //
     using layout_type_1 = get_element_layout_t<ET1>;
-    using layout_traits = addition_layout_traits<COTR, layout_type_1, layout_type_1>;
+    using layout_traits = multiplication_layout_traits<COTR, layout_type_1, layout_type_1>;
     using layout_type   = typename layout_traits::layout_type;
 
   public:

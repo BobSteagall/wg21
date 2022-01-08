@@ -498,14 +498,14 @@ concept valid_engine_extents_and_allocator =
 
 
 //--------------------------------------------------------------------------------------------------
-//  Concepts:   valid_layout_for_2d_storage_engine<L>
+//  Concepts:   valid_layout_for_storage_engine<L>
 //
 //  This private concept is used to validate the fifth template parameter of matrix_storage_engine,
 //  the engine's layout type.  It must be row_major or column_major for matrix storage engines.
 //--------------------------------------------------------------------------------------------------
 //
 template<typename L>
-concept valid_layout_for_2d_storage_engine =
+concept valid_layout_for_storage_engine =
     (std::is_same_v<L, matrix_layout::row_major> || std::is_same_v<L, matrix_layout::column_major>);
 
 
