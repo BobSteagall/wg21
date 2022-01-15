@@ -177,8 +177,8 @@ struct subtraction_engine_traits
 
     //- Determine the resulting layout type.
     //
-    using layout_type_1 = get_element_layout_t<ET1>;
-    using layout_type_2 = get_element_layout_t<ET2>;
+    using layout_type_1 = get_layout_t<ET1>;
+    using layout_type_2 = get_layout_t<ET2>;
     using layout_traits = subtraction_layout_traits<COTR, layout_type_1, layout_type_2>;
     using layout_type   = typename layout_traits::layout_type;
 

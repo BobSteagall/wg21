@@ -33,12 +33,6 @@ struct engine_extents_helper<matrix_storage_engine<T, R, C, A, L>>
     }
 };
 
-template<class T, size_t R, size_t C, class A, class L>
-struct element_layout_helper<matrix_storage_engine<T, R, C, A, L>>
-{
-    using layout_type = L;
-};
-
 
 //==================================================================================================
 //                              **** ALLOCATION TRAITS ****

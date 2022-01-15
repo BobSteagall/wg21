@@ -45,7 +45,7 @@ class matrix_view_engine<ET, matrix_view::const_negation>
     using engine_type        = ET;
     using owning_engine_type = detail::get_owning_engine_type_t<ET>;
     using element_type       = typename engine_type::element_type;
-    using layout_type        = detail::get_layout_type_t<ET>;
+    using layout_type        = detail::get_layout_t<ET>;
     using reference          = typename engine_type::element_type;
     using const_reference    = typename engine_type::element_type;
     using size_type          = typename engine_type::size_type;
@@ -192,7 +192,7 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
     using engine_type        = ET;
     using owning_engine_type = detail::get_owning_engine_type_t<ET>;
     using element_type       = typename engine_type::element_type;
-    using layout_type        = detail::get_layout_type_t<ET>;
+    using layout_type        = detail::get_layout_t<ET>;
     using reference          = conj_elem_type;
     using const_reference    = conj_elem_type;
     using size_type          = typename engine_type::size_type;
@@ -346,7 +346,7 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
     using engine_type        = ET;
     using owning_engine_type = detail::get_owning_engine_type_t<ET>;
     using element_type       = typename engine_type::element_type;
-    using layout_type        = detail::get_transpose_layout_t<detail::get_layout_type_t<ET>>;
+    using layout_type        = detail::get_transpose_layout_t<detail::get_layout_t<ET>>;
     using reference          = conj_elem_type;
     using const_reference    = conj_elem_type;
     using size_type          = typename engine_type::size_type;
@@ -497,7 +497,7 @@ class matrix_view_engine<ET, matrix_view::identity>
     using engine_type        = ET;
     using owning_engine_type = detail::get_owning_engine_type_t<ET>;
     using element_type       = typename engine_type::element_type;
-    using layout_type        = detail::get_layout_type_t<ET>;
+    using layout_type        = detail::get_layout_t<ET>;
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
@@ -649,7 +649,7 @@ class matrix_view_engine<ET, matrix_view::const_identity>
     using engine_type        = ET;
     using owning_engine_type = detail::get_owning_engine_type_t<ET>;
     using element_type       = typename engine_type::element_type;
-    using layout_type        = detail::get_layout_type_t<ET>;
+    using layout_type        = detail::get_layout_t<ET>;
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
@@ -802,7 +802,7 @@ class matrix_view_engine<ET, matrix_view::transpose>
     using engine_type        = ET;
     using owning_engine_type = detail::get_owning_engine_type_t<ET>;
     using element_type       = typename engine_type::element_type;
-    using layout_type        = detail::get_transpose_layout_t<detail::get_layout_type_t<ET>>;
+    using layout_type        = detail::get_transpose_layout_t<detail::get_layout_t<ET>>;
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
@@ -954,7 +954,7 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
     using engine_type        = ET;
     using owning_engine_type = detail::get_owning_engine_type_t<ET>;
     using element_type       = typename engine_type::element_type;
-    using layout_type        = detail::get_transpose_layout_t<detail::get_layout_type_t<ET>>;
+    using layout_type        = detail::get_transpose_layout_t<detail::get_layout_t<ET>>;
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
@@ -1107,7 +1107,7 @@ class matrix_view_engine<ET, matrix_view::column>
     using engine_type        = ET;
     using owning_engine_type = detail::get_owning_engine_type_t<ET>;
     using element_type       = typename engine_type::element_type;
-    using layout_type        = detail::get_layout_type_t<ET>;
+    using layout_type        = detail::get_layout_t<ET>;
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
@@ -1246,7 +1246,7 @@ class matrix_view_engine<ET, matrix_view::const_column>
     using engine_type        = ET;
     using owning_engine_type = detail::get_owning_engine_type_t<ET>;
     using element_type       = typename engine_type::element_type;
-    using layout_type        = detail::get_layout_type_t<ET>;
+    using layout_type        = detail::get_layout_t<ET>;
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
@@ -1386,7 +1386,7 @@ class matrix_view_engine<ET, matrix_view::row>
     using engine_type        = ET;
     using owning_engine_type = detail::get_owning_engine_type_t<ET>;
     using element_type       = typename engine_type::element_type;
-    using layout_type        = detail::get_layout_type_t<ET>;
+    using layout_type        = detail::get_layout_t<ET>;
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
@@ -1525,7 +1525,7 @@ class matrix_view_engine<ET, matrix_view::const_row>
     using engine_type        = ET;
     using owning_engine_type = detail::get_owning_engine_type_t<ET>;
     using element_type       = typename engine_type::element_type;
-    using layout_type        = detail::get_layout_type_t<ET>;
+    using layout_type        = detail::get_layout_t<ET>;
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;

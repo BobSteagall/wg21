@@ -170,7 +170,7 @@ struct division_engine_traits
 
     //- Determine the resulting layout type.
     //
-    using layout_type_1 = get_element_layout_t<ET1>;
+    using layout_type_1 = get_layout_t<ET1>;
     using layout_traits = division_layout_traits<COTR, layout_type_1, layout_type_1>;
     using layout_type   = typename layout_traits::layout_type;
 

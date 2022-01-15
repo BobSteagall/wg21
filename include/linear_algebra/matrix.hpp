@@ -326,7 +326,7 @@ class matrix
     }
 
     //----------------------------------------------------------
-    //- Assignment from a 2D initializtion list.
+    //- Assignment from a 2D initialization list.
     //
     template<class U>
     constexpr matrix&

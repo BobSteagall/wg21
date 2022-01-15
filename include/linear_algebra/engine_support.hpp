@@ -822,54 +822,40 @@ struct engine_extents_helper
   public:
     static constexpr size_t
     columns()
-    requires
-        readable_matrix_engine<ET>
     {
         return get_value_helper([]{ return static_cast<size_t>(ET().columns()); });
     }
 
     static constexpr size_t
     rows()
-    requires
-        readable_matrix_engine<ET>
     {
         return get_value_helper([]{ return static_cast<size_t>(ET().rows()); });
     }
 
     static constexpr size_t
     size()
-    requires
-        readable_matrix_engine<ET>
     {
         return get_value_helper([]{ return static_cast<size_t>(ET().size()); });
     }
 };
 
 
-template<class ET>
-struct element_layout_helper
-{
-    using layout_type = matrix_layout::unknown;
-};
-
-template<class ET>
-using get_element_layout_t = typename element_layout_helper<ET>::layout_type;
-
 
 template<class ET, class = void>
-struct extract_nested_layout_type_alias
+struct layout_type_extractor
 {
     using layout_type = void;
 };
 
 template<class ET>
-struct extract_nested_layout_type_alias<ET, void_t<typename ET::layout_type>>
+struct layout_type_extractor<ET, void_t<typename ET::layout_type>>
 {
     using layout_type = typename ET::layout_type;
 };
 
 template<class ET>
-using get_layout_type_t = typename extract_nested_layout_type_alias<ET>::layout_type;
+using get_layout_t = typename layout_type_extractor<ET>::layout_type;
+
 
 
 
