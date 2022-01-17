@@ -191,7 +191,7 @@ class matrix
     requires
         detail::writable_and_1d_indexable_matrix_engine<ET>
         and
-        detail::random_access_standard_container<CT>
+        detail::standard_random_access_container<CT>
         and
         detail::constructible_from<engine_type, CT>
     :   m_engine(rhs)
@@ -203,7 +203,7 @@ class matrix
     requires
         detail::writable_and_1d_indexable_matrix_engine<ET>
         and
-        detail::random_access_standard_container<CT>
+        detail::standard_random_access_container<CT>
         and
         detail::not_constructible_from<engine_type, CT>
         and
@@ -363,7 +363,7 @@ class matrix
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
-        detail::random_access_standard_container<CT>
+        detail::standard_random_access_container<CT>
         and
         detail::assignable_from<engine_type, decltype(rhs)>
     {
@@ -377,7 +377,7 @@ class matrix
     requires
         detail::writable_and_1d_indexable_matrix_engine<ET>
         and
-        detail::random_access_standard_container<CT>
+        detail::standard_random_access_container<CT>
         and
         detail::not_assignable_from<engine_type, decltype(rhs)>
         and

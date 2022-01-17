@@ -202,7 +202,7 @@ struct mdspan_view_traits<void>
     using transpose_mdspan_type = void;
 };
 
-//- This partial specialization is used when the view engine has a true mdspan interface.
+//- This partial specialization is used when the view engine has a non-void mdspan interface.
 //
 template<class T, size_t X0, size_t X1, class L, class A>
 struct mdspan_view_traits<mdspan<T, extents<X0, X1>, L, A>>

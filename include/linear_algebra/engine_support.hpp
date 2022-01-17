@@ -79,33 +79,33 @@ bool    is_complex_v = is_specialization_of_v<T, std::complex>;
 
 
 //--------------------------------------------------------------------------------------------------
-//  Trait:      is_random_access_standard_container<X>
-//  Variable:   is_random_access_standard_container_v<X>
+//  Trait:      is_standard_random_access_container<X>
+//  Variable:   is_standard_random_access_container_v<X>
 //
 //  This private traits type determines whether the template parameter is a specialization
 //  of std::array, std::deque, or std::vector.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T>
-struct is_random_access_standard_container : public false_type
+struct is_standard_random_access_container : public false_type
 {};
 
 template<class T, std::size_t N>
-struct is_random_access_standard_container<std::array<T, N>> : public true_type
+struct is_standard_random_access_container<std::array<T, N>> : public true_type
 {};
 
 template<class T, class A>
-struct is_random_access_standard_container<std::deque<T, A>> : public true_type
+struct is_standard_random_access_container<std::deque<T, A>> : public true_type
 {};
 
 template<class T, class A>
-struct is_random_access_standard_container<std::vector<T, A>> : public true_type
+struct is_standard_random_access_container<std::vector<T, A>> : public true_type
 {};
 
 //------
 //
 template<class T> inline constexpr
-bool    is_random_access_standard_container_v = is_random_access_standard_container<T>::value;
+bool    is_standard_random_access_container_v = is_standard_random_access_container<T>::value;
 
 
 //==================================================================================================
@@ -264,6 +264,92 @@ template<class ET> inline constexpr
 bool    has_constexpr_size_v = has_constexpr_size<ET>();
 
 
+//--------------------------------------------------------------------------------------------------
+//  Class:      engine_extents_helper<ET>
+//
+//  This private concept determines whether to use row-wise indexing for the inner loop when
+//  performing two-dimensional iteration over the elements of a matrix engine.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET>
+struct engine_extents_helper
+{
+  private:
+    template<class Lambda, int = (Lambda{}(), 0)>
+    static constexpr size_t
+    get_value_helper(Lambda)
+    {
+        return Lambda{}();
+    }
+
+    static constexpr size_t
+    get_value_helper(...)
+    {
+        return dynamic_extent;
+    }
+
+  public:
+    static constexpr size_t
+    columns()
+    {
+        return get_value_helper([]{ return static_cast<size_t>(ET().columns()); });
+    }
+
+    static constexpr size_t
+    rows()
+    {
+        return get_value_helper([]{ return static_cast<size_t>(ET().rows()); });
+    }
+
+    static constexpr size_t
+    size()
+    {
+        return get_value_helper([]{ return static_cast<size_t>(ET().size()); });
+    }
+};
+
+
+
+template<class ET, class = void>
+struct layout_type_extractor
+{
+    using layout_type = matrix_layout::unknown;
+};
+
+template<class ET>
+struct layout_type_extractor<ET, void_t<typename ET::layout_type>>
+{
+    using layout_type = typename ET::layout_type;
+};
+
+template<class ET>
+using get_layout_t = typename layout_type_extractor<ET>::layout_type;
+
+
+
+
+template<class LT>
+struct transpose_layout_helper
+{
+    using layout_type = matrix_layout::unknown;
+};
+
+template<>
+struct transpose_layout_helper<matrix_layout::row_major>
+{
+    using layout_type = matrix_layout::column_major;
+};
+
+template<>
+struct transpose_layout_helper<matrix_layout::column_major>
+{
+    using layout_type = matrix_layout::row_major;
+};
+
+template<class LT>
+using get_transpose_layout_t = typename transpose_layout_helper<LT>::layout_type;
+
+
 //==================================================================================================
 //  CONCEPT DEFINITIONS
 //==================================================================================================
@@ -396,14 +482,14 @@ concept comparable_types = comparable_types_helper<T1, T2> and comparable_types_
 
 
 //--------------------------------------------------------------------------------------------------
-//  Concept:    random_access_standard_container<CT>
+//  Concept:    standard_random_access_container<CT>
 //
 //  This private concept determines whether a type is a specialization of std::array, std::deque,
 //  or std::vector.
 //--------------------------------------------------------------------------------------------------
 //
 template<class CT>
-concept random_access_standard_container = is_random_access_standard_container_v<CT>;
+concept standard_random_access_container = is_standard_random_access_container_v<CT>;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -795,92 +881,6 @@ concept row_reshapable_matrix_engine =
     };
 
 
-//--------------------------------------------------------------------------------------------------
-//  Class:      engine_extents_helper<ET>
-//
-//  This private concept determines whether to use row-wise indexing for the inner loop when
-//  performing two-dimensional iteration over the elements of a matrix engine.
-//--------------------------------------------------------------------------------------------------
-//
-template<class ET>
-struct engine_extents_helper
-{
-  private:
-    template<class Lambda, int = (Lambda{}(), 0)>
-    static constexpr size_t
-    get_value_helper(Lambda)
-    {
-        return Lambda{}();
-    }
-
-    static constexpr size_t
-    get_value_helper(...)
-    {
-        return dynamic_extent;
-    }
-
-  public:
-    static constexpr size_t
-    columns()
-    {
-        return get_value_helper([]{ return static_cast<size_t>(ET().columns()); });
-    }
-
-    static constexpr size_t
-    rows()
-    {
-        return get_value_helper([]{ return static_cast<size_t>(ET().rows()); });
-    }
-
-    static constexpr size_t
-    size()
-    {
-        return get_value_helper([]{ return static_cast<size_t>(ET().size()); });
-    }
-};
-
-
-
-template<class ET, class = void>
-struct layout_type_extractor
-{
-    using layout_type = void;
-};
-
-template<class ET>
-struct layout_type_extractor<ET, void_t<typename ET::layout_type>>
-{
-    using layout_type = typename ET::layout_type;
-};
-
-template<class ET>
-using get_layout_t = typename layout_type_extractor<ET>::layout_type;
-
-
-
-
-template<class LT>
-struct transpose_layout_helper
-{
-    using layout_type = matrix_layout::unknown;
-};
-
-template<>
-struct transpose_layout_helper<matrix_layout::row_major>
-{
-    using layout_type = matrix_layout::column_major;
-};
-
-template<>
-struct transpose_layout_helper<matrix_layout::column_major>
-{
-    using layout_type = matrix_layout::row_major;
-};
-
-template<class LT>
-using get_transpose_layout_t = typename transpose_layout_helper<LT>::layout_type;
-
-
 //==================================================================================================
 //  MATRIX ENGINE SUPPORT TYPE DEFINITION
 //==================================================================================================
@@ -1150,7 +1150,7 @@ struct matrix_engine_support
     requires
         writable_and_1d_indexable_matrix_engine<ET>
         and
-        random_access_standard_container<CT>
+        standard_random_access_container<CT>
         and
         convertible_from<typename ET::element_type, typename CT::value_type>
     {
@@ -1410,7 +1410,7 @@ struct matrix_engine_support
     requires
         readable_and_1d_indexable_matrix_engine<ET>
         and
-        random_access_standard_container<CT>
+        standard_random_access_container<CT>
         and
         comparable_types<typename ET::element_type, typename CT::value_type>
     {

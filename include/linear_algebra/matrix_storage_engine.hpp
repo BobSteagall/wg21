@@ -111,18 +111,6 @@ struct mse_data<T, R, C, void, L>
 
     constexpr mse_data&     operator =(mse_data&&) noexcept = default;
     constexpr mse_data&     operator =(mse_data const&) = default;
-
-    constexpr span_type
-    span()
-    {
-        return span_type(m_elems.data());
-    }
-
-    constexpr const_span_type
-    span() const
-    {
-        return const_span_type(m_elems.data());
-    }
 };
 
 
@@ -428,7 +416,7 @@ class matrix_storage_engine
     requires
         this_type::is_1d_indexable
         and
-        detail::random_access_standard_container<CT>
+        detail::standard_random_access_container<CT>
         and
         detail::convertible_from<element_type, typename CT::value_type>
     :   m_data()
@@ -502,7 +490,7 @@ class matrix_storage_engine
     requires
         this_type::is_1d_indexable
         and
-        detail::random_access_standard_container<CT>
+        detail::standard_random_access_container<CT>
         and
         detail::convertible_from<element_type, typename CT::value_type>
     {
@@ -850,9 +838,5 @@ class matrix_storage_engine
     }
 };
 
-namespace detail {
-
-
-}       //- detail namespace
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_MATRIX_STORAGE_ENGINE_HPP_DEFINED
