@@ -2,8 +2,8 @@
 //  File:       engine_support.hpp
 //
 //  Summary:    This header defines a number of private aliases, traits, concepts, types, and
-//              functions used across the entire library to support matrix engines and the
-//              operations upon them.
+//              functions used throughout the library to support matrix engines and the operations
+//              upon them.
 //==================================================================================================
 //
 #ifndef LINEAR_ALGEBRA_ENGINE_SUPPORT_HPP_DEFINED
@@ -15,8 +15,7 @@ namespace STD_LA {
 //  PUBLIC TYPE FORWARD DECLARATIONS
 //==================================================================================================
 template<class T>
-struct matrix_scalar_engine
-;//{};
+struct matrix_scalar_engine;
 
 
 namespace detail {
@@ -28,7 +27,7 @@ struct special_ctor_tag{};
 
 
 //--------------------------------------------------------------------------------------------------
-//  Trait:      has_size_type<T>
+//  Trait:      detect_size_type<T>
 //  Alias:      get_size_type_t<T>
 //
 //  This private traits type finds the nested type alias size_type if it is present; otherwise,
@@ -36,13 +35,13 @@ struct special_ctor_tag{};
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, typename = void>
-struct has_size_type_alias
+struct detect_size_type_alias
 {
     using size_type = std::size_t;
 };
 
 template<class T>
-struct has_size_type_alias<T, std::void_t<typename T::size_type>>
+struct detect_size_type_alias<T, std::void_t<typename T::size_type>>
 {
     using size_type = typename T::size_type;
 };
@@ -50,7 +49,7 @@ struct has_size_type_alias<T, std::void_t<typename T::size_type>>
 //------
 //
 template<class T>
-using get_size_type_t = typename has_size_type_alias<T>::size_type;
+using get_size_type_t = typename detect_size_type_alias<T>::size_type;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -215,6 +214,9 @@ bool    is_owning_engine_type_v = has_owning_engine_type_alias<ET>::is_owning;
 //
 //  The detection code comes directly from a very cool technique described on StackOverflow at:
 //  https://stackoverflow.com/questions/55288555/c-check-if-statement-can-be-evaluated-constexpr.
+//
+//  Although it is not used in the library implementation, it is used in the unit test source
+//  code, and so we leave it here for now.
 //--------------------------------------------------------------------------------------------------
 //
 template<class Lambda, int = (Lambda{}(), 0)> inline constexpr
@@ -231,37 +233,16 @@ is_constexpr(...)
     return false;
 }
 
-template<class ET> inline constexpr
-bool
-has_constexpr_columns()
-{
-    return is_constexpr([]{ ET().columns(); });
-}
-
-template<class ET> inline constexpr
-bool
-has_constexpr_rows()
-{
-    return is_constexpr([]{ ET().rows(); });
-}
-
-template<class ET> inline constexpr
-bool
-has_constexpr_size()
-{
-    return is_constexpr([]{ ET().size(); });
-}
-
 //------
 //
 template<class ET> inline constexpr
-bool    has_constexpr_columns_v = has_constexpr_columns<ET>();
+bool    has_constexpr_columns_v = is_constexpr([]{ ET().columns(); });
 
 template<class ET> inline constexpr
-bool    has_constexpr_rows_v = has_constexpr_rows<ET>();
+bool    has_constexpr_rows_v = is_constexpr([]{ ET().rows(); });
 
 template<class ET> inline constexpr
-bool    has_constexpr_size_v = has_constexpr_size<ET>();
+bool    has_constexpr_size_v = is_constexpr([]{ ET().size(); });
 
 
 //--------------------------------------------------------------------------------------------------
@@ -269,6 +250,9 @@ bool    has_constexpr_size_v = has_constexpr_size<ET>();
 //
 //  This private concept determines whether to use row-wise indexing for the inner loop when
 //  performing two-dimensional iteration over the elements of a matrix engine.
+//
+//  It uses the same idea for constexpr member detection as the `is_constexpr()` functions
+//  above, the difference being that the end result is an extent instead of a boolean.
 //--------------------------------------------------------------------------------------------------
 //
 template<class ET>
@@ -799,12 +783,12 @@ concept spannable_matrix_engine =
     and
     requires (ET const& ceng, ET& meng)
     {
-        typename ET::span_type;
-        typename ET::const_span_type;
-        requires is_2d_mdspan_v<typename ET::span_type>;
-        requires is_2d_mdspan_v<typename ET::const_span_type>;
-        { meng.span() } -> same_as<typename ET::span_type>;
-        { ceng.span() } -> same_as_either<typename ET::const_span_type, typename ET::span_type>;
+        typename ET::mdspan_type;
+        typename ET::const_mdspan_type;
+        requires is_2d_mdspan_v<typename ET::mdspan_type>;
+        requires is_2d_mdspan_v<typename ET::const_mdspan_type>;
+        { meng.span() } -> same_as<typename ET::mdspan_type>;
+        { ceng.span() } -> same_as_either<typename ET::const_mdspan_type, typename ET::mdspan_type>;
     };
 
 

@@ -30,8 +30,8 @@ template<class T, size_t R, size_t C, class A, class L>
 struct mse_data
 {
     using array_type      = std::vector<T, A>;
-    using span_type       = mdspan<T, extents<R, C>, get_mdspan_layout_t<L>>;
-    using const_span_type = mdspan<T const, extents<R, C>, get_mdspan_layout_t<L>>;
+    using mdspan_type       = mdspan<T, extents<R, C>, get_mdspan_layout_t<L>>;
+    using const_mdspan_type = mdspan<T const, extents<R, C>, get_mdspan_layout_t<L>>;
 
     static constexpr bool   has_dynamic_mdspan   = false;
     static constexpr bool   is_column_matrix     = (C == 1);
@@ -76,8 +76,8 @@ template<class T, size_t R, size_t C, class L>
 struct mse_data<T, R, C, void, L>
 {
     using array_type      = std::array<T, R*C>;
-    using span_type       = mdspan<T, extents<R, C>, get_mdspan_layout_t<L>>;
-    using const_span_type = mdspan<T const, extents<R, C>, get_mdspan_layout_t<L>>;
+    using mdspan_type       = mdspan<T, extents<R, C>, get_mdspan_layout_t<L>>;
+    using const_mdspan_type = mdspan<T const, extents<R, C>, get_mdspan_layout_t<L>>;
 
     static constexpr bool   has_dynamic_mdspan   = false;
     static constexpr bool   is_column_matrix     = (C == 1);
@@ -125,8 +125,8 @@ template<class T, size_t R, class A, class L>
 struct mse_data<T, R, dynamic_extent, A, L>
 {
     using array_type      = std::vector<T, A>;
-    using span_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
-    using const_span_type = mdspan<T const, dyn_mdspan_extents, dyn_mdspan_layout>;
+    using mdspan_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
+    using const_mdspan_type = mdspan<T const, dyn_mdspan_extents, dyn_mdspan_layout>;
 
     static constexpr bool   has_dynamic_mdspan   = true;
     static constexpr bool   is_column_matrix     = false;
@@ -172,8 +172,8 @@ template<class T, size_t C, class A, class L>
 struct mse_data<T, dynamic_extent, C, A, L>
 {
     using array_type      = std::vector<T, A>;
-    using span_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
-    using const_span_type = mdspan<T const, dyn_mdspan_extents, dyn_mdspan_layout>;
+    using mdspan_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
+    using const_mdspan_type = mdspan<T const, dyn_mdspan_extents, dyn_mdspan_layout>;
 
     static constexpr bool   has_dynamic_mdspan   = true;
     static constexpr bool   is_column_matrix     = (C == 1);
@@ -220,8 +220,8 @@ template<class T, class A, class L>
 struct mse_data<T, dynamic_extent, dynamic_extent, A, L>
 {
     using array_type      = std::vector<T, A>;
-    using span_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
-    using const_span_type = mdspan<T const, dyn_mdspan_extents, dyn_mdspan_layout>;
+    using mdspan_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
+    using const_mdspan_type = mdspan<T const, dyn_mdspan_extents, dyn_mdspan_layout>;
 
     static constexpr bool   has_dynamic_mdspan   = true;
     static constexpr bool   is_column_matrix     = false;
@@ -297,14 +297,14 @@ class matrix_storage_engine
     storage_type    m_data;
 
   public:
-    using element_type    = T;
-    using allocator_type  = A;
-    using layout_type     = L;
-    using reference       = element_type&;
-    using const_reference = element_type const&;
-    using size_type       = size_t;
-    using span_type       = typename storage_type::span_type;
-    using const_span_type = typename storage_type::const_span_type;
+    using element_type      = T;
+    using allocator_type    = A;
+    using layout_type       = L;
+    using reference         = element_type&;
+    using const_reference   = element_type const&;
+    using size_type         = size_t;
+    using mdspan_type       = typename storage_type::mdspan_type;
+    using const_mdspan_type = typename storage_type::const_mdspan_type;
 
   public:
     ~matrix_storage_engine() = default;
@@ -610,16 +610,16 @@ class matrix_storage_engine
          return m_data.m_elems[i + (j * m_data.m_rowcap)];
     }
 
-    constexpr span_type
+    constexpr mdspan_type
     span() noexcept
     {
-        return make_mdspan<span_type, storage_type>(m_data);
+        return make_mdspan<mdspan_type, storage_type>(m_data);
     }
 
-    constexpr const_span_type
+    constexpr const_mdspan_type
     span() const noexcept
     {
-        return make_mdspan<const_span_type, storage_type const>(m_data);
+        return make_mdspan<const_mdspan_type, storage_type const>(m_data);
     }
 
     //- Setting overall size and capacity.

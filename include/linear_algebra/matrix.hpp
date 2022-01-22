@@ -22,6 +22,7 @@ class matrix
     static constexpr bool   is_writable = detail::writable_matrix_engine<ET>;
 
     using engine_support              = detail::matrix_engine_support;
+    using possibly_writable_identity  = conditional_t<is_writable, matrix_view::identity, matrix_view::const_identity>;
     using possibly_writable_column    = conditional_t<is_writable, matrix_view::column, matrix_view::const_column>;
     using possibly_writable_row       = conditional_t<is_writable, matrix_view::row, matrix_view::const_row>;
     using possibly_writable_submatrix = conditional_t<is_writable, matrix_view::submatrix, matrix_view::const_submatrix>;
@@ -39,8 +40,8 @@ class matrix
 
     //- Type aliases pertaining to mdspan.
     //
-    using span_type            = detail::get_mdspan_type_t<ET>;
-    using const_span_type      = detail::get_const_mdspan_type_t<ET>;
+    using mdspan_type          = detail::get_mdspan_type_t<ET>;
+    using const_mdspan_type    = detail::get_const_mdspan_type_t<ET>;
 
     //- Type aliases pertaining to views.
     //
@@ -591,7 +592,7 @@ class matrix
     //- Custom operation injection.
     //
     template<class COT2>
-    constexpr matrix<matrix_view_engine<engine_type, matrix_view::identity>, COT2>
+    constexpr matrix<matrix_view_engine<engine_type, possibly_writable_identity>, COT2>
     adopt() noexcept
     {
         return {detail::special_ctor_tag(), m_engine};
@@ -619,7 +620,7 @@ class matrix
         return m_engine;
     }
 
-    constexpr span_type
+    constexpr mdspan_type
     span() noexcept
     requires
         detail::spannable_matrix_engine<engine_type>
@@ -627,7 +628,7 @@ class matrix
         return m_engine.span();
     }
 
-    constexpr const_span_type
+    constexpr const_mdspan_type
     span() const noexcept
     requires
         detail::spannable_matrix_engine<engine_type>

@@ -41,8 +41,8 @@ TEST(Add, Constexpr)
 
     PRINT(ETT::R2);
     PRINT(ETT::C2);
-    PRINT(has_constexpr_columns<ET1>());
-    PRINT(has_constexpr_columns<ET2>());
+    PRINT(has_constexpr_columns_v<ET1>);
+    PRINT(has_constexpr_columns_v<ET2>);
 
     constexpr ET1   et1;
     constexpr auto  r1 = et1.rows();

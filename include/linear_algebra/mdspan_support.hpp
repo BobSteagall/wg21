@@ -2,7 +2,7 @@
 //  File:       mdpsan_support.hpp
 //
 //  Summary:    This header defines a number of private facilities to support the use of
-//              mdspan across the entire library.
+//              mdspan across the library.
 //==================================================================================================
 //
 #ifndef LINEAR_ALGEBRA_MDSPAN_SUPPORT_HPP_DEFINED
@@ -84,34 +84,34 @@ using get_mdspan_layout_t = typename mdspan_layout_mapper<L>::layout_type;
 //  Aliases:    get_mdspan_type_t<T> and get_const_mdspan_type_t<T>
 //
 //  This private traits type and the associated alias templates determine whether or not the
-//  template parameter type has nested type aliases "span_type" and "const_span_type".  If both
-//  aliases are present, then the associated aliases templates refer to the corresponding mdspan
-//  types.  Otherwise, the alias templates refer to the void type.
+//  template parameter type has nested type aliases "mdspan_type" and "const_mdspan_type".  If
+//  both aliases are present, then the associated aliases templates refer to the corresponding
+//  mdspan types.  Otherwise, the alias templates refer to the void type.
 //--------------------------------------------------------------------------------------------------
 //
 template<class ET, class = void>
 struct detect_nested_mdspan_types
 :   public false_type
 {
-    using span_type       = void;
-    using const_span_type = void;
+    using mdspan_type       = void;
+    using const_mdspan_type = void;
 };
 
 template<class ET>
-struct detect_nested_mdspan_types<ET, void_t<typename ET::span_type, typename ET::const_span_type>>
+struct detect_nested_mdspan_types<ET, void_t<typename ET::mdspan_type, typename ET::const_mdspan_type>>
 :   public true_type
 {
-    using span_type       = typename ET::span_type;
-    using const_span_type = typename ET::const_span_type;
+    using mdspan_type       = typename ET::mdspan_type;
+    using const_mdspan_type = typename ET::const_mdspan_type;
 };
 
 //------
 //
 template<class ET>
-using get_mdspan_type_t = typename detect_nested_mdspan_types<ET>::span_type;
+using get_mdspan_type_t = typename detect_nested_mdspan_types<ET>::mdspan_type;
 
 template<class ET>
-using get_const_mdspan_type_t = typename detect_nested_mdspan_types<ET>::const_span_type;
+using get_const_mdspan_type_t = typename detect_nested_mdspan_types<ET>::const_mdspan_type;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -219,9 +219,9 @@ struct mdspan_view_traits<mdspan<T, extents<X0, X1>, L, A>>
     static constexpr negation_mdspan_type
     make_negation(EST const& s)
     {
-        dyn_mdspan_extents     ext(s.extent(0), s.extent(1));
-        dyn_mdspan_strides     str{s.stride(0), s.stride(1)};
-        dyn_mdspan_mapping     map(ext, str);
+        dyn_mdspan_extents  ext(s.extent(0), s.extent(1));
+        dyn_mdspan_strides  str{s.stride(0), s.stride(1)};
+        dyn_mdspan_mapping  map(ext, str);
 
         return negation_mdspan_type(s.data(), map, negation_accessor<T, A>());
     }
@@ -230,9 +230,9 @@ struct mdspan_view_traits<mdspan<T, extents<X0, X1>, L, A>>
     static constexpr conjugate_mdspan_type
     make_conjugate(EST const& s)
     {
-        dyn_mdspan_extents     ext(s.extent(0), s.extent(1));
-        dyn_mdspan_strides     str{s.stride(0), s.stride(1)};
-        dyn_mdspan_mapping     map(ext, str);
+        dyn_mdspan_extents  ext(s.extent(0), s.extent(1));
+        dyn_mdspan_strides  str{s.stride(0), s.stride(1)};
+        dyn_mdspan_mapping  map(ext, str);
 
         return conjugate_mdspan_type(s.data(), map, conjugate_accessor<T, A>());
     }
@@ -241,9 +241,9 @@ struct mdspan_view_traits<mdspan<T, extents<X0, X1>, L, A>>
     static constexpr hermitian_mdspan_type
     make_hermitian(EST const& s)
     {
-        dyn_mdspan_extents     ext(s.extent(1), s.extent(0));
-        dyn_mdspan_strides     str{s.stride(1), s.stride(0)};
-        dyn_mdspan_mapping     map(ext, str);
+        dyn_mdspan_extents  ext(s.extent(1), s.extent(0));
+        dyn_mdspan_strides  str{s.stride(1), s.stride(0)};
+        dyn_mdspan_mapping  map(ext, str);
 
         return hermitian_mdspan_type(s.data(), map, conjugate_accessor<T, A>());
     }
@@ -252,9 +252,9 @@ struct mdspan_view_traits<mdspan<T, extents<X0, X1>, L, A>>
     static constexpr transpose_mdspan_type
     make_transpose(EST const& s)
     {
-        dyn_mdspan_extents     ext(s.extent(1), s.extent(0));
-        dyn_mdspan_strides     str{s.stride(1), s.stride(0)};
-        dyn_mdspan_mapping     map(ext, str);
+        dyn_mdspan_extents  ext(s.extent(1), s.extent(0));
+        dyn_mdspan_strides  str{s.stride(1), s.stride(0)};
+        dyn_mdspan_mapping  map(ext, str);
 
         return transpose_mdspan_type(s.data(), map, A());
     }
@@ -275,9 +275,9 @@ struct mdspan_view_traits<mdspan<T, extents<X0, X1>, L, A>>
         }
         else
         {
-            dyn_mdspan_extents     ext(s.extent(0), s.extent(1));
-            dyn_mdspan_strides     str{s.stride(0), s.stride(1)};
-            dyn_mdspan_mapping     map(ext, str);
+            dyn_mdspan_extents  ext(s.extent(0), s.extent(1));
+            dyn_mdspan_strides  str{s.stride(0), s.stride(1)};
+            dyn_mdspan_mapping  map(ext, str);
 
             return submdspan(submatrix_mdspan_type(s.data(), map), row_set, col_set);
         }

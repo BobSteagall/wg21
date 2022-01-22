@@ -49,8 +49,8 @@ class matrix_view_engine<ET, matrix_view::const_negation>
     using reference          = typename engine_type::element_type;
     using const_reference    = typename engine_type::element_type;
     using size_type          = typename engine_type::size_type;
-    using span_type          = typename const_mdspan_traits::negation_mdspan_type;
-    using const_span_type    = typename const_mdspan_traits::negation_mdspan_type;
+    using mdspan_type        = typename const_mdspan_traits::negation_mdspan_type;
+    using const_mdspan_type  = typename const_mdspan_traits::negation_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -82,7 +82,7 @@ class matrix_view_engine<ET, matrix_view::const_negation>
     constexpr size_type
     columns() const noexcept
     {
-        if constexpr(detail::has_constexpr_columns<engine_type>())
+        if constexpr(detail::has_constexpr_columns_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::columns();
         }
@@ -95,7 +95,7 @@ class matrix_view_engine<ET, matrix_view::const_negation>
     constexpr size_type
     rows() const noexcept
     {
-        if constexpr(detail::has_constexpr_rows<engine_type>())
+        if constexpr(detail::has_constexpr_rows_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::rows();
         }
@@ -108,7 +108,7 @@ class matrix_view_engine<ET, matrix_view::const_negation>
     constexpr size_type
     size() const noexcept
     {
-        if constexpr(detail::has_constexpr_size<engine_type>())
+        if constexpr(detail::has_constexpr_size_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::size();
         }
@@ -144,7 +144,7 @@ class matrix_view_engine<ET, matrix_view::const_negation>
         return -(*mp_engine)(i, j);
     }
 
-    constexpr span_type
+    constexpr mdspan_type
     span() const noexcept
     requires
         this_type::has_mdspan
@@ -196,8 +196,8 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
     using reference          = conj_elem_type;
     using const_reference    = conj_elem_type;
     using size_type          = typename engine_type::size_type;
-    using span_type          = typename const_mdspan_traits::conjugate_mdspan_type;
-    using const_span_type    = typename const_mdspan_traits::conjugate_mdspan_type;
+    using mdspan_type        = typename const_mdspan_traits::conjugate_mdspan_type;
+    using const_mdspan_type  = typename const_mdspan_traits::conjugate_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -229,7 +229,7 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
     constexpr size_type
     columns() const noexcept
     {
-        if constexpr(detail::has_constexpr_columns<engine_type>())
+        if constexpr(detail::has_constexpr_columns_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::columns();
         }
@@ -242,7 +242,7 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
     constexpr size_type
     rows() const noexcept
     {
-        if constexpr(detail::has_constexpr_rows<engine_type>())
+        if constexpr(detail::has_constexpr_rows_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::rows();
         }
@@ -255,7 +255,7 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
     constexpr size_type
     size() const noexcept
     {
-        if constexpr(detail::has_constexpr_size<engine_type>())
+        if constexpr(detail::has_constexpr_size_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::size();
         }
@@ -298,7 +298,7 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
         }
     }
 
-    constexpr span_type
+    constexpr mdspan_type
     span() const noexcept
     requires
         this_type::has_mdspan
@@ -350,8 +350,8 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
     using reference          = conj_elem_type;
     using const_reference    = conj_elem_type;
     using size_type          = typename engine_type::size_type;
-    using span_type          = typename const_mdspan_traits::hermitian_mdspan_type;
-    using const_span_type    = typename const_mdspan_traits::hermitian_mdspan_type;
+    using mdspan_type        = typename const_mdspan_traits::hermitian_mdspan_type;
+    using const_mdspan_type  = typename const_mdspan_traits::hermitian_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -383,7 +383,7 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
     constexpr size_type
     columns() const noexcept
     {
-        if constexpr(detail::has_constexpr_rows<engine_type>())
+        if constexpr(detail::has_constexpr_rows_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::rows();
         }
@@ -396,7 +396,7 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
     constexpr size_type
     rows() const noexcept
     {
-        if constexpr(detail::has_constexpr_columns<engine_type>())
+        if constexpr(detail::has_constexpr_columns_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::columns();
         }
@@ -409,7 +409,7 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
     constexpr size_type
     size() const noexcept
     {
-        if constexpr(detail::has_constexpr_size<engine_type>())
+        if constexpr(detail::has_constexpr_size_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::size();
         }
@@ -452,7 +452,7 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
         }
     }
 
-    constexpr span_type
+    constexpr mdspan_type
     span() const noexcept
     requires
         this_type::has_mdspan
@@ -501,8 +501,8 @@ class matrix_view_engine<ET, matrix_view::identity>
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
-    using span_type          = detail::get_mdspan_type_t<ET>;
-    using const_span_type    = detail::get_const_mdspan_type_t<ET>;
+    using mdspan_type        = detail::get_mdspan_type_t<ET>;
+    using const_mdspan_type  = detail::get_const_mdspan_type_t<ET>;
 
     //- Construct/copy/destroy
     //
@@ -534,7 +534,7 @@ class matrix_view_engine<ET, matrix_view::identity>
     constexpr size_type
     columns() const noexcept
     {
-        if constexpr(detail::has_constexpr_columns<engine_type>())
+        if constexpr(detail::has_constexpr_columns_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::columns();
         }
@@ -547,7 +547,7 @@ class matrix_view_engine<ET, matrix_view::identity>
     constexpr size_type
     rows() const noexcept
     {
-        if constexpr(detail::has_constexpr_rows<engine_type>())
+        if constexpr(detail::has_constexpr_rows_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::rows();
         }
@@ -560,7 +560,7 @@ class matrix_view_engine<ET, matrix_view::identity>
     constexpr size_type
     size() const noexcept
     {
-        if constexpr(detail::has_constexpr_size<engine_type>())
+        if constexpr(detail::has_constexpr_size_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::size();
         }
@@ -604,7 +604,7 @@ class matrix_view_engine<ET, matrix_view::identity>
         return (*mp_engine)(i);
     }
 
-    constexpr span_type
+    constexpr mdspan_type
     span() const noexcept
     requires
         this_type::has_mdspan
@@ -653,8 +653,8 @@ class matrix_view_engine<ET, matrix_view::const_identity>
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
-    using span_type          = detail::get_const_mdspan_type_t<ET>;
-    using const_span_type    = detail::get_const_mdspan_type_t<ET>;
+    using mdspan_type        = detail::get_const_mdspan_type_t<ET>;
+    using const_mdspan_type  = detail::get_const_mdspan_type_t<ET>;
 
     //- Construct/copy/destroy
     //
@@ -686,7 +686,7 @@ class matrix_view_engine<ET, matrix_view::const_identity>
     constexpr size_type
     columns() const noexcept
     {
-        if constexpr(detail::has_constexpr_columns<engine_type>())
+        if constexpr(detail::has_constexpr_columns_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::columns();
         }
@@ -699,7 +699,7 @@ class matrix_view_engine<ET, matrix_view::const_identity>
     constexpr size_type
     rows() const noexcept
     {
-        if constexpr(detail::has_constexpr_rows<engine_type>())
+        if constexpr(detail::has_constexpr_rows_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::rows();
         }
@@ -712,7 +712,7 @@ class matrix_view_engine<ET, matrix_view::const_identity>
     constexpr size_type
     size() const noexcept
     {
-        if constexpr(detail::has_constexpr_size<engine_type>())
+        if constexpr(detail::has_constexpr_size_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::size();
         }
@@ -756,7 +756,7 @@ class matrix_view_engine<ET, matrix_view::const_identity>
         return (*mp_engine)(i);
     }
 
-    constexpr span_type
+    constexpr mdspan_type
     span() const noexcept
     requires
         this_type::has_mdspan
@@ -806,8 +806,8 @@ class matrix_view_engine<ET, matrix_view::transpose>
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
-    using span_type          = typename mdspan_traits::transpose_mdspan_type;
-    using const_span_type    = typename const_mdspan_traits::transpose_mdspan_type;
+    using mdspan_type        = typename mdspan_traits::transpose_mdspan_type;
+    using const_mdspan_type  = typename const_mdspan_traits::transpose_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -839,7 +839,7 @@ class matrix_view_engine<ET, matrix_view::transpose>
     constexpr size_type
     columns() const noexcept
     {
-        if constexpr(detail::has_constexpr_rows<engine_type>())
+        if constexpr(detail::has_constexpr_rows_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::rows();
         }
@@ -852,7 +852,7 @@ class matrix_view_engine<ET, matrix_view::transpose>
     constexpr size_type
     rows() const noexcept
     {
-        if constexpr(detail::has_constexpr_columns<engine_type>())
+        if constexpr(detail::has_constexpr_columns_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::columns();
         }
@@ -865,7 +865,7 @@ class matrix_view_engine<ET, matrix_view::transpose>
     constexpr size_type
     size() const noexcept
     {
-        if constexpr(detail::has_constexpr_size<engine_type>())
+        if constexpr(detail::has_constexpr_size_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::size();
         }
@@ -909,7 +909,7 @@ class matrix_view_engine<ET, matrix_view::transpose>
         return (*mp_engine)(i);
     }
 
-    constexpr span_type
+    constexpr mdspan_type
     span() const noexcept
     requires
         this_type::has_mdspan
@@ -958,8 +958,8 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
-    using span_type          = typename const_mdspan_traits::transpose_mdspan_type;
-    using const_span_type    = typename const_mdspan_traits::transpose_mdspan_type;
+    using mdspan_type        = typename const_mdspan_traits::transpose_mdspan_type;
+    using const_mdspan_type  = typename const_mdspan_traits::transpose_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -991,7 +991,7 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
     constexpr size_type
     columns() const noexcept
     {
-        if constexpr(detail::has_constexpr_rows<engine_type>())
+        if constexpr(detail::has_constexpr_rows_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::rows();
         }
@@ -1004,7 +1004,7 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
     constexpr size_type
     rows() const noexcept
     {
-        if constexpr(detail::has_constexpr_columns<engine_type>())
+        if constexpr(detail::has_constexpr_columns_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::columns();
         }
@@ -1017,7 +1017,7 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
     constexpr size_type
     size() const noexcept
     {
-        if constexpr(detail::has_constexpr_size<engine_type>())
+        if constexpr(detail::has_constexpr_size_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::size();
         }
@@ -1061,7 +1061,7 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
         return (*mp_engine)(i);
     }
 
-    constexpr span_type
+    constexpr mdspan_type
     span() const noexcept
     requires
         this_type::has_mdspan
@@ -1111,8 +1111,8 @@ class matrix_view_engine<ET, matrix_view::column>
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
-    using span_type          = typename mdspan_traits::submatrix_mdspan_type;
-    using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
+    using mdspan_type        = typename mdspan_traits::submatrix_mdspan_type;
+    using const_mdspan_type  = typename const_mdspan_traits::submatrix_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -1152,7 +1152,7 @@ class matrix_view_engine<ET, matrix_view::column>
     constexpr size_type
     rows() const noexcept
     {
-        if constexpr(detail::has_constexpr_rows<engine_type>())
+        if constexpr(detail::has_constexpr_rows_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::rows();
         }
@@ -1200,7 +1200,7 @@ class matrix_view_engine<ET, matrix_view::column>
         return (*mp_engine)(i, m_column);
     }
 
-    constexpr span_type
+    constexpr mdspan_type
     span() const noexcept
     requires
         this_type::has_mdspan
@@ -1250,8 +1250,8 @@ class matrix_view_engine<ET, matrix_view::const_column>
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
-    using span_type          = typename const_mdspan_traits::submatrix_mdspan_type;
-    using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
+    using mdspan_type        = typename const_mdspan_traits::submatrix_mdspan_type;
+    using const_mdspan_type  = typename const_mdspan_traits::submatrix_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -1291,7 +1291,7 @@ class matrix_view_engine<ET, matrix_view::const_column>
     constexpr size_type
     rows() const noexcept
     {
-        if constexpr(detail::has_constexpr_rows<engine_type>())
+        if constexpr(detail::has_constexpr_rows_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::rows();
         }
@@ -1339,7 +1339,7 @@ class matrix_view_engine<ET, matrix_view::const_column>
         return (*mp_engine)(i, m_column);
     }
 
-    constexpr span_type
+    constexpr mdspan_type
     span() const noexcept
     requires
         this_type::has_mdspan
@@ -1390,8 +1390,8 @@ class matrix_view_engine<ET, matrix_view::row>
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
-    using span_type          = typename mdspan_traits::submatrix_mdspan_type;
-    using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
+    using mdspan_type        = typename mdspan_traits::submatrix_mdspan_type;
+    using const_mdspan_type  = typename const_mdspan_traits::submatrix_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -1425,7 +1425,7 @@ class matrix_view_engine<ET, matrix_view::row>
     constexpr size_type
     columns() const noexcept
     {
-        if constexpr(detail::has_constexpr_columns<engine_type>())
+        if constexpr(detail::has_constexpr_columns_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::columns();
         }
@@ -1479,7 +1479,7 @@ class matrix_view_engine<ET, matrix_view::row>
         return (*mp_engine)(m_row, j);
     }
 
-    constexpr span_type
+    constexpr mdspan_type
     span() const noexcept
     requires
         this_type::has_mdspan
@@ -1529,8 +1529,8 @@ class matrix_view_engine<ET, matrix_view::const_row>
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
-    using span_type          = typename const_mdspan_traits::submatrix_mdspan_type;
-    using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
+    using mdspan_type        = typename const_mdspan_traits::submatrix_mdspan_type;
+    using const_mdspan_type  = typename const_mdspan_traits::submatrix_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -1564,7 +1564,7 @@ class matrix_view_engine<ET, matrix_view::const_row>
     constexpr size_type
     columns() const noexcept
     {
-        if constexpr(detail::has_constexpr_columns<engine_type>())
+        if constexpr(detail::has_constexpr_columns_v<engine_type>)
         {
             return detail::engine_extents_helper<engine_type>::columns();
         }
@@ -1618,7 +1618,7 @@ class matrix_view_engine<ET, matrix_view::const_row>
         return (*mp_engine)(m_row, j);
     }
 
-    constexpr span_type
+    constexpr mdspan_type
     span() const noexcept
     requires
         this_type::has_mdspan
@@ -1668,8 +1668,8 @@ class matrix_view_engine<ET, matrix_view::submatrix>
     using reference          = typename engine_type::reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
-    using span_type          = typename mdspan_traits::submatrix_mdspan_type;
-    using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
+    using mdspan_type        = typename mdspan_traits::submatrix_mdspan_type;
+    using const_mdspan_type  = typename const_mdspan_traits::submatrix_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -1760,7 +1760,7 @@ class matrix_view_engine<ET, matrix_view::submatrix>
         return (*mp_engine)(i);
     }
 
-    constexpr span_type
+    constexpr mdspan_type
     span() const noexcept
     requires
         this_type::has_mdspan
@@ -1810,13 +1810,12 @@ class matrix_view_engine<ET, matrix_view::const_submatrix>
   public:
     using engine_type        = ET;
     using owning_engine_type = detail::get_owning_engine_type_t<ET>;
-
     using element_type       = typename engine_type::element_type;
     using reference          = typename engine_type::const_reference;
     using const_reference    = typename engine_type::const_reference;
     using size_type          = typename engine_type::size_type;
-    using span_type          = typename const_mdspan_traits::submatrix_mdspan_type;
-    using const_span_type    = typename const_mdspan_traits::submatrix_mdspan_type;
+    using mdspan_type        = typename const_mdspan_traits::submatrix_mdspan_type;
+    using const_mdspan_type  = typename const_mdspan_traits::submatrix_mdspan_type;
 
     //- Construct/copy/destroy
     //
@@ -1907,7 +1906,7 @@ class matrix_view_engine<ET, matrix_view::const_submatrix>
         return (*mp_engine)(i);
     }
 
-    constexpr span_type
+    constexpr mdspan_type
     span() const noexcept
     requires
         this_type::has_mdspan

@@ -20,8 +20,8 @@ class fs_matrix_engine_tst
     using size_tuple_type = std::tuple<size_type, size_type>;
 
 #ifdef LA_USE_MDSPAN
-//    using span_type       = typename STD_LA::fs_matrix_engine<T, R, C>::span_type;
-//    using const_span_type = typename STD_LA::fs_matrix_engine<T, R, C>::const_span_type;
+//    using mdspan_type       = typename STD_LA::fs_matrix_engine<T, R, C>::mdspan_type;
+//    using const_mdspan_type = typename STD_LA::fs_matrix_engine<T, R, C>::const_mdspan_type;
 #endif
 
   public:
@@ -232,8 +232,8 @@ class test_fs_matrix_engine
     using size_type       = std::uint32_t;
 
 #ifdef LA_USE_MDSPAN
-//    using span_type       = typename STD_LA::fs_matrix_engine<T, R, C>::span_type;
-//    using const_span_type = typename STD_LA::fs_matrix_engine<T, R, C>::const_span_type;
+//    using mdspan_type       = typename STD_LA::fs_matrix_engine<T, R, C>::mdspan_type;
+//    using const_mdspan_type = typename STD_LA::fs_matrix_engine<T, R, C>::const_mdspan_type;
 #endif
 
     using direct_engine_type = test_fs_matrix_engine;

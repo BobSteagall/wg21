@@ -153,7 +153,6 @@ struct matrix_view
 #include "linear_algebra/op_traits_multiplication.hpp"
 #include "linear_algebra/op_traits_division.hpp"
 #include "linear_algebra/operation_traits.hpp"
-
 #include "linear_algebra/arithmetic_operators.hpp"
 
 #include "linear_algebra/debug_helpers.hpp"     //- Helpers for edit/debug/test -- not for production.
