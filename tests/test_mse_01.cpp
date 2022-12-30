@@ -7,4 +7,5 @@ using namespace MDSPAN_NS;
 
 TEST(Traits, AddSelectors)
 {
+    //constexpr std::vector<int>  b{0, 0, 0, 0};
 }

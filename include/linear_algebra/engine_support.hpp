@@ -122,8 +122,8 @@ bool    is_standard_random_access_container_v = is_standard_random_access_contai
 template<class X>
 struct is_valid_engine_extents : public false_type {};
 
-template<size_t R, size_t C>
-struct is_valid_engine_extents<extents<R, C>>
+template<class IT, size_t R, size_t C>
+struct is_valid_engine_extents<extents<IT, R, C>>
 {
     static constexpr bool   value = (R > 0) && (C > 0);
 };
@@ -150,8 +150,8 @@ bool    is_valid_engine_size_v = (R > 0) && (C > 0);
 template<class X>
 struct is_valid_fixed_engine_extents : public std::false_type {};
 
-template<size_t R, size_t C>
-struct is_valid_fixed_engine_extents<extents<R, C>>
+template<class IT, size_t R, size_t C>
+struct is_valid_fixed_engine_extents<extents<IT, R, C>>
 {
     static constexpr bool   value = (R > 0 && R != dynamic_extent) && (C > 0 && C != dynamic_extent);
 };
@@ -1063,16 +1063,16 @@ struct matrix_engine_support
         }
     }
 
-    template<class ET, class U, size_t X0, size_t X1, class SL, class SA>
+    template<class ET, class U, class IT, size_t X0, size_t X1, class SL, class SA>
     static constexpr void
-    assign_from(ET& dst, mdspan<U, extents<X0, X1>, SL, SA> const& src)
+    assign_from(ET& dst, mdspan<U, extents<IT, X0, X1>, SL, SA> const& src)
     requires
         writable_matrix_engine<ET>
         and
         convertible_from<typename ET::element_type, U>
     {
         using size_type_dst = typename ET::size_type;
-        using size_type_src = typename mdspan<U, extents<X0, X1>, SL, SA>::size_type;
+        using size_type_src = typename mdspan<U, extents<IT, X0, X1>, SL, SA>::size_type;
 
         size_type_src   rows = src.extent(0);
         size_type_src   cols = src.extent(1);
@@ -1153,16 +1153,16 @@ struct matrix_engine_support
         }
     }
 
-    template<class ET, class T, size_t X0, class SL, class SA>
+    template<class ET, class T, class IT, size_t X0, class SL, class SA>
     static constexpr void
-    assign_from(ET& dst, mdspan<T, extents<X0>, SL, SA> const& src)
+    assign_from(ET& dst, mdspan<T, extents<IT, X0>, SL, SA> const& src)
     requires
         writable_and_1d_indexable_matrix_engine<ET>
         and
         convertible_from<typename ET::element_type, T>
     {
         using size_type_dst = typename ET::size_type;
-        using size_type_src = typename mdspan<T, extents<X0>, SL, SA>::size_type;
+        using size_type_src = typename mdspan<T, extents<IT, X0>, SL, SA>::size_type;
 
         size_type_dst   di = 0;
         size_type_src   si = 0;
@@ -1316,16 +1316,16 @@ struct matrix_engine_support
         return true;
     }
 
-    template<class ET, class T, size_t X0, size_t X1, class SL, class SA>
+    template<class ET, class T, class IT, size_t X0, size_t X1, class SL, class SA>
     static constexpr bool
-    compare(ET const& lhs, mdspan<T, extents<X0, X1>, SL, SA> const& rhs)
+    compare(ET const& lhs, mdspan<T, extents<IT, X0, X1>, SL, SA> const& rhs)
     requires
         readable_matrix_engine<ET>
         and
         comparable_types<typename ET::element_type, T>
     {
         using size_type_lhs = typename ET::size_type;
-        using size_type_rhs = typename mdspan<T, extents<X0, X1>, SL, SA>::size_type;
+        using size_type_rhs = typename mdspan<T, extents<IT, X0, X1>, SL, SA>::size_type;
 
         size_type_lhs   r1 = lhs.rows();
         size_type_lhs   c1 = lhs.columns();
@@ -1416,16 +1416,16 @@ struct matrix_engine_support
         return true;
     }
 
-    template<class ET, class T, size_t X0, class L, class A>
+    template<class ET, class T, class IT, size_t X0, class L, class A>
     static constexpr bool
-    compare(ET const& lhs, mdspan<T, extents<X0>, L, A> const& rhs)
+    compare(ET const& lhs, mdspan<T, extents<IT, X0>, L, A> const& rhs)
     requires
         readable_and_1d_indexable_matrix_engine<ET>
         and
         comparable_types<typename ET::element_type, T>
     {
         using size_type_lhs = typename ET::size_type;
-        using size_type_rhs = typename mdspan<T, extents<X0>, L, A>::size_type;
+        using size_type_rhs = typename mdspan<T, extents<IT, X0>, L, A>::size_type;
 
         size_type_lhs   n1 = lhs.size();
         size_type_rhs   n2 = rhs.extent(0);

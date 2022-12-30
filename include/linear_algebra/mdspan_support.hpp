@@ -18,7 +18,7 @@ using MDSPAN_NS::layout_stride;
 
 namespace detail {
 
-using dyn_mdspan_extents = extents<dynamic_extent, dynamic_extent>;
+using dyn_mdspan_extents = extents<size_t, dynamic_extent, dynamic_extent>;
 using dyn_mdspan_strides = array<size_t, 2>;
 using dyn_mdspan_layout  = layout_stride;
 using dyn_mdspan_mapping = typename dyn_mdspan_layout::mapping<dyn_mdspan_extents>;
@@ -35,8 +35,8 @@ template<class T>
 struct is_2d_mdspan : public false_type
 {};
 
-template<class T, size_t X0, size_t X1, class SL, class SA>
-struct is_2d_mdspan<mdspan<T, extents<X0, X1>, SL, SA>> : public true_type
+template<class T, class IT, size_t X0, size_t X1, class SL, class SA>
+struct is_2d_mdspan<mdspan<T, extents<IT, X0, X1>, SL, SA>> : public true_type
 {};
 
 //------
@@ -126,10 +126,11 @@ using get_const_mdspan_type_t = typename detect_nested_mdspan_types<ET>::const_m
 template<class T, class WA = MDSPAN_NS::default_accessor<T>>
 struct negation_accessor
 {
-    using offset_policy = negation_accessor;
-    using element_type  = T;
-    using reference     = T;
-    using pointer       = typename WA::pointer;
+    using offset_policy    = negation_accessor;
+    using element_type     = T;
+    using reference        = T;
+    using pointer          = typename WA::data_handle_type;
+    using data_handle_type = typename WA::data_handle_type;
 
     constexpr pointer
     offset(pointer p, size_t i) const noexcept
@@ -153,10 +154,11 @@ struct negation_accessor
 template<class T, class WA = MDSPAN_NS::default_accessor<T>>
 struct conjugate_accessor
 {
-    using offset_policy = conjugate_accessor;
-    using element_type  = T;
-    using reference     = T;
-    using pointer       = typename WA::pointer;
+    using offset_policy    = conjugate_accessor;
+    using element_type     = T;
+    using reference        = T;
+    using pointer          = typename WA::data_handle_type;
+    using data_handle_type = typename WA::data_handle_type;
 
     constexpr pointer
     offset(pointer p, size_t i) const noexcept
@@ -204,8 +206,8 @@ struct mdspan_view_traits<void>
 
 //- This partial specialization is used when the view engine has a non-void mdspan interface.
 //
-template<class T, size_t X0, size_t X1, class L, class A>
-struct mdspan_view_traits<mdspan<T, extents<X0, X1>, L, A>>
+template<class T, class IT, size_t X0, size_t X1, class L, class A>
+struct mdspan_view_traits<mdspan<T, extents<IT, X0, X1>, L, A>>
 {
     static constexpr bool   has_mdspan = true;
 
@@ -223,7 +225,7 @@ struct mdspan_view_traits<mdspan<T, extents<X0, X1>, L, A>>
         dyn_mdspan_strides  str{s.stride(0), s.stride(1)};
         dyn_mdspan_mapping  map(ext, str);
 
-        return negation_mdspan_type(s.data(), map, negation_accessor<T, A>());
+        return negation_mdspan_type(s.data_handle(), map, negation_accessor<T, A>());
     }
 
     template<class EST>
@@ -234,7 +236,7 @@ struct mdspan_view_traits<mdspan<T, extents<X0, X1>, L, A>>
         dyn_mdspan_strides  str{s.stride(0), s.stride(1)};
         dyn_mdspan_mapping  map(ext, str);
 
-        return conjugate_mdspan_type(s.data(), map, conjugate_accessor<T, A>());
+        return conjugate_mdspan_type(s.data_handle(), map, conjugate_accessor<T, A>());
     }
 
     template<class EST>
@@ -245,7 +247,7 @@ struct mdspan_view_traits<mdspan<T, extents<X0, X1>, L, A>>
         dyn_mdspan_strides  str{s.stride(1), s.stride(0)};
         dyn_mdspan_mapping  map(ext, str);
 
-        return hermitian_mdspan_type(s.data(), map, conjugate_accessor<T, A>());
+        return hermitian_mdspan_type(s.data_handle(), map, conjugate_accessor<T, A>());
     }
 
     template<class EST>
@@ -256,7 +258,7 @@ struct mdspan_view_traits<mdspan<T, extents<X0, X1>, L, A>>
         dyn_mdspan_strides  str{s.stride(1), s.stride(0)};
         dyn_mdspan_mapping  map(ext, str);
 
-        return transpose_mdspan_type(s.data(), map, A());
+        return transpose_mdspan_type(s.data_handle(), map, A());
     }
 
     template<class EST, class S1, class S2, class S3, class S4>
@@ -279,7 +281,7 @@ struct mdspan_view_traits<mdspan<T, extents<X0, X1>, L, A>>
             dyn_mdspan_strides  str{s.stride(0), s.stride(1)};
             dyn_mdspan_mapping  map(ext, str);
 
-            return submdspan(submatrix_mdspan_type(s.data(), map), row_set, col_set);
+            return submdspan(submatrix_mdspan_type(s.data_handle(), map), row_set, col_set);
         }
     }
 };

@@ -4,6 +4,8 @@ using namespace STD_LA;
 using namespace STD_LA::detail;
 using namespace MDSPAN_NS;
 
+using st = std::size_t;
+
 //==================================================================================================
 //  Unit tests for resizable, dynamically allocated matrix engine, Case 3C (column matrix)
 //==================================================================================================
@@ -47,17 +49,17 @@ TEST(MSE_Matrix_3C, CmpEq)
 {
     mse_f_df_rm    e1, e2, e3;
 
-    std::array<float, 4>        a1 = LST_4_0;
-    mdspan<float, extents<4>>   s1(a1.data());
+    std::array<float, 4>            a1 = LST_4_0;
+    mdspan<float, extents<st, 4>>   s1(a1.data());
 
-    std::array<float, 4>        a2 = LST_4_2;
-    mdspan<float, extents<4>>   s2(a2.data());
+    std::array<float, 4>            a2 = LST_4_2;
+    mdspan<float, extents<st, 4>>   s2(a2.data());
 
-    std::array<float, 5>        a3 = LST_5_2;
-    mdspan<float, extents<5>>   s3(a2.data());
+    std::array<float, 5>            a3 = LST_5_2;
+    mdspan<float, extents<st, 5>>   s3(a2.data());
 
-    std::array<float, 4>        a4 = LST_4_3;
-    mdspan<float, extents<4>>   s4(a4.data());
+    std::array<float, 4>            a4 = LST_4_3;
+    mdspan<float, extents<st, 4>>   s4(a4.data());
 
     e1.reshape_rows(4, 0);
     e2.reshape_rows(4, 0);
@@ -339,10 +341,10 @@ TEST(MSE_Matrix_3C, OtherCtor)
 {
     //- Construct new engines via other ctors and verify their initial state.
     //
-    std::array<float, 4>        o1 = LST_4_1;
-    std::vector<float>          o2 = fl_4_2;
-    std::deque<float>           o3 = fl_4_3;
-    mdspan<float, extents<4>>   o4(o1.data());
+    std::array<float, 4>            o1 = LST_4_1;
+    std::vector<float>              o2 = fl_4_2;
+    std::deque<float>               o3 = fl_4_3;
+    mdspan<float, extents<st, 4>>   o4(o1.data());
 
     mse_f_df_rm     e1(o1);
     mse_f_df_cm     e2(o2);
@@ -541,10 +543,10 @@ TEST(MSE_Matrix_3C, OtherAssign)
 
     //- Assign and verify.
     //
-    std::array<float, 4>        o1 = LST_4_1;
-    std::vector<float>          o2 = fl_4_2;
-    std::deque<float>           o3 = fl_4_3;
-    mdspan<float, extents<4>>   o4(o1.data());
+    std::array<float, 4>            o1 = LST_4_1;
+    std::vector<float>              o2 = fl_4_2;
+    std::deque<float>               o3 = fl_4_3;
+    mdspan<float, extents<st, 4>>   o4(o1.data());
 
     e1 = o1;
     EXPECT_TRUE(msupport::compare(e1, o1));

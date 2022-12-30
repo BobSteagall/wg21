@@ -132,9 +132,9 @@ class matrix
     //----------------------------------------------------------
     //- Construction from a 2D mdspan.
     //
-    template<class U, size_t X0, size_t X1, class L, class A>
+    template<class U, class IT, size_t X0, size_t X1, class L, class A>
     constexpr explicit
-    matrix(mdspan<U, extents<X0, X1>, L, A> const& rhs)
+    matrix(mdspan<U, extents<IT, X0, X1>, L, A> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -142,9 +142,9 @@ class matrix
     :   m_engine(rhs)
     {}
 
-    template<class U, size_t X0, size_t X1, class L, class A>
+    template<class U, class IT, size_t X0, size_t X1, class L, class A>
     constexpr explicit
-    matrix(mdspan<U, extents<X0, X1>, L, A> const& rhs)
+    matrix(mdspan<U, extents<IT, X0, X1>, L, A> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -217,9 +217,9 @@ class matrix
     //----------------------------------------------------------
     //- Construction from a 1D mdspan.
     //
-    template<class U, size_t X0, class L, class A>
+    template<class U, class IT, size_t X0, class L, class A>
     constexpr explicit
-    matrix(mdspan<U, extents<X0>, L, A> const& rhs)
+    matrix(mdspan<U, extents<IT, X0>, L, A> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -227,9 +227,9 @@ class matrix
     :   m_engine(rhs)
     {}
 
-    template<class U, size_t X0, class L, class A>
+    template<class U, class IT, size_t X0, class L, class A>
     constexpr explicit
-    matrix(mdspan<U, extents<X0>, L, A> const& rhs)
+    matrix(mdspan<U, extents<IT, X0>, L, A> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -300,9 +300,9 @@ class matrix
     //----------------------------------------------------------
     //- Assignment from a 2D mdspan.
     //
-    template<class U, size_t X0, size_t X1, class L, class A>
+    template<class U, class IT, size_t X0, size_t X1, class L, class A>
     constexpr matrix&
-    operator =(mdspan<U, extents<X0, X1>, L, A> const& rhs)
+    operator =(mdspan<U, extents<IT, X0, X1>, L, A> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -312,9 +312,9 @@ class matrix
         return *this;
     }
 
-    template<class U, size_t X0, size_t X1, class L, class A>
+    template<class U, class IT, size_t X0, size_t X1, class L, class A>
     constexpr matrix&
-    operator =(mdspan<U, extents<X0, X1>, L, A> const& rhs)
+    operator =(mdspan<U, extents<IT, X0, X1>, L, A> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -391,9 +391,9 @@ class matrix
     //----------------------------------------------------------
     //- Assignment from a 1D mdspan.
     //
-    template<class U, size_t X0, class L, class A>
+    template<class U, class IT, size_t X0, class L, class A>
     constexpr matrix&
-    operator =(mdspan<U, extents<X0>, L, A> const& rhs)
+    operator =(mdspan<U, extents<IT, X0>, L, A> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -403,9 +403,9 @@ class matrix
         return *this;
     }
 
-    template<class U, size_t X0, class L, class A>
+    template<class U, class IT, size_t X0, class L, class A>
     constexpr matrix&
-    operator =(mdspan<U, extents<X0>, L, A> const& rhs)
+    operator =(mdspan<U, extents<IT, X0>, L, A> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and

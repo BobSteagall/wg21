@@ -261,9 +261,9 @@ Print(matrix<ET, OT> const& m, char const* pname = nullptr)
     }
 }
 
-template<class T, size_t X0, size_t X1, class L, class A>
+template<class T, class IT, size_t X0, size_t X1, class L, class A>
 void
-Print(mdspan<T, extents<X0, X1>, L, A> const& s, char const* pname = nullptr)
+Print(mdspan<T, extents<IT, X0, X1>, L, A> const& s, char const* pname = nullptr)
 {
     using size_type = size_t;
 
