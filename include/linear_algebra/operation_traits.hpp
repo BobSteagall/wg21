@@ -69,7 +69,7 @@ using extract_division_arithmetic_traits_t = typename detail::division_arithmeti
 //  Class:  matrix_operation_traits
 //
 //  This class provides a set of nested type aliases which, in turn, provide for element
-//  promotion, allocator promotion, layout promotion, engine promotion, and actual peform
+//  promotion, allocator promotion, layout promotion, engine promotion, and actually perform
 //  computation for the four basic arithmetic operations (addition, subtraction, multiplication,
 //  and scalar division).
 //--------------------------------------------------------------------------------------------------

@@ -111,61 +111,6 @@ bool    is_standard_random_access_container_v = is_standard_random_access_contai
 //  TYPES AND TRAITS DEFINITIONS -- ENGINE-RELATED
 //==================================================================================================
 //--------------------------------------------------------------------------------------------------
-//  Trait:      is_valid_engine_extents<X>
-//  Variable:   is_valid_engine_extents_v<X>
-//
-//  This private traits type is used to validate an engine's extents template argument.  The
-//  extents parameter must be two-dimensional, and each dimension's template argument must
-//  have a value greater than zero or equal to dynamic_extent.
-//--------------------------------------------------------------------------------------------------
-//
-template<class X>
-struct is_valid_engine_extents : public false_type {};
-
-template<class IT, size_t R, size_t C>
-struct is_valid_engine_extents<extents<IT, R, C>>
-{
-    static constexpr bool   value = (R > 0) && (C > 0);
-};
-
-//------
-//
-template<class T> inline constexpr
-bool    is_valid_engine_extents_v = is_valid_engine_extents<T>::value;
-
-template<size_t R, size_t C> inline constexpr
-bool    is_valid_engine_size_v = (R > 0) && (C > 0);
-
-
-//--------------------------------------------------------------------------------------------------
-//  Trait:      is_valid_fixed_engine_extents<X>
-//  Variables:  is_valid_fixed_engine_extents_v<X>
-//              is_valid_fixed_engine_size_v<R, C>
-//
-//  This private traits type is used to validate an engine's extents template argument.  The
-//  extents parameter must be two-dimensional, and each dimension's template argument must
-//  have a value greater than zero.
-//--------------------------------------------------------------------------------------------------
-//
-template<class X>
-struct is_valid_fixed_engine_extents : public std::false_type {};
-
-template<class IT, size_t R, size_t C>
-struct is_valid_fixed_engine_extents<extents<IT, R, C>>
-{
-    static constexpr bool   value = (R > 0 && R != dynamic_extent) && (C > 0 && C != dynamic_extent);
-};
-
-//------
-//
-template<class X> inline constexpr
-bool    is_valid_fixed_engine_extents_v = is_valid_fixed_engine_extents<X>::value;
-
-template<size_t R, size_t C> inline constexpr
-bool    is_valid_fixed_engine_size_v = (R > 0 && R != dynamic_extent) && (C > 0 && C != dynamic_extent);
-
-
-//--------------------------------------------------------------------------------------------------
 //  Trait:      has_owning_engine_type_alias<ET>
 //  Alias:      get_owning_engine_type_t<ET>
 //  Variable:   is_owning_engine_type_v<ET>
@@ -214,9 +159,6 @@ bool    is_owning_engine_type_v = has_owning_engine_type_alias<ET>::is_owning;
 //
 //  The detection code comes directly from a very cool technique described on StackOverflow at:
 //  https://stackoverflow.com/questions/55288555/c-check-if-statement-can-be-evaluated-constexpr.
-//
-//  Although it is not used in the library implementation, it is used in the unit test source
-//  code, and so we leave it here for now.
 //--------------------------------------------------------------------------------------------------
 //
 template<class Lambda, int = (Lambda{}(), 0)> inline constexpr
@@ -477,28 +419,22 @@ concept standard_random_access_container = is_standard_random_access_container_v
 
 
 //--------------------------------------------------------------------------------------------------
-//  Concepts:   valid_engine_extents<X>
+//  Concepts:   valid_engine_size<R, C>
 //
-//  This private concept is used to validate the second template parameter of a specialization
-//  of matrix_storage_engine, the engine's extents type.
+//  This private concept is used to validate the row size and column size template arguments
+//  of a matrix_storage_engine specialization.
 //--------------------------------------------------------------------------------------------------
 //
-template<typename X>
-concept valid_engine_extents = is_valid_engine_extents_v<X>;
-
 template<size_t R, size_t C>
 concept valid_engine_size = (R > 0) && (C > 0);
 
 //--------------------------------------------------------------------------------------------------
 //  Concepts:   valid_fixed_engine_extents<X>
 //
-//  This private concept is used to validate the second template parameter of a specialization
-//  of matrix_storage_engine, the engine's extents type for non-resizable engines
+//  This private concept is used to validate the row size and column size template arguments
+//  of a matrix_storage_engine specialization for fixed-size engines.
 //--------------------------------------------------------------------------------------------------
 //
-template<typename X>
-concept valid_fixed_engine_extents = is_valid_fixed_engine_extents_v<X>;
-
 template<size_t R, size_t C>
 concept valid_fixed_engine_size = (R > 0 && R != dynamic_extent) && (C > 0 && C != dynamic_extent);
 

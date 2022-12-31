@@ -767,6 +767,7 @@ class matrix
     engine_type     m_engine;
 
     template<class ET2, class... ARGS>
+
     constexpr
     matrix(detail::special_ctor_tag, ET2&& eng, ARGS&&... args)
     :   m_engine(std::forward<ET2>(eng), std::forward<ARGS>(args)...)

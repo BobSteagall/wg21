@@ -95,7 +95,7 @@ USING_STD
 //--------------------------------------------------------------------------------------------------
 //  Class:      matrix_layout
 //
-//  This public type is a container of tag sub-types whose purpose is to specify the layout
+//  This public type is a container of nested tag types whose purpose is to specify the layout
 //  of matrix elements when used as a template argument to matrix_storage_engine<T, R, C, A, L>.
 //--------------------------------------------------------------------------------------------------
 //
@@ -106,12 +106,11 @@ struct matrix_layout
     struct unknown {};
 };
 
-
 //--------------------------------------------------------------------------------------------------
 //  Class:      matrix_view
 //
-//  This public type is a container of tag sub-types whose purpose is to specify the functionality
-//  of a view engine when used as the second template argument to matrix_view_engine<ET, MVTT>.
+//  This public type is a container of nest tag types whose purpose is to specify the functionality
+//  of a view engine when used as the second template argument to matrix_view_engine<ET, MVT>.
 //--------------------------------------------------------------------------------------------------
 //
 struct matrix_view

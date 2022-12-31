@@ -3,7 +3,7 @@
 //
 //  Summary:    This header defines several private and public traits types that are used to
 //              implement the binary multiplication operator.  This is a somewhat long file,
-//              divided into two main sections, each with three sub-sections:
+//              divided into two main sections, each with three subsections:
 //                  1. Private traits definitions that:
 //                      A. determine the element promotion traits to be used for multiplication
 //                      B. determine the engine promotion traits to be used for multiplication

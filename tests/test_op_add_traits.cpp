@@ -363,7 +363,7 @@ template<class OTR,
          class T1, size_t R1, size_t C1,
          class T2, size_t R2, size_t C2, class AT, class LT>
 requires
-    is_valid_fixed_engine_size_v<R2, C2>
+    valid_fixed_engine_size<R2, C2>
 struct engine_add_traits_tst<OTR,
                              fs_matrix_engine_tst<T1, R1, C1>,
                              matrix_storage_engine<T2, R2, C2, AT, LT>>
@@ -380,7 +380,7 @@ template<class OTR,
          class T1, size_t R1, size_t C1, class AT, class LT,
          class T2, size_t R2, size_t C2>
 requires
-    is_valid_fixed_engine_size_v<R1, C1>
+    valid_fixed_engine_size<R1, C1>
 struct engine_add_traits_tst<OTR,
                              matrix_storage_engine<T1, R1, C1, AT, LT>,
                              fs_matrix_engine_tst<T2, R2, C2>>

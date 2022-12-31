@@ -282,7 +282,6 @@ requires
     detail::valid_layout_for_storage_engine<L>
 class matrix_storage_engine
 {
-  public:
     using this_type      = matrix_storage_engine;
     using support_traits = detail::matrix_engine_support;
     using storage_type   = detail::mse_data<T, R, C, A, L>;

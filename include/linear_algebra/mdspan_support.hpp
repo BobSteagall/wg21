@@ -1,8 +1,8 @@
 //==================================================================================================
 //  File:       mdpsan_support.hpp
 //
-//  Summary:    This header defines a number of private facilities to support the use of
-//              mdspan across the library.
+//  Summary:    This header defines a number of private facilities to support the use of mdspan
+//              throughout the library.
 //==================================================================================================
 //
 #ifndef LINEAR_ALGEBRA_MDSPAN_SUPPORT_HPP_DEFINED
@@ -83,9 +83,9 @@ using get_mdspan_layout_t = typename mdspan_layout_mapper<L>::layout_type;
 //  Trait:      detect_nested_mdspan_types<T>
 //  Aliases:    get_mdspan_type_t<T> and get_const_mdspan_type_t<T>
 //
-//  This private traits type and the associated alias templates determine whether or not the
-//  template parameter type has nested type aliases "mdspan_type" and "const_mdspan_type".  If
-//  both aliases are present, then the associated aliases templates refer to the corresponding
+//  This private traits type and the associated alias templates determine whether the template
+//  parameter type has nested type aliases "mdspan_type" and "const_mdspan_type".  If both
+//  aliases are present, then the associated aliases templates refer to the corresponding
 //  mdspan types.  Otherwise, the alias templates refer to the void type.
 //--------------------------------------------------------------------------------------------------
 //
@@ -205,6 +205,7 @@ struct mdspan_view_traits<void>
 };
 
 //- This partial specialization is used when the view engine has a non-void mdspan interface.
+//  Note that member template parameter type EST is shorthand for "engine span type".
 //
 template<class T, class IT, size_t X0, size_t X1, class L, class A>
 struct mdspan_view_traits<mdspan<T, extents<IT, X0, X1>, L, A>>
