@@ -1,5 +1,5 @@
 //==================================================================================================
-//  File:       subtraction_traits.hpp
+//  File:       op_traits_subtraction.hpp
 //
 //  Summary:    This header defines several private and public traits types that are used to
 //              implement the binary subtraction operator.  This is a somewhat long file, divided
@@ -14,8 +14,8 @@
 //                      C. perform the actual act of subtraction
 //==================================================================================================
 //
-#ifndef LINEAR_ALGEBRA_SUBTRACTION_TRAITS_HPP_DEFINED
-#define LINEAR_ALGEBRA_SUBTRACTION_TRAITS_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_OP_TRAITS_SUBTRACTION_HPP_DEFINED
+#define LINEAR_ALGEBRA_OP_TRAITS_SUBTRACTION_HPP_DEFINED
 
 namespace STD_LA {
 namespace detail {
@@ -252,4 +252,4 @@ struct subtraction_arithmetic_traits<COTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
 
 }       //- namespace detail
 }       //- STD_LA namespace
-#endif  //- LINEAR_ALGEBRA_SUBTRACTION_TRAITS_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_OP_TRAITS_SUBTRACTION_HPP_DEFINED

@@ -5,8 +5,8 @@
 //              defined by the library.
 //==================================================================================================
 //
-#ifndef LINEAR_ALGEBRA_MATRIX_HPP_DEFINED
-#define LINEAR_ALGEBRA_MATRIX_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_HPP_DEFINED
+#define LINEAR_ALGEBRA_HPP_DEFINED
 
 //- Detect the compiler.
 //
@@ -154,6 +154,6 @@ struct matrix_view
 #include "linear_algebra/operation_traits.hpp"
 #include "linear_algebra/arithmetic_operators.hpp"
 
-#include "linear_algebra/debug_helpers.hpp"     //- Helpers for edit/debug/test -- not for production.
+#include "linear_algebra/debug_helpers.hpp"     //- Helpers for edit/debug/test -- not for production!
 
-#endif  //- LINEAR_ALGEBRA_MATRIX_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_HPP_DEFINED

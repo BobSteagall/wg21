@@ -1,12 +1,12 @@
 //==================================================================================================
-//  File:       traits_support.hpp
+//  File:       op_traits_support.hpp
 //
 //  Summary:    This header defines library's default operation traits type and a customization
-//              point that is specializable by users.
+//              point that may be specialized by users.
 //==================================================================================================
 //
-#ifndef LINEAR_ALGEBRA_TRAITS_SUPPORT_HPP_DEFINED
-#define LINEAR_ALGEBRA_TRAITS_SUPPORT_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_OP_TRAITS_SUPPORT_HPP_DEFINED
+#define LINEAR_ALGEBRA_OP_TRAITS_SUPPORT_HPP_DEFINED
 
 namespace STD_LA {
 namespace detail {
@@ -45,7 +45,7 @@ struct engine_extents_helper<matrix_storage_engine<T, R, C, A, L>>
 //    a. If both allocator types are void, then the resulting allocator type is void;
 //    b. If one allocator is std::allocator, and the other is custom, rebind from the custom
 //       allocator type;
-//    c. If both allocator types are std::allocator, the result is allocator<T>.
+//    c. If both allocator types are std::allocator, the result is std::allocator.
 //--------------------------------------------------------------------------------------------------
 //
 template<class AT1, class AT2, class T>
@@ -140,4 +140,4 @@ struct engine_allocation_traits<matrix_storage_engine<T1, R1, C1, AT1, LT1>,
 
 }       //- detail namespace
 }       //- STD_LA namespace
-#endif  //- LINEAR_ALGEBRA_TRAITS_SUPPORT_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_OP_TRAITS_SUPPORT_HPP_DEFINED

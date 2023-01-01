@@ -1,5 +1,5 @@
 //==================================================================================================
-//  File:       division_traits.hpp
+//  File:       op_traits_division.hpp
 //
 //  Summary:    This header defines several private and public traits types that are used to
 //              implement the binary scalar division operator.  This is a somewhat long file,
@@ -14,8 +14,8 @@
 //                      C. perform the actual act of scalar division
 //==================================================================================================
 //
-#ifndef LINEAR_ALGEBRA_DIVISION_TRAITS_HPP_DEFINED
-#define LINEAR_ALGEBRA_DIVISION_TRAITS_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_OP_TRAITS_DIVISION_HPP_DEFINED
+#define LINEAR_ALGEBRA_OP_TRAITS_DIVISION_HPP_DEFINED
 
 namespace STD_LA {
 namespace detail {
@@ -242,4 +242,4 @@ struct division_arithmetic_traits<COTR, matrix<ET1, COT1>, S2>
 
 }       //- namespace detail
 }       //- STD_LA namespace
-#endif  //- LINEAR_ALGEBRA_DIVISION_TRAITS_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_OP_TRAITS_DIVISION_HPP_DEFINED

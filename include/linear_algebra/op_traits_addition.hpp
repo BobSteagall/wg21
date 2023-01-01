@@ -1,5 +1,5 @@
 //==================================================================================================
-//  File:       addition_traits.hpp
+//  File:       op_traits_addition.hpp
 //
 //  Summary:    This header defines several private and public traits types that are used to
 //              implement the binary addition operator.  This is a somewhat long file, divided
@@ -14,8 +14,8 @@
 //                      C. perform the actual act of addition
 //==================================================================================================
 //
-#ifndef LINEAR_ALGEBRA_ADDITION_TRAITS_HPP_DEFINED
-#define LINEAR_ALGEBRA_ADDITION_TRAITS_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_OP_TRAITS_ADDITION_HPP_DEFINED
+#define LINEAR_ALGEBRA_OP_TRAITS_ADDITION_HPP_DEFINED
 
 namespace STD_LA {
 namespace detail {
@@ -224,7 +224,7 @@ struct addition_arithmetic_traits<COTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
 
         size_type_r     rows = static_cast<size_type_r>(m1.rows());
         size_type_r     cols = static_cast<size_type_r>(m1.columns());
-        result_type	    mr;
+        result_type     mr;
 
         if constexpr (detail::reshapable_matrix_engine<engine_type>)
         {
@@ -253,4 +253,4 @@ struct addition_arithmetic_traits<COTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
 
 }       //- namespace detail
 }       //- STD_LA namespace
-#endif  //- LINEAR_ALGEBRA_ADDITION_TRAITS_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_OP_TRAITS_ADDITION_HPP_DEFINED

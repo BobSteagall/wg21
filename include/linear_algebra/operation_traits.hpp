@@ -11,7 +11,7 @@
 namespace STD_LA {
 
 template<typename OT, typename U, typename V>
-using extract_addition_element_traits_t = typename detail::addition_element_traits_extractor<OT, U, V>::type;
+using extract_addition_element_traits_t = typename detail::addition_element_traits_t<OT, U, V>; //_extractor<OT, U, V>::type;
 
 template<typename OT, typename U, typename V>
 using extract_addition_layout_traits_t = typename detail::addition_layout_traits_extractor<OT, U, V>::type;

@@ -5,8 +5,8 @@
 //              math objects provided by the library.
 //==================================================================================================
 //
-#ifndef LINEAR_ALGEBRA_BASIC_MATRIX_HPP_DEFINED
-#define LINEAR_ALGEBRA_BASIC_MATRIX_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_MATRIX_HPP_DEFINED
+#define LINEAR_ALGEBRA_MATRIX_HPP_DEFINED
 
 namespace STD_LA {
 
@@ -84,7 +84,7 @@ class matrix
     :   m_engine(rows, cols, rowcap, colcap)
     {}
 
-    constexpr
+    constexpr explicit
     matrix(size_type cols)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
@@ -93,7 +93,7 @@ class matrix
     :   m_engine(cols, cols)
     {}
 
-    constexpr
+    constexpr explicit
     matrix(size_type rows)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
@@ -829,4 +829,4 @@ operator !=(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
 }
 
 }       //- STD_LA namespace
-#endif  //- LINEAR_ALGEBRA_BASIC_MATRIX_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_MATRIX_HPP_DEFINED
