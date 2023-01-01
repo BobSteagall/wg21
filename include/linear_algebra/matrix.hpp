@@ -775,6 +775,26 @@ class matrix
 };
 
 
+//- Comparison operators for matrix operands.  Using these may or may not make sense,
+//  based on the element type.
+//
+template<class ET1, class COT1, class ET2, class COT2> inline constexpr
+bool
+operator ==(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
+{
+    return detail::matrix_engine_support::compare(m1, m2);
+}
+
+template<class ET1, class COT1, class ET2, class COT2> inline constexpr
+bool
+operator !=(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
+{
+    return !detail::matrix_engine_support::compare(m1, m2);
+}
+
+
+//- Convenience aliases for declaring matrix objects.
+//
 template<class T, size_t R, size_t C, class COT = void>
 using fixed_size_matrix =
         matrix<matrix_storage_engine<T, R, C, void, matrix_layout::row_major>, COT>;
@@ -803,30 +823,16 @@ using general_row_vector =
 
 template<class T, class COT = void>
 using dynamic_matrix =
-        matrix<matrix_storage_engine<T, dynamic_extent, dynamic_extent, std::allocator<T>, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, std::dynamic_extent, std::dynamic_extent, std::allocator<T>, matrix_layout::row_major>, COT>;
 
 template<class T, class COT = void>
 using dynamic_column_vector =
-        matrix<matrix_storage_engine<T, dynamic_extent, 1, std::allocator<T>, matrix_layout::column_major>, COT>;
+        matrix<matrix_storage_engine<T, std::dynamic_extent, 1, std::allocator<T>, matrix_layout::column_major>, COT>;
 
 template<class T, class COT = void>
 using dynamic_row_vector =
-        matrix<matrix_storage_engine<T, 1, dynamic_extent, std::allocator<T>, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, 1, std::dynamic_extent, std::allocator<T>, matrix_layout::row_major>, COT>;
 
-
-template<class ET1, class COT1, class ET2, class COT2> inline constexpr
-bool
-operator ==(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
-{
-    return detail::matrix_engine_support::compare(m1, m2);
-}
-
-template<class ET1, class COT1, class ET2, class COT2> inline constexpr
-bool
-operator !=(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
-{
-    return !detail::matrix_engine_support::compare(m1, m2);
-}
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_MATRIX_HPP_DEFINED

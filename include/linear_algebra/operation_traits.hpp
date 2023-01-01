@@ -11,58 +11,58 @@
 namespace STD_LA {
 
 template<typename OT, typename U, typename V>
-using extract_addition_element_traits_t = typename detail::addition_element_traits_t<OT, U, V>; //_extractor<OT, U, V>::type;
+using extract_addition_element_traits_t = typename detail::addition_element_traits_t<OT, U, V>;
 
 template<typename OT, typename U, typename V>
-using extract_addition_layout_traits_t = typename detail::addition_layout_traits_extractor<OT, U, V>::type;
+using extract_addition_layout_traits_t = typename detail::addition_layout_traits_t<OT, U, V>;
 
 template<typename OT, typename U, typename V>
-using extract_addition_engine_traits_t = typename detail::addition_engine_traits_extractor<OT, U, V>::type;
+using extract_addition_engine_traits_t = typename detail::addition_engine_traits_t<OT, U, V>;
 
 template<typename OT, typename U, typename V>
-using extract_addition_arithmetic_traits_t = typename detail::addition_arithmetic_traits_extractor<OT, U, V>::type;
-
-//------
-//
-template<typename OT, typename U, typename V>
-using extract_subtraction_element_traits_t = typename detail::subtraction_element_traits_extractor<OT, U, V>::type;
-
-template<typename OT, typename U, typename V>
-using extract_subtraction_layout_traits_t = typename detail::subtraction_layout_traits_extractor<OT, U, V>::type;
-
-template<typename OT, typename U, typename V>
-using extract_subtraction_engine_traits_t = typename detail::subtraction_engine_traits_extractor<OT, U, V>::type;
-
-template<typename OT, typename U, typename V>
-using extract_subtraction_arithmetic_traits_t = typename detail::subtraction_arithmetic_traits_extractor<OT, U, V>::type;
+using extract_addition_arithmetic_traits_t = typename detail::addition_arithmetic_traits_t<OT, U, V>;
 
 //------
 //
 template<typename OT, typename U, typename V>
-using extract_multiplication_element_traits_t = typename detail::multiplication_element_traits_extractor<OT, U, V>::type;
+using extract_subtraction_element_traits_t = typename detail::subtraction_element_traits_t<OT, U, V>;
 
 template<typename OT, typename U, typename V>
-using extract_multiplication_layout_traits_t = typename detail::multiplication_layout_traits_extractor<OT, U, V>::type;
+using extract_subtraction_layout_traits_t = typename detail::subtraction_layout_traits_t<OT, U, V>;
 
 template<typename OT, typename U, typename V>
-using extract_multiplication_engine_traits_t = typename detail::multiplication_engine_traits_extractor<OT, U, V>::type;
+using extract_subtraction_engine_traits_t = typename detail::subtraction_engine_traits_t<OT, U, V>;
 
 template<typename OT, typename U, typename V>
-using extract_multiplication_arithmetic_traits_t = typename detail::multiplication_arithmetic_traits_extractor<OT, U, V>::type;
+using extract_subtraction_arithmetic_traits_t = typename detail::subtraction_arithmetic_traits_t<OT, U, V>;
 
 //------
 //
 template<typename OT, typename U, typename V>
-using extract_division_element_traits_t = typename detail::division_element_traits_extractor<OT, U, V>::type;
+using extract_multiplication_element_traits_t = typename detail::multiplication_element_traits_t<OT, U, V>;
 
 template<typename OT, typename U, typename V>
-using extract_division_layout_traits_t = typename detail::division_layout_traits_extractor<OT, U, V>::type;
+using extract_multiplication_layout_traits_t = typename detail::multiplication_layout_traits_t<OT, U, V>;
 
 template<typename OT, typename U, typename V>
-using extract_division_engine_traits_t = typename detail::division_engine_traits_extractor<OT, U, V>::type;
+using extract_multiplication_engine_traits_t = typename detail::multiplication_engine_traits_t<OT, U, V>;
 
 template<typename OT, typename U, typename V>
-using extract_division_arithmetic_traits_t = typename detail::division_arithmetic_traits_extractor<OT, U, V>::type;
+using extract_multiplication_arithmetic_traits_t = typename detail::multiplication_arithmetic_traits_t<OT, U, V>;
+
+//------
+//
+template<typename OT, typename U, typename V>
+using extract_division_element_traits_t = typename detail::division_element_traits_t<OT, U, V>;
+
+template<typename OT, typename U, typename V>
+using extract_division_layout_traits_t = typename detail::division_layout_traits_t<OT, U, V>;
+
+template<typename OT, typename U, typename V>
+using extract_division_engine_traits_t = typename detail::division_engine_traits_t<OT, U, V>;
+
+template<typename OT, typename U, typename V>
+using extract_division_arithmetic_traits_t = typename detail::division_arithmetic_traits_t<OT, U, V>;
 
 
 //--------------------------------------------------------------------------------------------------

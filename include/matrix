@@ -5,8 +5,8 @@
 //              defined by the library.
 //==================================================================================================
 //
-#ifndef LINEAR_ALGEBRA_HPP_DEFINED
-#define LINEAR_ALGEBRA_HPP_DEFINED
+#ifndef LINEAR_ALGEBRA_MATRIX_DEFINED
+#define LINEAR_ALGEBRA_MATRIX_DEFINED
 
 //- Detect the compiler.
 //
@@ -36,17 +36,23 @@
     #endif
 #endif
 
-//- Namespace alternatives for testing and also for detecting ADL issues.  Pick a pair
+//- Namespace alternatives for testing and also maybe detecting ADL issues.  Pick a pair
 //  and attempt to build.
 //
-//#define STD_LA      la
-//#define USING_STD   using namespace std; using namespace std::experimental;
+#if 0
+    #define STD_LA      la
+    #define USING_STD   using namespace std; using namespace std::experimental;
+#endif
 
-//#define STD_LA      std::math
-//#define USING_STD   using namespace std::experimental;
+#if 0
+    #define STD_LA      std::math
+    #define USING_STD   using namespace std; using namespace std::experimental;
+#endif
 
-#define STD_LA      std::experimental::math
-#define USING_STD   using namespace std::experimental;
+#if 1
+    #define STD_LA      std::experimental::math
+    #define USING_STD   using namespace std; using namespace std::experimental;
+#endif
 
 #include <cstdint>
 #include <array>
@@ -54,6 +60,7 @@
 #include <deque>
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <tuple>
 #include <type_traits>
 #include <vector>
@@ -156,4 +163,4 @@ struct matrix_view
 
 #include "linear_algebra/debug_helpers.hpp"     //- Helpers for edit/debug/test -- not for production!
 
-#endif  //- LINEAR_ALGEBRA_HPP_DEFINED
+#endif  //- LINEAR_ALGEBRA_MATRIX_DEFINED

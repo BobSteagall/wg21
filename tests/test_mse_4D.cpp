@@ -4,16 +4,16 @@ using namespace STD_LA;
 using namespace STD_LA::detail;
 using namespace MDSPAN_NS;
 
+using msupport = matrix_engine_support;
+
 //==================================================================================================
 //  Unit tests for dynamically column-resizeable matrix engine, Case 4D
 //==================================================================================================
 //
-using mse_f_fd_cm = matrix_storage_engine<float, 4, dynamic_extent, std::allocator<float>, matrix_layout::column_major>;
-using mse_f_fd_rm = matrix_storage_engine<float, 4, dynamic_extent, std::allocator<float>, matrix_layout::row_major>;
-using mse_i_fd_cm = matrix_storage_engine<int, 4, dynamic_extent, std::allocator<int>, matrix_layout::column_major>;
-using mse_d_fd_rm = matrix_storage_engine<double, 4, dynamic_extent, std::allocator<double>, matrix_layout::row_major>;
-
-using msupport = matrix_engine_support;
+using mse_f_fd_cm = matrix_storage_engine<float, 4, std::dynamic_extent, std::allocator<float>, matrix_layout::column_major>;
+using mse_f_fd_rm = matrix_storage_engine<float, 4, std::dynamic_extent, std::allocator<float>, matrix_layout::row_major>;
+using mse_i_fd_cm = matrix_storage_engine<int, 4,   std::dynamic_extent, std::allocator<int>, matrix_layout::column_major>;
+using mse_d_fd_rm = matrix_storage_engine<double, 4, std::dynamic_extent, std::allocator<double>, matrix_layout::row_major>;
 
 TEST(MSE_Matrix_4D, DefaultCtor)
 {

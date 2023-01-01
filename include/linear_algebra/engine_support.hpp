@@ -211,7 +211,7 @@ struct engine_extents_helper
     static constexpr size_t
     get_value_helper(...)
     {
-        return dynamic_extent;
+        return std::dynamic_extent;
     }
 
   public:
@@ -436,7 +436,7 @@ concept valid_engine_size = (R > 0) && (C > 0);
 //--------------------------------------------------------------------------------------------------
 //
 template<size_t R, size_t C>
-concept valid_fixed_engine_size = (R > 0 && R != dynamic_extent) && (C > 0 && C != dynamic_extent);
+concept valid_fixed_engine_size = (R > 0 && R != std::dynamic_extent) && (C > 0 && C != std::dynamic_extent);
 
 //--------------------------------------------------------------------------------------------------
 //  Concept:    valid_allocator<T, A>

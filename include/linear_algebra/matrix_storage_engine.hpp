@@ -125,7 +125,7 @@ struct mse_data<T, R, C, void, L>
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, size_t R, class A, class L>
-struct mse_data<T, R, dynamic_extent, A, L>
+struct mse_data<T, R, std::dynamic_extent, A, L>
 {
     using array_type        = std::vector<T, A>;
     using mdspan_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
@@ -172,7 +172,7 @@ struct mse_data<T, R, dynamic_extent, A, L>
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, size_t C, class A, class L>
-struct mse_data<T, dynamic_extent, C, A, L>
+struct mse_data<T, std::dynamic_extent, C, A, L>
 {
     using array_type        = std::vector<T, A>;
     using mdspan_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
@@ -219,7 +219,7 @@ struct mse_data<T, dynamic_extent, C, A, L>
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, class A, class L>
-struct mse_data<T, dynamic_extent, dynamic_extent, A, L>
+struct mse_data<T, std::dynamic_extent, std::dynamic_extent, A, L>
 {
     using array_type        = std::vector<T, A>;
     using mdspan_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;

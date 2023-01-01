@@ -66,7 +66,7 @@ TEST(Mul, Various)
 {
     gmf_33  g1;
 
-    general_matrix<float, 3, dynamic_extent>    g2;
+    general_matrix<float, 3, std::dynamic_extent>   g2;
 
     g2.resize_columns(100);
 

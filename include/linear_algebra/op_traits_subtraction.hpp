@@ -154,8 +154,8 @@ struct subtraction_engine_traits
 
     //- Determine if there are dynamic row or column extents.
     //
-    static constexpr bool   dyn_rows = ((R1 == dynamic_extent) || (R2 == dynamic_extent));
-    static constexpr bool   dyn_cols = ((C1 == dynamic_extent) || (C2 == dynamic_extent));
+    static constexpr bool   dyn_rows = ((R1 == std::dynamic_extent) || (R2 == std::dynamic_extent));
+    static constexpr bool   dyn_cols = ((C1 == std::dynamic_extent) || (C2 == std::dynamic_extent));
     static constexpr bool   dyn_size = (dyn_rows || dyn_cols);
 
     //- Validate the extents.
@@ -165,8 +165,8 @@ struct subtraction_engine_traits
 
     //- Determine the new extents.
     //
-    static constexpr size_t     RR = (dyn_rows) ? dynamic_extent : R1;
-    static constexpr size_t     CR = (dyn_cols) ? dynamic_extent : C1;
+    static constexpr size_t     RR = (dyn_rows) ? std::dynamic_extent : R1;
+    static constexpr size_t     CR = (dyn_cols) ? std::dynamic_extent : C1;
 
     //- Determine the resulting allocator type.
     //

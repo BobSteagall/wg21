@@ -10,7 +10,7 @@ using namespace MDSPAN_NS;
 //
 using fve_type_v = matrix_storage_engine<float, extents<4>, void, void>;
 using fve_type_a = matrix_storage_engine<float, extents<4>, std::allocator<float>, void>;
-using dve_type   = matrix_storage_engine<float, extents<dynamic_extent>, std::allocator<float>, void>;
+using dve_type   = matrix_storage_engine<float, extents<std::dynamic_extent>, std::allocator<float>, void>;
 
 using vsupport = vector_engine_support;
 

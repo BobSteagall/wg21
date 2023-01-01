@@ -32,8 +32,7 @@ struct dummy_type {};
 #endif
 
 #if 0
-using size_tuple_type = std::experimental::extents<std::experimental::dynamic_extent,
-                                                   std::experimental::dynamic_extent>;
+using size_tuple_type = std::experimental::extents<std::dynamic_extent, std::dynamic_extent>;
 
 namespace std::experimental
 {
@@ -51,6 +50,8 @@ namespace STD_LA
     inline bool
     operator >=(size_tuple_type lhs, size_tuple_type rhs)
     {
+        using std::operator <;      //- Causes ADL to find the correct less-than operator.
+
         return !(lhs < rhs);
     }
 }
@@ -395,7 +396,7 @@ struct is_ttp_helper : public std::true_type
                                                                             \
     template<typename OT, typename U, typename V>                           \
     concept valid_##NAME =                                                  \
-        std::experimental::math::detail::class_type<OT>                     \
+        STD_LA::detail::class_type<OT>                                      \
         and                                                                 \
         (has_valid_##NAME<OT, U, V> or has_no_nested_##NAME<OT>)
 

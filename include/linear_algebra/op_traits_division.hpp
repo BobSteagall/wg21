@@ -153,8 +153,8 @@ struct division_engine_traits
 
     //- Determine if there are dynamic row or column extents.
     //
-    static constexpr bool   dyn_rows = (R1 == dynamic_extent);
-    static constexpr bool   dyn_cols = (C1 == dynamic_extent);
+    static constexpr bool   dyn_rows = (R1 == std::dynamic_extent);
+    static constexpr bool   dyn_cols = (C1 == std::dynamic_extent);
     static constexpr bool   dyn_size = (dyn_rows || dyn_cols);
 
     //- Determine the new extents.

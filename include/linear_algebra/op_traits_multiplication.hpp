@@ -162,19 +162,19 @@ struct multiplication_engine_traits
 
     //- Determine if there are dynamic row or column extents.
     //
-    static constexpr bool   dyn_rows = (R1 == dynamic_extent);
-    static constexpr bool   dyn_cols = (C2 == dynamic_extent);
+    static constexpr bool   dyn_rows = (R1 == std::dynamic_extent);
+    static constexpr bool   dyn_cols = (C2 == std::dynamic_extent);
     static constexpr bool   dyn_size = (dyn_rows || dyn_cols);
 
     //- Validate the extents.
     //
-    static_assert((C1 == R2  ||  C1 == dynamic_extent  ||  R2 == dynamic_extent),
+    static_assert((C1 == R2  ||  C1 == std::dynamic_extent  ||  R2 == std::dynamic_extent),
                   "mis-matched/invalid number of rows and columns for multiplication");
 
     //- Decide on the new extents.
     //
-    static constexpr size_t     RR = (dyn_rows) ? dynamic_extent : R1;
-    static constexpr size_t     CR = (dyn_cols) ? dynamic_extent : C2;
+    static constexpr size_t     RR = (dyn_rows) ? std::dynamic_extent : R1;
+    static constexpr size_t     CR = (dyn_cols) ? std::dynamic_extent : C2;
 
     //- Determine the resulting allocator type.
     //
@@ -215,8 +215,8 @@ struct multiplication_engine_traits<COTR, matrix_scalar_engine<S1>, ET2>
 
     //- Determine if there are dynamic row or column extents.
     //
-    static constexpr bool   dyn_rows = (R2 == dynamic_extent);
-    static constexpr bool   dyn_cols = (C2 == dynamic_extent);
+    static constexpr bool   dyn_rows = (R2 == std::dynamic_extent);
+    static constexpr bool   dyn_cols = (C2 == std::dynamic_extent);
     static constexpr bool   dyn_size = (dyn_rows || dyn_cols);
 
     //- Decide on the new extents.
@@ -261,8 +261,8 @@ struct multiplication_engine_traits<COTR, ET1, matrix_scalar_engine<S2>>
 
     //- Determine if there are dynamic row or column extents.
     //
-    static constexpr bool   dyn_rows = (R1 == dynamic_extent);
-    static constexpr bool   dyn_cols = (C1 == dynamic_extent);
+    static constexpr bool   dyn_rows = (R1 == std::dynamic_extent);
+    static constexpr bool   dyn_cols = (C1 == std::dynamic_extent);
     static constexpr bool   dyn_size = (dyn_rows || dyn_cols);
 
     //- Decide on the new extents.

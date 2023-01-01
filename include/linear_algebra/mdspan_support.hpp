@@ -9,18 +9,11 @@
 #define LINEAR_ALGEBRA_MDSPAN_SUPPORT_HPP_DEFINED
 
 namespace STD_LA {
-
-using MDSPAN_NS::extents;
-using MDSPAN_NS::dynamic_extent;
-using MDSPAN_NS::layout_left;
-using MDSPAN_NS::layout_left;
-using MDSPAN_NS::layout_stride;
-
 namespace detail {
 
-using dyn_mdspan_extents = extents<size_t, dynamic_extent, dynamic_extent>;
+using dyn_mdspan_extents = MDSPAN_NS::extents<size_t, std::dynamic_extent, std::dynamic_extent>;
 using dyn_mdspan_strides = array<size_t, 2>;
-using dyn_mdspan_layout  = layout_stride;
+using dyn_mdspan_layout  = MDSPAN_NS::layout_stride;
 using dyn_mdspan_mapping = typename dyn_mdspan_layout::mapping<dyn_mdspan_extents>;
 
 //--------------------------------------------------------------------------------------------------
@@ -266,7 +259,7 @@ struct mdspan_view_traits<mdspan<T, extents<IT, X0, X1>, L, A>>
     static constexpr submatrix_mdspan_type
     make_submatrix(EST const& s, S1 row_index, S2 row_count, S3 col_index, S4 col_count)
     {
-        using idx_t  = decltype(dynamic_extent);
+        using idx_t  = decltype(std::dynamic_extent);
         using pair_t = std::pair<idx_t, idx_t>;
 
         pair_t  row_set(static_cast<idx_t>(row_index), static_cast<idx_t>(row_index + row_count));
