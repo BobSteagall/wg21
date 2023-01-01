@@ -1,7 +1,7 @@
 build*
 cmake-*
 extsrc*
-externals*
+externals/
 obsolete*
 packages/
 tmp

@@ -141,13 +141,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="..\docs\papers\P1385D7.md">
       <Filter>Docs</Filter>
     </None>
     <None Include="..\include\matrix">
       <Filter>Library Interface Headers</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\CMakeLists.txt">
