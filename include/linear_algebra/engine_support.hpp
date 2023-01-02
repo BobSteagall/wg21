@@ -190,8 +190,9 @@ bool    has_constexpr_size_v = is_constexpr([]{ ET().size(); });
 //--------------------------------------------------------------------------------------------------
 //  Class:      engine_extents_helper<ET>
 //
-//  This private concept determines whether to use row-wise indexing for the inner loop when
-//  performing two-dimensional iteration over the elements of a matrix engine.
+//  This private struct attempts to determine at compile time the number of rows and columns
+//  possessed by an engine.  If the extents can be determined at compile time, those are
+//  returned by constexpr member functions; if not, then `std::dynamic_extent` is returned.
 //
 //  It uses the same idea for constexpr member detection as the `is_constexpr()` functions
 //  above, the difference being that the end result is an extent instead of a boolean.
