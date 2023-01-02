@@ -21,7 +21,7 @@ operator +(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
     using op_traits  = select_matrix_operation_traits_t<COT1, COT2>;
     using op1_type   = matrix<ET1, COT1>;
     using op2_type   = matrix<ET2, COT2>;
-    using add_traits = extract_addition_arithmetic_traits_t<op_traits, op1_type, op2_type>;
+    using add_traits = matrix_addition_arithmetic_traits_t<op_traits, op1_type, op2_type>;
 
     return add_traits::add(m1, m2);
 }
@@ -38,7 +38,7 @@ operator -(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
     using op_traits  = select_matrix_operation_traits_t<COT1, COT2>;
     using op1_type   = matrix<ET1, COT1>;
     using op2_type   = matrix<ET2, COT2>;
-    using sub_traits = extract_subtraction_arithmetic_traits_t<op_traits, op1_type, op2_type>;
+    using sub_traits = matrix_subtraction_arithmetic_traits_t<op_traits, op1_type, op2_type>;
 
     return sub_traits::subtract(m1, m2);
 }
@@ -55,7 +55,7 @@ operator *(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
     using op_traits  = select_matrix_operation_traits_t<COT1, COT2>;
     using op1_type   = matrix<ET1, COT1>;
     using op2_type   = matrix<ET2, COT2>;
-    using mul_traits = extract_multiplication_arithmetic_traits_t<op_traits, op1_type, op2_type>;
+    using mul_traits = matrix_multiplication_arithmetic_traits_t<op_traits, op1_type, op2_type>;
 
     return mul_traits::multiply(m1, m2);
 }
@@ -67,7 +67,7 @@ operator *(matrix<ET1, COT1> const& m1, S2 const& s2)
     using op_traits  = COT1;
     using op1_type   = matrix<ET1, COT1>;
     using op2_type   = S2;
-    using mul_traits = extract_multiplication_arithmetic_traits_t<op_traits, op1_type, op2_type>;
+    using mul_traits = matrix_multiplication_arithmetic_traits_t<op_traits, op1_type, op2_type>;
 
     return mul_traits::multiply(m1, s2);
 }
@@ -79,7 +79,7 @@ operator *(S1 const& s1, matrix<ET2, COT2> const& m2)
     using op_traits  = COT2;
     using op1_type   = S1;
     using op2_type   = matrix<ET2, COT2>;
-    using mul_traits = extract_multiplication_arithmetic_traits_t<op_traits, op1_type, op2_type>;
+    using mul_traits = matrix_multiplication_arithmetic_traits_t<op_traits, op1_type, op2_type>;
 
     return mul_traits::multiply(s1, m2);
 }
@@ -96,7 +96,7 @@ operator /(matrix<ET1, COT1> const& m1, S2 const& s2)
     using op_traits  = COT1;
     using op1_type   = matrix<ET1, COT1>;
     using op2_type   = S2;
-    using div_traits = extract_division_arithmetic_traits_t<op_traits, op1_type, op2_type>;
+    using div_traits = matrix_division_arithmetic_traits_t<op_traits, op1_type, op2_type>;
 
     return div_traits::divide(m1, s2);
 }

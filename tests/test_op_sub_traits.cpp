@@ -168,48 +168,48 @@ TEST(SubTraits, Extraction)
 
     //- Extracting from the library's default operation traits should yield library results.
     //
-    static_assert(std::is_same_v<extract_subtraction_element_traits_t<matrix_operation_traits, int, int>,
+    static_assert(std::is_same_v<matrix_subtraction_element_traits_t<matrix_operation_traits, int, int>,
                                  matrix_operation_traits::subtraction_element_traits<matrix_operation_traits, int, int>>);
 
-    static_assert(std::is_same_v<extract_subtraction_engine_traits_t<matrix_operation_traits, eng_t, eng_t>,
+    static_assert(std::is_same_v<matrix_subtraction_engine_traits_t<matrix_operation_traits, eng_t, eng_t>,
                                  matrix_operation_traits::subtraction_engine_traits<matrix_operation_traits, eng_t, eng_t>>);
 
-    static_assert(std::is_same_v<extract_subtraction_arithmetic_traits_t<matrix_operation_traits, mat_t, mat_t>,
+    static_assert(std::is_same_v<matrix_subtraction_arithmetic_traits_t<matrix_operation_traits, mat_t, mat_t>,
                                  matrix_operation_traits::subtraction_arithmetic_traits<matrix_operation_traits, mat_t, mat_t>>);
 
     //- Extracting from an empty operation traits type should yield library results.
     //
-    static_assert(std::is_same_v<extract_subtraction_element_traits_t<test_sub_op_traits_empty, int, int>,
+    static_assert(std::is_same_v<matrix_subtraction_element_traits_t<test_sub_op_traits_empty, int, int>,
                                  matrix_operation_traits::subtraction_element_traits<test_sub_op_traits_empty, int, int>>);
 
-    static_assert(std::is_same_v<extract_subtraction_engine_traits_t<test_sub_op_traits_empty, eng_t, eng_t>,
+    static_assert(std::is_same_v<matrix_subtraction_engine_traits_t<test_sub_op_traits_empty, eng_t, eng_t>,
                                  matrix_operation_traits::subtraction_engine_traits<test_sub_op_traits_empty, eng_t, eng_t>>);
 
-    static_assert(std::is_same_v<extract_subtraction_arithmetic_traits_t<test_sub_op_traits_empty, int, int>,
+    static_assert(std::is_same_v<matrix_subtraction_arithmetic_traits_t<test_sub_op_traits_empty, int, int>,
                                  matrix_operation_traits::subtraction_arithmetic_traits<test_sub_op_traits_empty, int, int>>);
 
     //- Extracting a nested alias template specialization from a custom operation traits type should
     //  yield the specializations to which those aliases refer.
     //
-    static_assert(std::is_same_v<extract_subtraction_element_traits_t<test_sub_op_traits_nta, int, int>,
+    static_assert(std::is_same_v<matrix_subtraction_element_traits_t<test_sub_op_traits_nta, int, int>,
                                  test_element_sub_traits_nta<test_sub_op_traits_nta, int, int>>);
 
-    static_assert(std::is_same_v<extract_subtraction_engine_traits_t<test_sub_op_traits_nta, eng_t, eng_t>,
+    static_assert(std::is_same_v<matrix_subtraction_engine_traits_t<test_sub_op_traits_nta, eng_t, eng_t>,
                                  test_engine_sub_traits_nta<test_sub_op_traits_nta, eng_t, eng_t>>);
 
-    static_assert(std::is_same_v<extract_subtraction_arithmetic_traits_t<test_sub_op_traits_nta, mat_t, mat_t>,
+    static_assert(std::is_same_v<matrix_subtraction_arithmetic_traits_t<test_sub_op_traits_nta, mat_t, mat_t>,
                                  test_arithmetic_sub_traits_nta<test_sub_op_traits_nta, mat_t, mat_t>>);
 
     //- Extracting a nested class template specialization from a custom operation traits type should
     //  yield those same nested specializations.
     //
-    static_assert(std::is_same_v<extract_subtraction_element_traits_t<test_sub_op_traits_nct, int, int>,
+    static_assert(std::is_same_v<matrix_subtraction_element_traits_t<test_sub_op_traits_nct, int, int>,
                                  test_sub_op_traits_nct::subtraction_element_traits<test_sub_op_traits_nct, int, int>>);
 
-    static_assert(std::is_same_v<extract_subtraction_engine_traits_t<test_sub_op_traits_nct, eng_t, eng_t>,
+    static_assert(std::is_same_v<matrix_subtraction_engine_traits_t<test_sub_op_traits_nct, eng_t, eng_t>,
                                  test_sub_op_traits_nct::subtraction_engine_traits<test_sub_op_traits_nct, eng_t, eng_t>>);
 
-    static_assert(std::is_same_v<extract_subtraction_arithmetic_traits_t<test_sub_op_traits_nct, mat_t, mat_t>,
+    static_assert(std::is_same_v<matrix_subtraction_arithmetic_traits_t<test_sub_op_traits_nct, mat_t, mat_t>,
                                  test_sub_op_traits_nct::subtraction_arithmetic_traits<test_sub_op_traits_nct, mat_t, mat_t>>);
 }
 
@@ -352,7 +352,7 @@ struct engine_sub_traits_tst<OTR,
 {
     static_assert(R1 == R2  &&  R1 > 0);
     static_assert(C1 == C2  &&  C1 > 0);
-    using element_traits = extract_subtraction_element_traits_t<OTR, T1, T2>;
+    using element_traits = matrix_subtraction_element_traits_t<OTR, T1, T2>;
 
     using element_type = typename element_traits::element_type;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
@@ -369,7 +369,7 @@ struct engine_sub_traits_tst<OTR,
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
-    using element_traits = extract_subtraction_element_traits_t<OTR, T1, T2>;
+    using element_traits = matrix_subtraction_element_traits_t<OTR, T1, T2>;
 
     using element_type = typename element_traits::element_type;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
@@ -386,7 +386,7 @@ struct engine_sub_traits_tst<OTR,
 {
     static_assert(R1 == R2);
     static_assert(C1 == C2);
-    using element_traits = extract_subtraction_element_traits_t<OTR, T1, T2>;
+    using element_traits = matrix_subtraction_element_traits_t<OTR, T1, T2>;
 
     using element_type = typename element_traits::element_type;
     using engine_type  = fs_matrix_engine_tst<element_type, R1, C1>;
@@ -408,7 +408,7 @@ struct subtraction_traits_tst<OTR,
     using engine_type_1 = typename op_type_1::engine_type;
     using engine_type_2 = typename op_type_2::engine_type;
 
-    using engine_traits = extract_subtraction_engine_traits_t<op_traits, engine_type_1, engine_type_2>;
+    using engine_traits = matrix_subtraction_engine_traits_t<op_traits, engine_type_1, engine_type_2>;
     using engine_type   = typename engine_traits::engine_type;
     using result_type   = matrix<engine_type, op_traits>;
 
