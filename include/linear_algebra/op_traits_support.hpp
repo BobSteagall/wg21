@@ -10,7 +10,13 @@
 
 namespace STD_LA {
 namespace detail {
-
+//--------------------------------------------------------------------------------------------------
+//  Class:      engine_extents_helper<matrix_storage_engine<T, R, C, A, L>>
+//
+//  This partial specialization determines the number of rows and columns assocated with
+//  a specific specialization of `matrix_storage_engine`.
+//--------------------------------------------------------------------------------------------------
+//
 template<class T, size_t R, size_t C, class A, class L>
 struct engine_extents_helper<matrix_storage_engine<T, R, C, A, L>>
 {

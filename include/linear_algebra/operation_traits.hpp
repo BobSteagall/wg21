@@ -9,119 +9,6 @@
 #define LINEAR_ALGEBRA_OPERATION_TRAITS_HPP_DEFINED
 
 namespace STD_LA {
-
-template<typename OT, typename U, typename V>
-using matrix_addition_element_traits_t = typename detail::addition_element_traits_t<OT, U, V>;
-
-template<typename OT, typename U, typename V>
-using matrix_addition_layout_traits_t = typename detail::addition_layout_traits_t<OT, U, V>;
-
-template<typename OT, typename U, typename V>
-using matrix_addition_engine_traits_t = typename detail::addition_engine_traits_t<OT, U, V>;
-
-template<typename OT, typename U, typename V>
-using matrix_addition_arithmetic_traits_t = typename detail::addition_arithmetic_traits_t<OT, U, V>;
-
-//------
-//
-template<typename OT, typename U, typename V>
-using matrix_subtraction_element_traits_t = typename detail::subtraction_element_traits_t<OT, U, V>;
-
-template<typename OT, typename U, typename V>
-using matrix_subtraction_layout_traits_t = typename detail::subtraction_layout_traits_t<OT, U, V>;
-
-template<typename OT, typename U, typename V>
-using matrix_subtraction_engine_traits_t = typename detail::subtraction_engine_traits_t<OT, U, V>;
-
-template<typename OT, typename U, typename V>
-using matrix_subtraction_arithmetic_traits_t = typename detail::subtraction_arithmetic_traits_t<OT, U, V>;
-
-//------
-//
-template<typename OT, typename U, typename V>
-using matrix_multiplication_element_traits_t = typename detail::multiplication_element_traits_t<OT, U, V>;
-
-template<typename OT, typename U, typename V>
-using matrix_multiplication_layout_traits_t = typename detail::multiplication_layout_traits_t<OT, U, V>;
-
-template<typename OT, typename U, typename V>
-using matrix_multiplication_engine_traits_t = typename detail::multiplication_engine_traits_t<OT, U, V>;
-
-template<typename OT, typename U, typename V>
-using matrix_multiplication_arithmetic_traits_t = typename detail::multiplication_arithmetic_traits_t<OT, U, V>;
-
-//------
-//
-template<typename OT, typename U, typename V>
-using matrix_division_element_traits_t = typename detail::division_element_traits_t<OT, U, V>;
-
-template<typename OT, typename U, typename V>
-using matrix_division_layout_traits_t = typename detail::division_layout_traits_t<OT, U, V>;
-
-template<typename OT, typename U, typename V>
-using matrix_division_engine_traits_t = typename detail::division_engine_traits_t<OT, U, V>;
-
-template<typename OT, typename U, typename V>
-using matrix_division_arithmetic_traits_t = typename detail::division_arithmetic_traits_t<OT, U, V>;
-
-
-//--------------------------------------------------------------------------------------------------
-//  Class:  matrix_operation_traits
-//
-//  This class provides a set of nested type aliases which, in turn, provide for element
-//  promotion, allocator promotion, layout promotion, engine promotion, and actually perform
-//  computation for the four basic arithmetic operations (addition, subtraction, multiplication,
-//  and scalar division).
-//--------------------------------------------------------------------------------------------------
-//
-struct matrix_operation_traits
-{
-    //- Addition
-    //
-    template<class OTR, class T1, class T2>
-    using addition_element_traits    = detail::addition_element_traits<OTR, T1, T2>;
-
-    template<class OTR, class ET1, class ET2>
-    using addition_engine_traits     = detail::addition_engine_traits<OTR, ET1, ET2>;
-
-    template<class OTR, class OP1, class OP2>
-    using addition_arithmetic_traits = detail::addition_arithmetic_traits<OTR, OP1, OP2>;
-
-    //- Subtraction
-    //
-    template<class OTR, class T1, class T2>
-    using subtraction_element_traits    = detail::subtraction_element_traits<OTR, T1, T2>;
-
-    template<class OTR, class ET1, class ET2>
-    using subtraction_engine_traits     = detail::subtraction_engine_traits<OTR, ET1, ET2>;
-
-    template<class OTR, class OP1, class OP2>
-    using subtraction_arithmetic_traits = detail::subtraction_arithmetic_traits<OTR, OP1, OP2>;
-
-    //- Multiplication
-    //
-    template<class OTR, class T1, class T2>
-    using multiplication_element_traits    = detail::multiplication_element_traits<OTR, T1, T2>;
-
-    template<class OTR, class ET1, class ET2>
-    using multiplication_engine_traits     = detail::multiplication_engine_traits<OTR, ET1, ET2>;
-
-    template<class OTR, class OP1, class OP2>
-    using multiplication_arithmetic_traits = detail::multiplication_arithmetic_traits<OTR, OP1, OP2>;
-
-    //- Division
-    //
-    template<class OTR, class T1, class T2>
-    using division_element_traits    = detail::division_element_traits<OTR, T1, T2>;
-
-    template<class OTR, class T1, class T2>
-    using division_engine_traits     = detail::division_engine_traits<OTR, T1, T2>;
-
-    template<class OTR, class T1, class T2>
-    using division_arithmetic_traits = detail::division_arithmetic_traits<OTR, T1, T2>;
-};
-
-
 //--------------------------------------------------------------------------------------------------
 //  Class Template:     matrix_operation_traits_selector
 //
@@ -138,55 +25,18 @@ struct matrix_operation_traits_selector<void, void>
     using traits_type = void;
 };
 
-template<>
-struct matrix_operation_traits_selector<void, matrix_operation_traits>
-{
-    using traits_type = void;
-};
-
 template<class COT2>
 struct matrix_operation_traits_selector<void, COT2>
 {
     using traits_type = COT2;
 };
 
-//------
-//
-template<>
-struct matrix_operation_traits_selector<matrix_operation_traits, void>
-{
-    using traits_type = void;
-};
-
-template<>
-struct matrix_operation_traits_selector<matrix_operation_traits, matrix_operation_traits>
-{
-    using traits_type = void;
-};
-
-template<class COT2>
-struct matrix_operation_traits_selector<matrix_operation_traits, COT2>
-{
-    using traits_type = COT2;
-};
-
-//------
-//
 template<class COT1>
 struct matrix_operation_traits_selector<COT1, void>
 {
     using traits_type = COT1;
 };
 
-
-template<class COT1>
-struct matrix_operation_traits_selector<COT1, matrix_operation_traits>
-{
-    using traits_type = COT1;
-};
-
-//------
-//
 template<class COT1>
 struct matrix_operation_traits_selector<COT1, COT1>
 {
@@ -194,11 +44,73 @@ struct matrix_operation_traits_selector<COT1, COT1>
 };
 
 
-//- Alias template interface to trait.
+//- Alias template interface to traits result.
 //
 template<class COT1, class COT2>
 using select_matrix_operation_traits_t =
         typename matrix_operation_traits_selector<COT1,COT2>::traits_type;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Alias Templates:    matrix_<op>_<level>_traits_t
+//
+//  These alias templates extract a given traits type from a set of template parameters.
+//--------------------------------------------------------------------------------------------------
+//
+template<typename OT, typename MT1, typename MT2>
+using matrix_addition_element_traits_t = detail::addition_element_traits_t<OT, MT1, MT2>;
+
+template<typename OT, typename MT1, typename MT2>
+using matrix_addition_layout_traits_t = detail::addition_layout_traits_t<OT, MT1, MT2>;
+
+template<typename OT, typename MT1, typename MT2>
+using matrix_addition_engine_traits_t = detail::addition_engine_traits_t<OT, MT1, MT2>;
+
+template<typename OT, typename MT1, typename MT2>
+using matrix_addition_arithmetic_traits_t = detail::addition_arithmetic_traits_t<OT, MT1, MT2>;
+
+//------
+//
+template<typename OT, typename MT1, typename MT2>
+using matrix_subtraction_element_traits_t = detail::subtraction_element_traits_t<OT, MT1, MT2>;
+
+template<typename OT, typename MT1, typename MT2>
+using matrix_subtraction_layout_traits_t = detail::subtraction_layout_traits_t<OT, MT1, MT2>;
+
+template<typename OT, typename MT1, typename MT2>
+using matrix_subtraction_engine_traits_t = detail::subtraction_engine_traits_t<OT, MT1, MT2>;
+
+template<typename OT, typename MT1, typename MT2>
+using matrix_subtraction_arithmetic_traits_t = detail::subtraction_arithmetic_traits_t<OT, MT1, MT2>;
+
+//------
+//
+template<typename OT, typename MT1, typename MT2>
+using matrix_multiplication_element_traits_t = detail::multiplication_element_traits_t<OT, MT1, MT2>;
+
+template<typename OT, typename MT1, typename MT2>
+using matrix_multiplication_layout_traits_t = detail::multiplication_layout_traits_t<OT, MT1, MT2>;
+
+template<typename OT, typename MT1, typename MT2>
+using matrix_multiplication_engine_traits_t = detail::multiplication_engine_traits_t<OT, MT1, MT2>;
+
+template<typename OT, typename MT1, typename MT2>
+using matrix_multiplication_arithmetic_traits_t = detail::multiplication_arithmetic_traits_t<OT, MT1, MT2>;
+
+//------
+//
+template<typename OT, typename MT1, typename MT2>
+using matrix_division_element_traits_t = detail::division_element_traits_t<OT, MT1, MT2>;
+
+template<typename OT, typename MT1, typename MT2>
+using matrix_division_layout_traits_t = detail::division_layout_traits_t<OT, MT1, MT2>;
+
+template<typename OT, typename MT1, typename MT2>
+using matrix_division_engine_traits_t = detail::division_engine_traits_t<OT, MT1, MT2>;
+
+template<typename OT, typename MT1, typename MT2>
+using matrix_division_arithmetic_traits_t = detail::division_arithmetic_traits_t<OT, MT1, MT2>;
+
 
 
 }       //- STD_LA namespace

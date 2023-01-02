@@ -57,6 +57,64 @@ namespace STD_LA
 }
 #endif
 
+//--------------------------------------------------------------------------------------------------
+//  Class:  matrix_operation_traits
+//
+//  This class provides a set of nested type aliases which, in turn, provide for element
+//  promotion, allocator promotion, layout promotion, engine promotion, and actually perform
+//  computation for the four basic arithmetic operations (addition, subtraction, multiplication,
+//  and scalar division).
+//--------------------------------------------------------------------------------------------------
+//
+struct matrix_operation_traits
+{
+    //- Addition
+    //
+    template<class OTR, class T1, class T2>
+    using addition_element_traits    = STD_LA::detail::addition_element_traits<OTR, T1, T2>;
+
+    template<class OTR, class ET1, class ET2>
+    using addition_engine_traits     = STD_LA::detail::addition_engine_traits<OTR, ET1, ET2>;
+
+    template<class OTR, class OP1, class OP2>
+    using addition_arithmetic_traits = STD_LA::detail::addition_arithmetic_traits<OTR, OP1, OP2>;
+
+    //- Subtraction
+    //
+    template<class OTR, class T1, class T2>
+    using subtraction_element_traits    = STD_LA::detail::subtraction_element_traits<OTR, T1, T2>;
+
+    template<class OTR, class ET1, class ET2>
+    using subtraction_engine_traits     = STD_LA::detail::subtraction_engine_traits<OTR, ET1, ET2>;
+
+    template<class OTR, class OP1, class OP2>
+    using subtraction_arithmetic_traits = STD_LA::detail::subtraction_arithmetic_traits<OTR, OP1, OP2>;
+
+    //- Multiplication
+    //
+    template<class OTR, class T1, class T2>
+    using multiplication_element_traits    = STD_LA::detail::multiplication_element_traits<OTR, T1, T2>;
+
+    template<class OTR, class ET1, class ET2>
+    using multiplication_engine_traits     = STD_LA::detail::multiplication_engine_traits<OTR, ET1, ET2>;
+
+    template<class OTR, class OP1, class OP2>
+    using multiplication_arithmetic_traits = STD_LA::detail::multiplication_arithmetic_traits<OTR, OP1, OP2>;
+
+    //- Division
+    //
+    template<class OTR, class T1, class T2>
+    using division_element_traits    = STD_LA::detail::division_element_traits<OTR, T1, T2>;
+
+    template<class OTR, class T1, class T2>
+    using division_engine_traits     = STD_LA::detail::division_engine_traits<OTR, T1, T2>;
+
+    template<class OTR, class T1, class T2>
+    using division_arithmetic_traits = STD_LA::detail::division_arithmetic_traits<OTR, T1, T2>;
+};
+
+
+
 using itup_t = size_tuple_type;
 
 using vi_init_list = std::initializer_list<int>;
