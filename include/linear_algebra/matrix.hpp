@@ -796,6 +796,8 @@ operator !=(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
 //- Convenience aliases for declaring matrix objects.
 //
 template<class T, size_t R, size_t C, class COT = void>
+requires
+    (R != std::dynamic_extent)
 using fixed_size_matrix =
         matrix<matrix_storage_engine<T, R, C, void, matrix_layout::row_major>, COT>;
 
