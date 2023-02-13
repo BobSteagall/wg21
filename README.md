@@ -1,7 +1,7 @@
 ## wg21
-[![Conan Build](https://img.shields.io/github/workflow/status/Twon/wg21/Conan/master?label=Conan)](https://github.com/Twon/wg21/actions?query=workflow%3A%22Conan%22+branch%3Amaster)
+[![Conan Build](https://img.shields.io/github/workflow/status/BobSteagall/wg21/Conan/master?label=Conan)](https://github.com/BobSteagall/wg21/actions?query=workflow%3A%22Conan%22+branch%3Amaster)
 
-Work on revision R7  of linear algebra proposal P1385 is currently underway in the `r7y` branch.  We are targeting C++23, but may be delayed until C++26.
+Work on revision R7  of linear algebra proposal P1385 is currently underway in the `r7y` branch.  We are targeting C++26.
 
 ## Support
 
@@ -12,9 +12,8 @@ Current compiler support is as follows, but will change as new compilers become 
 * Windows 10
   * Visual Studio 2019, Version 16.5.4 and higher
 
-* Linux (written and tested on Ubuntu 18.04)
-  * GCC 10.x
-  * Clang 10.x 
+* Linux (written and tested on RHEL 8.X)
+  * GCC 12.x
 
 ## Cloning the Repo
 
