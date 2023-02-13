@@ -24,7 +24,11 @@ template<class OT, class L1, class L2>      struct division_layout_traits;
 template<class OT, class ET1, class ET2>    struct division_engine_traits;
 template<class OT, class OP1, class OP2>    struct division_arithmetic_traits;
 
-//------
+//==================================================================================================
+//                              **** DIVISION TRAITS EXTRACTORS ****
+//==================================================================================================
+//- These types employ the type detection idiom to detect a custom traits type related to
+//  scalar division; if none is found, they "return" the default traits type, defined below.
 //
 template<typename OT, typename U, typename V, typename = void>
 struct division_element_traits_extractor

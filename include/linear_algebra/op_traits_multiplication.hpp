@@ -24,7 +24,11 @@ template<class OT, class L1, class L2>      struct multiplication_layout_traits;
 template<class OT, class ET1, class ET2>    struct multiplication_engine_traits;
 template<class OT, class OP1, class OP2>    struct multiplication_arithmetic_traits;
 
-//------
+//==================================================================================================
+//                        **** MULTIPLICATION TRAITS EXTRACTORS ****
+//==================================================================================================
+//- These types employ the type detection idiom to detect a custom traits type related to
+//  multiplication; if none is found, they "return" the default traits type, defined below.
 //
 template<typename OT, typename U, typename V, typename = void>
 struct multiplication_element_traits_extractor

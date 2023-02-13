@@ -24,7 +24,11 @@ template<class OT, class L1, class L2>      struct subtraction_layout_traits;
 template<class OT, class ET1, class ET2>    struct subtraction_engine_traits;
 template<class OT, class OP1, class OP2>    struct subtraction_arithmetic_traits;
 
-//------
+//==================================================================================================
+//                           **** SUBTRACTION TRAITS EXTRACTORS ****
+//==================================================================================================
+//- These types employ the type detection idiom to detect a custom traits type related to
+//  subtraction; if none is found, they "return" the default traits type, defined below.
 //
 template<typename OT, typename U, typename V, typename = void>
 struct subtraction_element_traits_extractor
