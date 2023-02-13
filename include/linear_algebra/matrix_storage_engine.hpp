@@ -11,9 +11,9 @@
 namespace STD_LA {
 namespace detail {
 //--------------------------------------------------------------------------------------------------
-//  Class Template:     mse_data<T, R, C, A, L>
+//  Class Template:     mse_data<T, R, C, AT, LT>
 //
-//  Thie type contains and manages elements on behalf of matrix_storage_engine<T,R,C,A,L>.
+//  Thie type contains and manages elements on behalf of matrix_storage_engine<T,R,C,AT,LT>.
 //
 //  Partial specializations of this class template are tailored to specific combinations of
 //  template arguments of matrix_storage_engine.  They provide the special member functions
@@ -29,12 +29,12 @@ namespace detail {
 //  are stored in a std::vector.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, size_t R, size_t C, class A, class L>
+template<class T, size_t R, size_t C, class AT, class LT>
 struct mse_data
 {
-    using array_type        = std::vector<T, A>;
-    using mdspan_type       = mdspan<T, extents<size_t, R, C>, get_mdspan_layout_t<L>>;
-    using const_mdspan_type = mdspan<T const, extents<size_t, R, C>, get_mdspan_layout_t<L>>;
+    using array_type        = std::vector<T, AT>;
+    using mdspan_type       = mdspan<T, extents<size_t, R, C>, get_mdspan_layout_t<LT>>;
+    using const_mdspan_type = mdspan<T const, extents<size_t, R, C>, get_mdspan_layout_t<LT>>;
 
     static constexpr bool   has_dynamic_mdspan   = false;
     static constexpr bool   is_column_matrix     = (C == 1);
@@ -43,8 +43,8 @@ struct mse_data
     static constexpr bool   is_column_reshapable = false;
     static constexpr bool   is_row_reshapable    = false;
     static constexpr bool   is_reshapable        = false;
-    static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
-    static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
+    static constexpr bool   is_column_major      = is_same_v<LT, matrix_layout::column_major>;
+    static constexpr bool   is_row_major         = is_same_v<LT, matrix_layout::row_major>;
 
     static constexpr size_t     m_rows   = R;
     static constexpr size_t     m_cols   = C;
@@ -69,18 +69,18 @@ struct mse_data
 
 
 //--------------------------------------------------------------------------------------------------
-//  Partial Specialization:     mse_data<T, R, C, void, L>
+//  Partial Specialization:     mse_data<T, R, C, void, LT>
 //
 //  Manages elements representing a fixed-size matrix of R rows and C columns.  Its elements
 //  are stored in a std::array.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, size_t R, size_t C, class L>
-struct mse_data<T, R, C, void, L>
+template<class T, size_t R, size_t C, class LT>
+struct mse_data<T, R, C, void, LT>
 {
     using array_type        = std::array<T, R*C>;
-    using mdspan_type       = mdspan<T, extents<size_t, R, C>, get_mdspan_layout_t<L>>;
-    using const_mdspan_type = mdspan<T const, extents<size_t, R, C>, get_mdspan_layout_t<L>>;
+    using mdspan_type       = mdspan<T, extents<size_t, R, C>, get_mdspan_layout_t<LT>>;
+    using const_mdspan_type = mdspan<T const, extents<size_t, R, C>, get_mdspan_layout_t<LT>>;
 
     static constexpr bool   has_dynamic_mdspan   = false;
     static constexpr bool   is_column_matrix     = (C == 1);
@@ -89,8 +89,8 @@ struct mse_data<T, R, C, void, L>
     static constexpr bool   is_column_reshapable = false;
     static constexpr bool   is_row_reshapable    = false;
     static constexpr bool   is_reshapable        = false;
-    static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
-    static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
+    static constexpr bool   is_column_major      = is_same_v<LT, matrix_layout::column_major>;
+    static constexpr bool   is_row_major         = is_same_v<LT, matrix_layout::row_major>;
 
     static constexpr size_t     m_rows   = R;
     static constexpr size_t     m_cols   = C;
@@ -106,7 +106,10 @@ struct mse_data<T, R, C, void, L>
     {
         if constexpr (!std::is_class_v<T>)
         {
-            for (auto& elem : m_elems) elem = T{};
+            for (auto& elem : m_elems)
+            {
+                elem = T{};
+            }
         }
     }
     constexpr mse_data(mse_data&&) noexcept = default;
@@ -118,16 +121,16 @@ struct mse_data<T, R, C, void, L>
 
 
 //--------------------------------------------------------------------------------------------------
-//  Partial Specialization:     mse_data<T, R, dynamic_extent, A, L>
+//  Partial Specialization:     mse_data<T, R, dynamic_extent, AT, LT>
 //
 //  Manages elements representing a matrix having a fixed number of R rows and a dynamically-
 //  resizable number of columns.  Its elements are stored in a std::vector.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, size_t R, class A, class L>
-struct mse_data<T, R, std::dynamic_extent, A, L>
+template<class T, size_t R, class AT, class LT>
+struct mse_data<T, R, std::dynamic_extent, AT, LT>
 {
-    using array_type        = std::vector<T, A>;
+    using array_type        = std::vector<T, AT>;
     using mdspan_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
     using const_mdspan_type = mdspan<T const, dyn_mdspan_extents, dyn_mdspan_layout>;
 
@@ -138,8 +141,8 @@ struct mse_data<T, R, std::dynamic_extent, A, L>
     static constexpr bool   is_column_reshapable = true;
     static constexpr bool   is_row_reshapable    = false;
     static constexpr bool   is_reshapable        = false;
-    static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
-    static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
+    static constexpr bool   is_column_major      = is_same_v<LT, matrix_layout::column_major>;
+    static constexpr bool   is_row_major         = is_same_v<LT, matrix_layout::row_major>;
 
     static constexpr size_t     m_rows   = R;
     static constexpr size_t     m_rowcap = R;
@@ -165,16 +168,16 @@ struct mse_data<T, R, std::dynamic_extent, A, L>
 
 
 //--------------------------------------------------------------------------------------------------
-//  Partial Specialization:     mse_data<T, dynamic_extent, C, A, L>
+//  Partial Specialization:     mse_data<T, dynamic_extent, C, AT, LT>
 //
 //  Manages elements representing a matrix having a dynamically-resizable number of rows and a
 //  fixed number of C columns.  Its elements are stored in a std::vector.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, size_t C, class A, class L>
-struct mse_data<T, std::dynamic_extent, C, A, L>
+template<class T, size_t C, class AT, class LT>
+struct mse_data<T, std::dynamic_extent, C, AT, LT>
 {
-    using array_type        = std::vector<T, A>;
+    using array_type        = std::vector<T, AT>;
     using mdspan_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
     using const_mdspan_type = mdspan<T const, dyn_mdspan_extents, dyn_mdspan_layout>;
 
@@ -185,8 +188,8 @@ struct mse_data<T, std::dynamic_extent, C, A, L>
     static constexpr bool   is_column_reshapable = false;
     static constexpr bool   is_row_reshapable    = true;
     static constexpr bool   is_reshapable        = false;
-    static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
-    static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
+    static constexpr bool   is_column_major      = is_same_v<LT, matrix_layout::column_major>;
+    static constexpr bool   is_row_major         = is_same_v<LT, matrix_layout::row_major>;
 
     static constexpr size_t     m_cols   = C;
     static constexpr size_t     m_colcap = C;
@@ -212,16 +215,16 @@ struct mse_data<T, std::dynamic_extent, C, A, L>
 
 
 //--------------------------------------------------------------------------------------------------
-//  Partial Specialization:     mse_data<T, dynamic_extent, dynamic_extent, A, L>
+//  Partial Specialization:     mse_data<T, dynamic_extent, dynamic_extent, AT, LT>
 //
 //  Manages elements representing a matrix having a dynamically-resizable number of rows and a
 //  dynamically-resizable number of columns.  Its elements are stored in a std::vector.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, class A, class L>
-struct mse_data<T, std::dynamic_extent, std::dynamic_extent, A, L>
+template<class T, class AT, class LT>
+struct mse_data<T, std::dynamic_extent, std::dynamic_extent, AT, LT>
 {
-    using array_type        = std::vector<T, A>;
+    using array_type        = std::vector<T, AT>;
     using mdspan_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
     using const_mdspan_type = mdspan<T const, dyn_mdspan_extents, dyn_mdspan_layout>;
 
@@ -232,8 +235,8 @@ struct mse_data<T, std::dynamic_extent, std::dynamic_extent, A, L>
     static constexpr bool   is_column_reshapable = false;
     static constexpr bool   is_row_reshapable    = false;
     static constexpr bool   is_reshapable        = true;
-    static constexpr bool   is_column_major      = is_same_v<L, matrix_layout::column_major>;
-    static constexpr bool   is_row_major         = is_same_v<L, matrix_layout::row_major>;
+    static constexpr bool   is_column_major      = is_same_v<LT, matrix_layout::column_major>;
+    static constexpr bool   is_row_major         = is_same_v<LT, matrix_layout::row_major>;
 
     array_type  m_elems;
     size_t      m_rows;
@@ -259,7 +262,7 @@ struct mse_data<T, std::dynamic_extent, std::dynamic_extent, A, L>
 }       //- detail namespace
 //==================================================================================================
 //==================================================================================================
-//  Class Template:     matrix_storage_engine<T, R, C, A, L>
+//  Class Template:     matrix_storage_engine<T, R, C, AT, LT>
 //
 //  This class template implements an owning engine for use by class template matrix<ET, OT>.
 //  Specifically, it models a mathematical matrix with R rows and C columns, employing an
@@ -275,16 +278,16 @@ struct mse_data<T, std::dynamic_extent, std::dynamic_extent, A, L>
 //  lying in unused capacity are default-constructed.
 //--------------------------------------------------------------------------------------------------
 //
-template<class T, size_t R, size_t C, class A, class L>
+template<class T, size_t R, size_t C, class AT, class LT>
 requires
-    detail::valid_engine_extents_and_allocator<T, R, C, A>
+    detail::valid_engine_extents_and_allocator<T, R, C, AT>
     and
-    detail::valid_layout_for_storage_engine<L>
+    detail::valid_layout_for_storage_engine<LT>
 class matrix_storage_engine
 {
     using this_type      = matrix_storage_engine;
     using support_traits = detail::matrix_engine_support;
-    using storage_type   = detail::mse_data<T, R, C, A, L>;
+    using storage_type   = detail::mse_data<T, R, C, AT, LT>;
 
     static constexpr bool   has_dynamic_mdspan      = storage_type::has_dynamic_mdspan;
     static constexpr bool   has_column_major_layout = storage_type::is_column_major;
@@ -298,8 +301,8 @@ class matrix_storage_engine
 
   public:
     using element_type      = T;
-    using allocator_type    = A;
-    using layout_type       = L;
+    using allocator_type    = AT;
+    using layout_type       = LT;
     using reference         = element_type&;
     using const_reference   = element_type const&;
     using size_type         = size_t;

@@ -132,9 +132,9 @@ class matrix
     //----------------------------------------------------------
     //- Construction from a 2D mdspan.
     //
-    template<class U, class IT, size_t X0, size_t X1, class L, class A>
+    template<class U, class IT, size_t X0, size_t X1, class ML, class MA>
     constexpr explicit
-    matrix(mdspan<U, extents<IT, X0, X1>, L, A> const& rhs)
+    matrix(mdspan<U, extents<IT, X0, X1>, ML, MA> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -142,9 +142,9 @@ class matrix
     :   m_engine(rhs)
     {}
 
-    template<class U, class IT, size_t X0, size_t X1, class L, class A>
+    template<class U, class IT, size_t X0, size_t X1, class ML, class MA>
     constexpr explicit
-    matrix(mdspan<U, extents<IT, X0, X1>, L, A> const& rhs)
+    matrix(mdspan<U, extents<IT, X0, X1>, ML, MA> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -217,9 +217,9 @@ class matrix
     //----------------------------------------------------------
     //- Construction from a 1D mdspan.
     //
-    template<class U, class IT, size_t X0, class L, class A>
+    template<class U, class IT, size_t X0, class ML, class MA>
     constexpr explicit
-    matrix(mdspan<U, extents<IT, X0>, L, A> const& rhs)
+    matrix(mdspan<U, extents<IT, X0>, ML, MA> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -227,9 +227,9 @@ class matrix
     :   m_engine(rhs)
     {}
 
-    template<class U, class IT, size_t X0, class L, class A>
+    template<class U, class IT, size_t X0, class ML, class MA>
     constexpr explicit
-    matrix(mdspan<U, extents<IT, X0>, L, A> const& rhs)
+    matrix(mdspan<U, extents<IT, X0>, ML, MA> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -300,9 +300,9 @@ class matrix
     //----------------------------------------------------------
     //- Assignment from a 2D mdspan.
     //
-    template<class U, class IT, size_t X0, size_t X1, class L, class A>
+    template<class U, class IT, size_t X0, size_t X1, class ML, class MA>
     constexpr matrix&
-    operator =(mdspan<U, extents<IT, X0, X1>, L, A> const& rhs)
+    operator =(mdspan<U, extents<IT, X0, X1>, ML, MA> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -312,9 +312,9 @@ class matrix
         return *this;
     }
 
-    template<class U, class IT, size_t X0, size_t X1, class L, class A>
+    template<class U, class IT, size_t X0, size_t X1, class ML, class MA>
     constexpr matrix&
-    operator =(mdspan<U, extents<IT, X0, X1>, L, A> const& rhs)
+    operator =(mdspan<U, extents<IT, X0, X1>, ML, MA> const& rhs)
     requires
         detail::writable_matrix_engine<engine_type>
         and
@@ -391,9 +391,9 @@ class matrix
     //----------------------------------------------------------
     //- Assignment from a 1D mdspan.
     //
-    template<class U, class IT, size_t X0, class L, class A>
+    template<class U, class IT, size_t X0, class ML, class MA>
     constexpr matrix&
-    operator =(mdspan<U, extents<IT, X0>, L, A> const& rhs)
+    operator =(mdspan<U, extents<IT, X0>, ML, MA> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -403,9 +403,9 @@ class matrix
         return *this;
     }
 
-    template<class U, class IT, size_t X0, class L, class A>
+    template<class U, class IT, size_t X0, class ML, class MA>
     constexpr matrix&
-    operator =(mdspan<U, extents<IT, X0>, L, A> const& rhs)
+    operator =(mdspan<U, extents<IT, X0>, ML, MA> const& rhs)
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
         and
@@ -796,31 +796,35 @@ operator !=(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
 //- Convenience aliases for declaring matrix objects.
 //
 template<class T, size_t R, size_t C, class COT = void>
-requires
-    (R != std::dynamic_extent)
+requires detail::valid_fixed_engine_size<R, C>
 using fixed_size_matrix =
         matrix<matrix_storage_engine<T, R, C, void, matrix_layout::row_major>, COT>;
 
 template<class T, size_t R, class COT = void>
+requires detail::valid_fixed_engine_size<R, 1>
 using fixed_size_column_vector =
         matrix<matrix_storage_engine<T, R, 1, void, matrix_layout::column_major>, COT>;
 
 template<class T, size_t C, class COT = void>
+requires detail::valid_fixed_engine_size<1, C>
 using fixed_size_row_vector =
         matrix<matrix_storage_engine<T, 1, C, void, matrix_layout::row_major>, COT>;
 
 
-template<class T, size_t R, size_t C, class A = std::allocator<T>, class COT = void>
+template<class T, size_t R, size_t C, class COT = void>
+requires detail::valid_fixed_engine_size<R, 1>
 using general_matrix =
-        matrix<matrix_storage_engine<T, R, C, A, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, R, C, std::allocator<T>, matrix_layout::row_major>, COT>;
 
-template<class T, size_t R, class A = std::allocator<T>, class COT = void>
+template<class T, size_t R, class COT = void>
+requires detail::valid_fixed_engine_size<R, 1>
 using general_column_vector =
-        matrix<matrix_storage_engine<T, R, 1, A, matrix_layout::column_major>, COT>;
+        matrix<matrix_storage_engine<T, R, 1, std::allocator<T>, matrix_layout::column_major>, COT>;
 
-template<class T, size_t C, class A = std::allocator<T>, class COT = void>
+template<class T, size_t C, class COT = void>
+requires detail::valid_fixed_engine_size<1, C>
 using general_row_vector =
-        matrix<matrix_storage_engine<T, 1, C, A, matrix_layout::row_major>, COT>;
+        matrix<matrix_storage_engine<T, 1, C, std::allocator<T>, matrix_layout::row_major>, COT>;
 
 
 template<class T, class COT = void>

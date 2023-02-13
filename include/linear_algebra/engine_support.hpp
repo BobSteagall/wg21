@@ -240,7 +240,7 @@ struct engine_extents_helper
 template<class ET, class = void>
 struct layout_type_extractor
 {
-    using layout_type = matrix_layout::unknown;
+    using layout_type = matrix_layout::arbitrary;
 };
 
 template<class ET>
@@ -258,7 +258,7 @@ using get_layout_t = typename layout_type_extractor<ET>::layout_type;
 template<class LT>
 struct transpose_layout_helper
 {
-    using layout_type = matrix_layout::unknown;
+    using layout_type = matrix_layout::arbitrary;
 };
 
 template<>
@@ -429,6 +429,7 @@ concept standard_random_access_container = is_standard_random_access_container_v
 template<size_t R, size_t C>
 concept valid_engine_size = (R > 0) && (C > 0);
 
+
 //--------------------------------------------------------------------------------------------------
 //  Concepts:   valid_fixed_engine_extents<X>
 //
@@ -438,6 +439,7 @@ concept valid_engine_size = (R > 0) && (C > 0);
 //
 template<size_t R, size_t C>
 concept valid_fixed_engine_size = (R > 0 && R != std::dynamic_extent) && (C > 0 && C != std::dynamic_extent);
+
 
 //--------------------------------------------------------------------------------------------------
 //  Concept:    valid_allocator<T, A>
@@ -1353,16 +1355,16 @@ struct matrix_engine_support
         return true;
     }
 
-    template<class ET, class T, class IT, size_t X0, class L, class A>
+    template<class ET, class T, class IT, size_t X0, class ML, class MA>
     static constexpr bool
-    compare(ET const& lhs, mdspan<T, extents<IT, X0>, L, A> const& rhs)
+    compare(ET const& lhs, mdspan<T, extents<IT, X0>, ML, MA> const& rhs)
     requires
         readable_and_1d_indexable_matrix_engine<ET>
         and
         comparable_types<typename ET::element_type, T>
     {
         using size_type_lhs = typename ET::size_type;
-        using size_type_rhs = typename mdspan<T, extents<IT, X0>, L, A>::size_type;
+        using size_type_rhs = typename mdspan<T, extents<IT, X0>, ML, MA>::size_type;
 
         size_type_lhs   n1 = lhs.size();
         size_type_rhs   n2 = rhs.extent(0);

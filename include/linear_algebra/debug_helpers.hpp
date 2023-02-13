@@ -218,11 +218,11 @@ PrintOperandTypes(string const& loc, O1 const& o1, O2 const& o2)
 #define PRINT_OP_TYPES(ET, MSG, ...)
 //#define PRINT_OP_TYPES(ET, MSG, ...)    STD_LA::PrintOperandTypes<ET>(MSG, __VA_ARGS__)
 
-template<class T, size_t R, size_t C, class A, class L>
+template<class T, size_t R, size_t C, class AT, class LT>
 void
-Print(matrix_storage_engine<T, R, C, A, L> const& v, char const* pname = nullptr)
+Print(matrix_storage_engine<T, R, C, AT, LT> const& v, char const* pname = nullptr)
 {
-    using engine_type = matrix_storage_engine<T, R, C, A, L>;
+    using engine_type = matrix_storage_engine<T, R, C, AT, LT>;
     using size_type  = typename engine_type::size_type;
 
     cout << endl << "engine: " << ((pname) ? pname : "<anon>") << endl;
@@ -261,9 +261,9 @@ Print(matrix<ET, OT> const& m, char const* pname = nullptr)
     }
 }
 
-template<class T, class IT, size_t X0, size_t X1, class L, class A>
+template<class T, class IT, size_t X0, size_t X1, class ML, class MA>
 void
-Print(mdspan<T, extents<IT, X0, X1>, L, A> const& s, char const* pname = nullptr)
+Print(mdspan<T, extents<IT, X0, X1>, ML, MA> const& s, char const* pname = nullptr)
 {
     using size_type = size_t;
 

@@ -21,7 +21,7 @@ using dyn_mdspan_mapping = typename dyn_mdspan_layout::mapping<dyn_mdspan_extent
 //  Variable:   is_2d_mdspan_v<T>
 //
 //  This private traits type determines whether its template parameter is a specialization of
-//  mdspan<T, X, L, A> with a two-dimensional extents template parameter.
+//  mdspan<T, X, ML, MA> with a two-dimensional extents template parameter.
 //--------------------------------------------------------------------------------------------------
 //
 template<class T>
@@ -200,16 +200,16 @@ struct mdspan_view_traits<void>
 //- This partial specialization is used when the view engine has a non-void mdspan interface.
 //  Note that member template parameter type EST is shorthand for "engine span type".
 //
-template<class T, class IT, size_t X0, size_t X1, class L, class A>
-struct mdspan_view_traits<mdspan<T, extents<IT, X0, X1>, L, A>>
+template<class T, class IT, size_t X0, size_t X1, class ML, class MA>
+struct mdspan_view_traits<mdspan<T, extents<IT, X0, X1>, ML, MA>>
 {
     static constexpr bool   has_mdspan = true;
 
-    using negation_mdspan_type  = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, negation_accessor<T, A>>;
-    using conjugate_mdspan_type = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, conjugate_accessor<T, A>>;
-    using hermitian_mdspan_type = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, conjugate_accessor<T, A>>;
-    using transpose_mdspan_type = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, A>;
-    using submatrix_mdspan_type = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, A>;
+    using negation_mdspan_type  = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, negation_accessor<T, MA>>;
+    using conjugate_mdspan_type = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, conjugate_accessor<T, MA>>;
+    using hermitian_mdspan_type = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, conjugate_accessor<T, MA>>;
+    using transpose_mdspan_type = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, MA>;
+    using submatrix_mdspan_type = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, MA>;
 
     template<class EST>
     static constexpr negation_mdspan_type
@@ -219,7 +219,7 @@ struct mdspan_view_traits<mdspan<T, extents<IT, X0, X1>, L, A>>
         dyn_mdspan_strides  str{s.stride(0), s.stride(1)};
         dyn_mdspan_mapping  map(ext, str);
 
-        return negation_mdspan_type(s.data_handle(), map, negation_accessor<T, A>());
+        return negation_mdspan_type(s.data_handle(), map, negation_accessor<T, MA>());
     }
 
     template<class EST>
@@ -230,7 +230,7 @@ struct mdspan_view_traits<mdspan<T, extents<IT, X0, X1>, L, A>>
         dyn_mdspan_strides  str{s.stride(0), s.stride(1)};
         dyn_mdspan_mapping  map(ext, str);
 
-        return conjugate_mdspan_type(s.data_handle(), map, conjugate_accessor<T, A>());
+        return conjugate_mdspan_type(s.data_handle(), map, conjugate_accessor<T, MA>());
     }
 
     template<class EST>
@@ -241,7 +241,7 @@ struct mdspan_view_traits<mdspan<T, extents<IT, X0, X1>, L, A>>
         dyn_mdspan_strides  str{s.stride(1), s.stride(0)};
         dyn_mdspan_mapping  map(ext, str);
 
-        return hermitian_mdspan_type(s.data_handle(), map, conjugate_accessor<T, A>());
+        return hermitian_mdspan_type(s.data_handle(), map, conjugate_accessor<T, MA>());
     }
 
     template<class EST>
@@ -252,7 +252,7 @@ struct mdspan_view_traits<mdspan<T, extents<IT, X0, X1>, L, A>>
         dyn_mdspan_strides  str{s.stride(1), s.stride(0)};
         dyn_mdspan_mapping  map(ext, str);
 
-        return transpose_mdspan_type(s.data_handle(), map, A());
+        return transpose_mdspan_type(s.data_handle(), map, MA());
     }
 
     template<class EST, class S1, class S2, class S3, class S4>
