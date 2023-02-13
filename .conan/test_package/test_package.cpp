@@ -1,12 +1,11 @@
-#include <linear_algebra.hpp>
+#include <matrix>
 
 using namespace STD_LA;
 
 int main()
 {
-    STD_LA::vector<fs_vector_engine<double, 4>>     v;
-    STD_LA::matrix<fs_matrix_engine<double, 4, 4>>  m;
-    v*m;
+    STD_LA::fixed_size_matrix<float, 4, 4>  m;
+    m.rows();
 
     return EXIT_SUCCESS;
 }

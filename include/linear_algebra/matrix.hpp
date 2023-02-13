@@ -1,517 +1,844 @@
 //==================================================================================================
 //  File:       matrix.hpp
 //
-//  Summary:    This header defines the matrix class template, one of the two primary math
-//              objects provided by the library.
+//  Summary:    This header defines the matrix class template, one of the two primary
+//              math objects provided by the library.
 //==================================================================================================
 //
 #ifndef LINEAR_ALGEBRA_MATRIX_HPP_DEFINED
 #define LINEAR_ALGEBRA_MATRIX_HPP_DEFINED
 
-#include <linear_algebra.hpp>
-
 namespace STD_LA {
-//==================================================================================================
-//  A matrix parametrized by an engine type and operator traits.
-//==================================================================================================
-//
-template<class ET, class OT>
+
+template<class ET, class COT = void>
+requires
+    detail::copyable<ET>
+    and
+    detail::default_initializable<ET>
+    and
+    detail::readable_matrix_engine<ET>
 class matrix
 {
-    static_assert(is_matrix_engine_v<ET>);
-    static_assert(detail::has_valid_span_alias_form_v<ET>);
+    static constexpr bool   is_writable = detail::writable_matrix_engine<ET>;
 
-    using possibly_writable_vector_tag = detail::noe_category_t<ET, writable_vector_engine_tag>;
-    using possibly_writable_matrix_tag = detail::noe_category_t<ET, writable_matrix_engine_tag>;
-
-    static constexpr bool   has_cx_elem = detail::is_complex_v<typename ET::value_type>;
+    using engine_support              = detail::matrix_engine_support;
+    using possibly_writable_identity  = conditional_t<is_writable, matrix_view::identity, matrix_view::const_identity>;
+    using possibly_writable_column    = conditional_t<is_writable, matrix_view::column, matrix_view::const_column>;
+    using possibly_writable_row       = conditional_t<is_writable, matrix_view::row, matrix_view::const_row>;
+    using possibly_writable_submatrix = conditional_t<is_writable, matrix_view::submatrix, matrix_view::const_submatrix>;
+    using possibly_writable_transpose = conditional_t<is_writable, matrix_view::transpose, matrix_view::const_transpose>;
 
   public:
-    //- Types
+    //- Fundamental type aliases.
     //
     using engine_type          = ET;
+    using owning_engine_type   = detail::get_owning_engine_type_t<ET>;
     using element_type         = typename engine_type::element_type;
-    using value_type           = typename engine_type::value_type;
     using reference            = typename engine_type::reference;
     using const_reference      = typename engine_type::const_reference;
-    using difference_type      = typename engine_type::difference_type;
-    using index_type           = typename engine_type::index_type;
-    using index_tuple          = typename engine_type::index_tuple;
+    using size_type            = typename engine_type::size_type;
 
-    using column_type          = vector<matrix_column_engine<engine_type, possibly_writable_vector_tag>, OT>;
-    using const_column_type    = vector<matrix_column_engine<engine_type, readable_vector_engine_tag>, OT>;
-    using row_type             = vector<matrix_row_engine<engine_type, possibly_writable_vector_tag>, OT>;
-    using const_row_type       = vector<matrix_row_engine<engine_type, readable_vector_engine_tag>, OT>;
-    using submatrix_type       = matrix<matrix_subset_engine<engine_type, possibly_writable_matrix_tag>, OT>;
-    using const_submatrix_type = matrix<matrix_subset_engine<engine_type, readable_matrix_engine_tag>, OT>;
-    using transpose_type       = matrix<matrix_transpose_engine<engine_type, possibly_writable_matrix_tag>, OT>;
-    using const_transpose_type = matrix<matrix_transpose_engine<engine_type, readable_matrix_engine_tag>, OT>;
-    using hermitian_type       = conditional_t<has_cx_elem, matrix, const_transpose_type>;
-    using const_hermitian_type = conditional_t<has_cx_elem, matrix, const_transpose_type>;
-    using span_type            = detail::engine_span_t<ET>;
-    using const_span_type      = detail::engine_const_span_t<ET>;
-
-#ifdef LA_NEGATION_AS_VIEW
-    using negation_type        = matrix<matrix_negation_engine<engine_type>, OT>;
-    using const_negation_type  = matrix<matrix_negation_engine<engine_type>, OT>;
-#endif
-
-    //- Construct/copy/destroy
+    //- Type aliases pertaining to mdspan.
     //
-    ~matrix() noexcept = default;
+    using mdspan_type          = detail::get_mdspan_type_t<ET>;
+    using const_mdspan_type    = detail::get_const_mdspan_type_t<ET>;
+
+    //- Type aliases pertaining to views.
+    //
+    using const_negation_type  = matrix<matrix_view_engine<engine_type, matrix_view::const_negation>, COT>;
+    using const_conjugate_type = matrix<matrix_view_engine<engine_type, matrix_view::const_conjugate>, COT>;
+    using const_hermitian_type = matrix<matrix_view_engine<engine_type, matrix_view::const_hermitian>, COT>;
+    using transpose_type       = matrix<matrix_view_engine<engine_type, possibly_writable_transpose>, COT>;
+    using const_transpose_type = matrix<matrix_view_engine<engine_type, matrix_view::const_transpose>, COT>;
+    using column_type          = matrix<matrix_view_engine<engine_type, possibly_writable_column>, COT>;
+    using const_column_type    = matrix<matrix_view_engine<engine_type, matrix_view::const_column>, COT>;
+    using row_type             = matrix<matrix_view_engine<engine_type, possibly_writable_row>, COT>;
+    using const_row_type       = matrix<matrix_view_engine<engine_type, matrix_view::const_row>, COT>;
+    using submatrix_type       = matrix<matrix_view_engine<engine_type, possibly_writable_submatrix>, COT>;
+    using const_submatrix_type = matrix<matrix_view_engine<engine_type, matrix_view::const_submatrix>, COT>;
+
+  public:
+    ~matrix() = default;
 
     constexpr matrix() = default;
     constexpr matrix(matrix&&) noexcept = default;
     constexpr matrix(matrix const&) = default;
 
-    template<class ET2, class OT2>
-    constexpr matrix(matrix<ET2, OT2> const& src);
-    template<class U, class ET2 = ET, detail::enable_if_initable<ET, ET2, U> = true>
-    constexpr matrix(initializer_list<initializer_list<U>> rhs);
+    matrix&   operator =(matrix&&) noexcept = default;
+    matrix&   operator =(matrix const&) = default;
 
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    explicit constexpr matrix(index_tuple size);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr matrix(index_type rows, index_type cols);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr matrix(index_tuple size, index_tuple cap);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr matrix(index_type rows, index_type cols, index_type rowcap, index_type colcap);
-
-    constexpr matrix&   operator =(matrix&&) noexcept = default;
-    constexpr matrix&   operator =(matrix const&) = default;
-    template<class ET2, class OT2>
-    constexpr matrix&   operator =(matrix<ET2, OT2> const& rhs);
-    template<class U, class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
-    constexpr matrix&   operator =(initializer_list<initializer_list<U>> rhs);
-
-    //- Capacity
+    //----------------------------------------------------------
+    //- Other constructors.
     //
-    constexpr index_type    columns() const noexcept;
-    constexpr index_type    rows() const noexcept;
-    constexpr index_tuple   size() const noexcept;
+    constexpr
+    matrix(size_type rows, size_type cols)
+    requires
+        detail::reshapable_matrix_engine<engine_type>
+    :   m_engine(rows, cols, rows, cols)
+    {}
 
-    constexpr index_type    column_capacity() const noexcept;
-    constexpr index_type    row_capacity() const noexcept;
-    constexpr index_tuple   capacity() const noexcept;
+    constexpr
+    matrix(size_type rows, size_type cols, size_type rowcap, size_type colcap)
+    requires
+        detail::reshapable_matrix_engine<engine_type>
+    :   m_engine(rows, cols, rowcap, colcap)
+    {}
 
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void      reserve(index_tuple cap);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void      reserve(index_type rowcap, index_type colcap);
+    constexpr explicit
+    matrix(size_type cols)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::column_reshapable_matrix_engine<engine_type>
+    :   m_engine(cols, cols)
+    {}
 
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void      resize(index_tuple size);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void      resize(index_type rows, index_type cols);
+    constexpr explicit
+    matrix(size_type rows)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::row_reshapable_matrix_engine<engine_type>
+    :   m_engine(rows, rows)
+    {}
 
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void      resize(index_tuple size, index_tuple cap);
-    template<class ET2 = ET, detail::enable_if_resizable<ET, ET2> = true>
-    constexpr void      resize(index_type rows, index_type cols, index_type rowcap, index_type colcap);
-
-    //- Element access
+    //----------------------------------------------------------
+    //- Construction from a matrix of different engine type.
     //
-    constexpr reference             operator ()(index_type i, index_type j);
-    constexpr const_reference       operator ()(index_type i, index_type j) const;
+    template<class ET2, class COT2>
+    constexpr
+    matrix(matrix<ET2, COT2> const& rhs)
+    requires
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::constructible_from<engine_type, ET2>
+    :   m_engine(rhs.engine())
+    {}
 
-#ifdef LA_NEGATION_AS_VIEW
-    constexpr const_negation_type   operator -() const noexcept;
-#endif
+    template<class ET2, class COT2>
+    constexpr
+    matrix(matrix<ET2, COT2> const& rhs)
+    requires
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::not_constructible_from<engine_type, ET2>
+        and
+        detail::convertible_from<element_type, typename ET2::element_type>
+    :   m_engine()
+    {
+        engine_support::assign_from(m_engine, rhs.engine());
+    }
 
-    constexpr column_type           column(index_type j) noexcept;
-    constexpr const_column_type     column(index_type j) const noexcept;
-    constexpr row_type              row(index_type i) noexcept;
-    constexpr const_row_type        row(index_type i) const noexcept;
-    constexpr submatrix_type        submatrix(index_type ri, index_type rn, index_type ci, index_type cn) noexcept;
-    constexpr const_submatrix_type  submatrix(index_type ri, index_type rn, index_type ci, index_type cn) const noexcept;
-    constexpr transpose_type        t() noexcept;
-    constexpr const_transpose_type  t() const noexcept;
-    constexpr const_hermitian_type  h() const;
-
-    //- Data access
+    //----------------------------------------------------------
+    //- Construction from a 2D mdspan.
     //
-    constexpr engine_type&          engine() noexcept;
-    constexpr engine_type const&    engine() const noexcept;
+    template<class U, class IT, size_t X0, size_t X1, class ML, class MA>
+    constexpr explicit
+    matrix(mdspan<U, extents<IT, X0, X1>, ML, MA> const& rhs)
+    requires
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::constructible_from<engine_type, decltype(rhs)>
+    :   m_engine(rhs)
+    {}
 
-    template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
-    constexpr span_type             span() noexcept;
-    template<class ET2 = ET, detail::enable_if_spannable<ET, ET2> = true>
-    constexpr const_span_type       span() const noexcept;
+    template<class U, class IT, size_t X0, size_t X1, class ML, class MA>
+    constexpr explicit
+    matrix(mdspan<U, extents<IT, X0, X1>, ML, MA> const& rhs)
+    requires
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::not_constructible_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
+    :   m_engine()
+    {
+        engine_support::assign_from(m_engine, rhs);
+    }
 
-    //- Modifiers
+    //----------------------------------------------------------
+    //- Construction from a 2D initialization list.
     //
-    constexpr void      swap(matrix& rhs) noexcept;
-    template<class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
-    constexpr void      swap_columns(index_type c1, index_type c2) noexcept;
-    template<class ET2 = ET, detail::enable_if_writable<ET, ET2> = true>
-    constexpr void      swap_rows(index_type r1, index_type r2) noexcept;
+    template<class U>
+    constexpr
+    matrix(initializer_list<initializer_list<U>> rhs)
+    requires
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::constructible_from<engine_type, decltype(rhs)>
+    :   m_engine(rhs)
+    {}
+
+    template<class U>
+    constexpr
+    matrix(initializer_list<initializer_list<U>> rhs)
+    requires
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::not_constructible_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
+    :   m_engine()
+    {
+        engine_support::assign_from(m_engine, rhs);
+    }
+
+    //----------------------------------------------------------
+    //- Construction from a standard random-access container.
+    //
+    template<class CT>
+    constexpr explicit
+    matrix(CT const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<ET>
+        and
+        detail::standard_random_access_container<CT>
+        and
+        detail::constructible_from<engine_type, CT>
+    :   m_engine(rhs)
+    {}
+
+    template<class CT>
+    constexpr explicit
+    matrix(CT const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<ET>
+        and
+        detail::standard_random_access_container<CT>
+        and
+        detail::not_constructible_from<engine_type, CT>
+        and
+        detail::convertible_from<typename ET::element_type, typename CT::value_type>
+    :   m_engine()
+    {
+        engine_support::assign_from(m_engine, rhs);
+    }
+
+    //----------------------------------------------------------
+    //- Construction from a 1D mdspan.
+    //
+    template<class U, class IT, size_t X0, class ML, class MA>
+    constexpr explicit
+    matrix(mdspan<U, extents<IT, X0>, ML, MA> const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::constructible_from<engine_type, decltype(rhs)>
+    :   m_engine(rhs)
+    {}
+
+    template<class U, class IT, size_t X0, class ML, class MA>
+    constexpr explicit
+    matrix(mdspan<U, extents<IT, X0>, ML, MA> const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::not_constructible_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
+    :   m_engine()
+    {
+        engine_support::assign_from(m_engine, rhs);
+    }
+
+    //----------------------------------------------------------
+    //- Construction from a 1D initialization list.
+    //
+    template<class U>
+    constexpr
+    matrix(initializer_list<U> rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::constructible_from<engine_type, decltype(rhs)>
+    :   m_engine(rhs)
+    {}
+
+    template<class U>
+    constexpr
+    matrix(initializer_list<U> rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::not_constructible_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
+    :   m_engine()
+    {
+        engine_support::assign_from(m_engine, rhs);
+    }
+
+    //----------------------------------------------------------
+    //- Assignment from a different matrix engine type.
+    //
+    template<class ET2, class COT2>
+    constexpr matrix&
+    operator =(matrix<ET2, COT2> const& rhs)
+    requires
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::assignable_from<engine_type, ET2>
+    {
+        m_engine = rhs.engine();
+        return *this;
+    }
+
+    template<class ET2, class COT2>
+    constexpr matrix&
+    operator =(matrix<ET2, COT2> const& rhs)
+    requires
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::not_assignable_from<engine_type, ET2>
+        and
+        detail::convertible_from<element_type, typename ET2::element_type>
+    {
+        engine_support::assign_from(m_engine, rhs.engine());
+        return *this;
+    }
+
+    //----------------------------------------------------------
+    //- Assignment from a 2D mdspan.
+    //
+    template<class U, class IT, size_t X0, size_t X1, class ML, class MA>
+    constexpr matrix&
+    operator =(mdspan<U, extents<IT, X0, X1>, ML, MA> const& rhs)
+    requires
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::assignable_from<engine_type, decltype(rhs)>
+    {
+        m_engine = rhs;
+        return *this;
+    }
+
+    template<class U, class IT, size_t X0, size_t X1, class ML, class MA>
+    constexpr matrix&
+    operator =(mdspan<U, extents<IT, X0, X1>, ML, MA> const& rhs)
+    requires
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::not_assignable_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
+    {
+        engine_support::assign_from(m_engine, rhs);
+        return *this;
+    }
+
+    //----------------------------------------------------------
+    //- Assignment from a 2D initialization list.
+    //
+    template<class U>
+    constexpr matrix&
+    operator =(initializer_list<initializer_list<U>> rhs)
+    requires
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::assignable_from<engine_type, decltype(rhs)>
+    {
+        m_engine = rhs;
+        return *this;
+    }
+
+    template<class U>
+    constexpr matrix&
+    operator =(initializer_list<initializer_list<U>> rhs)
+    requires
+        detail::writable_matrix_engine<engine_type>
+        and
+        detail::not_assignable_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
+    {
+        engine_support::assign_from(m_engine, rhs);
+        return *this;
+    }
+
+    //----------------------------------------------------------
+    //- Assignment from a standard random-access container.
+    //
+    template<class CT>
+    constexpr matrix&
+    operator =(CT const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::standard_random_access_container<CT>
+        and
+        detail::assignable_from<engine_type, decltype(rhs)>
+    {
+        m_engine = rhs;
+        return *this;
+    }
+
+    template<class CT>
+    constexpr matrix&
+    operator =(CT const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<ET>
+        and
+        detail::standard_random_access_container<CT>
+        and
+        detail::not_assignable_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, typename CT::value_type>
+    {
+        engine_support::assign_from(m_engine, rhs);
+        return *this;
+    }
+
+    //----------------------------------------------------------
+    //- Assignment from a 1D mdspan.
+    //
+    template<class U, class IT, size_t X0, class ML, class MA>
+    constexpr matrix&
+    operator =(mdspan<U, extents<IT, X0>, ML, MA> const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::assignable_from<engine_type, decltype(rhs)>
+    {
+        m_engine = rhs;
+        return *this;
+    }
+
+    template<class U, class IT, size_t X0, class ML, class MA>
+    constexpr matrix&
+    operator =(mdspan<U, extents<IT, X0>, ML, MA> const& rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::not_assignable_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
+    {
+        engine_support::assign_from(m_engine, rhs);
+        return *this;
+    }
+
+    //----------------------------------------------------------
+    //- Assignment from a 1D initialization list.
+    //
+    template<class U>
+    constexpr matrix&
+    operator =(initializer_list<U> rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::assignable_from<engine_type, decltype(rhs)>
+    {
+        m_engine = rhs;
+        return *this;
+    }
+
+    template<class U>
+    constexpr matrix&
+    operator =(initializer_list<U> rhs)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+        and
+        detail::not_assignable_from<engine_type, decltype(rhs)>
+        and
+        detail::convertible_from<element_type, U>
+    {
+        engine_support::assign_from(m_engine, rhs);
+        return *this;
+    }
+
+    //----------------------------------------------------------
+    //- Size and capacity reporting.
+    //
+    constexpr size_type
+    elements() const noexcept
+    {
+        return m_engine.elements();
+    }
+
+    constexpr size_type
+    columns() const noexcept
+    {
+        return m_engine.columns();
+    }
+
+    constexpr size_type
+    rows() const noexcept
+    {
+        return m_engine.rows();
+    }
+
+    constexpr size_type
+    size() const noexcept
+    {
+        return m_engine.size();
+    }
+
+    constexpr size_type
+    column_capacity() const noexcept
+    {
+        return m_engine.column_capacity();
+    }
+
+    constexpr size_type
+    row_capacity() const noexcept
+    {
+        return m_engine.row_capacity();
+    }
+
+    constexpr size_type
+    capacity() const noexcept
+    {
+        return m_engine.capacity();
+    }
+
+    //----------------------------------------------------------
+    //- Element access.
+    //
+    constexpr reference
+    operator ()(size_type i, size_type j)
+    {
+        return m_engine(i, j);
+    }
+
+    constexpr const_reference
+    operator ()(size_type i, size_type j) const
+    {
+        return m_engine(i, j);
+    }
+
+    constexpr reference
+    operator ()(size_type i)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        return m_engine(i);
+    }
+
+    constexpr const_reference
+    operator ()(size_type i) const
+    requires
+        detail::readable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        return m_engine(i);
+    }
+
+    constexpr const_negation_type
+    operator -() const noexcept
+    {
+        return const_negation_type(detail::special_ctor_tag(), m_engine);
+    }
+
+    constexpr const_conjugate_type
+    conj() const noexcept
+    {
+        return const_conjugate_type(detail::special_ctor_tag(), m_engine);
+    }
+
+    constexpr const_hermitian_type
+    h() const noexcept
+    {
+        return const_hermitian_type(detail::special_ctor_tag(), m_engine);
+    }
+
+    constexpr transpose_type
+    t() noexcept
+    {
+        return transpose_type(detail::special_ctor_tag(), m_engine);
+    }
+
+    constexpr const_transpose_type
+    t() const noexcept
+    {
+        return const_transpose_type(detail::special_ctor_tag(), m_engine);
+    }
+
+    constexpr column_type
+    column(size_type j) noexcept
+    {
+        return column_type(detail::special_ctor_tag(), m_engine, j);
+    }
+
+    constexpr const_column_type
+    column(size_type j) const noexcept
+    {
+        return const_column_type(detail::special_ctor_tag(), m_engine, j);
+    }
+
+    constexpr row_type
+    row(size_type i) noexcept
+    {
+        return row_type(detail::special_ctor_tag(), m_engine, i);
+    }
+
+    constexpr const_row_type
+    row(size_type i) const noexcept
+    {
+        return const_row_type(detail::special_ctor_tag(), m_engine, i);
+    }
+
+    constexpr submatrix_type
+    submatrix(size_type ri, size_type rn, size_type ci, size_type cn) noexcept
+    {
+        return submatrix_type(detail::special_ctor_tag(), m_engine, ri, rn, ci, cn);
+    }
+
+    constexpr const_submatrix_type
+    submatrix(size_type ri, size_type rn, size_type ci, size_type cn) const noexcept
+    {
+        return const_submatrix_type(detail::special_ctor_tag(), m_engine, ri, rn, ci, cn);
+    }
+
+    //----------------------------------------------------------
+    //- Custom operation injection.
+    //
+    template<class COT2>
+    constexpr matrix<matrix_view_engine<engine_type, possibly_writable_identity>, COT2>
+    adopt() noexcept
+    {
+        return {detail::special_ctor_tag(), m_engine};
+    }
+
+    template<class COT2>
+    constexpr matrix<matrix_view_engine<engine_type, matrix_view::const_identity>, COT2>
+    adopt() const noexcept
+    {
+        return {detail::special_ctor_tag(), m_engine};
+    }
+
+    //----------------------------------------------------------
+    //- Data access.
+    //
+    constexpr engine_type&
+    engine() noexcept
+    {
+        return m_engine;
+    }
+
+    constexpr engine_type const&
+    engine() const noexcept
+    {
+        return m_engine;
+    }
+
+    constexpr mdspan_type
+    span() noexcept
+    requires
+        detail::spannable_matrix_engine<engine_type>
+    {
+        return m_engine.span();
+    }
+
+    constexpr const_mdspan_type
+    span() const noexcept
+    requires
+        detail::spannable_matrix_engine<engine_type>
+    {
+        return m_engine.span();
+    }
+
+    //----------------------------------------------------------
+    //- Setting column size and capacity.
+    //
+    constexpr void
+    resize_columns(size_type cols)
+    requires
+        detail::column_reshapable_matrix_engine<engine_type>
+    {
+        m_engine.reshape_columns(cols, m_engine.column_capacity());
+    }
+
+    constexpr void
+    reserve_columns(size_type colcap)
+    requires
+        detail::column_reshapable_matrix_engine<engine_type>
+    {
+        m_engine.reshape_columns(m_engine.columns(), colcap);
+    }
+
+    constexpr void
+    reshape_columns(size_type cols, size_type colcap)
+    requires
+        detail::column_reshapable_matrix_engine<engine_type>
+    {
+        m_engine.reshape_columns(cols, colcap);
+    }
+
+    //----------------------------------------------------------
+    //- Setting row size and capacity.
+    //
+    constexpr void
+    resize_rows(size_type rows)
+    requires
+        detail::row_reshapable_matrix_engine<engine_type>
+    {
+        m_engine.reshape_rows(rows, m_engine.row_capacity());
+    }
+
+    constexpr void
+    reserve_rows(size_type rowcap)
+    requires
+        detail::row_reshapable_matrix_engine<engine_type>
+    {
+        m_engine.reshape_rows(m_engine.rows(), rowcap);
+    }
+
+    constexpr void
+    reshape_rows(size_type rows, size_type rowcap)
+    requires
+        detail::row_reshapable_matrix_engine<engine_type>
+    {
+        m_engine.reshape_rows(rows, rowcap);
+    }
+
+    //----------------------------------------------------------
+    //- Setting overall size and capacity.
+    //
+    constexpr void
+    resize(size_type rows, size_type cols)
+    requires
+        detail::reshapable_matrix_engine<engine_type>
+    {
+        m_engine.reshape(rows, cols, m_engine.row_capacity(), m_engine.column_capacity());
+    }
+
+    constexpr void
+    reserve(size_type rowcap, size_type colcap)
+    requires
+        detail::reshapable_matrix_engine<engine_type>
+    {
+        m_engine.reshape(m_engine.rows(), m_engine.columns(), rowcap, colcap);
+    }
+
+    constexpr void
+    reshape(size_type rows, size_type cols, size_type rowcap, size_type colcap)
+    requires
+        detail::reshapable_matrix_engine<engine_type>
+    {
+        m_engine.reshape(rows, cols, rowcap, colcap);
+    }
+
+    //----------------------------------------------------------
+    //- Other modifiers.
+    //
+    constexpr void
+    swap(matrix& rhs) noexcept
+    {
+        m_engine.swap(rhs.m_engine);
+    }
+
+    constexpr void
+    swap_columns(size_type c1, size_type c2) noexcept
+    requires
+        detail::writable_matrix_engine<engine_type>
+    {
+        if (c1 != c2)
+        {
+            for (size_type i = 0;  i < m_engine.rows();  ++i)
+            {
+                engine_support::swap(m_engine(i, c1), m_engine(i, c2));
+            }
+        }
+    }
+
+    constexpr void
+    swap_rows(size_type r1, size_type r2) noexcept
+    requires
+        detail::writable_matrix_engine<engine_type>
+    {
+        if (r1 != r2)
+        {
+            for (size_type j = 0;  j < m_engine.columns();  ++j)
+            {
+                engine_support::swap(m_engine(r1, j), m_engine(r2, j));
+            }
+        }
+    }
 
   private:
-    template<class ET2, class OT2> friend class matrix;
-    template<class ET2, class OT2> friend class vector;
+    template<class ET2, class COT2>
+    requires
+        detail::copyable<ET2>
+        and
+        detail::default_initializable<ET2>
+        and
+        detail::readable_matrix_engine<ET2>
+    friend class matrix;
 
     engine_type     m_engine;
 
     template<class ET2, class... ARGS>
-    constexpr matrix(detail::special_ctor_tag, ET2&& eng, ARGS&&... args);
+
+    constexpr
+    matrix(detail::special_ctor_tag, ET2&& eng, ARGS&&... args)
+    :   m_engine(std::forward<ET2>(eng), std::forward<ARGS>(args)...)
+    {}
 };
 
-//------------------------
-//- Construct/copy/destroy
+
+//- Comparison operators for matrix operands.  Using these may or may not make sense,
+//  based on the element type.
 //
-template<class ET, class OT>
-template<class ET2, class OT2> constexpr
-matrix<ET,OT>::matrix(matrix<ET2, OT2> const& rhs)
-:   m_engine(rhs.m_engine)
-{}
-
-template<class ET, class OT>
-template<class U, class ET2, detail::enable_if_initable<ET, ET2, U>> constexpr
-matrix<ET,OT>::matrix(initializer_list<initializer_list<U>> rhs)
-:   m_engine(rhs)
-{}
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
-matrix<ET,OT>::matrix(index_tuple size)
-:   m_engine(get<0>(size), get<1>(size))
-{}
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
-matrix<ET,OT>::matrix(index_type rows, index_type cols)
-:   m_engine(rows, cols)
-{}
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
-matrix<ET,OT>::matrix(index_tuple size, index_tuple cap)
-:   m_engine(get<0>(size), get<1>(size), get<0>(cap), get<1>(cap))
-{}
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> constexpr
-matrix<ET,OT>::matrix(index_type rows, index_type cols, index_type rowcap, index_type colcap)
-:   m_engine(rows, cols, rowcap, colcap)
-{}
-
-template<class ET, class OT>
-template<class ET2, class... ARGS> constexpr
-matrix<ET,OT>::matrix(detail::special_ctor_tag, ET2&& eng, ARGS&&... args)
-:   m_engine(std::forward<ET2>(eng), std::forward<ARGS>(args)...)
-{}
-
-template<class ET, class OT>
-template<class ET2, class OT2> constexpr
-matrix<ET,OT>&
-matrix<ET,OT>::operator =(matrix<ET2, OT2> const& rhs)
+template<class ET1, class COT1, class ET2, class COT2> inline constexpr
+bool
+operator ==(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
 {
-    m_engine = rhs.m_engine;
-    return *this;
+    return detail::matrix_engine_support::compare(m1, m2);
 }
 
-template<class ET, class OT>
-template<class U, class ET2, detail::enable_if_writable<ET, ET2>> constexpr
-matrix<ET,OT>&
-matrix<ET,OT>::operator =(initializer_list<initializer_list<U>> rhs)
+template<class ET1, class COT1, class ET2, class COT2> inline constexpr
+bool
+operator !=(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
 {
-    m_engine = rhs;
-    return *this;
+    return !detail::matrix_engine_support::compare(m1, m2);
 }
 
-//----------
-//- Capacity
+
+//- Convenience aliases for declaring matrix objects.
 //
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::index_type
-matrix<ET,OT>::columns() const noexcept
-{
-    return m_engine.columns();
-}
+template<class T, size_t R, size_t C, class COT = void>
+requires detail::valid_fixed_engine_size<R, C>
+using fixed_size_matrix =
+        matrix<matrix_storage_engine<T, R, C, void, matrix_layout::row_major>, COT>;
 
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::index_type
-matrix<ET,OT>::rows() const noexcept
-{
-    return m_engine.rows();
-}
+template<class T, size_t R, class COT = void>
+requires detail::valid_fixed_engine_size<R, 1>
+using fixed_size_column_vector =
+        matrix<matrix_storage_engine<T, R, 1, void, matrix_layout::column_major>, COT>;
 
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::index_tuple
-matrix<ET,OT>::size() const noexcept
-{
-    return index_tuple(m_engine.rows(), m_engine.columns());
-}
+template<class T, size_t C, class COT = void>
+requires detail::valid_fixed_engine_size<1, C>
+using fixed_size_row_vector =
+        matrix<matrix_storage_engine<T, 1, C, void, matrix_layout::row_major>, COT>;
 
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::index_type
-matrix<ET,OT>::column_capacity() const noexcept
-{
-    return m_engine.column_capacity();
-}
 
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::index_type
-matrix<ET,OT>::row_capacity() const noexcept
-{
-    return m_engine.row_capacity();
-}
+template<class T, size_t R, size_t C, class COT = void>
+requires detail::valid_fixed_engine_size<R, 1>
+using general_matrix =
+        matrix<matrix_storage_engine<T, R, C, std::allocator<T>, matrix_layout::row_major>, COT>;
 
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::index_tuple
-matrix<ET,OT>::capacity() const noexcept
-{
-    return index_tuple(m_engine.row_capacity(), m_engine.column_capacity());
-}
+template<class T, size_t R, class COT = void>
+requires detail::valid_fixed_engine_size<R, 1>
+using general_column_vector =
+        matrix<matrix_storage_engine<T, R, 1, std::allocator<T>, matrix_layout::column_major>, COT>;
 
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> inline constexpr
-void
-matrix<ET,OT>::reserve(index_tuple cap)
-{
-    m_engine.resize(get<0>(cap), get<1>(cap));
-}
+template<class T, size_t C, class COT = void>
+requires detail::valid_fixed_engine_size<1, C>
+using general_row_vector =
+        matrix<matrix_storage_engine<T, 1, C, std::allocator<T>, matrix_layout::row_major>, COT>;
 
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> inline constexpr
-void
-matrix<ET,OT>::reserve(index_type rowcap, index_type colcap)
-{
-    m_engine.reserve(rowcap, colcap);
-}
 
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> inline constexpr
-void
-matrix<ET,OT>::resize(index_tuple size)
-{
-    m_engine.resize(get<0>(size), get<1>(size));
-}
+template<class T, class COT = void>
+using dynamic_matrix =
+        matrix<matrix_storage_engine<T, std::dynamic_extent, std::dynamic_extent, std::allocator<T>, matrix_layout::row_major>, COT>;
 
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> inline constexpr
-void
-matrix<ET,OT>::resize(index_type rows, index_type cols)
-{
-    m_engine.resize(rows, cols);
-}
+template<class T, class COT = void>
+using dynamic_column_vector =
+        matrix<matrix_storage_engine<T, std::dynamic_extent, 1, std::allocator<T>, matrix_layout::column_major>, COT>;
 
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> inline constexpr
-void
-matrix<ET,OT>::resize(index_tuple size, index_tuple cap)
-{
-    m_engine.resize(get<0>(size), get<1>(size), get<0>(cap), get<1>(cap));
-}
+template<class T, class COT = void>
+using dynamic_row_vector =
+        matrix<matrix_storage_engine<T, 1, std::dynamic_extent, std::allocator<T>, matrix_layout::row_major>, COT>;
 
-template<class ET, class OT>
-template<class ET2, detail::enable_if_resizable<ET, ET2>> inline constexpr
-void
-matrix<ET,OT>::resize(index_type rows, index_type cols, index_type rowcap, index_type colcap)
-{
-    m_engine.resize(rows, cols, rowcap, colcap);
-}
-
-//----------------
-//- Element access
-//
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::reference
-matrix<ET,OT>::operator ()(index_type i, index_type j)
-{
-    return m_engine(i, j);
-}
-
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::const_reference
-matrix<ET,OT>::operator ()(index_type i, index_type j) const
-{
-    return m_engine(i, j);
-}
-
-#ifdef LA_NEGATION_AS_VIEW
-template<class ET, class OT> constexpr
-typename matrix<ET, OT>::const_negation_type
-matrix<ET,OT>::operator -() const noexcept
-{
-    return const_negation_type(detail::special_ctor_tag(), m_engine);
-}
-#endif
-
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::const_column_type
-matrix<ET,OT>::column(index_type j) const noexcept
-{
-    return const_column_type(detail::special_ctor_tag(), m_engine, j);
-}
-
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::column_type
-matrix<ET,OT>::column(index_type j) noexcept
-{
-    return column_type(detail::special_ctor_tag(), m_engine, j);
-}
-
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::row_type
-matrix<ET,OT>::row(index_type i) noexcept
-{
-    return row_type(detail::special_ctor_tag(), m_engine, i);
-}
-
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::const_row_type
-matrix<ET,OT>::row(index_type i) const noexcept
-{
-    return const_row_type(detail::special_ctor_tag(), m_engine, i);
-}
-
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::submatrix_type
-matrix<ET,OT>::submatrix(index_type ri, index_type rn, index_type ci, index_type cn) noexcept
-{
-    return submatrix_type(detail::special_ctor_tag(), m_engine, ri, rn, ci, cn);
-}
-
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::const_submatrix_type
-matrix<ET,OT>::submatrix(index_type ri, index_type rn, index_type ci, index_type cn) const noexcept
-{
-    return const_submatrix_type(detail::special_ctor_tag(), m_engine, ri, rn, ci, cn);
-}
-
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::transpose_type
-matrix<ET,OT>::t() noexcept
-{
-    return transpose_type(detail::special_ctor_tag(), m_engine);
-}
-
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::const_transpose_type
-matrix<ET,OT>::t() const noexcept
-{
-    return const_transpose_type(detail::special_ctor_tag(), m_engine);
-}
-
-template<class ET, class OT> inline constexpr
-typename matrix<ET,OT>::const_hermitian_type
-matrix<ET,OT>::h() const
-{
-    if constexpr (detail::is_complex_v<element_type>)
-    {
-        return const_hermitian_type();
-    }
-    else
-    {
-        return const_hermitian_type(detail::special_ctor_tag(), m_engine);
-    }
-}
-
-//-------------
-//- Data access
-//
-template<class ET, class OT> constexpr
-typename matrix<ET,OT>::engine_type&
-matrix<ET,OT>::engine() noexcept
-{
-    return m_engine;
-}
-
-template<class ET, class OT> constexpr
-typename matrix<ET,OT>::engine_type const&
-matrix<ET,OT>::engine() const noexcept
-{
-    return m_engine;
-}
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_spannable<ET, ET2>> constexpr
-typename matrix<ET,OT>::span_type
-matrix<ET,OT>::span() noexcept
-{
-    return m_engine.span();
-}
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_spannable<ET, ET2>> constexpr
-typename matrix<ET,OT>::const_span_type
-matrix<ET,OT>::span() const noexcept
-{
-    return m_engine.span();
-}
-
-//-----------
-//- Modifiers
-//
-template<class ET, class OT> constexpr
-void
-matrix<ET,OT>::swap(matrix& rhs) noexcept
-{
-    m_engine.swap(rhs.m_engine);
-}
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_writable<ET, ET2>> constexpr
-void
-matrix<ET,OT>::swap_columns(index_type c1, index_type c2) noexcept
-{
-    m_engine.swap_columns(c1, c2);
-}
-
-template<class ET, class OT>
-template<class ET2, detail::enable_if_writable<ET, ET2>> constexpr
-void
-matrix<ET,OT>::swap_rows(index_type r1, index_type r2) noexcept
-{
-    m_engine.swap_rows(r1, r2);
-}
-
-//------------
-//- Comparison
-//
-template<class ET1, class OT1, class ET2, class OT2> constexpr
-bool
-operator ==(matrix<ET1, OT1> const& lhs, matrix<ET2, OT2> const& rhs)
-{
-    return detail::m_cmp_eq(lhs.engine(), rhs.engine());
-}
-
-template<class ET1, class OT1, class ET2, class OT2> constexpr
-bool
-operator !=(matrix<ET1, OT1> const& lhs, matrix<ET2, OT2> const& rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<class ET, class OT, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
-bool
-operator ==(matrix<ET, OT> const& lhs, basic_mdspan<T, extents<X0, X1>, L, A> const& rhs)
-{
-    return detail::m_cmp_eq(lhs.engine(), rhs);
-}
-
-template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A, class ET, class OT> constexpr
-bool
-operator ==(basic_mdspan<T, extents<X0, X1>, L, A> const& lhs, matrix<ET, OT> const& rhs)
-{
-    return detail::m_cmp_eq(rhs.engine(), lhs);
-}
-
-template<class ET, class OT, class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A> constexpr
-bool
-operator !=(matrix<ET, OT> const& lhs, basic_mdspan<T, extents<X0, X1>, L, A> const& rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<class T, ptrdiff_t X0, ptrdiff_t X1, class L, class A, class ET, class OT> constexpr
-bool
-operator !=(basic_mdspan<T, extents<X0, X1>, L, A> const& lhs, matrix<ET, OT> const& rhs)
-{
-    return !(lhs == rhs);
-}
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_MATRIX_HPP_DEFINED

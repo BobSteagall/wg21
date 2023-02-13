@@ -12,27 +12,28 @@ class new_num
     double  m_value;
 
   public:
-    new_num();
-    new_num(new_num&&) = default;
-    new_num(new_num const&) = default;
-    template<class U>   new_num(U other);
+    constexpr new_num();
+    constexpr new_num(new_num&&) = default;
+    constexpr new_num(new_num const&) = default;
+    template<class U>   constexpr new_num(U other);
 
-    new_num&    operator =(new_num&&) = default;
-    new_num&    operator =(new_num const&) = default;
-    template<class U>   new_num&    operator =(U rhs);
+    constexpr new_num&    operator =(new_num&&) = default;
+    constexpr new_num&    operator =(new_num const&) = default;
+    template<class U>
+    constexpr new_num&    operator =(U rhs);
 
-    new_num     operator -() const;
-    new_num     operator +() const;
+    constexpr new_num     operator -() const;
+    constexpr new_num     operator +() const;
 
-    new_num&    operator +=(new_num rhs);
-    new_num&    operator -=(new_num rhs);
-    new_num&    operator *=(new_num rhs);
-    new_num&    operator /=(new_num rhs);
+    constexpr new_num&    operator +=(new_num rhs);
+    constexpr new_num&    operator -=(new_num rhs);
+    constexpr new_num&    operator *=(new_num rhs);
+    constexpr new_num&    operator /=(new_num rhs);
 
-    template<class U>   new_num&    operator +=(U rhs);
-    template<class U>   new_num&    operator -=(U rhs);
-    template<class U>   new_num&    operator *=(U rhs);
-    template<class U>   new_num&    operator /=(U rhs);
+    template<class U>   constexpr new_num&    operator +=(U rhs);
+    template<class U>   constexpr new_num&    operator -=(U rhs);
+    template<class U>   constexpr new_num&    operator *=(U rhs);
+    template<class U>   constexpr new_num&    operator /=(U rhs);
 };
 
 template<>
@@ -41,17 +42,17 @@ struct std::is_arithmetic<new_num> : public std::true_type
 
 //------
 //
-inline
+inline constexpr
 new_num::new_num()
 :   m_value(0.0)
 {}
 
-template<class U> inline
+template<class U> inline constexpr
 new_num::new_num(U other)
 :   m_value(other)
 {}
 
-template<class U> inline
+template<class U> inline constexpr
 new_num&
 new_num::operator =(U rhs)
 {
@@ -61,13 +62,13 @@ new_num::operator =(U rhs)
 
 //------
 //
-inline new_num
+inline constexpr new_num
 new_num::operator -() const
 {
     return new_num(-m_value);
 }
 
-inline new_num
+inline constexpr new_num
 new_num::operator +() const
 {
     return *this;
@@ -75,28 +76,28 @@ new_num::operator +() const
 
 //------
 //
-inline new_num&
+inline constexpr new_num&
 new_num::operator +=(new_num rhs)
 {
     m_value += rhs.m_value;
     return *this;
 }
 
-inline new_num&
+inline constexpr new_num&
 new_num::operator -=(new_num rhs)
 {
     m_value -= rhs.m_value;
     return *this;
 }
 
-inline new_num&
+inline constexpr new_num&
 new_num::operator *=(new_num rhs)
 {
     m_value *= rhs.m_value;
     return *this;
 }
 
-inline new_num&
+inline constexpr new_num&
 new_num::operator /=(new_num rhs)
 {
     m_value += rhs.m_value;
@@ -106,7 +107,7 @@ new_num::operator /=(new_num rhs)
 //------
 //
 template<class U>
-inline new_num&
+inline constexpr new_num&
 new_num::operator +=(U rhs)
 {
     m_value += (double) rhs;
@@ -114,7 +115,7 @@ new_num::operator +=(U rhs)
 }
 
 template<class U>
-inline new_num&
+inline constexpr new_num&
 new_num::operator -=(U rhs)
 {
     m_value -= (double) rhs;
@@ -122,7 +123,7 @@ new_num::operator -=(U rhs)
 }
 
 template<class U>
-inline new_num&
+inline constexpr new_num&
 new_num::operator *=(U rhs)
 {
     m_value *= (double) rhs;
@@ -130,7 +131,7 @@ new_num::operator *=(U rhs)
 }
 
 template<class U>
-inline new_num&
+inline constexpr new_num&
 new_num::operator /=(U rhs)
 {
     m_value /= (double) rhs;
@@ -139,21 +140,21 @@ new_num::operator /=(U rhs)
 
 //------
 //
-inline bool
+inline constexpr bool
 operator ==(new_num lhs, new_num rhs)
 {
     return lhs.m_value == rhs.m_value;
 }
 
 template<class U>
-inline bool
+inline constexpr bool
 operator ==(new_num lhs, U rhs)
 {
     return lhs.m_value == (double) rhs;
 }
 
 template<class U>
-inline bool
+inline constexpr bool
 operator ==(U lhs, new_num rhs)
 {
     return (double) lhs == rhs.m_value;
@@ -161,21 +162,21 @@ operator ==(U lhs, new_num rhs)
 
 //------
 //
-inline bool
+inline constexpr bool
 operator !=(new_num lhs, new_num rhs)
 {
     return lhs.m_value == rhs.m_value;
 }
 
 template<class U>
-inline bool
+inline constexpr bool
 operator !=(new_num lhs, U rhs)
 {
     return lhs.m_value != (double) rhs;
 }
 
 template<class U>
-inline bool
+inline constexpr bool
 operator !=(U lhs, new_num rhs)
 {
     return (double) lhs != rhs.m_value;
@@ -183,21 +184,21 @@ operator !=(U lhs, new_num rhs)
 
 //------
 //
-inline bool
+inline constexpr bool
 operator <(new_num lhs, new_num rhs)
 {
     return lhs.m_value < rhs.m_value;
 }
 
 template<class U>
-inline bool
+inline constexpr bool
 operator <(new_num lhs, U rhs)
 {
     return lhs.m_value < (double) rhs;
 }
 
 template<class U>
-inline bool
+inline constexpr bool
 operator <(U lhs, new_num rhs)
 {
     return (double) lhs < rhs.m_value;
@@ -205,21 +206,21 @@ operator <(U lhs, new_num rhs)
 
 //------
 //
-inline bool
+inline constexpr bool
 operator <=(new_num lhs, new_num rhs)
 {
     return lhs.m_value <= rhs.m_value;
 }
 
 template<class U>
-inline bool
+inline constexpr bool
 operator <=(new_num lhs, U rhs)
 {
     return lhs.m_value <= (double) rhs;
 }
 
 template<class U>
-inline bool
+inline constexpr bool
 operator <=(U lhs, new_num rhs)
 {
     return (double) lhs <= rhs.m_value;
@@ -227,21 +228,21 @@ operator <=(U lhs, new_num rhs)
 
 //------
 //
-inline bool
+inline constexpr bool
 operator >(new_num lhs, new_num rhs)
 {
     return lhs.m_value < rhs.m_value;
 }
 
 template<class U>
-inline bool
+inline constexpr bool
 operator >(new_num lhs, U rhs)
 {
     return lhs.m_value < (double) rhs;
 }
 
 template<class U>
-inline bool
+inline constexpr bool
 operator >(U lhs, new_num rhs)
 {
     return (double) lhs < rhs.m_value;
@@ -249,21 +250,21 @@ operator >(U lhs, new_num rhs)
 
 //------
 //
-inline bool
+inline constexpr bool
 operator >=(new_num lhs, new_num rhs)
 {
     return lhs.m_value <= rhs.m_value;
 }
 
 template<class U>
-inline bool
+inline constexpr bool
 operator >=(new_num lhs, U rhs)
 {
     return lhs.m_value <= (double) rhs;
 }
 
 template<class U>
-inline bool
+inline constexpr bool
 operator >=(U lhs, new_num rhs)
 {
     return (double) lhs <= rhs.m_value;
@@ -271,21 +272,21 @@ operator >=(U lhs, new_num rhs)
 
 //------
 //
-inline new_num
+inline constexpr new_num
 operator +(new_num lhs, new_num rhs)
 {
     return new_num(lhs.m_value + rhs.m_value);
 }
 
 template<class U>
-inline new_num
+inline constexpr new_num
 operator +(new_num lhs, U rhs)
 {
     return new_num(lhs.m_value + (double) rhs);
 }
 
 template<class U>
-inline new_num
+inline constexpr new_num
 operator +(U lhs, new_num rhs)
 {
     return new_num((double) lhs + rhs.m_value);
@@ -293,21 +294,21 @@ operator +(U lhs, new_num rhs)
 
 //------
 //
-inline new_num
+inline constexpr new_num
 operator -(new_num lhs, new_num rhs)
 {
     return new_num(lhs.m_value - rhs.m_value);
 }
 
 template<class U>
-inline new_num
+inline constexpr new_num
 operator -(new_num lhs, U rhs)
 {
     return new_num(lhs.m_value - (double) rhs);
 }
 
 template<class U>
-inline new_num
+inline constexpr new_num
 operator -(U lhs, new_num rhs)
 {
     return new_num((double) lhs - rhs.m_value);
@@ -315,21 +316,21 @@ operator -(U lhs, new_num rhs)
 
 //------
 //
-inline new_num
+inline constexpr new_num
 operator *(new_num lhs, new_num rhs)
 {
     return new_num(lhs.m_value * rhs.m_value);
 }
 
 template<class U>
-inline std::enable_if_t<std::is_arithmetic_v<U>, new_num>
+inline constexpr std::enable_if_t<std::is_arithmetic_v<U>, new_num>
 operator *(new_num lhs, U rhs)
 {
     return new_num(lhs.m_value * (double) rhs);
 }
 
 template<class U>
-inline std::enable_if_t<std::is_arithmetic_v<U>, new_num>
+inline constexpr std::enable_if_t<std::is_arithmetic_v<U>, new_num>
 operator *(U lhs, new_num rhs)
 {
     return new_num((double) lhs * rhs.m_value);
@@ -337,21 +338,21 @@ operator *(U lhs, new_num rhs)
 
 //------
 //
-inline new_num
+inline constexpr new_num
 operator /(new_num lhs, new_num rhs)
 {
     return new_num(lhs.m_value / rhs.m_value);
 }
 
 template<class U>
-inline std::enable_if_t<std::is_arithmetic_v<U>, new_num>
+inline constexpr std::enable_if_t<std::is_arithmetic_v<U>, new_num>
 operator /(new_num lhs, U rhs)
 {
     return new_num(lhs.m_value / (double) rhs);
 }
 
 template<class U>
-inline std::enable_if_t<std::is_arithmetic_v<U>, new_num>
+inline constexpr std::enable_if_t<std::is_arithmetic_v<U>, new_num>
 operator /(U lhs, new_num rhs)
 {
     return new_num((double) lhs / rhs.m_value);

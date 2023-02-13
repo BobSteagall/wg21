@@ -1,0 +1,166 @@
+//==================================================================================================
+//  File:       linear_algebra.hpp
+//
+//  Summary:    This is a driver header for including all of the linear algebra facilities
+//              defined by the library.
+//==================================================================================================
+//
+#ifndef LINEAR_ALGEBRA_MATRIX_DEFINED
+#define LINEAR_ALGEBRA_MATRIX_DEFINED
+
+//- Detect the compiler.
+//
+#if defined __clang__
+    #if (__clang_major__ < 10)
+        #error unsupported version of Clang
+    #endif
+    #define LA_COMPILER_CLANG
+
+#elif defined __GNUG__
+    #if (__GNUG__ < 10)
+        #error unsupported version of GCC
+    #endif
+    #define LA_COMPILER_GCC
+    #define LA_GCC_VERSION  __GNUG__
+    #if (__GNUG__ >= 10)
+        #define LA_STD_CONCEPTS_HEADER_SUPPORTED
+    #endif
+
+#elif defined _MSC_VER
+    #if (_MSC_VER < 1925)
+        #error unsupported version of VC++
+    #endif
+    #define LA_COMPILER_MS
+    #if (_MSC_VER >= 1925)
+        #define LA_STD_CONCEPTS_HEADER_SUPPORTED
+    #endif
+#endif
+
+//- Namespace alternatives for testing and also maybe detecting ADL issues.  Pick a pair
+//  and attempt to build.
+//
+#if 0
+    #define STD_LA      la
+    #define USING_STD   using namespace std; using namespace std::experimental;
+#endif
+
+#if 0
+    #define STD_LA      std::math
+    #define USING_STD   using namespace std; using namespace std::experimental;
+#endif
+
+#if 1
+    #define STD_LA      std::experimental::math
+    #define USING_STD   using namespace std; using namespace std::experimental;
+#endif
+
+#include <cstdint>
+#include <array>
+#include <complex>
+#include <deque>
+#include <initializer_list>
+#include <memory>
+#include <span>
+#include <tuple>
+#include <type_traits>
+#include <vector>
+
+#if defined(LA_STD_CONCEPTS_HEADER_SUPPORTED)
+    #include <concepts>
+#endif
+
+//- Disable some unnecessary compiler warnings coming from mdspan.
+//
+#if defined LA_COMPILER_CLANG
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#elif defined LA_COMPILER_GCC
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-parameter"
+#elif defined LA_COMPILER_MS
+    #pragma warning(push)
+    #pragma warning(disable: 4100)
+#endif
+
+#include <experimental/mdspan>
+
+//- Restore the compiler's diagnostic state.
+//
+#if defined LA_COMPILER_CLANG
+    #pragma clang diagnostic pop
+#elif defined LA_COMPILER_GCC
+    #pragma GCC diagnostic pop
+#elif defined LA_COMPILER_MS
+    #pragma warning(pop)
+#endif
+
+#define MDSPAN_NS   std::experimental
+
+namespace STD_LA {
+USING_STD
+
+//--------------------------------------------------------------------------------------------------
+//  Class:      matrix_layout
+//
+//  This public type is a container of nested tag types whose purpose is to specify the layout
+//  of matrix elements when used as a template argument to matrix_storage_engine<T, R, C, A, L>.
+//--------------------------------------------------------------------------------------------------
+//
+struct matrix_layout
+{
+    struct row_major {};
+    struct column_major {};
+    struct arbitrary {};
+};
+
+//--------------------------------------------------------------------------------------------------
+//  Class:      matrix_view
+//
+//  This public type is a container of nest tag types whose purpose is to specify the functionality
+//  of a view engine when used as the second template argument to matrix_view_engine<ET, MVT>.
+//--------------------------------------------------------------------------------------------------
+//
+struct matrix_view
+{
+    struct const_negation {};
+    struct const_conjugate {};
+    struct const_hermitian {};
+
+    struct identity {};
+    struct const_identity {};
+
+    struct transpose {};
+    struct const_transpose {};
+
+    struct column {};
+    struct const_column {};
+
+    struct row {};
+    struct const_row {};
+
+    struct submatrix {};
+    struct const_submatrix {};
+};
+
+}   //- STD_LA namespace
+
+//- Implementation headers.
+//
+#include "linear_algebra/mdspan_support.hpp"
+#include "linear_algebra/engine_support.hpp"
+
+#include "linear_algebra/matrix_storage_engine.hpp"
+#include "linear_algebra/matrix_view_engine.hpp"
+#include "linear_algebra/matrix.hpp"
+
+#include "linear_algebra/op_traits_support.hpp"
+#include "linear_algebra/op_traits_addition.hpp"
+#include "linear_algebra/op_traits_subtraction.hpp"
+#include "linear_algebra/op_traits_multiplication.hpp"
+#include "linear_algebra/op_traits_division.hpp"
+#include "linear_algebra/operation_traits.hpp"
+#include "linear_algebra/arithmetic_operators.hpp"
+
+#include "linear_algebra/debug_helpers.hpp"     //- Helpers for edit/debug/test -- not for production!
+
+#endif  //- LINEAR_ALGEBRA_MATRIX_DEFINED
