@@ -18,7 +18,7 @@ template<class ET1, class COT1, class ET2, class COT2> inline constexpr
 auto
 operator +(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
 {
-    using op_traits  = select_matrix_operation_traits_t<COT1, COT2>;
+    using op_traits  = select_custom_matrix_operation_traits_t<COT1, COT2>;
     using op1_type   = matrix<ET1, COT1>;
     using op2_type   = matrix<ET2, COT2>;
     using add_traits = matrix_addition_arithmetic_traits_t<op_traits, op1_type, op2_type>;
@@ -35,7 +35,7 @@ template<class ET1, class COT1, class ET2, class COT2> inline constexpr
 auto
 operator -(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
 {
-    using op_traits  = select_matrix_operation_traits_t<COT1, COT2>;
+    using op_traits  = select_custom_matrix_operation_traits_t<COT1, COT2>;
     using op1_type   = matrix<ET1, COT1>;
     using op2_type   = matrix<ET2, COT2>;
     using sub_traits = matrix_subtraction_arithmetic_traits_t<op_traits, op1_type, op2_type>;
@@ -52,7 +52,7 @@ template<class ET1, class COT1, class ET2, class COT2> inline constexpr
 auto
 operator *(matrix<ET1, COT1> const& m1, matrix<ET2, COT2> const& m2)
 {
-    using op_traits  = select_matrix_operation_traits_t<COT1, COT2>;
+    using op_traits  = select_custom_matrix_operation_traits_t<COT1, COT2>;
     using op1_type   = matrix<ET1, COT1>;
     using op2_type   = matrix<ET2, COT2>;
     using mul_traits = matrix_multiplication_arithmetic_traits_t<op_traits, op1_type, op2_type>;
