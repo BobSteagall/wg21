@@ -1,17 +1,16 @@
 //==================================================================================================
 //  File:       op_traits_addition.hpp
 //
-//  Summary:    This header defines several private and public traits types that are used to
-//              implement the binary addition operator.  This is a somewhat long file, divided
-//              into two main sections, each with three subsections:
-//                  1. Private traits definitions that:
-//                      A. determine the element promotion traits to be used for addition
-//                      B. determine the engine promotion traits to be used for addition
-//                      C. determine the arithmetic traits to be used to perform addition
-//                  2. Public traits definitions that:
-//                      A. perform element promotion for addition
-//                      B. perform engine promotion for addition
-//                      C. perform the actual act of addition
+//  Summary:    This header defines several private traits types and alias templates that are used
+//              to implement the binary addition operator.  This is a somewhat long file, divided
+//              into five main sections:
+//                  1. Extraction traits, that detect if a given operation traits type is
+//                     part of a custom operation traits container type, along with alias
+//                     templates to promote ease-of-use;
+//                  2. Default operation traits definition for element promotion;
+//                  3. Default operation traits definition for layout promotion;
+//                  4. Default operation traits definition for engine promotion;
+//                  5. Default operation traits definition for arithmetic.
 //==================================================================================================
 //
 #ifndef LINEAR_ALGEBRA_OP_TRAITS_ADDITION_HPP_DEFINED
@@ -28,7 +27,7 @@ template<class OT, class OP1, class OP2>    struct default_addition_arithmetic_t
 //                              **** ADDITION TRAITS EXTRACTORS ****
 //==================================================================================================
 //- These types employ the type detection idiom to detect a custom traits type related to addition;
-//  if none is found, they "return" the default traits type, defined below.
+//  if none is found, they "return" the default traits type, defined in sections below.
 //
 template<typename OT, typename U, typename V, typename = void>
 struct addition_element_traits_extractor

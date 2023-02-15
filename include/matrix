@@ -1,5 +1,5 @@
 //==================================================================================================
-//  File:       linear_algebra.hpp
+//  File:       matrix
 //
 //  Summary:    This is a driver header for including all of the linear algebra facilities
 //              defined by the library.

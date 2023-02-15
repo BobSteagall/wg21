@@ -442,51 +442,53 @@ concept valid_fixed_engine_size = (R > 0 && R != std::dynamic_extent) && (C > 0 
 
 
 //--------------------------------------------------------------------------------------------------
-//  Concept:    valid_allocator<T, A>
+//  Concept:    valid_allocator_interface<T, AT>
 //
-//  This private concept determines whether a given type A is an acceptable allocator of type T.
-//  Prospective allocator type A must either: be void; or, it must be possible to instantiate a
-//  specialization of allocator_traits<A> that meets certain requirements relative to allocated
-//  type T, such as allocator_traits<A>::value_type is the same type as T, etc.
+//  This private concept determines whether a given type AT is an acceptable allocator of type T.
+//  Prospective allocator type AT must either: be void; or, it must be possible to instantiate a
+//  specialization of allocator_traits<AT> that meets certain requirements relative to allocated
+//  type T, such as allocator_traits<AT>::value_type is the same type as T, etc.
 //--------------------------------------------------------------------------------------------------
 //
-template<typename T, typename A>
+template<typename T, typename AT>
 concept valid_allocator_interface =
-    requires (A a, get_size_type_t<A> n)
+    requires (AT a, get_size_type_t<AT> n)
     {
-        typename A::value_type;
-        requires std::is_same_v<T, typename A::value_type>;
+        typename AT::value_type;
+        requires std::is_same_v<T, typename AT::value_type>;
         { *(a.allocate(n))               } -> same_as<T&>;
         { a.deallocate(a.allocate(n), n) };
     };
 
-
-template<typename T, typename AT>
+template<typename T, typename ATT>
 concept valid_allocator_traits =
     requires
     {
-        typename AT::allocator_type;
-        typename AT::value_type;
-        typename AT::size_type;
-        typename AT::pointer;
-        typename AT::template rebind_alloc<T>;
-        requires std::is_same_v<T, typename AT::value_type>;
+        typename ATT::allocator_type;
+        typename ATT::value_type;
+        typename ATT::size_type;
+        typename ATT::pointer;
+        typename ATT::template rebind_alloc<T>;
+        requires std::is_same_v<T, typename ATT::value_type>;
     }
     and
-    requires (typename AT::allocator_type a, typename AT::pointer p, typename AT::size_type n)
+    requires (typename ATT::allocator_type a, typename ATT::pointer p, typename ATT::size_type n)
     {
-        { AT::deallocate(a, p, n) };
-        { AT::allocate(a, n) } -> same_as<typename AT::pointer>;
+        { ATT::deallocate(a, p, n) };
+        { ATT::allocate(a, n) } -> same_as<typename ATT::pointer>;
         { static_cast<T*>(p) };
         { *p   } -> same_as<T&>;
         { p[n] } -> same_as<T&>;
     };
 
+template<typename T, typename AT>
+concept valid_allocator_interface_2 = valid_allocator_traits<T, std::allocator_traits<AT>>;
+
 template<typename AT>
 concept no_allocator = same_as<AT, void>;
 
-template<typename T, typename A>
-concept valid_allocator_arg = no_allocator<A> or valid_allocator_interface<T, A>;
+template<typename T, typename AT>
+concept valid_allocator_arg = no_allocator<AT> or valid_allocator_interface_2<T, AT>;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -498,7 +500,6 @@ concept valid_allocator_arg = no_allocator<A> or valid_allocator_interface<T, A>
 //  2. There is a valid allocator, the extent arguments are valid for fixed-size or dynamic-sized.
 //--------------------------------------------------------------------------------------------------
 //
-//template<typename T, typename X, typename A>
 template<typename T, size_t R, size_t C, typename A>
 concept valid_engine_extents_and_allocator =
     (no_allocator<A> and valid_fixed_engine_size<R, C>)
