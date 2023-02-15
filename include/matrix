@@ -54,17 +54,13 @@
     #define USING_STD   using namespace std; using namespace std::experimental;
 #endif
 
-#include <cstdint>
 #include <array>
 #include <complex>
+#include <concepts>
 #include <deque>
 #include <initializer_list>
 #include <type_traits>
 #include <vector>
-
-#if defined(LA_STD_CONCEPTS_HEADER_SUPPORTED)
-    #include <concepts>
-#endif
 
 //- Disable some unnecessary compiler warnings coming from mdspan.
 //
@@ -79,6 +75,7 @@
     #pragma warning(disable: 4100)
 #endif
 
+#define MDSPAN_USE_PAREN_OPERATOR 1
 #include <experimental/mdspan>
 
 //- Restore the compiler's diagnostic state.
@@ -105,9 +102,9 @@ USING_STD
 //
 struct matrix_layout
 {
-    struct row_major {};
-    struct column_major {};
-    struct arbitrary {};
+    struct row_major;
+    struct column_major;
+    struct arbitrary;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -119,24 +116,24 @@ struct matrix_layout
 //
 struct matrix_view
 {
-    struct const_negation {};
-    struct const_conjugate {};
-    struct const_hermitian {};
+    struct const_negation;
+    struct const_conjugate;
+    struct const_hermitian;
 
-    struct identity {};
-    struct const_identity {};
+    struct identity;
+    struct const_identity;
 
-    struct transpose {};
-    struct const_transpose {};
+    struct transpose;
+    struct const_transpose;
 
-    struct column {};
-    struct const_column {};
+    struct column;
+    struct const_column;
 
-    struct row {};
-    struct const_row {};
+    struct row;
+    struct const_row;
 
-    struct submatrix {};
-    struct const_submatrix {};
+    struct submatrix;
+    struct const_submatrix;
 };
 
 }   //- STD_LA namespace
