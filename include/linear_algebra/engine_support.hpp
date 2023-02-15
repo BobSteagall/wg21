@@ -1306,12 +1306,12 @@ struct matrix_engine_support
 
         if (sizes_differ(r1, c1, r2, c2)) return false;
 
-        size_type_lhs  i1 = 0;
+        size_type_lhs   i1 = 0;
         auto            i2 = rhs.begin();
 
         for (;  i1 < r1;  ++i1, ++i2)
         {
-            size_type_lhs  j1 = 0;
+            size_type_lhs   j1 = 0;
             auto            j2 = i2->begin();
 
             for (;  j1 < c1;  ++j1, ++j2)
