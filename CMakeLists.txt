@@ -4,7 +4,7 @@ if(NOT DEFINED PROJECT_NAME)
     set(LA_IS_PRIMARY_PROJECT ON)
 endif()
 
-project(wg21_linear_algebra VERSION 0.7.2)
+project(wg21_linear_algebra VERSION 0.8.0)
 
 include(CTest)
 include(FetchContent)
