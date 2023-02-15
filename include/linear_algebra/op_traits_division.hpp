@@ -19,10 +19,10 @@
 
 namespace STD_LA {
 namespace detail {
-template<class OT, class T1, class T2>      struct division_element_traits;
-template<class OT, class L1, class L2>      struct division_layout_traits;
-template<class OT, class ET1, class ET2>    struct division_engine_traits;
-template<class OT, class OP1, class OP2>    struct division_arithmetic_traits;
+template<class OT, class T1, class T2>      struct default_division_element_traits;
+template<class OT, class L1, class L2>      struct default_division_layout_traits;
+template<class OT, class ET1, class ET2>    struct default_division_engine_traits;
+template<class OT, class OP1, class OP2>    struct default_division_arithmetic_traits;
 
 //==================================================================================================
 //                              **** DIVISION TRAITS EXTRACTORS ****
@@ -33,7 +33,7 @@ template<class OT, class OP1, class OP2>    struct division_arithmetic_traits;
 template<typename OT, typename U, typename V, typename = void>
 struct division_element_traits_extractor
 {
-    using type = division_element_traits<OT,U,V>;
+    using type = default_division_element_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -51,7 +51,7 @@ using division_element_traits_t = typename division_element_traits_extractor<OT,
 template<typename OT, typename U, typename V, typename = void>
 struct division_layout_traits_extractor
 {
-    using type = division_layout_traits<OT,U,V>;
+    using type = default_division_layout_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -69,7 +69,7 @@ using division_layout_traits_t = typename division_layout_traits_extractor<OT, U
 template<typename OT, typename U, typename V, typename = void>
 struct division_engine_traits_extractor
 {
-    using type = division_engine_traits<OT,U,V>;
+    using type = default_division_engine_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -87,7 +87,7 @@ using division_engine_traits_t = typename division_engine_traits_extractor<OT, U
 template<typename OT, typename U, typename V, typename = void>
 struct division_arithmetic_traits_extractor
 {
-    using type = division_arithmetic_traits<OT,U,V>;
+    using type = default_division_arithmetic_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -107,7 +107,7 @@ using division_arithmetic_traits_t = typename division_arithmetic_traits_extract
 //  the result of multiplying two elements of (possibly) different types.
 //
 template<class OT, class T1, class T2>
-struct division_element_traits
+struct default_division_element_traits
 {
     using element_type = decltype(declval<T1>() / declval<T2>());
 };
@@ -120,13 +120,13 @@ struct division_element_traits
 //  resulting data layout when adding two matrices having different layouts..
 //
 template<class COTR, class L1, class L2>
-struct division_layout_traits
+struct default_division_layout_traits
 {
     using layout_type = matrix_layout::row_major;
 };
 
 template<class COTR>
-struct division_layout_traits<COTR, matrix_layout::column_major, matrix_layout::column_major>
+struct default_division_layout_traits<COTR, matrix_layout::column_major, matrix_layout::column_major>
 {
     using layout_type = matrix_layout::column_major;
 };
@@ -140,7 +140,7 @@ struct division_layout_traits<COTR, matrix_layout::column_major, matrix_layout::
 //  correct engine type for a matrix/matrix or vector/vector addition.
 //
 template<class COTR, class ET1, class S2>
-struct division_engine_traits
+struct default_division_engine_traits
 {
     //- Extract the element traits from the operation traits, and determine the resulting
     //  element type.
@@ -175,7 +175,7 @@ struct division_engine_traits
     //- Determine the resulting layout type.
     //
     using layout_type_1 = get_layout_t<ET1>;
-    using layout_traits = division_layout_traits<COTR, layout_type_1, layout_type_1>;
+    using layout_traits = division_layout_traits_t<COTR, layout_type_1, layout_type_1>;
     using layout_type   = typename layout_traits::layout_type;
 
   public:
@@ -192,7 +192,7 @@ struct division_engine_traits
 //  result of a matrix/matrix addition.
 //
 template<class COTR, class ET1, class COT1, class S2>
-struct division_arithmetic_traits<COTR, matrix<ET1, COT1>, S2>
+struct default_division_arithmetic_traits<COTR, matrix<ET1, COT1>, S2>
 {
   private:
     using engine_type_1 = typename matrix<ET1, COT1>::engine_type;

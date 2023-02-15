@@ -91,25 +91,25 @@ struct test_div_op_traits_bad_00
 struct test_div_op_traits_bad_01
 {
     template<class OT>
-    using division_element_traits = STD_LA::detail::division_element_traits<OT, int, int>;
+    using division_element_traits = STD_LA::detail::default_division_element_traits<OT, int, int>;
 
     template<class OT>
-    using division_engine_traits = STD_LA::detail::division_engine_traits<OT, int, int>;
+    using division_engine_traits = STD_LA::detail::default_division_engine_traits<OT, int, int>;
 
     template<class OT>
-    using division_arithmetic_traits = STD_LA::detail::division_arithmetic_traits<OT, int, int>;
+    using division_arithmetic_traits = STD_LA::detail::default_division_arithmetic_traits<OT, int, int>;
 };
 
 struct test_div_op_traits_bad_02
 {
     template<class OT, class T1>
-    using division_element_traits = STD_LA::detail::division_element_traits<OT, T1, T1>;
+    using division_element_traits = STD_LA::detail::default_division_element_traits<OT, T1, T1>;
 
     template<class OT, class T1>
-    using division_engine_traits = STD_LA::detail::division_engine_traits<OT, T1, T1>;
+    using division_engine_traits = STD_LA::detail::default_division_engine_traits<OT, T1, T1>;
 
     template<class OT, class T1>
-    using division_arithmetic_traits = STD_LA::detail::division_arithmetic_traits<OT, T1, T1>;
+    using division_arithmetic_traits = STD_LA::detail::default_division_arithmetic_traits<OT, T1, T1>;
 };
 
 //--------------------------------------------------------------------------------------------------

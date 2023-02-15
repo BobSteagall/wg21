@@ -19,10 +19,10 @@
 
 namespace STD_LA {
 namespace detail {
-template<class OT, class T1, class T2>      struct multiplication_element_traits;
-template<class OT, class L1, class L2>      struct multiplication_layout_traits;
-template<class OT, class ET1, class ET2>    struct multiplication_engine_traits;
-template<class OT, class OP1, class OP2>    struct multiplication_arithmetic_traits;
+template<class OT, class T1, class T2>      struct default_multiplication_element_traits;
+template<class OT, class L1, class L2>      struct default_multiplication_layout_traits;
+template<class OT, class ET1, class ET2>    struct default_multiplication_engine_traits;
+template<class OT, class OP1, class OP2>    struct default_multiplication_arithmetic_traits;
 
 //==================================================================================================
 //                        **** MULTIPLICATION TRAITS EXTRACTORS ****
@@ -33,7 +33,7 @@ template<class OT, class OP1, class OP2>    struct multiplication_arithmetic_tra
 template<typename OT, typename U, typename V, typename = void>
 struct multiplication_element_traits_extractor
 {
-    using type = multiplication_element_traits<OT,U,V>;
+    using type = default_multiplication_element_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -51,7 +51,7 @@ using multiplication_element_traits_t = typename multiplication_element_traits_e
 template<typename OT, typename U, typename V, typename = void>
 struct multiplication_layout_traits_extractor
 {
-    using type = multiplication_layout_traits<OT,U,V>;
+    using type = default_multiplication_layout_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -69,7 +69,7 @@ using multiplication_layout_traits_t = typename multiplication_layout_traits_ext
 template<typename OT, typename U, typename V, typename = void>
 struct multiplication_engine_traits_extractor
 {
-    using type = multiplication_engine_traits<OT,U,V>;
+    using type = default_multiplication_engine_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -87,7 +87,7 @@ using multiplication_engine_traits_t = typename multiplication_engine_traits_ext
 template<typename OT, typename U, typename V, typename = void>
 struct multiplication_arithmetic_traits_extractor
 {
-    using type = multiplication_arithmetic_traits<OT,U,V>;
+    using type = default_multiplication_arithmetic_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -107,7 +107,7 @@ using multiplication_arithmetic_traits_t = typename multiplication_arithmetic_tr
 //  the result of multiplying two elements of (possibly) different types.
 //
 template<class OT, class T1, class T2>
-struct multiplication_element_traits
+struct default_multiplication_element_traits
 {
     using element_type = decltype(declval<T1>() * declval<T2>());
 };
@@ -120,19 +120,19 @@ struct multiplication_element_traits
 //  the result of multiplying two elements of (possibly) different types.
 //
 template<class COTR, class L1, class L2>
-struct multiplication_layout_traits
+struct default_multiplication_layout_traits
 {
     using layout_type = matrix_layout::row_major;
 };
 
 template<class COTR>
-struct multiplication_layout_traits<COTR, matrix_layout::row_major, matrix_layout::column_major>
+struct default_multiplication_layout_traits<COTR, matrix_layout::row_major, matrix_layout::column_major>
 {
     using layout_type = matrix_layout::column_major;
 };
 
 template<class COTR>
-struct multiplication_layout_traits<COTR, matrix_layout::column_major, matrix_layout::column_major>
+struct default_multiplication_layout_traits<COTR, matrix_layout::column_major, matrix_layout::column_major>
 {
     using layout_type = matrix_layout::column_major;
 };
@@ -146,7 +146,7 @@ struct multiplication_layout_traits<COTR, matrix_layout::column_major, matrix_la
 //  correct engine type for a matrix/matrix or vector/vector addition.
 //
 template<class COTR, class ET1, class ET2>
-struct multiplication_engine_traits
+struct default_multiplication_engine_traits
 {
   private:
     //- Extract the element traits from the operation traits, and determine the resulting
@@ -191,7 +191,7 @@ struct multiplication_engine_traits
     //
     using layout_type_1 = get_layout_t<ET1>;
     using layout_type_2 = get_layout_t<ET2>;
-    using layout_traits = multiplication_layout_traits<COTR, layout_type_1, layout_type_2>;
+    using layout_traits = multiplication_layout_traits_t<COTR, layout_type_1, layout_type_2>;
     using layout_type   = typename layout_traits::layout_type;
 
   public:
@@ -201,7 +201,7 @@ struct multiplication_engine_traits
 
 
 template<class COTR, class S1, class ET2>
-struct multiplication_engine_traits<COTR, matrix_scalar_engine<S1>, ET2>
+struct default_multiplication_engine_traits<COTR, matrix_scalar_engine<S1>, ET2>
 {
   private:
     //- Extract the element traits from the operation traits, and determine the resulting
@@ -237,7 +237,7 @@ struct multiplication_engine_traits<COTR, matrix_scalar_engine<S1>, ET2>
     //- Determine the resulting layout type.
     //
     using layout_type_2 = get_layout_t<ET2>;
-    using layout_traits = multiplication_layout_traits<COTR, layout_type_2, layout_type_2>;
+    using layout_traits = multiplication_layout_traits_t<COTR, layout_type_2, layout_type_2>;
     using layout_type   = typename layout_traits::layout_type;
 
   public:
@@ -247,7 +247,7 @@ struct multiplication_engine_traits<COTR, matrix_scalar_engine<S1>, ET2>
 
 
 template<class COTR, class ET1, class S2>
-struct multiplication_engine_traits<COTR, ET1, matrix_scalar_engine<S2>>
+struct default_multiplication_engine_traits<COTR, ET1, matrix_scalar_engine<S2>>
 {
   private:
     //- Extract the element traits from the operation traits, and determine the resulting
@@ -283,7 +283,7 @@ struct multiplication_engine_traits<COTR, ET1, matrix_scalar_engine<S2>>
     //- Determine the resulting layout type.
     //
     using layout_type_1 = get_layout_t<ET1>;
-    using layout_traits = multiplication_layout_traits<COTR, layout_type_1, layout_type_1>;
+    using layout_traits = multiplication_layout_traits_t<COTR, layout_type_1, layout_type_1>;
     using layout_type   = typename layout_traits::layout_type;
 
   public:
@@ -300,7 +300,7 @@ struct multiplication_engine_traits<COTR, ET1, matrix_scalar_engine<S2>>
 //  result of a matrix/matrix addition.
 //
 template<class COTR, class ET1, class COT1, class ET2, class COT2>
-struct multiplication_arithmetic_traits<COTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
+struct default_multiplication_arithmetic_traits<COTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
 {
     using engine_type_1 = typename matrix<ET1, COT1>::engine_type;
     using engine_type_2 = typename matrix<ET2, COT2>::engine_type;
@@ -357,7 +357,7 @@ struct multiplication_arithmetic_traits<COTR, matrix<ET1, COT1>, matrix<ET2, COT
 
 
 template<class COTR, class S1, class ET2, class COT2>
-struct multiplication_arithmetic_traits<COTR, S1, matrix<ET2, COT2>>
+struct default_multiplication_arithmetic_traits<COTR, S1, matrix<ET2, COT2>>
 {
     using engine_type_1 = matrix_scalar_engine<S1>;
     using engine_type_2 = typename matrix<ET2, COT2>::engine_type;
@@ -403,7 +403,7 @@ struct multiplication_arithmetic_traits<COTR, S1, matrix<ET2, COT2>>
 
 
 template<class COTR, class ET1, class COT1, class S2>
-struct multiplication_arithmetic_traits<COTR, matrix<ET1, COT1>, S2>
+struct default_multiplication_arithmetic_traits<COTR, matrix<ET1, COT1>, S2>
 {
     using engine_type_1 = typename matrix<ET1, COT1>::engine_type;
     using engine_type_2 = matrix_scalar_engine<S2>;

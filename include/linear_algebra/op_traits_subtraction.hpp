@@ -19,10 +19,10 @@
 
 namespace STD_LA {
 namespace detail {
-template<class OT, class T1, class T2>      struct subtraction_element_traits;
-template<class OT, class L1, class L2>      struct subtraction_layout_traits;
-template<class OT, class ET1, class ET2>    struct subtraction_engine_traits;
-template<class OT, class OP1, class OP2>    struct subtraction_arithmetic_traits;
+template<class OT, class T1, class T2>      struct default_subtraction_element_traits;
+template<class OT, class L1, class L2>      struct default_subtraction_layout_traits;
+template<class OT, class ET1, class ET2>    struct default_subtraction_engine_traits;
+template<class OT, class OP1, class OP2>    struct default_subtraction_arithmetic_traits;
 
 //==================================================================================================
 //                           **** SUBTRACTION TRAITS EXTRACTORS ****
@@ -33,7 +33,7 @@ template<class OT, class OP1, class OP2>    struct subtraction_arithmetic_traits
 template<typename OT, typename U, typename V, typename = void>
 struct subtraction_element_traits_extractor
 {
-    using type = subtraction_element_traits<OT,U,V>;
+    using type = default_subtraction_element_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -51,7 +51,7 @@ using subtraction_element_traits_t = typename subtraction_element_traits_extract
 template<typename OT, typename U, typename V, typename = void>
 struct subtraction_layout_traits_extractor
 {
-    using type = subtraction_layout_traits<OT,U,V>;
+    using type = default_subtraction_layout_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -69,7 +69,7 @@ using subtraction_layout_traits_t = typename subtraction_layout_traits_extractor
 template<typename OT, typename U, typename V, typename = void>
 struct subtraction_engine_traits_extractor
 {
-    using type = subtraction_engine_traits<OT,U,V>;
+    using type = default_subtraction_engine_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -87,7 +87,7 @@ using subtraction_engine_traits_t = typename subtraction_engine_traits_extractor
 template<typename OT, typename U, typename V, typename = void>
 struct subtraction_arithmetic_traits_extractor
 {
-    using type = subtraction_arithmetic_traits<OT,U,V>;
+    using type = default_subtraction_arithmetic_traits<OT,U,V>;
 };
 
 template<typename OT, typename U, typename V>
@@ -107,7 +107,7 @@ using subtraction_arithmetic_traits_t = typename subtraction_arithmetic_traits_e
 //  result of subtracting two elements of (possibly) different types.
 //
 template<class COTR, class T1, class T2>
-struct subtraction_element_traits
+struct default_subtraction_element_traits
 {
     using element_type = decltype(declval<T1>() - declval<T2>());
 };
@@ -120,13 +120,13 @@ struct subtraction_element_traits
 //  resulting data layout when adding two matrices having different layouts..
 //
 template<class COTR, class L1, class L2>
-struct subtraction_layout_traits
+struct default_subtraction_layout_traits
 {
     using layout_type = matrix_layout::row_major;
 };
 
 template<class COTR>
-struct subtraction_layout_traits<COTR, matrix_layout::column_major, matrix_layout::column_major>
+struct default_subtraction_layout_traits<COTR, matrix_layout::column_major, matrix_layout::column_major>
 {
     using layout_type = matrix_layout::column_major;
 };
@@ -139,7 +139,7 @@ struct subtraction_layout_traits<COTR, matrix_layout::column_major, matrix_layou
 //  correct engine type for a matrix/matrix or vector/vector subtraction.
 //
 template<class COTR, class ET1, class ET2>
-struct subtraction_engine_traits
+struct default_subtraction_engine_traits
 {
     //- Extract the element traits from the operation traits, and determine the resulting
     //  element type.
@@ -183,7 +183,7 @@ struct subtraction_engine_traits
     //
     using layout_type_1 = get_layout_t<ET1>;
     using layout_type_2 = get_layout_t<ET2>;
-    using layout_traits = subtraction_layout_traits<COTR, layout_type_1, layout_type_2>;
+    using layout_traits = subtraction_layout_traits_t<COTR, layout_type_1, layout_type_2>;
     using layout_type   = typename layout_traits::layout_type;
 
   public:
@@ -199,7 +199,7 @@ struct subtraction_engine_traits
 //  result of a matrix/matrix subtraction.
 //
 template<class COTR, class ET1, class COT1, class ET2, class COT2>
-struct subtraction_arithmetic_traits<COTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
+struct default_subtraction_arithmetic_traits<COTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
 {
   private:
     using engine_type_1  = typename matrix<ET1, COT1>::engine_type;

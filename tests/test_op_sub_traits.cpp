@@ -90,25 +90,25 @@ struct test_sub_op_traits_bad_00
 struct test_sub_op_traits_bad_01
 {
     template<class OT>
-    using subtraction_element_traits = STD_LA::detail::subtraction_element_traits<OT, int, int>;
+    using subtraction_element_traits = STD_LA::detail::default_subtraction_element_traits<OT, int, int>;
 
     template<class OT>
-    using subtraction_engine_traits = STD_LA::detail::subtraction_engine_traits<OT, int, int>;
+    using subtraction_engine_traits = STD_LA::detail::default_subtraction_engine_traits<OT, int, int>;
 
     template<class OT>
-    using subtraction_arithmetic_traits = STD_LA::detail::subtraction_arithmetic_traits<OT, int, int>;
+    using subtraction_arithmetic_traits = STD_LA::detail::default_subtraction_arithmetic_traits<OT, int, int>;
 };
 
 struct test_sub_op_traits_bad_02
 {
     template<class OT, class T1>
-    using subtraction_element_traits = STD_LA::detail::subtraction_element_traits<OT, T1, T1>;
+    using subtraction_element_traits = STD_LA::detail::default_subtraction_element_traits<OT, T1, T1>;
 
     template<class OT, class T1>
-    using subtraction_engine_traits = STD_LA::detail::subtraction_engine_traits<OT, T1, T1>;
+    using subtraction_engine_traits = STD_LA::detail::default_subtraction_engine_traits<OT, T1, T1>;
 
     template<class OT, class T1>
-    using subtraction_arithmetic_traits = STD_LA::detail::subtraction_arithmetic_traits<OT, T1, T1>;
+    using subtraction_arithmetic_traits = STD_LA::detail::default_subtraction_arithmetic_traits<OT, T1, T1>;
 };
 
 //--------------------------------------------------------------------------------------------------

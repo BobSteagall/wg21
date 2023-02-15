@@ -92,25 +92,25 @@ struct test_mul_op_traits_bad_00
 struct test_mul_op_traits_bad_01
 {
     template<class OT>
-    using multiplication_element_traits = STD_LA::detail::multiplication_element_traits<OT, int, int>;
+    using multiplication_element_traits = STD_LA::detail::default_multiplication_element_traits<OT, int, int>;
 
     template<class OT>
-    using multiplication_engine_traits = STD_LA::detail::multiplication_engine_traits<OT, int, int>;
+    using multiplication_engine_traits = STD_LA::detail::default_multiplication_engine_traits<OT, int, int>;
 
     template<class OT>
-    using multiplication_arithmetic_traits = STD_LA::detail::multiplication_arithmetic_traits<OT, int, int>;
+    using multiplication_arithmetic_traits = STD_LA::detail::default_multiplication_arithmetic_traits<OT, int, int>;
 };
 
 struct test_mul_op_traits_bad_02
 {
     template<class OT, class T1>
-    using multiplication_element_traits = STD_LA::detail::multiplication_element_traits<OT, T1, T1>;
+    using multiplication_element_traits = STD_LA::detail::default_multiplication_element_traits<OT, T1, T1>;
 
     template<class OT, class T1>
-    using multiplication_engine_traits = STD_LA::detail::multiplication_engine_traits<OT, T1, T1>;
+    using multiplication_engine_traits = STD_LA::detail::default_multiplication_engine_traits<OT, T1, T1>;
 
     template<class OT, class T1>
-    using multiplication_arithmetic_traits = STD_LA::detail::multiplication_arithmetic_traits<OT, T1, T1>;
+    using multiplication_arithmetic_traits = STD_LA::detail::default_multiplication_arithmetic_traits<OT, T1, T1>;
 };
 
 //--------------------------------------------------------------------------------------------------

@@ -32,7 +32,7 @@ TEST(Sub, Constexpr)
     PRINT_TYPE(ET1);
     PRINT_TYPE(ET2);
 
-    using ETT = addition_engine_traits<void, ET1, ET2>;
+    using ETT = default_subtraction_engine_traits<void, ET1, ET2>;
     PRINT_TYPE(ETT);
     PRINT_TYPE(ETT::owning_type_1);
     PRINT_TYPE(ETT::owning_type_2);

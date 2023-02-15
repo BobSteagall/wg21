@@ -91,25 +91,25 @@ struct test_add_op_traits_bad_00
 struct test_add_op_traits_bad_01
 {
     template<class OT>
-    using addition_element_traits = STD_LA::detail::addition_element_traits<OT, int, int>;
+    using addition_element_traits = STD_LA::detail::default_addition_element_traits<OT, int, int>;
 
     template<class OT>
-    using addition_engine_traits = STD_LA::detail::addition_engine_traits<OT, int, int>;
+    using addition_engine_traits = STD_LA::detail::default_addition_engine_traits<OT, int, int>;
 
     template<class OT>
-    using addition_arithmetic_traits = STD_LA::detail::addition_arithmetic_traits<OT, int, int>;
+    using addition_arithmetic_traits = STD_LA::detail::default_addition_arithmetic_traits<OT, int, int>;
 };
 
 struct test_add_op_traits_bad_02
 {
     template<class OT, class T1>
-    using addition_element_traits = STD_LA::detail::addition_element_traits<OT, T1, T1>;
+    using addition_element_traits = STD_LA::detail::default_addition_element_traits<OT, T1, T1>;
 
     template<class OT, class T1>
-    using addition_engine_traits = STD_LA::detail::addition_engine_traits<OT, T1, T1>;
+    using addition_engine_traits = STD_LA::detail::default_addition_engine_traits<OT, T1, T1>;
 
     template<class OT, class T1>
-    using addition_arithmetic_traits = STD_LA::detail::addition_arithmetic_traits<OT, T1, T1>;
+    using addition_arithmetic_traits = STD_LA::detail::default_addition_arithmetic_traits<OT, T1, T1>;
 };
 
 //--------------------------------------------------------------------------------------------------
