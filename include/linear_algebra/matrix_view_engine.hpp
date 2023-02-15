@@ -145,6 +145,32 @@ class matrix_view_engine<ET, matrix_view::const_negation>
         return -(*mp_engine)(i, j);
     }
 
+#ifdef __cpp_multidimensional_subscript
+
+    constexpr const_reference
+    operator [](size_type i, size_type j) const
+    {
+        return -(*mp_engine)[i, j];
+    }
+
+#endif
+
+    constexpr const_reference
+    operator ()(size_type i) const
+    requires
+        detail::readable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        return -(*mp_engine)(i);
+    }
+
+    constexpr const_reference
+    operator [](size_type i) const
+    requires
+        detail::readable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        return -(*mp_engine)[i];
+    }
+
     constexpr mdspan_type
     span() const noexcept
     requires
@@ -296,6 +322,53 @@ class matrix_view_engine<ET, matrix_view::const_conjugate>
         else
         {
             return (*mp_engine)(i, j);
+        }
+    }
+
+#ifdef __cpp_multidimensional_subscript
+
+    constexpr const_reference
+    operator [](size_type i, size_type j) const
+    {
+        if constexpr (is_cx)
+        {
+            return std::conj((*mp_engine)[i, j]);
+        }
+        else
+        {
+            return (*mp_engine)[i, j];
+        }
+    }
+
+#endif
+
+    constexpr const_reference
+    operator ()(size_type i) const
+    requires
+        detail::readable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        if constexpr (is_cx)
+        {
+            return std::conj((*mp_engine)(i));
+        }
+        else
+        {
+            return (*mp_engine)(i);
+        }
+    }
+
+    constexpr const_reference
+    operator [](size_type i) const
+    requires
+        detail::readable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        if constexpr (is_cx)
+        {
+            return std::conj((*mp_engine)[i]);
+        }
+        else
+        {
+            return (*mp_engine)[i];
         }
     }
 
@@ -453,6 +526,53 @@ class matrix_view_engine<ET, matrix_view::const_hermitian>
         }
     }
 
+#ifdef __cpp_multidimensional_subscript
+
+    constexpr const_reference
+    operator [](size_type i, size_type j) const
+    {
+        if constexpr (is_cx)
+        {
+            return std::conj((*mp_engine)[j, i]);
+        }
+        else
+        {
+            return (*mp_engine)[j, i];
+        }
+    }
+
+#endif
+
+    constexpr const_reference
+    operator ()(size_type i) const
+    requires
+        detail::readable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        if constexpr (is_cx)
+        {
+            return std::conj((*mp_engine)(i));
+        }
+        else
+        {
+            return (*mp_engine)(i);
+        }
+    }
+
+    constexpr const_reference
+    operator [](size_type i) const
+    requires
+        detail::readable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        if constexpr (is_cx)
+        {
+            return std::conj((*mp_engine)[i]);
+        }
+        else
+        {
+            return (*mp_engine)[i];
+        }
+    }
+
     constexpr mdspan_type
     span() const noexcept
     requires
@@ -597,12 +717,30 @@ class matrix_view_engine<ET, matrix_view::identity>
         return (*mp_engine)(i, j);
     }
 
+#ifdef __cpp_multidimensional_subscript
+
+    constexpr reference
+    operator [](size_type i, size_type j) const
+    {
+        return (*mp_engine)[i, j];
+    }
+
+#endif
+
     constexpr reference
     operator ()(size_type i) const
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
     {
         return (*mp_engine)(i);
+    }
+
+    constexpr reference
+    operator [](size_type i) const
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        return (*mp_engine)[i];
     }
 
     constexpr mdspan_type
@@ -749,12 +887,30 @@ class matrix_view_engine<ET, matrix_view::const_identity>
         return (*mp_engine)(i, j);
     }
 
+#ifdef __cpp_multidimensional_subscript
+
+    constexpr const_reference
+    operator [](size_type i, size_type j) const
+    {
+        return (*mp_engine)[i, j];
+    }
+
+#endif
+
     constexpr const_reference
     operator ()(size_type i) const
     requires
         detail::readable_and_1d_indexable_matrix_engine<engine_type>
     {
         return (*mp_engine)(i);
+    }
+
+    constexpr const_reference
+    operator [](size_type i) const
+    requires
+        detail::readable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        return (*mp_engine)[i];
     }
 
     constexpr mdspan_type
@@ -902,12 +1058,30 @@ class matrix_view_engine<ET, matrix_view::transpose>
         return (*mp_engine)(j, i);
     }
 
+#ifdef __cpp_multidimensional_subscript
+
+    constexpr reference
+    operator [](size_type i, size_type j) const
+    {
+        return (*mp_engine)[j, i];
+    }
+
+#endif
+
     constexpr reference
     operator ()(size_type i) const
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
     {
         return (*mp_engine)(i);
+    }
+
+    constexpr reference
+    operator [](size_type i) const
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        return (*mp_engine)[i];
     }
 
     constexpr mdspan_type
@@ -1054,12 +1228,30 @@ class matrix_view_engine<ET, matrix_view::const_transpose>
         return (*mp_engine)(j, i);
     }
 
+#ifdef __cpp_multidimensional_subscript
+
+    constexpr const_reference
+    operator [](size_type i, size_type j) const
+    {
+        return (*mp_engine)[j, i];
+    }
+
+#endif
+
     constexpr const_reference
     operator ()(size_type i) const
     requires
         detail::readable_and_1d_indexable_matrix_engine<engine_type>
     {
         return (*mp_engine)(i);
+    }
+
+    constexpr const_reference
+    operator [](size_type i) const
+    requires
+        detail::readable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        return (*mp_engine)[i];
     }
 
     constexpr mdspan_type
@@ -1195,8 +1387,24 @@ class matrix_view_engine<ET, matrix_view::column>
         return (*mp_engine)(i, m_column);
     }
 
+#ifdef __cpp_multidimensional_subscript
+
+    constexpr reference
+    operator [](size_type i, size_type) const
+    {
+        return (*mp_engine)[i, m_column];
+    }
+
+#endif
+
     constexpr reference
     operator ()(size_type i) const
+    {
+        return (*mp_engine)(i, m_column);
+    }
+
+    constexpr reference
+    operator [](size_type i) const
     {
         return (*mp_engine)(i, m_column);
     }
@@ -1334,8 +1542,24 @@ class matrix_view_engine<ET, matrix_view::const_column>
         return (*mp_engine)(i, m_column);
     }
 
+#ifdef __cpp_multidimensional_subscript
+
+    constexpr const_reference
+    operator [](size_type i, size_type) const
+    {
+        return (*mp_engine)[i, m_column];
+    }
+
+#endif
+
     constexpr const_reference
     operator ()(size_type i) const
+    {
+        return (*mp_engine)(i, m_column);
+    }
+
+    constexpr const_reference
+    operator [](size_type i) const
     {
         return (*mp_engine)(i, m_column);
     }
@@ -1474,8 +1698,24 @@ class matrix_view_engine<ET, matrix_view::row>
         return (*mp_engine)(m_row, j);
     }
 
+#ifdef __cpp_multidimensional_subscript
+
+    constexpr reference
+    operator [](size_type, size_type j) const
+    {
+        return (*mp_engine)[m_row, j];
+    }
+
+#endif
+
     constexpr reference
     operator ()(size_type j) const
+    {
+        return (*mp_engine)(m_row, j);
+    }
+
+    constexpr reference
+    operator [](size_type j) const
     {
         return (*mp_engine)(m_row, j);
     }
@@ -1613,8 +1853,24 @@ class matrix_view_engine<ET, matrix_view::const_row>
         return (*mp_engine)(m_row, j);
     }
 
+#ifdef __cpp_multidimensional_subscript
+
+    constexpr const_reference
+    operator [](size_type, size_type j) const
+    {
+        return (*mp_engine)[m_row, j];
+    }
+
+#endif
+
     constexpr const_reference
     operator ()(size_type j) const
+    {
+        return (*mp_engine)(m_row, j);
+    }
+
+    constexpr const_reference
+    operator [](size_type j) const
     {
         return (*mp_engine)(m_row, j);
     }
@@ -1753,12 +2009,30 @@ class matrix_view_engine<ET, matrix_view::submatrix>
         return (*mp_engine)(i + m_row_start, j + m_col_start);
     }
 
+#ifdef __cpp_multidimensional_subscript
+
+    constexpr reference
+    operator [](size_type i, size_type j) const
+    {
+        return (*mp_engine)[i + m_row_start, j + m_col_start];
+    }
+
+#endif
+
     constexpr reference
     operator ()(size_type i) const
     requires
         detail::writable_and_1d_indexable_matrix_engine<engine_type>
     {
         return (*mp_engine)(i);
+    }
+
+    constexpr reference
+    operator [](size_type i) const
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        return (*mp_engine)[i];
     }
 
     constexpr mdspan_type
@@ -1899,12 +2173,30 @@ class matrix_view_engine<ET, matrix_view::const_submatrix>
         return (*mp_engine)(i + m_row_start, j + m_col_start);
     }
 
+#ifdef __cpp_multidimensional_subscript
+
+    constexpr const_reference
+    operator [](size_type i, size_type j) const
+    {
+        return (*mp_engine)[i + m_row_start, j + m_col_start];
+    }
+
+#endif
+
     constexpr const_reference
     operator ()(size_type i) const
     requires
         detail::readable_and_1d_indexable_matrix_engine<engine_type>
     {
         return (*mp_engine)(i);
+    }
+
+    constexpr const_reference
+    operator [](size_type i) const
+    requires
+        detail::readable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        return (*mp_engine)[i];
     }
 
     constexpr mdspan_type

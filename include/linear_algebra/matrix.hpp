@@ -506,6 +506,22 @@ class matrix
         return m_engine(i, j);
     }
 
+#ifdef __cpp_multidimensional_subscript
+
+    constexpr reference
+    operator [](size_type i, size_type j)
+    {
+        return m_engine[i, j];
+    }
+
+    constexpr const_reference
+    operator [](size_type i, size_type j) const
+    {
+        return m_engine[i, j];
+    }
+
+#endif
+
     constexpr reference
     operator ()(size_type i)
     requires
@@ -516,6 +532,22 @@ class matrix
 
     constexpr const_reference
     operator ()(size_type i) const
+    requires
+        detail::readable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        return m_engine(i);
+    }
+
+    constexpr reference
+    operator [](size_type i)
+    requires
+        detail::writable_and_1d_indexable_matrix_engine<engine_type>
+    {
+        return m_engine(i);
+    }
+
+    constexpr const_reference
+    operator [](size_type i) const
     requires
         detail::readable_and_1d_indexable_matrix_engine<engine_type>
     {

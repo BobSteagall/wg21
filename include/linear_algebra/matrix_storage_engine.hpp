@@ -582,6 +582,22 @@ class matrix_storage_engine
     }
 
     constexpr reference
+    operator [](size_type i)
+    requires
+        this_type::is_1d_indexable
+    {
+        return m_data.m_elems[i];
+    }
+
+    constexpr const_reference
+    operator [](size_type i) const
+    requires
+        this_type::is_1d_indexable
+    {
+        return m_data.m_elems[i];
+    }
+
+    constexpr reference
     operator ()(size_type i, size_type j)
     requires
         this_type::has_row_major_layout
@@ -612,6 +628,41 @@ class matrix_storage_engine
     {
          return m_data.m_elems[i + (j * m_data.m_rowcap)];
     }
+
+#ifdef __cpp_multidimensional_subscript
+
+    constexpr reference
+    operator [](size_type i, size_type j)
+    requires
+        this_type::has_row_major_layout
+    {
+        return m_data.m_elems[(i * m_data.m_colcap) + j];
+    }
+
+    constexpr reference
+    operator [](size_type i, size_type j)
+    requires
+        this_type::has_column_major_layout
+    {
+         return m_data.m_elems[i + (j * m_data.m_rowcap)];
+    }
+
+    constexpr const_reference
+    operator [](size_type i, size_type j) const
+    requires
+        this_type::has_row_major_layout
+    {
+        return m_data.m_elems[(i * m_data.m_colcap) + j];
+    }
+
+    constexpr const_reference
+    operator [](size_type i, size_type j) const
+    requires
+        this_type::has_column_major_layout
+    {
+         return m_data.m_elems[i + (j * m_data.m_rowcap)];
+    }
+#endif
 
     constexpr mdspan_type
     span() noexcept
