@@ -202,19 +202,12 @@ template<class COTR, class ET1, class COT1, class ET2, class COT2>
 struct addition_arithmetic_traits<COTR, matrix<ET1, COT1>, matrix<ET2, COT2>>
 {
   private:
-    using element_type_1 = typename ET1::element_type;
-    using element_type_2 = typename ET2::element_type;
-    using element_traits = addition_element_traits_t<COTR, element_type_1, element_type_2>;
-
     using engine_type_1 = typename matrix<ET1, COT1>::engine_type;
     using engine_type_2 = typename matrix<ET2, COT2>::engine_type;
     using engine_traits = addition_engine_traits_t<COTR, engine_type_1, engine_type_2>;
 
-    static_assert(std::is_same_v<typename element_traits::element_type,
-                                 typename engine_traits::engine_type::element_type>);
-
   public:
-    using element_type = typename element_traits::element_type;
+    using element_type = typename engine_traits::element_type;
     using engine_type  = typename engine_traits::engine_type;
     using result_type  = matrix<engine_type, COTR>;
 

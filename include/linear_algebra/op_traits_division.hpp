@@ -195,19 +195,12 @@ template<class COTR, class ET1, class COT1, class S2>
 struct division_arithmetic_traits<COTR, matrix<ET1, COT1>, S2>
 {
   private:
-    using element_type_1 = typename ET1::element_type;
-    using element_type_2 = S2;
-    using element_traits = division_element_traits_t<COTR, element_type_1, element_type_2>;
-
     using engine_type_1 = typename matrix<ET1, COT1>::engine_type;
     using engine_type_2 = S2;
     using engine_traits = division_engine_traits_t<COTR, engine_type_1, engine_type_2>;
 
-    static_assert(std::is_same_v<typename element_traits::element_type,
-                                 typename engine_traits::engine_type::element_type>);
-
   public:
-    using element_type = typename element_traits::element_type;
+    using element_type = typename engine_traits::element_type;
     using engine_type  = typename engine_traits::engine_type;
     using result_type  = matrix<engine_type, COTR>;
 
@@ -217,8 +210,8 @@ struct division_arithmetic_traits<COTR, matrix<ET1, COT1>, S2>
         using size_type_1 = typename matrix<ET1, COT1>::size_type;
         using size_type_r = typename result_type::size_type;
 
-        size_type_r    rows = static_cast<size_type_r>(m1.rows());
-        size_type_r    cols = static_cast<size_type_r>(m1.columns());
+        size_type_r     rows = static_cast<size_type_r>(m1.rows());
+        size_type_r     cols = static_cast<size_type_r>(m1.columns());
         result_type		mr;
 
         if constexpr (detail::reshapable_matrix_engine<engine_type>)
