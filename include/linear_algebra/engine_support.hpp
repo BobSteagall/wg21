@@ -460,35 +460,11 @@ concept valid_allocator_interface =
         { a.deallocate(a.allocate(n), n) };
     };
 
-template<typename T, typename ATT>
-concept valid_allocator_traits =
-    requires
-    {
-        typename ATT::allocator_type;
-        typename ATT::value_type;
-        typename ATT::size_type;
-        typename ATT::pointer;
-        typename ATT::template rebind_alloc<T>;
-        requires std::is_same_v<T, typename ATT::value_type>;
-    }
-    and
-    requires (typename ATT::allocator_type a, typename ATT::pointer p, typename ATT::size_type n)
-    {
-        { ATT::deallocate(a, p, n) };
-        { ATT::allocate(a, n) } -> same_as<typename ATT::pointer>;
-        { static_cast<T*>(p) };
-        { *p   } -> same_as<T&>;
-        { p[n] } -> same_as<T&>;
-    };
-
-template<typename T, typename AT>
-concept valid_allocator_interface_2 = valid_allocator_traits<T, std::allocator_traits<AT>>;
-
 template<typename AT>
 concept no_allocator = same_as<AT, void>;
 
 template<typename T, typename AT>
-concept valid_allocator_arg = no_allocator<AT> or valid_allocator_interface_2<T, AT>;
+concept valid_allocator_arg = no_allocator<AT> or valid_allocator_interface<T, AT>;
 
 
 //--------------------------------------------------------------------------------------------------
