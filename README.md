@@ -132,7 +132,29 @@ The Linear Algebra library is available for integration into your own project vi
 
 ### Getting the Conan package
 
-To add the *linear_algebra* library to your project as a dependency, you need to add a remote to Conan that points to the location of the package:
+The *wg21-linear_algebra* is now officially available via the [Conan Center](https://conan.io/center/)
+To add the *linear_algebra* library to your project as a dependency, you need to ensure the the Conan Center is available as a remote, if not add the Conan Center:
+
+```bash
+pip install conan
+conan remote add conancenter https://center.conan.io
+```
+
+Once this is set, you can add the linear_algebra dependency to you project via the following signature:
+
+```bash
+wg21-linear_algebra/0.7.2
+```
+
+Available versions of the Linear Algebra package can be search via Conan:
+
+```bash
+conan search wg21-linear_algebra
+```
+
+### Development Conan Package
+
+To add the development version of the *linear_algebra* library to your project as a dependency, you need to add a remote to Conan that points to the location of the package:
 
 ```bash
 pip install conan
@@ -142,13 +164,13 @@ conan remote add linear_algebra https://twonington.jfrog.io/artifactory/api/cona
 Once this is set, you can add the linear_algebra dependency to you project via the following signature:
 
 ```bash
-linear_algebra/0.7.0@conan-oss/testing
+linear_algebra/0.7.2@conan-oss/testing
 ```
 
 Available versions of the Linear Algebra package can be search via Conan:
 
 ```bash
-conan search linear_algebra
+conan search wg21-linear_algebra
 ```
 
 ### Building the Conan package
