@@ -10,7 +10,6 @@
 #define LINEAR_ALGEBRA_ENGINE_SUPPORT_HPP_DEFINED
 
 namespace STD_LA {
-
 //==================================================================================================
 //  PUBLIC TYPE FORWARD DECLARATIONS
 //==================================================================================================
@@ -236,7 +235,15 @@ struct engine_extents_helper
 };
 
 
-
+//--------------------------------------------------------------------------------------------------
+//  Trait:      layout_type_extractor<ET>
+//  Alias:      get_layout_t<ET>
+//
+//  This private type detector and alias template are used to determine the nested element layout
+//  type alias associated with a matrix engine type ET.  If the engine type does not provide a
+//  layout, then the result is `matrix_layout::arbitrary`.
+//--------------------------------------------------------------------------------------------------
+//
 template<class ET, class = void>
 struct layout_type_extractor
 {
@@ -253,8 +260,17 @@ template<class ET>
 using get_layout_t = typename layout_type_extractor<ET>::layout_type;
 
 
-
-
+//--------------------------------------------------------------------------------------------------
+//  Trait:      transpose_layout_helper<ET>
+//  Alias:      get_transpose_layout_t<ET>
+//
+//  This private type detector and alias template are used to determine the nested element layout
+//  type alias associated with a matrix engine type ET in order to provide a corresponding layout
+//  for a transpose.  For example, if the engine type has a layout of `matrix_layout::row_major`,
+//  the resulting type will be `matrix_layout::column_major`.  If the engine type does not provide
+//  a layout, then the result is `matrix_layout::arbitrary`.
+//--------------------------------------------------------------------------------------------------
+//
 template<class LT>
 struct transpose_layout_helper
 {
