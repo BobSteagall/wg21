@@ -80,13 +80,13 @@ target_sources(wg21_linear_algebra
 
 target_compile_features(wg21_linear_algebra
     INTERFACE
-        cxx_std_20
+        cxx_std_23
 )
 
-#target_compile_definitions(wg21_linear_algebra
-#    INTERFACE
-#        LA_USE_MDSPAN
-#)
+target_compile_definitions(wg21_linear_algebra
+    INTERFACE
+        MDSPAN_USE_BRACKET_OPERATOR
+)
 
 target_link_libraries(wg21_linear_algebra
     INTERFACE
