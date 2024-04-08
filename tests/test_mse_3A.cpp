@@ -594,15 +594,15 @@ TEST(MSE_Matrix_3A, Span)
 
     //- The elements of the const and mutable spans should have the expected values.
     //
-    EXPECT_EQ(sp1(0, 0), 11.0f);
-    EXPECT_EQ(sp1(1, 0), 12.0f);
-    EXPECT_EQ(sp1(2, 0), 13.0f);
-    EXPECT_EQ(sp1(3, 0), 14.0f);
+    EXPECT_EQ((sp1[0, 0]), 11.0f);
+    EXPECT_EQ((sp1[1, 0]), 12.0f);
+    EXPECT_EQ((sp1[2, 0]), 13.0f);
+    EXPECT_EQ((sp1[3, 0]), 14.0f);
 
-    EXPECT_EQ(csp1(0, 0), 11.0f);
-    EXPECT_EQ(csp1(1, 0), 12.0f);
-    EXPECT_EQ(csp1(2, 0), 13.0f);
-    EXPECT_EQ(csp1(3, 0), 14.0f);
+    EXPECT_EQ((csp1[0, 0]), 11.0f);
+    EXPECT_EQ((csp1[1, 0]), 12.0f);
+    EXPECT_EQ((csp1[2, 0]), 13.0f);
+    EXPECT_EQ((csp1[3, 0]), 14.0f);
 
     //- Whole-object comparison between engines and spans should work as expected.
     //
@@ -615,10 +615,10 @@ TEST(MSE_Matrix_3A, Span)
 
     //- Setting values of individual span elements should be reflected in the owning engine.
     //
-    sp1(0, 0) = 111.0f;
-    sp1(1, 0) = 222.0f;
-    sp1(2, 0) = 333.0f;
-    sp1(3, 0) = 444.0f;
+    sp1[0, 0] = 111.0f;
+    sp1[1, 0] = 222.0f;
+    sp1[2, 0] = 333.0f;
+    sp1[3, 0] = 444.0f;
     EXPECT_EQ(e1(0), 111.0f);
     EXPECT_EQ(e1(1), 222.0f);
     EXPECT_EQ(e1(2), 333.0f);

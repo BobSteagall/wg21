@@ -594,15 +594,15 @@ TEST(MSE_Matrix_2B, Span)
 
     //- The elements of the const and mutable spans should have the expected values.
     //
-    EXPECT_EQ(sp1(0, 0), 11.0f);
-    EXPECT_EQ(sp1(0, 1), 12.0f);
-    EXPECT_EQ(sp1(0, 2), 13.0f);
-    EXPECT_EQ(sp1(0, 3), 14.0f);
+    EXPECT_EQ((sp1[0, 0]), 11.0f);
+    EXPECT_EQ((sp1[0, 1]), 12.0f);
+    EXPECT_EQ((sp1[0, 2]), 13.0f);
+    EXPECT_EQ((sp1[0, 3]), 14.0f);
 
-    EXPECT_EQ(csp1(0, 0), 11.0f);
-    EXPECT_EQ(csp1(0, 1), 12.0f);
-    EXPECT_EQ(csp1(0, 2), 13.0f);
-    EXPECT_EQ(csp1(0, 3), 14.0f);
+    EXPECT_EQ((csp1[0, 0]), 11.0f);
+    EXPECT_EQ((csp1[0, 1]), 12.0f);
+    EXPECT_EQ((csp1[0, 2]), 13.0f);
+    EXPECT_EQ((csp1[0, 3]), 14.0f);
 
     //- Whole-object comparison between engines and spans should work as expected.
     //
