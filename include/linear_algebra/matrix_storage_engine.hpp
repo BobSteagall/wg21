@@ -864,6 +864,7 @@ class matrix_storage_engine
     static constexpr ST
     make_mdspan(MSE& mse) noexcept
     {
+#if 0
         if constexpr (this_type::has_dynamic_mdspan)
         {
             using accessor_type = typename ST::accessor_type;
@@ -889,6 +890,15 @@ class matrix_storage_engine
         {
             return ST(mse.m_elems.data());
         }
+#else
+        using traits = detail::mdspan_view_traits<ST>;
+
+        static constexpr bool   is_dyn = this_type::has_dynamic_mdspan;
+        static constexpr bool   is_rml = this_type::has_row_major_layout;
+
+        return traits::template make_matrix<is_dyn, is_rml>
+                        (mse.m_elems.data(), mse.m_rows, mse.m_cols, mse.m_rowcap, mse.m_colcap);
+#endif
     }
 };
 

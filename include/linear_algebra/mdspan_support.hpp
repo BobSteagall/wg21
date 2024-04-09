@@ -17,6 +17,28 @@ using dyn_mdspan_layout  = MDSPAN_NS::layout_stride;
 using dyn_mdspan_mapping = typename dyn_mdspan_layout::mapping<dyn_mdspan_extents>;
 
 //--------------------------------------------------------------------------------------------------
+//  Trait:      is_1d_mdspan<T>
+//  Variable:   is_1d_mdspan_v<T>
+//
+//  This private traits type determines whether its template parameter is a specialization of
+//  mdspan<T, X, L, A> with a one-dimensional extents template parameter.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T>
+struct is_1d_mdspan : public false_type
+{};
+
+template<class T, class IT, size_t X0, class SL, class SA>
+struct is_1d_mdspan<mdspan<T, extents<IT, X0>, SL, SA>> : public true_type
+{};
+
+//------
+//
+template<class T> inline constexpr
+bool    is_1d_mdspan_v = is_1d_mdspan<T>::value;
+
+
+//--------------------------------------------------------------------------------------------------
 //  Trait:      is_2d_mdspan<T>
 //  Variable:   is_2d_mdspan_v<T>
 //
@@ -205,6 +227,7 @@ struct mdspan_view_traits<mdspan<T, extents<IT, X0, X1>, ML, MA>>
 {
     static constexpr bool   has_mdspan = true;
 
+    using matrx_mdspan_type     = mdspan<T, extents<IT, X0, X1>, ML, MA>;
     using negation_mdspan_type  = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, negation_accessor<T, MA>>;
     using conjugate_mdspan_type = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, conjugate_accessor<T, MA>>;
     using hermitian_mdspan_type = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout, conjugate_accessor<T, MA>>;
@@ -276,6 +299,37 @@ struct mdspan_view_traits<mdspan<T, extents<IT, X0, X1>, ML, MA>>
             dyn_mdspan_mapping  map(ext, str);
 
             return submdspan(submatrix_mdspan_type(s.data_handle(), map), row_set, col_set);
+        }
+    }
+
+    template<bool IsDynamic, bool IsRowMajor, class S1, class S2, class S3, class S4>
+    static constexpr matrx_mdspan_type
+    make_matrix(T* pdata, S1 rows, S2 cols, S3 rowcap, S4 colcap)
+    {
+        if constexpr (IsDynamic)
+        {
+            using accessor_type = typename matrx_mdspan_type::accessor_type;
+
+            if constexpr (IsRowMajor)
+            {
+                detail::dyn_mdspan_extents  extents(rows, cols);
+                detail::dyn_mdspan_strides  strides{colcap, 1};
+                detail::dyn_mdspan_mapping  mapping(extents, strides);
+
+                return matrx_mdspan_type(pdata, mapping, accessor_type());
+            }
+            else
+            {
+                detail::dyn_mdspan_extents  extents(rows, cols);
+                detail::dyn_mdspan_strides  strides{1, rowcap};
+                detail::dyn_mdspan_mapping  mapping(extents, strides);
+
+                return matrx_mdspan_type(pdata, mapping, accessor_type());
+            }
+        }
+        else
+        {
+            return matrx_mdspan_type(pdata);
         }
     }
 };
