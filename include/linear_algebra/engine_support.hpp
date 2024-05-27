@@ -110,6 +110,66 @@ bool    is_standard_random_access_container_v = is_standard_random_access_contai
 //  TYPES AND TRAITS DEFINITIONS -- ENGINE-RELATED
 //==================================================================================================
 //--------------------------------------------------------------------------------------------------
+//  Trait:      is_valid_engine_extents<X>
+//  Variable:   is_valid_engine_extents_v<X>
+//
+//  This private traits type is used to validate an engine's extents template argument.  The
+//  extents parameter must be one- or two-dimensional, and each dimension's template argument
+//  must have a value greater than zero or equal to dynamic_extent.
+//--------------------------------------------------------------------------------------------------
+//
+template<class X>
+struct is_valid_engine_extents : public false_type {};
+
+template<size_t N>
+struct is_valid_engine_extents<extents<size_t, N>>
+{
+    static constexpr bool   value = (N == dynamic_extent || N > 0);
+};
+
+template<size_t R, size_t C>
+struct is_valid_engine_extents<extents<size_t, R, C>>
+{
+    static constexpr bool   value = (R == dynamic_extent || R > 0) && (C == dynamic_extent || C > 0);
+};
+
+//------
+//
+template<class X> inline constexpr
+bool    is_valid_engine_extents_v = is_valid_engine_extents<X>::value;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Trait:      is_valid_fixed_engine_extents<X>
+//  Variable:   is_valid_fixed_engine_extents_v<X>
+//
+//  This private traits type is used to validate an engine's extents template argument.  The
+//  extents parameter must be one- or two-dimensional, and each dimension's template argument
+//  must have a value greater than zero.
+//--------------------------------------------------------------------------------------------------
+//
+template<class X>
+struct is_valid_fixed_engine_extents : public std::false_type {};
+
+template<size_t N>
+struct is_valid_fixed_engine_extents<extents<size_t, N>>
+{
+    static constexpr bool   value = (N > 0  &&  N != dynamic_extent);
+};
+
+template<size_t R, size_t C>
+struct is_valid_fixed_engine_extents<extents<size_t, R, C>>
+{
+    static constexpr bool   value = (R > 0  &&  R!= dynamic_extent) && (C > 0  &&  C!= dynamic_extent);
+};
+
+//------
+//
+template<class X> inline constexpr
+bool    is_valid_fixed_engine_extents_v = is_valid_fixed_engine_extents<X>::value;
+
+
+//--------------------------------------------------------------------------------------------------
 //  Trait:      has_owning_engine_type_alias<ET>
 //  Alias:      get_owning_engine_type_t<ET>
 //  Variable:   is_owning_engine_type_v<ET>
@@ -484,6 +544,28 @@ concept valid_allocator_arg = no_allocator<AT> or valid_allocator_interface<T, A
 
 
 //--------------------------------------------------------------------------------------------------
+//  Concepts:   valid_engine_extents<X>
+//
+//  This private concept is used to validate the second template parameter of a specialization
+//  of matrix_storage_engine, the engine's extents type.
+//--------------------------------------------------------------------------------------------------
+//
+template<typename X>
+concept valid_engine_extents = is_valid_engine_extents_v<X>;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concepts:   valid_fixed_engine_extents<X>
+//
+//  This private concept is used to validate the second template parameter of a specialization
+//  of matrix_storage_engine, the engine's extents type for non-resizable engines
+//--------------------------------------------------------------------------------------------------
+//
+template<typename X>
+concept valid_fixed_engine_extents = is_valid_fixed_engine_extents_v<X>;
+
+
+//--------------------------------------------------------------------------------------------------
 //  Concept:    valid_engine_extents_and_allocator<T, X, A>
 //
 //  This private concept determines whether a given combination of element type T, allocator A,
@@ -492,12 +574,17 @@ concept valid_allocator_arg = no_allocator<AT> or valid_allocator_interface<T, A
 //  2. There is a valid allocator, the extent arguments are valid for fixed-size or dynamic-sized.
 //--------------------------------------------------------------------------------------------------
 //
-template<typename T, size_t R, size_t C, typename A>
+template<typename T, typename X, typename A>
 concept valid_engine_extents_and_allocator =
+    (no_allocator<A> and is_valid_fixed_engine_extents_v<X>)
+    or
+    (valid_allocator_interface<T, A> and is_valid_engine_extents_v<X>);
+
+template<typename T, size_t R, size_t C, typename A>
+concept valid_engine_extents_and_allocator2 =
     (no_allocator<A> and valid_fixed_engine_size<R, C>)
     or
     (valid_allocator_interface<T, A> and valid_engine_size<R, C>);
-
 
 //--------------------------------------------------------------------------------------------------
 //  Concepts:   valid_layout_for_storage_engine<L>
@@ -656,6 +743,66 @@ concept engine_is_not_2d_indexable =
     {
         { eng(i, i) };
     };
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    readable_vector_engine<ET>
+//
+//  This private concept determines whether a prospective vector engine type provides the
+//  readability interface required to function correctly with basic_vector<ET, OT>.
+//
+//  Engine types that fulfill this concept may have the value of their elements read via one-
+//  dimensional indexing, their element sizes and capacities read, and publicly declare several
+//  important nested type aliases.  They do not have two-dimensional indexing.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET>
+concept readable_vector_engine =
+    readable_engine_fundamentals<ET>
+    and
+    engine_has_valid_1d_const_indexing<ET>
+    and
+    engine_is_not_2d_indexable<ET>;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    spannable_vector_engine<ET>
+//
+//  This private concept determines whether a prospective vector engine type provides the
+//  correct nested mdspan types optionally required by basic_vector<ET, OT>.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET>
+concept spannable_vector_engine =
+    readable_vector_engine<ET>
+    and
+    requires (ET const& ceng, ET& meng)
+    {
+        typename ET::span_type;
+        typename ET::const_span_type;
+        requires is_1d_mdspan_v<typename ET::span_type>;
+        requires is_1d_mdspan_v<typename ET::const_span_type>;
+        { meng.span() } -> same_as<typename ET::span_type>;
+        { ceng.span() } -> same_as_either<typename ET::const_span_type, typename ET::span_type>;
+    };
+
+
+//--------------------------------------------------------------------------------------------------
+//  Concept:    writable_vector_engine<ET>
+//
+//  This private concept determines whether a prospective vector engine type provides the
+//  writability interface required to function correctly with basic_vector<ET, OT>.
+//
+//  Engine types that fulfill this concept fulfill the corresponding readable_vector_engine<ET>
+//  concept, and also permit the value of their elements to be changed via one-dimensional
+//  indexing.
+//--------------------------------------------------------------------------------------------------
+//
+template<class ET>
+concept writable_vector_engine =
+    readable_vector_engine<ET>
+    and
+    engine_has_valid_1d_mutable_indexing<ET>;
 
 
 //--------------------------------------------------------------------------------------------------

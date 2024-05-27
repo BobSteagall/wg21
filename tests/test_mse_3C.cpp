@@ -10,10 +10,10 @@ using st = std::size_t;
 //  Unit tests for resizable, dynamically allocated matrix engine, Case 3C (column matrix)
 //==================================================================================================
 //
-using mse_f_df_cm = matrix_storage_engine<float, std::dynamic_extent, 1, std::allocator<float>, matrix_layout::column_major>;
-using mse_f_df_rm = matrix_storage_engine<float, std::dynamic_extent, 1, std::allocator<float>, matrix_layout::row_major>;
-using mse_i_df_cm = matrix_storage_engine<int,   std::dynamic_extent, 1, std::allocator<int>, matrix_layout::column_major>;
-using mse_d_df_rm = matrix_storage_engine<double, std::dynamic_extent, 1, std::allocator<double>, matrix_layout::row_major>;
+using mse_f_df_cm = matrix_storage_engine<float, extents<size_t, std::dynamic_extent, 1>, std::allocator<float>, matrix_layout::column_major>;
+using mse_f_df_rm = matrix_storage_engine<float, extents<size_t, std::dynamic_extent, 1>, std::allocator<float>, matrix_layout::row_major>;
+using mse_i_df_cm = matrix_storage_engine<int,   extents<size_t, std::dynamic_extent, 1>, std::allocator<int>, matrix_layout::column_major>;
+using mse_d_df_rm = matrix_storage_engine<double, extents<size_t, std::dynamic_extent, 1>, std::allocator<double>, matrix_layout::row_major>;
 
 using msupport = matrix_engine_support;
 

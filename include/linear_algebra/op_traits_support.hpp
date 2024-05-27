@@ -18,7 +18,7 @@ namespace detail {
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, size_t R, size_t C, class AT, class LT>
-struct engine_extents_helper<matrix_storage_engine<T, R, C, AT, LT>>
+struct engine_extents_helper<matrix_storage_engine<T, extents<size_t, R, C>, AT, LT>>
 {
     static constexpr size_t
     columns()
@@ -137,8 +137,8 @@ struct engine_allocation_traits
 template<class T1, size_t R1, size_t C1, class AT1, class LT1,
          class T2, size_t R2, size_t C2, class AT2, class LT2,
          bool DX, size_t RR, size_t CR, class T>
-struct engine_allocation_traits<matrix_storage_engine<T1, R1, C1, AT1, LT1>,
-                                matrix_storage_engine<T2, R2, C2, AT2, LT2>,
+struct engine_allocation_traits<matrix_storage_engine<T1, extents<size_t, R1, C1>, AT1, LT1>,
+                                matrix_storage_engine<T2, extents<size_t, R2, C2>, AT2, LT2>,
                                 DX, RR, CR, T>
 {
     using allocator_type = typename mse_allocation_traits<AT1, AT2, T>::allocator_type;

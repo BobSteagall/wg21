@@ -21,7 +21,7 @@ elseif(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     conan_basic_setup()
     find_package(mdspan CONFIG REQUIRED)
 else()
-    FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git GIT_TAG stable) #5694f21c39f3b948d06a0c63b9c219bf802e28a8)
+    FetchContent_Declare(mdspan GIT_REPOSITORY https://github.com/kokkos/mdspan.git GIT_TAG stable)
     FetchContent_MakeAvailable(mdspan)
 endif()
 

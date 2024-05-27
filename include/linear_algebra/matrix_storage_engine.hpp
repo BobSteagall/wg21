@@ -11,9 +11,131 @@
 namespace STD_LA {
 namespace detail {
 //--------------------------------------------------------------------------------------------------
+//  Class Template:     mse_data<T, X, A, L>
+//
+//  Thie type contains and manages elements on behalf of matrix_storage_engine<T,X,A,L>.
+//
+//  Partial specializations of this class template are tailored to specific corresponding partial
+//  specializations of matrix_storage_engine.  They provide the special member functions that make
+//  sense for each valid set of template arguments.
+//
+//  This implementation assumes that all dynamically-allocated memory is default-constructed,
+//  with the consequence that elements lying in unused capacity are also constructed with value
+//  equal to that of a value-initialized element (i.e., "0").
+//
+//  This assumption makes implementation easy, but may be absent in the final version.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T, class X, class A, class L>    struct mse_data;
+
+
+//--------------------------------------------------------------------------------------------------
+//  Specialization:     mse_data<T, extents<size_t, N>, void, void>
+//
+//  Manages elements representing a fixed-size unoriented vector of N elements.  Its elements are
+//  implemented as member data in a std::array.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T, size_t N>
+struct mse_data<T, extents<size_t, N>, void, void>
+{
+    using array_type        = std::array<T, N>;
+    using mdspan_type       = mdspan<T, extents<size_t, N>>;
+    using const_mdspan_type = mdspan<T const, extents<size_t, N>>;
+
+    static constexpr bool   is_reshapable = false;
+
+    static constexpr size_t     m_size = N;
+    static constexpr size_t     m_cap  = N;
+
+    array_type  m_elems;
+
+    ~mse_data() = default;
+
+    constexpr mse_data()
+    :   m_elems()
+    {
+        if constexpr (!std::is_class_v<T>)
+        {
+            for (auto& elem : m_elems) elem = T{};
+        }
+    }
+    constexpr mse_data(mse_data&&) noexcept = default;
+    constexpr mse_data(mse_data const&) = default;
+    constexpr mse_data&     operator =(mse_data&&) noexcept = default;
+    constexpr mse_data&     operator =(mse_data const&) = default;
+};
+
+
+//--------------------------------------------------------------------------------------------------
+//  Specialization:     mse_data<T, extents<size_t, N>, A, void>
+//
+//  Manages elements representing a fixed-size unoriented vector of N elements.  Its elements are
+//  implemented as member data in a std::vector.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T, size_t N, class AT>
+struct mse_data<T, extents<size_t, N>, AT, void>
+{
+    using array_type        = std::vector<T, AT>;
+    using mdspan_type       = mdspan<T, extents<size_t, N>>;
+    using const_mdspan_type = mdspan<T const, extents<size_t, N>>;
+
+    static constexpr bool   is_reshapable = false;
+
+    static constexpr size_t     m_size = N;
+    static constexpr size_t     m_cap  = N;
+
+    array_type  m_elems;
+
+    ~mse_data() = default;
+
+    mse_data()
+    :   m_elems(N)
+    {}
+    mse_data(mse_data&&) noexcept = default;
+    mse_data(mse_data const&) = default;
+    mse_data&   operator =(mse_data&&) noexcept = default;
+    mse_data&   operator =(mse_data const&) = default;
+};
+
+
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     mse_data<T, extents<size_t, dynamic_extent>, AT, void>
+//
+//  Manages elements representing a dynamically-resizable unoriented vector.  Its elements are
+//  implemented as member data in a std::vector.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T, class AT>
+struct mse_data<T, extents<size_t, dynamic_extent>, AT, void>
+{
+    using array_type        = std::vector<T, AT>;
+    using mdspan_type       = mdspan<T, extents<size_t, dynamic_extent>>;
+    using const_mdspan_type = mdspan<T const, extents<size_t, dynamic_extent>>;
+
+    static constexpr bool   is_reshapable = true;
+
+    array_type  m_elems;
+    size_t      m_size;
+    size_t      m_cap;
+
+    ~mse_data() = default;
+
+    constexpr mse_data()
+    :   m_elems(), m_size(0), m_cap(0)
+    {}
+    constexpr mse_data(mse_data&&) noexcept = default;
+    constexpr mse_data(mse_data const&) = default;
+    constexpr mse_data&     operator =(mse_data&&) noexcept = default;
+    constexpr mse_data&     operator =(mse_data const&) = default;
+};
+
+
+//--------------------------------------------------------------------------------------------------
 //  Class Template:     mse_data<T, R, C, AT, LT>
 //
-//  Thie type contains and manages elements on behalf of matrix_storage_engine<T,R,C,AT,LT>.
+//  Thie type contains and manages elements on behalf of matrix_storage_engine<T,X,AT,LT>.
 //
 //  Partial specializations of this class template are tailored to specific combinations of
 //  template arguments of matrix_storage_engine.  They provide the special member functions
@@ -30,7 +152,7 @@ namespace detail {
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, size_t R, size_t C, class AT, class LT>
-struct mse_data
+struct mse_data<T, extents<size_t, R, C>, AT, LT>
 {
     using array_type        = std::vector<T, AT>;
     using mdspan_type       = mdspan<T, extents<size_t, R, C>, get_mdspan_layout_t<LT>>;
@@ -76,7 +198,7 @@ struct mse_data
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, size_t R, size_t C, class LT>
-struct mse_data<T, R, C, void, LT>
+struct mse_data<T, extents<size_t, R, C>, void, LT>
 {
     using array_type        = std::array<T, R*C>;
     using mdspan_type       = mdspan<T, extents<size_t, R, C>, get_mdspan_layout_t<LT>>;
@@ -128,7 +250,7 @@ struct mse_data<T, R, C, void, LT>
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, size_t R, class AT, class LT>
-struct mse_data<T, R, std::dynamic_extent, AT, LT>
+struct mse_data<T, extents<size_t, R, dynamic_extent>, AT, LT>
 {
     using array_type        = std::vector<T, AT>;
     using mdspan_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
@@ -175,7 +297,7 @@ struct mse_data<T, R, std::dynamic_extent, AT, LT>
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, size_t C, class AT, class LT>
-struct mse_data<T, std::dynamic_extent, C, AT, LT>
+struct mse_data<T, extents<size_t, dynamic_extent, C>, AT, LT>
 {
     using array_type        = std::vector<T, AT>;
     using mdspan_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
@@ -222,7 +344,7 @@ struct mse_data<T, std::dynamic_extent, C, AT, LT>
 //--------------------------------------------------------------------------------------------------
 //
 template<class T, class AT, class LT>
-struct mse_data<T, std::dynamic_extent, std::dynamic_extent, AT, LT>
+struct mse_data<T, extents<size_t, dynamic_extent, dynamic_extent>, AT, LT>
 {
     using array_type        = std::vector<T, AT>;
     using mdspan_type       = mdspan<T, dyn_mdspan_extents, dyn_mdspan_layout>;
@@ -262,7 +384,7 @@ struct mse_data<T, std::dynamic_extent, std::dynamic_extent, AT, LT>
 }       //- detail namespace
 //==================================================================================================
 //==================================================================================================
-//  Class Template:     matrix_storage_engine<T, R, C, AT, LT>
+//  Class Template:     matrix_storage_engine<T, X, AT, LT>
 //
 //  This class template implements an owning engine for use by class template matrix<ET, OT>.
 //  Specifically, it models a mathematical matrix with R rows and C columns, employing an
@@ -278,16 +400,19 @@ struct mse_data<T, std::dynamic_extent, std::dynamic_extent, AT, LT>
 //  lying in unused capacity are default-constructed.
 //--------------------------------------------------------------------------------------------------
 //
+template<class T, class X, class AT, class LT>
+class matrix_storage_engine;
+
 template<class T, size_t R, size_t C, class AT, class LT>
 requires
-    detail::valid_engine_extents_and_allocator<T, R, C, AT>
+    detail::valid_engine_extents_and_allocator<T, extents<size_t, R, C>, AT>
     and
     detail::valid_layout_for_storage_engine<LT>
-class matrix_storage_engine
+class matrix_storage_engine<T, extents<size_t, R, C>, AT, LT>
 {
     using this_type      = matrix_storage_engine;
     using support_traits = detail::matrix_engine_support;
-    using storage_type   = detail::mse_data<T, R, C, AT, LT>;
+    using storage_type   = detail::mse_data<T, extents<size_t, R, C>, AT, LT>;
 
     static constexpr bool   has_dynamic_mdspan      = storage_type::has_dynamic_mdspan;
     static constexpr bool   has_column_major_layout = storage_type::is_column_major;
@@ -901,6 +1026,274 @@ class matrix_storage_engine
 #endif
     }
 };
+
+//--------------------------------------------------------------------------------------------------
+//  Partial Specialization:     matrix_storage_engine<T, extents<size_t, N>, AT, LT>
+//
+//  This partial specialization of matrix_storage_engine<T,X,A,L> implements an owning engine
+//  for use by class template basic_vector<ET, OT>.  Specifically, it models a mathematical
+//  vector having N elements, employing allocator A, and having element layout L.
+//
+//  Size N may be a positive integer, or have the value "dynamic_extent" (defined by the
+//  mdspan facilities).  Allocator type A may be void, which indicates internal non-heap
+//  element storage, or it may be an allocator type that fulfills all the requirements imposed
+//  by std::allocator_traits.  Layout type L must be "unspecified".
+//
+//  This specialization assumes that all dynamically-allocated memory is default-constructed,
+//  with the consequence that elements lying in unused capacity are also constructed.  This
+//  assumption makes implementation easy, but may be absent in the final version.
+//--------------------------------------------------------------------------------------------------
+//
+template<class T, size_t N, class AT, class LT>
+requires
+    detail::valid_engine_extents_and_allocator<T, extents<size_t, N>, AT>
+//    and
+//    detail::valid_layout_for_1d_storage_engine<LT>
+class matrix_storage_engine<T, extents<size_t, N>, AT, LT>
+{
+    using this_type      = matrix_storage_engine;
+    using storage_type   = detail::mse_data<T, extents<size_t, N>, AT, LT>;
+    using support_traits = detail::matrix_engine_support;
+
+    static constexpr bool   is_reshapable = storage_type::is_reshapable;
+
+  private:
+    storage_type    m_data;
+
+  public:
+    using value_type        = T;
+    using allocator_type    = AT;
+    using element_type      = value_type;
+    using reference         = element_type&;
+    using const_reference   = element_type const&;
+    using index_type        = size_t;
+    using mdspan_type       = typename storage_type::mdspan_type;
+    using const_mdspan_type = typename storage_type::const_mdspan_type;
+
+  public:
+    ~matrix_storage_engine() = default;
+
+    //- Construct / assign.
+    //
+    constexpr matrix_storage_engine() = default;
+    constexpr matrix_storage_engine(matrix_storage_engine&&) noexcept = default;
+    constexpr matrix_storage_engine(matrix_storage_engine const&) = default;
+
+    constexpr matrix_storage_engine&    operator =(matrix_storage_engine&&) noexcept = default;
+    constexpr matrix_storage_engine&    operator =(matrix_storage_engine const&) = default;
+
+    //- Heterogeneous constructors.
+    //
+    constexpr
+    matrix_storage_engine(index_type size)
+    requires
+        this_type::is_reshapable
+    :   m_data()
+    {
+        do_reshape(size, size);
+    }
+
+    constexpr
+    matrix_storage_engine(index_type size, index_type cap)
+    requires
+        this_type::is_reshapable
+    :   m_data()
+    {
+        do_reshape(size, cap);
+    }
+
+    template<class ET2>
+    constexpr
+    matrix_storage_engine(ET2 const& rhs)
+    requires
+        detail::readable_vector_engine<ET2>
+        and
+        detail::convertible_from<element_type, typename ET2::element_type>
+    :   m_data()
+    {
+        support_traits::assign_from(*this, rhs);
+    }
+
+    template<class CT>
+    constexpr
+    matrix_storage_engine(CT const& rhs)
+    requires
+        detail::standard_random_access_container<CT>
+        and
+        detail::convertible_from<element_type, typename CT::value_type>
+    :   m_data()
+    {
+        support_traits::assign_from(*this, rhs);
+    }
+
+    template<class U, ptrdiff_t X0, class SL, class SA>
+    constexpr
+    matrix_storage_engine(mdspan<U, extents<size_t, X0>, SL, SA> const& rhs)
+    requires
+        detail::convertible_from<element_type, U>
+    :   m_data()
+    {
+        support_traits::assign_from(*this, rhs);
+    }
+
+    template<class U>
+    constexpr
+    matrix_storage_engine(initializer_list<U> rhs)
+    requires
+        detail::convertible_from<element_type, U>
+    :   m_data()
+    {
+        support_traits::assign_from(*this, rhs);
+    }
+
+    //- Heterogeneous assignment operators.
+    //
+    template<class ET2>
+    constexpr matrix_storage_engine&
+    operator =(ET2 const& rhs)
+    requires
+        detail::readable_vector_engine<ET2>
+        and
+        detail::convertible_from<element_type, typename ET2::element_type>
+    {
+        support_traits::assign_from(*this, rhs);
+        return *this;
+    }
+
+    template<class CT>
+    constexpr matrix_storage_engine&
+    operator =(CT const& rhs)
+    requires
+        detail::standard_random_access_container<CT>
+        and
+        detail::convertible_from<element_type, typename CT::value_type>
+    {
+        support_traits::assign_from(*this, rhs);
+        return *this;
+    }
+
+    template<class U, ptrdiff_t X0, class SL, class SA>
+    constexpr matrix_storage_engine&
+    operator =(mdspan<U, extents<size_t, X0>, SL, SA> const& rhs)
+    requires
+        detail::convertible_from<element_type, U>
+    {
+        support_traits::assign_from(*this, rhs);
+        return *this;
+    }
+
+    template<class U>
+    constexpr matrix_storage_engine&
+    operator =(initializer_list<U> rhs)
+    requires
+        detail::convertible_from<element_type, U>
+    {
+        support_traits::assign_from(*this, rhs);
+        return *this;
+    }
+
+    //- Size and capacity reporting.
+    //
+    constexpr index_type
+    size() const noexcept
+    {
+        return m_data.m_size;
+    }
+
+    constexpr index_type
+    capacity() const noexcept
+    {
+        return m_data.m_cap;
+    }
+
+    //- Setting overall size and capacity.
+    //
+    void
+    reshape(index_type newsize, index_type newcap)
+    requires
+        this_type::is_reshapable
+    {
+        do_reshape(newsize, newcap);
+    }
+
+    //- Element access
+    //
+    constexpr reference
+    operator ()(index_type i)
+    {
+        return m_data.m_elems[i];
+    }
+
+    constexpr const_reference
+    operator ()(index_type i) const
+    {
+        return m_data.m_elems[i];
+    }
+
+    constexpr mdspan_type
+    span() noexcept
+    {
+        return {}; //make_mdspan<mdspan_type, storage_type>(m_data);
+    }
+
+    constexpr const_mdspan_type
+    span() const noexcept
+    {
+        return {}; //make_mdspan<const_mdspan_type, storage_type const>(m_data);
+    }
+
+    //- Modifiers
+    //
+    constexpr void
+    swap(matrix_storage_engine& rhs) noexcept
+    {
+        support_traits::swap(m_data, rhs.m_data);
+    }
+
+  private:
+    constexpr void
+    do_reshape(ptrdiff_t newsize, ptrdiff_t newcap)
+    requires
+        this_type::is_reshapable
+    {
+        if (newsize == m_data.m_size) return;
+
+        support_traits::verify_size(newsize);
+        support_traits::verify_capacity(newcap);
+
+        //- Only allocate new storage if it is needed.
+        //
+        if (newsize > m_data.m_cap  ||  newcap != m_data.m_cap)
+        {
+            //- Normalize requested new capacity.
+            //
+            newcap = std::max(newsize, newcap);
+
+            //- Prepare a temporary engine to receive elements from this one.
+            //
+            this_type   tmp;
+            tmp.m_data.m_elems.resize(newcap);
+            tmp.m_data.m_size = newsize;
+            tmp.m_data.m_cap  = newcap;
+
+            //- Move the appropriate subset of elements into the temporary engine, then swap.
+            //
+            ptrdiff_t   dst_size = std::min(newsize, m_data.m_size);
+            support_traits::move_elements(tmp, *this, dst_size);
+            support_traits::swap(m_data, tmp.m_data);
+        }
+        else
+        {
+            if (newsize < m_data.m_size)
+            {
+                support_traits::fill_rows(*this, newsize, m_data.m_size, T{});
+                m_data.m_size = newsize;
+            }
+        }
+    }
+};
+
+
 
 }       //- STD_LA namespace
 #endif  //- LINEAR_ALGEBRA_MATRIX_STORAGE_ENGINE_HPP_DEFINED

@@ -10,10 +10,10 @@ using st = std::size_t;
 //  Unit tests for fixed-size, dynamically allocated matrix engine, Case 2B (row matrix)
 //==================================================================================================
 //
-using mse_f_ffa_cm = matrix_storage_engine<float, 1, 4, std::allocator<float>, matrix_layout::column_major>;
-using mse_f_ffa_rm = matrix_storage_engine<float, 1, 4, std::allocator<float>, matrix_layout::row_major>;
-using mse_i_ffa_cm = matrix_storage_engine<int, 1, 4, std::allocator<int>, matrix_layout::column_major>;
-using mse_d_ffa_rm = matrix_storage_engine<double, 1, 4, std::allocator<double>, matrix_layout::column_major>;
+using mse_f_ffa_cm = matrix_storage_engine<float, extents<size_t, 1, 4>, std::allocator<float>, matrix_layout::column_major>;
+using mse_f_ffa_rm = matrix_storage_engine<float, extents<size_t, 1, 4>, std::allocator<float>, matrix_layout::row_major>;
+using mse_i_ffa_cm = matrix_storage_engine<int,   extents<size_t, 1, 4>, std::allocator<int>, matrix_layout::column_major>;
+using mse_d_ffa_rm = matrix_storage_engine<double, extents<size_t, 1, 4>, std::allocator<double>, matrix_layout::column_major>;
 
 using msupport = matrix_engine_support;
 

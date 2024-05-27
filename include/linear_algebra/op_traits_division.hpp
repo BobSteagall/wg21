@@ -177,10 +177,11 @@ struct default_division_engine_traits
     using layout_type_1 = get_layout_t<ET1>;
     using layout_traits = division_layout_traits_t<COTR, layout_type_1, layout_type_1>;
     using layout_type   = typename layout_traits::layout_type;
+    using extents_type  = extents<size_t, RR, CR>;
 
   public:
     using element_type = elem_type;
-    using engine_type  = matrix_storage_engine<element_type, RR, CR, allocator_type, layout_type>;
+    using engine_type  = matrix_storage_engine<element_type, extents_type, allocator_type, layout_type>;
 };
 
 
