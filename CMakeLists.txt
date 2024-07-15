@@ -12,7 +12,11 @@ include(GNUInstallDirs)
 include(CMakeDependentOption)
 include(CMakePackageConfigHelpers)
 
-if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
+option(USE_EXTERNAL_MDSPAN "Use external copy of mdspan" OFF)
+
+if(${USE_EXTERNAL_MDSPAN})
+    find_package(mdspan CONFIG REQUIRED)
+elseif(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
     include(${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
     conan_basic_setup()
     find_package(mdspan CONFIG REQUIRED)
