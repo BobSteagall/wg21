@@ -71,11 +71,11 @@ target_sources(wg21_linear_algebra
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/matrix_storage_engine.hpp>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/matrix_view_engine.hpp>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/mdspan_support.hpp>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/opt_traits_addition.hpp>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/opt_traits_division.hpp>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/opt_traits_multiplication.hpp>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/opt_traits_subtraction.hpp>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/opt_traits_support.hpp>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/op_traits_addition.hpp>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/op_traits_division.hpp>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/op_traits_multiplication.hpp>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/op_traits_subtraction.hpp>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/op_traits_support.hpp>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/linear_algebra/operation_traits.hpp>
 )
 
@@ -109,8 +109,6 @@ if (${LA_INSTALL})
             "${CMAKE_CURRENT_SOURCE_DIR}/include/"
         DESTINATION
             ${CMAKE_INSTALL_INCLUDEDIR}
-        FILES_MATCHING PATTERN
-            "*.hpp"
     )
 
     install(
